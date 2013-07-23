@@ -14,14 +14,13 @@
 #ifdef _OPENMP 
   #include <omp.h>
 #endif 
-/*#ifdef __APPLE__
+#ifdef __APPLE__
   #include <Accelerate/Accelerate.h>
 #elif __unix__
   #include <cblas.h>
 #else
   #include <cblas.h>
-#endif */ 
-#include <Accelerate/Accelerate.h> 
+#endif
 #include "purify_visibility.h"
 #include "purify_sparsemat.h"
 #include "purify_image.h"
@@ -43,9 +42,6 @@
 
 int main(int argc, char *argv[]) {
 
-  
- 
-
   int i, j, Nx, Ny, Nr, Nb;
   int seedn=54;
   double sigma;
@@ -57,7 +53,6 @@ int main(int argc, char *argv[]) {
   double aux1, aux2;
   complex double alpha;
   
-
   purify_image img, img_copy;
   purify_visibility_filetype filetype_vis;
   purify_image_filetype filetype_img;
