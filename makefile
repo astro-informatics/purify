@@ -3,9 +3,9 @@
 CC      = gcc
 #OPT	= -Wall -g \
 #          -DPURIFY_VERSION=\"0.1\" -DPURIFY_BUILD=\"`svnversion -n .`\"
-OPT	= -Wall -O3 -fopenmp -framework Accelerate\
-          -DSZIP_VERSION=\"0.1\" \
-          -DSZIP_BUILD=\"`svnversion -n .`\"
+OPT	= -Wall -O3 -fopenmp \
+          -DPURIFY_VERSION=\"0.1\" \
+          -DPURIFY_BUILD=\"`git rev-parse HEAD`\"
 
 
 # ======== LINKS ========
@@ -61,11 +61,18 @@ FFLAGS  = -I$(FFTWINC) -I$(CFITSIOINC) -I$(PURIFYINC) -I$(SOPTINC) -I$(TIFFINC)
 
 # ======== LDFLAGS ========
 
-LDFLAGS = -L$(PURIFYLIB) -l$(PURIFYLIBNM)         \
-          -L$(SOPTLIB) -l$(SOPTLIBNM)             \
-          -L$(CFITSIOLIB) -l$(CFITSIOLIBNM)       \
-          -L$(FFTWLIB) -l$(FFTWLIBNM)             \
-          -L$(TIFFLIB) -l$(TIFFLIBNM) -lm
+ifeq ($(UNAME), Linux)
+  LDFLAGS = -static 
+endif
+ifeq ($(UNAME), Darwin)
+  LDFLAGS = 
+endif
+LDFLAGS += -L$(PURIFYLIB) -l$(PURIFYLIBNM)         \
+           -L$(SOPTLIB) -l$(SOPTLIBNM)             \
+           -L$(CFITSIOLIB) -l$(CFITSIOLIBNM)       \
+           -L$(FFTWLIB) -l$(FFTWLIBNM)             \
+           -L$(TIFFLIB) -l$(TIFFLIBNM)
+LDFLAGS += -lm -lblas
 
 
 # ======== OBJECT FILES TO MAKE ========
@@ -87,11 +94,11 @@ PURIFYHEADERS = purify_error.h                   \
                 purify_utils.h                   \
                 purify_sparsemat.h 
 
-PURIFYPROGS = $(PURIFYBIN)/example_m31          \
+PURIFYPROGS = $(PURIFYBIN)/purify_about         \
+              $(PURIFYBIN)/example_m31          \
               $(PURIFYBIN)/example_30dor        \
-              $(PURIFYBIN)/example_ami   
-              
-              
+              $(PURIFYBIN)/example_ami  
+
 
 # ======== MAKE RULES ========
 

@@ -23,7 +23,10 @@
 #else
   #include <cblas.h>
 #endif 
+<<<<<<< HEAD
 #include <Accelerate/Accelerate.h> 
+=======
+>>>>>>> 22b01d4cba728be4bf56c6dff0f1b5573ee51812
 #include "purify_visibility.h"
 #include "purify_sparsemat.h"
 #include "purify_image.h"

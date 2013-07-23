@@ -28,8 +28,8 @@ EXPERIMENTS
 
 REFERENCES
   When referencing this code, please cite our related paper:
-    [1] R. E. Carrillo, J. D. McEwen and Y. Wiaux.  
-    "Why CLEAN when you can PURIFY?", submitted to MNRAS, 2013.
+    [1] R. E. Carrillo, J. D. McEwen and Y. Wiaux.  "Why CLEAN when
+    you can PURIFY?", submitted to MNRAS, 2013 (arXiv:arXiv:1307.4370).  
     Preprint available at http://infoscience.epfl.ch/record/187457.
 
 DOCUMENTATION
