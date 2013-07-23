@@ -16,13 +16,13 @@
 #ifdef _OPENMP 
   #include <omp.h>
 #endif 
-/*#ifdef __APPLE__
+#ifdef __APPLE__
   #include <Accelerate/Accelerate.h>
 #elif __unix__
   #include <cblas.h>
 #else
   #include <cblas.h>
-#endif */ 
+#endif 
 #include <Accelerate/Accelerate.h> 
 #include "purify_visibility.h"
 #include "purify_sparsemat.h"
@@ -433,7 +433,11 @@ int main(int argc, char *argv[]) {
       xoutc[i] = 0.0 + 0.0*I;
   }
  
-  assert((start = clock())!=-1);
+  #ifdef _OPENMP 
+    start1 = omp_get_wtime();
+  #else
+    assert((start = clock())!=-1);
+  #endif
   sopt_l1_sdmm((void*)xoutc, Nx,
                    &purify_measurement_cftfwd,
                    datafwd,
@@ -446,8 +450,13 @@ int main(int argc, char *argv[]) {
                    Nr,
                    (void*)y, Ny, w, param4);
 
-  stop = clock();
-  t = (double) (stop-start)/CLOCKS_PER_SEC;
+  #ifdef _OPENMP 
+    stop1 = omp_get_wtime();
+    t = stop1 - start1;
+  #else
+    stop = clock();
+    t = (double) (stop-start)/CLOCKS_PER_SEC;
+  #endif
 
   printf("Time BPSA: %f \n\n", t); 
 
@@ -504,8 +513,11 @@ int main(int argc, char *argv[]) {
   param5.sigma = sigma*sqrt((double)Ny/(double)Nr);
   param5.init_sol = 1;
 
-  
-  start1 = omp_get_wtime();
+  #ifdef _OPENMP 
+    start1 = omp_get_wtime();
+  #else
+    assert((start = clock())!=-1);
+  #endif
   sopt_l1_rwsdmm((void*)xoutc, Nx,
                    &purify_measurement_cftfwd,
                    datafwd,
@@ -518,8 +530,13 @@ int main(int argc, char *argv[]) {
                    Nr,
                    (void*)y, Ny, param4, param5);
 
-  stop1 = omp_get_wtime();
-  t = stop1 - start1;
+  #ifdef _OPENMP 
+    stop1 = omp_get_wtime();
+    t = stop1 - start1;
+  #else
+    stop = clock();
+    t = (double) (stop-start)/CLOCKS_PER_SEC;
+  #endif
 
   printf("Time SARA: %f \n\n", t); 
 

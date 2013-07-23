@@ -14,13 +14,13 @@
 #ifdef _OPENMP 
   #include <omp.h>
 #endif 
-/*#ifdef __APPLE__
+#ifdef __APPLE__
   #include <Accelerate/Accelerate.h>
 #elif __unix__
   #include <cblas.h>
 #else
   #include <cblas.h>
-#endif */ 
+#endif 
 #include <Accelerate/Accelerate.h> 
 #include "purify_visibility.h"
 #include "purify_sparsemat.h"
@@ -97,6 +97,7 @@ int main(int argc, char *argv[]) {
 
   clock_t start, stop;
   double t = 0.0;
+  double start1, stop1;
   int dimy, dimx;
   
   //Image dimension of the zero padded image
@@ -362,7 +363,11 @@ int main(int argc, char *argv[]) {
       xoutc[i] = 0.0 + 0.0*I;
   }
  
-  assert((start = clock())!=-1);
+  #ifdef _OPENMP 
+    start1 = omp_get_wtime();
+  #else
+    assert((start = clock())!=-1);
+  #endif
   sopt_l1_sdmm((void*)xoutc, Nx,
                    &purify_measurement_cftfwd,
                    datafwd,
@@ -375,8 +380,13 @@ int main(int argc, char *argv[]) {
                    Nr,
                    (void*)y, Ny, w, param2);
 
-  stop = clock();
-  t = (double) (stop-start)/CLOCKS_PER_SEC;
+  #ifdef _OPENMP 
+    stop1 = omp_get_wtime();
+    t = stop1 - start1;
+  #else
+    stop = clock();
+    t = (double) (stop-start)/CLOCKS_PER_SEC;
+  #endif
 
   printf("Time BPSA: %f \n\n", t); 
 
