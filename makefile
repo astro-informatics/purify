@@ -5,7 +5,7 @@ CC      = gcc
 #          -DPURIFY_VERSION=\"0.1\" -DPURIFY_BUILD=\"`svnversion -n .`\"
 OPT	= -Wall -O3 -fopenmp \
           -DPURIFY_VERSION=\"0.1\" \
-          -DPURIFY_BUILD=\"`svnversion -n .`\"
+          -DPURIFY_BUILD=\"`git rev-parse HEAD`\"
 
 
 # ======== LINKS ========
@@ -94,11 +94,11 @@ PURIFYHEADERS = purify_error.h                   \
                 purify_utils.h                   \
                 purify_sparsemat.h 
 
-PURIFYPROGS = $(PURIFYBIN)/example_m31          \
+PURIFYPROGS = $(PURIFYBIN)/purify_about         \
+              $(PURIFYBIN)/example_m31          \
               $(PURIFYBIN)/example_30dor        \
-              $(PURIFYBIN)/example_ami   
-              
-              
+              $(PURIFYBIN)/example_ami  
+
 
 # ======== MAKE RULES ========
 
