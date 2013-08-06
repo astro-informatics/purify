@@ -21,6 +21,7 @@
 #else
   #include <cblas.h>
 #endif 
+#include <Accelerate/Accelerate.h> 
 #include "purify_visibility.h"
 #include "purify_sparsemat.h"
 #include "purify_image.h"
@@ -42,6 +43,9 @@
 
 int main(int argc, char *argv[]) {
 
+  
+ 
+
   int i, j, Nx, Ny, Nr, Nb;
   int seedn=54;
   double sigma;
@@ -53,6 +57,7 @@ int main(int argc, char *argv[]) {
   double aux1, aux2;
   complex double alpha;
   
+
   purify_image img, img_copy;
   purify_visibility_filetype filetype_vis;
   purify_image_filetype filetype_img;
@@ -92,7 +97,6 @@ int main(int argc, char *argv[]) {
 
   clock_t start, stop;
   double t = 0.0;
-  double start1, stop1;
   int dimy, dimx;
   
   //Image dimension of the zero padded image
@@ -103,12 +107,17 @@ int main(int argc, char *argv[]) {
   //Define parameters
   filetype_vis = PURIFY_VISIBILITY_FILETYPE_PROFILE_VIS;
   filetype_img = PURIFY_IMAGE_FILETYPE_FITS;
-
+  
+  printf("**********************\n");
+  printf("Visibility module test\n");
+  printf("**********************\n\n");
   //Read coverage
+  printf("Reading u-v coverage\n\n");
   purify_visibility_readfile(&vis_test,
              "./data/images/Coverages/cont_sim2.vis",
              filetype_vis); 
   printf("Number of visibilities: %i \n\n", vis_test.nmeas);  
+  printf("Visibility module test past\n\n"); 
 
    
 
@@ -118,9 +127,15 @@ int main(int argc, char *argv[]) {
   img.nx = 4;
   img.ny = 4;
 
-  //Read imput image
-  purify_image_readfile(&img, "data/images/M31_128.fits", filetype_img);
+  printf("**********************\n");
+  printf("Image module test\n");
+  printf("**********************\n\n");
+
+  //Read input image
+  printf("Reading input image\n\n");
+  purify_image_readfile(&img, "data/images/cluster.fits", filetype_img);
   printf("Image dimension: %i, %i \n\n", img.nx, img.ny); 
+  printf("Image module test past\n\n"); 
 
   param_m1.nmeas = vis_test.nmeas;
   param_m1.ny1 = dimy;
@@ -181,12 +196,16 @@ int main(int argc, char *argv[]) {
     }
   }
   
+  printf("***********************\n");
+  printf("Measurement module test\n");
+  printf("***********************\n\n");
   //Initialize griding matrix
+  printf("Initializing griding matrix\n\n");
   assert((start = clock())!=-1);
   purify_measurement_init_cft(&gmat, deconv, vis_test.u, vis_test.v, &param_m1);
   stop = clock();
   t = (double) (stop-start)/CLOCKS_PER_SEC;
-  printf("Time initalization: %f \n\n", t);
+  printf("Time griding matrix initalization: %f \n\n", t);
   
   //Memory allocation for the fft
   i = Nx*param_m1.ofy*param_m1.ofx;
@@ -220,12 +239,12 @@ int main(int argc, char *argv[]) {
 
   printf("FFT plan done \n\n");
   
-  
+  printf("Simulating visibilities \n\n");
   assert((start = clock())!=-1);
   purify_measurement_cftfwd((void*)y0, (void*)xinc, datafwd);
   stop = clock();
   t = (double) (stop-start)/CLOCKS_PER_SEC;
-  printf("Time forward operator: %f \n\n", t);
+  printf("Time measurement operator: %f \n\n", t);
 
   
   //Noise realization
@@ -264,6 +283,7 @@ int main(int argc, char *argv[]) {
   }
   
   //Dirty image
+  printf("Computing dirty image from visibilities \n\n");
   purify_measurement_cftadj((void*)xoutc, (void*)y, dataadj);
   img_copy.pix = (double*)malloc((Nx) * sizeof(double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(img_copy.pix);
@@ -271,12 +291,18 @@ int main(int argc, char *argv[]) {
   for (i=0; i < Nx; i++){
     img_copy.pix[i] = creal(xoutc[i]);
   }
-  
-  purify_image_writefile(&img_copy, "data/test/m31dirty.fits", filetype_img);
-  
+  printf("Writing dirty image in fits file\n\n");
+  purify_image_writefile(&img_copy, "data/test/test_dirty.fits", filetype_img);
 
+  printf("Measurement module test past\n\n"); 
+  
+  printf("***********************\n");
+  printf("SOPT linking test\n");
+  printf("***********************\n\n");
   
   //SARA structure initialization
+  printf("SARA structure initialization\n\n");
+  
 
     param1.ndict = Nb;
     param1.real = 0;
@@ -300,7 +326,7 @@ int main(int argc, char *argv[]) {
 
     datas[0] = (void*)&param1;
 
-   
+   printf("SARA structure initialization done\n\n");
 
   //Scaling constants in the representation domain
 
@@ -333,23 +359,19 @@ int main(int argc, char *argv[]) {
     xout[i] = creal(xinc[i]);
   }
 
-
-
-  printf("**********************\n");
-  printf("BPSA reconstruction\n");
-  printf("**********************\n");
-
   
-    
+  printf("BPSA reconstruction\n\n");
+  
+  
   //Structure for the L1 solver      
   param2.verbose = 2;
-  param2.max_iter = 300;
+  param2.max_iter = 100;
   param2.gamma = gamma*aux1;
   param2.rel_obj = 0.001;
   param2.epsilon = sqrt(Ny + 2*sqrt(Ny))*sigma/sqrt(aux2);
-  param2.epsilon_tol = 0.01;
+  param2.epsilon_tol = 0.05;
   param2.real_data = 0;
-  param2.cg_max_iter = 100;
+  param2.cg_max_iter = 3;
   param2.cg_tol = 0.000001;
 
   
@@ -358,11 +380,7 @@ int main(int argc, char *argv[]) {
       xoutc[i] = 0.0 + 0.0*I;
   }
  
-  #ifdef _OPENMP 
-    start1 = omp_get_wtime();
-  #else
-    assert((start = clock())!=-1);
-  #endif
+  assert((start = clock())!=-1);
   sopt_l1_sdmm((void*)xoutc, Nx,
                    &purify_measurement_cftfwd,
                    datafwd,
@@ -375,15 +393,10 @@ int main(int argc, char *argv[]) {
                    Nr,
                    (void*)y, Ny, w, param2);
 
-  #ifdef _OPENMP 
-    stop1 = omp_get_wtime();
-    t = stop1 - start1;
-  #else
-    stop = clock();
-    t = (double) (stop-start)/CLOCKS_PER_SEC;
-  #endif
+  stop = clock();
+  t = (double) (stop-start)/CLOCKS_PER_SEC;
 
-  printf("Time BPSA: %f \n\n", t); 
+  printf("Time BPSA reconstruction: %f \n\n", t); 
 
   
     //SNR
@@ -396,34 +409,19 @@ int main(int argc, char *argv[]) {
     printf("SNR: %f dB\n\n", snr_out);
 
 
+
     
   for (i=0; i < Nx; i++){
     img_copy.pix[i] = creal(xoutc[i]);
   }
   
-  purify_image_writefile(&img_copy, "data/test/m31bpsa.fits", filetype_img);
+  printf("Writing reconstructed image in fits file\n\n");
+  purify_image_writefile(&img_copy, "data/test/test_rec.fits", filetype_img);
 
-  //Residual image
+  
+  printf("SOPT linking test past\n\n"); 
 
-  purify_measurement_cftfwd((void*)y0, (void*)xoutc, datafwd);
-  alpha = -1.0 +0.0*I;
-  cblas_zaxpy(Ny, (void*)&alpha, y, 1, y0, 1);
-  purify_measurement_cftadj((void*)xinc, (void*)y0, dataadj);
-
-  for (i=0; i < Nx; i++){
-    img_copy.pix[i] = creal(xinc[i]);
-  }
   
-  purify_image_writefile(&img_copy, "data/test/m31bpsares.fits", filetype_img);
-  
-  //Error image
-  for (i=0; i < Nx; i++){
-    img_copy.pix[i] = error[i];
-  }
-  
-  purify_image_writefile(&img_copy, "data/test/m31bpsaerror.fits", filetype_img);
-  
-
   
   //Free all memory
   purify_image_free(&img);
