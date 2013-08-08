@@ -129,7 +129,7 @@ runtest: test
 
 .PHONY: cleantest
 cleantest: 
-	rm -r data/test/*
+	rm -rf data/test/*
 
 
 # Library
@@ -153,7 +153,7 @@ cleandoc:
 # Cleaning up
 
 .PHONY: clean
-clean:	tidy
+clean:	tidy cleantest
 	rm -f $(PURIFYOBJ)/*.o
 	rm -f $(PURIFYLIB)/lib$(PURIFYLIBNM).a
 	rm -rf $(PURIFYBIN)/*

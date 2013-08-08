@@ -21,7 +21,6 @@
 #else
   #include <cblas.h>
 #endif 
-#include <Accelerate/Accelerate.h> 
 #include "purify_visibility.h"
 #include "purify_sparsemat.h"
 #include "purify_image.h"
