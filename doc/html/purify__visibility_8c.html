@@ -19,7 +19,7 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li><a href="dirs.html"><span>Directories</span></a></li>
     </ul>
@@ -32,7 +32,7 @@
   </div>
   <div id="nav-path" class="navpath">
     <ul>
-      <li class="navelem"><a class="el" href="dir_9ffe7dd5c604fd47278ae3849e4c40da.html">src</a>      </li>
+      <li class="navelem"><a class="el" href="dir_9896194fa8e05668660c9a800904979b.html">src</a>      </li>
     </ul>
   </div>
 </div>
@@ -47,12 +47,12 @@
 <code>#include &lt;stdlib.h&gt;</code><br/>
 <code>#include &lt;string.h&gt;</code><br/>
 <code>#include &lt;math.h&gt;</code><br/>
-<code>#include &quot;purify_visibility.h&quot;</code><br/>
-<code>#include &quot;purify_sparsemat.h&quot;</code><br/>
-<code>#include &quot;purify_utils.h&quot;</code><br/>
-<code>#include &quot;purify_ran.h&quot;</code><br/>
-<code>#include &quot;purify_error.h&quot;</code><br/>
-<code>#include &quot;purify_types.h&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__visibility_8h_source.html">purify_visibility.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__sparsemat_8h_source.html">purify_sparsemat.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__utils_8h_source.html">purify_utils.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__ran_8h_source.html">purify_ran.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__error_8h_source.html">purify_error.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__types_8h_source.html">purify_types.h</a>&quot;</code><br/>
 </div>
 <p><a href="purify__visibility_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -64,20 +64,20 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#abcc85680625f66013487f259d7a3a14f">purify_visibility_ind2iuiv</a> (int *iu, int *iv, int ind, int nx, int ny)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a4e5e9d855ad227d8dea242a6b8735c74">purify_visibility_du</a> (double fov)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a6b1bafc3d1cf3a502a1af5b662b857c2">purify_visibility_umax</a> (double fov, int n)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a4eb44f7e837bfc95268d539ccfeb8811">purify_visibility_alloc</a> (purify_visibility *vis, int nmeas)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a374f561740c262cd0251542eb6c6eb88">purify_visibility_copy</a> (purify_visibility *copy, purify_visibility *orig)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a9f34d9af56afbec35b3636d4af578f42">purify_visibility_free</a> (purify_visibility *vis)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a3d3570cbe3e66da18f7c66aaaf0aca3c">purify_visibility_compare</a> (purify_visibility *vis1, purify_visibility *vis2, double tol)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a292411ded00e035da8bf6cbb61f35b95">purify_visibility_genranmask</a> (purify_sparsemat *mask, int nmeas, int nvis, int seed)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#aa32c144784f08420a7977496f24f7383">purify_visibility_mask2ivis</a> (int **ivis, purify_sparsemat *mask)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#ad917235d6ab1a478607df8a145745eeb">purify_visibility_mask2vis</a> (purify_visibility *vis, purify_sparsemat *mask, purify_image *img)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a803f8a76a77d62a64172318fae467558">purify_visibility_ivis2mask</a> (purify_sparsemat *mask, int *ivis, int nmeas, int nvis)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#aaeaa70bcab3bdb3fee4f527cd52b1309">purify_visibility_ivis2vis</a> (purify_visibility *vis, int *ivis, int nmeas, purify_image *img)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a2601bb4d6945afbbf054170e66512455">purify_visibility_snap2grid</a> (purify_visibility *vis, purify_image *img)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#ad2d71eb00ce2e141d14382d780063020">purify_visibility_vis2mask</a> (purify_sparsemat *mask, purify_visibility *vis, purify_image *img)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#ab518583593cdcbcca5b302fea3d47ca2">purify_visibility_readfile</a> (purify_visibility *vis, const char *filename, purify_visibility_filetype filetype)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#af9407787b5e67a6f6a2bf0f84a7ad5e2">purify_visibility_writefile</a> (purify_visibility *vis, const char *filename, purify_visibility_filetype filetype)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#afeadf84a3f2ac1798ecdbfa70152556d">purify_visibility_vdsmask</a> (purify_sparsemat *mask, purify_image *img, double p, int nmeas_tol, int maxiter_pdf, int maxiter_nmeas, int seed)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a4eb44f7e837bfc95268d539ccfeb8811">purify_visibility_alloc</a> (<a class="el" href="structpurify__visibility.html">purify_visibility</a> *vis, int nmeas)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a374f561740c262cd0251542eb6c6eb88">purify_visibility_copy</a> (<a class="el" href="structpurify__visibility.html">purify_visibility</a> *copy, <a class="el" href="structpurify__visibility.html">purify_visibility</a> *orig)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a9f34d9af56afbec35b3636d4af578f42">purify_visibility_free</a> (<a class="el" href="structpurify__visibility.html">purify_visibility</a> *vis)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a3d3570cbe3e66da18f7c66aaaf0aca3c">purify_visibility_compare</a> (<a class="el" href="structpurify__visibility.html">purify_visibility</a> *vis1, <a class="el" href="structpurify__visibility.html">purify_visibility</a> *vis2, double tol)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a292411ded00e035da8bf6cbb61f35b95">purify_visibility_genranmask</a> (<a class="el" href="structpurify__sparsemat.html">purify_sparsemat</a> *mask, int nmeas, int nvis, int seed)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#aa32c144784f08420a7977496f24f7383">purify_visibility_mask2ivis</a> (int **ivis, <a class="el" href="structpurify__sparsemat.html">purify_sparsemat</a> *mask)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#ad917235d6ab1a478607df8a145745eeb">purify_visibility_mask2vis</a> (<a class="el" href="structpurify__visibility.html">purify_visibility</a> *vis, <a class="el" href="structpurify__sparsemat.html">purify_sparsemat</a> *mask, <a class="el" href="structpurify__image.html">purify_image</a> *img)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a803f8a76a77d62a64172318fae467558">purify_visibility_ivis2mask</a> (<a class="el" href="structpurify__sparsemat.html">purify_sparsemat</a> *mask, int *ivis, int nmeas, int nvis)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#aaeaa70bcab3bdb3fee4f527cd52b1309">purify_visibility_ivis2vis</a> (<a class="el" href="structpurify__visibility.html">purify_visibility</a> *vis, int *ivis, int nmeas, <a class="el" href="structpurify__image.html">purify_image</a> *img)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#a2601bb4d6945afbbf054170e66512455">purify_visibility_snap2grid</a> (<a class="el" href="structpurify__visibility.html">purify_visibility</a> *vis, <a class="el" href="structpurify__image.html">purify_image</a> *img)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#ad2d71eb00ce2e141d14382d780063020">purify_visibility_vis2mask</a> (<a class="el" href="structpurify__sparsemat.html">purify_sparsemat</a> *mask, <a class="el" href="structpurify__visibility.html">purify_visibility</a> *vis, <a class="el" href="structpurify__image.html">purify_image</a> *img)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#ab518583593cdcbcca5b302fea3d47ca2">purify_visibility_readfile</a> (<a class="el" href="structpurify__visibility.html">purify_visibility</a> *vis, const char *filename, <a class="el" href="purify__visibility_8h.html#af939926a839cc33357af10e593f26980">purify_visibility_filetype</a> filetype)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#af9407787b5e67a6f6a2bf0f84a7ad5e2">purify_visibility_writefile</a> (<a class="el" href="structpurify__visibility.html">purify_visibility</a> *vis, const char *filename, <a class="el" href="purify__visibility_8h.html#af939926a839cc33357af10e593f26980">purify_visibility_filetype</a> filetype)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__visibility_8c.html#afeadf84a3f2ac1798ecdbfa70152556d">purify_visibility_vdsmask</a> (<a class="el" href="structpurify__sparsemat.html">purify_sparsemat</a> *mask, <a class="el" href="structpurify__image.html">purify_image</a> *img, double p, int nmeas_tol, int maxiter_pdf, int maxiter_nmeas, int seed)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Functionality to operate on vsibilities. </p>
@@ -135,9 +135,9 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__visibility_8c.html#a4eb44f7e837bfc95268d539ccfeb8811">purify_visibility_alloc</a> </td>
+          <td class="memname">void <a class="el" href="purify__visibility_8h.html#a4eb44f7e837bfc95268d539ccfeb8811">purify_visibility_alloc</a> </td>
           <td>(</td>
-          <td class="paramtype">purify_visibility *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__visibility.html">purify_visibility</a> *&#160;</td>
           <td class="paramname"><em>vis</em>, </td>
         </tr>
         <tr>
@@ -166,7 +166,7 @@ Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="purify__visibility_8c_source.html#l00106">106</a> of file <a class="el" href="purify__visibility_8c_source.html">purify_visibility.c</a>.</p>
 
-<p>References <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>.</p>
+<p>References <a class="el" href="purify__visibility_8h_source.html#l00018">purify_visibility::nmeas</a>, <a class="el" href="purify__visibility_8h_source.html#l00026">purify_visibility::noise_std</a>, <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, <a class="el" href="purify__visibility_8h_source.html#l00020">purify_visibility::u</a>, <a class="el" href="purify__visibility_8h_source.html#l00022">purify_visibility::v</a>, <a class="el" href="purify__visibility_8h_source.html#l00024">purify_visibility::w</a>, and <a class="el" href="purify__visibility_8h_source.html#l00028">purify_visibility::y</a>.</p>
 
 <p>Referenced by <a class="el" href="purify__visibility_8c_source.html#l00136">purify_visibility_copy()</a>, <a class="el" href="purify__visibility_8c_source.html#l00415">purify_visibility_ivis2vis()</a>, and <a class="el" href="purify__visibility_8c_source.html#l00573">purify_visibility_readfile()</a>.</p>
 
@@ -177,15 +177,15 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int <a class="el" href="purify__visibility_8c.html#a3d3570cbe3e66da18f7c66aaaf0aca3c">purify_visibility_compare</a> </td>
+          <td class="memname">int <a class="el" href="purify__visibility_8h.html#a3d3570cbe3e66da18f7c66aaaf0aca3c">purify_visibility_compare</a> </td>
           <td>(</td>
-          <td class="paramtype">purify_visibility *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__visibility.html">purify_visibility</a> *&#160;</td>
           <td class="paramname"><em>vis1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">purify_visibility *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__visibility.html">purify_visibility</a> *&#160;</td>
           <td class="paramname"><em>vis2</em>, </td>
         </tr>
         <tr>
@@ -221,6 +221,8 @@ Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="purify__visibility_8c_source.html#l00185">185</a> of file <a class="el" href="purify__visibility_8c_source.html">purify_visibility.c</a>.</p>
 
+<p>References <a class="el" href="purify__visibility_8h_source.html#l00018">purify_visibility::nmeas</a>, <a class="el" href="purify__visibility_8h_source.html#l00026">purify_visibility::noise_std</a>, <a class="el" href="purify__visibility_8h_source.html#l00020">purify_visibility::u</a>, <a class="el" href="purify__visibility_8h_source.html#l00022">purify_visibility::v</a>, <a class="el" href="purify__visibility_8h_source.html#l00024">purify_visibility::w</a>, and <a class="el" href="purify__visibility_8h_source.html#l00028">purify_visibility::y</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a374f561740c262cd0251542eb6c6eb88"></a><!-- doxytag: member="purify_visibility.c::purify_visibility_copy" ref="a374f561740c262cd0251542eb6c6eb88" args="(purify_visibility *copy, purify_visibility *orig)" -->
@@ -228,15 +230,15 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__visibility_8c.html#a374f561740c262cd0251542eb6c6eb88">purify_visibility_copy</a> </td>
+          <td class="memname">void <a class="el" href="purify__visibility_8h.html#a374f561740c262cd0251542eb6c6eb88">purify_visibility_copy</a> </td>
           <td>(</td>
-          <td class="paramtype">purify_visibility *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__visibility.html">purify_visibility</a> *&#160;</td>
           <td class="paramname"><em>copy</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">purify_visibility *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__visibility.html">purify_visibility</a> *&#160;</td>
           <td class="paramname"><em>orig</em>&#160;</td>
         </tr>
         <tr>
@@ -260,7 +262,7 @@ Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="purify__visibility_8c_source.html#l00136">136</a> of file <a class="el" href="purify__visibility_8c_source.html">purify_visibility.c</a>.</p>
 
-<p>References <a class="el" href="purify__visibility_8c_source.html#l00106">purify_visibility_alloc()</a>.</p>
+<p>References <a class="el" href="purify__visibility_8h_source.html#l00018">purify_visibility::nmeas</a>, <a class="el" href="purify__visibility_8h_source.html#l00026">purify_visibility::noise_std</a>, <a class="el" href="purify__visibility_8c_source.html#l00106">purify_visibility_alloc()</a>, <a class="el" href="purify__visibility_8h_source.html#l00020">purify_visibility::u</a>, <a class="el" href="purify__visibility_8h_source.html#l00022">purify_visibility::v</a>, <a class="el" href="purify__visibility_8h_source.html#l00024">purify_visibility::w</a>, and <a class="el" href="purify__visibility_8h_source.html#l00028">purify_visibility::y</a>.</p>
 
 </div>
 </div>
@@ -269,7 +271,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double <a class="el" href="purify__visibility_8c.html#a4e5e9d855ad227d8dea242a6b8735c74">purify_visibility_du</a> </td>
+          <td class="memname">double <a class="el" href="purify__visibility_8h.html#a4e5e9d855ad227d8dea242a6b8735c74">purify_visibility_du</a> </td>
           <td>(</td>
           <td class="paramtype">double&#160;</td>
           <td class="paramname"><em>fov</em></td><td>)</td>
@@ -304,9 +306,9 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__visibility_8c.html#a9f34d9af56afbec35b3636d4af578f42">purify_visibility_free</a> </td>
+          <td class="memname">void <a class="el" href="purify__visibility_8h.html#a9f34d9af56afbec35b3636d4af578f42">purify_visibility_free</a> </td>
           <td>(</td>
-          <td class="paramtype">purify_visibility *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__visibility.html">purify_visibility</a> *&#160;</td>
           <td class="paramname"><em>vis</em></td><td>)</td>
           <td></td>
         </tr>
@@ -324,7 +326,9 @@ Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="purify__visibility_8c_source.html#l00161">161</a> of file <a class="el" href="purify__visibility_8c_source.html">purify_visibility.c</a>.</p>
 
-<p>Referenced by <a class="el" href="example__30dor_8c_source.html#l00046">main()</a>, and <a class="el" href="purify__sim1_8c_source.html#l00197">sim_cont()</a>.</p>
+<p>References <a class="el" href="purify__visibility_8h_source.html#l00018">purify_visibility::nmeas</a>, <a class="el" href="purify__visibility_8h_source.html#l00026">purify_visibility::noise_std</a>, <a class="el" href="purify__visibility_8h_source.html#l00020">purify_visibility::u</a>, <a class="el" href="purify__visibility_8h_source.html#l00022">purify_visibility::v</a>, <a class="el" href="purify__visibility_8h_source.html#l00024">purify_visibility::w</a>, and <a class="el" href="purify__visibility_8h_source.html#l00028">purify_visibility::y</a>.</p>
+
+<p>Referenced by <a class="el" href="example__30dor_8c_source.html#l00045">main()</a>.</p>
 
 </div>
 </div>
@@ -333,9 +337,9 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__visibility_8c.html#a292411ded00e035da8bf6cbb61f35b95">purify_visibility_genranmask</a> </td>
+          <td class="memname">void <a class="el" href="purify__visibility_8h.html#a292411ded00e035da8bf6cbb61f35b95">purify_visibility_genranmask</a> </td>
           <td>(</td>
-          <td class="paramtype">purify_sparsemat *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__sparsemat.html">purify_sparsemat</a> *&#160;</td>
           <td class="paramname"><em>mask</em>, </td>
         </tr>
         <tr>
@@ -381,8 +385,6 @@ Functions</h2></td></tr>
 
 <p>References <a class="el" href="purify__visibility_8c_source.html#l00297">purify_compare_ints()</a>, <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, <a class="el" href="purify__ran_8c_source.html#l00140">purify_ran_knuthshuffle()</a>, and <a class="el" href="purify__visibility_8c_source.html#l00351">purify_visibility_ivis2mask()</a>.</p>
 
-<p>Referenced by <a class="el" href="purify__sim_8c_source.html#l00029">main()</a>.</p>
-
 </div>
 </div>
 <a class="anchor" id="abcc85680625f66013487f259d7a3a14f"></a><!-- doxytag: member="purify_visibility.c::purify_visibility_ind2iuiv" ref="abcc85680625f66013487f259d7a3a14f" args="(int *iu, int *iv, int ind, int nx, int ny)" -->
@@ -390,7 +392,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__visibility_8c.html#abcc85680625f66013487f259d7a3a14f">purify_visibility_ind2iuiv</a> </td>
+          <td class="memname">void <a class="el" href="purify__visibility_8h.html#abcc85680625f66013487f259d7a3a14f">purify_visibility_ind2iuiv</a> </td>
           <td>(</td>
           <td class="paramtype">int *&#160;</td>
           <td class="paramname"><em>iu</em>, </td>
@@ -453,7 +455,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__visibility_8c.html#aa3c310f16037b7db40b56659a69a6375">purify_visibility_iuiv2ind</a> </td>
+          <td class="memname">void <a class="el" href="purify__visibility_8h.html#aa3c310f16037b7db40b56659a69a6375">purify_visibility_iuiv2ind</a> </td>
           <td>(</td>
           <td class="paramtype">int *&#160;</td>
           <td class="paramname"><em>ind</em>, </td>
@@ -507,7 +509,7 @@ Functions</h2></td></tr>
 
 <p>References <a class="el" href="purify__error_8c_source.html#l00015">PURIFY_ERROR_GENERIC()</a>.</p>
 
-<p>Referenced by <a class="el" href="purify__measurement_8c_source.html#l00038">purify_measurement_fft_real()</a>, and <a class="el" href="purify__visibility_8c_source.html#l00515">purify_visibility_vis2mask()</a>.</p>
+<p>Referenced by <a class="el" href="purify__measurement_8c_source.html#l00044">purify_measurement_fft_real()</a>, and <a class="el" href="purify__visibility_8c_source.html#l00515">purify_visibility_vis2mask()</a>.</p>
 
 </div>
 </div>
@@ -516,9 +518,9 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__visibility_8c.html#a803f8a76a77d62a64172318fae467558">purify_visibility_ivis2mask</a> </td>
+          <td class="memname">void <a class="el" href="purify__visibility_8h.html#a803f8a76a77d62a64172318fae467558">purify_visibility_ivis2mask</a> </td>
           <td>(</td>
-          <td class="paramtype">purify_sparsemat *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__sparsemat.html">purify_sparsemat</a> *&#160;</td>
           <td class="paramname"><em>mask</em>, </td>
         </tr>
         <tr>
@@ -562,7 +564,7 @@ Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="purify__visibility_8c_source.html#l00351">351</a> of file <a class="el" href="purify__visibility_8c_source.html">purify_visibility.c</a>.</p>
 
-<p>References <a class="el" href="purify__visibility_8c_source.html#l00297">purify_compare_ints()</a>, and <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>.</p>
+<p>References <a class="el" href="purify__sparsemat_8h_source.html#l00031">purify_sparsemat::colptr</a>, <a class="el" href="purify__sparsemat_8h_source.html#l00019">purify_sparsemat::ncols</a>, <a class="el" href="purify__sparsemat_8h_source.html#l00017">purify_sparsemat::nrows</a>, <a class="el" href="purify__sparsemat_8h_source.html#l00021">purify_sparsemat::nvals</a>, <a class="el" href="purify__visibility_8c_source.html#l00297">purify_compare_ints()</a>, <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, <a class="el" href="purify__sparsemat_8h_source.html#l00029">purify_sparsemat::rowind</a>, and <a class="el" href="purify__sparsemat_8h_source.html#l00025">purify_sparsemat::vals</a>.</p>
 
 <p>Referenced by <a class="el" href="purify__visibility_8c_source.html#l00228">purify_visibility_genranmask()</a>, <a class="el" href="purify__visibility_8c_source.html#l00900">purify_visibility_vdsmask()</a>, and <a class="el" href="purify__visibility_8c_source.html#l00515">purify_visibility_vis2mask()</a>.</p>
 
@@ -573,9 +575,9 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__visibility_8c.html#aaeaa70bcab3bdb3fee4f527cd52b1309">purify_visibility_ivis2vis</a> </td>
+          <td class="memname">void <a class="el" href="purify__visibility_8h.html#aaeaa70bcab3bdb3fee4f527cd52b1309">purify_visibility_ivis2vis</a> </td>
           <td>(</td>
-          <td class="paramtype">purify_visibility *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__visibility.html">purify_visibility</a> *&#160;</td>
           <td class="paramname"><em>vis</em>, </td>
         </tr>
         <tr>
@@ -593,7 +595,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">purify_image *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__image.html">purify_image</a> *&#160;</td>
           <td class="paramname"><em>img</em>&#160;</td>
         </tr>
         <tr>
@@ -619,7 +621,7 @@ Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="purify__visibility_8c_source.html#l00415">415</a> of file <a class="el" href="purify__visibility_8c_source.html">purify_visibility.c</a>.</p>
 
-<p>References <a class="el" href="purify__visibility_8c_source.html#l00297">purify_compare_ints()</a>, <a class="el" href="purify__error_8c_source.html#l00015">PURIFY_ERROR_GENERIC()</a>, <a class="el" href="purify__visibility_8c_source.html#l00106">purify_visibility_alloc()</a>, <a class="el" href="purify__visibility_8c_source.html#l00078">purify_visibility_du()</a>, <a class="el" href="purify__visibility_8c_source.html#l00058">purify_visibility_ind2iuiv()</a>, and <a class="el" href="purify__visibility_8c_source.html#l00093">purify_visibility_umax()</a>.</p>
+<p>References <a class="el" href="purify__image_8h_source.html#l00010">purify_image::fov_x</a>, <a class="el" href="purify__image_8h_source.html#l00012">purify_image::fov_y</a>, <a class="el" href="purify__image_8h_source.html#l00014">purify_image::nx</a>, <a class="el" href="purify__image_8h_source.html#l00016">purify_image::ny</a>, <a class="el" href="purify__visibility_8c_source.html#l00297">purify_compare_ints()</a>, <a class="el" href="purify__error_8c_source.html#l00015">PURIFY_ERROR_GENERIC()</a>, <a class="el" href="purify__visibility_8c_source.html#l00106">purify_visibility_alloc()</a>, <a class="el" href="purify__visibility_8c_source.html#l00078">purify_visibility_du()</a>, <a class="el" href="purify__visibility_8c_source.html#l00058">purify_visibility_ind2iuiv()</a>, <a class="el" href="purify__visibility_8c_source.html#l00093">purify_visibility_umax()</a>, <a class="el" href="purify__visibility_8h_source.html#l00020">purify_visibility::u</a>, <a class="el" href="purify__visibility_8h_source.html#l00022">purify_visibility::v</a>, and <a class="el" href="purify__visibility_8h_source.html#l00024">purify_visibility::w</a>.</p>
 
 <p>Referenced by <a class="el" href="purify__visibility_8c_source.html#l00319">purify_visibility_mask2vis()</a>.</p>
 
@@ -630,7 +632,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__visibility_8c.html#aa32c144784f08420a7977496f24f7383">purify_visibility_mask2ivis</a> </td>
+          <td class="memname">void <a class="el" href="purify__visibility_8h.html#aa32c144784f08420a7977496f24f7383">purify_visibility_mask2ivis</a> </td>
           <td>(</td>
           <td class="paramtype">int **&#160;</td>
           <td class="paramname"><em>ivis</em>, </td>
@@ -638,7 +640,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">purify_sparsemat *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__sparsemat.html">purify_sparsemat</a> *&#160;</td>
           <td class="paramname"><em>mask</em>&#160;</td>
         </tr>
         <tr>
@@ -662,7 +664,7 @@ Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="purify__visibility_8c_source.html#l00265">265</a> of file <a class="el" href="purify__visibility_8c_source.html">purify_visibility.c</a>.</p>
 
-<p>References <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>.</p>
+<p>References <a class="el" href="purify__sparsemat_8h_source.html#l00031">purify_sparsemat::colptr</a>, <a class="el" href="purify__sparsemat_8h_source.html#l00019">purify_sparsemat::ncols</a>, <a class="el" href="purify__sparsemat_8h_source.html#l00021">purify_sparsemat::nvals</a>, and <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>.</p>
 
 <p>Referenced by <a class="el" href="purify__visibility_8c_source.html#l00319">purify_visibility_mask2vis()</a>.</p>
 
@@ -673,21 +675,21 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__visibility_8c.html#ad917235d6ab1a478607df8a145745eeb">purify_visibility_mask2vis</a> </td>
+          <td class="memname">void <a class="el" href="purify__visibility_8h.html#ad917235d6ab1a478607df8a145745eeb">purify_visibility_mask2vis</a> </td>
           <td>(</td>
-          <td class="paramtype">purify_visibility *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__visibility.html">purify_visibility</a> *&#160;</td>
           <td class="paramname"><em>vis</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">purify_sparsemat *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__sparsemat.html">purify_sparsemat</a> *&#160;</td>
           <td class="paramname"><em>mask</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">purify_image *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__image.html">purify_image</a> *&#160;</td>
           <td class="paramname"><em>img</em>&#160;</td>
         </tr>
         <tr>
@@ -712,9 +714,7 @@ Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="purify__visibility_8c_source.html#l00319">319</a> of file <a class="el" href="purify__visibility_8c_source.html">purify_visibility.c</a>.</p>
 
-<p>References <a class="el" href="purify__visibility_8c_source.html#l00415">purify_visibility_ivis2vis()</a>, and <a class="el" href="purify__visibility_8c_source.html#l00265">purify_visibility_mask2ivis()</a>.</p>
-
-<p>Referenced by <a class="el" href="purify__sim_8c_source.html#l00029">main()</a>.</p>
+<p>References <a class="el" href="purify__sparsemat_8h_source.html#l00021">purify_sparsemat::nvals</a>, <a class="el" href="purify__visibility_8c_source.html#l00415">purify_visibility_ivis2vis()</a>, and <a class="el" href="purify__visibility_8c_source.html#l00265">purify_visibility_mask2ivis()</a>.</p>
 
 </div>
 </div>
@@ -792,9 +792,9 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int <a class="el" href="purify__visibility_8c.html#ab518583593cdcbcca5b302fea3d47ca2">purify_visibility_readfile</a> </td>
+          <td class="memname">int <a class="el" href="purify__visibility_8h.html#ab518583593cdcbcca5b302fea3d47ca2">purify_visibility_readfile</a> </td>
           <td>(</td>
-          <td class="paramtype">purify_visibility *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__visibility.html">purify_visibility</a> *&#160;</td>
           <td class="paramname"><em>vis</em>, </td>
         </tr>
         <tr>
@@ -806,7 +806,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">purify_visibility_filetype&#160;</td>
+          <td class="paramtype"><a class="el" href="purify__visibility_8h.html#af939926a839cc33357af10e593f26980">purify_visibility_filetype</a>&#160;</td>
           <td class="paramname"><em>filetype</em>&#160;</td>
         </tr>
         <tr>
@@ -837,9 +837,9 @@ Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="purify__visibility_8c_source.html#l00573">573</a> of file <a class="el" href="purify__visibility_8c_source.html">purify_visibility.c</a>.</p>
 
-<p>References <a class="el" href="purify__error_8c_source.html#l00015">PURIFY_ERROR_GENERIC()</a>, and <a class="el" href="purify__visibility_8c_source.html#l00106">purify_visibility_alloc()</a>.</p>
+<p>References <a class="el" href="purify__visibility_8h_source.html#l00026">purify_visibility::noise_std</a>, <a class="el" href="purify__error_8c_source.html#l00015">PURIFY_ERROR_GENERIC()</a>, <a class="el" href="purify__types_8h_source.html#l00013">PURIFY_SQRT2</a>, <a class="el" href="purify__types_8h_source.html#l00008">PURIFY_STRLEN</a>, <a class="el" href="purify__visibility_8c_source.html#l00106">purify_visibility_alloc()</a>, <a class="el" href="purify__visibility_8h_source.html#l00038">PURIFY_VISIBILITY_FILETYPE_PROFILE_VIS</a>, <a class="el" href="purify__visibility_8h_source.html#l00040">PURIFY_VISIBILITY_FILETYPE_PROFILE_WIS</a>, <a class="el" href="purify__visibility_8h_source.html#l00036">PURIFY_VISIBILITY_FILETYPE_VIS</a>, <a class="el" href="purify__visibility_8h_source.html#l00020">purify_visibility::u</a>, <a class="el" href="purify__visibility_8h_source.html#l00022">purify_visibility::v</a>, <a class="el" href="purify__visibility_8h_source.html#l00024">purify_visibility::w</a>, and <a class="el" href="purify__visibility_8h_source.html#l00028">purify_visibility::y</a>.</p>
 
-<p>Referenced by <a class="el" href="example__30dor_8c_source.html#l00046">main()</a>, and <a class="el" href="purify__sim1_8c_source.html#l00197">sim_cont()</a>.</p>
+<p>Referenced by <a class="el" href="example__30dor_8c_source.html#l00045">main()</a>.</p>
 
 </div>
 </div>
@@ -848,15 +848,15 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__visibility_8c.html#a2601bb4d6945afbbf054170e66512455">purify_visibility_snap2grid</a> </td>
+          <td class="memname">void <a class="el" href="purify__visibility_8h.html#a2601bb4d6945afbbf054170e66512455">purify_visibility_snap2grid</a> </td>
           <td>(</td>
-          <td class="paramtype">purify_visibility *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__visibility.html">purify_visibility</a> *&#160;</td>
           <td class="paramname"><em>vis</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">purify_image *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__image.html">purify_image</a> *&#160;</td>
           <td class="paramname"><em>img</em>&#160;</td>
         </tr>
         <tr>
@@ -880,7 +880,7 @@ Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="purify__visibility_8c_source.html#l00485">485</a> of file <a class="el" href="purify__visibility_8c_source.html">purify_visibility.c</a>.</p>
 
-<p>References <a class="el" href="purify__visibility_8c_source.html#l00078">purify_visibility_du()</a>.</p>
+<p>References <a class="el" href="purify__image_8h_source.html#l00010">purify_image::fov_x</a>, <a class="el" href="purify__image_8h_source.html#l00012">purify_image::fov_y</a>, <a class="el" href="purify__visibility_8h_source.html#l00018">purify_visibility::nmeas</a>, <a class="el" href="purify__visibility_8c_source.html#l00078">purify_visibility_du()</a>, <a class="el" href="purify__visibility_8h_source.html#l00020">purify_visibility::u</a>, and <a class="el" href="purify__visibility_8h_source.html#l00022">purify_visibility::v</a>.</p>
 
 </div>
 </div>
@@ -889,7 +889,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double <a class="el" href="purify__visibility_8c.html#a6b1bafc3d1cf3a502a1af5b662b857c2">purify_visibility_umax</a> </td>
+          <td class="memname">double <a class="el" href="purify__visibility_8h.html#a6b1bafc3d1cf3a502a1af5b662b857c2">purify_visibility_umax</a> </td>
           <td>(</td>
           <td class="paramtype">double&#160;</td>
           <td class="paramname"><em>fov</em>, </td>
@@ -935,15 +935,15 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int <a class="el" href="purify__visibility_8c.html#afeadf84a3f2ac1798ecdbfa70152556d">purify_visibility_vdsmask</a> </td>
+          <td class="memname">int <a class="el" href="purify__visibility_8h.html#afeadf84a3f2ac1798ecdbfa70152556d">purify_visibility_vdsmask</a> </td>
           <td>(</td>
-          <td class="paramtype">purify_sparsemat *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__sparsemat.html">purify_sparsemat</a> *&#160;</td>
           <td class="paramname"><em>mask</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">purify_image *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__image.html">purify_image</a> *&#160;</td>
           <td class="paramname"><em>img</em>, </td>
         </tr>
         <tr>
@@ -1010,7 +1010,7 @@ Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="purify__visibility_8c_source.html#l00900">900</a> of file <a class="el" href="purify__visibility_8c_source.html">purify_visibility.c</a>.</p>
 
-<p>References <a class="el" href="purify__error_8c_source.html#l00015">PURIFY_ERROR_GENERIC()</a>, <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, <a class="el" href="purify__ran_8c_source.html#l00087">purify_ran_ran2()</a>, <a class="el" href="purify__utils_8c_source.html#l00049">purify_utils_ifftshift_1d()</a>, <a class="el" href="purify__visibility_8c_source.html#l00351">purify_visibility_ivis2mask()</a>, and <a class="el" href="purify__visibility_8c_source.html#l00821">purify_visibility_modifypdf()</a>.</p>
+<p>References <a class="el" href="purify__image_8h_source.html#l00014">purify_image::nx</a>, <a class="el" href="purify__image_8h_source.html#l00016">purify_image::ny</a>, <a class="el" href="purify__error_8c_source.html#l00015">PURIFY_ERROR_GENERIC()</a>, <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, <a class="el" href="purify__ran_8c_source.html#l00087">purify_ran_ran2()</a>, <a class="el" href="purify__utils_8c_source.html#l00049">purify_utils_ifftshift_1d()</a>, <a class="el" href="purify__visibility_8c_source.html#l00351">purify_visibility_ivis2mask()</a>, and <a class="el" href="purify__visibility_8c_source.html#l00821">purify_visibility_modifypdf()</a>.</p>
 
 </div>
 </div>
@@ -1019,21 +1019,21 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__visibility_8c.html#ad2d71eb00ce2e141d14382d780063020">purify_visibility_vis2mask</a> </td>
+          <td class="memname">void <a class="el" href="purify__visibility_8h.html#ad2d71eb00ce2e141d14382d780063020">purify_visibility_vis2mask</a> </td>
           <td>(</td>
-          <td class="paramtype">purify_sparsemat *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__sparsemat.html">purify_sparsemat</a> *&#160;</td>
           <td class="paramname"><em>mask</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">purify_visibility *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__visibility.html">purify_visibility</a> *&#160;</td>
           <td class="paramname"><em>vis</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">purify_image *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__image.html">purify_image</a> *&#160;</td>
           <td class="paramname"><em>img</em>&#160;</td>
         </tr>
         <tr>
@@ -1057,7 +1057,7 @@ Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="purify__visibility_8c_source.html#l00515">515</a> of file <a class="el" href="purify__visibility_8c_source.html">purify_visibility.c</a>.</p>
 
-<p>References <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, <a class="el" href="purify__visibility_8c_source.html#l00078">purify_visibility_du()</a>, <a class="el" href="purify__visibility_8c_source.html#l00036">purify_visibility_iuiv2ind()</a>, and <a class="el" href="purify__visibility_8c_source.html#l00351">purify_visibility_ivis2mask()</a>.</p>
+<p>References <a class="el" href="purify__image_8h_source.html#l00010">purify_image::fov_x</a>, <a class="el" href="purify__image_8h_source.html#l00012">purify_image::fov_y</a>, <a class="el" href="purify__visibility_8h_source.html#l00018">purify_visibility::nmeas</a>, <a class="el" href="purify__image_8h_source.html#l00014">purify_image::nx</a>, <a class="el" href="purify__image_8h_source.html#l00016">purify_image::ny</a>, <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, <a class="el" href="purify__visibility_8c_source.html#l00078">purify_visibility_du()</a>, <a class="el" href="purify__visibility_8c_source.html#l00036">purify_visibility_iuiv2ind()</a>, <a class="el" href="purify__visibility_8c_source.html#l00351">purify_visibility_ivis2mask()</a>, <a class="el" href="purify__visibility_8h_source.html#l00020">purify_visibility::u</a>, and <a class="el" href="purify__visibility_8h_source.html#l00022">purify_visibility::v</a>.</p>
 
 </div>
 </div>
@@ -1066,9 +1066,9 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int <a class="el" href="purify__visibility_8c.html#af9407787b5e67a6f6a2bf0f84a7ad5e2">purify_visibility_writefile</a> </td>
+          <td class="memname">int <a class="el" href="purify__visibility_8h.html#af9407787b5e67a6f6a2bf0f84a7ad5e2">purify_visibility_writefile</a> </td>
           <td>(</td>
-          <td class="paramtype">purify_visibility *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__visibility.html">purify_visibility</a> *&#160;</td>
           <td class="paramname"><em>vis</em>, </td>
         </tr>
         <tr>
@@ -1080,7 +1080,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">purify_visibility_filetype&#160;</td>
+          <td class="paramtype"><a class="el" href="purify__visibility_8h.html#af939926a839cc33357af10e593f26980">purify_visibility_filetype</a>&#160;</td>
           <td class="paramname"><em>filetype</em>&#160;</td>
         </tr>
         <tr>
@@ -1110,9 +1110,7 @@ Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="purify__visibility_8c_source.html#l00745">745</a> of file <a class="el" href="purify__visibility_8c_source.html">purify_visibility.c</a>.</p>
 
-<p>References <a class="el" href="purify__error_8c_source.html#l00015">PURIFY_ERROR_GENERIC()</a>.</p>
-
-<p>Referenced by <a class="el" href="purify__sim_8c_source.html#l00029">main()</a>.</p>
+<p>References <a class="el" href="purify__visibility_8h_source.html#l00018">purify_visibility::nmeas</a>, <a class="el" href="purify__visibility_8h_source.html#l00026">purify_visibility::noise_std</a>, <a class="el" href="purify__error_8c_source.html#l00015">PURIFY_ERROR_GENERIC()</a>, <a class="el" href="purify__types_8h_source.html#l00008">PURIFY_STRLEN</a>, <a class="el" href="purify__visibility_8h_source.html#l00038">PURIFY_VISIBILITY_FILETYPE_PROFILE_VIS</a>, <a class="el" href="purify__visibility_8h_source.html#l00040">PURIFY_VISIBILITY_FILETYPE_PROFILE_WIS</a>, <a class="el" href="purify__visibility_8h_source.html#l00036">PURIFY_VISIBILITY_FILETYPE_VIS</a>, <a class="el" href="purify__visibility_8h_source.html#l00020">purify_visibility::u</a>, <a class="el" href="purify__visibility_8h_source.html#l00022">purify_visibility::v</a>, <a class="el" href="purify__visibility_8h_source.html#l00024">purify_visibility::w</a>, and <a class="el" href="purify__visibility_8h_source.html#l00028">purify_visibility::y</a>.</p>
 
 </div>
 </div>
@@ -1120,7 +1118,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 16 2013 20:04:34 by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Aug 8 2013 12:52:49 by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

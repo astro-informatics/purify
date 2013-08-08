@@ -19,7 +19,7 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li><a href="dirs.html"><span>Directories</span></a></li>
     </ul>
@@ -32,7 +32,7 @@
   </div>
   <div id="nav-path" class="navpath">
     <ul>
-      <li class="navelem"><a class="el" href="dir_9ffe7dd5c604fd47278ae3849e4c40da.html">src</a>      </li>
+      <li class="navelem"><a class="el" href="dir_9896194fa8e05668660c9a800904979b.html">src</a>      </li>
     </ul>
   </div>
 </div>
@@ -51,14 +51,14 @@
 <code>#include &lt;math.h&gt;</code><br/>
 <code>#include &lt;assert.h&gt;</code><br/>
 <code>#include &lt;time.h&gt;</code><br/>
-<code>#include &lt;Accelerate/Accelerate.h&gt;</code><br/>
-<code>#include &quot;purify_visibility.h&quot;</code><br/>
-<code>#include &quot;purify_sparsemat.h&quot;</code><br/>
-<code>#include &quot;purify_image.h&quot;</code><br/>
-<code>#include &quot;purify_measurement.h&quot;</code><br/>
-<code>#include &quot;purify_types.h&quot;</code><br/>
-<code>#include &quot;purify_error.h&quot;</code><br/>
-<code>#include &quot;purify_ran.h&quot;</code><br/>
+<code>#include &lt;cblas.h&gt;</code><br/>
+<code>#include &quot;<a class="el" href="purify__visibility_8h_source.html">purify_visibility.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__sparsemat_8h_source.html">purify_sparsemat.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__image_8h_source.html">purify_image.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__measurement_8h_source.html">purify_measurement.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__types_8h_source.html">purify_types.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__error_8h_source.html">purify_error.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__ran_8h_source.html">purify_ran.h</a>&quot;</code><br/>
 <code>#include &quot;sopt_image.h&quot;</code><br/>
 <code>#include &quot;sopt_utility.h&quot;</code><br/>
 <code>#include &quot;sopt_prox.h&quot;</code><br/>
@@ -67,7 +67,7 @@
 <code>#include &quot;sopt_wavelet.h&quot;</code><br/>
 <code>#include &quot;sopt_sara.h&quot;</code><br/>
 <code>#include &quot;sopt_ran.h&quot;</code><br/>
-<code>#include &quot;purify_utils.h&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__utils_8h_source.html">purify_utils.h</a>&quot;</code><br/>
 </div>
 <p><a href="example__ami_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -94,7 +94,7 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="example__ami_8c_source.html#l00044">44</a> of file <a class="el" href="example__ami_8c_source.html">example_ami.c</a>.</p>
+<p>Definition at line <a class="el" href="example__ami_8c_source.html#l00043">43</a> of file <a class="el" href="example__ami_8c_source.html">example_ami.c</a>.</p>
 
 </div>
 </div>
@@ -124,9 +124,9 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="example__ami_8c_source.html#l00046">46</a> of file <a class="el" href="example__ami_8c_source.html">example_ami.c</a>.</p>
+<p>Definition at line <a class="el" href="example__ami_8c_source.html#l00045">45</a> of file <a class="el" href="example__ami_8c_source.html">example_ami.c</a>.</p>
 
-<p>References <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, <a class="el" href="purify__image_8c_source.html#l00064">purify_image_free()</a>, <a class="el" href="purify__image_8c_source.html#l00117">purify_image_readfile()</a>, <a class="el" href="purify__image_8c_source.html#l00202">purify_image_writefile()</a>, <a class="el" href="purify__measurement_8c_source.html#l00796">purify_measurement_cftadj()</a>, <a class="el" href="purify__measurement_8c_source.html#l00722">purify_measurement_cftfwd()</a>, <a class="el" href="purify__measurement_8c_source.html#l00238">purify_measurement_init_cft()</a>, <a class="el" href="purify__sparsemat_8c_source.html#l00191">purify_sparsemat_freer()</a>, <a class="el" href="purify__utils_8c_source.html#l00076">purify_utils_maxarray()</a>, <a class="el" href="purify__visibility_8c_source.html#l00161">purify_visibility_free()</a>, and <a class="el" href="purify__visibility_8c_source.html#l00573">purify_visibility_readfile()</a>.</p>
+<p>References <a class="el" href="purify__image_8h_source.html#l00010">purify_image::fov_x</a>, <a class="el" href="purify__image_8h_source.html#l00012">purify_image::fov_y</a>, <a class="el" href="purify__measurement_8h_source.html#l00023">purify_measurement_cparam::kx</a>, <a class="el" href="purify__measurement_8h_source.html#l00021">purify_measurement_cparam::ky</a>, <a class="el" href="purify__measurement_8h_source.html#l00011">purify_measurement_cparam::nmeas</a>, <a class="el" href="purify__visibility_8h_source.html#l00018">purify_visibility::nmeas</a>, <a class="el" href="purify__image_8h_source.html#l00014">purify_image::nx</a>, <a class="el" href="purify__measurement_8h_source.html#l00015">purify_measurement_cparam::nx1</a>, <a class="el" href="purify__image_8h_source.html#l00016">purify_image::ny</a>, <a class="el" href="purify__measurement_8h_source.html#l00013">purify_measurement_cparam::ny1</a>, <a class="el" href="purify__measurement_8h_source.html#l00019">purify_measurement_cparam::ofx</a>, <a class="el" href="purify__measurement_8h_source.html#l00017">purify_measurement_cparam::ofy</a>, <a class="el" href="purify__image_8h_source.html#l00018">purify_image::pix</a>, <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, <a class="el" href="purify__image_8h_source.html#l00026">PURIFY_IMAGE_FILETYPE_FITS</a>, <a class="el" href="purify__image_8c_source.html#l00064">purify_image_free()</a>, <a class="el" href="purify__image_8c_source.html#l00117">purify_image_readfile()</a>, <a class="el" href="purify__image_8c_source.html#l00202">purify_image_writefile()</a>, <a class="el" href="purify__measurement_8c_source.html#l00802">purify_measurement_cftadj()</a>, <a class="el" href="purify__measurement_8c_source.html#l00728">purify_measurement_cftfwd()</a>, <a class="el" href="purify__measurement_8c_source.html#l00244">purify_measurement_init_cft()</a>, <a class="el" href="purify__types_8h_source.html#l00010">PURIFY_PI</a>, <a class="el" href="purify__sparsemat_8c_source.html#l00191">purify_sparsemat_freer()</a>, <a class="el" href="purify__utils_8c_source.html#l00076">purify_utils_maxarray()</a>, <a class="el" href="purify__visibility_8h_source.html#l00038">PURIFY_VISIBILITY_FILETYPE_PROFILE_VIS</a>, <a class="el" href="purify__visibility_8c_source.html#l00161">purify_visibility_free()</a>, <a class="el" href="purify__visibility_8c_source.html#l00573">purify_visibility_readfile()</a>, <a class="el" href="purify__visibility_8h_source.html#l00020">purify_visibility::u</a>, and <a class="el" href="purify__visibility_8h_source.html#l00022">purify_visibility::v</a>.</p>
 
 </div>
 </div>
@@ -134,7 +134,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 16 2013 20:04:34 by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Aug 8 2013 12:52:49 by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

@@ -19,7 +19,7 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li><a href="dirs.html"><span>Directories</span></a></li>
     </ul>
@@ -32,7 +32,7 @@
   </div>
   <div id="nav-path" class="navpath">
     <ul>
-      <li class="navelem"><a class="el" href="dir_9ffe7dd5c604fd47278ae3849e4c40da.html">src</a>      </li>
+      <li class="navelem"><a class="el" href="dir_9896194fa8e05668660c9a800904979b.html">src</a>      </li>
     </ul>
   </div>
 </div>
@@ -45,8 +45,8 @@
 <div class="contents">
 <div class="textblock"><code>#include &lt;math.h&gt;</code><br/>
 <code>#include &lt;stdlib.h&gt;</code><br/>
-<code>#include &quot;purify_ran.h&quot;</code><br/>
-<code>#include &quot;purify_error.h&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__ran_8h_source.html">purify_ran.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__error_8h_source.html">purify_error.h</a>&quot;</code><br/>
 </div>
 <p><a href="purify__ran_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -66,7 +66,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double <a class="el" href="purify__ran_8c.html#a76eaeee1aa74990791ea5b173c8b251c">purify_ran_gasdev2</a> </td>
+          <td class="memname">double <a class="el" href="purify__ran_8h.html#a76eaeee1aa74990791ea5b173c8b251c">purify_ran_gasdev2</a> </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>idum</em></td><td>)</td>
@@ -90,17 +90,17 @@ Functions</h2></td></tr>
 </dl>
 <dl class="note"><dt><b>Note:</b></dt><dd>Gaussian deviate inpsired from gasdev (Num Rec 1992, chap 7.3), the only difference is the use of RAN2 instead of RAN1. </dd>
 <dd>
-This routine calls <a class="el" href="purify__ran_8c.html#afe185cdc9db99b749b5c5db2f0590191">purify_ran_ran2</a> and so changes the state of the random generator.</dd></dl>
+This routine calls <a class="el" href="purify__ran_8h.html#afe185cdc9db99b749b5c5db2f0590191">purify_ran_ran2</a> and so changes the state of the random generator.</dd></dl>
 <dl class="warning"><dt><b>Warning:</b></dt><dd>This C implementation has been copied from a Fortran version and has not yet been tested!</dd>
 <dd>
-Must inialise <a class="el" href="purify__ran_8c.html#afe185cdc9db99b749b5c5db2f0590191">purify_ran_ran2</a> first with a negative seed first and then subsequently call with the identical magnitude positive seed, i.e. if seed&gt;0, initialise <a class="el" href="purify__ran_8c.html#afe185cdc9db99b749b5c5db2f0590191">purify_ran_ran2</a> with -seed and then call with seed.</dd></dl>
+Must inialise <a class="el" href="purify__ran_8h.html#afe185cdc9db99b749b5c5db2f0590191">purify_ran_ran2</a> first with a negative seed first and then subsequently call with the identical magnitude positive seed, i.e. if seed&gt;0, initialise <a class="el" href="purify__ran_8h.html#afe185cdc9db99b749b5c5db2f0590191">purify_ran_ran2</a> with -seed and then call with seed.</dd></dl>
 <dl class="author"><dt><b>Author:</b></dt><dd>Numerical recipes </dd></dl>
 
 <p>Definition at line <a class="el" href="purify__ran_8c_source.html#l00035">35</a> of file <a class="el" href="purify__ran_8c_source.html">purify_ran.c</a>.</p>
 
 <p>References <a class="el" href="purify__ran_8c_source.html#l00087">purify_ran_ran2()</a>.</p>
 
-<p>Referenced by <a class="el" href="purify__measurement_8c_source.html#l00856">purify_measurement_pow_meth()</a>.</p>
+<p>Referenced by <a class="el" href="purify__measurement_8c_source.html#l00862">purify_measurement_pow_meth()</a>.</p>
 
 </div>
 </div>
@@ -109,7 +109,7 @@ Must inialise <a class="el" href="purify__ran_8c.html#afe185cdc9db99b749b5c5db2f
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int <a class="el" href="purify__ran_8c.html#ace0abe9efa252721d9a11caa6564e92c">purify_ran_knuthshuffle</a> </td>
+          <td class="memname">int <a class="el" href="purify__ran_8h.html#ace0abe9efa252721d9a11caa6564e92c">purify_ran_knuthshuffle</a> </td>
           <td>(</td>
           <td class="paramtype">int *&#160;</td>
           <td class="paramname"><em>perm</em>, </td>
@@ -156,7 +156,7 @@ Must inialise <a class="el" href="purify__ran_8c.html#afe185cdc9db99b749b5c5db2f
   </table>
   </dd>
 </dl>
-<dl class="note"><dt><b>Note:</b></dt><dd>This routine calls <a class="el" href="purify__ran_8c.html#afe185cdc9db99b749b5c5db2f0590191">purify_ran_ran2</a> and so changes the state of the random generator.</dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>This routine calls <a class="el" href="purify__ran_8h.html#afe185cdc9db99b749b5c5db2f0590191">purify_ran_ran2</a> and so changes the state of the random generator.</dd></dl>
 <dl class="author"><dt><b>Authors:</b></dt><dd><a href="http://www.jasonmcewen.org">Jason McEwen</a> </dd></dl>
 
 <p>Definition at line <a class="el" href="purify__ran_8c_source.html#l00140">140</a> of file <a class="el" href="purify__ran_8c_source.html">purify_ran.c</a>.</p>
@@ -172,7 +172,7 @@ Must inialise <a class="el" href="purify__ran_8c.html#afe185cdc9db99b749b5c5db2f
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double <a class="el" href="purify__ran_8c.html#afe185cdc9db99b749b5c5db2f0590191">purify_ran_ran2</a> </td>
+          <td class="memname">double <a class="el" href="purify__ran_8h.html#afe185cdc9db99b749b5c5db2f0590191">purify_ran_ran2</a> </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>idum</em></td><td>)</td>
@@ -210,7 +210,7 @@ Long period (&gt; 2 × 1018) random number generator of L’Ecuyer with Bays-Dur
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 16 2013 20:04:34 by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Aug 8 2013 12:52:49 by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

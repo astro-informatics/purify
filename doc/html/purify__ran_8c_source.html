@@ -19,7 +19,7 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li><a href="dirs.html"><span>Directories</span></a></li>
     </ul>
@@ -32,7 +32,7 @@
   </div>
   <div id="nav-path" class="navpath">
     <ul>
-      <li class="navelem"><a class="el" href="dir_9ffe7dd5c604fd47278ae3849e4c40da.html">src</a>      </li>
+      <li class="navelem"><a class="el" href="dir_9896194fa8e05668660c9a800904979b.html">src</a>      </li>
     </ul>
   </div>
 </div>
@@ -44,11 +44,11 @@
 <a href="purify__ran_8c.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 
 <a name="l00006"></a>00006 <span class="preprocessor">#include &lt;math.h&gt;</span>
 <a name="l00007"></a>00007 <span class="preprocessor">#include &lt;stdlib.h&gt;</span>
-<a name="l00008"></a>00008 <span class="preprocessor">#include &quot;purify_ran.h&quot;</span>
-<a name="l00009"></a>00009 <span class="preprocessor">#include &quot;purify_error.h&quot;</span>
+<a name="l00008"></a>00008 <span class="preprocessor">#include &quot;<a class="code" href="purify__ran_8h.html">purify_ran.h</a>&quot;</span>
+<a name="l00009"></a>00009 <span class="preprocessor">#include &quot;<a class="code" href="purify__error_8h.html">purify_error.h</a>&quot;</span>
 <a name="l00010"></a>00010 
 <a name="l00011"></a>00011 
-<a name="l00035"></a><a class="code" href="purify__ran_8c.html#a76eaeee1aa74990791ea5b173c8b251c">00035</a> <span class="keywordtype">double</span> <a class="code" href="purify__ran_8c.html#a76eaeee1aa74990791ea5b173c8b251c">purify_ran_gasdev2</a>(<span class="keywordtype">int</span> idum) {
+<a name="l00035"></a><a class="code" href="purify__ran_8h.html#a76eaeee1aa74990791ea5b173c8b251c">00035</a> <span class="keywordtype">double</span> <a class="code" href="purify__ran_8c.html#a76eaeee1aa74990791ea5b173c8b251c">purify_ran_gasdev2</a>(<span class="keywordtype">int</span> idum) {
 <a name="l00036"></a>00036 
 <a name="l00037"></a>00037   <span class="keywordtype">double</span> gasdev2_dp;
 <a name="l00038"></a>00038   <span class="keywordtype">double</span> fac,rsq,v1,v2;
@@ -76,7 +76,7 @@
 <a name="l00060"></a>00060 }
 <a name="l00061"></a>00061 
 <a name="l00062"></a>00062 
-<a name="l00087"></a><a class="code" href="purify__ran_8c.html#afe185cdc9db99b749b5c5db2f0590191">00087</a> <span class="keywordtype">double</span> <a class="code" href="purify__ran_8c.html#afe185cdc9db99b749b5c5db2f0590191">purify_ran_ran2</a>(<span class="keywordtype">int</span> idum) {
+<a name="l00087"></a><a class="code" href="purify__ran_8h.html#afe185cdc9db99b749b5c5db2f0590191">00087</a> <span class="keywordtype">double</span> <a class="code" href="purify__ran_8c.html#afe185cdc9db99b749b5c5db2f0590191">purify_ran_ran2</a>(<span class="keywordtype">int</span> idum) {
 <a name="l00088"></a>00088 
 <a name="l00089"></a>00089   <span class="keywordtype">int</span> IM1=2147483563,IM2=2147483399,IMM1=IM1-1, 
 <a name="l00090"></a>00090     IA1=40014,IA2=40692,IQ1=53668,IQ2=52774,IR1=12211,IR2=3791, 
@@ -113,7 +113,7 @@
 <a name="l00121"></a>00121 }
 <a name="l00122"></a>00122 
 <a name="l00123"></a>00123 
-<a name="l00140"></a><a class="code" href="purify__ran_8c.html#ace0abe9efa252721d9a11caa6564e92c">00140</a> <span class="keywordtype">int</span> <a class="code" href="purify__ran_8c.html#ace0abe9efa252721d9a11caa6564e92c">purify_ran_knuthshuffle</a>(<span class="keywordtype">int</span> *perm, <span class="keywordtype">int</span> nperm, <span class="keywordtype">int</span> N, <span class="keywordtype">int</span> seed) {
+<a name="l00140"></a><a class="code" href="purify__ran_8h.html#ace0abe9efa252721d9a11caa6564e92c">00140</a> <span class="keywordtype">int</span> <a class="code" href="purify__ran_8c.html#ace0abe9efa252721d9a11caa6564e92c">purify_ran_knuthshuffle</a>(<span class="keywordtype">int</span> *perm, <span class="keywordtype">int</span> nperm, <span class="keywordtype">int</span> N, <span class="keywordtype">int</span> seed) {
 <a name="l00141"></a>00141 
 <a name="l00142"></a>00142   <span class="keywordtype">int</span> *scratch;
 <a name="l00143"></a>00143   <span class="keywordtype">int</span> i, j, tmp, nmax;
@@ -169,7 +169,7 @@
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 16 2013 20:04:34 by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Aug 8 2013 12:52:49 by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

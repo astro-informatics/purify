@@ -19,7 +19,7 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li><a href="dirs.html"><span>Directories</span></a></li>
     </ul>
@@ -32,7 +32,7 @@
   </div>
   <div id="nav-path" class="navpath">
     <ul>
-      <li class="navelem"><a class="el" href="dir_9ffe7dd5c604fd47278ae3849e4c40da.html">src</a>      </li>
+      <li class="navelem"><a class="el" href="dir_9896194fa8e05668660c9a800904979b.html">src</a>      </li>
     </ul>
   </div>
 </div>
@@ -48,15 +48,15 @@
 <code>#include &lt;math.h&gt;</code><br/>
 <code>#include &lt;complex.h&gt;</code><br/>
 <code>#include &lt;fftw3.h&gt;</code><br/>
-<code>#include &lt;Accelerate/Accelerate.h&gt;</code><br/>
-<code>#include &quot;purify_image.h&quot;</code><br/>
-<code>#include &quot;purify_sparsemat.h&quot;</code><br/>
-<code>#include &quot;purify_visibility.h&quot;</code><br/>
-<code>#include &quot;purify_error.h&quot;</code><br/>
-<code>#include &quot;purify_types.h&quot;</code><br/>
-<code>#include &quot;purify_utils.h&quot;</code><br/>
-<code>#include &quot;purify_measurement.h&quot;</code><br/>
-<code>#include &quot;purify_ran.h&quot;</code><br/>
+<code>#include &lt;cblas.h&gt;</code><br/>
+<code>#include &quot;<a class="el" href="purify__image_8h_source.html">purify_image.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__sparsemat_8h_source.html">purify_sparsemat.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__visibility_8h_source.html">purify_visibility.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__error_8h_source.html">purify_error.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__types_8h_source.html">purify_types.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__utils_8h_source.html">purify_utils.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__measurement_8h_source.html">purify_measurement.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="purify__ran_8h_source.html">purify_ran.h</a>&quot;</code><br/>
 </div>
 <p><a href="purify__measurement_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -67,7 +67,7 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__measurement_8c.html#af70ff6fba25fd3eb1945f32569f66e4f">purify_measurement_mask_opfwd</a> (void *out, void *in, void **data)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__measurement_8c.html#aade89eebf19bb473447d47377e680ab0">purify_measurement_mask_opadj</a> (void *out, void *in, void **data)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__measurement_8c.html#a16df22650e9f52a681a72b2bf45c2245">purify_measurement_opfwd</a> (void *out, void *in, void **data)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__measurement_8c.html#af65e0d9075b0b1da7ff83ab6c8579fd1">purify_measurement_init_cft</a> (purify_sparsemat_row *mat, double *deconv, double *u, double *v, purify_measurement_cparam *param)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__measurement_8c.html#af65e0d9075b0b1da7ff83ab6c8579fd1">purify_measurement_init_cft</a> (<a class="el" href="structpurify__sparsemat__row.html">purify_sparsemat_row</a> *mat, double *deconv, double *u, double *v, <a class="el" href="structpurify__measurement__cparam.html">purify_measurement_cparam</a> *param)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__measurement_8c.html#a876f0179c953c7bf3ec9ea3039b9815e">purify_measurement_cftfwd</a> (void *out, void *in, void **data)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__measurement_8c.html#a7968b44abc44478f942c29bd3d8c81dd">purify_measurement_cftadj</a> (void *out, void *in, void **data)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="purify__measurement_8c.html#acbab39e87db6866b3c885f88f3245d1d">purify_measurement_pow_meth</a> (void(*A)(void *out, void *in, void **data), void **A_data, void(*At)(void *out, void *in, void **data), void **At_data)</td></tr>
@@ -84,7 +84,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__measurement_8c.html#a7968b44abc44478f942c29bd3d8c81dd">purify_measurement_cftadj</a> </td>
+          <td class="memname">void <a class="el" href="purify__measurement_8h.html#a7968b44abc44478f942c29bd3d8c81dd">purify_measurement_cftadj</a> </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>out</em>, </td>
@@ -127,11 +127,11 @@ Functions</h2></td></tr>
 </dl>
 <dl class="author"><dt><b>Authors:</b></dt><dd>Rafael Carrillo </dd></dl>
 
-<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00796">796</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
+<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00802">802</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
 
-<p>References <a class="el" href="purify__sparsemat_8c_source.html#l00335">purify_sparsemat_adj_complexr()</a>.</p>
+<p>References <a class="el" href="purify__measurement_8h_source.html#l00015">purify_measurement_cparam::nx1</a>, <a class="el" href="purify__measurement_8h_source.html#l00013">purify_measurement_cparam::ny1</a>, <a class="el" href="purify__measurement_8h_source.html#l00019">purify_measurement_cparam::ofx</a>, <a class="el" href="purify__measurement_8h_source.html#l00017">purify_measurement_cparam::ofy</a>, and <a class="el" href="purify__sparsemat_8c_source.html#l00335">purify_sparsemat_adj_complexr()</a>.</p>
 
-<p>Referenced by <a class="el" href="example__30dor_8c_source.html#l00046">main()</a>, <a class="el" href="purify__measurement_8c_source.html#l01009">purify_measurement_symcftadj()</a>, and <a class="el" href="purify__sim1_8c_source.html#l00197">sim_cont()</a>.</p>
+<p>Referenced by <a class="el" href="example__30dor_8c_source.html#l00045">main()</a>, and <a class="el" href="purify__measurement_8c_source.html#l01015">purify_measurement_symcftadj()</a>.</p>
 
 </div>
 </div>
@@ -140,7 +140,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__measurement_8c.html#a876f0179c953c7bf3ec9ea3039b9815e">purify_measurement_cftfwd</a> </td>
+          <td class="memname">void <a class="el" href="purify__measurement_8h.html#a876f0179c953c7bf3ec9ea3039b9815e">purify_measurement_cftfwd</a> </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>out</em>, </td>
@@ -183,11 +183,11 @@ Functions</h2></td></tr>
 </dl>
 <dl class="author"><dt><b>Authors:</b></dt><dd>Rafael Carrillo </dd></dl>
 
-<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00722">722</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
+<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00728">728</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
 
-<p>References <a class="el" href="purify__sparsemat_8c_source.html#l00300">purify_sparsemat_fwd_complexr()</a>.</p>
+<p>References <a class="el" href="purify__measurement_8h_source.html#l00015">purify_measurement_cparam::nx1</a>, <a class="el" href="purify__measurement_8h_source.html#l00013">purify_measurement_cparam::ny1</a>, <a class="el" href="purify__measurement_8h_source.html#l00019">purify_measurement_cparam::ofx</a>, <a class="el" href="purify__measurement_8h_source.html#l00017">purify_measurement_cparam::ofy</a>, and <a class="el" href="purify__sparsemat_8c_source.html#l00300">purify_sparsemat_fwd_complexr()</a>.</p>
 
-<p>Referenced by <a class="el" href="example__30dor_8c_source.html#l00046">main()</a>, <a class="el" href="purify__measurement_8c_source.html#l00963">purify_measurement_symcftfwd()</a>, and <a class="el" href="purify__sim1_8c_source.html#l00197">sim_cont()</a>.</p>
+<p>Referenced by <a class="el" href="example__30dor_8c_source.html#l00045">main()</a>, and <a class="el" href="purify__measurement_8c_source.html#l00969">purify_measurement_symcftfwd()</a>.</p>
 
 </div>
 </div>
@@ -196,7 +196,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__measurement_8c.html#ab748ad2cbc80f8c19589eb48840a5e2c">purify_measurement_fft_complex</a> </td>
+          <td class="memname">void <a class="el" href="purify__measurement_8h.html#ab748ad2cbc80f8c19589eb48840a5e2c">purify_measurement_fft_complex</a> </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>out</em>, </td>
@@ -235,7 +235,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="author"><dt><b>Authors:</b></dt><dd><a href="http://www.jasonmcewen.org">Jason McEwen</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00121">121</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
+<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00127">127</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
 
 </div>
 </div>
@@ -244,7 +244,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__measurement_8c.html#a9c67649713a41be1587e6e67e989f4a4">purify_measurement_fft_real</a> </td>
+          <td class="memname">void <a class="el" href="purify__measurement_8h.html#a9c67649713a41be1587e6e67e989f4a4">purify_measurement_fft_real</a> </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>out</em>, </td>
@@ -284,11 +284,11 @@ Functions</h2></td></tr>
 </dl>
 <dl class="author"><dt><b>Authors:</b></dt><dd><a href="http://www.jasonmcewen.org">Jason McEwen</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00038">38</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
+<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00044">44</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
 
-<p>References <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, and <a class="el" href="purify__visibility_8c_source.html#l00036">purify_visibility_iuiv2ind()</a>.</p>
+<p>References <a class="el" href="purify__image_8h_source.html#l00014">purify_image::nx</a>, <a class="el" href="purify__image_8h_source.html#l00016">purify_image::ny</a>, <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, and <a class="el" href="purify__visibility_8c_source.html#l00036">purify_visibility_iuiv2ind()</a>.</p>
 
-<p>Referenced by <a class="el" href="purify__measurement_8c_source.html#l00197">purify_measurement_opfwd()</a>.</p>
+<p>Referenced by <a class="el" href="purify__measurement_8c_source.html#l00203">purify_measurement_opfwd()</a>.</p>
 
 </div>
 </div>
@@ -297,9 +297,9 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__measurement_8c.html#af65e0d9075b0b1da7ff83ab6c8579fd1">purify_measurement_init_cft</a> </td>
+          <td class="memname">void <a class="el" href="purify__measurement_8h.html#af65e0d9075b0b1da7ff83ab6c8579fd1">purify_measurement_init_cft</a> </td>
           <td>(</td>
-          <td class="paramtype">purify_sparsemat_row *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__sparsemat__row.html">purify_sparsemat_row</a> *&#160;</td>
           <td class="paramname"><em>mat</em>, </td>
         </tr>
         <tr>
@@ -323,7 +323,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">purify_measurement_cparam *&#160;</td>
+          <td class="paramtype"><a class="el" href="structpurify__measurement__cparam.html">purify_measurement_cparam</a> *&#160;</td>
           <td class="paramname"><em>param</em>&#160;</td>
         </tr>
         <tr>
@@ -347,11 +347,11 @@ Functions</h2></td></tr>
 </dl>
 <dl class="author"><dt><b>Authors:</b></dt><dd>Rafael Carrillo </dd></dl>
 
-<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00238">238</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
+<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00244">244</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
 
-<p>References <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, and <a class="el" href="purify__utils_8c_source.html#l00098">purify_utils_absearch()</a>.</p>
+<p>References <a class="el" href="purify__sparsemat_8h_source.html#l00055">purify_sparsemat_row::colind</a>, <a class="el" href="purify__sparsemat_8h_source.html#l00053">purify_sparsemat_row::cvals</a>, <a class="el" href="purify__measurement_8h_source.html#l00023">purify_measurement_cparam::kx</a>, <a class="el" href="purify__measurement_8h_source.html#l00021">purify_measurement_cparam::ky</a>, <a class="el" href="purify__sparsemat_8h_source.html#l00045">purify_sparsemat_row::ncols</a>, <a class="el" href="purify__measurement_8h_source.html#l00011">purify_measurement_cparam::nmeas</a>, <a class="el" href="purify__sparsemat_8h_source.html#l00043">purify_sparsemat_row::nrows</a>, <a class="el" href="purify__sparsemat_8h_source.html#l00047">purify_sparsemat_row::nvals</a>, <a class="el" href="purify__measurement_8h_source.html#l00015">purify_measurement_cparam::nx1</a>, <a class="el" href="purify__measurement_8h_source.html#l00013">purify_measurement_cparam::ny1</a>, <a class="el" href="purify__measurement_8h_source.html#l00019">purify_measurement_cparam::ofx</a>, <a class="el" href="purify__measurement_8h_source.html#l00017">purify_measurement_cparam::ofy</a>, <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, <a class="el" href="purify__types_8h_source.html#l00010">PURIFY_PI</a>, <a class="el" href="purify__utils_8c_source.html#l00098">purify_utils_absearch()</a>, <a class="el" href="purify__sparsemat_8h_source.html#l00049">purify_sparsemat_row::real</a>, <a class="el" href="purify__sparsemat_8h_source.html#l00057">purify_sparsemat_row::rowptr</a>, and <a class="el" href="purify__sparsemat_8h_source.html#l00051">purify_sparsemat_row::vals</a>.</p>
 
-<p>Referenced by <a class="el" href="example__30dor_8c_source.html#l00046">main()</a>, and <a class="el" href="purify__sim1_8c_source.html#l00197">sim_cont()</a>.</p>
+<p>Referenced by <a class="el" href="example__30dor_8c_source.html#l00045">main()</a>.</p>
 
 </div>
 </div>
@@ -360,7 +360,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__measurement_8c.html#aade89eebf19bb473447d47377e680ab0">purify_measurement_mask_opadj</a> </td>
+          <td class="memname">void <a class="el" href="purify__measurement_8h.html#aade89eebf19bb473447d47377e680ab0">purify_measurement_mask_opadj</a> </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>out</em>, </td>
@@ -399,7 +399,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="author"><dt><b>Authors:</b></dt><dd><a href="http://www.jasonmcewen.org">Jason McEwen</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00169">169</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
+<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00175">175</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
 
 <p>References <a class="el" href="purify__sparsemat_8c_source.html#l00162">purify_sparsemat_adj_complex()</a>.</p>
 
@@ -410,7 +410,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__measurement_8c.html#af70ff6fba25fd3eb1945f32569f66e4f">purify_measurement_mask_opfwd</a> </td>
+          <td class="memname">void <a class="el" href="purify__measurement_8h.html#af70ff6fba25fd3eb1945f32569f66e4f">purify_measurement_mask_opfwd</a> </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>out</em>, </td>
@@ -449,11 +449,11 @@ Functions</h2></td></tr>
 </dl>
 <dl class="author"><dt><b>Authors:</b></dt><dd><a href="http://www.jasonmcewen.org">Jason McEwen</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00145">145</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
+<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00151">151</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
 
 <p>References <a class="el" href="purify__sparsemat_8c_source.html#l00128">purify_sparsemat_fwd_complex()</a>.</p>
 
-<p>Referenced by <a class="el" href="purify__measurement_8c_source.html#l00197">purify_measurement_opfwd()</a>.</p>
+<p>Referenced by <a class="el" href="purify__measurement_8c_source.html#l00203">purify_measurement_opfwd()</a>.</p>
 
 </div>
 </div>
@@ -462,7 +462,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__measurement_8c.html#a16df22650e9f52a681a72b2bf45c2245">purify_measurement_opfwd</a> </td>
+          <td class="memname">void <a class="el" href="purify__measurement_8h.html#a16df22650e9f52a681a72b2bf45c2245">purify_measurement_opfwd</a> </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>out</em>, </td>
@@ -503,11 +503,9 @@ Functions</h2></td></tr>
 </dl>
 <dl class="author"><dt><b>Authors:</b></dt><dd><a href="http://www.jasonmcewen.org">Jason McEwen</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00197">197</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
+<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00203">203</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
 
-<p>References <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, <a class="el" href="purify__measurement_8c_source.html#l00038">purify_measurement_fft_real()</a>, and <a class="el" href="purify__measurement_8c_source.html#l00145">purify_measurement_mask_opfwd()</a>.</p>
-
-<p>Referenced by <a class="el" href="purify__sim_8c_source.html#l00029">main()</a>.</p>
+<p>References <a class="el" href="purify__image_8h_source.html#l00014">purify_image::nx</a>, <a class="el" href="purify__image_8h_source.html#l00016">purify_image::ny</a>, <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, <a class="el" href="purify__measurement_8c_source.html#l00044">purify_measurement_fft_real()</a>, and <a class="el" href="purify__measurement_8c_source.html#l00151">purify_measurement_mask_opfwd()</a>.</p>
 
 </div>
 </div>
@@ -516,7 +514,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double <a class="el" href="purify__measurement_8c.html#acbab39e87db6866b3c885f88f3245d1d">purify_measurement_pow_meth</a> </td>
+          <td class="memname">double <a class="el" href="purify__measurement_8h.html#acbab39e87db6866b3c885f88f3245d1d">purify_measurement_pow_meth</a> </td>
           <td>(</td>
           <td class="paramtype">void(*)(void *out, void *in, void **data)&#160;</td>
           <td class="paramname"><em>A</em>, </td>
@@ -565,9 +563,9 @@ Functions</h2></td></tr>
 </dl>
 <dl class="author"><dt><b>Authors:</b></dt><dd>Rafael Carrillo </dd></dl>
 
-<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00856">856</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
+<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00862">862</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
 
-<p>References <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, and <a class="el" href="purify__ran_8c_source.html#l00035">purify_ran_gasdev2()</a>.</p>
+<p>References <a class="el" href="purify__measurement_8h_source.html#l00011">purify_measurement_cparam::nmeas</a>, <a class="el" href="purify__measurement_8h_source.html#l00015">purify_measurement_cparam::nx1</a>, <a class="el" href="purify__measurement_8h_source.html#l00013">purify_measurement_cparam::ny1</a>, <a class="el" href="purify__error_8c_source.html#l00035">PURIFY_ERROR_MEM_ALLOC_CHECK()</a>, and <a class="el" href="purify__ran_8c_source.html#l00035">purify_ran_gasdev2()</a>.</p>
 
 </div>
 </div>
@@ -576,7 +574,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__measurement_8c.html#a434ca16d113e681f99b2b5eb7cb57852">purify_measurement_symcftadj</a> </td>
+          <td class="memname">void <a class="el" href="purify__measurement_8h.html#a434ca16d113e681f99b2b5eb7cb57852">purify_measurement_symcftadj</a> </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>out</em>, </td>
@@ -619,9 +617,9 @@ Functions</h2></td></tr>
 </dl>
 <dl class="author"><dt><b>Authors:</b></dt><dd>Rafael Carrillo </dd></dl>
 
-<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l01009">1009</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
+<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l01015">1015</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
 
-<p>References <a class="el" href="purify__measurement_8c_source.html#l00796">purify_measurement_cftadj()</a>.</p>
+<p>References <a class="el" href="purify__measurement_8h_source.html#l00015">purify_measurement_cparam::nx1</a>, <a class="el" href="purify__measurement_8h_source.html#l00013">purify_measurement_cparam::ny1</a>, and <a class="el" href="purify__measurement_8c_source.html#l00802">purify_measurement_cftadj()</a>.</p>
 
 </div>
 </div>
@@ -630,7 +628,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="purify__measurement_8c.html#aa92602bef5a7bed96f85c148ad692e7b">purify_measurement_symcftfwd</a> </td>
+          <td class="memname">void <a class="el" href="purify__measurement_8h.html#aa92602bef5a7bed96f85c148ad692e7b">purify_measurement_symcftfwd</a> </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>out</em>, </td>
@@ -673,9 +671,9 @@ Functions</h2></td></tr>
 </dl>
 <dl class="author"><dt><b>Authors:</b></dt><dd>Rafael Carrillo </dd></dl>
 
-<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00963">963</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
+<p>Definition at line <a class="el" href="purify__measurement_8c_source.html#l00969">969</a> of file <a class="el" href="purify__measurement_8c_source.html">purify_measurement.c</a>.</p>
 
-<p>References <a class="el" href="purify__measurement_8c_source.html#l00722">purify_measurement_cftfwd()</a>.</p>
+<p>References <a class="el" href="purify__measurement_8h_source.html#l00011">purify_measurement_cparam::nmeas</a>, and <a class="el" href="purify__measurement_8c_source.html#l00728">purify_measurement_cftfwd()</a>.</p>
 
 </div>
 </div>
@@ -683,7 +681,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 16 2013 20:04:34 by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Aug 8 2013 12:52:49 by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
