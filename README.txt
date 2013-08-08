@@ -33,13 +33,19 @@ REFERENCES
     Preprint available at http://infoscience.epfl.ch/record/187457.
 
 DOCUMENTATION
-   See doc/index.html
+   See doc/html/index.html
+
+WEBPAGE
+   http://basp-group.github.io/purify/
 
 INSTALLATION 
   To install the toolbox, the CFITSIO library 
   (heasarc.gsfc.nasa.gov/fitsio/)  and the SOPT toolbox 
   (github.com/basp-group/sopt) must be installed. 
-  Once these are installed you just need to type
+  A makefile is provided to build the code. Before compiling you 
+  might need to edit the makefile to specify your compiler and the 
+  location where the dependencies are installed. Once these are 
+  installed you just need to type
   
   %make all
 
@@ -50,7 +56,7 @@ SUPPORT
   Carrillo at: rafael {DOT} carrillo {AT} epfl {DOT} ch.
 
 NOTES
-  The code is not optimized and is given for educational purpose. The code is
+  The code is given for educational purpose. The code is
   in beta and still under development.
 
 LICENSE
