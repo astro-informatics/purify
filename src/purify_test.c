@@ -54,7 +54,6 @@ int main(int argc, char *argv[]) {
   double snr_out;
   double gamma=0.001;
   double aux1, aux2;
-  complex double alpha;
   
 
   purify_image img, img_copy;
