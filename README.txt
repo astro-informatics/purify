@@ -14,7 +14,7 @@ DESCRIPTION
 AUTHORS
   R. E. Carrillo (http://people.epfl.ch/rafael.carrillo)
   J. D. McEwen (http://www.jasonmcewen.org)
-  Y. Wiaux (http://people.epfl.ch/yves.wiaux)
+  Y. Wiaux (http://basp.eps.hw.ac.uk)
 
 EXPERIMENTS
   To run an example with a simulated AMI coverage and a 128X128 M31 test image,
