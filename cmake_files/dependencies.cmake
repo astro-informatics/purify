@@ -37,4 +37,11 @@ set(TARGET_LIBRARIES
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${BLAS_LINKER_FLAGS}")
 
-
+if(openmp)
+  find_package(OpenMP)
+  if(OPENMP_FOUND)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  else()
+    message(STATUS "Could not find OpenMP. Compiling without.")
+  endif()
+endif()

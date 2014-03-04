@@ -13,6 +13,7 @@ version_and_build_id(0.1)
 include(c99_flags)
 
 option(tests          "Enable testing"                         on)
+option(openmp         "Enable OpenMP"                          on)
 
 
 # Downloads and installs GreatCMakeCookOff
