@@ -3,6 +3,10 @@ find_package(FFTW3 REQUIRED)
 find_package(TIFF REQUIRED)
 find_package(CFitsIO REQUIRED)
 find_package(BLAS REQUIRED)
+# find_package blas does not look for cblas.h
+if(NOT EXISTS BLAS_INCLUDE_DIR)
+  find_path(BLAS_INCLUDE_DIR cblas.h)
+endif()
 
 # Find somewhat extenal package
 if(EXISTS ${PROJECT_SOURCE_DIR}/../sopt)
