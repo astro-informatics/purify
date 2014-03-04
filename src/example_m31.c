@@ -108,7 +108,9 @@ int main(int argc, char *argv[]) {
 
   clock_t start, stop;
   double t = 0.0;
+  #ifdef _OPENMP 
   double start1, stop1;
+  #endif
   int dimy, dimx;
   
   //Image dimension of the zero padded image
