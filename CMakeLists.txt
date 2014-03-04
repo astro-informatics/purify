@@ -8,7 +8,11 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_files)
 include(version_and_build_id)
 version_and_build_id(0.1)
 
-option(tests          "Enable testing."                         on)
+# Add C99 flag, since code uses inline 
+# yeah, yeah it is GNU C, and others since for ever, but it was not part of the standard. 
+include(c99_flags)
+
+option(tests          "Enable testing"                         on)
 
 
 # Downloads and installs GreatCMakeCookOff
