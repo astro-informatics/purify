@@ -49,6 +49,7 @@ extern void purify_image_ind2iuiv(int *ix, int *iy, int ind,
 void purify_image_free(purify_image *img) {
   
   if(img->pix != NULL) free(img->pix);
+  img->pix = NULL;
   img->fov_x = 0.0;
   img->fov_y = 0.0;
   img->nx = 0;
