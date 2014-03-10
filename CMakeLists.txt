@@ -14,6 +14,7 @@ include(c99_flags)
 
 option(tests          "Enable testing"                         on)
 option(openmp         "Enable OpenMP"                          on)
+option(python         "Enable python bindings"                 on)
 
 
 # Downloads and installs GreatCMakeCookOff
@@ -26,6 +27,10 @@ if(tests)
   enable_testing()
 endif()
 
+if(python) 
+  include(python)
+endif()
+
 add_subdirectory(src)
 add_subdirectory(include)
-
+add_subdirectory(python)
