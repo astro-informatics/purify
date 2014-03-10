@@ -60,6 +60,7 @@ if(python)
 
   add_custom_target(python_files)
   add_cython_modules(visibility)
+  add_cython_modules(image)
 
   add_python_files(*.py ${PYPURIFY_DIRECTORY})
   add_python_files( ${PROJECT_SOURCE_DIR}/data/images/Coverages/*.vis 
