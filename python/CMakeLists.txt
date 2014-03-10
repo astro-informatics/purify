@@ -8,24 +8,50 @@ if(python)
     set_target_properties(py${NAME} PROPERTIES OUTPUT_NAME ${NAME})
     set_target_properties(py${NAME} PROPERTIES PREFIX "")
     set_target_properties(py${NAME} PROPERTIES SUFFIX ".so")
-    target_link_libraries(py${NAME} ${PYTHON_LIBRARIES})
+    target_link_libraries(py${NAME} ${PYTHON_LIBRARIES} libpurify)
     # Change path to something such that we can import it in tests.
     set_target_properties(py${NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PYPURIFY_DIRECTORY})
+
   endfunction()
 
-  # Copy python files to output package
-  file(GLOB input_sources *.py)
-  foreach(input ${input_sources})
+  function(add_cython_module TARGET)
+
+    set(OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.c)
     add_custom_command(
-      TARGET pypurify
-      POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${input} ${PYPURIFY_DIRECTORY}
+      OUTPUT ${OUTPUT_FILE}
+      COMMAND ${PYTHON_EXECUTABLE} -m cython ${ARGN} -o ${OUTPUT_FILE}
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+      DEPENDS ${ARGN}
     )
-  endforeach()
+
+    add_python_module(${TARGET} ${OUTPUT_FILE})
+    add_dependencies(py${TARGET} ${ARGN})
+
+  endfunction()
+
+  add_cython_module(visibility visibility.pyx)
+
+  # Copy python files to output package
+  add_custom_target(python_files)
+  function(add_python_files THEGLOB OUTPUT_DIR)
+    file(GLOB input_sources ${THEGLOB})
+    foreach(input ${input_sources})
+      add_custom_command(
+        TARGET python_files
+        PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${input} ${OUTPUT_DIR}
+        DEPENDS ${input}
+      )
+      add_dependencies(pyvisibility python_files)
+    endforeach()
+  endfunction() 
+
+  add_python_files(*.py ${PYPURIFY_DIRECTORY})
+  add_python_files( ${PROJECT_SOURCE_DIR}/data/images/Coverages/*.vis 
+                    ${PYPURIFY_DIRECTORY}/data/images/Coverage/ )
 
   # Installation
-  install(TARGETS pypurify DESTINATION ${PYTHON_PKG_DIR}/purify)
-  install(FILES ${input_sources} DESTINATION ${PYTHON_PKG_DIR}/purify)
+  install(TARGETS pyvisibility DESTINATION ${PYTHON_PKG_DIR}/purify)
 endif()
 
 add_subdirectory(tests)

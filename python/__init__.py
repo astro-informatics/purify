@@ -1,5 +1,4 @@
 """ Purify package """
 __docformat__ = "restructuredtext en"
-__all__ = ['visibility_descriptor']
-
-from _purify import visibility_descriptor
+__all__ = ['read_visibility']
+from .visibility import read_visibility

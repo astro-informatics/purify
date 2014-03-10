@@ -22,4 +22,5 @@ if(tests AND python)
     set_tests_properties(${SOURCE_NAME} PROPERTIES LABELS "nose")
   endfunction()
 
+  add_nose_test(test_visibility.py)
 endif()
