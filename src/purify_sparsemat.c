@@ -21,6 +21,10 @@ void purify_sparsemat_free(purify_sparsemat *mat) {
   if(mat->cvals != NULL) free(mat->cvals);
   if(mat->rowind != NULL) free(mat->rowind);
   if(mat->colptr != NULL) free(mat->colptr);
+  mat->vals = NULL;
+  mat->cvals = NULL;
+  mat->rowind = NULL;
+  mat->colptr = NULL;
   mat->nrows = 0;
   mat->ncols = 0;
   mat->nvals = 0;
