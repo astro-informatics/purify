@@ -23,4 +23,6 @@ if(tests AND python)
   endfunction()
 
   add_nose_test(test_visibility.py)
+  add_nose_test(test_image.py)
+  add_nose_test(test_sparse.py)
 endif()
