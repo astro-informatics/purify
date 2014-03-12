@@ -45,17 +45,18 @@ find_package(PythonLibs REQUIRED)
 # But it is likely headers are from different place under macos + brew
 if(NOT ${PYTHONLIBS_VERSION_STRING} VERSION_EQUAL ${PYTHON_VERSION_STRING})
   unset(PYTHON_INCLUDE_DIR)
-  find_path(PYTHON_INCLUDE_DIR 
+  string(REGEX REPLACE "([0-9]\\.[0-9]+)\\.[0-9]+" "\\1" version_string "${PYTHON_VERSION_STRING}")
+  find_path(_PYTHON_INCLUDE_DIR 
     NAMES Python.h
-    HINTS ${PYTHON_INTERP_PREFIX}
+    HINTS ${PYTHON_INTERP_PREFIX}/
     PATH_SUFFIXES
-      include/python${_CURRENT_VERSION}mu
-      include/python${_CURRENT_VERSION}m
-      include/python${_CURRENT_VERSION}u
-      include/python${_CURRENT_VERSION}
+      include/python${version_string}mu
+      include/python${version_string}m
+      include/python${version_string}u
+      include/python${version_string}
     NO_DEFAULT_PATH
   )
-  set(PYTHON_INCLUDE_DIR ${PYTHON_INCLUDE_DIR} CACHE PATH "Path to python includes")
+  set(PYTHON_INCLUDE_DIR ${_PYTHON_INCLUDE_DIR} CACHE PATH "Path to python includes" FORCE)
 
   if(PYTHON_INCLUDE_DIR AND EXISTS "${PYTHON_INCLUDE_DIR}/patchlevel.h")
     file(STRINGS 
