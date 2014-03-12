@@ -80,7 +80,7 @@ function(add_cython_modules TARGET)
   )
 
   add_python_module(${TARGET} ${ARGN} FILES ${OUTPUT_FILE})
-  add_dependencies(py${TARGET} ${DEPENDENCIES})
+  add_dependencies(py${TARGET} ${OUTPUT_FILE})
   target_link_libraries(py${TARGET} ${TARGET_LIBRARIES})
 
 endfunction()
