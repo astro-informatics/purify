@@ -17,18 +17,6 @@ if(tests AND python)
     set_tests_properties(${testname} PROPERTIES LABELS "nose")
   endfunction()
 
-  # Copy pdx (cython's header files) to include directory on build dir
-  # This hoop must be jumped if we want cython to find those headers, since compilation is from
-  # files in the "python" directory, rather than a "purify" directory, as per normal python package
-  # directory organisation. The alternative to having a python directory structure, is having pdx
-  # files with names package.subpackage.pdx. This is what the next statements do.
-  add_custom_target(test_copy)
-  include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
-
-  add_copy_files( test_copy GLOB ${PROJECT_SOURCE_DIR}/python/*.pxd 
-                  DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include
-                  REPLACE "([^ ]+)" "purify.\\1" )
-
   # add testing packages
   add_cython_modules(sparse_testing
     LOCATION ${PYPURIFY_DIRECTORY}/tests
