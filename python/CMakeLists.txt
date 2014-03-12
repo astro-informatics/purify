@@ -12,7 +12,7 @@ if(python)
   ###############################
 
   add_custom_target(copy)
-  foreach(module visibility image sparse)
+  foreach(module visibility image sparse functor)
     add_cython_modules(${module}
       LOCATION ${PYPURIFY_DIRECTORY}
       LIBRARIES ${PYTHON_LIBRARIES} libpurify
