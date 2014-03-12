@@ -29,6 +29,7 @@ endif()
 
 if(python) 
   include(python)
+  include(cython)
 endif()
 
 add_subdirectory(src)
