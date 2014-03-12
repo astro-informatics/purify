@@ -32,7 +32,12 @@ if(tests AND python)
   # add testing packages
   add_cython_modules(sparse_testing
     LOCATION ${PYPURIFY_DIRECTORY}/tests
-    LIBRARIES ${PYTHON_LIBRARIES} 
+    LIBRARIES ${PYTHON_LIBRARIES}
+    DEPENDS test_copy
+  )
+  add_cython_modules(visibility_testing
+    LOCATION ${PYPURIFY_DIRECTORY}/tests
+    LIBRARIES ${PYTHON_LIBRARIES}
     DEPENDS test_copy
   )
 
