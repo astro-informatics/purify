@@ -32,4 +32,6 @@ cdef extern from "sopt_sara.h":
         int nb_levels
 
 cdef class BasisFunctions:
-    cdef sopt_sara_param wavelets
+    cdef sopt_sara_param _wavelets
+    cpdef analyze(self, image)
+    cpdef synthesize(self, inout)

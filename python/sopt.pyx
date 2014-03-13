@@ -1,9 +1,12 @@
+from cython.view cimport contiguous
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 
 cdef extern from "sopt_sara.h":
     void sopt_sara_initop(sopt_sara_param *param, int nx1, int nx2, int nb_levels, 
                           sopt_wavelet_type *dict_types)
     void sopt_sara_free(sopt_sara_param *param)
+    void sopt_sara_analysisop(void *, void *, void **)
+    void sopt_sara_synthesisop(void *, void *, void **)
 
 cdef class BasisFunctions:
     """ Mostly opaque object that holds basis-function information """
@@ -44,27 +47,39 @@ cdef class BasisFunctions:
 
         for i, wavelet in enumerate(types): wavelets[i] = self.wavelet_types[wavelet.lower()]
 
-        self.wavelets.ndict = len(types)
-        self.wavelets.real = 0;
-        sopt_sara_initop(&self.wavelets, shape[0], shape[1], <int>nlevels, wavelets)
+        self._wavelets.ndict = len(types)
+        self._wavelets.real = 0;
+        sopt_sara_initop(&self._wavelets, shape[0], shape[1], <int>nlevels, wavelets)
         
         PyMem_Free(wavelets)
 
     def __dealloc__(self):
-        sopt_sara_free(&self.wavelets)
+        sopt_sara_free(&self._wavelets)
+        self._wavelets.wav_params = NULL
+        self._wavelets.ndict = 0
 
     def __len__(self):
         """ Number of wavelet basis """
-        return self.wavelets.ndict
+        return self._wavelets.ndict
 
     def __getitem__(self, index):
-        """ Returns names of wavelets """
+        """ Returns tuple with information from wavelets """
+        from numpy import asarray
+        from collections import namedtuple
         if index < 0: index += len(self)
         if index < 0 or index >= len(self): raise IndexError("BasisFunctions")
-        value = self.wavelets.wav_params[index].type
+        
+        Wavelet = namedtuple('Wavelet', ['name', 'type', 'shape', 'nlevels', 'filter'])
+
+        cdef sopt_wavelet_param* wavelet = &self._wavelets.wav_params[index]
         for name, type in self.wavelet_types.iteritems():
-            if type == value: return name
-        raise RuntimeError("Could not determine basis function type")
+            if type == wavelet.type: break
+        else: raise RuntimeError("Could not determine basis function type")
+
+        filter = asarray(<double[:wavelet.h_size:1]> wavelet.h)
+        filter.flags.writeable = False
+        return Wavelet( name=name, type=wavelet.type, shape=(wavelet.nx1, wavelet.nx2),
+                        nlevels=wavelet.nb_levels, filter=filter )
 
     def __iter__(self):
         """ Iterates over wavelets """
@@ -72,12 +87,57 @@ cdef class BasisFunctions:
             for i in xrange(len(self)): yield self[i]
         return generator()
 
-    property nlevels:
-        """ Number of levels for each wavelets """
-        def __get__(self):
-            return self.wavelets.wav_params.nb_levels
+    cpdef analyze(self, image):
+        """ computes the analysis operator for concatenation of bases 
 
-    property shape:
-        """ Planar dimensions """
-        def __get__(self):
-            return self.wavelets.wav_params.nx1, self.wavelets.wav_params.nx2
+            :Parameters:
+                image: numpy.ndarray
+                    Should have the same shape as the wavelets in this object.
+                    Should be real if the wavelets are real, and real or complex if the wavelets are
+                    complex.
+        """
+        from numpy import zeros, dtype as np_dtype
+
+        # Checks size of input
+        assert len(set([u.shape for u in self])) == 1
+        if self[0].shape != image.shape: raise ValueError("Incorrect image shape.")
+
+        # Checks type of the input and transform it if need be 
+        dtype = np_dtype('double' if self._wavelets.real else 'complex')
+        if dtype != image.dtype: image = image.astype(dtype)
+
+        # Creates ouput and calls C function
+        result = zeros((len(self),) + image.shape, dtype=dtype)
+        cdef:
+            unsigned char[::1] c_image = image.data
+            unsigned char[::1] c_result = result.data
+            void *c_voidify = <void*> &self._wavelets
+        sopt_sara_analysisop(<void*> &c_result[0], <void*> &c_image[0], &c_voidify)
+
+        return result
+
+    cpdef synthesize(self, inout):
+        """ This function computes the synthesis operator for concatenation of bases.
+            
+            For parameters, see sopt_sara_synthesisop.
+        """
+        from numpy import zeros, dtype as np_dtype
+
+        # Checks size of input
+        assert len(set([u.shape for u in self])) == 1
+        if ((len(self),) + self[0].shape) != inout.shape:
+            raise ValueError("Incorrect input shape.")
+
+        # Checks type of the input and transform it if need be 
+        dtype = np_dtype('double' if self._wavelets.real else 'complex')
+        if dtype != inout.dtype: inout = inout.astype(dtype)
+
+        # Creates ouput and calls C function
+        result = zeros(self[0].shape, dtype=dtype)
+        cdef:
+            unsigned char[::1] c_inout = inout.data
+            unsigned char[::1] c_result = result.data
+            void *c_voidify = <void*> &self._wavelets
+        sopt_sara_synthesisop(<void*> &c_result[0], <void*> &c_inout[0], &c_voidify)
+
+        return result
