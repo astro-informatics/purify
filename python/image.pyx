@@ -23,15 +23,13 @@ cdef class Image:
         double _fov[2]
         object _pixels
 
-    def __cinit__(self):
-        """ Sets up C quantities """
-        pass
-
-    def __init__(self, fov=None, filename = None):
+    def __init__(self, filename = None, fov=None):
         """ Initializes the image 
            
             :Parameters: 
-               filename : File from which to read the image data
+                filename : File from which to read the image data
+                fov: (float, float)
+                    Field of view. Not used anywhere...
         """
         from numpy import array
         self._pixels = array([[]], dtype="double")
