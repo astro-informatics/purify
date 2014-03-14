@@ -25,3 +25,4 @@ cdef class Fourier2D:
         fftw_complex *_data
         object shape
     cpdef execute(self)
+    cdef void set_ccall(self, void** data) nogil

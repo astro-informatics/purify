@@ -37,6 +37,16 @@ cdef class Fourier2D:
         fftw_destroy_plan(self._plan)
         PyMem_Free(self._data)
 
+    cdef void set_ccall(self, void** data) nogil:
+        """ Sets up void data structures for calls to SOPT and PURIFY functions. 
+        
+            :Parameters:
+                data : void*[2]
+                    Will be set to the address of plan and the address of the first element of data.
+        """
+        data[0] = <void *> &self._plan
+        data[1] = <void *> self._data
+
 
     property data:
         """ Input and output data of the FFT 
