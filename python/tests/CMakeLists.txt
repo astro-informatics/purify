@@ -13,7 +13,7 @@ if(tests AND python)
   # A function to add tests
   function(add_nose_test SOURCE) 
     get_filename_component(testname ${SOURCE} NAME_WE)
-    add_test(NAME ${testname} COMMAND ${TESTER_COMMAND} -m nose ${SOURCE})
+    add_test(NAME ${testname} COMMAND ${TESTER_COMMAND} -m nose ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE})
     set_tests_properties(${testname} PROPERTIES LABELS "nose")
   endfunction()
 
@@ -34,9 +34,9 @@ if(tests AND python)
 
 
   # Now add tests 
-  add_nose_test(visibility)
-  add_nose_test(image)
-  add_nose_test(sparse)
-  add_nose_test(fftw)
-  add_nose_test(sparsity_ops)
+  add_nose_test(test_visibility.py)
+  add_nose_test(test_image.py)
+  add_nose_test(test_sparse.py)
+  add_nose_test(test_fftw.py)
+  add_nose_test(test_sparsity_ops.py)
 endif()
