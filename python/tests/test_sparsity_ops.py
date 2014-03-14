@@ -3,12 +3,12 @@
 def test_sara_wavelets():
     """ Create basis-functions object """
     from nose.tools import assert_equal
-    from purify.sopt import BasisFunctions
+    from purify import SparsityOperator
 
     shape = 256, 256
     nlevels = 5
     types = ["DB1", "DB2", "DB10", "Dirac"]
-    functions = BasisFunctions(shape, nlevels, types)
+    functions = SparsityOperator(shape, nlevels, types)
 
     assert_equal(len(functions), len(types))
     assert_equal(set([u.name.lower() for u in functions]), set([u.lower() for u in types]))
@@ -22,12 +22,12 @@ def test_sara_analysisop_hardening():
     """ Hardens sopt_sara_analysisop bindings against code changes """
     from numpy import add, exp, arange, mean, max, min
     from numpy.testing import assert_allclose
-    from purify.sopt import BasisFunctions
+    from purify import SparsityOperator
 
     shape = 256, 256
     nlevels = 4
     types = ["DB1", "DB2", "DB10"]
-    functions = BasisFunctions(shape, nlevels, types)
+    functions = SparsityOperator(shape, nlevels, types)
 
     
     sigma = 10.0, 8.0
@@ -56,12 +56,12 @@ def test_sara_synthesisop_hardening():
     from numpy import add, exp, arange, mean, max, min
     from numpy.testing import assert_allclose
     from nose.tools import assert_almost_equal
-    from purify.sopt import BasisFunctions
+    from purify import SparsityOperator
 
     shape = 256, 256
     nlevels = 4
     types = ["DB1", "DB2", "DB10"]
-    functions = BasisFunctions(shape, nlevels, types)
+    functions = SparsityOperator(shape, nlevels, types)
 
     
     sigma = 10.0, 8.0

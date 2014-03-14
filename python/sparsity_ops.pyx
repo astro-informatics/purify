@@ -8,7 +8,7 @@ cdef extern from "sopt_sara.h":
     void sopt_sara_analysisop(void *, void *, void **)
     void sopt_sara_synthesisop(void *, void *, void **)
 
-cdef class BasisFunctions:
+cdef class SparsityOperator:
     """ Mostly opaque object that holds basis-function information """
 
     wavelet_types = {
@@ -67,7 +67,7 @@ cdef class BasisFunctions:
         from numpy import asarray
         from collections import namedtuple
         if index < 0: index += len(self)
-        if index < 0 or index >= len(self): raise IndexError("BasisFunctions")
+        if index < 0 or index >= len(self): raise IndexError("SparsityOperator")
         
         Wavelet = namedtuple('Wavelet', ['name', 'type', 'shape', 'nlevels', 'filter'])
 

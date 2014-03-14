@@ -31,7 +31,7 @@ cdef extern from "sopt_sara.h":
         int h_size
         int nb_levels
 
-cdef class BasisFunctions:
+cdef class SparsityOperator:
     cdef sopt_sara_param _wavelets
     cpdef analyze(self, image)
     cpdef synthesize(self, inout)
