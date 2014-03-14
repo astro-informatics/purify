@@ -58,5 +58,7 @@ def test_cycle_python_to_c_to_python():
             assert_equal(actual.shape, expected.shape)
             assert_equal(actual.nnz, expected.nnz)
             assert_allclose(actual.data, expected.data)
+            actual.data[0] +=  2 # both arrays refer to the same underlying data
+            assert_allclose(actual.data, expected.data)
             assert_allclose(actual.indices, expected.indices)
             assert_allclose(actual.indptr, expected.indptr)

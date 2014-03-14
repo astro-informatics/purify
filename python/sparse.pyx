@@ -1,7 +1,7 @@
 cdef object _convert_sparsemat(_SparseMatRow *sparse):
     """ Converts C sparse matrix to scipy sparse matrix 
     
-        This function copies the data.
+        This function does *not* copy the data. It should not outlive the input C matrix.
     """
     from scipy.sparse import csr_matrix
     from numpy import asarray
