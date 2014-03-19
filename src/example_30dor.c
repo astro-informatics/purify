@@ -106,6 +106,9 @@ int main(int argc, char *argv[]) {
   double start1, stop1;
   #endif
   int dimy, dimx;
+
+  // seed SOPT's random number generator
+  sopt_ran_ran2(-seedn);
   
   //Image dimension of the zero padded image
   //Dimensions should be power of 2
