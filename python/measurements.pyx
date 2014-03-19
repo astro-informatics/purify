@@ -1,20 +1,18 @@
 from cython.view cimport contiguous
-from purify.sparse cimport _SparseMatRow, purify_sparsemat_freer, _convert_sparsemat, \
+from purify.sparse cimport purify_sparsemat_freer, _convert_sparsemat, \
                            _wrap_sparsemat
 from purify.visibility cimport _wrap_visibility, _Visibility
 
 
 cdef extern from "purify_measurement.h":
     cdef void purify_measurement_init_cft(
-            _SparseMatRow *mat, 
-            double *deconv, double *u, double *v, 
+            _SparseMatRow *mat,
+            double *deconv, double *u, double *v,
             _MeasurementParams *param
     )
-    void purify_measurement_cftfwd(void *, void *, void **)
-    void purify_measurement_cftadj(void *, void *, void **)
 
-cdef void _measurement_params( _MeasurementParams *_params, int _nmeasurements, _image,
-                               _oversampling, _interpolation ):
+cdef void _measurement_params( _MeasurementParams *_params, int _nmeasurements,
+                               _image, _oversampling, _interpolation ):
     """ Fills measurement parameter structure. """
     _params.nmeas = _nmeasurements
     _params.ny1, _params.nx1 = _image
@@ -27,7 +25,8 @@ def kernels(visibility, dimensions, oversampling, interpolation):
 
         :Parameters:
             visibility: pandas.Dataframe
-                Should contain two column, 'u' and 'v'. It needs not be a full visibility dataframe.
+                Should contain two column, 'u' and 'v'. It needs not be a full 
+                visibility dataframe.
             dimensions: (int, int)
                 Size of the discrete image
             oversampling: (int, int)
@@ -36,8 +35,9 @@ def kernels(visibility, dimensions, oversampling, interpolation):
                 Size of the interpolation kernel
 
         :returns: (interpolation, deconvolution)
-           The interpolation kernel is a sparse CSR matrix, whereas the deconvolution kernel is a n
-           by m matrix where n and m are the dimensions of the image.
+           The interpolation kernel is a sparse CSR matrix, whereas the
+           deconvolution kernel is a n by m matrix where n and m are the 
+           dimensions of the image.
 
            This is a named tuple object.
     """
@@ -45,7 +45,8 @@ def kernels(visibility, dimensions, oversampling, interpolation):
     from numpy import zeros, product
     for name in ['u', 'v']:
         if visibility[name].values.dtype != 'double':
-            raise TypeError("Visibility's %s column should be composed of doubles." % name)
+            msg = "Visibility['%s'] should be composed of doubles." % name
+            raise TypeError(msg)
 
     deconvolution_kernel = zeros(dimensions, dtype='double')
     cdef:
@@ -55,7 +56,8 @@ def kernels(visibility, dimensions, oversampling, interpolation):
         double[::1] u = visibility['u'].values
         double[::1] v = visibility['v'].values
 
-    _measurement_params(&params, len(visibility), dimensions, oversampling, interpolation)
+    _measurement_params( &params, len(visibility), dimensions, oversampling, 
+                         interpolation )
 
     purify_measurement_init_cft(&sparse, &c_deconvolution[0, 0],  &u[0], &v[0], &params)
 
@@ -64,6 +66,29 @@ def kernels(visibility, dimensions, oversampling, interpolation):
 
     Kernel = namedtuple('Kernel', ['interpolation', 'deconvolution'])
     return Kernel(interpolation_kernel, deconvolution_kernel)
+
+# Forward declaration so we can bind the parent argument of _VoidedData.__init__
+cdef class MeasurementOperator
+
+cdef class _VoidedData:
+    """ Holds voided data needed by the purify_measurement_cft*. """
+
+    def __init__(self, MeasurementOperator parent not None, is_forward, scale=None):
+        """ Initializes void structure with info needed by C library """
+        self.deconvolution = parent.kernels.deconvolution if scale is None \
+                             else parent.kernels.deconvolution * scale
+        cdef unsigned char[::1] c_deconv = self.deconvolution.data
+        _wrap_sparsemat(parent.kernels.interpolation, &self._c_sparse)
+        self._data[0] = <void *> &parent._params
+        self._data[1] = <void *> &c_deconv[0]
+        self._data[2] = <void *> &self._c_sparse
+
+        if is_forward: parent._fftw_forward.set_ccall(&self._data[3])
+        else: parent._fftw_backward.set_ccall(&self._data[3])
+
+    cdef void** data(self):
+        """ Pointer to void structure of data """
+        return &self._data[0]
 
 
 
@@ -122,18 +147,13 @@ cdef class MeasurementOperator:
             unsigned char[::1] c_visibilities = visibilities.data
             unsigned char[::1] c_image = image.data
             unsigned char[::1] c_deconv = self.kernels.deconvolution.data
-            _SparseMatRow c_sparse
-            void* data[5]
 
-        _wrap_sparsemat(self.kernels.interpolation, &c_sparse)
-        data[0] = <void *> &self._params
-        data[1] = <void *> &c_deconv[0]
-        data[2] = <void *> &c_sparse
-        self._fftw_forward.set_ccall(&data[3])
+        data = self.forward_voided_data()
 
-        purify_measurement_cftfwd(<void*> &c_visibilities[0], <void*> &c_image[0], &data[0])
+        purify_measurement_cftfwd(<void*> &c_visibilities[0], <void*> &c_image[0], data.data())
 
         return visibilities
+
 
     cpdef adjoint(self, visibilities):
         """ Define adjoint measurement operator for continuous visibilities """
@@ -145,15 +165,18 @@ cdef class MeasurementOperator:
         cdef:
             unsigned char[::1] c_image = image.data
             unsigned char[::1] c_visibilities = visibilities.data
-            unsigned char[::1] c_deconv = self.kernels.deconvolution.data
-            _SparseMatRow c_sparse
-            void* data[5]
-        _wrap_sparsemat(self.kernels.interpolation, &c_sparse)
-        data[0] = <void *> &self._params
-        data[1] = <void *> &c_deconv[0]
-        data[2] = <void *> &c_sparse
-        self._fftw_backward.set_ccall(&data[3])
+        data = self.adjoint_voided_data()
 
-        purify_measurement_cftadj(<void*> &c_image[0], <void*> &c_visibilities[0], &data[0])
+        purify_measurement_cftadj(<void*> &c_image[0], <void*> &c_visibilities[0], data.data())
 
         return image
+
+    cdef _VoidedData forward_voided_data(self, scale = None):
+        """ Sets C data structures for callbacks. """
+        return _VoidedData(self, True, scale)
+
+    cdef _VoidedData adjoint_voided_data(self, scale = None):
+        """ Sets C data structures for callbacks. """
+        return _VoidedData(self, False, scale)
+
+

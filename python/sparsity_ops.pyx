@@ -5,8 +5,6 @@ cdef extern from "sopt_sara.h":
     void sopt_sara_initop(sopt_sara_param *param, int nx1, int nx2, int nb_levels, 
                           sopt_wavelet_type *dict_types)
     void sopt_sara_free(sopt_sara_param *param)
-    void sopt_sara_analysisop(void *, void *, void **)
-    void sopt_sara_synthesisop(void *, void *, void **)
 
 cdef class SparsityOperator:
     """ Mostly opaque object that holds basis-function information """
@@ -33,7 +31,7 @@ cdef class SparsityOperator:
                     Size of the image
                 nlevels: int
                     Number of levels of each wavelet
-                types: 
+                wavelets: 
                     Any number of "DB1" through "DB10", or "Dirac"
         """
         allwavelets = set([u.lower() for u in self.wavelet_types.iterkeys()])
@@ -104,6 +102,10 @@ cdef class SparsityOperator:
             for i in xrange(len(self)): yield self[i]
         return generator()
 
+    cdef set_wavelet_pointer(self, void **data):
+        """ Sets pointer for C callbacks. """
+        data[0] = <void*>&self._wavelets
+
     cpdef analyze(self, image):
         """ computes the analysis operator for concatenation of bases 
 
@@ -129,7 +131,8 @@ cdef class SparsityOperator:
         cdef:
             unsigned char[::1] c_image = image.data
             unsigned char[::1] c_result = result.data
-            void *c_voidify = <void*> &self._wavelets
+            void *c_voidify 
+        self.set_wavelet_pointer(&c_voidify)
         sopt_sara_analysisop(<void*> &c_result[0], <void*> &c_image[0], &c_voidify)
 
         return result
@@ -152,7 +155,8 @@ cdef class SparsityOperator:
         cdef:
             unsigned char[::1] c_inout = inout.data
             unsigned char[::1] c_result = result.data
-            void *c_voidify = <void*> &self._wavelets
+            void *c_voidify 
+        self.set_wavelet_pointer(&c_voidify)
         sopt_sara_synthesisop(<void*> &c_result[0], <void*> &c_inout[0], &c_voidify)
 
         return result
