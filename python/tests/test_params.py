@@ -64,7 +64,7 @@ def assert_sdmm(param):
     assert_tvprox(param)
     assert_positive_real_or_none(param, 'gamma')
     assert_positive_real(param, 'relative_radius')
-    assert_positive_real(param, 'radius')
+    assert_positive_real_or_none(param, 'radius')
     assert_positive_integer(param.cg, 'max_iter')
     assert_positive_real(param.cg, 'tolerance')
 
@@ -127,7 +127,6 @@ def test_tvprox():
     assert_tvprox(param)
 
 def test_tv_sdmm():
-
     from nose.tools import assert_equal, assert_almost_equal
     from purify.params import TV_SDMM
 
