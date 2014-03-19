@@ -5,17 +5,17 @@ def test_sara_wavelets():
     from nose.tools import assert_equal
     from purify import SparsityOperator
 
-    shape = 256, 256
+    image_size = 256, 256
     nlevels = 5
     types = ["DB1", "DB2", "DB10", "Dirac"]
-    functions = SparsityOperator(shape, nlevels, types)
+    functions = SparsityOperator(image_size, nlevels, types)
 
     assert_equal(len(functions), len(types))
     assert_equal(set([u.name.lower() for u in functions]), set([u.lower() for u in types]))
   
     for wavelet in functions:
         assert_equal(wavelet.nlevels, nlevels)
-        assert_equal(wavelet.shape, shape)
+        assert_equal(wavelet.image_size, image_size)
 
 
 def test_sara_analysisop_hardening():
@@ -24,15 +24,15 @@ def test_sara_analysisop_hardening():
     from numpy.testing import assert_allclose
     from purify import SparsityOperator
 
-    shape = 256, 256
+    image_size = 256, 256
     nlevels = 4
     types = ["DB1", "DB2", "DB10"]
-    functions = SparsityOperator(shape, nlevels, types)
+    functions = SparsityOperator(image_size, nlevels, types)
 
     
     sigma = 10.0, 8.0
-    xaxis = (arange(shape[0]) / float(shape[0]) - 0.5) / sigma[0]
-    yaxis = (arange(shape[1]) / float(shape[1]) - 0.5) / sigma[1]
+    xaxis = (arange(image_size[0]) / float(image_size[0]) - 0.5) / sigma[0]
+    yaxis = (arange(image_size[1]) / float(image_size[1]) - 0.5) / sigma[1]
 
     gaussian = exp(-add.outer(xaxis * xaxis, yaxis * yaxis))
 
@@ -58,15 +58,15 @@ def test_sara_synthesisop_hardening():
     from nose.tools import assert_almost_equal
     from purify import SparsityOperator
 
-    shape = 256, 256
+    image_size = 256, 256
     nlevels = 4
     types = ["DB1", "DB2", "DB10"]
-    functions = SparsityOperator(shape, nlevels, types)
+    functions = SparsityOperator(image_size, nlevels, types)
 
     
     sigma = 10.0, 8.0
-    xaxis = (arange(shape[0]) / float(shape[0]) - 0.5) / sigma[0]
-    yaxis = (arange(shape[1]) / float(shape[1]) - 0.5) / sigma[1]
+    xaxis = (arange(image_size[0]) / float(image_size[0]) - 0.5) / sigma[0]
+    yaxis = (arange(image_size[1]) / float(image_size[1]) - 0.5) / sigma[1]
 
     gaussian = exp(-add.outer(xaxis * xaxis, yaxis * yaxis))
 
