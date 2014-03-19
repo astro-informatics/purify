@@ -89,7 +89,7 @@ class SDMM(TVProx):
     """ SDMM related parameters """
 
     gamma = positive_real_or_none('gamma', "SDMM convergence criteria")
-    radius = positive_real('radius', "L2 ball radius")
+    radius = positive_real_or_none('radius', "L2 ball radius")
     relative_radius = positive_real('relative_radius', "Defines range of the radius")
 
     def __init__( self, verbose='high', max_iter=300, gamma=None, relative_variation=1e-3,
