@@ -80,10 +80,12 @@ class TVProx(object):
     max_iter = positive_int('max_iter', "Maximum number of iterations")
     relative_variation = positive_real( 'relative_variation',
                                         "Acceptable relative variation in the solution" )
-    def __init__(self, verbose='high', max_iter=50, relative_variation=1e-4):
+    def __init__(self, verbose='high', max_iter=50, relative_variation=1e-4, **kwargs):
+        super(TVProx, self).__init__()
         self.verbose = verbose
         self.max_iter = max_iter
         self.relative_variation = relative_variation
+
 
 class SDMM(TVProx):
     """ SDMM related parameters """
@@ -93,8 +95,8 @@ class SDMM(TVProx):
     relative_radius = positive_real('relative_radius', "Defines range of the radius")
 
     def __init__( self, verbose='high', max_iter=300, gamma=None, relative_variation=1e-3,
-                  radius=None, relative_radius=1e-2, cg_max_iter=100, cg_tolerance=1e-6 ):
-
+                  radius=None, relative_radius=1e-2, cg_max_iter=100, cg_tolerance=1e-6,
+                  **kwargs ):
         super(SDMM, self).__init__( verbose=verbose, max_iter=max_iter,
                                     relative_variation=relative_variation )
         self.gamma = gamma
@@ -111,7 +113,7 @@ class RW(TVProx):
     warm_start = boolean('warm_start', "If True, use provided starting point")
 
     def __init__( self, verbose='high', max_iter=5, sigma=None, relative_variation=1e-3,
-                  warm_start=True ):
+                  warm_start=True, **kwargs ):
         super(RW, self).__init__( verbose=verbose, max_iter=max_iter,
                                   relative_variation=relative_variation )
         self.sigma = sigma
@@ -122,7 +124,7 @@ class TV_SDMM(SDMM):
     """ Parameters for the TV optimisation problem using SDMM """
     def __init__( self, verbose='high', max_iter=300, gamma=None, relative_variation=1e-3,
                   radius=None, relative_radius=1e-2, cg_max_iter=100, cg_tolerance=1e-6,
-                  tv_verbose='high', tv_max_iter=50, tv_relative_variation=1e-4):
+                  tv_verbose='high', tv_max_iter=50, tv_relative_variation=1e-4, **kwargs):
         super(TV_SDMM, self).__init__( verbose=verbose, max_iter=max_iter, gamma=gamma,
                                        relative_variation=relative_variation, radius=radius,
                                        relative_radius=relative_radius, cg_max_iter=cg_max_iter,
