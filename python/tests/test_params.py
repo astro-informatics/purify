@@ -55,6 +55,15 @@ def assert_boolean(param, name):
     setattr(param, name, "") 
     assert_true(getattr(param, name) is False)
 
+def assert_size(param, name):
+    from nose.tools import assert_equal, assert_raises
+    setattr(param, name, (50, 51))
+    assert_equal(getattr(param, name), (50, 51))
+    assert_equal(getattr(getattr(param, name), 'x'), 50)
+    assert_equal(getattr(getattr(param, name), 'y'), 51)
+    for value in [(0, 1), (1, 0), (-1, 1), (1, -1), (0, 0)]:
+       with assert_raises(ValueError): setattr(param, name, value)
+
 def assert_tvprox(param): 
     assert_verbosity(param)
     assert_positive_integer(param, 'max_iter')
@@ -149,3 +158,15 @@ def test_tv_sdmm():
 
     assert_sdmm(param)
     assert_tvprox(param.tv)
+
+def test_measurements():
+    from nose.tools import assert_equal
+    from purify.params import Measurements
+    param = Measurements((2, 3), (4, 5), (6, 7))
+    assert_equal(param.image_size, (2, 3))
+    assert_equal(param.oversampling, (4, 5))
+    assert_equal(param.interpolation, (6, 7))
+
+    assert_size(param, 'image_size')
+    assert_size(param, 'oversampling')
+    assert_size(param, 'interpolation')

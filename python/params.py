@@ -7,7 +7,7 @@
 
     The parameters are grouped in a way to reflect the C parameter structures.
 """
-__all__ = ['ConjugateGradient', 'SDMM', 'RW', 'TVProx']
+__all__ = ['ConjugateGradient', 'SDMM', 'RW', 'TVProx', 'Measurements']
 __docformat__ = "restructuredtext en"
 
 def verbosity():
@@ -65,6 +65,19 @@ def boolean(name, doc=None):
         lambda x, v: setattr(x, "_%s" % name, True if v else False), 
         doc = doc
     )
+
+def size_property(name, doc=None):
+    """ A property that sets 2d sizes. """
+    from collections import namedtuple
+    
+    _name = "_%s" % name
+    Size = namedtuple('Size', ['x', 'y'])
+    def set(self, value):
+        x, y = int(value[0]), int(value[1])
+        if x <= 0 or y <= 0: raise ValueError("Size must be positive.")
+        setattr(self, _name, Size(x, y))
+    return property(lambda x: getattr(x, _name), set, doc=doc)
+
 
 class ConjugateGradient(object):
     """ Contains conjugate gradient parameters. """
@@ -131,3 +144,15 @@ class TV_SDMM(SDMM):
                                        cg_tolerance=cg_tolerance )
         self.tv = TVProx( verbose=tv_verbose, max_iter=tv_max_iter,
                           relative_variation=tv_relative_variation )
+class Measurements(object):
+    """ Parameter entering measurement and output values. """
+    image_size = size_property("image_size", "Output image size.")
+    interpolation = size_property("interpolation", "Size of the interpolation kernel")
+    oversampling = size_property("oversampling", "Oversampling factor")
+    def __init__( self, image_size=(256, 256), oversampling=(2,2), interpolation=(24, 24),
+                  **kwargs ):
+        super(Measurements, self).__init__()
+
+        self.image_size = image_size
+        self.oversampling = oversampling
+        self.interpolation = interpolation
