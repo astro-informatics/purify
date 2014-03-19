@@ -193,7 +193,8 @@ int main(int argc, char *argv[]) {
   printf("***********************\n\n");
   //Initialize griding matrix
   printf("Initializing griding matrix\n\n");
-  assert((start = clock())!=-1);
+  start = clock();
+  assert(start != -1);
   purify_measurement_init_cft(&gmat, deconv, vis_test.u, vis_test.v, &param_m1);
   stop = clock();
   t = (double) (stop-start)/CLOCKS_PER_SEC;
@@ -232,7 +233,8 @@ int main(int argc, char *argv[]) {
   printf("FFT plan done \n\n");
   
   printf("Simulating visibilities \n\n");
-  assert((start = clock())!=-1);
+  start = clock();
+  assert(start != -1);
   purify_measurement_cftfwd((void*)y0, (void*)xinc, datafwd);
   stop = clock();
   t = (double) (stop-start)/CLOCKS_PER_SEC;
@@ -372,7 +374,8 @@ int main(int argc, char *argv[]) {
       xoutc[i] = 0.0 + 0.0*I;
   }
  
-  assert((start = clock())!=-1);
+  start = clock();
+  assert(start != -1);
   sopt_l1_sdmm((void*)xoutc, Nx,
                    &purify_measurement_cftfwd,
                    datafwd,
