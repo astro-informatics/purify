@@ -14,13 +14,7 @@
 #ifdef _OPENMP 
   #include <omp.h>
 #endif 
-#ifdef __APPLE__
-  #include <Accelerate/Accelerate.h>
-#elif __unix__
-  #include <cblas.h>
-#else
-  #include <cblas.h>
-#endif 
+#include <cblas.h>
 #include "purify_visibility.h"
 #include "purify_sparsemat.h"
 #include "purify_image.h"

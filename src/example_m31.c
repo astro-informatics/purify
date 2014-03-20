@@ -16,13 +16,7 @@
 #ifdef _OPENMP 
   #include <omp.h>
 #endif 
-#ifdef __APPLE__
-  #include <Accelerate/Accelerate.h>
-#elif __unix__
-  #include <cblas.h>
-#else
-  #include <cblas.h>
-#endif 
+#include <cblas.h>
 #include "purify_visibility.h"
 #include "purify_sparsemat.h"
 #include "purify_image.h"
@@ -108,7 +102,9 @@ int main(int argc, char *argv[]) {
 
   clock_t start, stop;
   double t = 0.0;
+  #ifdef _OPENMP 
   double start1, stop1;
+  #endif
   int dimy, dimx;
   
   //Image dimension of the zero padded image

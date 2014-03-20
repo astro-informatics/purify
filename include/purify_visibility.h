@@ -7,6 +7,7 @@
 #define PURIFY_VISIBILITY
 
 #include <complex.h>
+#include "purify_error.h"
 #include "purify_sparsemat.h"
 #include "purify_image.h"
 
@@ -42,14 +43,32 @@ typedef enum
 
 
 inline void purify_visibility_iuiv2ind(int *ind, int iu, int iv, 
-				       int nx, int ny);
+				       int nx, int ny) {
+
+  if (iu >= nx || iv >= ny)
+    PURIFY_ERROR_GENERIC("Visibility index too large.");
+
+  *ind = iu * ny + iv;
+
+}
 
 inline void purify_visibility_ind2iuiv(int *iu, int *iv, int ind, 
-				       int nx, int ny);
+				       int nx, int ny) {
 
-inline double purify_visibility_du(double fov);
+  if (ind >= nx*ny)
+    PURIFY_ERROR_GENERIC("Visibility index too large");
 
-inline double purify_visibility_umax(double fov, int n);
+  *iu = ind / ny; // Integer division.
+  *iv = ind - *iu * ny;
+
+}
+
+inline double purify_visibility_du(double fov) { return 1e0 / fov; }
+
+inline double purify_visibility_umax(double fov, int n) {
+  return (double)n / (double)(2.0 * fov);
+}
+
 
 void purify_visibility_alloc(purify_visibility *vis, int nmeas);
 

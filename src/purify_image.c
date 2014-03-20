@@ -21,15 +21,8 @@
  *
  * \authors <a href="http://www.jasonmcewen.org">Jason McEwen</a>
  */
-inline void purify_image_ixiy2ind(int *ind, int ix, int iy, 
-				  purify_image *img) {
-
- if (ix >= img->nx || ix >= img->ny)
-    PURIFY_ERROR_GENERIC("Image index too large");
-
-  *ind = ix * img->ny + iy;
-
-}
+extern inline void purify_image_ixiy2ind(int *ind, int ix, int iy, 
+				  purify_image *img);
 
 
 /*!
@@ -42,16 +35,8 @@ inline void purify_image_ixiy2ind(int *ind, int ix, int iy,
  *
  * \authors <a href="http://www.jasonmcewen.org">Jason McEwen</a>
  */
-inline void purify_image_ind2iuiv(int *ix, int *iy, int ind, 
-				  purify_image *img) {
-
-  if (ind >= img->nx*img->ny)
-    PURIFY_ERROR_GENERIC("Image index too large");
-
-  *ix = ind / img->ny; // Integer division.
-  *iy = ind - *ix * img->ny;
-
-}
+extern void purify_image_ind2iuiv(int *ix, int *iy, int ind, 
+				  purify_image *img);
 
 
 /*!
