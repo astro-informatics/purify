@@ -12,7 +12,7 @@ if(python)
   ###############################
 
   add_custom_target(copy)
-  foreach(module visibility image sparse measurements fftw sparsity_ops)
+  foreach(module visibility image sparse measurements fftw sparsity_ops sdmm)
     add_cython_modules(${module}
       LOCATION ${PYPURIFY_DIRECTORY}
       LIBRARIES ${PYTHON_LIBRARIES} libpurify
@@ -23,10 +23,15 @@ if(python)
 
   add_copy_files(copy GLOB *.py DESTINATION ${PYPURIFY_DIRECTORY})
   add_copy_files(copy GLOB *.pdx DESTINATION ${PYPURIFY_DIRECTORY})
-  add_copy_files( copy GLOB ${PROJECT_SOURCE_DIR}/data/images/Coverages/*.vis 
-                  DESTINATION ${PYPURIFY_DIRECTORY}/data/images/Coverages/ )
-  add_copy_files( copy GLOB ${PROJECT_SOURCE_DIR}/data/images/*.fits
-                  DESTINATION ${PYPURIFY_DIRECTORY}/data/images/ )
+  if(tests)
+    # Files only needed in testing. Added here cos here is where the copy target is defined.
+    add_copy_files( copy GLOB ${PROJECT_SOURCE_DIR}/data/images/Coverages/*.vis
+                    DESTINATION ${PYPURIFY_DIRECTORY}/data/images/Coverages/ )
+    add_copy_files( copy GLOB ${PROJECT_SOURCE_DIR}/data/images/*.fits
+                    DESTINATION ${PYPURIFY_DIRECTORY}/data/images/ )
+    add_copy_files( copy GLOB ${PROJECT_SOURCE_DIR}/data/expected/*.fits
+                    DESTINATION ${PYPURIFY_DIRECTORY}/data/expected/ )
+  endif()
 
   # Copy pdx (cython's header files) to include directory on build dir
   # This hoop must be jumped if we want cython to find those headers, since compilation is from
@@ -34,7 +39,7 @@ if(python)
   # directory organisation. The alternative to having a python directory structure, is having pdx
   # files with names package.subpackage.pdx. This is what the next statements do.
 
-  add_copy_files( copy GLOB *.pxd 
+  add_copy_files( copy GLOB *.pxd
                   DESTINATION ${PYPURIFY_DIRECTORY}/include
                   REPLACE "([^ ]+)" "purify.\\1" )
 endif()
