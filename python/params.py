@@ -1,13 +1,15 @@
 """ Defines parameters mix-in classes
 
-    Parameters are defined as *traits*. This means that they can be set to only a subset of possible
-    values, rather than just any python object. For instance, acceptable values for a tolerance
-    criteria might be positive real numbers. Anything else should raise an expection. In a way,
-    *traits* are akin to types in C.
+    Parameters are defined as *traits*. This means that they can be set to only
+    a subset of possible values, rather than just any python object. For
+    instance, acceptable values for a tolerance criteria might be positive real
+    numbers. Anything else should raise an expection. In a way, *traits* are
+    akin to types in C.
 
     The parameters are grouped in a way to reflect the C parameter structures.
 """
-__all__ = ['ConjugateGradient', 'SDMM', 'RW', 'TVProx', 'Measurements']
+__all__ = ['ConjugateGradient', 'SDMM', 'RW', 'TVProx', 'Measurements',
+           'apply_params']
 __docformat__ = "restructuredtext en"
 
 def _trait_name(name):
@@ -18,7 +20,7 @@ def verbosity():
 
         There are three levels of verbosity, 'off', 'medium', and 'high'.
     """
-    doc = """ (off|0|None|False) | (summary|medium|1|True) | (convergence|high|2) """
+    doc = "(off|0|None|False) | (summary|medium|1|True) | (convergence|high|2)"
     _name = _trait_name('verbose')
     def get(self):
         return ['off', 'medium', 'high'][getattr(self, _name)]
@@ -81,8 +83,10 @@ def size_property(name, doc=None):
 
 class ConjugateGradient(object):
     """ Contains conjugate gradient parameters. """
-    max_iter = positive_int('max_iter', "Maximum number of Conjugate-gradient iterations")
-    tolerance = positive_real('radius', "Conjugate gradient convergence criteria")
+    max_iter = positive_int('max_iter',
+            "Maximum number of Conjugate-gradient iterations")
+    tolerance = positive_real('radius',
+            "Conjugate gradient convergence criteria")
 
     def __init__(self, max_iter=100, tolerance=1e-6, **kwargs):
         super(ConjugateGradient, self).__init__(**kwargs)
@@ -93,8 +97,9 @@ class TVProx(object):
     verbose = verbosity()
     max_iter = positive_int('max_iter', "Maximum number of iterations")
     relative_variation = positive_real( 'relative_variation',
-                                        "Acceptable relative variation in the solution" )
-    def __init__(self, verbose='high', max_iter=50, relative_variation=1e-4, **kwargs):
+                   "Acceptable relative variation in the solution" )
+    def __init__(self, verbose='high', max_iter=300, relative_variation=1e-4,
+                 **kwargs):
         super(TVProx, self).__init__(**kwargs)
         self.verbose = verbose
         self.max_iter = max_iter
@@ -103,10 +108,10 @@ class TVProx(object):
 
 class SDMM(TVProx):
     """ SDMM related parameters """
-
     gamma = positive_real_or_none('gamma', "SDMM convergence criteria")
     radius = positive_real_or_none('radius', "L2 ball radius")
-    relative_radius = positive_real('relative_radius', "Defines range of the radius")
+    relative_radius = positive_real('relative_radius',
+            "Defines range of the radius")
 
     def __init__( self, gamma=None, radius=None, relative_radius=1e-2,
                   cg_max_iter=100, cg_tolerance=1e-6, **kwargs ):
@@ -119,9 +124,8 @@ class SDMM(TVProx):
 
 class RW(TVProx):
     """ Reweighted L1 optimization problem """
-
-    sigma = positive_real_or_none( 'sigma',
-                                   "Standard deviation of the noise in the representation domain" )
+    sigma = positive_real_or_none('sigma',
+          "Standard deviation of the noise in the representation domain" )
     warm_start = boolean('warm_start', "If True, use provided starting point")
 
     def __init__(self, sigma=None, warm_start=True, **kwargs):
@@ -139,13 +143,37 @@ class TV_SDMM(SDMM):
                           relative_variation=tv_relative_variation )
 class Measurements(object):
     """ Parameter entering measurement and output values. """
-    image_size = size_property("image_size", "Output image size.")
-    interpolation = size_property("interpolation", "Size of the interpolation kernel")
+    image_size = size_property("image_size", "Output image size")
+    interpolation = size_property("interpolation",
+            "Size of the interpolation kernel")
     oversampling = size_property("oversampling", "Oversampling factor")
-    def __init__( self, image_size=(256, 256), oversampling=(2,2), interpolation=(24, 24),
-                  **kwargs ):
+    def __init__( self, image_size=(256, 256), oversampling=(2,2),
+                  interpolation=(24, 24), **kwargs ):
         super(Measurements, self).__init__(**kwargs)
 
         self.image_size = image_size
         self.oversampling = oversampling
         self.interpolation = interpolation
+
+def apply_params(inner):
+    """ Modify traits using keyword arguments for duration of call.
+
+        The traits are modified for the duration of the call only.
+    """
+    from functools import wraps
+    @wraps(inner)
+    def modified_self(self, *args, **kwargs):
+        saved_traits, other_kwargs = {}, {}
+        try:
+            # Save and modify traits that appear in kwargs
+            for name, value in kwargs.iteritems():
+                attr = _trait_name(name)
+                if hasattr(self, attr):
+                    saved_traits[name] = getattr(self, attr)
+                    setattr(self, name, value)
+                else: other_kwargs[name] = value
+            return inner(self, *args, **other_kwargs)
+        finally:
+            for name, value in saved_traits.iteritems():
+                setattr(self, _trait_name(name), value)
+    return modified_self

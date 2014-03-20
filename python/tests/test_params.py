@@ -170,3 +170,82 @@ def test_measurements():
     assert_size(param, 'image_size')
     assert_size(param, 'oversampling')
     assert_size(param, 'interpolation')
+
+
+def test_apply_params():
+    """ Test that apply params does apply parameters. """
+    from nose.tools import assert_equal
+    from purify.params import TVProx, apply_params
+    class ApplyParamsChecker(TVProx):
+        def __init__(self, **kwargs):
+            super(ApplyParamsChecker, self).__init__(**kwargs)
+            self.called = False
+        @apply_params
+        def __call__(self, value):
+            assert_equal(self.verbose, 'medium')
+            assert_equal(self.max_iter, 5)
+            assert_equal(self.relative_variation, 1e-6)
+            self.called = value
+            return "My name is Inigo Montoya"
+    # create a fake function object with some traits
+    mock = ApplyParamsChecker(verbose='high', max_iter=6,
+            relative_variation=1e-2)
+
+    # Check the traits are what we expect them to be
+    assert_equal(mock.verbose, 'high')
+    assert_equal(mock.max_iter, 6)
+    assert_equal(mock.relative_variation, 1e-2)
+    assert_equal(mock.called, False)
+    # Call the function object. It will check internally that it has been
+    # modified.
+    result = mock(True, verbose='medium', max_iter=5, relative_variation=1e-6)
+    assert_equal(result, "My name is Inigo Montoya")
+    # Check the traits have not changed when leaving the function
+    assert_equal(mock.verbose, 'high')
+    assert_equal(mock.max_iter, 6)
+    assert_equal(mock.relative_variation, 1e-2)
+    assert_equal(mock.called, True)
+
+def test_apply_params_with_exception():
+    """ Test that apply params unmodifies function when raising exception. """
+    from nose.tools import assert_equal
+    from purify.params import TVProx, apply_params
+    class ApplyParamsChecker(TVProx):
+        def __init__(self, **kwargs):
+            super(ApplyParamsChecker, self).__init__(**kwargs)
+            self.called = False
+        @apply_params
+        def __call__(self, value):
+            assert_equal(self.verbose, 'medium')
+            assert_equal(self.max_iter, 5)
+            assert_equal(self.relative_variation, 1e-6)
+            self.called = value
+            raise RuntimeError("hello, you killed my father")
+    # create a fake function object with some traits
+    mock = ApplyParamsChecker(verbose='high', max_iter=6,
+            relative_variation=1e-2)
+
+    # Check the traits are what we expect them to be
+    assert_equal(mock.verbose, 'high')
+    assert_equal(mock.max_iter, 6)
+    assert_equal(mock.relative_variation, 1e-2)
+    assert_equal(mock.called, False)
+    # Call the function object. It will check internally that it has been
+    # modified.
+    try: mock(True, verbose='medium', max_iter=5, relative_variation=1e-6)
+    except RuntimeError as e:
+      # Check the traits have not changed when leaving the function
+      assert_equal(mock.verbose, 'high')
+      assert_equal(mock.max_iter, 6)
+      assert_equal(mock.relative_variation, 1e-2)
+      assert_equal(mock.called, True)
+      assert_equal(str(e), "hello, you killed my father")
+
+    try: mock(False, verbose='medium', max_iter=-5, relative_variation=1e-6)
+    except ValueError as e:
+      # Check the traits have not changed when leaving the function
+      assert_equal(mock.verbose, 'high')
+      assert_equal(mock.max_iter, 6)
+      assert_equal(mock.relative_variation, 1e-2)
+      assert_equal(mock.called, True)
+      assert_equal(str(e), "max_iter cannot be negative or null")
