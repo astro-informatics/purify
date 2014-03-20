@@ -24,7 +24,8 @@ cdef class SparsityOperator:
         'db10':  SOPT_WAVELET_DB10
     }
 
-    def __cinit__(self, image_size, unsigned int nlevels=4, wavelets='DB1', **kwargs):
+    def __cinit__(self, image_size=(256, 256), unsigned int nlevels=4,
+                  wavelets='DB1', **kwargs):
         """ Creates the basis functions.
 
             :Parameters:

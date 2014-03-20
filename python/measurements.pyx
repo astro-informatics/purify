@@ -178,5 +178,3 @@ cdef class MeasurementOperator:
     cdef _VoidedData adjoint_voided_data(self, scale = None):
         """ Sets C data structures for callbacks. """
         return _VoidedData(self, False, scale)
-
-
