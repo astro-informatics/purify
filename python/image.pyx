@@ -17,16 +17,16 @@ cdef extern from "purify_image.h":
     cdef int purify_image_writefile(_Image *img, const char *filename, _IMAGE_FILETYPES filetype)
 
 
-cdef class Image: 
+cdef class Image:
     """ Purify image object. """
     cdef:
         double _fov[2]
         object _pixels
 
     def __init__(self, filename = None, fov=None):
-        """ Initializes the image 
-           
-            :Parameters: 
+        """ Initializes the image
+
+            :Parameters:
                 filename : File from which to read the image data
                 fov: (float, float)
                     Field of view. Not used anywhere...
@@ -47,7 +47,7 @@ cdef class Image:
             _Image image
             _IMAGE_FILETYPES flag = FITS
         read_result = purify_image_readfile(&image, filename, flag)
-        if read_result != 0: 
+        if read_result != 0:
             raise RuntimeError("Unknown error when opening %s" % filename)
         cdef double[:, ::1] values = <double [:image.nx, :image.ny:1]> image.pix
         self.pixels = values
@@ -61,7 +61,7 @@ cdef class Image:
             _IMAGE_FILETYPES flag = FITS
         self._fill_cpointer(&image)
         read_result = purify_image_writefile(&image, filename, flag)
-        if read_result != 0: 
+        if read_result != 0:
             raise RuntimeError("Unknown error when writing to %s" % filename)
 
     cdef void _fill_cpointer(self, _Image *_image):
@@ -82,7 +82,7 @@ cdef class Image:
     property dtype:
         """ Number of dimension. """
         def __get__(self): return None if self._pixels is None else self._pixels.dtype
-    property pixels: 
+    property pixels:
         """ A numpy array holding the pixels of the image """
         def __get__(self): return self._pixels
         def __set__(self, value):

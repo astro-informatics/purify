@@ -6,9 +6,9 @@ cdef extern from "purify_visibility.h":
         PROFILE_WIS "PURIFY_VISIBILITY_FILETYPE_PROFILE_WIS"
 
     cdef int purify_visibility_readfile(
-            _Visibility *visibility, 
+            _Visibility *visibility,
             const char *filename,
-            _VISIBILITY_FILETYPES filetype 
+            _VISIBILITY_FILETYPES filetype
     )
 
     cdef void purify_visibility_free(_Visibility *_vis)
@@ -18,7 +18,7 @@ cdef object _convert_visibility(_Visibility *_visibility):
     from pandas import DataFrame
     from numpy import array
 
-    cdef int N = _visibility[0].nmeas 
+    cdef int N = _visibility[0].nmeas
     cdef:
       double[::1] u = <double[:N:]> _visibility[0].u
       double[::1] v = <double[:N:]> _visibility[0].v
@@ -35,7 +35,7 @@ cdef void _wrap_visibility(py_visibility, _Visibility *c_visibility) except *:
     from itertools import repeat
     for name, type in list(zip(['u', 'v', 'w'], repeat('double'))) \
                       + list(zip(['noise', 'y'], repeat('complex'))):
-        if not py_visibility[name].values.dtype == type: 
+        if not py_visibility[name].values.dtype == type:
             message = "Visibility's %s column should be composed of %s values." % (name, type)
             raise TypeError(message)
     cdef:
@@ -54,7 +54,7 @@ cdef void _wrap_visibility(py_visibility, _Visibility *c_visibility) except *:
 
 
 def read_visibility(const char * filename):
-    """ Reads visibility from input file 
+    """ Reads visibility from input file
 
         :Parameters:
           filename: Name of the file storing the visibility
@@ -69,11 +69,11 @@ def read_visibility(const char * filename):
     result = purify_visibility_readfile(&visibility, filename, flag)
     data = None if result < 0 else _convert_visibility(&visibility)
     purify_visibility_free(&visibility)
-    if result == -1: 
+    if result == -1:
       raise IOError("Could not open file %s" % filename)
     elif result == -2:
       raise IOError("Unexpected end of file %s" % filename)
-    elif result < 0: 
+    elif result < 0:
       raise Exception("Unknown error when opening %s" % filename)
 
     return data

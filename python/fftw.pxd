@@ -3,7 +3,7 @@ cdef extern from "fftw3.h":
         pass
     ctypedef struct fftw_complex:
         pass
-            
+
     cdef fftw_plan fftw_plan_dft_2d( int n0, int n1, fftw_complex *_in,  \
                                      fftw_complex *out,                  \
                                      int sign, unsigned flags )

@@ -2,30 +2,30 @@
 def assert_positive_integer(object, name):
     from nose.tools import assert_equal, assert_raises
 
-    setattr(object, name, 2) 
+    setattr(object, name, 2)
     assert_equal(getattr(object, name), 2)
-    
+
     setattr(object, name, 1.4)
     assert_equal(getattr(object, name), 1)
-    
+
     with assert_raises(ValueError): setattr(object, name, 0)
     with assert_raises(ValueError): setattr(object, name, -1)
 
 def assert_positive_real(object, name):
     from nose.tools import assert_almost_equal, assert_raises
-    
-    setattr(object, name, 2) 
+
+    setattr(object, name, 2)
     assert_almost_equal(getattr(object, name), 2)
-    
+
     setattr(object, name, 1e-2)
     assert_almost_equal(getattr(object, name), 1e-2)
-    
+
     with assert_raises(ValueError): setattr(object, name, 0)
     with assert_raises(ValueError): setattr(object, name, -1)
 
 def assert_positive_real_or_none(object, name):
     from nose.tools import assert_true
-    
+
     assert_positive_real(object, name)
     setattr(object, name, None)
     assert_true(getattr(object, name) is None)
@@ -45,14 +45,14 @@ def assert_verbosity(param):
 def assert_boolean(param, name):
     from nose.tools import assert_true
 
-    setattr(param, name, True) 
+    setattr(param, name, True)
     assert_true(getattr(param, name) is True)
-    setattr(param, name, "not empty") 
+    setattr(param, name, "not empty")
     assert_true(getattr(param, name) is True)
 
-    setattr(param, name, 0) 
+    setattr(param, name, 0)
     assert_true(getattr(param, name) is False)
-    setattr(param, name, "") 
+    setattr(param, name, "")
     assert_true(getattr(param, name) is False)
 
 def assert_size(param, name):
@@ -64,7 +64,7 @@ def assert_size(param, name):
     for value in [(0, 1), (1, 0), (-1, 1), (1, -1), (0, 0)]:
        with assert_raises(ValueError): setattr(param, name, value)
 
-def assert_tvprox(param): 
+def assert_tvprox(param):
     assert_verbosity(param)
     assert_positive_integer(param, 'max_iter')
     assert_positive_real(param, 'relative_variation')
@@ -80,11 +80,11 @@ def assert_sdmm(param):
 def test_cg():
     from nose.tools import assert_equal, assert_almost_equal
     from purify.params import ConjugateGradient
- 
+
     cg = ConjugateGradient(10, 1e-3)
     assert_equal(cg.max_iter, 10)
     assert_almost_equal(cg.tolerance, 1e-3)
- 
+
     assert_positive_integer(cg, "max_iter")
     assert_positive_real(cg, "tolerance")
 

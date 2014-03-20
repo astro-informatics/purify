@@ -2,9 +2,10 @@ from cython.view cimport contiguous
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 
 cdef extern from "sopt_sara.h":
-    void sopt_sara_initop(sopt_sara_param *param, int nx1, int nx2, int nb_levels, 
+    void sopt_sara_initop(sopt_sara_param *param, int nx1, int nx2, int nb_levels,
                           sopt_wavelet_type *dict_types)
     void sopt_sara_free(sopt_sara_param *param)
+
 
 cdef class SparsityOperator:
     """ Mostly opaque object that holds basis-function information """
@@ -31,40 +32,40 @@ cdef class SparsityOperator:
                     Size of the image
                 nlevels: int
                     Number of levels of each wavelet
-                wavelets: 
+                wavelets:
                     Any number of "DB1" through "DB10", or "Dirac"
         """
         allwavelets = set([u.lower() for u in self.wavelet_types.iterkeys()])
-        if isinstance(wavelets, str): 
+        if isinstance(wavelets, str):
             if wavelets.lower() == "all": wavelets = allwavelets;
             else: wavelets = [wavelets.lower()]
         else: wavelets = set([u.lower() for u in wavelets])
         if not (allwavelets  >= wavelets):
             raise ValueError("Acceptable wavelets: %s" % allwavelets)
-        if len(wavelets) == 0: 
+        if len(wavelets) == 0:
             raise ValueError("Cannot create empty basis set")
-        
+
         # Reorders wavelets to follow input scheme from C examples.
         # Makes it easier to compare quantities between two code bases.
         allwavelets = ["db%i" % i for i in range(1, 11)] + ['dirac']
         # makes sure line above contains all wavelets, e.g. it is
         # in sync with self.wavelet_types
-        assert wavelets <= set(allwavelets) 
+        assert wavelets <= set(allwavelets)
         wavelets = [u for u in allwavelets if u in wavelets]
 
-        # Creates C list of wavelets 
+        # Creates C list of wavelets
         cdef int dictsize = len(wavelets) * sizeof(sopt_wavelet_type)
         cdef sopt_wavelet_type* dictionary  \
                 = <sopt_wavelet_type*> PyMem_Malloc(dictsize)
         try:
           for cindex, wavelet in enumerate(wavelets):
               dictionary[cindex] = self.wavelet_types[wavelet]
-  
+
           self._wavelets.ndict = len(wavelets)
           self._wavelets.real = 0;
           sopt_sara_initop( &self._wavelets, image_size[0], image_size[1],
                             <int>nlevels, dictionary )
-          
+
         finally:
             PyMem_Free(dictionary)
 
@@ -83,7 +84,7 @@ cdef class SparsityOperator:
         from collections import namedtuple
         if index < 0: index += len(self)
         if index < 0 or index >= len(self): raise IndexError("SparsityOperator")
-        
+
         Wavelet = namedtuple('Wavelet', ['name', 'type', 'image_size', 'nlevels', 'filter'])
 
         cdef sopt_wavelet_param* wavelet = &self._wavelets.wav_params[index]
@@ -107,7 +108,7 @@ cdef class SparsityOperator:
         data[0] = <void*>&self._wavelets
 
     cpdef analyze(self, image):
-        """ computes the analysis operator for concatenation of bases 
+        """ computes the analysis operator for concatenation of bases
 
             :Parameters:
                 image: numpy.ndarray
@@ -122,7 +123,7 @@ cdef class SparsityOperator:
         if self[0].image_size != image.shape:
             raise ValueError("Incorrect image size.")
 
-        # Checks type of the input and transform it if need be 
+        # Checks type of the input and transform it if need be
         dtype = np_dtype('double' if self._wavelets.real else 'complex')
         if dtype != image.dtype: image = image.astype(dtype)
 
@@ -131,7 +132,7 @@ cdef class SparsityOperator:
         cdef:
             unsigned char[::1] c_image = image.data
             unsigned char[::1] c_result = result.data
-            void *c_voidify 
+            void *c_voidify
         self.set_wavelet_pointer(&c_voidify)
         sopt_sara_analysisop(<void*> &c_result[0], <void*> &c_image[0], &c_voidify)
 
@@ -146,7 +147,7 @@ cdef class SparsityOperator:
         if ((len(self),) + self[0].image_size) != inout.shape:
             raise ValueError("Incorrect input shape.")
 
-        # Checks type of the input and transform it if need be 
+        # Checks type of the input and transform it if need be
         dtype = np_dtype('double' if self._wavelets.real else 'complex')
         if dtype != inout.dtype: inout = inout.astype(dtype)
 
@@ -155,7 +156,7 @@ cdef class SparsityOperator:
         cdef:
             unsigned char[::1] c_inout = inout.data
             unsigned char[::1] c_result = result.data
-            void *c_voidify 
+            void *c_voidify
         self.set_wavelet_pointer(&c_voidify)
         sopt_sara_synthesisop(<void*> &c_result[0], <void*> &c_inout[0], &c_voidify)
 

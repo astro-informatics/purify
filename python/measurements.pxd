@@ -14,10 +14,10 @@ cdef extern from "purify_measurement.h":
         int ofx   # Oversampling factor in column dimension
         int ky    # Number of rows in interpolation kernel
         int kx    # Number of columns in interpolation kernel
-    
+
     void purify_measurement_cftfwd(void *, void *, void **)
     void purify_measurement_cftadj(void *, void *, void **)
-  
+
 # A class to hold C data needed by purify_measurement_cft*
 cdef class _VoidedData:
     cdef:

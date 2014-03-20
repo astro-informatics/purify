@@ -25,7 +25,7 @@ def kernels(visibility, dimensions, oversampling, interpolation):
 
         :Parameters:
             visibility: pandas.Dataframe
-                Should contain two column, 'u' and 'v'. It needs not be a full 
+                Should contain two column, 'u' and 'v'. It needs not be a full
                 visibility dataframe.
             dimensions: (int, int)
                 Size of the discrete image
@@ -36,7 +36,7 @@ def kernels(visibility, dimensions, oversampling, interpolation):
 
         :returns: (interpolation, deconvolution)
            The interpolation kernel is a sparse CSR matrix, whereas the
-           deconvolution kernel is a n by m matrix where n and m are the 
+           deconvolution kernel is a n by m matrix where n and m are the
            dimensions of the image.
 
            This is a named tuple object.
@@ -56,7 +56,7 @@ def kernels(visibility, dimensions, oversampling, interpolation):
         double[::1] u = visibility['u'].values
         double[::1] v = visibility['v'].values
 
-    _measurement_params( &params, len(visibility), dimensions, oversampling, 
+    _measurement_params( &params, len(visibility), dimensions, oversampling,
                          interpolation )
 
     purify_measurement_init_cft(&sparse, &c_deconvolution[0, 0],  &u[0], &v[0], &params)
@@ -94,9 +94,9 @@ cdef class _VoidedData:
 
 cdef class MeasurementOperator:
     """ Forward and adjoint measurement operators for continuous visibilities """
-    def __init__( self, visibility, dimensions, oversampling, interpolation, 
+    def __init__( self, visibility, dimensions, oversampling, interpolation,
                   fftwflags = "measure" ):
-        """ Creates measurements. 
+        """ Creates measurements.
 
             :Parameters:
                 Should contain two column, 'u' and 'v'. It needs not be a full visibility dataframe.
@@ -114,12 +114,12 @@ cdef class MeasurementOperator:
 
         self.kernels = kernels(visibility, dimensions, oversampling, interpolation)
         """ Interpolation and deconvolution kernels. """
-        
+
         self._fftw_forward = Fourier2D(dimensions, oversampling, "forward", fftwflags)
         """ Forward fourier transform object """
         self._fftw_backward = Fourier2D(dimensions, oversampling, "backward", fftwflags)
         """ Backward fourier transform object """
-    
+
     property sizes:
         """ Different sizes involved in the problem """
         def __get__(self):
@@ -141,7 +141,7 @@ cdef class MeasurementOperator:
         from numpy import zeros
         if image.shape != self.sizes.image: raise ValueError("Image is of incorrect size")
         if image.dtype != "complex": image = image.astype("complex")
-        
+
         visibilities = zeros(self._params.nmeas, dtype="complex")
         cdef:
             unsigned char[::1] c_visibilities = visibilities.data
@@ -160,7 +160,7 @@ cdef class MeasurementOperator:
         from numpy import zeros
         if len(visibilities) != self._params.nmeas: raise ValueError("Image is of incorrect size")
         if visibilities.dtype != "complex": visibilities = visibilities.astype("complex")
-        
+
         image = zeros(self.sizes.image, dtype="complex")
         cdef:
             unsigned char[::1] c_image = image.data

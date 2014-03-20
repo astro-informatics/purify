@@ -1,6 +1,6 @@
 cdef object _convert_sparsemat(_SparseMatRow *sparse):
-    """ Converts C sparse matrix to scipy sparse matrix 
-    
+    """ Converts C sparse matrix to scipy sparse matrix
+
         This function does *not* copy the data. It should not outlive the input C matrix.
     """
     from scipy.sparse import csr_matrix
@@ -16,8 +16,8 @@ cdef object _convert_sparsemat(_SparseMatRow *sparse):
     return csr_matrix((data, indices, indptr), shape=(sparse.nrows, sparse.ncols))
 
 cdef void _wrap_sparsemat(object py_sparse, _SparseMatRow* c_sparse) except *:
-    """ Wrapse C sparse matrix around a scipy sparse matrix 
-    
+    """ Wrapse C sparse matrix around a scipy sparse matrix
+
         This function does *not* copies the data. The C sparse matrix should *not* be deallocated.
         Nor should it be used beyond the lifetime of the python object. Nor should the python object
         be changed during the lifetime of the C matrix.
