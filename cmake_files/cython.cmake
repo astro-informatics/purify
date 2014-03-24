@@ -42,16 +42,23 @@ function(add_python_module NAME)
   endif()
 endfunction()
 
+set(FIND_DEPS_SCRIPT
+    ${CMAKE_CURRENT_LIST_DIR}/find_cython_deps.py
+    CACHE INTERNAL "Script to determine cython dependencies"
+)
 # Get dependencies from a cython file
-function(get_pyx_dependencies NAME OUTVAR)
-  set(${OUTVAR} ${ARGN})
-  foreach(filename ${NAME}.pyx ${NAME}.pxd)
-    set(filename ${CMAKE_CURRENT_SOURCE_DIR}/${filename})
-    if(EXISTS ${filename})
-      set(${OUTVAR} ${${OUTVAR}} ${filename})
-    endif()
-  endforeach()
-  set(${OUTVAR} ${${OUTVAR}} PARENT_SCOPE)
+function(get_pyx_dependencies SOURCE OUTVAR)
+  execute_process(
+      COMMAND ${PYTHON_EXECUTABLE} ${FIND_DEPS_SCRIPT} ${SOURCE} ${ARGN}
+      RESULT_VARIABLE RESULT
+      OUTPUT_VARIABLE OUTPUT
+      ERROR_VARIABLE ERROR
+  )
+  if(RESULT EQUAL 0)
+      set(${OUTVAR} ${OUTPUT} PARENT_SCOPE)
+  else()
+      message(FATAL_ERROR "Got an error ${ERROR}")
+  endif()
 endfunction()
 
 
@@ -65,7 +72,6 @@ function(add_cython_modules TARGET)
   if(NOT CYMODULE_SOURCE)
       set(CYMODULE_SOURCE ${TARGET}.pyx)
   endif()
-  get_pyx_dependencies(${CYMODULE_SOURCE} DEPENDENCIES)
 
   get_property(included_dirs
       DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -75,6 +81,8 @@ function(add_cython_modules TARGET)
   foreach(included ${included_dirs})
     set(inclusion ${inclusion} -I${included})
   endforeach()
+
+  get_pyx_dependencies(${CMAKE_CURRENT_SOURCE_DIR}/${CYMODULE_SOURCE} DEPENDENCIES ${included_dirs})
 
   add_custom_command(
     OUTPUT ${OUTPUT_FILE}
