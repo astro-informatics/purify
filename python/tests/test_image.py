@@ -1,4 +1,10 @@
 """ Tests python image bindings """
+def test_Image_module():
+    """ Check Image module is purify.image. """
+    from nose.tools import assert_equal
+    from purify import Image
+    assert_equal(Image.__module__, 'purify.image')
+
 def test_read_image():
     from nose.tools import assert_equal, assert_almost_equal
     from os.path import join, dirname
@@ -22,7 +28,7 @@ def test_set_fov():
     image = Image(fov=(15, 16))
     assert_almost_equal(image.fov[0], 15)
     assert_almost_equal(image.fov[1], 16)
-    
+
     image.fov = (18, 19)
     assert_almost_equal(image.fov[0], 18)
     assert_almost_equal(image.fov[1], 19)
@@ -46,7 +52,7 @@ def test_read_write_cycle():
     with NamedTemporaryFile(delete=True) as file:
         file.close()
         first.write(file.name)
-        
+
         second = Image(filename=location, fov=(16, 17))
         assert_equal(second.shape, (251, 251))
         assert_almost_equal(second.fov[0], 16)
@@ -68,7 +74,7 @@ def test_change_pixels():
     assert_allclose(image.pixels, [[1, 2], [2, 3]])
     assert_equal(image.shape, (2, 2))
     assert_equal(image.dtype, 'double')
-    
+
 
     # This should fail since pixels are always double
     with assert_raises(ValueError) as exception:

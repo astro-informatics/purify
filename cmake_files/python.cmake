@@ -1,24 +1,13 @@
+# Finds python interpreter and library.
+# Tries to make sure one fits the other
+# Finds default PYTHON_PKG_DIR, as given by distutils
+# Creates function to install relative to PYTHON_PKG_DIR
 find_package(PythonInterp REQUIRED)
-# Check python version 
-# if(PYTHONINTERP_FOUND AND NOT PYTHON_VERSION)
-#   execute_process( 
-#     COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print(\"%i.%i.%i\" % sys.version_info[:3])"
-#     OUTPUT_VARIABLE PYTHON_VERSION
-#   )
-#   if( PYTHON_VERSION )
-#     string (STRIP ${PYTHON_VERSION} PYTHON_VERSION)
-#     set(PYTHON_VERSION ${PYTHON_VERSION} CACHE STRING "Version of the Python interpreter.")
-#     mark_as_advanced(PYTHON_VERSION)
-#     MESSAGE(STATUS "[Python] Version: ${PYTHON_VERSION}")
-#   else( PYTHON_VERSION )
-#     MESSAGE(STATUS "Could not determine python version.")
-#   endif( PYTHON_VERSION )
-# endif(PYTHONINTERP_FOUND AND NOT PYTHON_VERSION)
 
 # Find python package directory
 if(NOT DEFINED PYTHON_PKG_DIR)
-  execute_process( 
-    COMMAND ${PYTHON_EXECUTABLE} -c 
+  execute_process(
+    COMMAND ${PYTHON_EXECUTABLE} -c
               "from distutils.sysconfig import get_python_lib; print(get_python_lib())"
               OUTPUT_VARIABLE PYTHON_PKG_DIR
   )
@@ -29,7 +18,7 @@ if(NOT DEFINED PYTHON_PKG_DIR)
   endif(PYTHON_PKG_DIR)
 endif(NOT DEFINED PYTHON_PKG_DIR)
 
-execute_process( 
+execute_process(
   COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print(sys.prefix)"
   OUTPUT_VARIABLE PYTHON_INTERP_PREFIX
 )
@@ -46,7 +35,7 @@ find_package(PythonLibs REQUIRED)
 if(NOT ${PYTHONLIBS_VERSION_STRING} VERSION_EQUAL ${PYTHON_VERSION_STRING})
   unset(PYTHON_INCLUDE_DIR)
   string(REGEX REPLACE "([0-9]\\.[0-9]+)\\.[0-9]+" "\\1" version_string "${PYTHON_VERSION_STRING}")
-  find_path(_PYTHON_INCLUDE_DIR 
+  find_path(_PYTHON_INCLUDE_DIR
     NAMES Python.h
     HINTS ${PYTHON_INTERP_PREFIX}/
     PATH_SUFFIXES
@@ -59,14 +48,14 @@ if(NOT ${PYTHONLIBS_VERSION_STRING} VERSION_EQUAL ${PYTHON_VERSION_STRING})
   set(PYTHON_INCLUDE_DIR ${_PYTHON_INCLUDE_DIR} CACHE PATH "Path to python includes" FORCE)
 
   if(PYTHON_INCLUDE_DIR AND EXISTS "${PYTHON_INCLUDE_DIR}/patchlevel.h")
-    file(STRINGS 
+    file(STRINGS
       "${PYTHON_INCLUDE_DIR}/patchlevel.h"
       PYTHONLIBS_VERSION_STRING
       REGEX "^#define[ \t]+PY_VERSION[ \t]+\"[^\"]+\""
     )
-    string(REGEX REPLACE 
+    string(REGEX REPLACE
       "^#define[ \t]+PY_VERSION[ \t]+\"([^\"]+)\".*" "\\1"
-      PYTHONLIBS_VERSION_STRING 
+      PYTHONLIBS_VERSION_STRING
       "${PYTHONLIBS_VERSION_STRING}"
     )
     message(STATUS "[PythonLibs] corrected path and version to ${PYTHONLIBS_VERSION_STRING}" )
@@ -74,9 +63,26 @@ if(NOT ${PYTHONLIBS_VERSION_STRING} VERSION_EQUAL ${PYTHON_VERSION_STRING})
 endif()
 
 
-
-
 find_package(Numpy REQUIRED)
 
 set(CMAKE_PREFIX_PATH ${OLD_CMAKE_PREFIX_PATH})
 
+include(CMakeParseArguments)
+# Installs relative to PYTHON_PKG_DIR
+function(install_python)
+    cmake_parse_arguments(INSTALLPYTHON "" "DESTINATION;COMPONENT" "" ${ARGN})
+    if(INSTALLPYTHON_DESTINATION AND IS_ABSOLUTE ${INSTALLPYTHON_DESTINATION})
+        set(directory ${INSTALLPYTHON_DESTINATION})
+    else()
+        set(directory ${PYTHON_PKG_DIR})
+        if(INSTALLPYTHON_DESTINATION)
+            set(directory ${directory}/${INSTALLPYTHON_DESTINATION})
+        endif()
+    endif()
+    set(component python)
+    if(INSTALLPYTHON_COMPONENT)
+        set(component ${INSTALLPYTHON_COMPONENT})
+    endif()
+    install(${INSTALLPYTHON_UNPARSED_ARGUMENTS} DESTINATION ${directory}
+            COMPONENT ${component})
+endfunction()

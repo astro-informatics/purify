@@ -12,14 +12,13 @@ endfunction()
 
 # Adds a python module as a target
 function(add_python_module NAME)
-  set(oneValueArgs LOCATION INSTALL_DESTINATION)
-  set(multiValueArgs DEPENDS LIBRARIES FILES)
-  cmake_parse_arguments(PYMODULE "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+  cmake_parse_arguments(PYMODULE
+      "" "LOCATION" "DEPENDS;LIBRARIES;FILES" ${ARGN})
 
   set(module_name py${NAME})
 
-  if(${PYMODULE_FILES} STREQUAL "")
-    set(sources ${ARGN})
+  if(NOT PYMODULE_FILES)
+    set(sources ${PYMODULE_UNPARSED_ARGUMENTS})
   else()
     set(sources ${PYMODULE_FILES})
   endif()
@@ -37,12 +36,9 @@ function(add_python_module NAME)
   endif()
   if(NOT "${PYMODULE_LOCATION}" STREQUAL "")
     set_target_properties(${module_name}
-      PROPERTIES LIBRARY_OUTPUT_DIRECTORY 
+      PROPERTIES LIBRARY_OUTPUT_DIRECTORY
       ${PYMODULE_LOCATION}
     )
-  endif()
-  if(NOT ${PYMODULE_INSTALL_DESTINATION} STREQUAL "")
-    install(TARGETS ${module_name} DESTINATION ${PYMODULE_INSTALL_DESTINATION})
   endif()
 endfunction()
 
@@ -63,10 +59,18 @@ endfunction()
 # Creates a cython mpdule from an input file
 function(add_cython_modules TARGET)
 
-  set(OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.c)
-  get_pyx_dependencies(${TARGET} DEPENDENCIES)
+  cmake_parse_arguments(CYMODULE "" "SOURCE" "" ${ARGN})
 
-  get_property(included_dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+  set(OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.c)
+  if(NOT CYMODULE_SOURCE)
+      set(CYMODULE_SOURCE ${TARGET}.pyx)
+  endif()
+  get_pyx_dependencies(${CYMODULE_SOURCE} DEPENDENCIES)
+
+  get_property(included_dirs
+      DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+      PROPERTY INCLUDE_DIRECTORIES
+  )
   set(inclusion)
   foreach(included ${included_dirs})
     set(inclusion ${inclusion} -I${included})
@@ -74,12 +78,13 @@ function(add_cython_modules TARGET)
 
   add_custom_command(
     OUTPUT ${OUTPUT_FILE}
-    COMMAND ${PYTHON_EXECUTABLE} -m cython ${TARGET}.pyx -o ${OUTPUT_FILE} ${inclusion}
+    COMMAND ${PYTHON_EXECUTABLE} -m cython ${CYMODULE_SOURCE}
+                                 -o ${OUTPUT_FILE} ${inclusion}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${DEPENDENCIES}
   )
 
-  add_python_module(${TARGET} ${ARGN} FILES ${OUTPUT_FILE})
+  add_python_module(${TARGET} ${CYMODULE_UNPARSED_ARGUMENTS} FILES ${OUTPUT_FILE})
   add_dependencies(py${TARGET} ${OUTPUT_FILE})
   target_link_libraries(py${TARGET} ${TARGET_LIBRARIES})
 
