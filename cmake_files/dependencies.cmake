@@ -1,5 +1,5 @@
 # Look for external software
-find_package(FFTW3 REQUIRED)
+find_package(FFTW3 REQUIRED DOUBLE)
 find_package(TIFF REQUIRED)
 find_package(CFitsIO REQUIRED)
 find_package(BLAS REQUIRED)
@@ -29,9 +29,9 @@ include_directories(
 set(TARGET_LIBRARIES
      libpurify
      ${SOPT_LIBRARY}
-     ${FFTW3_LIBRARY_DOUBLE} 
-     ${CFitsIO_LIBRARY} 
-     ${TIFF_LIBRARY} 
+     ${FFTW3_DOUBLE_LIBRARY}
+     ${CFitsIO_LIBRARY}
+     ${TIFF_LIBRARY}
      ${BLAS_LIBRARIES}
 )
 

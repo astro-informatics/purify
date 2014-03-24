@@ -21,7 +21,10 @@ if(NOT GreatCMakeCookOff_FOUND)
     )
   endif()
   execute_process(
-    COMMAND git clone https://github.com/UCL/GreatCMakeCookOff.git ${COOKOFF_DOWNLOAD_DIR}
+    COMMAND ${GIT_EXECUTABLE} clone
+         https://github.com/UCL/GreatCMakeCookOff.git
+         -b refactor
+         ${COOKOFF_DOWNLOAD_DIR}
     RESULT_VARIABLE CLONING_COOKOFF
     OUTPUT_QUIET
     ERROR_VARIABLE CLONING_ERROR
@@ -32,11 +35,13 @@ if(NOT GreatCMakeCookOff_FOUND)
     message(FATAL_ERROR "[GreatCMakeCookOff] git cloning failed.")
   else()
     message(STATUS "[GreatCMakeCookOff] downloaded to ${COOKOFF_DOWNLOAD_DIR}")
-  endif() 
-  set(GreatCMakeCookOff_DIR ${COOKOFF_DOWNLOAD_DIR})
+    find_package(GreatCMakeCookOff CONFIG PATHS ${COOKOFF_DOWNLOAD_DIR} QUIET)
+  endif()
 
+  set(GreatCMakeCookOff_DIR ${COOKOFF_DOWNLOAD_DIR})
   set(GreatCMakeCookOff_FOUND TRUE)
 endif()
 unset(COOKOFF_DOWNLOAD_DIR)
+
 # Adds GreatCMakeCookOff to module paths
-list(APPEND CMAKE_MODULE_PATH ${GreatCMakeCookOff_DIR})
+initialize_cookoff()

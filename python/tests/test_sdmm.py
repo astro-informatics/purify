@@ -123,4 +123,3 @@ def test_sdmm():
     actual = sdmm(visibility, radius=radius, max_iter=5)
 
     assert_allclose(actual.real, expected)
-test_sdmm()
