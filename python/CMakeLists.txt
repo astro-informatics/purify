@@ -10,19 +10,24 @@ if(python)
   ###############################
   # Add new targets
   ###############################
+  file(GLOB PXD_HEADERS *.pxd)
+  file(GLOB PYTHON_SOURCES *.py)
+  set(cython_modules visibility image sparse measurements fftw sparsity_ops sdmm)
+
 
   add_custom_target(copy)
-  foreach(module visibility image sparse measurements fftw sparsity_ops sdmm)
+  set(python_modules)
+  foreach(module ${cython_modules})
     add_cython_modules(${module}
       LOCATION ${PYPURIFY_DIRECTORY}
       LIBRARIES ${PYTHON_LIBRARIES} libpurify
       DEPENDS copy
-      INSTALL_DESTINATION ${PYTHON_PKG_DIR}/purify
     )
+    list(APPEND python_modules py${module})
   endforeach()
 
-  add_copy_files(copy GLOB *.py DESTINATION ${PYPURIFY_DIRECTORY})
-  add_copy_files(copy GLOB *.pdx DESTINATION ${PYPURIFY_DIRECTORY})
+  add_copy_files(copy FILES ${PYTHON_SOURCES} DESTINATION ${PYPURIFY_DIRECTORY})
+  add_copy_files(copy FILES ${PXD_HEADERS} DESTINATION ${PYPURIFY_DIRECTORY})
   if(tests)
     # Files only needed in testing. Added here cos here is where the copy target is defined.
     add_copy_files( copy GLOB ${PROJECT_SOURCE_DIR}/data/images/Coverages/*.vis
@@ -39,9 +44,13 @@ if(python)
   # directory organisation. The alternative to having a python directory structure, is having pdx
   # files with names package.subpackage.pdx. This is what the next statements do.
 
-  add_copy_files( copy GLOB *.pxd
+  add_copy_files( copy FILES ${PXD_HEADERS}
                   DESTINATION ${PYPURIFY_DIRECTORY}/include
                   REPLACE "([^ ]+)" "purify.\\1" )
+
+  install_python(TARGETS ${python_modules} DESTINATION purify)
+  install_python(FILES ${PXD_HEADERS} DESTINATION purify/headers)
+  install_python(FILES ${PYTHON_SOURCES} DESTINATION purify)
 endif()
 
 add_subdirectory(tests)

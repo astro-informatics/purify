@@ -12,7 +12,7 @@ endfunction()
 
 # Adds a python module as a target
 function(add_python_module NAME)
-  set(oneValueArgs LOCATION INSTALL_DESTINATION)
+  set(oneValueArgs LOCATION)
   set(multiValueArgs DEPENDS LIBRARIES FILES)
   cmake_parse_arguments(PYMODULE "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -37,12 +37,9 @@ function(add_python_module NAME)
   endif()
   if(NOT "${PYMODULE_LOCATION}" STREQUAL "")
     set_target_properties(${module_name}
-      PROPERTIES LIBRARY_OUTPUT_DIRECTORY 
+      PROPERTIES LIBRARY_OUTPUT_DIRECTORY
       ${PYMODULE_LOCATION}
     )
-  endif()
-  if(NOT ${PYMODULE_INSTALL_DESTINATION} STREQUAL "")
-    install(TARGETS ${module_name} DESTINATION ${PYMODULE_INSTALL_DESTINATION})
   endif()
 endfunction()
 
