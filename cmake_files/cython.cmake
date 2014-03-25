@@ -1,15 +1,3 @@
-# Adds some cython related functions
-
-function(relative_path PATH BASE OUTVAR)
-  execute_process(
-    COMMAND
-      ${PYTHON_EXECUTABLE} -c "from os.path import relpath; print(relpath('${PATH}', '${BASE}'))"
-    OUTPUT_VARIABLE OUTVAR
-  )
-  set(${OUTVAR} ${${OUTVAR}} PARENT_SCOPE)
-endfunction()
-
-
 # Adds a python module as a target
 function(add_python_module NAME)
   cmake_parse_arguments(PYMODULE

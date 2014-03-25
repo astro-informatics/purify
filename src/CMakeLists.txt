@@ -29,11 +29,11 @@ target_link_libraries(purify_about ${TARGET_LIBRARIES})
 
 
 # add test
-if(tests) 
+if(tests)
   add_executable(purify_test ${TEST_SOURCE})
   target_link_libraries(purify_test ${TARGET_LIBRARIES})
   add_test(
-    NAME purify 
+    NAME purify
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     COMMAND ${CMAKE_CURRENT_BINARY_DIR}/purify_test
   )

@@ -9,8 +9,9 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_files)
 include(LookUp-GreatCMakeCookOff)
 
 # Set version and build id of this package
-include(version_and_build_id)
-version_and_build_id(0.1)
+include(VersionAndGitRef)
+set_version(0.1)
+get_gitref()
 
 # Add C99 flag, since code uses inline
 # yeah, yeah it is GNU C, and others since for ever, but it was not part of the standard.
@@ -31,6 +32,8 @@ if(python)
   include(python)
   include(cython)
 endif()
+
+include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_subdirectory(src)
 add_subdirectory(include)

@@ -9,26 +9,25 @@ if(NOT EXISTS BLAS_INCLUDE_DIR)
 endif()
 
 # Find somewhat extenal package
-if(EXISTS ${PROJECT_SOURCE_DIR}/../sopt)
-  list(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/../sopt)
+find_package(Sopt)
+if(NOT Sopt_FOUND)
+    find_package(Sopt NO_MODULE REQUIRED)
 endif()
-find_package(SOPT)
 
 # Adds include directories
 include_directories(
-  ${PROJECT_SOURCE_DIR}/include
   ${BLAS_INCLUDE_DIR}
   ${FFTW3_INCLUDE_DIR}
   ${CFitsIO_INCLUDE_DIR}
   ${TIFF_INCLUDE_DIR}
-  ${SOPT_INCLUDE_DIR}
+  ${Sopt_INCLUDE_DIRS}
 )
 
 
 # Target libraries for the different executables
 set(TARGET_LIBRARIES
      libpurify
-     ${SOPT_LIBRARY}
+     ${Sopt_LIBRARIES}
      ${FFTW3_DOUBLE_LIBRARY}
      ${CFitsIO_LIBRARY}
      ${TIFF_LIBRARY}
