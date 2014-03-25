@@ -9,6 +9,7 @@ set(ABOUT_SOURCE purify_about.c)
 
 # Creates library
 add_library(libpurify ${PURIFY_SOURCES})
+set_target_properties(libpurify PROPERTIES OUTPUT_NAME "purify")
 
 # Now add each example and purify_about
 foreach(EXAMPLE_SOURCE ${EXAMPLE_SOURCES})
