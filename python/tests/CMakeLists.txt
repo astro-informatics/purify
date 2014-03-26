@@ -16,6 +16,8 @@ if(tests AND python)
           DEPENDS copy
         )
     endforeach()
+    target_link_libraries(pyrandom ${Sopt_LIBRARIES})
+    target_link_libraries(pysparse_testing libpurify)
 
     # Add fake __init__.py file so tests can import the test packages introduced above
     file(WRITE ${PYPURIFY_DIRECTORY}/tests/__init__.py "")

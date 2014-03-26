@@ -6,6 +6,25 @@ set(PURIFY_SOURCES
 set(TEST_SOURCE purify_test.c)
 set(ABOUT_SOURCE purify_about.c)
 
+# Adds include directories
+include_directories(
+  ${BLAS_INCLUDE_DIR}
+  ${FFTW3_INCLUDE_DIR}
+  ${CFitsIO_INCLUDE_DIR}
+  ${TIFF_INCLUDE_DIR}
+  ${Sopt_INCLUDE_DIRS}
+)
+message( "AM HERE ${BLAS_INCLUDE_DIR} ")
+
+# Target libraries for the different executables
+set(TARGET_LIBRARIES
+     libpurify
+     ${Sopt_LIBRARIES}
+     ${FFTW3_DOUBLE_LIBRARY}
+     ${CFitsIO_LIBRARY}
+     ${TIFF_LIBRARY}
+     ${BLAS_LIBRARIES}
+)
 
 # Creates library
 add_library(libpurify ${PURIFY_SOURCES})
