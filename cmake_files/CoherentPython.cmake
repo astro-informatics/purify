@@ -62,9 +62,6 @@ if(NOT ${PYTHONLIBS_VERSION_STRING} VERSION_EQUAL ${PYTHON_VERSION_STRING})
   endif()
 endif()
 
-
-find_package(Numpy REQUIRED)
-
 set(CMAKE_PREFIX_PATH ${OLD_CMAKE_PREFIX_PATH})
 
 include(CMakeParseArguments)

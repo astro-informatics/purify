@@ -50,4 +50,10 @@ if(python)
     if(tests)
         pip_install(nose LOCAL REQUIRED)
     endif()
+    pip_install(numpy REQUIRED)
+    pip_install(scipy REQUIRED)
+
+    # Finds additional info, like libraries, include dirs...
+    find_package(Numpy REQUIRED)
 endif()
+
