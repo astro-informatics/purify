@@ -18,18 +18,28 @@ get_gitref()
 include(AddC99Flags)
 
 option(tests          "Enable testing"                         on)
-option(openmp         "Enable OpenMP"                          on)
+option(openmp         "Enable OpenMP"                          off)
 option(python         "Enable python bindings"                 on)
 
 
+# Set up python environment
+if(python)
+  # Python interpreter + libraries
+  include(CoherentPython)
+  # Ability to install new python packages
+  include(PythonPackage)
+  # A virtual python environment so we don't pollute the original env
+  include(PythonVirtualEnv)
+endif()
+
 # include exernal dependencies
 include(dependencies)
+
 if(tests)
   enable_testing()
 endif()
 
 if(python)
-  include(python)
   include(cython)
 endif()
 

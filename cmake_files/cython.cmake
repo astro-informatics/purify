@@ -37,7 +37,7 @@ set(FIND_DEPS_SCRIPT
 # Get dependencies from a cython file
 function(get_pyx_dependencies SOURCE OUTVAR)
   execute_process(
-      COMMAND ${PYTHON_EXECUTABLE} ${FIND_DEPS_SCRIPT} ${SOURCE} ${ARGN}
+      COMMAND ${LOCAL_PYTHON_EXECUTABLE} ${FIND_DEPS_SCRIPT} ${SOURCE} ${ARGN}
       RESULT_VARIABLE RESULT
       OUTPUT_VARIABLE OUTPUT
       ERROR_VARIABLE ERROR
@@ -74,8 +74,8 @@ function(add_cython_modules TARGET)
 
   add_custom_command(
     OUTPUT ${OUTPUT_FILE}
-    COMMAND ${PYTHON_EXECUTABLE} -m cython ${CYMODULE_SOURCE}
-                                 -o ${OUTPUT_FILE} ${inclusion}
+    COMMAND ${LOCAL_PYTHON_EXECUTABLE} -m cython ${CYMODULE_SOURCE}
+                                       -o ${OUTPUT_FILE} ${inclusion}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${DEPENDENCIES}
   )
