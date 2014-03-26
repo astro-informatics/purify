@@ -72,9 +72,6 @@ function(_check_package_already_installed PACKAGE OUTVAR)
 endfunction()
 
 function(pip_install PACKAGE)
-    if(${PACKAGE}_FOUND)
-        return()
-    endif()
     cmake_parse_arguments(PIPINSTALL
         "REQUIRED;NONINSTALL" "PREFIX" "ARGUMENTS" ${ARGN})
     _python_executable(${PACKAGE}_PYTHON ${PIPINSTALL_UNPARSED_ARGUMENTS})
@@ -110,7 +107,7 @@ function(pip_install PACKAGE)
         )
         if(pip_FOUND)
             execute_process(
-                COMMAND ${LOCALPYTHON} -m pip install ${PACKAGE} ${ARGUMENTS}
+                COMMAND ${LOCALPYTHON} -m pip install ${ARGUMENTS} ${PACKAGE}
                 WORKING_DIRECTORY ${WORKING_DIRECTORY}
                 RESULT_VARIABLE PIPINSTALLATION_WORKED
                 OUTPUT_VARIABLE PIP_OUTPUT
@@ -131,31 +128,37 @@ function(pip_install PACKAGE)
     # Figures out package location
     if(package_FOUND)
         execute_process(
-            COMMAND ${LOCALPYTHON} -c
-                 "from ${PACKAGE} import __file__ as loc; print(loc)"
+            COMMAND ${LOCALPYTHON} -m pip show ${PACKAGE}
             WORKING_DIRECTORY ${WORKING_DIRECTORY}
             RESULT_VARIABLE RESULT
             ERROR_VARIABLE ERROR
             OUTPUT_VARIABLE OUTPUT
         )
-        string(STRIP "${OUTPUT}" ${PACKAGE}_LOCATION)
-        get_filename_component(${PACKAGE}_LOCATION "${${PACKAGE}_LOCATION}" PATH)
-        if(NOT ${PACKAGE}_LOCATION)
-            set(${PACKAGE}_LOCATION ${WORKING_DIRECTORY})
-        endif()
+        if(RESULT EQUAL 0)
+            string(REGEX REPLACE
+                ".*Location:[ ]*([^ \n]+).*\n" "\\1"
+                ${PACKAGE}_LOCATION ${OUTPUT}
+            )
+            string(REGEX REPLACE
+                ".*Version:.*([0-9]+\\.[0-9]+\\.[0-9]+).*" "\\1"
+                ${PACKAGE}_VERSION ${OUTPUT}
+            )
+       endif()
     endif()
 
+    set(${PACKAGE}_FIND_REQUIRED FALSE)
+    if(PIPINSTALL_REQUIRED)
+        set(${PACKAGE}_FIND_REQUIRED TRUE)
+    endif()
     # Complete process of finding the package
     find_package_handle_standard_args(${PACKAGE}
         FOUND_VAR ${PACKAGE}_FOUND
         REQUIRED_VARS ${PACKAGE}_LOCATION ${PACKAGE}_PYTHON
+        VERSION_VAR ${PACKAGE}_VERSION
     )
     if(${PACKAGE}_FOUND)
-        set(${PACKAGE}_LOCATION "${${PACKAGE}_LOCATION}"
-            CACHE PATH "Location of the python package ${PACKAGE}"
-        )
-        set(${PACKAGE}_PYTHON "${${PACKAGE}_PYTHON}"
-            CACHE PATH "Executable used to find ${PACKAGE}"
-        )
+        foreach(value VERSION PYTHON LOCATION)
+            set(${PACKAGE}_${value} ${${PACKAGE}_${value}} PARENT_SCOPE)
+        endforeach()
     endif()
 endfunction()
