@@ -27,6 +27,7 @@
 
 # First check for python executable
 include(FindPackageHandleStandardArgs)
+include(utilities)
 find_package(PythonInterp REQUIRED)
 
 include(CMakeParseArguments)
@@ -86,12 +87,7 @@ function(pip_install PACKAGE)
              --install-option=--install-scripts=${prefix}/bin
              --install-option=--prefix=${prefix}
         )
-        if(NOT EXISTS ${prefix}/pylibs)
-            execute_process(
-                COMMAND ${CMAKE_COMMAND} -E make_directory ${prefix}/pylibs
-                OUTPUT_QUIET
-            )
-        endif()
+        mkdir(${prefix}/pylibs)
     endif()
 
 
