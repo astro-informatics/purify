@@ -1,3 +1,7 @@
+# Looks up [CFitsIO](http://heasarc.gsfc.nasa.gov/fitsio/fitsio.html)
+#
+# - URL: Defaults to ftp://heasarc.gsfc.nasa.gov/software/fitsio/c/cfitsio_latest.tar.gz
+#
 if(CFitsIO_ARGUMENTS)
     cmake_parse_arguments(CFitsIO "" "URL" ""
         ${CFitsIO_ARGUMENTS})
