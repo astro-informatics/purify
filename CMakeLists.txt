@@ -30,6 +30,7 @@ if(python)
   include(PythonPackage)
   # A virtual python environment so we don't pollute the original env
   include(PythonVirtualEnv)
+  add_virtualenv()
 endif()
 
 # include exernal dependencies
