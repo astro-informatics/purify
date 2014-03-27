@@ -89,7 +89,7 @@ if(NOT TARGET lookup_dependencies)
     add_custom_target(lookup_dependencies ALL)
 endif()
 
-include(FindPackageHAndleStandardArgs)
+include(FindPackageHandleStandardArgs)
 include(ExternalProject)
 
 function(_find_lookup_recipe package OUTVAR)
