@@ -1,5 +1,5 @@
 if(Sopt_ARGUMENTS)
-    cmake_parse_arguments(Sopt "" "GIT_REPOSITORY;GIT_TAG" "" 
+    cmake_parse_arguments(Sopt "" "GIT_REPOSITORY;GIT_TAG" ""
         ${Sopt_ARGUMENTS})
 endif()
 if(NOT Sopt_GIT_REPOSITORY)
@@ -30,9 +30,3 @@ ExternalProject_Add(
     LOG_BUILD ON
 )
 add_recursive_cmake_step(Sopt Sopt_FOUND DEPENDEES install)
-ExternalProject_Get_Property(Sopt install_dir)
-# unset(Sopt_INCLUDE_DIRS CACHE)
-# set(Sopt_INCLUDE_DIRS ${install_dir}/include
-#     CACHE PATH "Path to external project include")
-set(Sopt_INCLUDE_DIRS Dummy)
-set(Sopt_LIBRARIES dummy)

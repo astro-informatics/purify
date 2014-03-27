@@ -17,6 +17,7 @@ if(tests AND python)
         )
     endforeach()
     target_link_libraries(pyrandom ${Sopt_LIBRARIES})
+    depends_on_lookups(pyrandom)
     target_link_libraries(pysparse_testing libpurify)
 
     # Add fake __init__.py file so tests can import the test packages introduced above

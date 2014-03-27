@@ -14,7 +14,6 @@ include_directories(
   ${TIFF_INCLUDE_DIR}
   ${Sopt_INCLUDE_DIRS}
 )
-message( "AM HERE ${BLAS_INCLUDE_DIR} ")
 
 # Target libraries for the different executables
 set(TARGET_LIBRARIES
@@ -29,6 +28,7 @@ set(TARGET_LIBRARIES
 # Creates library
 add_library(libpurify ${PURIFY_SOURCES})
 set_target_properties(libpurify PROPERTIES OUTPUT_NAME "purify")
+depends_on_lookups(libpurify)
 
 # Now add each example and purify_about
 foreach(EXAMPLE_SOURCE ${EXAMPLE_SOURCES})

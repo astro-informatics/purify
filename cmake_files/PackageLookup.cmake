@@ -5,49 +5,77 @@
 #
 # The user should only have to include this file and add to their cmake files:
 #
-#     lookup_package(PACKAGE NAME)
+#     lookup_package(<name>)
 #
+# The name should match that of an existing `find_package(<name>)` file.
 # The lookup_package function depends on files in directories in the cmake prefixes paths that have
 # the name of the package:
-# - ${CMAKE_PREFIX_PATH}/${package}/${package}-lookup.cmake
-# - ${CMAKE_PREFIX_PATH}/${package}/${package}-lookup.cmake
-# - ${CMAKE_PREFIX_PATH}/${package}/LookUp${package}.cmake
-# - ${CMAKE_PREFIX_PATH}/${package}/LookUp${package}.cmake
-# - ${CMAKE_PREFIX_PATH}/${package}/lookup.cmake
+#
+# - ${CMAKE_MODULE_PATH}/${package}/${package}-lookup.cmake
+# - ${CMAKE_MODULE_PATH}/${package}/LookUp${package}.cmake
+# - ${CMAKE_MODULE_PATH}/${package}/lookup.cmake
+# - ${CMAKE_MODULE_PATH}/${package}-lookup.cmake
+# - ${CMAKE_MODULE_PATH}/LookUp${package}.cmake
+# - ${CMAKE_MODULE_PATH}/${package}-lookup.cmake
+# - ${CMAKE_LOOKUP_PATH}/${package}-lookup.cmake
+# - ${CMAKE_LOOKUP_PATH}/LookUp${package}.cmake
 #
 # These files are included when the function lookup_package is called.
-# The files should have the general structure:
+# The files will generally have the structure:
 #
-#     find_package(something)
-#     if(NOT something_FOUND)
-#       ExternalProject_Add(...)
-#       add_recursive_cmake_step(something)
-#     endif()
+# ~~~cmake
+# # Parses arguments specific to the lookup recipe
+# # Optional step. Below, only a URL single-valued argument is specified.
+# if(package_ARGUMENTS)
+#     cmake_parse_arguments(package "" "URL" "" ${package_ARGUMENTS})
+# else()
+#     set(package_URL https://gaggledoo.doogaggle.com)
+# endif()
+# # The external project name `<package>` must match the package name exactly
+# ExternalProject_Add(package
+#   URL ${URL_
+# )
+# # Reincludes cmake so newly installed external can be found via find_package.
+# # Optional step.
+# add_recursive_cmake_step(...)
+# ~~~
 #
 # This pattern will first attempt to find the package on the system. If it is not found, an external
 # project to create it is added, with an extra step to rerun cmake and find the newly installed
 # package.
 #
-# A call to find_package(something) can be protected to make sure that the particular package is
-# always downloaded. The pattern is as follows
-#
-#   if(NOT something_DOWNLOAD_BY_DEFAULT)
-#     find_package(something)
-#   endif()
-#   if(NOT something_FOUND)
-#     ExternalProject_Add(...)
-#     add_recursive_cmake_step(something)
-#   endif()
-#
-#
-# This file adds two functions:
+# This file adds three functions/macro:
 # 
-# - lookup_package: calls a lookup file (the ones with the structure above)
-# - add_recursive_step: Adds a step to an external project to call cmake after that external project
-#   is downloaded/build/installed (to ${EXTERNAL_ROOT}).
+# ~~~cmake
+# lookup_package(<name>    # Name for find_package and lookup recipe files
+#    [DOWNLOAD_BY_DEFAULT] # Always look it up as external project first.
+#                          # This ensures the external project is always compiled specifically for
+#                          # this project.
+#    [ARGUMENTS <list>]    # Arguments specific to the look up recipe.
+#                          # They will be available inside the recipe under the variable
+#                          # ${name}_ARGUMENTS. Lookup recipes also have access to EXTERNAL_ROOT,
+#                          # a variable specifying a standard location for external projects in the
+#                          # build tree
+#    [...]                 # Arguments passed on to `find_package`.
+# )
+# ~~~~
 #
-# It also adds a location in the build directory where external projects are
-# downloaded/build/installed. The location is set in the variable EXTERNAL_ROOT.
+# ~~~~cmake
+# # Adds a custom step to the external project that calls cmake recusively
+# # This makes it possible for the newly built package to be installed.
+# add_recursive_cmake_step(<name> # Still the same package name
+#    <${name}_FOUND> # Variable set to true if package is found
+#    [...]           # Passed on to ExternalProject_Add_Step
+#                    # in general, it will be `DEPENDEES install`,
+#                    # making this step the last.
+# )
+# ~~~
+#
+# ~~~~cmake
+# # Makes sure TARGET is built after the looked up projects.
+# depends_on_lookups(TARGET)
+# ~~~
+#
 
 # Sets location where external project are included
 if(NOT EXTERNAL_ROOT)
@@ -56,6 +84,11 @@ endif(NOT EXTERNAL_ROOT)
 # Makes sure external projects are found by cmake
 list(APPEND CMAKE_PREFIX_PATH ${EXTERNAL_ROOT})
 
+# Adds a target for all external projects, so they can be made prior to others.
+if(NOT TARGET lookup_dependencies)
+    add_custom_target(lookup_dependencies ALL)
+endif()
+
 include(FindPackageHAndleStandardArgs)
 include(ExternalProject)
 
@@ -63,33 +96,28 @@ function(_find_lookup_recipe package OUTVAR)
     foreach(path ${CMAKE_MODULE_PATH})
       list(APPEND cmake_paths ${path}/${package})
     endforeach()
-    set(filename ${package}-lookup.cmake)
-    find_path(
-      LOOKUP_RECIPE ${filename}
-      PATHS ${CMAKE_MODULE_PATH} ${cmake_paths}
-      NO_DEFAULT_PATH
-    )
+    set(LOOKUP_RECIPE LOOKUP_RECIPE-NOTFOUND)
+    foreach(filename ${package}-lookup.cmake LookUp${package}.cmake)
+        find_path(LOOKUP_RECIPE ${filename}
+            PATHS ${CMAKE_LOOKUP_PATH} ${CMAKE_MODULE_PATH} ${cmake_paths}
+            NO_DEFAULT_PATH
+        )
+        if(LOOKUP_RECIPE)
+            set(${OUTVAR}_DIR "${LOOKUP_RECIPE}" PARENT_SCOPE)
+            set(${OUTVAR}_FILE "${LOOKUP_RECIPE}/${filename}" PARENT_SCOPE)
+            return()
+        endif()
+    endforeach()
 
     if(NOT LOOKUP_RECIPE)
-        set(filename LookUp${package}.cmake)
-      find_path(
-        LOOKUP_RECIPE ${filename}
-        PATHS ${CMAKE_MODULE_PATH} ${cmake_paths}
-        NO_DEFAULT_PATH
-      )
+        find_path(LOOKUP_RECIPE lookup.cmake
+            PATHS ${cmake_paths}
+            NO_DEFAULT_PATH
+        )
     endif()
 
-    if(NOT LOOKUP_RECIPE)
-      set(filename lookup.cmake)
-      find_path(
-        LOOKUP_RECIPE lookup.cmake
-        PATHS ${cmake_paths}
-        NO_DEFAULT_PATH
-      )
-    endif()
-
-    set(${OUTVAR}_DIR "${LOOKUP_RECIPE}" PARENT_SCOPE)
     if(LOOKUP_RECIPE)
+      set(${OUTVAR}_DIR "${LOOKUP_RECIPE}" PARENT_SCOPE)
       set(${OUTVAR}_FILE "${LOOKUP_RECIPE}/${filename}" PARENT_SCOPE)
     endif()
 endfunction()
@@ -115,16 +143,22 @@ macro(lookup_package package)
     elseif(NOT ${package}_RECURSIVE)
         set(quiet QUIET)
     endif()
+    set(arguments )
     if(dolook)
-        find_package(Sopt ${${package}_UNPARSED_ARGUMENTS} ${required} ${quiet})
+        find_package(${package} ${${package}_UNPARSED_ARGUMENTS} ${required} ${quiet})
     endif()
-    if(${package}_FOUND)
+    if(${package}_FOUND) # Have it print me
+        if(quiet AND NOT ${package}_QUIET)
+            # Just so message gets printed...
+            set(${package}_FOUND)
+            find_package(${package} ${arguments} ${required})
+        endif()
         return()
     endif()
 
     # Then try and find recipe
     _find_lookup_recipe(${package} ${package}_LOOKUP_RECIPE)
-    if(NOT ${package}_LOOKUP_RECIPE_DIR)
+    if(NOT ${package}_LOOKUP_RECIPE_FILE)
         # Checks if package is required
         set(msg "Could not find recipe to lookup "
                 "${package} -- ${${package}_RECIPE_DIR}")
@@ -137,20 +171,15 @@ macro(lookup_package package)
     endif()
 
     include(${${package}_LOOKUP_RECIPE_FILE})
+    add_dependencies(lookup_dependencies ${package})
 endmacro()
 
+# Makes target depend on external dependencies
+macro(depends_on_lookups TARGET)
+    add_dependencies(${TARGET} lookup_dependencies)
+endmacro()
 
 # Adds an external step to an external project to rerun cmake
-# This means that an externally installed project will be now catch the newly installed project.
-# It expects stuff was installed in EXTERNAL_ROOT
-#
-# In general, the usage pattern is something like:
-#   find_package(something)
-#   if(NOT something_FOUND)
-#     ExternalProject_Add(...)
-#     add_recursive_cmake_step(something)
-#   endif()
-#
 macro(add_recursive_cmake_step name check_var)
   set(cmake_arguments -DCMAKE_PROGRAM_PATH:PATH=${EXTERNAL_ROOT}/bin
                       -DCMAKE_LIBRARY_PATH:PATH=${EXTERNAL_ROOT}/lib
