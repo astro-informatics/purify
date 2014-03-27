@@ -1,7 +1,6 @@
 # Look for external software
 find_package(FFTW3 REQUIRED DOUBLE)
 find_package(TIFF REQUIRED)
-find_package(CFitsIO REQUIRED)
 find_package(BLAS REQUIRED)
 # find_package blas does not look for cblas.h
 if(NOT BLAS_INCLUDE_DIR)
@@ -11,6 +10,7 @@ endif()
 # Find somewhat extenal package
 include(PackageLookup)
 lookup_package(Sopt REQUIRED)
+lookup_package(CFitsIO REQUIRED)
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${BLAS_LINKER_FLAGS}")
 
