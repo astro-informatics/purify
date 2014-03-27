@@ -143,35 +143,26 @@ macro(lookup_package package)
     elseif(NOT ${package}_RECURSIVE)
         set(quiet QUIET)
     endif()
-    set(arguments )
     if(dolook)
         find_package(${package} ${${package}_UNPARSED_ARGUMENTS} ${required} ${quiet})
     endif()
-    if(${package}_FOUND) # Have it print me
-        if(quiet AND NOT ${package}_QUIET)
-            # Just so message gets printed...
-            set(${package}_FOUND)
-            find_package(${package} ${arguments} ${required})
+    # If package is not found, then look for a recipe to download and build it
+    if(NOT ${package}_FOUND)
+        _find_lookup_recipe(${package} ${package}_LOOKUP_RECIPE)
+        if(NOT ${package}_LOOKUP_RECIPE_FILE)
+            # Checks if package is required
+            set(msg "Could not find recipe to lookup "
+                    "${package} -- ${${package}_RECIPE_DIR}")
+            if(${package}_REQUIRED)
+              message(FATAL_ERROR ${msg})
+            elseif(NOT ${package}_QUIET)
+              message(STATUS ${msg})
+            endif()
+        else()
+            include(${${package}_LOOKUP_RECIPE_FILE})
+            add_dependencies(lookup_dependencies ${package})
         endif()
-        return()
     endif()
-
-    # Then try and find recipe
-    _find_lookup_recipe(${package} ${package}_LOOKUP_RECIPE)
-    if(NOT ${package}_LOOKUP_RECIPE_FILE)
-        # Checks if package is required
-        set(msg "Could not find recipe to lookup "
-                "${package} -- ${${package}_RECIPE_DIR}")
-        if(${package}_REQUIRED)
-          message(FATAL_ERROR ${msg})
-        elseif(NOT ${package}_QUIET)
-          message(STATUS ${msg})
-        endif()
-        return()
-    endif()
-
-    include(${${package}_LOOKUP_RECIPE_FILE})
-    add_dependencies(lookup_dependencies ${package})
 endmacro()
 
 # Makes target depend on external dependencies
