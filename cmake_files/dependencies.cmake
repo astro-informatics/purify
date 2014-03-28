@@ -24,19 +24,38 @@ if(openmp)
 endif()
 
 if(python)
+    function(find_or_fail package what)
+        find_python_package(${package})
+        if(NOT ${package}_FOUND)
+            message("*********")
+            message("${package} is required to ${what}")
+            message("It can likely be installed with pip")
+            message("*********")
+            message(FATAL_ERROR "Aborting")
+        endif()
+    endfunction()
+    # Python interpreter + libraries
+    include(CoherentPython)
+    # Ability to find installed python packages
+    include(PythonPackage)
     # Look for/install cython and nose
     # Only required for building
-    pip_install(cython LOCAL REQUIRED)
+    find_or_fail(cython "build Purify's python bindings")
+    # Also required for production
+    find_or_fail(numpy "by Purify's python bindings")
+    find_or_fail(scipy "by Purify's python bindings")
+    find_or_fail(pandas "by Purify's python bindings")
+
     if(tests)
-        pip_install(nose LOCAL REQUIRED)
+        # unit-test package
+        find_or_fail(nose "to run the unit-tests for the python bindings")
+        # python environment within which ctest will run the test.
+        # ensures ctest finds the packages in the build tree first,
+        # as opposed to install packages.
+        find_or_fail(virtualenv "to run the unit-tests for the python bindings")
+        include(PythonVirtualEnv)
     endif()
-    # Look for/install numpy, scipy, pandas
-    # Needed during production use of purify
-    pip_install(numpy REQUIRED)
-    pip_install(scipy REQUIRED)
-    pip_install(pandas REQUIRED)
 
     # Finds additional info, like libraries, include dirs...
     find_package(Numpy REQUIRED)
 endif()
-

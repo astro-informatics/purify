@@ -8,7 +8,7 @@ function(mkdir directory)
     endif()
 endfunction()
 
-# Immediately creates a symbolic link on unixes
+# Immediately creates a symbolic link between two files
 function(symlink FROM TO)
     if(NOT EXISTS "${FROM}")
         return()
