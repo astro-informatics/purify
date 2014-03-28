@@ -126,7 +126,8 @@ class RW(TVProx):
     """ Reweighted L1 optimization problem """
     sigma = positive_real_or_none('sigma',
           "Standard deviation of the noise in the representation domain" )
-    warm_start = boolean('warm_start', "If True, use provided starting point")
+    warm_start = boolean('warm_start',
+            "Whether to use initial solution or make a guess")
 
     def __init__(self, sigma=None, warm_start=True, **kwargs):
         super(RW, self).__init__(**kwargs)
@@ -154,6 +155,21 @@ class Measurements(object):
         self.image_size = image_size
         self.oversampling = oversampling
         self.interpolation = interpolation
+
+def pass_along(name, **kwargs):
+    """ Computes parameter dictionaries for inner attributes.
+
+        Returns a dictionary containing key/value pairs with the following transformation:
+
+        - key matches "%s_(.*)" % name: add {'\\1': value}
+        - key does not mathc "%s_(.*)", drop value
+    """
+    result = {}
+    start = "%s_" % name
+    for key, value in kwargs.iteritems():
+        if len(key) > len(start) and key[:len(start)] == start:
+            result[key[len(start):]] = value
+    return result
 
 def apply_params(inner):
     """ Modify traits using keyword arguments for duration of call.

@@ -13,6 +13,7 @@ image_files = {
 """ Path oracle images from which dirty images are created """
 expected_image_files = {
     '30dor': join(datadir, 'expected', "m31bpsa.fits"),
+    '30dor_sara': join(datadir, 'expected', "m31sara.fits"),
 }
 """ Path to expected outcome images """
 
@@ -30,10 +31,11 @@ def image_and_visibilities(name='30dor'):
     return image, visibility
 
 
-def expected_images(name='30dor'):
+def expected_images(name='30dor', method='sdmm'):
     """ Reads image results from disk. """
     from purify import read_image
-    return read_image(expected_image_files[name])
+    method = {'sdmm': '', 'sara': '_sara'}[method]
+    return read_image(expected_image_files[name + method])
 
 
 

@@ -249,3 +249,13 @@ def test_apply_params_with_exception():
       assert_equal(mock.relative_variation, 1e-2)
       assert_equal(mock.called, True)
       assert_equal(str(e), "max_iter cannot be negative or null")
+
+
+def test_pass_along():
+    from nose.tools import assert_equal
+    from purify.params import pass_along
+
+    input = {'cg_verbose':0, 'cg_that': 'hello', 'verbose': 1, 'other': 2}
+    actual = pass_along('cg', **input)
+    expected = {'verbose': 0, 'that': 'hello'}
+    assert_equal(actual, expected)
