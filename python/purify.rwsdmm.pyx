@@ -4,8 +4,8 @@ from purify.measurements cimport purify_measurement_cftfwd, \
                                  _VoidedData, MeasurementOperator
 from purify.sparsity_ops cimport sopt_sara_analysisop, sopt_sara_synthesisop, \
                                  SparsityOperator
-from purify.sdmm cimport _convert_sdmm_params, _default_sigma,\
-                         sopt_l1_sdmmparam
+from purify.cparams cimport _convert_sdmm_params, _default_sigma,\
+                            sopt_l1_sdmmparam
 from purify.sdmm import SDMM
 
 cdef extern from "sopt_l1.h":
