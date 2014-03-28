@@ -6,17 +6,6 @@ from purify.sparsity_ops cimport sopt_sara_analysisop, sopt_sara_synthesisop, \
                                  SparsityOperator
 
 cdef extern from "sopt_l1.h":
-    ctypedef struct sopt_l1_sdmmparam:
-        int verbose
-        int max_iter
-        double gamma
-        double rel_obj
-        double epsilon
-        double epsilon_tol
-        int real_data
-        int cg_max_iter
-        double cg_tol
-
     cdef void sopt_l1_sdmm( void *xsol, int nx,
             void (*A)(void *out, void *invec, void **data),
             void **A_data, void (*At)(void *out, void *invec, void **data),
@@ -24,6 +13,11 @@ cdef extern from "sopt_l1.h":
             void **Psi_data, void (*Psit)(void *out, void *invec, void **data),
             void **Psit_data, int nr, void *y, int ny, double *weights,
             sopt_l1_sdmmparam param ) nogil
+
+cdef double _default_sigma(measurements) except *:
+    from numpy import norm, sqrt
+    nvis = float(len(measurements))
+    return norm(measurements) * 10.0**-(1.5) / sqrt(nvis)
 
 cdef void _convert_sdmm_params(
         sopt_l1_sdmmparam *c_params,
@@ -42,8 +36,8 @@ cdef void _convert_sdmm_params(
     c_params.rel_obj = sdmm.relative_variation
     if sdmm.radius is not None: c_params.epsilon = sdmm.radius
     else:
-        nvis = float(len(visibility['y']))
-        sigma = norm(visibility['y']) * 10.0**-(1.5) / sqrt(nvis)
+        nvis = float(len(visibility))
+        sigma = _default_sigma(visibility['y'])
         c_params.epsilon = sqrt(nvis + 2.0 * sqrt(nvis)) * sigma \
                            / nvis * nelements
 
@@ -152,8 +146,8 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
                                             self.oversampling,
                                             self.interpolation )
         # Convert from python to C parameters
-        cdef sopt_l1_sdmmparam params
-        _convert_sdmm_params(&params, self, measurements, visibility)
+        cdef sopt_l1_sdmmparam sdparams
+        _convert_sdmm_params(&sdparams, self, measurements, visibility)
 
         # define all C objects
         cdef:
@@ -173,7 +167,7 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
             void *image_ptr = <void*> &c_image[0]
             void *visibility_ptr = <void*> &c_visibility[0]
             double *weights_ptr = <double*> &c_weights[0]
-        params.gamma *= scale
+        sdparams.gamma *= scale
 
         SparsityOperator.set_wavelet_pointer(self, &c_wavelets)
 
@@ -183,7 +177,7 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
             &purify_measurement_cftadj, dataadj,
             &sopt_sara_synthesisop, &c_wavelets,
             &sopt_sara_analysisop, &c_wavelets,
-            Nr, visibility_ptr, Ny, weights_ptr, params
+            Nr, visibility_ptr, Ny, weights_ptr, sdparams
         )
 
         return image
