@@ -47,12 +47,14 @@ if(python)
   add_copy_files(copy FILES ${PYTHON_SOURCES} DESTINATION ${PYPURIFY_DIRECTORY})
   if(tests)
     # Files only needed in testing. Added here cos here is where the copy target is defined.
-    add_copy_files( copy GLOB ${PROJECT_SOURCE_DIR}/data/images/Coverages/*.vis
-                    DESTINATION ${PYPURIFY_DIRECTORY}/data/images/Coverages/ )
-    add_copy_files( copy GLOB ${PROJECT_SOURCE_DIR}/data/images/*.fits
-                    DESTINATION ${PYPURIFY_DIRECTORY}/data/images/ )
-    add_copy_files( copy GLOB ${PROJECT_SOURCE_DIR}/data/expected/*.fits
-                    DESTINATION ${PYPURIFY_DIRECTORY}/data/expected/ )
+    add_copy_files( copy GLOB "${PROJECT_SOURCE_DIR}/data/images/Coverages/*.vis"
+                    DESTINATION "${PYPURIFY_DIRECTORY}/data/images/Coverages/" )
+    add_copy_files( copy GLOB "${PROJECT_SOURCE_DIR}/data/images/*.fits"
+                    DESTINATION "${PYPURIFY_DIRECTORY}/data/images/" )
+    add_copy_files( copy GLOB "${PROJECT_SOURCE_DIR}/data/expected/*.fits"
+                    DESTINATION "${PYPURIFY_DIRECTORY}/data/expected/" )
+    add_copy_files( copy GLOB "${CMAKE_CURRENT_SOURCE_DIR}/tests/*fixtures.py"
+                    DESTINATION "${PYPURIFY_DIRECTORY}/tests/" )
   endif()
 
   install_python(TARGETS ${python_modules} DESTINATION purify)
