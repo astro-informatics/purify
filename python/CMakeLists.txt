@@ -1,7 +1,23 @@
 if(python)
   include(TargetCopyFiles)
 
+  set(libfftw3 ${FFTW3_DOUBLE_LIBRARY})
+  set(libblas ${BLAS_LIBRARIES})
+  set(libsopt ${Sopt_LIBRARIES})
+  set(libcfitsio ${CFitsIO_LIBRARY})
   set(PYPURIFY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/purify)
+
+  function(add_module TARGET)
+      add_cython_modules(${TARGET}
+          SOURCE purify.${TARGET}.pyx
+          LOCATION ${PYPURIFY_DIRECTORY}
+          LIBRARIES ${PYTHON_LIBRARIES} libpurify ${ARGN}
+          DEPENDS copy
+      )
+      install_python(TARGETS py${TARGET} DESTINATION purify)
+  endfunction()
+
+
   # Add location of purify package in build tree,
   # so it can be found later on
   add_to_python_path(${CMAKE_CURRENT_BINARY_DIR})
@@ -22,29 +38,19 @@ if(python)
   ###############################
   # Add new targets
   ###############################
-  file(GLOB PXD_HEADERS *.pxd)
-  file(GLOB PYTHON_SOURCES *.py)
-  set(cython_modules visibility image sparse measurements fftw sparsity_ops sdmm)
-
+  file(GLOB pysources *.py)
 
   add_custom_target(copy)
-  set(python_modules)
-  foreach(module ${cython_modules})
-    add_cython_modules(${module}
-      SOURCE purify.${module}.pyx
-      LOCATION ${PYPURIFY_DIRECTORY}
-      LIBRARIES ${PYTHON_LIBRARIES} libpurify
-      DEPENDS copy
-    )
-    list(APPEND python_modules py${module})
-  endforeach()
-  target_link_libraries(pyfftw ${FFTW3_DOUBLE_LIBRARY})
-  target_link_libraries(pyimage ${CFitsIO_LIBRARY})
-  target_link_libraries(pymeasurements ${BLAS_LIBRARIES} ${FFTW3_DOUBLE_LIBRARY})
-  target_link_libraries(pysdmm ${Sopt_LIBRARIES} ${BLAS_LIBRARIES} ${FFTW3_DOUBLE_LIBRARY})
-  target_link_libraries(pysparsity_ops ${Sopt_LIBRARIES} ${BLAS_LIBRARIES})
 
-  add_copy_files(copy FILES ${PYTHON_SOURCES} DESTINATION ${PYPURIFY_DIRECTORY})
+  add_module(visibility)
+  add_module(image ${libcfitsio})
+  add_module(sparse)
+  add_module(measurements ${libblas} ${libfftw3})
+  add_module(fftw ${libfftw3})
+  add_module(sparsity_ops ${libsopt} ${libblas})
+  add_module(sdmm  ${libsopt} ${libblas} ${libfftw3})
+
+  add_copy_files(copy FILES ${pysources} DESTINATION ${PYPURIFY_DIRECTORY})
   if(tests)
     # Files only needed in testing. Added here cos here is where the copy target is defined.
     add_copy_files( copy GLOB "${PROJECT_SOURCE_DIR}/data/images/Coverages/*.vis"
@@ -57,9 +63,8 @@ if(python)
                     DESTINATION "${PYPURIFY_DIRECTORY}/tests/" )
   endif()
 
-  install_python(TARGETS ${python_modules} DESTINATION purify)
-  install_python(FILES ${PXD_HEADERS} DESTINATION purify/headers)
-  install_python(FILES ${PYTHON_SOURCES} DESTINATION purify)
+  install_python(FILES *.pxd DESTINATION purify/headers)
+  install_python(FILES ${pysources} DESTINATION purify)
 endif()
 
 add_subdirectory(tests)
