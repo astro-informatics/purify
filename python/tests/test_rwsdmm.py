@@ -4,7 +4,7 @@ def test_rwsdmm():
     from numpy.testing import assert_allclose
     from numpy import sqrt
     from purify.tests.random import reset
-    from purify import RWSDMM
+    from purify import SDMM
     from purify.tests.image_fixtures import image_and_visibilities, \
                                expected_images, dirty_measurements
     image, visibility = image_and_visibilities()
@@ -12,7 +12,8 @@ def test_rwsdmm():
 
     reset()
     wavelets = ['DB%i' % i for i in range(1, 9)] + ['Dirac']
-    rwsdmm = RWSDMM(image_size=image.shape, nblevels=4, wavelets=wavelets)
+    rwsdmm = SDMM(image_size=image.shape, nblevels=4, wavelets=wavelets,
+                  reweighted=True)
     visibility['y'] = dirty_measurements(image, visibility)
 
     sigma = norm(visibility['y0']) * 10.0**(-1.5) / sqrt(len(visibility))
