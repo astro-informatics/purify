@@ -106,6 +106,9 @@ int main(int argc, char *argv[]) {
   double start1, stop1;
   #endif
   int dimy, dimx;
+
+  // seed SOPT's random number generator
+  sopt_ran_ran2(-seedn);
   
   //Image dimension of the zero padded image
   //Dimensions should be power of 2
@@ -198,7 +201,8 @@ int main(int argc, char *argv[]) {
   }
   
   //Initialize griding matrix
-  assert((start = clock())!=-1);
+  start = clock();
+  assert(start != -1);
   purify_measurement_init_cft(&gmat, deconv, vis_test.u, vis_test.v, &param_m1);
   stop = clock();
   t = (double) (stop-start)/CLOCKS_PER_SEC;
@@ -237,7 +241,8 @@ int main(int argc, char *argv[]) {
   printf("FFT plan done \n\n");
   
   
-  assert((start = clock())!=-1);
+  start = clock();
+  assert(start != -1);
   purify_measurement_cftfwd((void*)y0, (void*)xinc, datafwd);
   stop = clock();
   t = (double) (stop-start)/CLOCKS_PER_SEC;
@@ -424,7 +429,8 @@ int main(int argc, char *argv[]) {
   #ifdef _OPENMP 
     start1 = omp_get_wtime();
   #else
-    assert((start = clock())!=-1);
+    start = clock();
+    assert(start != -1);
   #endif
   sopt_l1_sdmm((void*)xoutc, Nx,
                    &purify_measurement_cftfwd,
@@ -505,7 +511,8 @@ int main(int argc, char *argv[]) {
   #ifdef _OPENMP 
     start1 = omp_get_wtime();
   #else
-    assert((start = clock())!=-1);
+    start = clock();
+    assert(start != -1);
   #endif
   sopt_l1_rwsdmm((void*)xoutc, Nx,
                    &purify_measurement_cftfwd,
@@ -599,7 +606,8 @@ int main(int argc, char *argv[]) {
     }
 
     
-    assert((start = clock())!=-1);
+    start = clock();
+    assert(start != -1);
     sopt_tv_sdmm((void*)xoutc, dimx, dimy,
                    &purify_measurement_cftfwd,
                    datafwd,
@@ -661,7 +669,8 @@ int main(int argc, char *argv[]) {
   param8.init_sol = 1;
 
   
-  assert((start = clock())!=-1);
+  start = clock();
+  assert(start != -1);
     sopt_tv_rwsdmm((void*)xoutc, dimx, dimy,
                    &purify_measurement_cftfwd,
                    datafwd,
@@ -721,7 +730,8 @@ int main(int argc, char *argv[]) {
   
   param4.gamma = gamma*aux3;
 
-  assert((start = clock())!=-1);
+  start = clock();
+  assert(start != -1);
    sopt_l1_sdmm((void*)xoutc, Nx,
                    &purify_measurement_cftfwd,
                    datafwd,
@@ -788,7 +798,8 @@ int main(int argc, char *argv[]) {
   param5.init_sol = 1;
 
   
-  assert((start = clock())!=-1);
+  start = clock();
+  assert(start != -1);
   sopt_l1_rwsdmm((void*)xoutc, Nx,
                    &purify_measurement_cftfwd,
                    datafwd,
@@ -856,7 +867,8 @@ int main(int argc, char *argv[]) {
       xoutc[i] = 0.0 + 0.0*I;
   }
 
-  assert((start = clock())!=-1);
+  start = clock();
+  assert(start != -1);
   sopt_l1_sdmm((void*)xoutc, Nx,
                    &purify_measurement_cftfwd,
                    datafwd,
@@ -923,7 +935,8 @@ int main(int argc, char *argv[]) {
   param5.init_sol = 1;
 
   
-  assert((start = clock())!=-1);
+  start = clock();
+  assert(start != -1);
   sopt_l1_rwsdmm((void*)xoutc, Nx,
                    &purify_measurement_cftfwd,
                    datafwd,
