@@ -15,6 +15,7 @@ expected_image_files = {
     '30dor': join(datadir, 'expected', "m31bpsa.fits"),
     '30dor_sara': join(datadir, 'expected', "m31sara.fits"),
     '30dor_tv': join(datadir, 'expected', "m31tv.fits"),
+    '30dor_tvrw': join(datadir, 'expected', "m31rwtv.fits")
 }
 """ Path to expected outcome images """
 
@@ -35,9 +36,9 @@ def image_and_visibilities(name='30dor'):
 def expected_images(name='30dor', method='sdmm'):
     """ Reads image results from disk. """
     from purify import read_image
-    method = {'sdmm': '', 'sara': '_sara', 'tv': '_tv'}[method]
+    method = {'sdmm': '', 'sara': '_sara',
+              'tv': '_tv', 'tvrw': '_tvrw'}[method]
     return read_image(expected_image_files[name + method])
-
 
 
 def make_some_noise(visibility, n=None):

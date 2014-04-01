@@ -44,9 +44,10 @@ cdef void _convert_rwparams( sopt_l1_rwparam *c_params, sdmm,
     """ Sets c parameters from python object """
     from numpy import max, product, sqrt
     from numpy.linalg import norm
-    _convert_prox_tvparam(<sopt_prox_tvparam*>c_params, sdmm)
+    _convert_prox_tvparam(<sopt_prox_tvparam*>c_params, sdmm.rw)
     c_params.init_sol = 1 if sdmm.rw.warm_start else 0
     if sdmm.rw.sigma is not None: c_params.sigma = sdmm.rw.sigma
+    elif c_params.init_sol == 1: c_params.sigma = 0
     else:
         nelements = float(product(measurements.sizes.image) * len(sdmm))
         nvis = float(len(visibility['y']))
