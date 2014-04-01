@@ -7,7 +7,6 @@ from .image import Image
 from .measurements import kernels, MeasurementOperator
 from .sparsity_ops import SparsityOperator
 from .sdmm import SDMM
-from .rwsdmm import RWSDMM
 
 
 def read_image(path, power_of_two=True):

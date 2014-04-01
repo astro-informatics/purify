@@ -50,7 +50,6 @@ if(python)
   add_module(sparsity_ops ${libsopt} ${libblas})
   add_module(sdmm  ${libsopt} ${libblas} ${libfftw3})
   add_module(cparams  ${libsopt})
-  add_module(rwsdmm  ${libsopt} ${libblas} ${libfftw3})
 
   add_copy_files(copy FILES ${pysources} DESTINATION ${PYPURIFY_DIRECTORY})
   if(tests)
