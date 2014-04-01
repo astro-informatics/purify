@@ -22,3 +22,5 @@ ExternalProject_Add(
     LOG_BUILD ON
 )
 add_recursive_cmake_step(CFitsIO CFitsIO_FOUND DEPENDEES install)
+set(CFitsIO_INCLUDE_DIR "")
+set(CFitsIO_LIBRARY "")
