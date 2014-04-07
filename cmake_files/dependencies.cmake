@@ -35,7 +35,9 @@ if(python)
         endif()
     endfunction()
     # Python interpreter + libraries
-    include(CoherentPython)
+    find_package(CoherentPython)
+    # Function to install python files in python path ${PYTHON_PKG_DIR}
+    include(PythonInstall)
     # Ability to find installed python packages
     include(PythonPackage)
     # Look for/install cython and nose
