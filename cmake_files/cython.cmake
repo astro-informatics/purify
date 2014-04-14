@@ -42,10 +42,12 @@ function(get_pyx_dependencies SOURCE OUTVAR)
       OUTPUT_VARIABLE OUTPUT
       ERROR_VARIABLE ERROR
   )
-  if(RESULT EQUAL 0)
+  if("${RESULT}" STREQUAL "0")
       set(${OUTVAR} ${OUTPUT} PARENT_SCOPE)
   else()
-      message(FATAL_ERROR "Got an error ${ERROR}")
+      message("Error: ${ERROR}")
+      message("Output: ${OUTPUT}")
+      message(FATAL_ERROR "Error while computing cython dependencies")
   endif()
 endfunction()
 

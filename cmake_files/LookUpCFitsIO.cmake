@@ -21,6 +21,6 @@ ExternalProject_Add(
     LOG_CONFIGURE ON
     LOG_BUILD ON
 )
-add_recursive_cmake_step(CFitsIO CFitsIO_FOUND DEPENDEES install)
+add_recursive_cmake_step(CFitsIO DEPENDEES install)
 set(CFitsIO_INCLUDE_DIR "")
 set(CFitsIO_LIBRARY "")

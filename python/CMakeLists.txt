@@ -6,7 +6,7 @@ if(python)
   # so it can be found later on
   add_to_python_path(${CMAKE_CURRENT_BINARY_DIR})
 
-  add_definitions("-DNPY_NO_DEPRECATED_API=NPY_1_8_API_VERSION")
+  add_definitions("-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION")
 
   include_directories(
       ${PYTHON_INCLUDE_DIR}
