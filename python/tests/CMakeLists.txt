@@ -5,7 +5,7 @@ if(tests AND python)
         add_test( NAME ${testname}
             COMMAND ${LOCAL_PYTHON_EXECUTABLE}
                     -m nose ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE})
-        set_tests_properties(${testname} PROPERTIES LABELS "nose")
+        set_tests_properties(${testname} PROPERTIES LABELS "nose;python")
     endfunction()
 
     # add testing packages
