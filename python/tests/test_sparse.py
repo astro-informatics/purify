@@ -18,47 +18,46 @@ def test_python_to_c():
       expected = matrix * x
       
       assert_allclose(actual, expected)
-
-def test_python_to_c_random():
-    """ Wrapping a C-sparse matrix structures around random scipy sparse matrices """
-    from scipy.sparse import rand
-    from numpy.random import randint, random_sample
-    from numpy.testing import assert_allclose
-    from numpy import dtype
-    from purify.tests.sparse_testing import _debug_multiply
-
-    for type in [dtype('complex')]: # dtype('double'), 
-        for i in range(1):
-            shape = randint(3, 90), randint(3, 90)
-            matrix = rand(*shape, density=0.4, format = 'csr', dtype=type)
-            x = random_sample(shape[1])
-            if type == "complex": x = x + 1j * random_sample(shape[1])
-
-            actual = _debug_multiply(matrix, x)
-            expected = matrix * x
-            assert_allclose(actual, expected, atol=1e-7)
-
-test_python_to_c_random()
-def test_cycle_python_to_c_to_python():
-    """ Wraps a C object around python sparse matrix, and converts back. """
-    from scipy.sparse import rand
-    from numpy.random import randint
-    from numpy.testing import assert_allclose
-    from numpy import dtype
-    from nose.tools import assert_equal
-    from purify.tests.sparse_testing import _cycle_python_to_c_to_python
-
-    for type in [dtype('double'), dtype('complex')]:
-        for i in range(10):
-            shape = randint(3, 90), randint(3, 90)
-            expected = rand(*shape, density=0.4, format = 'csr', dtype=type)
-
-            actual = _cycle_python_to_c_to_python(expected)
-
-            assert_equal(actual.shape, expected.shape)
-            assert_equal(actual.nnz, expected.nnz)
-            assert_allclose(actual.data, expected.data)
-            actual.data[0] +=  2 # both arrays refer to the same underlying data
-            assert_allclose(actual.data, expected.data)
-            assert_allclose(actual.indices, expected.indices)
-            assert_allclose(actual.indptr, expected.indptr)
+test_python_to_c()
+# def test_python_to_c_random():
+#     """ Wrapping a C-sparse matrix structures around random scipy sparse matrices """
+#     from scipy.sparse import rand
+#     from numpy.random import randint, random_sample
+#     from numpy.testing import assert_allclose
+#     from numpy import dtype
+#     from purify.tests.sparse_testing import _debug_multiply
+# 
+#     for type in [dtype('complex')]: # dtype('double'), 
+#         for i in range(1):
+#             shape = randint(3, 90), randint(3, 90)
+#             matrix = rand(*shape, density=0.4, format = 'csr', dtype=type)
+#             x = random_sample(shape[1])
+#             if type == "complex": x = x + 1j * random_sample(shape[1])
+# 
+#             actual = _debug_multiply(matrix, x)
+#             expected = matrix * x
+#             assert_allclose(actual, expected, atol=1e-7)
+# 
+# def test_cycle_python_to_c_to_python():
+#     """ Wraps a C object around python sparse matrix, and converts back. """
+#     from scipy.sparse import rand
+#     from numpy.random import randint
+#     from numpy.testing import assert_allclose
+#     from numpy import dtype
+#     from nose.tools import assert_equal
+#     from purify.tests.sparse_testing import _cycle_python_to_c_to_python
+# 
+#     for type in [dtype('double'), dtype('complex')]:
+#         for i in range(10):
+#             shape = randint(3, 90), randint(3, 90)
+#             expected = rand(*shape, density=0.4, format = 'csr', dtype=type)
+# 
+#             actual = _cycle_python_to_c_to_python(expected)
+# 
+#             assert_equal(actual.shape, expected.shape)
+#             assert_equal(actual.nnz, expected.nnz)
+#             assert_allclose(actual.data, expected.data)
+#             actual.data[0] +=  2 # both arrays refer to the same underlying data
+#             assert_allclose(actual.data, expected.data)
+#             assert_allclose(actual.indices, expected.indices)
+#             assert_allclose(actual.indptr, expected.indptr)

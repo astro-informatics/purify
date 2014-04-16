@@ -33,6 +33,9 @@ cdef void _wrap_sparsemat(object py_sparse, _SparseMatRow* c_sparse) except *:
     c_sparse.nvals = py_sparse.nnz
     c_sparse.real = 1 if py_sparse.dtype == "double" else 0
 
+    print(type(py_sparse))
+    print type(py_sparse.data)
+    print type(py_sparse.data.data)
     cdef unsigned char[::1] data = py_sparse.data.data
     if c_sparse.real:
         c_sparse.vals = <double*>&data[0]

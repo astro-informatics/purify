@@ -5,6 +5,7 @@
  * Coverage: AMI simulation with M=9413 visibilities.
  *
  */
+#include "purify_config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +17,7 @@
 #ifdef _OPENMP 
   #include <omp.h>
 #endif 
-#include <cblas.h>
+#include PURIFY_BLAS_H
 #include "purify_visibility.h"
 #include "purify_sparsemat.h"
 #include "purify_image.h"

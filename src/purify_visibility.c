@@ -2,6 +2,7 @@
  * \file purify_visibility.c
  * Functionality to operate on vsibilities.
  */
+#include "purify_config.h"
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,6 +1,7 @@
 
 #ifndef PURIFY_IMAGE
 #define PURIFY_IMAGE
+#include "purify_config.h"
 #include "purify_error.h"
 
 /*!  

@@ -12,12 +12,14 @@ if(python)
       ${PYTHON_INCLUDE_DIR}
       ${NUMPY_INCLUDE_DIRS}
       ${CMAKE_CURRENT_SOURCE_DIR}
-      ${BLAS_INCLUDE_DIR}
       ${FFTW3_INCLUDE_DIR}
       ${CFitsIO_INCLUDE_DIR}
       ${TIFF_INCLUDE_DIR}
       ${Sopt_INCLUDE_DIRS}
   )
+  if(BLAS_INCLUDE_DIR)
+      include_directories(${BLAS_INCLUDE_DIR})
+  endif()
 
   ###############################
   # Add new targets
@@ -38,11 +40,6 @@ if(python)
     )
     list(APPEND python_modules py${module})
   endforeach()
-  target_link_libraries(pyfftw ${FFTW3_DOUBLE_LIBRARY})
-  target_link_libraries(pyimage ${CFitsIO_LIBRARY})
-  target_link_libraries(pymeasurements ${BLAS_LIBRARIES} ${FFTW3_DOUBLE_LIBRARY})
-  target_link_libraries(pysdmm ${Sopt_LIBRARIES} ${BLAS_LIBRARIES} ${FFTW3_DOUBLE_LIBRARY})
-  target_link_libraries(pysparsity_ops ${Sopt_LIBRARIES} ${BLAS_LIBRARIES})
 
   add_copy_files(copy FILES ${PYTHON_SOURCES} DESTINATION ${PYPURIFY_DIRECTORY})
   if(tests)

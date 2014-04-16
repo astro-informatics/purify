@@ -5,6 +5,7 @@
  * Coverage: random variable density with M=0.2N visibilities.
  *
  */
+#include "purify_config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +17,7 @@
 #ifdef _OPENMP 
   #include <omp.h>
 #endif 
-#include <cblas.h>
+#include PURIFY_BLAS_H
 #include "purify_visibility.h"
 #include "purify_sparsemat.h"
 #include "purify_image.h"

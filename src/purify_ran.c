@@ -2,6 +2,7 @@
  * \file purify_ran.c
  * Functionality to generate random deviates.
  */
+#include "purify_config.h"
 
 #include <math.h>
 #include <stdlib.h>

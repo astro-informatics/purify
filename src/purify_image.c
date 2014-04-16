@@ -2,6 +2,7 @@
  * \file purify_image.c
  * Functionality to operate on images.
  */
+#include "purify_config.h"
 
 #include <fitsio.h>
 #include <stdio.h>
