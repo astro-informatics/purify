@@ -32,7 +32,10 @@ if(python) # CMake functions to build python and cython modules
     include(cython)
 endif()
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(
+    "${PROJECT_SOURCE_DIR}/include"
+    "${PROJECT_BINARY_DIR}/include"
+)
 
 add_subdirectory(src)
 add_subdirectory(include)

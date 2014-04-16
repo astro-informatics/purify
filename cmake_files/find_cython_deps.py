@@ -42,7 +42,7 @@ def check_cimport_dep(line, results, includes):
 
 def cython_deps(path, includes, results=None):
     from os.path import splitext, split, exists, isfile, join, abspath
-    if results is None: results = set()
+    if results is None: results = set([path])
 
     path = abspath(path)
     directory, filename = split(path)
