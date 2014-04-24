@@ -1,7 +1,10 @@
+from purify.numpy_interface cimport PyArray_DATA, PyArrayObject
+
 cdef object _convert_sparsemat(_SparseMatRow *sparse):
     """ Converts C sparse matrix to scipy sparse matrix
 
-        This function does *not* copy the data. It should not outlive the input C matrix.
+        This function does *not* copy the data. It should not outlive the input
+        C matrix.
     """
     from scipy.sparse import csr_matrix
     from numpy import asarray
@@ -18,9 +21,10 @@ cdef object _convert_sparsemat(_SparseMatRow *sparse):
 cdef void _wrap_sparsemat(object py_sparse, _SparseMatRow* c_sparse) except *:
     """ Wrapse C sparse matrix around a scipy sparse matrix
 
-        This function does *not* copies the data. The C sparse matrix should *not* be deallocated.
-        Nor should it be used beyond the lifetime of the python object. Nor should the python object
-        be changed during the lifetime of the C matrix.
+        This function does *not* copies the data. The C sparse matrix should
+        *not* be deallocated.  Nor should it be used beyond the lifetime of the
+        python object. Nor should the python object be changed during the
+        lifetime of the C matrix.
     """
     from sys import path
     if py_sparse.format != 'csr':
@@ -33,16 +37,17 @@ cdef void _wrap_sparsemat(object py_sparse, _SparseMatRow* c_sparse) except *:
     c_sparse.nvals = py_sparse.nnz
     c_sparse.real = 1 if py_sparse.dtype == "double" else 0
 
-    print(type(py_sparse))
-    print type(py_sparse.data)
-    print type(py_sparse.data.data)
-    cdef unsigned char[::1] data = py_sparse.data.data
+    value = py_sparse.data
+    if not (value.flags['C_CONTIGUOUS'] or value.flags['F_CONTIGUOUS']):
+      msg = "Expected a C or Fortan contiguous numpy array on input"
+      raise TypeError(msg)
+    cdef void *np_data = PyArray_DATA(<PyArrayObject*>value)
     if c_sparse.real:
-        c_sparse.vals = <double*>&data[0]
+        c_sparse.vals = <double *>np_data
         c_sparse.cvals = NULL
     else:
         c_sparse.vals = NULL
-        c_sparse.cvals = <double complex *>&data[0]
+        c_sparse.cvals = <double complex *>np_data
 
     cdef int[::1] colind = py_sparse.indices
     cdef int[::1] rowptr = py_sparse.indptr

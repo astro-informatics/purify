@@ -1,3 +1,4 @@
+from purify.numpy_interface cimport untyped_pointer_to_data
 from cython.view cimport contiguous
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 
@@ -114,8 +115,8 @@ cdef class SparsityOperator:
             :Parameters:
                 image: numpy.ndarray
                     Should have the same shape as the wavelets in this object.
-                    Should be real if the wavelets are real, and real or complex if the wavelets are
-                    complex.
+                    Should be real if the wavelets are real, and real or
+                    complex if the wavelets are complex.
         """
         from numpy import zeros, dtype as np_dtype
 
@@ -127,20 +128,26 @@ cdef class SparsityOperator:
         # Checks type of the input and transform it if need be
         dtype = np_dtype('double' if self._wavelets.real else 'complex')
         if dtype != image.dtype: image = image.astype(dtype)
+        if not (image.flags['C_CONTIGUOUS'] or image.flags['F_CONTIGUOUS']):
+            msg = "Expected a C or Fortan contiguous numpy array on input"
+            raise TypeError("msg")
 
         # Creates ouput and calls C function
-        result = zeros((len(self),) + image.shape, dtype=dtype)
+        result = zeros((len(self),) + image.shape, dtype=dtype, order="C")
+        if not (result.flags['C_CONTIGUOUS'] or result.flags['F_CONTIGUOUS']):
+            msg = "Expected a C or Fortan contiguous numpy array"
+            raise RuntimeError("msg")
         cdef:
-            unsigned char[::1] c_image = image.data
-            unsigned char[::1] c_result = result.data
-            void *c_voidify
+            void* c_image = untyped_pointer_to_data(image)
+            void* c_result = untyped_pointer_to_data(result)
+            void* c_voidify
         self.set_wavelet_pointer(&c_voidify)
-        sopt_sara_analysisop(<void*> &c_result[0], <void*> &c_image[0], &c_voidify)
+        sopt_sara_analysisop(c_result, c_image, &c_voidify)
 
         return result
 
     cpdef synthesize(self, inout):
-        """ This function computes the synthesis operator for concatenation of bases. """
+        """ Computes the synthesis operator for concatenation of bases. """
         from numpy import zeros, dtype as np_dtype
 
         # Checks size of input
@@ -151,14 +158,20 @@ cdef class SparsityOperator:
         # Checks type of the input and transform it if need be
         dtype = np_dtype('double' if self._wavelets.real else 'complex')
         if dtype != inout.dtype: inout = inout.astype(dtype)
+        if not (inout.flags['C_CONTIGUOUS'] or inout.flags['F_CONTIGUOUS']):
+            msg = "Expected a C or Fortan contiguous numpy array on input"
+            raise TypeError("msg")
 
         # Creates ouput and calls C function
-        result = zeros(self[0].image_size, dtype=dtype)
+        result = zeros(self[0].image_size, dtype=dtype, order="C")
+        if not (result.flags['C_CONTIGUOUS'] or result.flags['F_CONTIGUOUS']):
+            msg = "Expected a C or Fortan contiguous numpy array"
+            raise RuntimeError("msg")
         cdef:
-            unsigned char[::1] c_inout = inout.data
-            unsigned char[::1] c_result = result.data
+            void* c_inout = untyped_pointer_to_data(inout)
+            void* c_result = untyped_pointer_to_data(result)
             void *c_voidify
         self.set_wavelet_pointer(&c_voidify)
-        sopt_sara_synthesisop(<void*> &c_result[0], <void*> &c_inout[0], &c_voidify)
+        sopt_sara_synthesisop(c_result, c_inout, &c_voidify)
 
         return result

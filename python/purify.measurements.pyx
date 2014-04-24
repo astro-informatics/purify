@@ -1,3 +1,4 @@
+from purify.numpy_interface cimport untyped_pointer_to_data
 from cython.view cimport contiguous
 from purify.sparse cimport purify_sparsemat_freer, _convert_sparsemat, \
                            _wrap_sparsemat
@@ -48,18 +49,19 @@ def kernels(visibility, dimensions, oversampling, interpolation):
             msg = "Visibility['%s'] should be composed of doubles." % name
             raise TypeError(msg)
 
-    deconvolution_kernel = zeros(dimensions, dtype='double')
+    deconvolution_kernel = zeros(dimensions, dtype='double', order="C")
     cdef:
         _MeasurementParams params
         _SparseMatRow sparse
-        double[:, ::contiguous] c_deconvolution = deconvolution_kernel
+        double* c_deconvolution = <double*>\
+            untyped_pointer_to_data(deconvolution_kernel)
         double[::1] u = visibility['u'].values
         double[::1] v = visibility['v'].values
 
     _measurement_params( &params, len(visibility), dimensions, oversampling,
-                         interpolation )
+        interpolation )
 
-    purify_measurement_init_cft(&sparse, &c_deconvolution[0, 0],  &u[0], &v[0], &params)
+    purify_measurement_init_cft(&sparse, c_deconvolution,  &u[0], &v[0], &params)
 
     interpolation_kernel = _convert_sparsemat(&sparse).copy()
     purify_sparsemat_freer(&sparse)
@@ -77,10 +79,9 @@ cdef class _VoidedData:
         """ Initializes void structure with info needed by C library """
         self.deconvolution = parent.kernels.deconvolution if scale is None \
                              else parent.kernels.deconvolution * scale
-        cdef unsigned char[::1] c_deconv = self.deconvolution.data
         _wrap_sparsemat(parent.kernels.interpolation, &self._c_sparse)
         self._data[0] = <void *> &parent._params
-        self._data[1] = <void *> &c_deconv[0]
+        self._data[1] = untyped_pointer_to_data(self.deconvolution)
         self._data[2] = <void *> &self._c_sparse
 
         if is_forward: parent._fftw_forward.set_ccall(&self._data[3])
@@ -142,15 +143,14 @@ cdef class MeasurementOperator:
         if image.shape != self.sizes.image: raise ValueError("Image is of incorrect size")
         if image.dtype != "complex": image = image.astype("complex")
 
-        visibilities = zeros(self._params.nmeas, dtype="complex")
+        visibilities = zeros(self._params.nmeas, dtype="complex", order='C')
         cdef:
-            unsigned char[::1] c_visibilities = visibilities.data
-            unsigned char[::1] c_image = image.data
-            unsigned char[::1] c_deconv = self.kernels.deconvolution.data
+            void* c_visibilities = untyped_pointer_to_data(visibilities)
+            void* c_image = untyped_pointer_to_data(image)
 
         data = self.forward_voided_data()
 
-        purify_measurement_cftfwd(<void*> &c_visibilities[0], <void*> &c_image[0], data.data())
+        purify_measurement_cftfwd(c_visibilities, c_image, data.data())
 
         return visibilities
 
@@ -161,13 +161,13 @@ cdef class MeasurementOperator:
         if len(visibilities) != self._params.nmeas: raise ValueError("Image is of incorrect size")
         if visibilities.dtype != "complex": visibilities = visibilities.astype("complex")
 
-        image = zeros(self.sizes.image, dtype="complex")
+        image = zeros(self.sizes.image, dtype="complex", order='C')
         cdef:
-            unsigned char[::1] c_image = image.data
-            unsigned char[::1] c_visibilities = visibilities.data
+            void* c_image = untyped_pointer_to_data(image)
+            void* c_visibilities = untyped_pointer_to_data(visibilities)
         data = self.adjoint_voided_data()
 
-        purify_measurement_cftadj(<void*> &c_image[0], <void*> &c_visibilities[0], data.data())
+        purify_measurement_cftadj(c_image, c_visibilities, data.data())
 
         return image
 

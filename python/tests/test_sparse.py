@@ -11,7 +11,7 @@ def test_python_to_c():
     matrix = csr_matrix(matrix)
 
     for i in xrange(matrix.shape[1]):
-      x = zeros(matrix.shape[1], dtype="double") + 1
+      x = zeros(matrix.shape[1], dtype="double", order="C") + 1
       x[2] = 0
 
       actual = _debug_multiply(matrix, x)
