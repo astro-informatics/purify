@@ -1,3 +1,5 @@
+from purify.numpy_interface cimport untyped_pointer_to_data, import_array
+import_array()
 from . import params
 from purify.numpy_interface cimport untyped_pointer_to_data
 from purify.measurements cimport purify_measurement_cftfwd, \

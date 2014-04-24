@@ -1,4 +1,5 @@
-from purify.numpy_interface cimport PyArray_DATA, PyArrayObject
+from purify.numpy_interface cimport untyped_pointer_to_data, import_array
+import_array()
 
 cdef object _convert_sparsemat(_SparseMatRow *sparse):
     """ Converts C sparse matrix to scipy sparse matrix
@@ -41,7 +42,7 @@ cdef void _wrap_sparsemat(object py_sparse, _SparseMatRow* c_sparse) except *:
     if not (value.flags['C_CONTIGUOUS'] or value.flags['F_CONTIGUOUS']):
       msg = "Expected a C or Fortan contiguous numpy array on input"
       raise TypeError(msg)
-    cdef void *np_data = PyArray_DATA(<PyArrayObject*>value)
+    cdef void *np_data = untyped_pointer_to_data(value)
     if c_sparse.real:
         c_sparse.vals = <double *>np_data
         c_sparse.cvals = NULL

@@ -35,7 +35,7 @@ if(python)
     add_cython_modules(${module}
       SOURCE purify.${module}.pyx
       LOCATION ${PYPURIFY_DIRECTORY}
-      LIBRARIES ${PYTHON_LIBRARIES} libpurify
+      LIBRARIES libpurify
       DEPENDS copy
     )
     list(APPEND python_modules py${module})

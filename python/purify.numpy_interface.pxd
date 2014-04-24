@@ -13,6 +13,7 @@ cdef extern from "numpy/arrayobject.h":
     ctypedef struct PyArrayObject:
         pass
     void* PyArray_DATA(PyArrayObject*)
+    void import_array()
 
 cdef inline void* untyped_pointer_to_data(object array):
     from numpy import ndarray

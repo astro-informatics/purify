@@ -1,4 +1,5 @@
-from purify.numpy_interface cimport untyped_pointer_to_data
+from purify.numpy_interface cimport untyped_pointer_to_data, import_array
+import_array()
 from purify.sparse cimport _convert_sparsemat, _wrap_sparsemat, _SparseMatRow
 
 #  For debugging purposes. 
