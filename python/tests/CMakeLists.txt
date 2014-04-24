@@ -1,12 +1,6 @@
 if(tests AND python)
     # A function to add tests
-    function(add_nose_test SOURCE)
-        get_filename_component(testname ${SOURCE} NAME_WE)
-        add_test( NAME ${testname}
-            COMMAND ${LOCAL_PYTHON_EXECUTABLE}
-                    -m nose ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE})
-        set_tests_properties(${testname} PROPERTIES LABELS "nose;python")
-    endfunction()
+    include(nose)
 
     # add testing packages
     foreach(module sparse_testing visibility_testing random)
