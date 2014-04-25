@@ -1,7 +1,7 @@
 /*! \file purify_error.c
  *  Error functions used in PURIFY package.
  */
-
+#include "purify_config.h"
 #include "purify_error.h"
 
 /*!

@@ -1,6 +1,7 @@
 
 #ifndef PURIFY_UTILS
 #define PURIFY_UTILS
+#include "purify_config.h"
 
 void purify_utils_fftshift_1d(double *out, double *in, int n);
 

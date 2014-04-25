@@ -1,3 +1,5 @@
 bin/
 lib/
 data/test/
+*.pyc
+.*.sw[p, o]

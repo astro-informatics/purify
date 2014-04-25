@@ -16,6 +16,7 @@ function(add_python_module NAME)
   set_target_properties(${module_name} PROPERTIES PREFIX "")
   set_target_properties(${module_name} PROPERTIES SUFFIX ".so")
 
+  target_link_libraries(${module_name} ${PYTHON_LIBRARIES})
   if(NOT "${PYMODULE_LIBRARIES}" STREQUAL "")
     target_link_libraries(${module_name} ${PYMODULE_LIBRARIES})
   endif()
@@ -42,10 +43,12 @@ function(get_pyx_dependencies SOURCE OUTVAR)
       OUTPUT_VARIABLE OUTPUT
       ERROR_VARIABLE ERROR
   )
-  if(RESULT EQUAL 0)
+  if("${RESULT}" STREQUAL "0")
       set(${OUTVAR} ${OUTPUT} PARENT_SCOPE)
   else()
-      message(FATAL_ERROR "Got an error ${ERROR}")
+      message("Error: ${ERROR}")
+      message("Output: ${OUTPUT}")
+      message(FATAL_ERROR "Error while computing cython dependencies")
   endif()
 endfunction()
 
@@ -72,16 +75,29 @@ function(add_cython_modules TARGET)
 
   get_pyx_dependencies(${CMAKE_CURRENT_SOURCE_DIR}/${CYMODULE_SOURCE} DEPENDENCIES ${included_dirs})
 
-  add_custom_command(
-    OUTPUT ${OUTPUT_FILE}
-    COMMAND ${LOCAL_PYTHON_EXECUTABLE} -m cython ${CYMODULE_SOURCE}
-                                       -o ${OUTPUT_FILE} ${inclusion}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${DEPENDENCIES}
-  )
+  if(cython_EXECUTABLE)
+      add_custom_command(
+        OUTPUT ${OUTPUT_FILE}
+        COMMAND ${cython_EXECUTABLE} ${CYMODULE_SOURCE} -o ${OUTPUT_FILE} ${inclusion}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        DEPENDS ${DEPENDENCIES}
+      )
+  else()
+      add_custom_command(
+        OUTPUT ${OUTPUT_FILE}
+        COMMAND ${LOCAL_PYTHON_EXECUTABLE} -m cython ${CYMODULE_SOURCE}
+                                           -o ${OUTPUT_FILE} ${inclusion}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        DEPENDS ${DEPENDENCIES}
+      )
+  endif()
 
   add_python_module(${TARGET} ${CYMODULE_UNPARSED_ARGUMENTS} FILES ${OUTPUT_FILE})
   add_dependencies(py${TARGET} ${OUTPUT_FILE})
   target_link_libraries(py${TARGET} ${TARGET_LIBRARIES})
 
 endfunction()
+
+find_package(PythonInterp REQUIRED)
+get_filename_component(directory "${PYTHON_EXECUTABLE}" PATH)
+find_program(cython_EXECUTABLE HINTS "${directory}")

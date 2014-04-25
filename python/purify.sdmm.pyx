@@ -1,3 +1,5 @@
+from purify.numpy_interface cimport untyped_pointer_to_data, import_array
+import_array()
 from . import params
 from purify.measurements cimport purify_measurement_cftfwd, \
                                  purify_measurement_cftadj, \
@@ -46,94 +48,94 @@ cdef extern from "sopt_l1.h":
         sopt_l1_sdmmparam paraml1,
         sopt_l1_rwparam paramrwl1)
 
-cdef void _l1_sdmm( self, measurements, visibility,
-                    unsigned char[::1] _image, int _image_size,
-                    void **_datafwd, void **_dataadj,
-                    unsigned char[::1] _visibility,
-                    weights ) except *:
+cdef void _l1_sdmm( self, measurements, visibility, _image, int _image_size,
+        void **_datafwd, void **_dataadj, _visibility, weights ) except *:
     """ Calls L1 SDMM """
     cdef:
         sopt_l1_sdmmparam sdparams
-        void *c_wavelets
-        unsigned char[::1] c_weights = weights.data
-        double *weights_ptr = <double*> &c_weights[0]
+        void* c_wavelets
+        double* c_weights = <double*>untyped_pointer_to_data(weights)
+        void* c_image = untyped_pointer_to_data(_image)
+        void* c_visibility = untyped_pointer_to_data(_visibility)
         int Nr = len(self) * _image_size
     _convert_l1param(&sdparams, self, measurements, visibility)
     SparsityOperator.set_wavelet_pointer(self, &c_wavelets)
 
     sopt_l1_sdmm(
-        <void*>&_image[0], _image_size,
+        c_image, _image_size,
         &purify_measurement_cftfwd, _datafwd,
         &purify_measurement_cftadj, _dataadj,
         &sopt_sara_synthesisop, &c_wavelets,
         &sopt_sara_analysisop, &c_wavelets,
-        Nr, <void *> &_visibility[0], len(visibility),
-        weights_ptr, sdparams
+        Nr, c_visibility, len(visibility),
+        c_weights, sdparams
     )
 
-cdef void _l1_rw_sdmm( self, measurements, visibility,
-                       unsigned char[::1] _image, int _image_size,
-                       void **_datafwd, void **_dataadj,
-                       unsigned char[::1] _visibility ) except *:
+cdef void _l1_rw_sdmm( self, measurements, visibility, _image,
+        int _image_size, void **_datafwd, void **_dataadj,
+        _visibility ) except *:
     """ Calls L1 SDMM """
     cdef:
         sopt_l1_sdmmparam sdparams
         sopt_l1_rwparam rwparams
         void *c_wavelets
         int Nr = len(self) * _image_size
+        void* c_image = untyped_pointer_to_data(_image)
+        void* c_visibility = untyped_pointer_to_data(_visibility)
     _convert_l1param(&sdparams, self, measurements, visibility)
     _convert_rwparams(&rwparams, self, measurements, visibility)
     SparsityOperator.set_wavelet_pointer(self, &c_wavelets)
 
     sopt_l1_rwsdmm(
-        <void*>&_image[0], _image_size,
+        c_image, _image_size,
         &purify_measurement_cftfwd, _datafwd,
         &purify_measurement_cftadj, _dataadj,
         &sopt_sara_synthesisop, &c_wavelets,
         &sopt_sara_analysisop, &c_wavelets,
-        Nr, <void *> &_visibility[0], len(visibility),
+        Nr, c_visibility, len(visibility),
         sdparams, rwparams
     )
 
 cdef void _tv_sdmm( self, measurements, visibility,
-                    unsigned char[::1] _image, _image_shape,
-                    void **_datafwd, void **_dataadj,
-                    unsigned char[::1] _visibility,
-                    weights ) except *:
+        _image, _image_shape, void **_datafwd, void **_dataadj, _visibility,
+        weights ) except *:
     """ Calls TV SDMM """
     cdef:
         sopt_tv_sdmmparam sdparams
-        int stride = weights.strides[0] 
-        unsigned char[::1] c_weights = weights.data
-        double *xweights_ptr = <double*> &c_weights[0]
+        int stride = weights.strides[0]
+        unsigned char* c_weights = \
+                <unsigned char*> untyped_pointer_to_data(weights)
+        double *xweights_ptr = <double*> c_weights
         double *yweights_ptr = <double*> &c_weights[stride]
+        void* c_image = untyped_pointer_to_data(_image)
+        void* c_visibility = untyped_pointer_to_data(_visibility)
     _convert_tvparam(&sdparams, self, measurements, visibility)
 
     sopt_tv_sdmm(
-        <void*>&_image[0], _image_shape[0], _image_shape[1],
+        c_image, _image_shape[0], _image_shape[1],
         &purify_measurement_cftfwd, _datafwd,
         &purify_measurement_cftadj, _dataadj,
-        <void *> &_visibility[0], len(visibility),
+        c_visibility, len(visibility),
         xweights_ptr, yweights_ptr, sdparams
     )
 
-cdef void _tv_rw_sdmm( self, measurements, visibility,
-                       unsigned char[::1] _image, _image_shape,
-                       void **_datafwd, void **_dataadj,
-                       unsigned char[::1] _visibility ) except *:
+cdef void _tv_rw_sdmm(self, measurements, visibility, _image, _image_shape,
+        void **_datafwd, void **_dataadj, _visibility ) except *:
     """ Calls TV RW SDMM """
     cdef:
         sopt_tv_sdmmparam sdparams
         sopt_tv_rwparam rwparams
+        void* c_image = untyped_pointer_to_data(_image)
+        void* c_visibility = untyped_pointer_to_data(_visibility)
     _convert_tvparam(&sdparams, self, measurements, visibility)
     _convert_rwparams(<sopt_l1_rwparam*>&rwparams, self, measurements,
                       visibility)
 
     sopt_tv_rwsdmm(
-        <void*>&_image[0], _image_shape[0], _image_shape[1],
+        c_image, _image_shape[0], _image_shape[1],
         &purify_measurement_cftfwd, _datafwd,
         &purify_measurement_cftadj, _dataadj,
-        <void *> &_visibility[0], len(visibility),
+        c_visibility, len(visibility),
         sdparams, rwparams
     )
 
@@ -285,26 +287,21 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
 
         if self.tv_norm and self.reweighted:
             _tv_rw_sdmm( self, measurements, visibility,
-                         image.data, image.shape,
-                         datafwd, dataadj,
-                         (visibility['y'].values * scale).data )
+                         image, image.shape, datafwd, dataadj,
+                         visibility['y'].values * scale )
         elif self.tv_norm:
             _tv_sdmm( self, measurements, visibility,
-                      image.data, image.shape,
-                      datafwd, dataadj,
-                      (visibility['y'].values * scale).data,
+                      image, image.shape, datafwd, dataadj,
+                      visibility['y'].values * scale,
                       weights )
         elif self.reweighted:
             _l1_rw_sdmm( self, measurements, visibility,
-                         image.data, image.size,
-                         datafwd, dataadj,
-                         (visibility['y'].values * scale).data )
+                         image, image.size, datafwd, dataadj,
+                         visibility['y'].values * scale )
         else:
             _l1_sdmm( self, measurements, visibility,
-                      image.data, image.size,
-                      datafwd, dataadj,
-                      (visibility['y'].values * scale).data,
-                      weights )
+                      image, image.size, datafwd, dataadj,
+                      visibility['y'].values * scale, weights )
 
         return image
 
@@ -317,7 +314,7 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
             if image.shape != self.image_size:
                 msg = "Shape of input image should be %s" % self.image_size
                 raise ValueError(msg)
-        else: image = zeros(self.image_size, dtype=dtype)
+        else: image = zeros(self.image_size, dtype=dtype, order='C')
         return image
 
     def _get_weight(self, weights):
@@ -328,5 +325,5 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
             if weights.dtype != 'double': weights = weights.astype('double')
             if weights.size != wshape:
                 raise ValueError('The shape of the weights should be %s' % wshape)
-        else: weights = ones(wshape, dtype='double')
+        else: weights = ones(wshape, dtype='double', order='C')
         return weights

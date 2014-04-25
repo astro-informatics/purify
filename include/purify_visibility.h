@@ -5,6 +5,7 @@
 
 #ifndef PURIFY_VISIBILITY
 #define PURIFY_VISIBILITY
+#include "purify_config.h"
 
 #include <complex.h>
 #include "purify_error.h"

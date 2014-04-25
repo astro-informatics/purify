@@ -41,7 +41,7 @@ def test_read_write_cycle():
     from os.path import join, dirname
     from tempfile import NamedTemporaryFile
     from purify import Image, __file__ as location
-    location = join(dirname(location), "data", "images", "30DOR.fits")
+    location = join(dirname(location), "data", "images", "30dor.fits")
     first = Image(filename=location)
 
     assert_equal(first.shape, (251, 251))
@@ -66,7 +66,7 @@ def test_change_pixels():
     from numpy.testing import assert_allclose
     from os.path import join, dirname
     from purify import Image, __file__ as location
-    location = join(dirname(location), "data", "images", "30DOR.fits")
+    location = join(dirname(location), "data", "images", "30dor.fits")
     image = Image(filename=location)
 
     # This should resize image automatically, as well as cast input to double

@@ -22,7 +22,7 @@ cdef void _convert_l1param( sopt_l1_sdmmparam* c_params, sdmm,
     if sdmm.gamma is not None: c_params.gamma = sdmm.gamma
     else:
         scale = sqrt(nelements) / sqrt(float(len(visibility)))
-        xout = measurements.adjoint(visibility['y'])
+        xout = measurements.adjoint(visibility['y'].values)
         if sdmm.tv_norm: c_params.gamma = 1e-3 * max(xout.real) * scale * scale
         else: c_params.gamma = 1e-3 * max(sdmm.analyze(xout).real) * scale * scale
     if sdmm.radius is not None: c_params.epsilon = sdmm.radius

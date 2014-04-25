@@ -17,6 +17,11 @@ endif()
 if(NOT Sopt_BUILD_TYPE)
     set(Sopt_BUILD_TYPE Release)
 endif()
+# Read all blas related input
+include(CachedVariables)
+cached_variables(blaslibs "BLAS_.*")
+cached_variables(fftwlibs "FFTW3_.*")
+cached_variables(tifflibs "TIFF_.*")
 ExternalProject_Add(
     Sopt
     PREFIX ${EXTERNAL_ROOT}
@@ -32,10 +37,14 @@ ExternalProject_Add(
       -DCMAKE_C_FLAGS_MINSIZEREL=${CMAKE_C_FLAGS_MINSIZEREL}
       -DCMAKE_BUILD_TYPE=${Sopt_BUILD_TYPE}
       -DCMAKE_INSTALL_PREFIX=${EXTERNAL_ROOT}
+      -DBLAS_INCLUDE_DIR=${BLAS_INCLUDE_DIR}
       -DNOEXPORT=TRUE
+      ${blaslibs}
+      ${fftwlibs}
+      ${tifflibs}
     INSTALL_DIR ${EXTERNAL_ROOT}
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
     LOG_BUILD ON
 )
-add_recursive_cmake_step(Sopt Sopt_FOUND DEPENDEES install)
+add_recursive_cmake_step(Sopt DEPENDEES install)

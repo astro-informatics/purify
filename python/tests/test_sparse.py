@@ -11,14 +11,13 @@ def test_python_to_c():
     matrix = csr_matrix(matrix)
 
     for i in xrange(matrix.shape[1]):
-      x = zeros(matrix.shape[1], dtype="double") + 1
+      x = zeros(matrix.shape[1], dtype="double", order="C") + 1
       x[2] = 0
 
       actual = _debug_multiply(matrix, x)
       expected = matrix * x
       
       assert_allclose(actual, expected)
-
 def test_python_to_c_random():
     """ Wrapping a C-sparse matrix structures around random scipy sparse matrices """
     from scipy.sparse import rand
@@ -38,7 +37,6 @@ def test_python_to_c_random():
             expected = matrix * x
             assert_allclose(actual, expected, atol=1e-7)
 
-test_python_to_c_random()
 def test_cycle_python_to_c_to_python():
     """ Wraps a C object around python sparse matrix, and converts back. """
     from scipy.sparse import rand

@@ -2,6 +2,7 @@
  * \file purify_util.c
  * Utility functions.
  */
+#include "purify_config.h"
 
 #include <stdio.h>
 #include <stdlib.h>

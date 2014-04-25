@@ -25,7 +25,7 @@ def read_image(path, power_of_two=True):
         shape = array(image.shape).astype('double')
         shape = 2**ceil(log(shape) / log(2.0))
         shape = tuple(shape)
-        topleft = zeros(shape, dtype=image.dtype)
+        topleft = zeros(shape, dtype=image.dtype, order='C')
         topleft[:image.shape[0], :image.shape[1]] = image
         image = topleft
     return topleft

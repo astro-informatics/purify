@@ -1,7 +1,7 @@
 def test_data_bindings():
+    from purify.fftw import Fourier2D
     from numpy.testing import assert_allclose
     from nose.tools import assert_equal
-    from purify.fftw import Fourier2D
 
     image_size = 256, 256
     oversampling = 2, 2
@@ -19,9 +19,9 @@ def test_data_bindings():
 
 def test_cycle_fftw():
     """ Apply forward and backward fft """
+    from purify.fftw import Fourier2D
     from numpy import add, exp, arange, product
     from numpy.testing import assert_allclose
-    from purify.fftw import Fourier2D
 
     image_size = 256, 256
     oversampling = 2, 2

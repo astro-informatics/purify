@@ -4,6 +4,7 @@
 
 #ifndef PURIFY_ERROR
 #define PURIFY_ERROR
+#include "purify_config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
