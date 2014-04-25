@@ -16,6 +16,7 @@ function(add_python_module NAME)
   set_target_properties(${module_name} PROPERTIES PREFIX "")
   set_target_properties(${module_name} PROPERTIES SUFFIX ".so")
 
+  target_link_libraries(${module_name} ${PYTHON_LIBRARIES})
   if(NOT "${PYMODULE_LIBRARIES}" STREQUAL "")
     target_link_libraries(${module_name} ${PYMODULE_LIBRARIES})
   endif()
