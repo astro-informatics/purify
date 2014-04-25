@@ -1,4 +1,5 @@
-from purify.numpy_interface cimport untyped_pointer_to_data
+from purify.numpy_interface cimport untyped_pointer_to_data, import_array
+import_array()
 from cython.view cimport contiguous
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 

@@ -1,4 +1,5 @@
-from purify.numpy_interface cimport untyped_pointer_to_data
+from purify.numpy_interface cimport untyped_pointer_to_data, import_array
+import_array()
 from cython.view cimport contiguous
 from purify.sparse cimport purify_sparsemat_freer, _convert_sparsemat, \
                            _wrap_sparsemat
