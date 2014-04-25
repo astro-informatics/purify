@@ -15,7 +15,7 @@ cdef extern from "numpy/arrayobject.h":
     void* PyArray_DATA(PyArrayObject*)
     void import_array()
 
-cdef inline void* untyped_pointer_to_data(object array):
+cdef inline void* untyped_pointer_to_data(object array) except *:
     from numpy import ndarray
     if not isinstance(array, ndarray):
         raise TypeError("Expected array numpy array on input")
