@@ -40,7 +40,7 @@ cdef void _convert_sdmm_params(
     if sdmm.gamma is not None: c_params.gamma = sdmm.gamma
     else:
         scale = sqrt(nelements) / sqrt(len(visibility))
-        xout = measurements.adjoint(visibility['y'])
+        xout = measurements.adjoint(visibility['y'].values)
         c_params.gamma = 1e-3 * max(sdmm.analyze(xout).real) * scale
     c_params.rel_obj = sdmm.relative_variation
     if sdmm.radius is not None: c_params.epsilon = sdmm.radius
