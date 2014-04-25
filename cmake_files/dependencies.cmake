@@ -62,3 +62,11 @@ if(python)
     # Finds additional info, like libraries, include dirs...
     find_package(Numpy REQUIRED)
 endif()
+
+if(tests)
+    # Add location of external libraries
+    include(EnvironmentScript)
+    add_to_ld_path("${EXTERNAL_ROOT}/lib")
+    # A script for executing purify executable inside the build tree
+    create_environment_script(PATH "${CMAKE_CURRENT_BINARY_DIR}/executor.sh")
+endif()

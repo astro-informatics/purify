@@ -54,10 +54,14 @@ target_link_libraries(purify_about libpurify)
 if(tests)
   add_executable(purify_test ${TEST_SOURCE})
   target_link_libraries(purify_test libpurify)
+  create_environment_script(
+      PATH "${CMAKE_CURRENT_BINARY_DIR}/purify_test.sh"
+      WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+  )
   add_test(
-    NAME purify
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/purify_test
+    NAME  purify
+    COMMAND "${CMAKE_CURRENT_BINARY_DIR}/purify_test.sh"
+        "$<TARGET_FILE:purify_test>"
   )
 endif()
 
