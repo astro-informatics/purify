@@ -38,6 +38,7 @@ ExternalProject_Add(
       -DCMAKE_BUILD_TYPE=${Sopt_BUILD_TYPE}
       -DCMAKE_INSTALL_PREFIX=${EXTERNAL_ROOT}
       -DBLAS_INCLUDE_DIR=${BLAS_INCLUDE_DIR}
+      -DGreatCMakeCookOff_DIR=${GreatCMakeCookOff_DIR}
       -DNOEXPORT=TRUE
       ${blaslibs}
       ${fftwlibs}
