@@ -25,7 +25,7 @@ if(openmp)
 endif()
 
 if(python)
-    function(find_or_fail package what)
+    macro(find_or_fail package what)
         find_python_package(${package})
         if(NOT ${package}_FOUND)
             message("*********")
@@ -34,7 +34,7 @@ if(python)
             message("*********")
             message(FATAL_ERROR "Aborting")
         endif()
-    endfunction()
+    endmacro()
     # Python interpreter + libraries
     find_package(CoherentPython)
     # Function to install python files in python path ${PYTHON_PKG_DIR}
