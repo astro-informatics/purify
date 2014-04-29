@@ -17,31 +17,28 @@ endif()
 if(NOT Sopt_BUILD_TYPE)
     set(Sopt_BUILD_TYPE Release)
 endif()
-# Read all blas related input
-include(CachedVariables)
-cached_variables(blaslibs "BLAS_.*")
-cached_variables(fftwlibs "FFTW3_.*")
-cached_variables(tifflibs "TIFF_.*")
+
+# write subset of variables to cache for sopt to use
+include(PassonVariables)
+passon_variables(Sopt
+  FILENAME "${EXTERNAL_ROOT}/src/SoptVariables.cmake"
+  PATTERNS
+      "CMAKE_[^_]*_PATH" "CMAKE_C_.*"
+      "BLAS_.*" "FFTW3_.*" "TIFF_.*"
+      "GreatCMakeCookOff_DIR"
+  ALSOADD
+      "\nset(CMAKE_INSTALL_PREFIX \"${EXTERNAL_ROOT}\" CACHE STRING \"\")\n"
+)
 ExternalProject_Add(
     Sopt
     PREFIX ${EXTERNAL_ROOT}
     GIT_REPOSITORY ${Sopt_GIT_REPOSITORY}
     GIT_TAG ${Sopt_GIT_TAG}
     CMAKE_ARGS
+      -C "${EXTERNAL_ROOT}/src/SoptVariables.cmake"
       -DBUILD_SHARED_LIBS=OFF
-      -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-      -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
-      -DCMAKE_C_FLAGS_DEBUG=${CMAKE_C_FLAGS_DEBUG}
-      -DCMAKE_C_FLAGS_RELWITHDEBINFO=${CMAKE_C_FLAGS_RELWITHDEBINFO}
-      -DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}
-      -DCMAKE_C_FLAGS_MINSIZEREL=${CMAKE_C_FLAGS_MINSIZEREL}
       -DCMAKE_BUILD_TYPE=${Sopt_BUILD_TYPE}
-      -DCMAKE_INSTALL_PREFIX=${EXTERNAL_ROOT}
-      -DBLAS_INCLUDE_DIR=${BLAS_INCLUDE_DIR}
       -DNOEXPORT=TRUE
-      ${blaslibs}
-      ${fftwlibs}
-      ${tifflibs}
     INSTALL_DIR ${EXTERNAL_ROOT}
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
