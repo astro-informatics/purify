@@ -24,10 +24,10 @@ passon_variables(Sopt
   FILENAME "${EXTERNAL_ROOT}/src/SoptVariables.cmake"
   PATTERNS
       "CMAKE_[^_]*_PATH" "CMAKE_C_.*"
-      "BLAS_.*" "FFTW3_.*" "TIFF_.*" 
+      "BLAS_.*" "FFTW3_.*" "TIFF_.*"
       "GreatCMakeCookOff_DIR"
   ALSOADD
-      "\nset(CMAKE_INSTALL_PREFIX "${EXTERNAL_ROOT}" CACHE STRING \"\")\n"
+      "\nset(CMAKE_INSTALL_PREFIX \"${EXTERNAL_ROOT}\" CACHE STRING \"\")\n"
 )
 ExternalProject_Add(
     Sopt
