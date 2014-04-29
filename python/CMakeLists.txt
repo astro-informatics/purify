@@ -2,14 +2,24 @@ if(python)
   include(TargetCopyFiles)
 
   set(PYPURIFY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/purify)
+  # Add location of purify package in build tree,
+  # so it can be found later on
+  add_to_python_path(${CMAKE_CURRENT_BINARY_DIR})
 
-  add_definitions("-DNPY_NO_DEPRECATED_API=NPY_1_8_API_VERSION")
+  add_definitions("-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION")
 
   include_directories(
       ${PYTHON_INCLUDE_DIR}
       ${NUMPY_INCLUDE_DIRS}
       ${CMAKE_CURRENT_SOURCE_DIR}
+      ${FFTW3_INCLUDE_DIR}
+      ${CFitsIO_INCLUDE_DIR}
+      ${TIFF_INCLUDE_DIR}
+      ${Sopt_INCLUDE_DIRS}
   )
+  if(BLAS_INCLUDE_DIR)
+      include_directories(${BLAS_INCLUDE_DIR})
+  endif()
 
   ###############################
   # Add new targets
@@ -25,7 +35,7 @@ if(python)
     add_cython_modules(${module}
       SOURCE purify.${module}.pyx
       LOCATION ${PYPURIFY_DIRECTORY}
-      LIBRARIES ${PYTHON_LIBRARIES} libpurify
+      LIBRARIES libpurify
       DEPENDS copy
     )
     list(APPEND python_modules py${module})

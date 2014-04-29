@@ -2,6 +2,7 @@
  * \file purify_sparsemat.c
  * Functionality to perform operations with sparse matrices.
  */
+#include "purify_config.h"
 
 #include <stdlib.h>
 #include "purify_sparsemat.h"

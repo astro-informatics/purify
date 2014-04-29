@@ -1,15 +1,3 @@
-# Adds some cython related functions
-
-function(relative_path PATH BASE OUTVAR)
-  execute_process(
-    COMMAND
-      ${PYTHON_EXECUTABLE} -c "from os.path import relpath; print(relpath('${PATH}', '${BASE}'))"
-    OUTPUT_VARIABLE OUTVAR
-  )
-  set(${OUTVAR} ${${OUTVAR}} PARENT_SCOPE)
-endfunction()
-
-
 # Adds a python module as a target
 function(add_python_module NAME)
   cmake_parse_arguments(PYMODULE
@@ -28,6 +16,7 @@ function(add_python_module NAME)
   set_target_properties(${module_name} PROPERTIES PREFIX "")
   set_target_properties(${module_name} PROPERTIES SUFFIX ".so")
 
+  target_link_libraries(${module_name} ${PYTHON_LIBRARIES})
   if(NOT "${PYMODULE_LIBRARIES}" STREQUAL "")
     target_link_libraries(${module_name} ${PYMODULE_LIBRARIES})
   endif()
@@ -42,16 +31,25 @@ function(add_python_module NAME)
   endif()
 endfunction()
 
+set(FIND_DEPS_SCRIPT
+    ${CMAKE_CURRENT_LIST_DIR}/find_cython_deps.py
+    CACHE INTERNAL "Script to determine cython dependencies"
+)
 # Get dependencies from a cython file
-function(get_pyx_dependencies NAME OUTVAR)
-  set(${OUTVAR} ${ARGN})
-  foreach(filename ${NAME}.pyx ${NAME}.pxd)
-    set(filename ${CMAKE_CURRENT_SOURCE_DIR}/${filename})
-    if(EXISTS ${filename})
-      set(${OUTVAR} ${${OUTVAR}} ${filename})
-    endif()
-  endforeach()
-  set(${OUTVAR} ${${OUTVAR}} PARENT_SCOPE)
+function(get_pyx_dependencies SOURCE OUTVAR)
+  execute_process(
+      COMMAND ${LOCAL_PYTHON_EXECUTABLE} ${FIND_DEPS_SCRIPT} ${SOURCE} ${ARGN}
+      RESULT_VARIABLE RESULT
+      OUTPUT_VARIABLE OUTPUT
+      ERROR_VARIABLE ERROR
+  )
+  if("${RESULT}" STREQUAL "0")
+      set(${OUTVAR} ${OUTPUT} PARENT_SCOPE)
+  else()
+      message("Error: ${ERROR}")
+      message("Output: ${OUTPUT}")
+      message(FATAL_ERROR "Error while computing cython dependencies")
+  endif()
 endfunction()
 
 
@@ -65,7 +63,6 @@ function(add_cython_modules TARGET)
   if(NOT CYMODULE_SOURCE)
       set(CYMODULE_SOURCE ${TARGET}.pyx)
   endif()
-  get_pyx_dependencies(${CYMODULE_SOURCE} DEPENDENCIES)
 
   get_property(included_dirs
       DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -76,16 +73,31 @@ function(add_cython_modules TARGET)
     set(inclusion ${inclusion} -I${included})
   endforeach()
 
-  add_custom_command(
-    OUTPUT ${OUTPUT_FILE}
-    COMMAND ${PYTHON_EXECUTABLE} -m cython ${CYMODULE_SOURCE}
-                                 -o ${OUTPUT_FILE} ${inclusion}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${DEPENDENCIES}
-  )
+  get_pyx_dependencies(${CMAKE_CURRENT_SOURCE_DIR}/${CYMODULE_SOURCE} DEPENDENCIES ${included_dirs})
+
+  if(cython_EXECUTABLE)
+      add_custom_command(
+        OUTPUT ${OUTPUT_FILE}
+        COMMAND ${cython_EXECUTABLE} ${CYMODULE_SOURCE} -o ${OUTPUT_FILE} ${inclusion}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        DEPENDS ${DEPENDENCIES}
+      )
+  else()
+      add_custom_command(
+        OUTPUT ${OUTPUT_FILE}
+        COMMAND ${LOCAL_PYTHON_EXECUTABLE} -m cython ${CYMODULE_SOURCE}
+                                           -o ${OUTPUT_FILE} ${inclusion}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        DEPENDS ${DEPENDENCIES}
+      )
+  endif()
 
   add_python_module(${TARGET} ${CYMODULE_UNPARSED_ARGUMENTS} FILES ${OUTPUT_FILE})
   add_dependencies(py${TARGET} ${OUTPUT_FILE})
   target_link_libraries(py${TARGET} ${TARGET_LIBRARIES})
 
 endfunction()
+
+find_package(PythonInterp REQUIRED)
+get_filename_component(directory "${PYTHON_EXECUTABLE}" PATH)
+find_program(cython_EXECUTABLE HINTS "${directory}")

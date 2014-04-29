@@ -1,4 +1,7 @@
+from purify.numpy_interface cimport untyped_pointer_to_data, import_array
+import_array()
 from . import params
+from purify.numpy_interface cimport untyped_pointer_to_data
 from purify.measurements cimport purify_measurement_cftfwd, \
                                  purify_measurement_cftadj, \
                                  MeasurementOperator, _VoidedData
@@ -37,7 +40,7 @@ cdef void _convert_sdmm_params(
     if sdmm.gamma is not None: c_params.gamma = sdmm.gamma
     else:
         scale = sqrt(nelements) / sqrt(len(visibility))
-        xout = measurements.adjoint(visibility['y'])
+        xout = measurements.adjoint(visibility['y'].values)
         c_params.gamma = 1e-3 * max(sdmm.analyze(xout).real) * scale
     c_params.rel_obj = sdmm.relative_variation
     if sdmm.radius is not None: c_params.epsilon = sdmm.radius
@@ -138,7 +141,7 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
             if image.shape != self.image_size:
                 msg = "Shape of input image should be %s" % self.image_size
                 raise ValueError(msg)
-        else: image = zeros(self.image_size, dtype=dtype)
+        else: image = zeros(self.image_size, dtype=dtype, order='C')
 
         wshape = (len(self), ) + self.image_size
         if weights is not None:
@@ -156,13 +159,13 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
         _convert_sdmm_params(&params, self, measurements, visibility)
 
         # define all C objects
+        cdef double scale = sqrt(image.size) / sqrt(len(visibility))
+        scaled_visibility = visibility['y'].values * scale
         cdef:
-            double scale = sqrt(image.size) / sqrt(len(visibility))
-            unsigned char[::1] c_image = image.data
+            void* c_image = untyped_pointer_to_data(image)
+            void* c_visibility = untyped_pointer_to_data(scaled_visibility)
+            void* c_weights = untyped_pointer_to_data(weights)
             void *c_wavelets
-            unsigned char[::1] c_visibility \
-                        = (visibility['y'].values * scale).data
-            unsigned char[::1] c_weights = weights.data
             _VoidedData forward_data = measurements.forward_voided_data(scale)
             _VoidedData adjoint_data = measurements.adjoint_voided_data(scale)
 
@@ -170,20 +173,17 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
             int Ny = len(visibility)
             void **datafwd = forward_data.data()
             void **dataadj = adjoint_data.data()
-            void *image_ptr = <void*> &c_image[0]
-            void *visibility_ptr = <void*> &c_visibility[0]
-            double *weights_ptr = <double*> &c_weights[0]
         params.gamma *= scale
 
         SparsityOperator.set_wavelet_pointer(self, &c_wavelets)
 
         sopt_l1_sdmm(
-            image_ptr, image.size,
+            c_image, image.size,
             &purify_measurement_cftfwd, datafwd,
             &purify_measurement_cftadj, dataadj,
             &sopt_sara_synthesisop, &c_wavelets,
             &sopt_sara_analysisop, &c_wavelets,
-            Nr, visibility_ptr, Ny, weights_ptr, params
+            Nr, c_visibility, Ny, <double*>c_weights, params
         )
 
         return image
