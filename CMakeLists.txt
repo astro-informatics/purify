@@ -24,6 +24,8 @@ option(python         "Enable python bindings"                 on)
 
 # include exernal dependencies
 include(dependencies)
+install(DIRECTORY ${EXTERNAL_ROOT}/lib DESTINATION ${CMAKE_INSTALL_PREFIX}
+    PATTERN "*.pc" EXCLUDE)
 
 if(tests)  # Adds ctest
     enable_testing()
