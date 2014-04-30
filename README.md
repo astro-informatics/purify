@@ -87,7 +87,7 @@ CASA users
 
 Run the following commands from the `casapy` ipython interface:
 
-```ipython
+```Python
 # Import easy_install so it can be run from ipython
 from setuptools.command.easy_install import main as easy_install
 # Install pip, cos it is that much better
@@ -97,7 +97,7 @@ easy_install(['pip'])
 Then exit `casapy`. Unfortunately, it does not seem to recognize that it has just installed a
 module. Then install `purify` proper:
 
-```ipython
+```Python
 # Import pip so it can be run from ipython
 from pip import main as pip
 # Now install purify directly from github: that's why we got pip in the first place
@@ -112,7 +112,7 @@ NOTE:
     It is possible to extend the path from within `casapy`.
     For instance:
 
-    ```ipython
+    ```Python
     from os import environ
     environ['PATH'] += ":/usr/local/bin"
     ```
