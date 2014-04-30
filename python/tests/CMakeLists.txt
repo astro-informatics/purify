@@ -21,12 +21,18 @@ if(tests AND python)
 
 
     # Now add tests
-    add_nose_test(test_visibility.py)
-    add_nose_test(test_image.py)
-    add_nose_test(test_sparse.py)
-    add_nose_test(test_fftw.py)
-    add_nose_test(test_sparsity_ops.py)
-    add_nose_test(test_params.py)
-    add_nose_test(test_image_fixtures.py)
-    add_nose_test(test_sdmm.py)
+    file(GLOB tests test_*.py)
+    foreach(test ${tests})
+        add_nose_test(${test})
+    endforeach()
+
+    file(GLOB fixtures *fixtures.py)
+    install_python(
+        FILES ${fixtures} ${tests} "${PYPURIFY_DIRECTORY}/tests/__init__.py"
+        DESTINATION purify/tests
+    )
+    install_python(
+        TARGETS pyrandom pysparse_testing pyvisibility_testing
+        DESTINATION purify/tests
+    )
 endif()

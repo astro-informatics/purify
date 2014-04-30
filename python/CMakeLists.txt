@@ -55,6 +55,14 @@ if(python)
                     DESTINATION "${PYPURIFY_DIRECTORY}/data/expected/" )
     add_copy_files( copy GLOB "${CMAKE_CURRENT_SOURCE_DIR}/tests/*fixtures.py"
                     DESTINATION "${PYPURIFY_DIRECTORY}/tests/" )
+    install_python(
+        DIRECTORY "${PROJECT_SOURCE_DIR}/data/"
+        DESTINATION purify/data
+        FILES_MATCHING
+        PATTERN "images/Coverages/*.vis"
+        PATTERN "images/*.fits"
+        PATTERN "expected/*.fits"
+    )
   endif()
 
   install_python(
