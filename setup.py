@@ -3,8 +3,8 @@ from distutils.command.build import build as dBuild
 from setuptools.command.install import install as dInstall
 from os.path import dirname, join
 
-def cmake_cache_line(variable, value):
-    return "set(%s \"%s\" CACHE STRING \"\")\n" % (variable, value)
+def cmake_cache_line(variable, value, type='STRING'):
+    return "set(%s \"%s\" CACHE %s \"\")\n" % (variable, value, type)
 def as_preload_file(name, info):
     """ Python information to cmake commandline """
     result = []
@@ -39,6 +39,21 @@ def get_fftw3_args():
         raise RuntimeError("Could not figure out fftw3 used in numpy")
     return result
 
+def get_casa_args():
+    """ If in CASA, then sets library location by hand
+
+        CASA removes LD_LIBRARY_PATH, PATH, and friends. So we have to install into whatever CASA
+        wants.
+    """
+    from os import environ
+    from os.path import join, exists
+    if 'CASAPATH' not in environ: return []
+    casapath = environ['CASAPATH'].split()[0]
+    casalibs = join(casapath, 'Frameworks')
+    if exists(casalibs):
+        return [cmake_cache_line('LIBRARY_INSTALL_PATH', casalibs)]
+    return []
+
 def cmake_executable():
     """ Path to cmake executable """
     from distutils.spawn import find_executable
@@ -59,9 +74,13 @@ class Build(dBuild):
         from sys import executable
         blas_args = get_algebra_args()
         fftw3_args = get_fftw3_args()
+        # CASA requires special attention to work
+        casa_args = get_casa_args()
+        # other args
+        other_args = [cmake_cache_line('nobins', 'TRUE', 'BOOL'), '\n']
 
         with open(filename, 'w') as file:
-            file.writelines(blas_args + fftw3_args + ['\n'])
+            file.writelines(blas_args + fftw3_args + casa_args + other_args)
         return [ '-DPYTHON_EXECUTABLE=\'%s\'' % executable,
                  '-Ddovirtualenv=OFF', '-C%s' % filename, '..' ]
 

@@ -66,5 +66,7 @@ if(tests)
 endif()
 
 # install library and about
-install(TARGETS libpurify DESTINATION lib)
-install(TARGETS purify_about DESTINATION bin)
+install(TARGETS libpurify DESTINATION ${LIBRARY_INSTALL_PATH})
+if(NOT ${nobins})
+    install(TARGETS purify_about DESTINATION bin)
+endif()
