@@ -52,11 +52,15 @@ if(python)
     if(tests)
         # unit-test package
         find_or_fail(nose "to run the unit-tests for the python bindings")
-        # python environment within which ctest will run the test.
-        # ensures ctest finds the packages in the build tree first,
-        # as opposed to install packages.
-        find_or_fail(virtualenv "to run the unit-tests for the python bindings")
-        include(PythonVirtualEnv)
+        if(dovirtualenv)
+            # python environment within which ctest will run the test.
+            # ensures ctest finds the packages in the build tree first,
+            # as opposed to install packages.
+            # NOTE: If virtualenv is disabled, then it is up to the user to
+            # make sure that python picks up the right package.
+            find_or_fail(virtualenv "to run the unit-tests for the python bindings")
+            include(PythonVirtualEnv)
+        endif()
     endif()
 
     # Finds additional info, like libraries, include dirs...

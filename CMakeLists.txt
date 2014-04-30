@@ -17,9 +17,10 @@ get_gitref()
 # yeah, yeah it is GNU C, and others since for ever, but it was not part of the standard.
 include(AddC99Flags)
 
-option(tests          "Enable testing"                         on)
-option(openmp         "Enable OpenMP"                          off)
-option(python         "Enable python bindings"                 on)
+option(tests          "Enable testing"                                  on)
+option(openmp         "Enable OpenMP"                                   off)
+option(python         "Enable python bindings"                          on)
+option(dovirtualenv   "Enable use of virtual environment when testing"  on)
 
 
 # include exernal dependencies

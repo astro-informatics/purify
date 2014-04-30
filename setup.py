@@ -63,7 +63,7 @@ class Build(dBuild):
         with open(filename, 'w') as file:
             file.writelines(blas_args + fftw3_args + ['\n'])
         return [ '-DPYTHON_EXECUTABLE=\'%s\'' % executable,
-            '-C%s' % filename, '..' ]
+                 '-Ddovirtualenv=OFF', '-C%s' % filename, '..' ]
 
     def run(self):
         from setuptools import find_packages
