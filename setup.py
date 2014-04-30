@@ -91,6 +91,7 @@ class Install(dInstall):
         from setuptools import find_packages
         from os.path import abspath
         from os import chdir, getcwd
+        self.distribution.run_command('build')
         current_cwd = getcwd()
         build_dir = join(dirname(abspath(__file__)), self.build_base)
         self.distribution.packages \
@@ -111,9 +112,7 @@ setup(
     version = "0.1",
 
     setup_requires = ["setuptools_git >= 0.3"],
-    install_requires = ['cython', 'numpy', 'scipy', 'pandas'],
-    tests_require = ['nose', 'virtualenv'],
-    requires = ['cython', 'numpy', 'scipy', 'pandas'],
+    install_requires = ['cython', 'numpy', 'scipy', 'pandas', 'nose', 'virtualenv'],
     platforms = ['GNU/Linux','Unix','Mac OS-X'],
 
     include_package_data=True,
