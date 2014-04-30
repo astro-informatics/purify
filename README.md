@@ -107,11 +107,8 @@ pip(['install', 'git+https://github.com/UCL/purify.git@features/setup.py'])
 This last snippet can be used to install other packages as well.
 
 NOTE:
-    CASA has the unfortunate behavior of replacing environment variables with its own. Amongst other
-    difficulties, it means that `cmake` may have disappeared from the PATH.
-    It is possible to extend the path from within `casapy`.
-    For instance:
-
+    CASA has the unfortunate behavior of replacing environment variables with its own. Amongst other difficulties, it means that `cmake` may have disappeared from the PATH. It is possible to extend the path from within `casapy`. For instance:
+    
     ```Python
     from os import environ
     environ['PATH'] += ":/usr/local/bin"
