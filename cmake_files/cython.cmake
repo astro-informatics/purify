@@ -1,3 +1,4 @@
+include(PythonPackage)
 # Adds a python module as a target
 function(add_python_module NAME)
   cmake_parse_arguments(PYMODULE
@@ -37,8 +38,9 @@ set(FIND_DEPS_SCRIPT
 )
 # Get dependencies from a cython file
 function(get_pyx_dependencies SOURCE OUTVAR)
+  _python_executable(LOCALPYTHON)
   execute_process(
-      COMMAND ${LOCAL_PYTHON_EXECUTABLE} ${FIND_DEPS_SCRIPT} ${SOURCE} ${ARGN}
+      COMMAND ${LOCALPYTHON} ${FIND_DEPS_SCRIPT} ${SOURCE} ${ARGN}
       RESULT_VARIABLE RESULT
       OUTPUT_VARIABLE OUTPUT
       ERROR_VARIABLE ERROR
@@ -57,7 +59,8 @@ endfunction()
 # Creates a cython mpdule from an input file
 function(add_cython_modules TARGET)
 
-  cmake_parse_arguments(CYMODULE "" "SOURCE" "" ${ARGN})
+  _python_executable(LOCALPYTHON ${ARGN})
+  cmake_parse_arguments(CYMODULE "" "SOURCE" "" ${LOCALPYTHON_UNPARSED_ARGUMENTS})
 
   set(OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.c)
   if(NOT CYMODULE_SOURCE)
@@ -85,8 +88,8 @@ function(add_cython_modules TARGET)
   else()
       add_custom_command(
         OUTPUT ${OUTPUT_FILE}
-        COMMAND ${LOCAL_PYTHON_EXECUTABLE} -m cython ${CYMODULE_SOURCE}
-                                           -o ${OUTPUT_FILE} ${inclusion}
+        COMMAND ${LOCALPYTHON} -m cython ${CYMODULE_SOURCE}
+                               -o ${OUTPUT_FILE} ${inclusion}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         DEPENDS ${DEPENDENCIES}
       )
