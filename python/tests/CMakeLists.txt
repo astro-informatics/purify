@@ -23,6 +23,7 @@ if(tests AND python)
     # Now add tests
     file(GLOB tests test_*.py)
     foreach(test ${tests})
+        get_filename_component(test "${test}" NAME)
         add_nose_test(${test})
     endforeach()
 
