@@ -82,6 +82,8 @@ Python users
 pip install git+https://github.com/UCL/purify.git@features/setup.py
 ```
 
+It is highly recommended to do this within a [virtual environment](http://www.virtualenv.org/en/latest/).
+
 CASA users
 ----------
 
