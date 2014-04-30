@@ -8,8 +8,9 @@ def assert_positive_integer(object, name):
     setattr(object, name, 1.4)
     assert_equal(getattr(object, name), 1)
 
-    with assert_raises(ValueError): setattr(object, name, 0)
-    with assert_raises(ValueError): setattr(object, name, -1)
+    def f(x): setattr(object, name, x)
+    assert_raises(ValueError, f, 0)
+    assert_raises(ValueError, f, -1)
 
 def assert_positive_real(object, name):
     from nose.tools import assert_almost_equal, assert_raises
@@ -20,8 +21,9 @@ def assert_positive_real(object, name):
     setattr(object, name, 1e-2)
     assert_almost_equal(getattr(object, name), 1e-2)
 
-    with assert_raises(ValueError): setattr(object, name, 0)
-    with assert_raises(ValueError): setattr(object, name, -1)
+    def f(x): setattr(object, name, x)
+    assert_raises(ValueError, f, 0)
+    assert_raises(ValueError, f, -1)
 
 def assert_positive_real_or_none(object, name):
     from nose.tools import assert_true
@@ -39,8 +41,9 @@ def assert_verbosity(param):
             param.verbose = value
             assert_equal(param.verbose, key)
 
-    with assert_raises(ValueError): param.verbose = 'med'
-    with assert_raises(ValueError): param.verbose = 0.1
+    def f(x): param.verbose = x
+    assert_raises(ValueError, f, 'med')
+    assert_raises(ValueError, f, 0.1)
 
 def assert_boolean(param, name):
     from nose.tools import assert_true
@@ -61,8 +64,9 @@ def assert_size(param, name):
     assert_equal(getattr(param, name), (50, 51))
     assert_equal(getattr(getattr(param, name), 'x'), 50)
     assert_equal(getattr(getattr(param, name), 'y'), 51)
+    def function(x): setattr(param, name, value)
     for value in [(0, 1), (1, 0), (-1, 1), (1, -1), (0, 0)]:
-       with assert_raises(ValueError): setattr(param, name, value)
+       assert_raises(ValueError, function, value)
 
 def assert_tvprox(param):
     assert_verbosity(param)
