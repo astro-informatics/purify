@@ -5,7 +5,7 @@ configure_file(purify_config.in.h
 
 file(GLOB headers *.h)
 install(FILES
-    ${HEADER_FILES}
+    ${headers}
     "${PROJECT_BINARY_DIR}/include/purify_config.h" 
     DESTINATION include/purify COMPONENT DEV
 )
