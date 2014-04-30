@@ -112,10 +112,10 @@ setup(
 
     setup_requires = ["setuptools_git >= 0.3"],
     install_requires = ['cython', 'numpy', 'scipy', 'pandas'],
-    test_requires = ['nose', 'virtualenv'],
+    tests_require = ['nose', 'virtualenv'],
     requires = ['cython', 'numpy', 'scipy', 'pandas'],
     platforms = ['GNU/Linux','Unix','Mac OS-X'],
-    packages = ['purify'],
+
     include_package_data=True,
     exclude_package_data = {'': ['.gitignore', 'Makefile'] },
 
