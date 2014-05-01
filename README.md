@@ -54,9 +54,45 @@ http://basp-group.github.io/purify/
 Installation
 ============
 
-There are several methods for installing purify, as described below. However, all rely on the
-ability to run [CMake](http://www.cmake.org/). This is a free software that allows cross-platform
-compilation. Please install it first.
+Pre-requisites:
+
+- [CMake](http://www.cmake.org/): a free software that allows cross-platform
+compilation
+- [fftw3](www.fftw.org): Fastest Fourier Transform in the West
+- [blas](http://www.openblas.net/): Basic Linear Algebras library
+- [tiff](http://www.libtiff.org/): Tag Image File Format library
+
+All of these can be [apt-getted](https://help.ubuntu.com/12.04/serverguide/apt-get.html),
+[yummed](https://fedoraproject.org/wiki/Yum), [ebuilt](http://en.wikipedia.org/wiki/Ebuild),
+[brewed](http://brew.sh/), [finked](http://www.finkproject.org/), or easily installed in some way
+or another.
+
+Optional C libraries:
+
+- [sopt](https://github.com/basp-group/sopt): C implementation of the Sparse Optimization SARA
+  algorithm that forms the back-bone of purify
+- [cfitsio](http://heasarc.gsfc.nasa.gov/fitsio/fitsio.html): library of C and Fortran subroutines
+  for reading and writing data files in FITS (Flexible Image Transport System) data format. It can
+  often be obtained in the same way as libraries above
+
+Both of these libraries will downloaded and installed if they are not found on the system.
+
+Python Packages:
+
+- [numpy](http://www.numpy.org/): numerical library for python
+- [scipy](http://www.scipy.org/): scientific library for python
+- [pandas](http://pandas.pydata.org/): data analysis library for python
+- [cython](http://www.cython.org/): C extensions for python made easy
+- [nose](https://nose.readthedocs.org/en/latest/): unit-test framework for python. Only needed for
+  running unit-tests.
+- [virtualenv](https://nose.readthedocs.org/en/latest/): creates an isolated python environment.
+  Only needed for running tests.
+
+These python packages will be installed automatically when going through the  `pip` or `casapy`
+routes below. They can be easily installed via
+[easy_install](http://pythonhosted.org/setuptools/easy_install.html) or
+[pip](http://www.pip-installer.org/en/latest/quickstart.html) otherwise.
+
 
 C users
 -------
@@ -70,19 +106,44 @@ cd /path/to/purify
 [ ! -d build ] && mkdir build
 cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=/path/to/root/
+make test
 make install
 ```
 
-This will put the libraries in `/path/to/root/lib`, executables `/path/to/root/bin`, and so forth.
+The libraries will end up in  `/path/to/root/lib`, the executables in `/path/to/root/bin`, and so forth.
+
+It is possible to tell `CMake` exactly which libraries to compile and link against. The general
+idea is to add `-DVARIABLE=something` to the command-line arguments of CMake. CMake can be called
+any number of times: previous settings will not be overwritten unless specifically requested. Some
+of the more common options are the following:
+
+- `CMAKE_PREFIX_PATH`: CMake will look in "CMAKE_PREFIX_PATH/lib" for libraries,
+  "CMAKE_PREFIX_PATH/include" for headers, etc.
+- `PYTHON_EXECUTABLE`, `PYTHON_LIBRARIES`, `PYTHON_INCLUDE_DIRS`
+- `FFTW3_LIBRARIES`, `FFTW3_INCLUDE_DIR`
+- `BLAS_INCLUDE_DIRS`, `BLAS_LIBRARIES`
+
+All these variables and more can be found and modified in the `CMakeCache.txt` file in the build
+directory.
 
 Python users
 ------------
 
 ```bash
-pip install git+https://github.com/UCL/purify.git@features/setup.py
+pip install git+https://github.com/UCL/purify.git
 ```
 
 It is highly recommended to do this within a [virtual environment](http://www.virtualenv.org/en/latest/).
+With most python installations, one can proceed as follows:
+
+```bash
+# Create virtual environment in directory purify
+python -m virtualenv purify --system-site-packages
+# Install purify in this environment
+./purify/bin/pip install git+https://github.com/UCL/purify.git
+# Run tests within the environment
+./purify/bin/python -c "import nose; nose.runmodule('purify')"
+```
 
 CASA users
 ----------
@@ -103,14 +164,14 @@ module. Then install `purify` proper:
 # Import pip so it can be run from ipython
 from pip import main as pip
 # Now install purify directly from github: that's why we got pip in the first place
-pip(['install', 'git+https://github.com/UCL/purify.git@features/setup.py'])
+pip(['install', 'git+https://github.com/UCL/purify.git'])
 ```
 
 This last snippet can be used to install other packages as well.
 
 NOTE:
     CASA has the unfortunate behavior of replacing environment variables with its own. Amongst other difficulties, it means that `cmake` may have disappeared from the PATH. It is possible to extend the path from within `casapy`. It should be done prior to calling `pip` above:
-    
+
 ```Python
     from os import environ
     environ['PATH'] += ":/usr/local/bin"
