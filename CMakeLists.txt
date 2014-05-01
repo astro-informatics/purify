@@ -22,12 +22,14 @@ option(openmp         "Enable OpenMP"                                   off)
 option(python         "Enable python bindings"                          on)
 option(dovirtualenv   "Enable use of virtual environment when testing"  on)
 
-
-# include exernal dependencies
-include(dependencies)
+# Extra parameters
 if(NOT DEFINED LIBRARY_INSTALL_PATH)
     set(LIBRARY_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
+include(rpath)
+
+# include exernal dependencies
+include(dependencies)
 install(DIRECTORY ${EXTERNAL_ROOT}/lib/
     DESTINATION ${LIBRARY_INSTALL_PATH}
     PATTERN "pkgconfig" EXCLUDE
