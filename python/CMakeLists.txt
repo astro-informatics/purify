@@ -64,6 +64,7 @@ if(python)
         PATTERN "images/Coverages/*.vis"
         PATTERN "images/*.fits"
         PATTERN "expected/*.fits"
+        PATTERN "test" EXCLUDE
     )
   endif()
 

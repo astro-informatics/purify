@@ -31,6 +31,7 @@ endif()
 install(DIRECTORY ${EXTERNAL_ROOT}/lib/
     DESTINATION ${LIBRARY_INSTALL_PATH}
     PATTERN "pkgconfig" EXCLUDE
+    PATTERN "*.a" EXCLUDE
 )
 
 if(tests)  # Adds ctest
