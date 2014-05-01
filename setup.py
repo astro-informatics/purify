@@ -20,32 +20,6 @@ def as_preload_file(name, info):
         result.append(cmake_cache_line("%s_INCLUDE_DIRS" % name, incs))
     return result
 
-def get_algebra_args(name='blas'):
-    """ Gets blas/lapack arguments from numpy """
-    from numpy.distutils.system_info import get_info
-    names = [
-        '%s_opt' % name,
-        name,
-        '%s_mkl' % name,
-        'atlas_%s' % name,
-        '%s_atlas' % name
-    ]
-    for blasname in names:
-        if len(get_info(blasname)) != 0: break
-    else: raise RuntimeError("Could not figure out blas used in numpy")
-    result = as_preload_file(name.upper(), get_info(blasname))
-    if len(result) == 0:
-        raise RuntimeError("Could not figure out %s used in numpy" % name)
-    return result
-
-def get_fftw3_args():
-    """ Gets fftw3 arguments from numpy """
-    from numpy.distutils.system_info import get_info
-    result = as_preload_file('FFTW3', get_info('fftw3'))
-    if len(result) == 0:
-        raise RuntimeError("Could not figure out fftw3 used in numpy")
-    return result
-
 def get_casa_args():
     """ If in CASA, then sets library location by hand
 
@@ -95,8 +69,6 @@ class Build(dBuild):
             command-line.
         """
         from sys import executable
-        blas_args = get_algebra_args()
-        fftw3_args = get_fftw3_args()
         # CASA requires special attention to work
         casa_args = get_casa_args()
         # other args
@@ -109,7 +81,7 @@ class Build(dBuild):
         ]
 
         with open(filename, 'w') as file:
-            file.writelines(blas_args + fftw3_args + casa_args + other_args)
+            file.writelines(casa_args + other_args)
         return ['-C%s' % filename, '..']
 
     def run(self):
