@@ -77,12 +77,17 @@ class Build(dBuild):
         # CASA requires special attention to work
         casa_args = get_casa_args()
         # other args
-        other_args = [cmake_cache_line('nobins', 'TRUE', 'BOOL'), '\n']
+        other_args = [
+            cmake_cache_line('nobins', 'TRUE', 'BOOL'),
+            cmake_cache_line('PYTHON_EXECUTABLE', executable, 'PATH'),
+            cmake_cache_line('dovirtualenv', 'FALSE', 'BOOL'),
+            cmake_cache_line('dont_install_headers', 'TRUE', 'BOOL'),
+            '\n',
+        ]
 
         with open(filename, 'w') as file:
             file.writelines(blas_args + fftw3_args + casa_args + other_args)
-        return [ '-DPYTHON_EXECUTABLE=\'%s\'' % executable,
-                 '-Ddovirtualenv=OFF', '-C%s' % filename, '..' ]
+        return ['-C%s' % filename, '..']
 
     def run(self):
         from setuptools import find_packages
