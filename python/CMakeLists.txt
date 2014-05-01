@@ -68,11 +68,13 @@ if(python)
     )
   endif()
 
-  install_python(
-      FILES ${PXD_HEADERS}
-      DESTINATION purify/headers
-      COMPONENT dev
-  )
+  if(NOT dont_install_headers)
+      install_python(
+          FILES ${PXD_HEADERS}
+          DESTINATION purify/headers
+          COMPONENT dev
+      )
+  endif()
   install_python(FILES ${PYTHON_SOURCES} DESTINATION purify)
   install_python(TARGETS ${python_modules} DESTINATION purify)
 endif()
