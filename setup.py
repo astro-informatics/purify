@@ -23,7 +23,14 @@ def as_preload_file(name, info):
 def get_algebra_args(name='blas'):
     """ Gets blas/lapack arguments from numpy """
     from numpy.distutils.system_info import get_info
-    for blasname in [name, '%s_mkl' % name, '%s_atlas' % name]:
+    names = [
+        '%s_opt' % name,
+        name,
+        '%s_mkl' % name,
+        'atlas_%s' % name,
+        '%s_atlas' % name
+    ]
+    for blasname in names:
         if len(get_info(blasname)) != 0: break
     else: raise RuntimeError("Could not figure out blas used in numpy")
     result = as_preload_file(name.upper(), get_info(blasname))
