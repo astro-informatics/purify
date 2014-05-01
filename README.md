@@ -82,12 +82,14 @@ Python users
 pip install git+https://github.com/UCL/purify.git@features/setup.py
 ```
 
+It is highly recommended to do this within a [virtual environment](http://www.virtualenv.org/en/latest/).
+
 CASA users
 ----------
 
 Run the following commands from the `casapy` ipython interface:
 
-```ipython
+```Python
 # Import easy_install so it can be run from ipython
 from setuptools.command.easy_install import main as easy_install
 # Install pip, cos it is that much better
@@ -97,7 +99,7 @@ easy_install(['pip'])
 Then exit `casapy`. Unfortunately, it does not seem to recognize that it has just installed a
 module. Then install `purify` proper:
 
-```ipython
+```Python
 # Import pip so it can be run from ipython
 from pip import main as pip
 # Now install purify directly from github: that's why we got pip in the first place
@@ -107,17 +109,12 @@ pip(['install', 'git+https://github.com/UCL/purify.git@features/setup.py'])
 This last snippet can be used to install other packages as well.
 
 NOTE:
-    CASA has the unfortunate behavior of replacing environment variables with its own. Amongst other
-    difficulties, it means that `cmake` may have disappeared from the PATH.
-    It is possible to extend the path from within `casapy`.
-    For instance:
-
-    ```ipython
+    CASA has the unfortunate behavior of replacing environment variables with its own. Amongst other difficulties, it means that `cmake` may have disappeared from the PATH. It is possible to extend the path from within `casapy`. It should be done prior to calling `pip` above:
+    
+```Python
     from os import environ
     environ['PATH'] += ":/usr/local/bin"
-    ```
-
-    This should be done prior to calling pip above.
+```
 
 SUPPORT
 =======
