@@ -168,5 +168,5 @@ setup(
          'Topic :: Software Development :: Libraries :: Python Modules',
          'Topic :: Software Development :: Libraries :: Application Frameworks',
     ],
-    long_description = open(join(dirname(__file__), 'README.txt'), 'r').read()
+    long_description = open(join(dirname(__file__), 'README.md'), 'r').read()
 )
