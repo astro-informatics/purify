@@ -33,7 +33,7 @@ def get_casa_args():
     casalibs = join(casapath, 'Frameworks')
     if exists(casalibs):
         return [cmake_cache_line('LIBRARY_INSTALL_PATH', casalibs)]
-    return []
+    return [cmake_cache_line('CMAKE_PREFIX_PATH', environ['CASAPATH'])]
 
 def cmake_executable():
     """ Path to cmake executable """
