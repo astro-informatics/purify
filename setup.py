@@ -56,8 +56,24 @@ def get_casa_args():
 
 def cmake_executable():
     """ Path to cmake executable """
+    from os.path import join, exists
+    from os import environ
     from distutils.spawn import find_executable
     cmake = find_executable('cmake')
+    if cmake is None and 'CASAPATH' in environ:
+        # Tries to out-smart CASA.
+        # Look places cmake might be that casa removes from path.
+        directories = [
+            join('/', 'usr', 'local', 'bin'),
+            join(environ['HOME'], 'bin'),
+            join(environ['HOME'], '.local', 'bin'),
+            join(environ['HOME'], 'usr', 'bin'),
+            join('/', 'sw', 'bin') # -- default Fink location
+        ]
+        for directory in directories:
+            if exists(join(directory, 'cmake')):
+                cmake = join(directory, 'cmake')
+                break
     if cmake is None:
         raise RuntimeError('Could not find cmake executable in path')
     return cmake
