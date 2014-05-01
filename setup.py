@@ -155,7 +155,7 @@ setup(
     # NOTE: python-dateutil is required by pandas,
     # but is not installed by it (pandas == 0.13)
     install_requires = ['cython', 'numpy', 'scipy',
-        'python-dateutil', 'pandas', 'nose', 'virtualenv'],
+        'pandas', 'nose', 'virtualenv'],
     platforms = ['GNU/Linux','Unix','Mac OS-X'],
 
     include_package_data=True,
