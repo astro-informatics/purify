@@ -1,4 +1,7 @@
 def test_data_bindings():
+    import sys
+    print "PATHPATHPATH"
+    print sys.path
     from purify.fftw import Fourier2D
     from numpy.testing import assert_allclose
     from nose.tools import assert_equal
