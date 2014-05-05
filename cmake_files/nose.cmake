@@ -14,9 +14,9 @@ function(add_nose_test SOURCE)
        "exit(nose.run() != True)"
     )
     add_test( NAME ${testname}
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/python/
         COMMAND ${exec} -c "${expression}"
             ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE}
-        WORKING_DIRECTORY ${CURRENT_BINARY_DIR}/python/
     )
     set_tests_properties(${testname} PROPERTIES LABELS "nose;python")
 endfunction()
