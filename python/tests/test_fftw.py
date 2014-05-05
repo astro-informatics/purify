@@ -1,8 +1,4 @@
 def test_data_bindings():
-    import sys
-    print "PATHPATHPATH"
-    print sys.executable
-    print sys.path
     from purify.fftw import Fourier2D
     from numpy.testing import assert_allclose
     from nose.tools import assert_equal
@@ -42,6 +38,6 @@ def test_cycle_fftw():
     forward.data = expected
     forward.execute()
     backward.data = forward.data
-    backward.execute() 
+    backward.execute()
 
     assert_allclose(backward.data, expected * product(forward.data.shape))
