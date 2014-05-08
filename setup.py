@@ -98,7 +98,7 @@ class Install(dInstall):
         self.distribution.packages \
             = find_packages(join(build_dir, 'python'), exclude=['*.tests'])
         cmake = cmake_executable()
-        prefix = abspath(self.root)
+        prefix = abspath(self.root or self.install_base)
         pkg = abspath(self.install_lib)
         clib = abspath(join(self.install_lib, 'purify', 'lib'))
         try:
