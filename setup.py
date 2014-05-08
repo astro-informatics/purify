@@ -20,21 +20,6 @@ def as_preload_file(name, info):
         result.append(cmake_cache_line("%s_INCLUDE_DIRS" % name, incs))
     return result
 
-def get_casa_args():
-    """ If in CASA, then sets library location by hand
-
-        CASA removes LD_LIBRARY_PATH, PATH, and friends. So we have to install into whatever CASA
-        wants.
-    """
-    from os import environ
-    from os.path import join, exists
-    if 'CASAPATH' not in environ: return []
-    casapath = environ['CASAPATH'].split()[0]
-    casalibs = join(casapath, 'Frameworks')
-    if exists(casalibs):
-        return [cmake_cache_line('LIBRARY_INSTALL_PATH', casalibs)]
-    return [cmake_cache_line('CMAKE_PREFIX_PATH', environ['CASAPATH'])]
-
 def cmake_executable():
     """ Path to cmake executable """
     from os.path import join, exists
@@ -69,8 +54,6 @@ class Build(dBuild):
             command-line.
         """
         from sys import executable
-        # CASA requires special attention to work
-        casa_args = get_casa_args()
         # other args
         other_args = [
             cmake_cache_line('nobins', 'TRUE', 'BOOL'),
@@ -80,8 +63,7 @@ class Build(dBuild):
             '\n',
         ]
 
-        with open(filename, 'w') as file:
-            file.writelines(casa_args + other_args)
+        with open(filename, 'w') as file: file.writelines(other_args)
         return ['-C%s' % filename, '..']
 
     def run(self):
@@ -116,11 +98,15 @@ class Install(dInstall):
         self.distribution.packages \
             = find_packages(join(build_dir, 'python'), exclude=['*.tests'])
         cmake = cmake_executable()
+        prefix = abspath(self.root)
+        pkg = abspath(self.install_lib)
+        clib = abspath(join(self.install_lib, 'purify', 'lib'))
         try:
             chdir(build_dir)
             self.spawn([cmake,
-                '-DCMAKE_INSTALL_PREFIX=\'%s\'' % self.install_base,
-                '-DPYTHON_PKG_DIR=\'%s\'' % self.install_lib,
+                '-DCMAKE_INSTALL_PREFIX=\'%s\'' % prefix,
+                '-DPYTHON_PKG_DIR=\'%s\'' % pkg,
+                '-DLIBRARY_INSTALL_PATH=\'%s\'' % clib,
                 '..'
             ])
             self.spawn([cmake, '--build', '.', '--target', 'install'])
