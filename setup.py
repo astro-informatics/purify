@@ -112,6 +112,15 @@ class Install(dInstall):
             self.spawn([cmake, '--build', '.', '--target', 'install'])
         finally: chdir(current_cwd)
 
+    def get_outputs(self):
+        """ Returns list of installed files """
+        from os.path import exists, join, abspath
+        build_dir = join(dirname(abspath(__file__)), self.build_base)
+        install_file = join(build_dir, 'install_manifest.txt')
+        if not exists(install_file): return []
+        with open(install_file, 'r') as file: return file.readlines()
+
+
 setup(
     name = "Purify",
     version = "0.1",
