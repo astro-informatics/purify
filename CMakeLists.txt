@@ -30,11 +30,13 @@ include(rpath)
 
 # include exernal dependencies
 include(dependencies)
-install(DIRECTORY ${EXTERNAL_ROOT}/lib/
-    DESTINATION ${LIBRARY_INSTALL_PATH}
-    PATTERN "pkgconfig" EXCLUDE
-    PATTERN "*.a" EXCLUDE
-)
+if(EXISTS "${EXTERNAL_ROOT}/lib/")
+    install(DIRECTORY "${EXTERNAL_ROOT}/lib/"
+        DESTINATION "${LIBRARY_INSTALL_PATH}"
+        PATTERN "pkgconfig" EXCLUDE
+        PATTERN "*.a" EXCLUDE
+    )
+endif()
 
 if(tests)  # Adds ctest
     enable_testing()
