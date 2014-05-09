@@ -5,6 +5,7 @@ from distutils.command.build import build as dBuild
 from setuptools.command.install import install as dInstall
 from setuptools.command.build_ext import build_ext as dBuildExt
 from setuptools.command.bdist_egg import bdist_egg as dBuildDistEgg
+from setuptools.command.sdist import sdist as dSDist
 from setuptools.command.egg_info import egg_info as dEggInfo
 from distutils.dir_util import mkpath
 
@@ -116,7 +117,10 @@ class Build(dBuild):
         self._configure(build_dir)
         self._build(build_dir)
         self._install(build_dir, package_dir)
-        dBuild.run(self)
+        try:
+            prior = getattr(self.distribution, 'running_binary', False)
+            dBuild.run(self)
+        finally: self.distribution.running_binary = prior
 
     def _install(self, build_dir, install_dir):
         from distutils import log
@@ -162,32 +166,72 @@ class Install(dInstall):
             ])
             self.spawn([cmake, '--build', '.', '--target', 'install'])
         finally: chdir(current_cwd)
-        dInstall.run(self)
+
+        try:
+            prior = getattr(self.distribution, 'running_binary', False)
+            self.distribution.running_binary = prior
+            self.distribution.have_run['egg_info'] = 0
+            dInstall.run(self)
+        finally: self.distribution.running_binary = prior
 
 class BuildExt(dBuildExt):
     def __init__(self, *args, **kwargs):
         dBuildExt.__init__(self, *args, **kwargs)
     def run(self):pass
+
 class BuildDistEgg(dBuildDistEgg):
     def __init__(self, *args, **kwargs):
         dBuildDistEgg.__init__(self, *args, **kwargs)
     def run(self):
-        self.run_command('build')
-        dBuildDistEgg.run(self)
+
+        try:
+            prior = getattr(self.distribution, 'running_binary', False)
+            self.distribution.running_binary = True
+            self.run_command('build')
+            dBuildDistEgg.run(self)
+        finally: self.distribution.running_binary = prior
+
 class EggInfo(dEggInfo):
     def __init__(self, *args, **kwargs):
         dEggInfo.__init__(self, *args, **kwargs)
     def run(self):
-        from distutils import log
-        from os.path import exists
+        from setuptools.command.egg_info import manifest_maker
         from os import listdir
-        if exists(package_dir) == False or len(listdir(package_dir)) == 0:
-            log.info("CMake package directory does not exist: will run build.")
-            self.run_command('build')
-        else:
-            log.info("Using existing CMake package directory %s" % package_dir)
-        dEggInfo.run(self)
+        which_template = 'MANIFEST.source.in'
 
+        dist = self.distribution
+        old_values = dist.ext_modules, dist.ext_package, \
+            dist.packages, dist.package_dir
+        if len(listdir(package_dir)) == 0  \
+            and getattr(self.distribution, 'running_binary', False):
+            which_template = 'MANIFEST.binary.in'
+        else:
+            dist.ext_modules, dist.ext_package = None, None
+            dist.packages, dist.package_dir = None, None
+
+        try:
+            old_template = manifest_maker.template
+            manifest_maker.template = which_template
+            dEggInfo.run(self)
+        finally:
+            manifest_maker.template = old_template
+            dist.ext_modules, dist.ext_package = old_values[:2]
+            dist.packages, dist.package_dir = old_values[2:]
+
+class SDist(dSDist):
+    def __init__(self, *args, **kwargs):
+        dSDist.__init__(self, *args, **kwargs)
+    def run(self):
+        dist = self.distribution
+        try:
+            old_values = dist.ext_modules, dist.ext_package, \
+                dist.packages, dist.package_dir
+            dist.ext_modules, dist.ext_package = None, None
+            dist.packages, dist.package_dir = None, None
+            dSDist.run(self)
+        finally:
+            dist.ext_modules, dist.ext_package = old_values[:2]
+            dist.packages, dist.package_dir = old_values[2:]
 setup(
     name = "purify",
     version = "0.1",
@@ -206,6 +250,7 @@ setup(
     },
 
     author = "Jason McEwen",
+    author_email = "j.mcewen@ucl.ac.uk",
     description = "Purify does what it does well",
     license = "GPL-2",
     url = "https://github.com/basp-group/purify",
@@ -230,5 +275,5 @@ setup(
          'Topic :: Software Development :: Libraries :: Python Modules',
          'Topic :: Software Development :: Libraries :: Application Frameworks',
     ],
-    long_description = open(join(dirname(__file__), 'README.md'), 'r').read()
+    long_description = open(join(dirname(__file__), 'README.rst'), 'r').read()
 )
