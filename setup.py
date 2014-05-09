@@ -1,7 +1,15 @@
-from setuptools import setup
+from os.path import basename, dirname, join
+from os import getcwd
+from setuptools import setup, Extension
 from distutils.command.build import build as dBuild
 from setuptools.command.install import install as dInstall
-from os.path import dirname, join
+from setuptools.command.build_ext import build_ext as dBuildExt
+from setuptools.command.bdist_egg import bdist_egg as dBuildDistEgg
+from distutils.dir_util import mkpath
+
+source_dir = getcwd()
+package_dir = join(source_dir, 'pkg_install')
+mkpath(package_dir)
 
 def cmake_cache_line(variable, value, type='STRING'):
     return "set(%s \"%s\" CACHE %s \"\")\n" % (variable, value, type)
@@ -64,43 +72,78 @@ class Build(dBuild):
         ]
 
         with open(filename, 'w') as file: file.writelines(other_args)
-        return ['-C%s' % filename, '..']
+        return ['-C%s' % filename]
 
-    def run(self):
-        from setuptools import find_packages
+    def _configure(self, build_dir):
         from distutils.spawn import spawn
-        from distutils.dir_util import mkpath
-        from os.path import abspath
         from os import chdir, getcwd
 
-        current_cwd = getcwd()
-        build_dir = join(dirname(abspath(__file__)), self.build_base)
+        current_dir = getcwd()
         mkpath(build_dir)
         command_line = self.configure_cmdl(join(build_dir, 'Variables.cmake'))
         cmake = cmake_executable()
 
         try:
             chdir(build_dir)
-            spawn([cmake] + command_line)
+            spawn([cmake] + command_line + [source_dir])
+        finally: chdir(current_dir)
+
+    def _build(self, build_dir):
+        from distutils.spawn import spawn
+        from os import chdir, getcwd
+
+        current_dir = getcwd()
+        cmake = cmake_executable()
+
+        try:
+            chdir(build_dir)
             spawn([cmake, '--build', '.'])
-            self.distribution.packages \
-                = find_packages(join(build_dir, 'python'), exclude=['*.tests'])
+        finally: chdir(current_dir)
+
+    def run(self):
+        from os.path import abspath
+
+        build_dir = join(dirname(abspath(__file__)), self.build_base)
+        self._configure(build_dir)
+        self._build(build_dir)
+        self._install(build_dir, package_dir)
+        dBuild.run(self)
+
+    def _install(self, build_dir, install_dir):
+        from os.path import abspath
+        from os import chdir, getcwd
+
+        current_cwd = getcwd()
+        build_dir = abspath(build_dir)
+        cmake = cmake_executable()
+        pkg = abspath(install_dir)
+        clib = join(pkg, 'purify', 'lib')
+        try:
+            chdir(build_dir)
+            self.spawn([cmake,
+                '-DPYTHON_PKG_DIR=\'%s\'' % pkg,
+                '-DLIBRARY_INSTALL_PATH=\'%s\'' % clib,
+                source_dir
+            ])
+            self.spawn([cmake, '--build', '.', '--target', 'install'])
         finally: chdir(current_cwd)
 
 class Install(dInstall):
     def run(self):
-        from setuptools import find_packages
+        from distutils import log
         from os.path import abspath
         from os import chdir, getcwd
         self.distribution.run_command('build')
         current_cwd = getcwd()
         build_dir = join(dirname(abspath(__file__)), self.build_base)
-        self.distribution.packages \
-            = find_packages(join(build_dir, 'python'), exclude=['*.tests'])
         cmake = cmake_executable()
         prefix = abspath(self.root or self.install_base)
         pkg = abspath(self.install_lib)
         clib = abspath(join(self.install_lib, 'purify', 'lib'))
+        log.info("******* %s" % self.bdist_dir)
+        log.info("******* %s" % self.root)
+        log.info("******* %s" % self.install_base)
+        log.info("CMake: Installing package to %s" % pkg)
         try:
             chdir(build_dir)
             self.spawn([cmake,
@@ -111,6 +154,7 @@ class Install(dInstall):
             ])
             self.spawn([cmake, '--build', '.', '--target', 'install'])
         finally: chdir(current_cwd)
+        dInstall.run(self)
 
     def get_outputs(self):
         """ Returns list of installed files """
@@ -121,27 +165,42 @@ class Install(dInstall):
         with open(install_file, 'r') as file: return file.readlines()
 
 
+class BuildExt(dBuildExt):
+    def __init__(self, *args, **kwargs):
+        dBuildExt.__init__(self, *args, **kwargs)
+    def run(self):pass
+class BuildDistEgg(dBuildDistEgg):
+    def __init__(self, *args, **kwargs):
+        dBuildDistEgg.__init__(self, *args, **kwargs)
+    def run(self):
+        self.run_command('build')
+        dBuildDistEgg.run(self)
+
 setup(
-    name = "Purify",
+    name = "purify",
     version = "0.1",
 
-    setup_requires = ["setuptools_git >= 0.3"],
     # NOTE: python-dateutil is required by pandas,
     # but is not installed by it (pandas == 0.13)
     install_requires = ['cython', 'numpy', 'scipy',
         'pandas', 'nose', 'virtualenv'],
     platforms = ['GNU/Linux','Unix','Mac OS-X'],
 
-    include_package_data=True,
-    exclude_package_data = {'': ['.gitignore', 'Makefile'] },
-
     zip_safe = False,
-    cmdclass = {'build': Build, 'install': Install},
+    cmdclass = {
+        'build': Build, 'install': Install, 
+        'build_ext': BuildExt, 'bdist_egg': BuildDistEgg
+    },
 
     author = "Jason McEwen",
     description = "Purify does what it does well",
     license = "GPL-2",
     url = "https://github.com/basp-group/purify",
+    ext_modules = [Extension('purify.cparams', [])],
+    ext_package = 'purify',
+    packages = ['purify', 'purify.tests'],
+    package_dir = {'': basename(package_dir)},
+    include_package_data=True,
 
     keywords= "radio astronomy",
     classifiers = [
