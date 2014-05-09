@@ -5,6 +5,7 @@ from distutils.command.build import build as dBuild
 from setuptools.command.install import install as dInstall
 from setuptools.command.build_ext import build_ext as dBuildExt
 from setuptools.command.bdist_egg import bdist_egg as dBuildDistEgg
+from setuptools.command.egg_info import egg_info as dEggInfo
 from distutils.dir_util import mkpath
 
 source_dir = getcwd()
@@ -173,6 +174,12 @@ class BuildDistEgg(dBuildDistEgg):
     def run(self):
         self.run_command('build')
         dBuildDistEgg.run(self)
+class EggInfo(dEggInfo):
+    def __init__(self, *args, **kwargs):
+        dEggInfo.__init__(self, *args, **kwargs)
+    def run(self):
+        self.run_command('build')
+        dEggInfo.run(self)
 
 setup(
     name = "purify",
@@ -187,7 +194,8 @@ setup(
     zip_safe = False,
     cmdclass = {
         'build': Build, 'install': Install,
-        'build_ext': BuildExt, 'bdist_egg': BuildDistEgg
+        'build_ext': BuildExt, 'bdist_egg': BuildDistEgg,
+        'egg_info': EggInfo
     },
 
     author = "Jason McEwen",
