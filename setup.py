@@ -13,6 +13,7 @@ mkpath(package_dir)
 
 def cmake_cache_line(variable, value, type='STRING'):
     return "set(%s \"%s\" CACHE %s \"\")\n" % (variable, value, type)
+
 def as_preload_file(name, info):
     """ Python information to cmake commandline """
     result = []
@@ -30,7 +31,7 @@ def as_preload_file(name, info):
 
 def cmake_executable():
     """ Path to cmake executable """
-    from os.path import join, exists
+    from os.path import exists
     from os import environ
     from distutils.spawn import find_executable
     cmake = find_executable('cmake')
@@ -75,12 +76,17 @@ class Build(dBuild):
         return ['-C%s' % filename]
 
     def _configure(self, build_dir):
+        from distutils import log
         from distutils.spawn import spawn
-        from os import chdir, getcwd
+        from os import chdir
 
         current_dir = getcwd()
         mkpath(build_dir)
         command_line = self.configure_cmdl(join(build_dir, 'Variables.cmake'))
+        log.info(
+                "CMake: configuring with variables in %s "
+                % join(build_dir, 'Variables.cmake')
+        )
         cmake = cmake_executable()
 
         try:
@@ -89,9 +95,11 @@ class Build(dBuild):
         finally: chdir(current_dir)
 
     def _build(self, build_dir):
+        from distutils import log
         from distutils.spawn import spawn
-        from os import chdir, getcwd
+        from os import chdir
 
+        log.info("CMake: building in %s" % build_dir)
         current_dir = getcwd()
         cmake = cmake_executable()
 
@@ -110,14 +118,16 @@ class Build(dBuild):
         dBuild.run(self)
 
     def _install(self, build_dir, install_dir):
+        from distutils import log
         from os.path import abspath
-        from os import chdir, getcwd
+        from os import chdir
 
         current_cwd = getcwd()
         build_dir = abspath(build_dir)
         cmake = cmake_executable()
         pkg = abspath(install_dir)
         clib = join(pkg, 'purify', 'lib')
+        log.info("CMake: Installing package to %s" % pkg)
         try:
             chdir(build_dir)
             self.spawn([cmake,
@@ -132,7 +142,7 @@ class Install(dInstall):
     def run(self):
         from distutils import log
         from os.path import abspath
-        from os import chdir, getcwd
+        from os import chdir
         self.distribution.run_command('build')
         current_cwd = getcwd()
         build_dir = join(dirname(abspath(__file__)), self.build_base)
@@ -140,9 +150,6 @@ class Install(dInstall):
         prefix = abspath(self.root or self.install_base)
         pkg = abspath(self.install_lib)
         clib = abspath(join(self.install_lib, 'purify', 'lib'))
-        log.info("******* %s" % self.bdist_dir)
-        log.info("******* %s" % self.root)
-        log.info("******* %s" % self.install_base)
         log.info("CMake: Installing package to %s" % pkg)
         try:
             chdir(build_dir)
@@ -155,15 +162,6 @@ class Install(dInstall):
             self.spawn([cmake, '--build', '.', '--target', 'install'])
         finally: chdir(current_cwd)
         dInstall.run(self)
-
-    def get_outputs(self):
-        """ Returns list of installed files """
-        from os.path import exists, join, abspath
-        build_dir = join(dirname(abspath(__file__)), self.build_base)
-        install_file = join(build_dir, 'install_manifest.txt')
-        if not exists(install_file): return []
-        with open(install_file, 'r') as file: return file.readlines()
-
 
 class BuildExt(dBuildExt):
     def __init__(self, *args, **kwargs):
@@ -188,7 +186,7 @@ setup(
 
     zip_safe = False,
     cmdclass = {
-        'build': Build, 'install': Install, 
+        'build': Build, 'install': Install,
         'build_ext': BuildExt, 'bdist_egg': BuildDistEgg
     },
 
