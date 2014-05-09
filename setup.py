@@ -178,7 +178,14 @@ class EggInfo(dEggInfo):
     def __init__(self, *args, **kwargs):
         dEggInfo.__init__(self, *args, **kwargs)
     def run(self):
-        self.run_command('build')
+        from distutils import log
+        from os.path import exists
+        from os import listdir
+        if exists(package_dir) == False or len(listdir(package_dir)) == 0:
+            log.info("CMake package directory does not exist: will run build.")
+            self.run_command('build')
+        else:
+            log.info("Using existing CMake package directory %s" % package_dir)
         dEggInfo.run(self)
 
 setup(
