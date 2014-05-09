@@ -5,3 +5,4 @@ data/test/
 .*.sw[p, o]
 *.egg*
 *build*/
+pkg_install/
