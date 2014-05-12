@@ -6,3 +6,4 @@ data/test/
 *.egg*
 *build*/
 pkg_install/
+dist/
