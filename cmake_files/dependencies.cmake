@@ -24,6 +24,11 @@ if(openmp)
   endif()
 endif()
 
+# Add script to execute to make sure libraries in the build tree can be found
+include(EnvironmentScript)
+add_to_ld_path("${EXTERNAL_ROOT}/lib")
+create_environment_script(PATH "${CMAKE_CURRENT_BINARY_DIR}/executor.sh")
+
 if(python)
     macro(find_or_fail package what)
         find_python_package(${package})
@@ -50,27 +55,21 @@ if(python)
     find_or_fail(pandas "by Purify's python bindings")
 
     if(tests)
-        # unit-test package
-        find_or_fail(nose "to run the unit-tests for the python bindings")
-        if(dovirtualenv)
-            # python environment within which ctest will run the test.
-            # ensures ctest finds the packages in the build tree first,
-            # as opposed to install packages.
-            # NOTE: If virtualenv is disabled, then it is up to the user to
-            # make sure that python picks up the right package.
-            find_or_fail(virtualenv "to run the unit-tests for the python bindings")
-            include(PythonVirtualEnv)
-        endif()
+        add_to_python_path("${PROJECT_BINARY_DIR}/python")
+        # A script for executing purify executable inside the build tree
+        set(LOCAL_PYTHON_EXECUTABLE "${PROJECT_BINARY_DIR}/localpython.sh")
+        create_environment_script(
+            EXECUTABLE "${PYTHON_EXECUTABLE}"
+            PATH "${LOCAL_PYTHON_EXECUTABLE}"
+            PYTHON
+        )
+        # install nose if not found
+        include(PythonPackageLookup)
+        lookup_python_package(nose "to run the unit-tests for the python bindings")
     endif()
 
     # Finds additional info, like libraries, include dirs...
+    # no need check numpy features, it's all handled by cython.
+    set(no_numpy_feature_tests TRUE)
     find_package(Numpy REQUIRED)
-endif()
-
-if(tests)
-    # Add location of external libraries
-    include(EnvironmentScript)
-    add_to_ld_path("${EXTERNAL_ROOT}/lib")
-    # A script for executing purify executable inside the build tree
-    create_environment_script(PATH "${CMAKE_CURRENT_BINARY_DIR}/executor.sh")
 endif()

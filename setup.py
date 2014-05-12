@@ -69,7 +69,6 @@ class Build(dBuild):
         other_args = [
             cmake_cache_line('nobins', 'TRUE', 'BOOL'),
             cmake_cache_line('PYTHON_EXECUTABLE', executable, 'PATH'),
-            cmake_cache_line('dovirtualenv', 'FALSE', 'BOOL'),
             cmake_cache_line('dont_install_headers', 'TRUE', 'BOOL'),
             '\n',
         ]
@@ -238,8 +237,7 @@ setup(
 
     # NOTE: python-dateutil is required by pandas,
     # but is not installed by it (pandas == 0.13)
-    install_requires = ['cython', 'numpy', 'scipy',
-        'pandas', 'nose', 'virtualenv'],
+    install_requires = ['cython', 'numpy', 'scipy', 'pandas', 'nose'],
     platforms = ['GNU/Linux','Unix','Mac OS-X'],
 
     zip_safe = False,
