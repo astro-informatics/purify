@@ -31,7 +31,7 @@ cdef class MeasurementOperator:
         _MeasurementParams _params
         Fourier2D _fftw_forward
         Fourier2D _fftw_backward
-        object kernels
+        object _kernels
     cdef _VoidedData forward_voided_data(self, scale=*)
     cdef _VoidedData adjoint_voided_data(self, scale=*)
     cpdef forward(self, image)

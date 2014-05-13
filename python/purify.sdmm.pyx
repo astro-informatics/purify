@@ -1,24 +1,29 @@
 from purify.numpy_interface cimport untyped_pointer_to_data, import_array
 import_array()
 from . import params
-from purify.numpy_interface cimport untyped_pointer_to_data
 from purify.measurements cimport purify_measurement_cftfwd, \
                                  purify_measurement_cftadj, \
                                  MeasurementOperator, _VoidedData
 from purify.sparsity_ops cimport sopt_sara_analysisop, sopt_sara_synthesisop, \
                                  SparsityOperator
+from purify.cparams cimport sopt_l1_sdmmparam, _convert_l1param, \
+                            sopt_l1_rwparam, _convert_rwparams, \
+                            sopt_tv_rwparam, sopt_tv_sdmmparam, \
+                            _convert_tvparam
 
 cdef extern from "sopt_l1.h":
-    ctypedef struct sopt_l1_sdmmparam:
-        int verbose
-        int max_iter
-        double gamma
-        double rel_obj
-        double epsilon
-        double epsilon_tol
-        int real_data
-        int cg_max_iter
-        double cg_tol
+    cdef void sopt_tv_sdmm(void *xsol, int nx1, int nx2,
+            void (*A)(void *out, void *invec, void **data), void **A_data,
+            void (*At)(void *out, void *invec, void **data), void **At_data,
+            void *y, int ny,
+            double *wt_dx, double *wt_dy,
+            sopt_tv_sdmmparam param)
+    cdef void sopt_tv_rwsdmm(void *xsol, int nx1, int nx2,
+            void (*A)(void *out, void *invec, void **data), void **A_data,
+            void (*At)(void *out, void *invec, void **data), void **At_data,
+            void *y, int ny,
+            sopt_tv_sdmmparam paramtv,
+            sopt_tv_rwparam paramrwtv )
 
     cdef void sopt_l1_sdmm( void *xsol, int nx,
             void (*A)(void *out, void *invec, void **data),
@@ -28,34 +33,111 @@ cdef extern from "sopt_l1.h":
             void **Psit_data, int nr, void *y, int ny, double *weights,
             sopt_l1_sdmmparam param ) nogil
 
-cdef void _convert_sdmm_params(
-        sopt_l1_sdmmparam *c_params,
-        sdmm, MeasurementOperator measurements, visibility ) except *:
-    """ Sets c parameters from python object """
-    from numpy import max, product, sqrt
-    from numpy.linalg import norm
-    c_params.verbose = {'off': 0, 'medium': 1, 'high': 2}[sdmm.verbose]
-    c_params.max_iter = sdmm.max_iter
-    nelements = product(measurements.sizes.image)
-    if sdmm.gamma is not None: c_params.gamma = sdmm.gamma
-    else:
-        scale = sqrt(nelements) / sqrt(len(visibility))
-        xout = measurements.adjoint(visibility['y'].values)
-        c_params.gamma = 1e-3 * max(sdmm.analyze(xout).real) * scale
-    c_params.rel_obj = sdmm.relative_variation
-    if sdmm.radius is not None: c_params.epsilon = sdmm.radius
-    else:
-        nvis = float(len(visibility['y']))
-        sigma = norm(visibility['y']) * 10.0**-(1.5) / sqrt(nvis)
-        c_params.epsilon = sqrt(nvis + 2.0 * sqrt(nvis)) * sigma \
-                           / nvis * nelements
+    cdef void sopt_l1_rwsdmm(void *xsol, int nx,
+        void (*A)(void *out, void *into, void **data),
+        void **A_data,
+        void (*At)(void *out, void *into, void **data),
+        void **At_data,
+        void (*Psi)(void *out, void *into, void **data),
+        void **Psi_data,
+        void (*Psit)(void *out, void *into, void **data),
+        void **Psit_data,
+        int nr,
+        void *y,
+        int ny,
+        sopt_l1_sdmmparam paraml1,
+        sopt_l1_rwparam paramrwl1)
 
-    c_params.epsilon_tol = sdmm.relative_radius
-    c_params.cg_max_iter = sdmm.cg.max_iter
-    c_params.cg_tol = sdmm.cg.tolerance
-    if visibility['y'].values.dtype != 'complex':
-        raise NotImplemented('Cannot purify real visibilities')
-    c_params.real_data = 0
+cdef void _l1_sdmm( self, measurements, visibility, _image, int _image_size,
+        void **_datafwd, void **_dataadj, _visibility, weights ) except *:
+    """ Calls L1 SDMM """
+    cdef:
+        sopt_l1_sdmmparam sdparams
+        void* c_wavelets
+        double* c_weights = <double*>untyped_pointer_to_data(weights)
+        void* c_image = untyped_pointer_to_data(_image)
+        void* c_visibility = untyped_pointer_to_data(_visibility)
+        int Nr = len(self) * _image_size
+    _convert_l1param(&sdparams, self, measurements, visibility)
+    SparsityOperator.set_wavelet_pointer(self, &c_wavelets)
+
+    sopt_l1_sdmm(
+        c_image, _image_size,
+        &purify_measurement_cftfwd, _datafwd,
+        &purify_measurement_cftadj, _dataadj,
+        &sopt_sara_synthesisop, &c_wavelets,
+        &sopt_sara_analysisop, &c_wavelets,
+        Nr, c_visibility, len(visibility),
+        c_weights, sdparams
+    )
+
+cdef void _l1_rw_sdmm( self, measurements, visibility, _image,
+        int _image_size, void **_datafwd, void **_dataadj,
+        _visibility ) except *:
+    """ Calls L1 SDMM """
+    cdef:
+        sopt_l1_sdmmparam sdparams
+        sopt_l1_rwparam rwparams
+        void *c_wavelets
+        int Nr = len(self) * _image_size
+        void* c_image = untyped_pointer_to_data(_image)
+        void* c_visibility = untyped_pointer_to_data(_visibility)
+    _convert_l1param(&sdparams, self, measurements, visibility)
+    _convert_rwparams(&rwparams, self, measurements, visibility)
+    SparsityOperator.set_wavelet_pointer(self, &c_wavelets)
+
+    sopt_l1_rwsdmm(
+        c_image, _image_size,
+        &purify_measurement_cftfwd, _datafwd,
+        &purify_measurement_cftadj, _dataadj,
+        &sopt_sara_synthesisop, &c_wavelets,
+        &sopt_sara_analysisop, &c_wavelets,
+        Nr, c_visibility, len(visibility),
+        sdparams, rwparams
+    )
+
+cdef void _tv_sdmm( self, measurements, visibility,
+        _image, _image_shape, void **_datafwd, void **_dataadj, _visibility,
+        weights ) except *:
+    """ Calls TV SDMM """
+    cdef:
+        sopt_tv_sdmmparam sdparams
+        int stride = weights.strides[0]
+        unsigned char* c_weights = \
+                <unsigned char*> untyped_pointer_to_data(weights)
+        double *xweights_ptr = <double*> c_weights
+        double *yweights_ptr = <double*> &c_weights[stride]
+        void* c_image = untyped_pointer_to_data(_image)
+        void* c_visibility = untyped_pointer_to_data(_visibility)
+    _convert_tvparam(&sdparams, self, measurements, visibility)
+
+    sopt_tv_sdmm(
+        c_image, _image_shape[0], _image_shape[1],
+        &purify_measurement_cftfwd, _datafwd,
+        &purify_measurement_cftadj, _dataadj,
+        c_visibility, len(visibility),
+        xweights_ptr, yweights_ptr, sdparams
+    )
+
+cdef void _tv_rw_sdmm(self, measurements, visibility, _image, _image_shape,
+        void **_datafwd, void **_dataadj, _visibility ) except *:
+    """ Calls TV RW SDMM """
+    cdef:
+        sopt_tv_sdmmparam sdparams
+        sopt_tv_rwparam rwparams
+        void* c_image = untyped_pointer_to_data(_image)
+        void* c_visibility = untyped_pointer_to_data(_visibility)
+    _convert_tvparam(&sdparams, self, measurements, visibility)
+    _convert_rwparams(<sopt_l1_rwparam*>&rwparams, self, measurements,
+                      visibility)
+
+    sopt_tv_rwsdmm(
+        c_image, _image_shape[0], _image_shape[1],
+        &purify_measurement_cftfwd, _datafwd,
+        &purify_measurement_cftadj, _dataadj,
+        c_visibility, len(visibility),
+        sdparams, rwparams
+    )
 
 class SDMM(params.Measurements, params.SDMM, SparsityOperator):
     """ Performs Simultaneous Direction Method of Mulitpliers
@@ -75,6 +157,10 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
         instanciation, most of these parameters can be accessed and modified as
         attributes of the function object.
     """
+    reweighted = params.boolean("reweighted",
+            "Whether to apply the reweighted scheme")
+    tv_norm = params.boolean("tv_norm",
+            "Whether to use TV (True) or L1 norm")
     def __init__(self, **kwargs):
         """ Creates a SDMM function object
 
@@ -113,9 +199,55 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
                 cg_tolerance: float
                     Convergence criteria for the internal conjugate gradient
                     operations. Defaults to 1e-6
+                reweighted: boolean
+                    If True, applies the reweighted scheme
+                rw_max_iter: int
+                    Maximum number of iterations for the global RW-L1 problem.
+                    Defaults to 5.
+                rw_verbose: off|medium|high
+                    Verbosity when solving the global RW-L1 problem.
+                    Defaults to high.
+                rw_sigma: float
+                    Noise standard deviation in the representation domain.
+                    Defaults to None, in which it is computed internally
+                    from the input visibilities.
+                rw_relative_variation: float
+                    Convergence criteria for the L1 problem.
+                    Minimum relative variation in the solution.
+                    Defaults to 1e-3.
+                tv_max_iter: int
+                    Maximum number of iterations when computing the proximity
+                    operator of the total variance norm.  Defaults to 50.
+                tv_verbose: off|medium|high
+                    Verbosity when computing the proximity operator of the
+                    total variance norm.  Defaults to medium.
+                tv_relative_variation: float
+                    Convergence criteria when computing the proximity operator
+                    of the total variance norm.
+                    Minimum relative variation in the solution.
+                    Defaults to 1e-4.
+                tv_norm: bool
+                    Whether to use TV norm (defaults to False)
         """
         super(SDMM, self).__init__(**kwargs)
+        if 'rw_max_iter' not in kwargs: kwargs['rw_max_iter'] = 5
+        if 'rw_relative_variation' not in kwargs:
+            kwargs['rw_relative_variation'] = 1e-3
+        if 'tv_max_iter' not in kwargs: kwargs['tv_max_iter'] = 50
+        if 'tv_relative_variation' not in kwargs:
+            kwargs['tv_relative_variation'] = 1e-4
+        if 'tv_verbose' not in kwargs: kwargs['tv_verbose'] = 'medium'
+        self.rw = params.RW(**params.pass_along('rw', **kwargs))
+        """ Parameters related to the reweighting """
+        self.tv = params.TVProx(**params.pass_along('tv', **kwargs))
+        """ Parameters related to the TV problem """
+        self.reweighted = kwargs.pop('reweighted', False) == True
+        self.tv_norm = kwargs.get('tv_norm', False)
 
+    def measurement_operator(self, visibility):
+        """ Measurement operator used when purifying """
+        return MeasurementOperator( visibility, self.image_size,
+                                    self.oversampling, self.interpolation )
     @params.apply_params
     def __call__(self, visibility, image=None, weights=None):
         """ Computes image from input visibility.
@@ -135,55 +267,63 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
 
         # Create missing weights and image objects if needed. Check they are
         # correct otherwise.
-        dtype = visibility['y'].values.dtype
+        image = self._get_image(image, visibility['y'].values.dtype)
+        if not self.reweighted: weights = self._get_weight(weights)
+        elif weights is not None:
+            msg = "weights input are not meaningfull in reweighted scheme"
+            raise ValueError(msg)
+
+        # Defined as C variable so that it's c member functions are accesible
+        cdef MeasurementOperator measurements \
+                = self.measurement_operator(visibility)
+        # define all common C objects
+        cdef:
+            double scale = sqrt(image.size) / sqrt(len(visibility))
+            _VoidedData forward_data = measurements.forward_voided_data(scale)
+            _VoidedData adjoint_data = measurements.adjoint_voided_data(scale)
+
+            void **datafwd = forward_data.data()
+            void **dataadj = adjoint_data.data()
+
+        if self.tv_norm and self.reweighted:
+            _tv_rw_sdmm( self, measurements, visibility,
+                         image, image.shape, datafwd, dataadj,
+                         visibility['y'].values * scale )
+        elif self.tv_norm:
+            _tv_sdmm( self, measurements, visibility,
+                      image, image.shape, datafwd, dataadj,
+                      visibility['y'].values * scale,
+                      weights )
+        elif self.reweighted:
+            _l1_rw_sdmm( self, measurements, visibility,
+                         image, image.size, datafwd, dataadj,
+                         visibility['y'].values * scale )
+        else:
+            _l1_sdmm( self, measurements, visibility,
+                      image, image.size, datafwd, dataadj,
+                      visibility['y'].values * scale, weights )
+
+        return image
+
+
+    def _get_image(self, image, dtype):
+        """ Check/create input image """
+        from numpy import zeros
         if image is not None:
             if image.dtype != dtype: image = image.astype(dtype)
             if image.shape != self.image_size:
                 msg = "Shape of input image should be %s" % self.image_size
                 raise ValueError(msg)
         else: image = zeros(self.image_size, dtype=dtype, order='C')
+        return image
 
-        wshape = (len(self), ) + self.image_size
+    def _get_weight(self, weights):
+        """ Check/create input weights """
+        from numpy import ones
+        wshape = (2 if self.tv_norm else len(self), ) + self.image_size
         if weights is not None:
             if weights.dtype != 'double': weights = weights.astype('double')
             if weights.size != wshape:
-                raise ValueError('Weights should be of shape %s' % wshape)
-        else: weights = ones(wshape, dtype='double')
-
-        #
-        measurements = MeasurementOperator( visibility, self.image_size,
-                                            self.oversampling,
-                                            self.interpolation )
-        # Convert from python to C parameters
-        cdef sopt_l1_sdmmparam params
-        _convert_sdmm_params(&params, self, measurements, visibility)
-
-        # define all C objects
-        cdef double scale = sqrt(image.size) / sqrt(len(visibility))
-        scaled_visibility = visibility['y'].values * scale
-        cdef:
-            void* c_image = untyped_pointer_to_data(image)
-            void* c_visibility = untyped_pointer_to_data(scaled_visibility)
-            void* c_weights = untyped_pointer_to_data(weights)
-            void *c_wavelets
-            _VoidedData forward_data = measurements.forward_voided_data(scale)
-            _VoidedData adjoint_data = measurements.adjoint_voided_data(scale)
-
-            int Nr = len(self) * image.size
-            int Ny = len(visibility)
-            void **datafwd = forward_data.data()
-            void **dataadj = adjoint_data.data()
-        params.gamma *= scale
-
-        SparsityOperator.set_wavelet_pointer(self, &c_wavelets)
-
-        sopt_l1_sdmm(
-            c_image, image.size,
-            &purify_measurement_cftfwd, datafwd,
-            &purify_measurement_cftadj, dataadj,
-            &sopt_sara_synthesisop, &c_wavelets,
-            &sopt_sara_analysisop, &c_wavelets,
-            Nr, c_visibility, Ny, <double*>c_weights, params
-        )
-
-        return image
+                raise ValueError('The shape of the weights should be %s' % wshape)
+        else: weights = ones(wshape, dtype='double', order='C')
+        return weights

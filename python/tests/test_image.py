@@ -77,5 +77,5 @@ def test_change_pixels():
 
 
     # This should fail since pixels are always double
-    with assert_raises(ValueError) as exception:
-      image.pixels = [['a', 'a'], ['a', 'a']]
+    def f(): image.pixels = [['a', 'a'], ['a', 'a']]
+    assert_raises(ValueError, f)

@@ -114,7 +114,7 @@ cdef class MeasurementOperator:
         """
         _measurement_params(&self._params, len(visibility), dimensions, oversampling, interpolation)
 
-        self.kernels = kernels(visibility, dimensions, oversampling, interpolation)
+        self._kernels = kernels(visibility, dimensions, oversampling, interpolation)
         """ Interpolation and deconvolution kernels. """
 
         self._fftw_forward = Fourier2D(dimensions, oversampling, "forward", fftwflags)
@@ -137,6 +137,9 @@ cdef class MeasurementOperator:
                 (self._params.kx, self._params.ky)
             )
 
+    property kernels:
+        """ Interpolation and deconvolution kernels. """
+        def __get__(self): return self._kernels
 
     cpdef forward(self, image):
         """ Define measurement operator for continuous visibilities """
@@ -159,7 +162,8 @@ cdef class MeasurementOperator:
     cpdef adjoint(self, visibilities):
         """ Define adjoint measurement operator for continuous visibilities """
         from numpy import zeros
-        if len(visibilities) != self._params.nmeas: raise ValueError("Image is of incorrect size")
+        if len(visibilities) != self._params.nmeas:
+            raise ValueError("Visibility is of incorrect size")
         if visibilities.dtype != "complex": visibilities = visibilities.astype("complex")
 
         image = zeros(self.sizes.image, dtype="complex", order='C')

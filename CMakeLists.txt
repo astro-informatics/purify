@@ -17,13 +17,26 @@ get_gitref()
 # yeah, yeah it is GNU C, and others since for ever, but it was not part of the standard.
 include(AddC99Flags)
 
-option(tests          "Enable testing"                         on)
-option(openmp         "Enable OpenMP"                          off)
-option(python         "Enable python bindings"                 on)
+option(tests          "Enable testing"                                  on)
+option(openmp         "Enable OpenMP"                                   off)
+option(python         "Enable python bindings"                          on)
+option(dovirtualenv   "Enable use of virtual environment when testing"  on)
 
+# Extra parameters
+if(NOT DEFINED LIBRARY_INSTALL_PATH)
+    set(LIBRARY_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
+include(rpath)
 
 # include exernal dependencies
 include(dependencies)
+if(EXISTS "${EXTERNAL_ROOT}/lib/")
+    install(DIRECTORY "${EXTERNAL_ROOT}/lib/"
+        DESTINATION "${LIBRARY_INSTALL_PATH}"
+        PATTERN "pkgconfig" EXCLUDE
+        PATTERN "*.a" EXCLUDE
+    )
+endif()
 
 if(tests)  # Adds ctest
     enable_testing()

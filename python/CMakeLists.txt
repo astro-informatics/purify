@@ -2,9 +2,12 @@ if(python)
   include(TargetCopyFiles)
 
   set(PYPURIFY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/purify)
-  # Add location of purify package in build tree,
-  # so it can be found later on
-  add_to_python_path(${CMAKE_CURRENT_BINARY_DIR})
+
+  if(dovirtualenv)
+      # Add location of purify package in build tree,
+      # so it can be found later on
+      add_to_python_path(${CMAKE_CURRENT_BINARY_DIR})
+  endif()
 
   add_definitions("-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION")
 
@@ -26,11 +29,13 @@ if(python)
   ###############################
   file(GLOB PXD_HEADERS *.pxd)
   file(GLOB PYTHON_SOURCES *.py)
-  set(cython_modules visibility image sparse measurements fftw sparsity_ops sdmm)
-
 
   add_custom_target(copy)
   set(python_modules)
+  set(cython_modules
+      visibility image sparse measurements
+      fftw sparsity_ops sdmm cparams
+  )
   foreach(module ${cython_modules})
     add_cython_modules(${module}
       SOURCE purify.${module}.pyx
@@ -44,17 +49,34 @@ if(python)
   add_copy_files(copy FILES ${PYTHON_SOURCES} DESTINATION ${PYPURIFY_DIRECTORY})
   if(tests)
     # Files only needed in testing. Added here cos here is where the copy target is defined.
-    add_copy_files( copy GLOB ${PROJECT_SOURCE_DIR}/data/images/Coverages/*.vis
-                    DESTINATION ${PYPURIFY_DIRECTORY}/data/images/Coverages/ )
-    add_copy_files( copy GLOB ${PROJECT_SOURCE_DIR}/data/images/*.fits
-                    DESTINATION ${PYPURIFY_DIRECTORY}/data/images/ )
-    add_copy_files( copy GLOB ${PROJECT_SOURCE_DIR}/data/expected/*.fits
-                    DESTINATION ${PYPURIFY_DIRECTORY}/data/expected/ )
+    add_copy_files( copy GLOB "${PROJECT_SOURCE_DIR}/data/images/Coverages/*.vis"
+                    DESTINATION "${PYPURIFY_DIRECTORY}/data/images/Coverages/" )
+    add_copy_files( copy GLOB "${PROJECT_SOURCE_DIR}/data/images/*.fits"
+                    DESTINATION "${PYPURIFY_DIRECTORY}/data/images/" )
+    add_copy_files( copy GLOB "${PROJECT_SOURCE_DIR}/data/expected/*.fits"
+                    DESTINATION "${PYPURIFY_DIRECTORY}/data/expected/" )
+    add_copy_files( copy GLOB "${CMAKE_CURRENT_SOURCE_DIR}/tests/*fixtures.py"
+                    DESTINATION "${PYPURIFY_DIRECTORY}/tests/" )
+    install_python(
+        DIRECTORY "${PROJECT_SOURCE_DIR}/data/"
+        DESTINATION purify/data
+        FILES_MATCHING
+        PATTERN "images/Coverages/*.vis"
+        PATTERN "images/*.fits"
+        PATTERN "expected/*.fits"
+        PATTERN "test" EXCLUDE
+    )
   endif()
 
-  install_python(TARGETS ${python_modules} DESTINATION purify)
-  install_python(FILES ${PXD_HEADERS} DESTINATION purify/headers)
+  if(NOT dont_install_headers)
+      install_python(
+          FILES ${PXD_HEADERS}
+          DESTINATION purify/headers
+          COMPONENT dev
+      )
+  endif()
   install_python(FILES ${PYTHON_SOURCES} DESTINATION purify)
+  install_python(TARGETS ${python_modules} DESTINATION purify)
 endif()
 
 add_subdirectory(tests)

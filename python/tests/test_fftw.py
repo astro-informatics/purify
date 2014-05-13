@@ -38,6 +38,6 @@ def test_cycle_fftw():
     forward.data = expected
     forward.execute()
     backward.data = forward.data
-    backward.execute() 
+    backward.execute()
 
     assert_allclose(backward.data, expected * product(forward.data.shape))
