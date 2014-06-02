@@ -249,7 +249,7 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
         return MeasurementOperator( visibility, self.image_size,
                                     self.oversampling, self.interpolation )
     @params.apply_params
-    def __call__(self, visibility, image=None, weights=None):
+    def __call__(self, visibility, weights=None, image=None, scale=None):
         """ Computes image from input visibility.
 
             :Parameters:
@@ -259,6 +259,11 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
                 weights:
                     If present, an array of weights of shape
                     (len(self), ) + self.shape.
+                scale:
+                    Scaling factor applied to the visibility (and the deconvolution kernel).
+                    If None, it is set to :math:`\sqrt(l_p)/\sqrt(l_y)` where :math:`l_p` is the
+                    number of pixels in the image and :math:`l_y` the number of visibility
+                    measurements.
                 image:
                     If present, an initial solution. If the dtype is correct, it
                     will also contain the final solution.
@@ -278,9 +283,10 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
                 = self.measurement_operator(visibility)
         # define all common C objects
         cdef:
-            double scale = sqrt(image.size) / sqrt(len(visibility))
-            _VoidedData forward_data = measurements.forward_voided_data(scale)
-            _VoidedData adjoint_data = measurements.adjoint_voided_data(scale)
+            double c_scale = scale if scale is not None \
+                            else sqrt(image.size) / sqrt(len(visibility))
+            _VoidedData forward_data = measurements.forward_voided_data(c_scale)
+            _VoidedData adjoint_data = measurements.adjoint_voided_data(c_scale)
 
             void **datafwd = forward_data.data()
             void **dataadj = adjoint_data.data()
@@ -288,20 +294,20 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
         if self.tv_norm and self.reweighted:
             _tv_rw_sdmm( self, measurements, visibility,
                          image, image.shape, datafwd, dataadj,
-                         visibility['y'].values * scale )
+                         visibility['y'].values * c_scale )
         elif self.tv_norm:
             _tv_sdmm( self, measurements, visibility,
                       image, image.shape, datafwd, dataadj,
-                      visibility['y'].values * scale,
+                      visibility['y'].values * c_scale,
                       weights )
         elif self.reweighted:
             _l1_rw_sdmm( self, measurements, visibility,
                          image, image.size, datafwd, dataadj,
-                         visibility['y'].values * scale )
+                         visibility['y'].values * c_scale )
         else:
             _l1_sdmm( self, measurements, visibility,
                       image, image.size, datafwd, dataadj,
-                      visibility['y'].values * scale, weights )
+                      visibility['y'].values * c_scale, weights )
 
         return image
 
