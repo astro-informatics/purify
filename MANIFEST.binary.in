@@ -1,6 +1,6 @@
 # Declares files to include in python distribution
 
-include MANIFEST.in
+include MANIFEST.*.in
 include README.md
 include LICENSE.txt
 include setup.py
