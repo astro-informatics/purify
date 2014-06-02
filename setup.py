@@ -1,5 +1,4 @@
-from os.path import basename, dirname, join
-from os import getcwd
+from os.path import basename, dirname, join, abspath
 from setuptools import setup, Extension
 from distutils.command.build import build as dBuild
 from setuptools.command.install import install as dInstall
@@ -9,7 +8,7 @@ from setuptools.command.sdist import sdist as dSDist
 from setuptools.command.egg_info import egg_info as dEggInfo
 from distutils.dir_util import mkpath
 
-source_dir = getcwd()
+source_dir = dirname(abspath(__file__))
 package_dir = join(source_dir, 'pkg_install')
 mkpath(package_dir)
 
@@ -79,7 +78,7 @@ class Build(dBuild):
     def _configure(self, build_dir):
         from distutils import log
         from distutils.spawn import spawn
-        from os import chdir
+        from os import chdir, getcwd
 
         current_dir = getcwd()
         mkpath(build_dir)
@@ -98,7 +97,7 @@ class Build(dBuild):
     def _build(self, build_dir):
         from distutils import log
         from distutils.spawn import spawn
-        from os import chdir
+        from os import chdir, getcwd
 
         log.info("CMake: building in %s" % build_dir)
         current_dir = getcwd()
@@ -124,7 +123,7 @@ class Build(dBuild):
     def _install(self, build_dir, install_dir):
         from distutils import log
         from os.path import abspath
-        from os import chdir
+        from os import chdir, getcwd
 
         current_cwd = getcwd()
         build_dir = abspath(build_dir)
@@ -146,7 +145,7 @@ class Install(dInstall):
     def run(self):
         from distutils import log
         from os.path import abspath
-        from os import chdir
+        from os import chdir, getcwd
         self.distribution.run_command('build')
         current_cwd = getcwd()
         build_dir = join(dirname(abspath(__file__)), self.build_base)
