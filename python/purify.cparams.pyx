@@ -23,12 +23,12 @@ cdef void _convert_l1param( sopt_l1_sdmmparam* c_params, sdmm,
     else:
         scale = sqrt(nelements) / sqrt(float(len(visibility)))
         xout = measurements.adjoint(visibility)
-        if sdmm.tv_norm: c_params.gamma = 1e-3 * max(xout.real) * scale * scale
-        else: c_params.gamma = 1e-3 * max(sdmm.analyze(xout).real) * scale * scale
+        if sdmm.tv_norm: c_params.gamma = 1e-3 * max(xout.real) * scale
+        else: c_params.gamma = 1e-3 * max(sdmm.analyze(xout).real) * scale
     if sdmm.radius is not None: c_params.epsilon = sdmm.radius
     else:
         nvis = float(len(visibility))
-        sigma = _default_sigma(visibility)
+        sigma = _default_sigma(visibility) / scale
         c_params.epsilon = sqrt(nvis + 2.0 * sqrt(nvis)) * sigma \
                            / nvis * nelements
 
@@ -49,10 +49,11 @@ cdef void _convert_rwparams( sopt_l1_rwparam *c_params, sdmm,
     if sdmm.rw.sigma is not None: c_params.sigma = sdmm.rw.sigma
     elif c_params.init_sol == 1: c_params.sigma = 0
     else:
-        nelements = float(product(measurements.sizes.image) * len(sdmm))
+        scale = sqrt(float(product(measurements.sizes.image)) / float(len(visibility)))
+        nelements = float(product(measurements.sizes.image))
         nvis = float(len(visibility))
-        sigma = _default_sigma(visibility)
-        c_params.sigma = sigma * sqrt(nvis / nelements)
+        c_params.sigma = _default_sigma(visibility) \
+                * nvis / nelements / sqrt(len(float(sdmm)))
 
 cdef void _convert_tvparam( sopt_tv_sdmmparam* c_params, sdmm,
                             MeasurementOperator measurements,
