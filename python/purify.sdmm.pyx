@@ -58,7 +58,7 @@ cdef void _l1_sdmm( self, measurements, visibility, _image, int _image_size,
         void* c_image = untyped_pointer_to_data(_image)
         void* c_visibility = untyped_pointer_to_data(_visibility)
         int Nr = len(self) * _image_size
-    _convert_l1param(&sdparams, self, measurements, visibility)
+    _convert_l1param(&sdparams, self, measurements, visibility['y'].values)
     SparsityOperator.set_wavelet_pointer(self, &c_wavelets)
 
     sopt_l1_sdmm(
@@ -67,7 +67,7 @@ cdef void _l1_sdmm( self, measurements, visibility, _image, int _image_size,
         &purify_measurement_cftadj, _dataadj,
         &sopt_sara_synthesisop, &c_wavelets,
         &sopt_sara_analysisop, &c_wavelets,
-        Nr, c_visibility, len(visibility),
+        Nr, c_visibility, len(_visibility),
         c_weights, sdparams
     )
 
@@ -82,8 +82,8 @@ cdef void _l1_rw_sdmm( self, measurements, visibility, _image,
         int Nr = len(self) * _image_size
         void* c_image = untyped_pointer_to_data(_image)
         void* c_visibility = untyped_pointer_to_data(_visibility)
-    _convert_l1param(&sdparams, self, measurements, visibility)
-    _convert_rwparams(&rwparams, self, measurements, visibility)
+    _convert_l1param(&sdparams, self, measurements, visibility['y'].values)
+    _convert_rwparams(&rwparams, self, measurements, visibility['y'].values)
     SparsityOperator.set_wavelet_pointer(self, &c_wavelets)
 
     sopt_l1_rwsdmm(
@@ -92,7 +92,7 @@ cdef void _l1_rw_sdmm( self, measurements, visibility, _image,
         &purify_measurement_cftadj, _dataadj,
         &sopt_sara_synthesisop, &c_wavelets,
         &sopt_sara_analysisop, &c_wavelets,
-        Nr, c_visibility, len(visibility),
+        Nr, c_visibility, len(_visibility),
         sdparams, rwparams
     )
 
@@ -109,13 +109,13 @@ cdef void _tv_sdmm( self, measurements, visibility,
         double *yweights_ptr = <double*> &c_weights[stride]
         void* c_image = untyped_pointer_to_data(_image)
         void* c_visibility = untyped_pointer_to_data(_visibility)
-    _convert_tvparam(&sdparams, self, measurements, visibility)
+    _convert_tvparam(&sdparams, self, measurements, visibility['y'].values)
 
     sopt_tv_sdmm(
         c_image, _image_shape[0], _image_shape[1],
         &purify_measurement_cftfwd, _datafwd,
         &purify_measurement_cftadj, _dataadj,
-        c_visibility, len(visibility),
+        c_visibility, len(_visibility),
         xweights_ptr, yweights_ptr, sdparams
     )
 
@@ -127,15 +127,15 @@ cdef void _tv_rw_sdmm(self, measurements, visibility, _image, _image_shape,
         sopt_tv_rwparam rwparams
         void* c_image = untyped_pointer_to_data(_image)
         void* c_visibility = untyped_pointer_to_data(_visibility)
-    _convert_tvparam(&sdparams, self, measurements, visibility)
+    _convert_tvparam(&sdparams, self, measurements, visibility['y'].values)
     _convert_rwparams(<sopt_l1_rwparam*>&rwparams, self, measurements,
-                      visibility)
+                      visibility['y'].values)
 
     sopt_tv_rwsdmm(
         c_image, _image_shape[0], _image_shape[1],
         &purify_measurement_cftfwd, _datafwd,
         &purify_measurement_cftadj, _dataadj,
-        c_visibility, len(visibility),
+        c_visibility, len(_visibility),
         sdparams, rwparams
     )
 
