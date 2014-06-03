@@ -1,4 +1,4 @@
-from purify.measurements cimport MeasurementOperator
+from purify.sensing cimport SensingOperator
 cdef extern from "sopt_l1.h":
     # Parameters for solving the l1 optimisation problem using SDMM.
     # Must have the same order as the C structure.
@@ -57,13 +57,13 @@ cdef extern from "sopt_tv.h":
 
 # Populates C parameter structures from python
 cdef void _convert_l1param( sopt_l1_sdmmparam* c_params, sdmm,
-                            MeasurementOperator measurements,
+                            SensingOperator sensing_op,
                             visibility ) except *
 cdef void _convert_rwparams( sopt_l1_rwparam *c_params, sdmm,
-        MeasurementOperator measurements, visibility ) except *
+        SensingOperator sensing_op, visibility ) except *
 cdef void _convert_tvparam( sopt_tv_sdmmparam* c_params, sdmm,
-                            MeasurementOperator measurements,
+                            SensingOperator sensing_op,
                             visibility ) except *
 
-# Computes default sigma value from measurements
-cdef double _default_sigma(measurements) except *
+# Computes default sigma value from visibilities
+cdef double _default_sigma(visibilities) except *

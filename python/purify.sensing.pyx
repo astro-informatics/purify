@@ -13,10 +13,10 @@ cdef extern from "purify_measurement.h":
             _MeasurementParams *param
     )
 
-cdef void _measurement_params( _MeasurementParams *_params, int _nmeasurements,
+cdef void _sensing_params( _MeasurementParams *_params, int _nvis,
                                _image, _oversampling, _interpolation ):
-    """ Fills measurement parameter structure. """
-    _params.nmeas = _nmeasurements
+    """ Fills sensing parameter structure. """
+    _params.nmeas = _nvis
     _params.ny1, _params.nx1 = _image
     _params.ofy, _params.ofx = _oversampling
     _params.ky, _params.kx = _interpolation
@@ -59,7 +59,7 @@ def kernels(visibility, dimensions, oversampling, interpolation):
         double[::1] u = visibility['u'].values
         double[::1] v = visibility['v'].values
 
-    _measurement_params( &params, len(visibility), dimensions, oversampling,
+    _sensing_params( &params, len(visibility), dimensions, oversampling,
         interpolation )
 
     purify_measurement_init_cft(&sparse, c_deconvolution,  &u[0], &v[0], &params)
@@ -71,12 +71,12 @@ def kernels(visibility, dimensions, oversampling, interpolation):
     return Kernel(interpolation_kernel, deconvolution_kernel)
 
 # Forward declaration so we can bind the parent argument of _VoidedData.__init__
-cdef class MeasurementOperator
+cdef class SensingOperator
 
 cdef class _VoidedData:
     """ Holds voided data needed by the purify_measurement_cft*. """
 
-    def __init__(self, MeasurementOperator parent not None, is_forward, scale=None):
+    def __init__(self, SensingOperator parent not None, is_forward, scale=None):
         """ Initializes void structure with info needed by C library """
         self.deconvolution = parent.kernels.deconvolution if scale is None \
                              else parent.kernels.deconvolution * scale
@@ -94,11 +94,11 @@ cdef class _VoidedData:
 
 
 
-cdef class MeasurementOperator:
+cdef class SensingOperator:
     """ Forward and adjoint measurement operators for continuous visibilities """
     def __init__( self, visibility, dimensions, oversampling, interpolation,
                   fftwflags = "measure" ):
-        """ Creates measurements.
+        """ Creates sensing operator
 
             :Parameters:
                 Should contain two column, 'u' and 'v'. It needs not be a full visibility dataframe.
@@ -112,25 +112,29 @@ cdef class MeasurementOperator:
                     Any combination of flags to define the FFTW transforms. See
                     `purify.fftw.Fourier2D`.
         """
-        _measurement_params(&self._params, len(visibility), dimensions, oversampling, interpolation)
+        _sensing_params(&self._params, len(visibility),
+                dimensions, oversampling, interpolation)
 
-        self._kernels = kernels(visibility, dimensions, oversampling, interpolation)
+        self._kernels = kernels(visibility, dimensions,
+                oversampling, interpolation)
         """ Interpolation and deconvolution kernels. """
 
-        self._fftw_forward = Fourier2D(dimensions, oversampling, "forward", fftwflags)
+        self._fftw_forward = Fourier2D(dimensions,
+                oversampling, "forward", fftwflags)
         """ Forward fourier transform object """
-        self._fftw_backward = Fourier2D(dimensions, oversampling, "backward", fftwflags)
+        self._fftw_backward = Fourier2D(dimensions,
+                oversampling, "backward", fftwflags)
         """ Backward fourier transform object """
 
     property sizes:
         """ Different sizes involved in the problem """
         def __get__(self):
             from collections import namedtuple
-            MeasurementSizes = namedtuple(
-                'MeasurementSizes',
+            SensingOperatorSizes = namedtuple(
+                'SensingOperatorSizes',
                 ['measurements', 'image', 'oversampling', 'interpolation']
             )
-            return MeasurementSizes(
+            return SensingOperatorSizes(
                 self._params.nmeas,
                 (self._params.ny1, self._params.nx1),
                 (self._params.ofy, self._params.ofx),
@@ -142,7 +146,7 @@ cdef class MeasurementOperator:
         def __get__(self): return self._kernels
 
     cpdef forward(self, image):
-        """ Define measurement operator for continuous visibilities """
+        """ From image to visibility domain """
         from numpy import zeros
         if image.shape != self.sizes.image: raise ValueError("Image is of incorrect size")
         if image.dtype != "complex": image = image.astype("complex")
@@ -160,7 +164,7 @@ cdef class MeasurementOperator:
 
 
     cpdef adjoint(self, visibilities):
-        """ Define adjoint measurement operator for continuous visibilities """
+        """ From visibility to image domain """
         from numpy import zeros
         if len(visibilities) != self._params.nmeas:
             raise ValueError("Visibility is of incorrect size")

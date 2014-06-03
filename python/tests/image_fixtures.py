@@ -24,12 +24,12 @@ def image_and_visibilities(name='30dor'):
 
         Creates dirty visibility by adding noise to standard file.
     """
-    from purify import read_visibility, read_image, MeasurementOperator as MO
+    from purify import read_visibility, read_image, SensingOperator as SO
 
     visibility = read_visibility(visibility_files[name])
     image = read_image(image_files[name])
-    measurements = MO(visibility, image.shape, (2, 2), (24, 24))
-    visibility['y0'] = measurements.forward(image)
+    sensing_op = SO(visibility, image.shape, (2, 2), (24, 24))
+    visibility['y0'] = sensing_op.forward(image)
     return image, visibility
 
 

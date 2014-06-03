@@ -26,7 +26,7 @@ cdef class _VoidedData:
         object deconvolution
     cdef void** data(self)
 
-cdef class MeasurementOperator:
+cdef class SensingOperator:
     cdef:
         _MeasurementParams _params
         Fourier2D _fftw_forward

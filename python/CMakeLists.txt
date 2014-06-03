@@ -33,7 +33,7 @@ if(python)
   add_custom_target(copy)
   set(python_modules)
   set(cython_modules
-      visibility image sparse measurements
+      visibility image sparse sensing
       fftw sparsity_ops sdmm cparams
   )
   foreach(module ${cython_modules})

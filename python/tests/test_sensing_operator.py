@@ -31,9 +31,9 @@ def test_deconvolution_kernel():
 
 
 def visibility_image_operator():
-    """ Fixture: visibility, image, and measurement operator. """
+    """ Fixture: visibility, image, and sensing operator. """
     from os.path import join, dirname
-    from purify import MeasurementOperator, read_visibility, Image, \
+    from purify import SensingOperator, read_visibility, Image, \
                        __file__ as path
 
     visibility_path = join(dirname(path), "data", "images",
@@ -50,19 +50,19 @@ def visibility_image_operator():
            nearest_power_of_two(image.shape[1])
     oversampling = 2, 2
     interpol = 4, 4
-    operator = MeasurementOperator(visibility, dims, oversampling, interpol)
+    sensing_op = SensingOperator(visibility, dims, oversampling, interpol)
 
-    return visibility, image, operator
+    return visibility, image, sensing_op
 
 
-def test_harden_forward_measurement_operator():
+def test_harden_forward_sensing_operator():
     from nose.tools import assert_almost_equal
     from numpy import mean, max, min
     from numpy.testing import assert_allclose
 
-    _, image, operator = visibility_image_operator()
+    _, image, sensing_op = visibility_image_operator()
 
-    actual = operator.forward(image.pixels)
+    actual = sensing_op.forward(image.pixels)
     expected = [2.03724422e-04 + 4.15991536e-04j,
                 1.08735157e-03 - 6.79113430e-03j,
                -1.60430819e-02 + 1.60710447e-01j,
@@ -84,15 +84,15 @@ def test_harden_forward_measurement_operator():
     assert_almost_equal(min(actual), -0.956794022954+0.893428684183j)
 
 
-def test_harden_adjoint_measurement_operator():
+def test_harden_adjoint_sensing_operator():
     from nose.tools import assert_almost_equal
     from numpy import mean, max, min
     from numpy.testing import assert_allclose
 
-    _, image, operator = visibility_image_operator()
+    _, image, sensing_op = visibility_image_operator()
 
-    visibility = operator.forward(image.pixels)
-    actual = operator.adjoint(visibility)
+    visibility = sensing_op.forward(image.pixels)
+    actual = sensing_op.adjoint(visibility)
 
     expected = [[ 0.01558801 + 0.00076014j, -0.00089624 + 0.00424112j,
                   0.00616964 - 0.01035894j, -0.00577823 + 0.00277242j],
