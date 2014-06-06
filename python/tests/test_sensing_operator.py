@@ -108,3 +108,96 @@ def test_harden_adjoint_sensing_operator():
     assert_almost_equal(mean(actual), 0.000481266445518+0.000282571620767j)
     assert_almost_equal(max(actual), 0.0911069005447-0.0129906262887j)
     assert_almost_equal(min(actual), -0.0168798725996-0.000672209789272j)
+
+
+def check_input_conversion(visibility, name, itis, expected, dtype):
+    """ Checks the argument is converted as expected """
+    from nose.tools import assert_equal, assert_true
+    from numpy import array, any, abs
+    from numpy.testing import assert_allclose
+    from copy import deepcopy
+    from purify.sensing import visibility_column_as_numpy_array as vcana
+
+    result = vcana(name, visibility)
+    assert_equal(result.dtype, dtype)
+    assert_allclose(result, expected)
+
+    copyme = deepcopy(expected)
+    expected[:] = (1.0 + array(expected, dtype=dtype) ** 0.5)[:]
+    if itis: assert_allclose(result, expected)
+    else: assert_true(any(abs(result - expected) > 1e-5))
+    
+    expected[:] = copyme
+
+
+def test_input_conversion_dataframe():
+    """ Input can be dataframe """
+    from numpy import array
+    from pandas import DataFrame
+
+    vis = DataFrame({
+        'u': [0, 1, 2, 3, 4],
+        'v': [0.0, 1, 2, 3, 4],
+        'y': [1j, 1., 2, 3, 4],
+    })
+
+    yield check_input_conversion, vis, 'u', False, vis['u'].values, 'double'
+    yield check_input_conversion, vis, 'v', True, vis['v'].values, 'double'
+    yield check_input_conversion, vis, 'y', True, vis['y'].values, 'complex'
+
+    vis['y'] = array([1.0, 5.0, 6.0, 7, 78], dtype='double')
+    yield check_input_conversion, vis, 'y', True, vis['y'].values, 'double'
+
+def test_input_conversion_dictionary():
+    """ Input can be dictionary """
+    from numpy import array
+    vis = {
+        'u': [0, 1, 2, 3, 4],
+        'v': [0.0, 1, 2, 3, 4],
+        'y': [1j, 1., 2, 3, 4],
+    }
+
+    yield check_input_conversion, vis, 'u', False, vis['u'], 'double'
+    yield check_input_conversion, vis, 'v', False, vis['v'], 'double'
+    yield check_input_conversion, vis, 'y', False, vis['y'], 'complex'
+
+    vis['u'] = array(vis['u'], dtype='double')
+    vis['y'] = array([1.0, 5.0, 6.0, 7, 78], dtype='double')
+    yield check_input_conversion, vis, 'u', True, vis['u'], 'double'
+    yield check_input_conversion, vis, 'y', True, vis['y'], 'double'
+
+def test_input_conversion_sequence():
+    """ Input can be a sequence """
+    from numpy import array
+    vis = ([0, 1, 2, 3, 4], [0.0, 1, 2, 3, 4], [1j, 1., 2, 3, 4])
+
+    yield check_input_conversion, vis, 'u', False, vis[0], 'double'
+    yield check_input_conversion, vis, 'v', False, vis[1], 'double'
+    yield check_input_conversion, vis, 'y', False, vis[2], 'complex'
+
+    vis = (
+        array(vis[0], dtype='double'),
+        vis[1],
+        array([1.0, 5.0, 6.0, 7, 78], dtype='double')
+    )
+    yield check_input_conversion, vis, 'u', True, vis[0], 'double'
+    yield check_input_conversion, vis, 'y', True, vis[2], 'double'
+
+def test_input_conversion_numpy_array():
+    """ Input can be a homogeneous numpy array """
+    from numpy import array
+    vis = array([[0, 1, 2, 3, 4], [0.0, 1, 2, 3, 4], [1, 1., 2, 3, 4]])
+
+    yield check_input_conversion, vis, 'u', True, vis[0], 'double'
+    yield check_input_conversion, vis, 'v', True, vis[1], 'double'
+    yield check_input_conversion, vis, 'y', True, vis[2], 'double'
+
+def test_input_conversion_numpy_record():
+    """ Input can be a numpy record array """
+    from numpy import array
+    vis = array([(0, 0, 1j), (1.5, 1.6, 1.6), (5, 4, 3), (2, 1, 1.5+2j)],
+            dtype=[('u', 'double'), ('v', 'double'), ('y', 'complex')])
+
+    yield check_input_conversion, vis, 'u', True, vis['u'], 'double'
+    yield check_input_conversion, vis, 'v', True, vis['v'], 'double'
+    yield check_input_conversion, vis, 'y', True, vis['y'], 'complex'

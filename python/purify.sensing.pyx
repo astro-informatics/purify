@@ -21,6 +21,34 @@ cdef void _sensing_params( _MeasurementParams *_params, int _nvis,
     _params.ofy, _params.ofx = _oversampling
     _params.ky, _params.kx = _interpolation
 
+def visibility_column_as_numpy_array(name, visibility):
+    """ Makes sure arguments are numpy arrays, or convert them
+
+        This function avoids copies whenever possible.
+        The U, V, and Y components should be available from the visibility as
+        indices 'u', 'v', 'y', or 0, 1, 2. The string format is tried first.
+
+        If the input column of interest is complex, then a complex numpy aray
+        is returned. Otherwise an array of doubles is returned. Complex/real
+        arrays with other precision (single, quad...) are converted to double
+        precision.
+    """
+    from numpy import array, iscomplex, any
+    # Input name should be explicit, rather than a number
+    names = {'u': 0, 'v': 1, 'y': 2}
+    assert name in names.keys()
+
+    try: arg = visibility[name]
+    except: arg = visibility[names[name]]
+
+    # Goes from columns of dataframes to numpy arrays
+    arg = getattr(arg, 'values', arg)
+    # Convert to expected type, unless None
+    if not hasattr(arg, 'dtype'):
+        arg = array(arg, dtype='complex' if any(iscomplex(arg)) else 'double')
+    elif arg.dtype not in ['complex', 'double']:
+        arg = arg.astype('complex' if any(iscomplex(arg)) else 'double')
+    return arg
 
 def kernels(visibility, dimensions, oversampling, interpolation):
     """ Creates interpolation and deconvolution kernels
@@ -28,7 +56,9 @@ def kernels(visibility, dimensions, oversampling, interpolation):
         :Parameters:
             visibility: pandas.Dataframe
                 Should contain two column, 'u' and 'v'. It needs not be a full
-                visibility dataframe.
+                visibility dataframe.  It can also be a dictionary with 'u' and
+                'v' items. Finally, it can be a sequence of two arrays with 'u'
+                the first one and 'v' the second.
             dimensions: (int, int)
                 Size of the discrete image
             oversampling: (int, int)
@@ -45,10 +75,9 @@ def kernels(visibility, dimensions, oversampling, interpolation):
     """
     from collections import namedtuple
     from numpy import zeros, product
-    for name in ['u', 'v']:
-        if visibility[name].values.dtype != 'double':
-            msg = "Visibility['%s'] should be composed of doubles." % name
-            raise TypeError(msg)
+
+    py_u = visibility_column_as_numpy_array('u', visibility)
+    py_v = visibility_column_as_numpy_array('v', visibility)
 
     deconvolution_kernel = zeros(dimensions, dtype='double', order="C")
     cdef:
@@ -56,13 +85,14 @@ def kernels(visibility, dimensions, oversampling, interpolation):
         _SparseMatRow sparse
         double* c_deconvolution = <double*>\
             untyped_pointer_to_data(deconvolution_kernel)
-        double[::1] u = visibility['u'].values
-        double[::1] v = visibility['v'].values
+        double[::1] c_u = py_u
+        double[::1] c_v = py_v
 
-    _sensing_params( &params, len(visibility), dimensions, oversampling,
+    _sensing_params( &params, len(py_u), dimensions, oversampling,
         interpolation )
 
-    purify_measurement_init_cft(&sparse, c_deconvolution,  &u[0], &v[0], &params)
+    purify_measurement_init_cft(&sparse, c_deconvolution,
+            &c_u[0], &c_v[0], &params)
 
     interpolation_kernel = _convert_sparsemat(&sparse).copy()
     purify_sparsemat_freer(&sparse)
@@ -70,13 +100,14 @@ def kernels(visibility, dimensions, oversampling, interpolation):
     Kernel = namedtuple('Kernel', ['interpolation', 'deconvolution'])
     return Kernel(interpolation_kernel, deconvolution_kernel)
 
-# Forward declaration so we can bind the parent argument of _VoidedData.__init__
+# Forward declaration so we can bind the parent
+# argument of _VoidedData.__init__
 cdef class SensingOperator
 
 cdef class _VoidedData:
     """ Holds voided data needed by the purify_measurement_cft*. """
 
-    def __init__(self, SensingOperator parent not None, is_forward, scale=None):
+    def __init__(self, SensingOperator parent not None, forward, scale=None):
         """ Initializes void structure with info needed by C library """
         self.deconvolution = parent.kernels.deconvolution if scale is None \
                              else parent.kernels.deconvolution * scale
@@ -85,7 +116,7 @@ cdef class _VoidedData:
         self._data[1] = untyped_pointer_to_data(self.deconvolution)
         self._data[2] = <void *> &self._c_sparse
 
-        if is_forward: parent._fftw_forward.set_ccall(&self._data[3])
+        if forward: parent._fftw_forward.set_ccall(&self._data[3])
         else: parent._fftw_backward.set_ccall(&self._data[3])
 
     cdef void** data(self):
@@ -95,13 +126,15 @@ cdef class _VoidedData:
 
 
 cdef class SensingOperator:
-    """ Forward and adjoint measurement operators for continuous visibilities """
+    """ Forward and adjoint sensing operators for continuous visibilities """
     def __init__( self, visibility, dimensions, oversampling, interpolation,
                   fftwflags = "measure" ):
         """ Creates sensing operator
 
             :Parameters:
-                Should contain two column, 'u' and 'v'. It needs not be a full visibility dataframe.
+                visibility: pandas.Dataframe
+                    Should contain two column, 'u' and 'v'. It needs not be a
+                    full visibility dataframe.
                 dimensions: (int, int)
                     Size of the discrete image
                 oversampling: (int, int)
@@ -112,10 +145,13 @@ cdef class SensingOperator:
                     Any combination of flags to define the FFTW transforms. See
                     `purify.fftw.Fourier2D`.
         """
-        _sensing_params(&self._params, len(visibility),
+        py_u = visibility_column_as_numpy_array('u', visibility)
+        py_v = visibility_column_as_numpy_array('v', visibility)
+
+        _sensing_params(&self._params, len(py_u),
                 dimensions, oversampling, interpolation)
 
-        self._kernels = kernels(visibility, dimensions,
+        self._kernels = kernels((py_u, py_v), dimensions,
                 oversampling, interpolation)
         """ Interpolation and deconvolution kernels. """
 
@@ -148,7 +184,8 @@ cdef class SensingOperator:
     cpdef forward(self, image):
         """ From image to visibility domain """
         from numpy import zeros
-        if image.shape != self.sizes.image: raise ValueError("Image is of incorrect size")
+        if image.shape != self.sizes.image:
+            raise ValueError("Image is of incorrect size")
         if image.dtype != "complex": image = image.astype("complex")
 
         visibilities = zeros(self._params.nmeas, dtype="complex", order='C')
@@ -168,7 +205,8 @@ cdef class SensingOperator:
         from numpy import zeros
         if len(visibilities) != self._params.nmeas:
             raise ValueError("Visibility is of incorrect size")
-        if visibilities.dtype != "complex": visibilities = visibilities.astype("complex")
+        if visibilities.dtype != "complex":
+            visibilities = visibilities.astype("complex")
 
         image = zeros(self.sizes.image, dtype="complex", order='C')
         cdef:

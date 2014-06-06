@@ -245,39 +245,51 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
 
     def sensing_operator(self, visibility):
         """ Measurement operator used when purifying """
-        return SensingOperator( visibility, self.image_size,
-                                    self.oversampling, self.interpolation )
+        return SensingOperator(visibility, self.image_size,
+                            self.oversampling, self.interpolation)
     @params.apply_params
     def __call__(self, visibility, weights=None, image=None, scale='default'):
         """ Computes image from input visibility.
 
             :Parameters:
                 visibility:
-                    A pandas dataframe with a 'u', 'v', 'w',
-                    'y' (visibility per se) columns
+                    U, V, W, and visibility data, in one of the following
+                    formats:
+
+                    - a pandas dataframe with a 'u', 'v', 'y' (visibility per
+                      se) columns
+                    - a dictionary with 'u', 'v', and 'y' keys
+                    - a seqence of three numpy arrays in the order 'u', 'v',
+                      'y'
+
                 weights:
                     If present, an array of weights of shape
                     (len(self), ) + self.shape.
                 scale:
-                    Scaling factor applied to the visibility (and the deconvolution kernel).
+                    Scaling factor applied to the visibility (and the
+                    deconvolution kernel).
 
-                    - If 'auto' or 'default', it is set to :math:`\sqrt(l_p)/\sqrt(l_y)` where
-                      :math:`l_p` is the number of pixels in the image and :math:`l_y` the number of
-                      visibility measurements.
+                    - If 'auto' or 'default', it is set to
+                      :math:`\sqrt(l_p)/\sqrt(l_y)` where :math:`l_p` is the
+                      number of pixels in the image and :math:`l_y` the number
+                      of visibility measurements.
                     - If 'None', 'none', or None, then no scaling is applied
                     - Otherwise, it should be a number
 
                 image:
-                    If present, an initial solution. If the dtype is correct, it
-                    will also contain the final solution, in order to avoid unnecessary memory
-                    allocation. However, this means that image may or may not be modified depending
-                    on how it is chosen.
+                    If present, an initial solution. If the dtype is correct,
+                    it will also contain the final solution, in order to avoid
+                    unnecessary memory allocation. However, this means that
+                    image may or may not be modified depending on how it is
+                    chosen.
         """
         from numpy import zeros, max, product, ones, sqrt
+        from purify.sensing import visibility_column_as_numpy_array
 
         # Create missing weights and image objects if needed. Check they are
         # correct otherwise.
-        image = self._get_image(image, visibility['y'].values.dtype)
+        y = visibility_column_as_numpy_array('y', visibility)
+        image = self._get_image(image, y.dtype)
         if not self.reweighted: weights = self._get_weight(weights)
         elif weights is not None:
             msg = "weights input are not meaningfull in reweighted scheme"
@@ -287,7 +299,7 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
         cdef SensingOperator sensing_op = self.sensing_operator(visibility)
         # define all common C objects
         if str(scale).lower() in ('auto', 'default'):
-            scale = sqrt(image.size) / sqrt(len(visibility))
+            scale = sqrt(image.size) / sqrt(len(y))
         elif scale is None and str(scale).lower() == 'none':
             scale = None
         else:
@@ -300,8 +312,7 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
             void **datafwd = forward_data.data()
             void **dataadj = adjoint_data.data()
 
-        if scale is not None:
-            scaled_visibility = visibility['y'].values * scale
+        if scale is not None: scaled_visibility = y * scale
 
         if self.tv_norm and self.reweighted:
             _tv_rw_sdmm( self, sensing_op, scaled_visibility,
@@ -339,6 +350,7 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
         if weights is not None:
             if weights.dtype != 'double': weights = weights.astype('double')
             if weights.size != wshape:
-                raise ValueError('The shape of the weights should be %s' % wshape)
+                message = 'The shape of the weights should be %s' % wshape
+                raise ValueError(message)
         else: weights = ones(wshape, dtype='double', order='C')
         return weights
