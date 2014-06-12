@@ -10,6 +10,7 @@ from distutils.dir_util import mkpath
 
 source_dir = dirname(abspath(__file__))
 package_dir = join(source_dir, 'pkg_install')
+long_description = open(join(dirname(__file__), 'README.rst'), 'r').read()
 mkpath(package_dir)
 
 def cmake_cache_line(variable, value, type='STRING'):
@@ -272,5 +273,5 @@ setup(
          'Topic :: Software Development :: Libraries :: Python Modules',
          'Topic :: Software Development :: Libraries :: Application Frameworks',
     ],
-    long_description = open(join(dirname(__file__), 'README.rst'), 'r').read()
+    long_description=long_description
 )
