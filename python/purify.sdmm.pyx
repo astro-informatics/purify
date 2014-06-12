@@ -253,7 +253,7 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
 
             :Parameters:
                 visibility:
-                    U, V, W, and visibility data, in one of the following
+                    U, V, Y, and visibility data, in one of the following
                     formats:
 
                     - a pandas dataframe with a 'u', 'v', 'y' (visibility per
@@ -338,8 +338,10 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
         if image is not None:
             if image.dtype != dtype: image = image.astype(dtype)
             if image.shape != self.image_size:
-                msg = "Shape of input image should be %s" % self.image_size
-                raise ValueError(msg)
+                raise ValueError(
+                    "Shape of input image should be %s, not %s." \
+                    % (str(self.image_size), str(image.shape))
+                )
         else: image = zeros(self.image_size, dtype=dtype, order='C')
         return image
 
@@ -350,7 +352,7 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
         if weights is not None:
             if weights.dtype != 'double': weights = weights.astype('double')
             if weights.size != wshape:
-                message = 'The shape of the weights should be %s' % wshape
+                message = 'The shape of the weights should be %s' % str(wshape)
                 raise ValueError(message)
         else: weights = ones(wshape, dtype='double', order='C')
         return weights
