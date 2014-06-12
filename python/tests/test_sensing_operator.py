@@ -126,7 +126,7 @@ def check_input_conversion(visibility, name, itis, expected, dtype):
     expected[:] = (1.0 + array(expected, dtype=dtype) ** 0.5)[:]
     if itis: assert_allclose(result, expected)
     else: assert_true(any(abs(result - expected) > 1e-5))
-    
+
     expected[:] = copyme
 
 
