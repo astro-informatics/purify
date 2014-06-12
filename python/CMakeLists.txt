@@ -27,6 +27,7 @@ if(python)
   ###############################
   file(GLOB PXD_HEADERS *.pxd)
   file(GLOB PYTHON_SOURCES *.py)
+  list(REMOVE_ITEM PYTHON_SOURCES task_purify_image.py)
 
   add_custom_target(copy)
   set(python_modules)
@@ -75,6 +76,12 @@ if(python)
   endif()
   install_python(FILES ${PYTHON_SOURCES} DESTINATION purify)
   install_python(TARGETS ${python_modules} DESTINATION purify)
+
+  add_copy_files(copy
+      FILES purify_image.xml task_purify_image.py
+      DESTINATION ${PROJECT_BINARY_DIR}/casa_task
+  )
+
 endif()
 
 add_subdirectory(tests)

@@ -173,6 +173,22 @@ class Install(dInstall):
             dInstall.run(self)
         finally: self.distribution.running_binary = prior
 
+        self.install_casa_task(pkg, build_dir)
+
+    def install_casa_task(self, install_dir, build_dir):
+        from os import environ, getcwd, chdir
+        from subprocess import call
+        if 'CASAPATH' not in environ: return
+
+        pwd = getcwd()
+        try:
+            chdir(join(build_dir, 'casa_task'))
+            task_dir = join(install_dir, "purify", "casa")
+            r = call(("buildmytasks -i=%s -o=task.py" % task_dir).split())
+            if r != 0: raise Exception("Could not build and install casa task")
+        finally: chdir(pwd)
+
+
 class BuildExt(dBuildExt):
     def __init__(self, *args, **kwargs):
         dBuildExt.__init__(self, *args, **kwargs)

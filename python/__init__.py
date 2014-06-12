@@ -2,6 +2,8 @@
 __docformat__ = "restructuredtext en"
 __all__ = ['read_visibility', 'Image', 'kernels', 'SensingOperator',
            'SparsityOperator', 'SDMM', 'read_image', 'RWSDMM']
+from os.path import exists, join, dirname
+
 from .visibility import read_visibility
 from .image import Image
 from .sensing import kernels, SensingOperator
@@ -29,3 +31,19 @@ def read_image(path, power_of_two=True):
         topleft[:image.shape[0], :image.shape[1]] = image
         image = topleft
     return topleft
+
+# Register casa task on import if:
+#     - this is an IPython session
+#     - this is a casapy session
+#     - the task has been built
+try:
+    from __builtin__ import __IPYTHON__
+    api = __IPYTHON__.getapi()
+    task_file = join(dirname(__file__), 'casa', 'task.py')
+    if 'casalog' in api.user_ns and exists(task_file):
+        execfile(task_file, api.user_ns)
+    # Clean-up purify namespace
+    del api
+    del task_file
+    del __IPYTHON__
+except ImportError: pass
