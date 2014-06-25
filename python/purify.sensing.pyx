@@ -204,7 +204,8 @@ cdef class SensingOperator:
         """ From visibility to image domain """
         from numpy import zeros
         if len(visibilities) != self._params.nmeas:
-            raise ValueError("Visibility is of incorrect size")
+            raise ValueError("Visibility is of incorrect size %s vs %s"
+                    % (len(visibilities), self._params.nmeas))
         if visibilities.dtype != "complex":
             visibilities = visibilities.astype("complex")
 

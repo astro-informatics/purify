@@ -5,7 +5,7 @@ cdef double _default_sigma(visibilities) except *:
     return norm(visibilities) * 10.0**-(1.5) / sqrt(nvis)
 
 cdef double guess_gamma_penalty(
-        sdmm, visibility, SensingOperator sensing_op ):
+        sdmm, visibility, SensingOperator sensing_op ) except *:
     """ Evaluates the convergence criteria from the input """
     from numpy import max, product, sqrt
     xout = sensing_op.adjoint(visibility)
@@ -16,8 +16,8 @@ cdef double guess_gamma_penalty(
         double gamma = max((xout if sdmm.tv_norm else sdmm.analyze(xout)).real)
     return  gamma * 1e-3 * scale
 
-cdef double guess_radius( sdmm, visibility,
-                SensingOperator sensing_op ):
+cdef double guess_radius(
+        sdmm, visibility, SensingOperator sensing_op) except *:
     from numpy import product, sqrt
     cdef double nvis = float(len(visibility))
     cdef double npixels = product(sensing_op.sizes.image)
@@ -25,8 +25,7 @@ cdef double guess_radius( sdmm, visibility,
     cdef double sigma = _default_sigma(visibility)
     return sqrt(nvis + 2.0 * sqrt(nvis)) * sigma
 
-cdef double guess_sigma( sdmm, visibility,
-                SensingOperator sensing_op ):
+cdef double guess_sigma(sdmm, visibility, SensingOperator sensing_op) except *:
     from numpy import product, sqrt
     cdef double nvis = float(len(visibility))
     cdef double npixels = product(sensing_op.sizes.image)
