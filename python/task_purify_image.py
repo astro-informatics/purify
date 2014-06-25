@@ -59,6 +59,7 @@ def _purify_image_impl(vis, imagename, imsize=None, datadescid=0,
             other arguments:
                 See purify.SDMM
     """
+    from os.path import exists, abspath
     from numpy import array
     from taskinit import gentools, casalog
     from purify.casa import purified_iterator
@@ -67,6 +68,13 @@ def _purify_image_impl(vis, imagename, imsize=None, datadescid=0,
     if 'image_size' in kwargs:
         msg = 'Image size should be given using the imsize argument'
         raise ValueError(msg)
+
+    imagename = abspath(imagename)
+    if exists(imagename):
+        msg = "File %s already exist. It will not be overwritten.\n" \
+                "Please delete the file or choose another filename for the" \
+                " image."
+        raise IOError(msg % imagename)
 
     casalog.post('Starting Purify task')
     iterator = purified_iterator(vis, channels=channels,
@@ -83,10 +91,8 @@ def _purify_image_impl(vis, imagename, imsize=None, datadescid=0,
     # Create image
     casalog.post('Creating CASA image')
     ia, = gentools(['ia'])
-    if image.dtype == 'complex':
-       ia.newimagefromarray(imagename + ".real", image.real)
-       ia.newimagefromarray(imagename + ".complex", image.imag)
-    else: ia.newimagefromarray(imagename, image)
+    # Only the real part is meaningful
+    ia.newimagefromarray(imagename, image.real)
 
 # Docstring same for CASA-awkward wrapper and actual implementation
 purify_image.__doc__ = _purify_image_impl.__doc__
