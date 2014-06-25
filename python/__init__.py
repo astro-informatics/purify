@@ -42,6 +42,9 @@ try:
     task_file = join(dirname(__file__), 'casa', 'task.py')
     if 'casalog' in api.user_ns and exists(task_file):
         execfile(task_file, api.user_ns)
+
+    from .casa import data_iterator, purified_iterator
+    __all__.extend(['data_iterator', 'purified_iterator'])
     # Clean-up purify namespace
     del api
     del task_file

@@ -17,7 +17,7 @@ file:///opt/casa/code/xmlcasa/xml/casa.xsd">
           <any type="variant" limittypes="string stringArray"/>
           <value type="string"></value>
         </param>
-        
+
         <param type="any" name="imagename">
           <description>Pre-name of output images</description>
           <any type="variant" limittypes="string stringArray"/>
@@ -34,38 +34,23 @@ file:///opt/casa/code/xmlcasa/xml/casa.xsd">
             <description>Data description ID</description>
             <value>0</value>
         </param>
-        <param type="string" name="stokes">
-            <description>Stokes params to image (eg I,IV,IQ,IQUV)</description>
-            <value>I</value>
-            <allowed kind="enum">
-                 <value>I</value>
-                 <value>Q</value>
-                 <value>U</value>
-                 <value>V</value>
-                 <value>IV</value>
-                 <value>IQ</value>
-                 <value>QU</value>
-                 <value>UV</value>
-                 <value>IQU</value>
-                 <value>IUV</value>
-                 <value>IQUV</value>
-                 <value>RR</value>
-                 <value>LL</value>
-                 <value>RRLL</value>
-                 <value>XX</value>
-                 <value>YY</value>
-                 <value>XXYY</value>
-            </allowed>
-        </param>
         <param name="ignoreW" type="bool">
             <description>Ignore value of W</description>
             <value>False</value>
         </param>
-        <param name="select" type="dict">
+        <param name="channels" type="intArray">
             <description>Data selection criteria</description>
             <value>None</value>
         </param>
-     
+        <param name="column" type="str">
+            <description>Column from which to get Y data</description>
+            <value>None</value>
+        </param>
+        <param name="width" type="float">
+            <description>Band-width of U and V (in meters). Defaults to max |U| and max |V| </description>
+            <value>None</value>
+        </param>
+
         <param type="int" name="nlevels">
             <description>Number of levels for each wavelet basis set</description>
             <value>4</value>
@@ -166,7 +151,7 @@ file:///opt/casa/code/xmlcasa/xml/casa.xsd">
             <value>False</value>
         </param>
    </input>
-   
+
    <returns type="void"/>
 
   <example>

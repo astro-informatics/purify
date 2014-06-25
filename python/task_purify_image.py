@@ -1,11 +1,11 @@
-def purify_image(vis, imagename, imsize=None, datadescid=0, 
-        ignoreW=False, select=None, nlevels=None, wavelets=None,
-        interpolation=None, oversampling=None, gamma=None, radius=None,
-        relative_radius=None, max_iter=None, relative_variation=None,
-        verbose=None, cg_max_iter=None, cg_tolerance=None, reweighted=None,
-        rw_max_iter=None, rw_verbose=None, rw_sigma=None,
-        rw_relative_variation=None, tv_max_iter=None, tv_verbose=None,
-        tv_relative_variation=None, tv_norm=None):
+def purify_image(vis, imagename, imsize=None, datadescid=0,
+        ignoreW=False, channels=None, column=None, width=None, nlevels=4,
+        wavelets=None, interpolation=None, oversampling=None, gamma=None,
+        radius=None, relative_radius=None, max_iter=None,
+        relative_variation=None, verbose=None, cg_max_iter=None,
+        cg_tolerance=None, reweighted=None, rw_max_iter=None, rw_verbose=None,
+        rw_sigma=None, rw_relative_variation=None, tv_max_iter=None,
+        tv_verbose=None, tv_relative_variation=None, tv_norm=None):
     """ Deals with CASA awkwardness
 
         Why do things once when you can do 'em twice and thrice as bad?
@@ -18,8 +18,8 @@ def purify_image(vis, imagename, imsize=None, datadescid=0,
     try:
         _purify_image_impl(
                 vis=vis, imagename=imagename, imsize=imsize,
-                datadescid=datadescid, ignoreW=ignoreW,
-                select=select, nlevels=nlevels, wavelets=wavelets,
+                datadescid=datadescid, ignoreW=ignoreW, channels=channels,
+                column=column, width=width, nlevels=nlevels, wavelets=wavelets,
                 interpolation=interpolation, oversampling=oversampling,
                 gamma=gamma, radius=radius, relative_radius=relative_radius,
                 max_iter=max_iter, relative_variation=relative_variation,
@@ -36,7 +36,7 @@ def purify_image(vis, imagename, imsize=None, datadescid=0,
         raise
 
 def _purify_image_impl(vis, imagename, imsize=None, datadescid=0,
-        ignoreW=False, select=None, **kwargs):
+        ignoreW=False, channels=None, column=None, **kwargs):
     """ Creates an image using the Purify method
 
         Parameters:
@@ -48,18 +48,20 @@ def _purify_image_impl(vis, imagename, imsize=None, datadescid=0,
                 Width and height of the output image in pixels
             datadescid: int
                 Integer selecting the subset of consistent data
-            select: dict
-                Dictionary with selection parameters
             ignoreW: boolean
                 W is not yet implemented. If W values are non-zero, the call
                 will fail unless this parameter is set
+            channels: [Int]
+                Channels for which to compute image
+            column:
+                Column to use for Y data. Defaults to 'CORRECTED_DATA' if
+                present, and 'DATA' otherwise.
             other arguments:
                 See purify.SDMM
     """
-    from itertools import product
-    from numpy import zeros
+    from numpy import array
     from taskinit import gentools, casalog
-    from purify import SDMM
+    from purify.casa import purified_iterator
 
     # Input sanitizing
     if 'image_size' in kwargs:
@@ -67,18 +69,16 @@ def _purify_image_impl(vis, imagename, imsize=None, datadescid=0,
         raise ValueError(msg)
 
     casalog.post('Starting Purify task')
-    y, u, v = _select_data(vis, datadescid, select, ignoreW, casalog)
+    iterator = purified_iterator(vis, channels=channels,
+            datadescid=datadescid, column=column, ignoreW=ignoreW, **kwargs)
 
     # Contains images over all dimensions
-    image = zeros(tuple(imsize) + y.shape[:-1], dtype=y.dtype, order='F')
+    image = []
+    for i, channel in enumerate(iterator):
+        casalog.origin('Purifying plane %s' % str(i))
+        image.append(channel)
 
-    # Now loop over chain non-image dimension
-    sdmm = SDMM(image_size=imsize, **kwargs)
-    for indices in product(*[range(x) for x in image.shape[2:]]):
-        casalog.origin('Purifying plane %s' % str(indices))
-        plane = image.T[indices[::-1]] # .T because CASA wants fortran array
-        sdmm((u, v, y[indices]), image=plane)
-
+    image = array(image, order='F')
 
     # Create image
     casalog.post('Creating CASA image')
@@ -90,36 +90,3 @@ def _purify_image_impl(vis, imagename, imsize=None, datadescid=0,
 
 # Docstring same for CASA-awkward wrapper and actual implementation
 purify_image.__doc__ = _purify_image_impl.__doc__
-
-def _select_data(vis, datadescid, select, ignoreW, casalog):
-    """ Open measurement set and select data """
-    from numpy import allclose, require
-    from taskinit import gentools, casalog
-
-    # open and select in ms
-    ms, tb = gentools(['ms', 'tb'])
-
-    casalog.post('Selecting data')
-    ms.open(vis)
-    ms.selectinit(datadescid)
-    if select is not None: ms.select(select)
-
-    # Check what's in the table
-    tb.open(vis)
-    columns = tb.colnames()
-
-    # Use CORRECTED_DATA by default
-    data_name = 'CORRECTED_DATA' if 'CORRECTED_DATA' in columns else 'DATA'
-    casalog.post('Using data from column %s' % data_name)
-    tables = [data_name,  'UVW']
-
-    # Now get the data
-    data = ms.getdata(tables)
-    y = data[data_name.lower()]
-    y = require(y, 'complex' if str(y.dtype)[:7] == 'complex' else 'double')
-    u, v, w = require(data['uvw'], 'double', 'C_CONTIGUOUS')
-
-    if not (ignoreW or allclose(w, 0)):
-        raise NotImplementedError('Cannot purify data with W components')
-
-    return y, u, v
