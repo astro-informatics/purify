@@ -4,8 +4,8 @@ __all__ = ['data_iterator']
 
 class DataTransform(object):
     """ Transforms measurement set to something purify understands """
-    def __init__(self, measurement_set, datadescid=0,
-            ignoreW=False, channels=None, width=None, column=None):
+    def __init__(self, measurement_set, datadescid=0, ignoreW=False,
+            channels=None, width=None, column=None, noscaling=False):
         """ Creates the transform
 
             :Parameters:
@@ -33,6 +33,8 @@ class DataTransform(object):
 
                     If None, defaults to the :math:`\max|u|` and
                     :math:`\max|v|`.
+                noscaling: bool
+                    Does not scale U, V to [-pi, pi[. Defaults to False.
         """
         super(DataTransform, self).__init__()
 
@@ -48,6 +50,8 @@ class DataTransform(object):
         """ By default, fails if W terms are not zero """
         self.width = width
         """ Width of the U, V bands """
+        self.noscaling = noscaling
+        """ Does not scale U, V to [-pi, pi[ """
 
     @property
     def spectral_window_id(self):
@@ -95,6 +99,7 @@ class DataTransform(object):
     def _convert(self, x):
         """ Normalizes x and puts is in interval [-pi, pi] """
         from numpy import pi, abs, max, fmod
+        if self.noscaling: return x
         width = self.width
         if width is None: width = max(abs(x))
         return fmod(x * pi / width, pi)
@@ -134,7 +139,7 @@ class DataTransform(object):
 
 def purified_iterator(measurement_set, imsize=(128, 128), datadescid=0,
             ignoreW=False, channels=None, column=None, width=None,
-            **kwargs):
+            noscaling=False, **kwargs):
     """ Iterates over purified channels
 
         Parameters:
@@ -162,10 +167,13 @@ def purified_iterator(measurement_set, imsize=(128, 128), datadescid=0,
                 This implies that width in the image domain is :math:`pi/w`.
 
                 If None, defaults to the :math:`\max|u|` and :math:`\max|v|`.
+            noscaling: bool
+                Does not scale U, V to [-pi, pi[. Defaults to False.
     """
     from . import SDMM
     iterator = data_iterator(measurement_set, channels=channels,
-            datadescid=datadescid, column=column, ignoreW=ignoreW, width=width)
+            datadescid=datadescid, column=column, ignoreW=ignoreW, width=width,
+            noscaling=noscaling)
     sdmm = SDMM(image_size=imsize, **kwargs)
 
     for u, v, y in iterator: yield sdmm((u, v, y))
