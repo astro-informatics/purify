@@ -44,7 +44,7 @@ class DataTransform(object):
         """ Data descriptor id for which to select data """
         self.channels = channels
         """ Channels over which to iterate. Defaults to all. """
-        self.column = self._get_column(column)
+        self.column = self._get_data_column_name(column)
         """ Name of the data column from which y is taken """
         self.ignoreW = ignoreW
         """ By default, fails if W terms are not zero """
@@ -53,21 +53,26 @@ class DataTransform(object):
         self.noscaling = noscaling
         """ Does not scale U, V to [-pi, pi[ """
 
+
+    def _get_table(self, name=None):
+        """ A table object """
+        from taskinit import gentools
+        tb, = gentools(['tb'])
+        if name == None: tb.open('%s' % self.measurement_set)
+        else: tb.open('%s/%s' % (self.measurement_set, name))
+        return tb
+
     @property
     def spectral_window_id(self):
         """ ID of the spectral window """
-        from taskinit import gentools
-        tb, = gentools(['tb'])
-        tb.open('%s/DATA_DESCRIPTION' % self.measurement_set)
-        return tb.getcol('SPECTRAL_WINDOW_ID')[self.datadescid]
+        return self._get_table('DATA_DESCRIPTION')\
+                .getcol('SPECTRAL_WINDOW_ID')[self.datadescid]
 
     @property
     def _all_frequencies(self):
         """ Frequencies (Hz) associated with each channel """
-        from taskinit import gentools
-        tb, = gentools(['tb'])
-        tb.open('%s/SPECTRAL_WINDOW' % self.measurement_set)
-        return tb.getcol('CHAN_FREQ')[:, self.spectral_window_id].squeeze()
+        return self._get_table('SPECTRAL_WINDOW')\
+                .getcol('CHAN_FREQ')[:, self.spectral_window_id].squeeze()
 
     @property
     def frequencies(self):
@@ -78,16 +83,13 @@ class DataTransform(object):
     def data(self):
         """ Data needed by Purify """
         from numpy import allclose, require
-        from taskinit import gentools
-        ms, = gentools(['ms'])
-        ms.open(self.measurement_set)
-        ms.selectinit()
-        ms.selectpolarization('I')
-        data = ms.getdata([self.column, 'UVW'])
-        y = data[self.column.lower()]
-        y = require(y, 'complex' if str(y.dtype)[:7] == 'complex' \
-                else 'double')
-        u, v, w = require(data['uvw'], 'double', 'C_CONTIGUOUS')
+        tb = self._get_table()\
+                .query( query = 'DATA_DESC_ID == 0',
+                        columns = "UVW, mscal.stokes(%s, 'I')" % self.column )
+        y = tb.getcol(tb.colnames()[-1]).squeeze()
+        y_is_complex = str(y.dtype)[:7] == 'complex'
+        y = require(y, 'complex' if y_is_complex else 'double')
+        u, v, w = require(tb.getcol('UVW'), 'double', 'C_CONTIGUOUS')
 
         if not (self.ignoreW or allclose(w, 0)):
             raise NotImplementedError('Cannot purify data with W components')
@@ -105,15 +107,9 @@ class DataTransform(object):
         return fmod(x * pi / width, pi)
 
 
-    def _get_column(self, column):
+    def _get_data_column_name(self, column):
         """ Name of the column to use for Y """
-        from taskinit import gentools
-
-        # open and select in ms
-        tb, = gentools(['tb'])
-        # Check what's in the table
-        tb.open(self.measurement_set)
-        columns = tb.colnames()
+        columns = self._get_table().colnames()
         if column is not None:
             if column not in columns:
                 raise ValueError('Unknown column %s' % column)
@@ -124,10 +120,7 @@ class DataTransform(object):
 
     def _get_channels(self, channels):
         """ Channels to use """
-        from taskinit import gentools
-        tb, = gentools(['tb'])
-        tb.open('%s/SPECTRAL_WINDOW' % self.measurement_set)
-        frequencies = tb.getcol('CHAN_FREQ')[:, self.spectral_window_id]
+        frequencies = self._all_frequencies
         if channels is None: return list(range(len(frequencies)))
         if hasattr(channels, '__iter__'): channels = list(channels)
         else: channels = [int(channels)]
