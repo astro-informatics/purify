@@ -1,6 +1,6 @@
 """ Functionality for interfacing CASA and Purify """
 __docformat__ = 'restructuredtext en'
-__all__ = ['data_iterator']
+__all__ = ['data_iterator', 'purified_iterator']
 
 class DataTransform(object):
     """ Transforms measurement set to something purify understands """
@@ -58,9 +58,17 @@ class DataTransform(object):
         """ A table object """
         from taskinit import gentools
         tb, = gentools(['tb'])
-        if name == None: tb.open('%s' % self.measurement_set)
+        if name is None: tb.open('%s' % self.measurement_set)
         else: tb.open('%s/%s' % (self.measurement_set, name))
         return tb
+
+    def _c_vs_fortran(self, value):
+        """ Function to derive in pyrap wrappers 
+        
+            Different indexing conventions are used in CASA(Fortran) and
+            pyrap(C).
+        """
+        return value
 
     @property
     def spectral_window_id(self):
@@ -86,10 +94,10 @@ class DataTransform(object):
         tb = self._get_table()\
                 .query( query = 'DATA_DESC_ID == 0',
                         columns = "UVW, mscal.stokes(%s, 'I')" % self.column )
-        y = tb.getcol(tb.colnames()[-1]).squeeze()
+        y = self._c_vs_fortran(tb.getcol(tb.colnames()[-1]).squeeze())
         y_is_complex = str(y.dtype)[:7] == 'complex'
         y = require(y, 'complex' if y_is_complex else 'double')
-        u, v, w = require(tb.getcol('UVW'), 'double', 'C_CONTIGUOUS')
+        u, v, w = self._c_vs_fortran(tb.getcol('UVW'))
 
         if not (self.ignoreW or allclose(w, 0)):
             raise NotImplementedError('Cannot purify data with W components')
@@ -100,7 +108,8 @@ class DataTransform(object):
 
     def _convert(self, x):
         """ Normalizes x and puts is in interval [-pi, pi] """
-        from numpy import pi, abs, max, fmod
+        from numpy import pi, abs, max, fmod, require
+        x = require(x, 'double')
         if self.noscaling: return x
         width = self.width
         if width is None: width = max(abs(x))
@@ -164,16 +173,23 @@ def purified_iterator(measurement_set, imsize=(128, 128), datadescid=0,
                 Does not scale U, V to [-pi, pi[. Defaults to False.
     """
     from . import SDMM
-    iterator = data_iterator(measurement_set, channels=channels,
-            datadescid=datadescid, column=column, ignoreW=ignoreW, width=width,
-            noscaling=noscaling)
+    iterator = data_iterator(
+            measurement_set, channels=channels, datadescid=datadescid,
+            column=column, ignoreW=ignoreW, width=width, noscaling=noscaling,
+            # Allows pyrap wrappers to use almost exact same code.
+            # However, it is a hack which likely should remain private and
+            # outside the actual signature of the function.
+            DataTransform=kwargs.pop('DataTransform', DataTransform)
+    )
     sdmm = SDMM(image_size=imsize, **kwargs)
 
     for u, v, y in iterator: yield sdmm((u, v, y))
 
 def data_iterator(*args, **kwargs):
     """ Iterates over channel data """
-    transform = DataTransform(*args, **kwargs)
+    # Can use a slightly different DataTransform object in pyrap interface
+    LocalDataTransform = kwargs.pop('DataTransform', DataTransform)
+    transform = LocalDataTransform(*args, **kwargs)
     u, v, y = transform.data
     for i in range(y.shape[-2]): yield u, v, y[..., i, :].squeeze()
 
