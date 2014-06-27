@@ -2,7 +2,7 @@ bin/
 lib/
 data/test/
 *.pyc
-.*.sw[p, o]
+.*.sw[p, o, n]
 *.egg*
 *build*/
 pkg_install/
