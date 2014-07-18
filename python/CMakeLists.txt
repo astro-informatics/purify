@@ -3,11 +3,9 @@ if(python)
 
   set(PYPURIFY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/purify)
 
-  if(dovirtualenv)
-      # Add location of purify package in build tree,
-      # so it can be found later on
-      add_to_python_path(${CMAKE_CURRENT_BINARY_DIR})
-  endif()
+  # Add location of purify package in build tree,
+  # so it can be found later on
+  add_to_python_path(${CMAKE_CURRENT_BINARY_DIR})
 
   add_definitions("-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION")
 
@@ -29,11 +27,12 @@ if(python)
   ###############################
   file(GLOB PXD_HEADERS *.pxd)
   file(GLOB PYTHON_SOURCES *.py)
+  list(REMOVE_ITEM PYTHON_SOURCES task_purify_image.py)
 
   add_custom_target(copy)
   set(python_modules)
   set(cython_modules
-      visibility image sparse measurements
+      visibility image sparse sensing
       fftw sparsity_ops sdmm cparams
   )
   foreach(module ${cython_modules})
@@ -77,6 +76,12 @@ if(python)
   endif()
   install_python(FILES ${PYTHON_SOURCES} DESTINATION purify)
   install_python(TARGETS ${python_modules} DESTINATION purify)
+
+  add_copy_files(copy
+      FILES purify_image.xml task_purify_image.py
+      DESTINATION ${PROJECT_BINARY_DIR}/casa_task
+  )
+
 endif()
 
 add_subdirectory(tests)

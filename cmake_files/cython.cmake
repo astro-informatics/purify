@@ -96,7 +96,6 @@ function(add_cython_modules TARGET)
   endif()
 
   add_python_module(${TARGET} ${CYMODULE_UNPARSED_ARGUMENTS} FILES ${OUTPUT_FILE})
-  add_dependencies(py${TARGET} ${OUTPUT_FILE})
   target_link_libraries(py${TARGET} ${TARGET_LIBRARIES})
 
 endfunction()

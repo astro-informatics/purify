@@ -44,7 +44,9 @@ cdef class SparsityOperator:
             else: wavelets = set([wavelets.lower()])
         else: wavelets = set([u.lower() for u in wavelets])
         if not (allwavelets  >= wavelets):
-            raise ValueError("Acceptable wavelets: %s" % allwavelets)
+            raise ValueError(
+                "Acceptable wavelets: %s (not %s)" % (allwavelets, wavelets)
+            )
         if len(wavelets) == 0:
             raise ValueError("Cannot create empty basis set")
 

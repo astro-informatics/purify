@@ -1,5 +1,5 @@
-from os.path import basename, dirname, join
-from os import getcwd
+from os.path import basename, dirname, join, abspath
+from os import chdir, getcwd
 from setuptools import setup, Extension
 from distutils.command.build import build as dBuild
 from setuptools.command.install import install as dInstall
@@ -9,8 +9,9 @@ from setuptools.command.sdist import sdist as dSDist
 from setuptools.command.egg_info import egg_info as dEggInfo
 from distutils.dir_util import mkpath
 
-source_dir = getcwd()
+source_dir = dirname(abspath(__file__))
 package_dir = join(source_dir, 'pkg_install')
+long_description = open(join(dirname(__file__), 'README.rst'), 'r').read()
 mkpath(package_dir)
 
 def cmake_cache_line(variable, value, type='STRING'):
@@ -79,7 +80,6 @@ class Build(dBuild):
     def _configure(self, build_dir):
         from distutils import log
         from distutils.spawn import spawn
-        from os import chdir
 
         current_dir = getcwd()
         mkpath(build_dir)
@@ -98,7 +98,6 @@ class Build(dBuild):
     def _build(self, build_dir):
         from distutils import log
         from distutils.spawn import spawn
-        from os import chdir
 
         log.info("CMake: building in %s" % build_dir)
         current_dir = getcwd()
@@ -118,13 +117,14 @@ class Build(dBuild):
         self._install(build_dir, package_dir)
         try:
             prior = getattr(self.distribution, 'running_binary', False)
+            self.distribution.running_binary = True
+            self.distribution.have_run['egg_info'] = 0
             dBuild.run(self)
         finally: self.distribution.running_binary = prior
 
     def _install(self, build_dir, install_dir):
         from distutils import log
         from os.path import abspath
-        from os import chdir
 
         current_cwd = getcwd()
         build_dir = abspath(build_dir)
@@ -146,7 +146,6 @@ class Install(dInstall):
     def run(self):
         from distutils import log
         from os.path import abspath
-        from os import chdir
         self.distribution.run_command('build')
         current_cwd = getcwd()
         build_dir = join(dirname(abspath(__file__)), self.build_base)
@@ -172,6 +171,22 @@ class Install(dInstall):
             self.distribution.have_run['egg_info'] = 0
             dInstall.run(self)
         finally: self.distribution.running_binary = prior
+
+        self.install_casa_task(pkg, build_dir)
+
+    def install_casa_task(self, install_dir, build_dir):
+        from os import environ
+        from subprocess import call
+        if 'CASAPATH' not in environ: return
+
+        pwd = getcwd()
+        try:
+            chdir(join(build_dir, 'casa_task'))
+            task_dir = join(install_dir, "purify", "casa")
+            r = call(("buildmytasks -i=%s -o=task.py" % task_dir).split())
+            if r != 0: raise Exception("Could not build and install casa task")
+        finally: chdir(pwd)
+
 
 class BuildExt(dBuildExt):
     def __init__(self, *args, **kwargs):
@@ -201,7 +216,7 @@ class EggInfo(dEggInfo):
         dist = self.distribution
         old_values = dist.ext_modules, dist.ext_package, \
             dist.packages, dist.package_dir
-        if len(listdir(package_dir)) == 0  \
+        if len(listdir(package_dir)) != 0  \
             and getattr(self.distribution, 'running_binary', False):
             which_template = 'MANIFEST.binary.in'
         else:
@@ -231,47 +246,53 @@ class SDist(dSDist):
         finally:
             dist.ext_modules, dist.ext_package = old_values[:2]
             dist.packages, dist.package_dir = old_values[2:]
-setup(
-    name = "purify",
-    version = "0.1",
 
-    # NOTE: python-dateutil is required by pandas,
-    # but is not installed by it (pandas == 0.13)
-    install_requires = ['cython', 'numpy', 'scipy', 'pandas', 'nose'],
-    platforms = ['GNU/Linux','Unix','Mac OS-X'],
 
-    zip_safe = False,
-    cmdclass = {
-        'build': Build, 'install': Install,
-        'build_ext': BuildExt, 'bdist_egg': BuildDistEgg,
-        'egg_info': EggInfo
-    },
+try:
+    cwd = getcwd()
+    chdir(source_dir)
+    setup(
+        name = "purify",
+        version = "0.1",
 
-    author = "Jason McEwen",
-    author_email = "j.mcewen@ucl.ac.uk",
-    description = "Purify does what it does well",
-    license = "GPL-2",
-    url = "https://github.com/basp-group/purify",
-    ext_modules = [Extension('purify.cparams', [])],
-    ext_package = 'purify',
-    packages = ['purify', 'purify.tests'],
-    package_dir = {'': basename(package_dir)},
-    include_package_data=True,
+        # NOTE: python-dateutil is required by pandas,
+        # but is not installed by it (pandas == 0.13)
+        install_requires = ['cython', 'numpy', 'scipy', 'pandas', 'nose'],
+        platforms = ['GNU/Linux','Unix','Mac OS-X'],
 
-    keywords= "radio astronomy",
-    classifiers = [
-         'Development Status :: 0 - Beta',
-         'Intended Audience :: Developers',
-         'Intended Audience :: Science/Research',
-         'License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)',
-         'Operating System :: OS Independent',
-         'Programming Language :: Python :: 2.6',
-         'Programming Language :: Python :: 2.7',
-         'Topic :: Scientific/Engineering',
-         'Topic :: Scientific/Engineering :: Astronomy',
-         'Topic :: Scientific/Engineering :: Information Analysis',
-         'Topic :: Software Development :: Libraries :: Python Modules',
-         'Topic :: Software Development :: Libraries :: Application Frameworks',
-    ],
-    long_description = open(join(dirname(__file__), 'README.rst'), 'r').read()
-)
+        zip_safe = False,
+        cmdclass = {
+            'build': Build, 'install': Install,
+            'build_ext': BuildExt, 'bdist_egg': BuildDistEgg,
+            'egg_info': EggInfo
+        },
+
+        author = "Jason McEwen",
+        author_email = "j.mcewen@ucl.ac.uk",
+        description = "Purify does what it does well",
+        license = "GPL-2",
+        url = "https://github.com/basp-group/purify",
+        ext_modules = [Extension('purify.cparams', [])],
+        ext_package = 'purify',
+        packages = ['purify', 'purify.tests'],
+        package_dir = {'': basename(package_dir)},
+        include_package_data=True,
+
+        keywords= "radio astronomy",
+        classifiers = [
+             'Development Status :: 0 - Beta',
+             'Intended Audience :: Developers',
+             'Intended Audience :: Science/Research',
+             'License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)',
+             'Operating System :: OS Independent',
+             'Programming Language :: Python :: 2.6',
+             'Programming Language :: Python :: 2.7',
+             'Topic :: Scientific/Engineering',
+             'Topic :: Scientific/Engineering :: Astronomy',
+             'Topic :: Scientific/Engineering :: Information Analysis',
+             'Topic :: Software Development :: Libraries :: Python Modules',
+             'Topic :: Software Development :: Libraries :: Application Frameworks',
+        ],
+        long_description=long_description
+    )
+finally: chdir(cwd)

@@ -20,7 +20,6 @@ include(AddC99Flags)
 option(tests          "Enable testing"                                  on)
 option(openmp         "Enable OpenMP"                                   off)
 option(python         "Enable python bindings"                          on)
-option(dovirtualenv   "Enable use of virtual environment when testing"  on)
 
 # Extra parameters
 if(NOT DEFINED LIBRARY_INSTALL_PATH)
