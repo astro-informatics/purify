@@ -167,8 +167,8 @@ Run the following commands from the ``casapy`` ipython interface:
     # Install pip, cos it is that much better
     easy_install(['pip'])
 
-Then exit ``casapy``. Unfortunately, it does not seem to recognize that
-it has just installed a module. Then install ``purify`` proper:
+Then *exit* and *restart* ``casapy``. Unfortunately, it does not seem to
+recognize that it has just installed a module. Then install ``purify`` proper:
 
 .. code:: Python
 
@@ -177,7 +177,12 @@ it has just installed a module. Then install ``purify`` proper:
     # Now install purify directly from github: that's why we got pip in the first place
     pip(['install', 'git+https://github.com/UCL/purify.git'])
 
-This last snippet can be used to install other packages as well.
+This last snippet can be used to install other packages as well, by replacing
+the second element in the list with the name or location of a package.
+
+Once again, please *exit* and *restart* casa to make sure it knows about the
+newly installed package. An example CASA script can be found in the ``scripts``
+directory.
 
 NOTE: CASA has the unfortunate behavior of replacing environment
 variables with its own. Amongst other difficulties, it means that
