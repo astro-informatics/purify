@@ -102,4 +102,4 @@ endfunction()
 
 find_package(PythonInterp REQUIRED)
 get_filename_component(directory "${PYTHON_EXECUTABLE}" PATH)
-find_program(cython_EXECUTABLE HINTS "${directory}")
+find_program(cython_EXECUTABLE cython HINTS "${directory}")

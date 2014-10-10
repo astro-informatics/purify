@@ -275,7 +275,7 @@ try:
         ext_modules = [Extension('purify.cparams', [])],
         ext_package = 'purify',
         packages = ['purify', 'purify.tests'],
-        package_dir = {'': basename(package_dir)},
+        package_dir = {'': str(basename(package_dir))},
         include_package_data=True,
 
         keywords= "radio astronomy",

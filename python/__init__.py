@@ -38,15 +38,17 @@ def read_image(path, power_of_two=True):
 #     - the task has been built
 try:
     from __builtin__ import __IPYTHON__
-    api = __IPYTHON__.getapi()
-    task_file = join(dirname(__file__), 'casa', 'task.py')
-    if 'casalog' in api.user_ns and exists(task_file):
-        execfile(task_file, api.user_ns)
+    if hasattr(__IPYTHON__, 'getapi'):
+        api = __IPYTHON__.getapi()
+        task_file = join(dirname(__file__), 'casa', 'task.py')
+        if 'casalog' in api.user_ns and exists(task_file):
+            execfile(task_file, api.user_ns)
 
-    from .casa import data_iterator, purified_iterator
-    __all__.extend(['data_iterator', 'purified_iterator'])
-    # Clean-up purify namespace
-    del api
-    del task_file
+        from .casa import data_iterator, purified_iterator
+        __all__.extend(['data_iterator', 'purified_iterator'])
+        # Clean-up purify namespace
+        del api
+        del task_file
     del __IPYTHON__
-except ImportError: pass
+except ImportError:
+    pass
