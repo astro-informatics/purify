@@ -1,8 +1,8 @@
 """ Test SOPT bindings """
 
+
 def test_sara_wavelets():
     """ Create basis-functions object """
-    from nose.tools import assert_equal
     from purify import SparsityOperator
 
     image_size = 256, 256
@@ -10,12 +10,13 @@ def test_sara_wavelets():
     types = ["DB1", "DB2", "DB10", "Dirac"]
     functions = SparsityOperator(image_size, nlevels, types)
 
-    assert_equal(len(functions), len(types))
-    assert_equal(set([u.name.lower() for u in functions]), set([u.lower() for u in types]))
-  
+    assert len(functions) == len(types)
+    assert set([u.name.lower() for u in functions]) \
+        == set([u.lower() for u in types])
+
     for wavelet in functions:
-        assert_equal(wavelet.nlevels, nlevels)
-        assert_equal(wavelet.image_size, image_size)
+        assert wavelet.nlevels == nlevels
+        assert wavelet.image_size == image_size
 
 
 def test_sara_analysisop_hardening():
@@ -29,7 +30,6 @@ def test_sara_analysisop_hardening():
     types = ["DB1", "DB2", "DB10"]
     functions = SparsityOperator(image_size, nlevels, types)
 
-    
     sigma = 10.0, 8.0
     xaxis = (arange(image_size[0]) / float(image_size[0]) - 0.5) / sigma[0]
     yaxis = (arange(image_size[1]) / float(image_size[1]) - 0.5) / sigma[1]
@@ -37,7 +37,7 @@ def test_sara_analysisop_hardening():
     gaussian = exp(-add.outer(xaxis * xaxis, yaxis * yaxis))
 
     actual = functions.analyze(gaussian)
-    
+
     assert_allclose(
         mean(mean(actual, -1), -1),
         [0.036007226135801075, 0.036007541133741106, 0.03600715848225703] 
@@ -51,11 +51,11 @@ def test_sara_analysisop_hardening():
         [9.237324386040596, 9.23745215540613, 9.237604022698143]
     )
 
+
 def test_sara_synthesisop_hardening():
     """ Hardens sopt_sara_synthesisop bindings against code changes """
     from numpy import add, exp, arange, mean, max, min
     from numpy.testing import assert_allclose
-    from nose.tools import assert_almost_equal
     from purify import SparsityOperator
 
     image_size = 256, 256
@@ -63,7 +63,6 @@ def test_sara_synthesisop_hardening():
     types = ["DB1", "DB2", "DB10"]
     functions = SparsityOperator(image_size, nlevels, types)
 
-    
     sigma = 10.0, 8.0
     xaxis = (arange(image_size[0]) / float(image_size[0]) - 0.5) / sigma[0]
     yaxis = (arange(image_size[1]) / float(image_size[1]) - 0.5) / sigma[1]
@@ -86,6 +85,7 @@ def test_sara_synthesisop_hardening():
         [0.5773502691896323, 0.5773502691896251, 0.5773502691896143]
     )
 
-    assert_almost_equal(mean(actual), 0.9978677505256317+0j)
-    assert_almost_equal(max(actual), 0.99999999999999689+0j)
-    assert_almost_equal(min(actual), 0.99361422627082718+0j)
+    relative = lambda x, y: abs(x - y) / (abs(x) + abs(y))
+    assert relative(mean(actual), 0.9978677505256317+0j) < 1e-8
+    assert relative(max(actual), 0.99999999999999689+0j) < 1e-8
+    assert relative(min(actual), 0.99361422627082718+0j) < 1e-8

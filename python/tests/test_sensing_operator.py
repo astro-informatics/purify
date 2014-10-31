@@ -7,7 +7,7 @@ def test_deconvolution_kernel():
     from numpy import add, exp
     from numpy.testing import assert_allclose
     from purify import kernels as create_kernels, read_visibility, \
-                       __file__ as path
+        __file__ as path
 
     path = join(dirname(path), "data", "images", "Coverages", "cont_sim4.vis")
     visibility = read_visibility(path)
@@ -34,7 +34,7 @@ def visibility_image_operator():
     """ Fixture: visibility, image, and sensing operator. """
     from os.path import join, dirname
     from purify import SensingOperator, read_visibility, Image, \
-                       __file__ as path
+        __file__ as path
 
     visibility_path = join(dirname(path), "data", "images",
                            "Coverages", "cont_sim4.vis")
@@ -47,7 +47,7 @@ def visibility_image_operator():
         from numpy import log, round
         return 2**int(0.1 + round(log(x) / log(2)))
     dims = nearest_power_of_two(image.shape[0]), \
-           nearest_power_of_two(image.shape[1])
+        nearest_power_of_two(image.shape[1])
     oversampling = 2, 2
     interpol = 4, 4
     sensing_op = SensingOperator(visibility, dims, oversampling, interpol)
@@ -56,36 +56,37 @@ def visibility_image_operator():
 
 
 def test_harden_forward_sensing_operator():
-    from nose.tools import assert_almost_equal
     from numpy import mean, max, min
     from numpy.testing import assert_allclose
 
     _, image, sensing_op = visibility_image_operator()
 
     actual = sensing_op.forward(image.pixels)
-    expected = [2.03724422e-04 + 4.15991536e-04j,
-                1.08735157e-03 - 6.79113430e-03j,
-               -1.60430819e-02 + 1.60710447e-01j,
-               -7.38552963e-04 - 1.19728759e-03j,
-                2.97760267e-05 - 1.82804158e-04j,
-                7.26545343e-03 - 5.90595568e-03j,
-               -6.70682680e-04 - 5.40322258e-04j,
-                1.02806690e-04 + 2.30846267e-05j,
-                1.33592565e-03 + 3.61525331e-03j,
-                2.80500284e-02 - 2.41679083e-02j,
-               -5.99541058e-04 + 2.08489869e-03j,
-               -5.95013573e-04 + 1.53026842e-03j,
-               -2.22493322e-03 - 1.41642788e-03j,
-                1.81243121e-03 - 4.02146676e-03j]
+    expected = [
+        2.03724422e-04 + 4.15991536e-04j,
+        1.08735157e-03 - 6.79113430e-03j,
+        -1.60430819e-02 + 1.60710447e-01j,
+        -7.38552963e-04 - 1.19728759e-03j,
+        2.97760267e-05 - 1.82804158e-04j,
+        7.26545343e-03 - 5.90595568e-03j,
+        -6.70682680e-04 - 5.40322258e-04j,
+        1.02806690e-04 + 2.30846267e-05j,
+        1.33592565e-03 + 3.61525331e-03j,
+        2.80500284e-02 - 2.41679083e-02j,
+        -5.99541058e-04 + 2.08489869e-03j,
+        -5.95013573e-04 + 1.53026842e-03j,
+        -2.22493322e-03 - 1.41642788e-03j,
+        1.81243121e-03 - 4.02146676e-03j
+    ]
     assert_allclose(actual[::1000], expected)
 
-    assert_almost_equal(mean(actual), 0.000787855678485+0.000115664948325j)
-    assert_almost_equal(max(actual), 2.01111312538-0.57210242831j)
-    assert_almost_equal(min(actual), -0.956794022954+0.893428684183j)
+    relative = lambda x, y: abs(x - y) / (abs(x) + abs(y))
+    assert relative(mean(actual), 0.000787855678485+0.000115664948325j) < 1e-8
+    assert relative(max(actual), 2.01111312538-0.57210242831j) < 1e-8
+    assert relative(min(actual), -0.956794022954+0.893428684183j) < 1e-8
 
 
 def test_harden_adjoint_sensing_operator():
-    from nose.tools import assert_almost_equal
     from numpy import mean, max, min
     from numpy.testing import assert_allclose
 
@@ -94,38 +95,51 @@ def test_harden_adjoint_sensing_operator():
     visibility = sensing_op.forward(image.pixels)
     actual = sensing_op.adjoint(visibility)
 
-    expected = [[ 0.01558801 + 0.00076014j, -0.00089624 + 0.00424112j,
-                  0.00616964 - 0.01035894j, -0.00577823 + 0.00277242j],
-                [ 0.00184355 + 0.00612539j, -0.01514326 + 0.00366365j,
-                 -0.00876138 - 0.00948248j,  0.00554129 - 0.00681591j],
-                [-0.00583695 + 0.00231628j,  0.00205820 - 0.00213758j,
-                  0.01177767 - 0.03686787j,  0.00258941 - 0.00038525j],
-                [-0.00167731 + 0.01125487j, -0.00452309 + 0.00287998j,
-                  0.02097403 + 0.02555827j,  0.00458462 + 0.00225583j]]
+    expected = [
+        [
+            0.01558801 + 0.00076014j, -0.00089624 + 0.00424112j,
+            0.00616964 - 0.01035894j, -0.00577823 + 0.00277242j
+        ], [
+            0.00184355 + 0.00612539j, -0.01514326 + 0.00366365j,
+            -0.00876138 - 0.00948248j,  0.00554129 - 0.00681591j
+        ], [
+            -0.00583695 + 0.00231628j,  0.00205820 - 0.00213758j,
+            0.01177767 - 0.03686787j,  0.00258941 - 0.00038525j
+        ], [
+            -0.00167731 + 0.01125487j, -0.00452309 + 0.00287998j,
+            0.02097403 + 0.02555827j,  0.00458462 + 0.00225583j
+        ]
+    ]
 
     assert_allclose(actual[::64, ::64], expected, rtol=1e-5)
 
-    assert_almost_equal(mean(actual), 0.000481266445518+0.000282571620767j)
-    assert_almost_equal(max(actual), 0.0911069005447-0.0129906262887j)
-    assert_almost_equal(min(actual), -0.0168798725996-0.000672209789272j)
+    relative = lambda x, y: abs(x - y) / (abs(x) + abs(y))
+    assert relative(mean(actual), 0.000481266445518+0.000282571620767j) < 1e-8
+    assert relative(max(actual), 0.0911069005447-0.0129906262887j) < 1e-8
+    assert relative(min(actual), -0.0168798725996-0.000672209789272j) < 1e-8
 
 
 def check_input_conversion(visibility, name, itis, expected, dtype):
     """ Checks the argument is converted as expected """
-    from nose.tools import assert_equal, assert_true
     from numpy import array, any, abs
     from numpy.testing import assert_allclose
     from copy import deepcopy
     from purify.sensing import visibility_column_as_numpy_array as vcana
 
     result = vcana(name, visibility)
-    assert_equal(result.dtype, dtype)
+    print(visibility)
+    print(result)
+    print(dtype)
+    print(name)
+    assert result.dtype == dtype
     assert_allclose(result, expected)
 
     copyme = deepcopy(expected)
     expected[:] = (1.0 + array(expected, dtype=dtype) ** 0.5)[:]
-    if itis: assert_allclose(result, expected)
-    else: assert_true(any(abs(result - expected) > 1e-5))
+    if itis:
+        assert_allclose(result, expected)
+    else:
+        assert any(abs(result - expected) > 1e-5)
 
     expected[:] = copyme
 
@@ -141,12 +155,13 @@ def test_input_conversion_dataframe():
         'y': [1j, 1., 2, 3, 4],
     })
 
-    yield check_input_conversion, vis, 'u', False, vis['u'].values, 'double'
-    yield check_input_conversion, vis, 'v', True, vis['v'].values, 'double'
-    yield check_input_conversion, vis, 'y', True, vis['y'].values, 'complex'
+    check_input_conversion(vis, 'u', False, vis['u'].values, 'double')
+    check_input_conversion(vis, 'v', True, vis['v'].values, 'double')
+    check_input_conversion(vis, 'y', True, vis['y'].values, 'complex')
 
     vis['y'] = array([1.0, 5.0, 6.0, 7, 78], dtype='double')
-    yield check_input_conversion, vis, 'y', True, vis['y'].values, 'double'
+    check_input_conversion(vis, 'y', True, vis['y'].values, 'double')
+
 
 def test_input_conversion_dictionary():
     """ Input can be dictionary """
@@ -157,47 +172,52 @@ def test_input_conversion_dictionary():
         'y': [1j, 1., 2, 3, 4],
     }
 
-    yield check_input_conversion, vis, 'u', False, vis['u'], 'double'
-    yield check_input_conversion, vis, 'v', False, vis['v'], 'double'
-    yield check_input_conversion, vis, 'y', False, vis['y'], 'complex'
+    check_input_conversion(vis, 'u', False, vis['u'], 'double')
+    check_input_conversion(vis, 'v', False, vis['v'], 'double')
+    check_input_conversion(vis, 'y', False, vis['y'], 'complex')
 
     vis['u'] = array(vis['u'], dtype='double')
     vis['y'] = array([1.0, 5.0, 6.0, 7, 78], dtype='double')
-    yield check_input_conversion, vis, 'u', True, vis['u'], 'double'
-    yield check_input_conversion, vis, 'y', True, vis['y'], 'double'
+    check_input_conversion(vis, 'u', True, vis['u'], 'double')
+    check_input_conversion(vis, 'y', True, vis['y'], 'double')
+
 
 def test_input_conversion_sequence():
     """ Input can be a sequence """
     from numpy import array
     vis = ([0, 1, 2, 3, 4], [0.0, 1, 2, 3, 4], [1j, 1., 2, 3, 4])
 
-    yield check_input_conversion, vis, 'u', False, vis[0], 'double'
-    yield check_input_conversion, vis, 'v', False, vis[1], 'double'
-    yield check_input_conversion, vis, 'y', False, vis[2], 'complex'
+    check_input_conversion(vis, 'u', False, vis[0], 'double')
+    check_input_conversion(vis, 'v', False, vis[1], 'double')
+    check_input_conversion(vis, 'y', False, vis[2], 'complex')
 
     vis = (
         array(vis[0], dtype='double'),
         vis[1],
         array([1.0, 5.0, 6.0, 7, 78], dtype='double')
     )
-    yield check_input_conversion, vis, 'u', True, vis[0], 'double'
-    yield check_input_conversion, vis, 'y', True, vis[2], 'double'
+    check_input_conversion(vis, 'u', True, vis[0], 'double')
+    check_input_conversion(vis, 'y', True, vis[2], 'double')
+
 
 def test_input_conversion_numpy_array():
     """ Input can be a homogeneous numpy array """
     from numpy import array
     vis = array([[0, 1, 2, 3, 4], [0.0, 1, 2, 3, 4], [1, 1., 2, 3, 4]])
 
-    yield check_input_conversion, vis, 'u', True, vis[0], 'double'
-    yield check_input_conversion, vis, 'v', True, vis[1], 'double'
-    yield check_input_conversion, vis, 'y', True, vis[2], 'double'
+    check_input_conversion(vis, 'u', True, vis[0], 'double')
+    check_input_conversion(vis, 'v', True, vis[1], 'double')
+    check_input_conversion(vis, 'y', True, vis[2], 'double')
+
 
 def test_input_conversion_numpy_record():
     """ Input can be a numpy record array """
     from numpy import array
-    vis = array([(0, 0, 1j), (1.5, 1.6, 1.6), (5, 4, 3), (2, 1, 1.5+2j)],
-            dtype=[('u', 'double'), ('v', 'double'), ('y', 'complex')])
+    vis = array(
+        [(0, 0, 1j), (1.5, 1.6, 1.6), (5, 4, 3), (2, 1, 1.5+2j)],
+        dtype=[('u', 'double'), ('v', 'double'), ('y', 'complex')]
+    )
 
-    yield check_input_conversion, vis, 'u', True, vis['u'], 'double'
-    yield check_input_conversion, vis, 'v', True, vis['v'], 'double'
-    yield check_input_conversion, vis, 'y', True, vis['y'], 'complex'
+    check_input_conversion(vis, 'u', True, vis['u'], 'double')
+    check_input_conversion(vis, 'v', True, vis['v'], 'double')
+    check_input_conversion(vis, 'y', True, vis['y'], 'complex')

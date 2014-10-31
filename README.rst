@@ -89,7 +89,7 @@ Python Packages:
    python
 -  `cython <http://www.cython.org/>`__: C extensions for python made
    easy
--  `nose <https://nose.readthedocs.org/en/latest/>`__: unit-test
+-  `py.test <http://pytest.org>`__: unit-test
    framework for python. Only needed for running unit-tests.
 -  `virtualenv <https://nose.readthedocs.org/en/latest/>`__: creates an
    isolated python environment. Only needed for running tests.

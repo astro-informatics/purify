@@ -1,87 +1,66 @@
-if(python)
-  include(TargetCopyFiles)
+if(NOT python)
+    return()
+endif()
 
-  set(PYPURIFY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/purify)
+include(TargetCopyFiles)
+include(PythonModule)
 
-  # Add location of purify package in build tree,
-  # so it can be found later on
-  add_to_python_path(${CMAKE_CURRENT_BINARY_DIR})
+set(PYPURIFY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/purify)
 
-  add_definitions("-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION")
+# Add location of purify package in build tree,
+# so it can be found later on
+add_to_python_path(${CMAKE_CURRENT_BINARY_DIR})
 
-  include_directories(
-      ${PYTHON_INCLUDE_DIR}
-      ${NUMPY_INCLUDE_DIRS}
-      ${CMAKE_CURRENT_SOURCE_DIR}
-      ${FFTW3_INCLUDE_DIR}
-      ${CFitsIO_INCLUDE_DIR}
-      ${TIFF_INCLUDE_DIR}
-      ${Sopt_INCLUDE_DIRS}
-  )
-  if(BLAS_INCLUDE_DIR)
-      include_directories(${BLAS_INCLUDE_DIR})
-  endif()
+add_definitions("-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION")
 
-  ###############################
-  # Add new targets
-  ###############################
-  file(GLOB PXD_HEADERS *.pxd)
-  file(GLOB PYTHON_SOURCES *.py)
-  list(REMOVE_ITEM PYTHON_SOURCES task_purify_image.py)
+include_directories(
+    ${PYTHON_INCLUDE_DIR}
+    ${NUMPY_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${FFTW3_INCLUDE_DIR}
+    ${CFitsIO_INCLUDE_DIR}
+    ${TIFF_INCLUDE_DIR}
+    ${Sopt_INCLUDE_DIRS}
+)
+if(BLAS_INCLUDE_DIR)
+    include_directories(${BLAS_INCLUDE_DIR})
+endif()
 
-  add_custom_target(copy)
-  set(python_modules)
-  set(cython_modules
-      visibility image sparse sensing
-      fftw sparsity_ops sdmm cparams
-  )
-  foreach(module ${cython_modules})
-    add_cython_modules(${module}
-      SOURCE purify.${module}.pyx
-      LOCATION ${PYPURIFY_DIRECTORY}
-      LIBRARIES libpurify
-      DEPENDS copy
+###############################
+# Add new targets
+###############################
+file(GLOB PXD_HEADERS *.pxd)
+file(GLOB PYTHON_SOURCES *.py)
+list(REMOVE_ITEM PYTHON_SOURCES task_purify_image.py)
+
+add_custom_target(copy ALL)
+add_python_module(purify
+    purify.visibility.pyx purify.image.pyx purify.sparse.pyx purify.sensing.pyx
+    purify.fftw.pyx purify.sparsity_ops.pyx purify.sdmm.pyx purify.cparams.pyx
+    ${PYTHON_SOURCES} ${PXD_HEADERS}
+    LIBRARIES libpurify
+)
+if(tests)
+    # Files only needed in testing. Added here cos here is where the copy
+    # target is defined.
+    add_copy_directory(copy
+        "${PROJECT_SOURCE_DIR}/data/"
+        GLOB *.vis *.fits
+        DESTINATION "${PYTHON_BINARY_DIR}/purify/data"
     )
-    list(APPEND python_modules py${module})
-  endforeach()
-
-  add_copy_files(copy FILES ${PYTHON_SOURCES} DESTINATION ${PYPURIFY_DIRECTORY})
-  if(tests)
-    # Files only needed in testing. Added here cos here is where the copy target is defined.
-    add_copy_files( copy GLOB "${PROJECT_SOURCE_DIR}/data/images/Coverages/*.vis"
-                    DESTINATION "${PYPURIFY_DIRECTORY}/data/images/Coverages/" )
-    add_copy_files( copy GLOB "${PROJECT_SOURCE_DIR}/data/images/*.fits"
-                    DESTINATION "${PYPURIFY_DIRECTORY}/data/images/" )
-    add_copy_files( copy GLOB "${PROJECT_SOURCE_DIR}/data/expected/*.fits"
-                    DESTINATION "${PYPURIFY_DIRECTORY}/data/expected/" )
-    add_copy_files( copy GLOB "${CMAKE_CURRENT_SOURCE_DIR}/tests/*fixtures.py"
-                    DESTINATION "${PYPURIFY_DIRECTORY}/tests/" )
     install_python(
         DIRECTORY "${PROJECT_SOURCE_DIR}/data/"
-        DESTINATION purify/data
+        DESTINATION ${PYTHON_PKG_DIR}/purify/data
         FILES_MATCHING
         PATTERN "images/Coverages/*.vis"
         PATTERN "images/*.fits"
         PATTERN "expected/*.fits"
         PATTERN "test" EXCLUDE
     )
-  endif()
-
-  if(NOT dont_install_headers)
-      install_python(
-          FILES ${PXD_HEADERS}
-          DESTINATION purify/headers
-          COMPONENT dev
-      )
-  endif()
-  install_python(FILES ${PYTHON_SOURCES} DESTINATION purify)
-  install_python(TARGETS ${python_modules} DESTINATION purify)
-
-  add_copy_files(copy
-      FILES purify_image.xml task_purify_image.py
-      DESTINATION ${PROJECT_BINARY_DIR}/casa_task
-  )
-
 endif()
 
+add_copy_files(copy
+    FILES purify_image.xml task_purify_image.py
+    DESTINATION ${PROJECT_BINARY_DIR}/casa_task
+)
 add_subdirectory(tests)

@@ -36,6 +36,9 @@ if(EXISTS "${EXTERNAL_ROOT}/lib/")
         PATTERN "*.a" EXCLUDE
     )
 endif()
+if(python)
+    include(python_dependencies)
+endif()
 
 if(tests)  # Adds ctest
     enable_testing()
