@@ -10,7 +10,7 @@ include(LookUp-GreatCMakeCookOff)
 
 # Set version and build id of this package
 include(VersionAndGitRef)
-set_version(0.1)
+set_version(0.1.1)
 get_gitref()
 
 # Add C99 flag, since code uses inline
