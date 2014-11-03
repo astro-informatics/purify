@@ -72,11 +72,14 @@ class Build(dBuild):
             through the command-line.
         """
         from sys import executable
+        from os import environ
         # other args
         other_args = [
             cmake_cache_line('nobins', 'TRUE', 'BOOL'),
             cmake_cache_line('PYTHON_EXECUTABLE', executable, 'PATH'),
             cmake_cache_line('dont_install_headers', 'TRUE', 'BOOL'),
+            cmake_cache_line(
+                'LINK_TO_ABSOLUTE_PYTHON_PATH', 'CASAPATH' in environ, 'BOOL'),
             '\n',
         ]
 

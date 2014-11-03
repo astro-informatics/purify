@@ -55,3 +55,16 @@ include_directories(
 add_subdirectory(src)
 add_subdirectory(include)
 add_subdirectory(python)
+
+if(LINK_TO_ABSOLUTE_PYTHON_PATH AND APPLE)
+    configure_file(
+        "${PROJECT_SOURCE_DIR}/cmake_files/AbsolutePythonPath.in.cmake"
+        "${PROJECT_BINARY_DIR}/post_install/AbsolutePythonPath.cmake"
+        @ONLY
+    )
+    file(WRITE
+        "${PROJECT_BINARY_DIR}/post_install/CMakeLists.txt"
+        "install(SCRIPT \"AbsolutePythonPath.cmake\")"
+    )
+    add_subdirectory("${PROJECT_BINARY_DIR}/post_install")
+endif()
