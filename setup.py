@@ -1,5 +1,5 @@
 from os.path import basename, dirname, join, abspath
-from os import chdir, getcwd
+from os import chdir, getcwd, environ
 from setuptools import setup, Extension
 from distutils.command.build import build as dBuild
 from setuptools.command.install import install as dInstall
@@ -14,6 +14,11 @@ package_dir = join(source_dir, 'pkg_install')
 long_description = open(join(dirname(__file__), 'README.rst'), 'r').read()
 mkpath(package_dir)
 
+isCASA = 'CASAPATH' in environ
+if isCASA:
+    # CASA 4.2.2 has personal ideas as to where numpy includes should go
+    casa_path = environ['CASAPATH'].split()[0]
+    environ['CFLAGS'] = environ.get('CFLAGS', '') + ' -I%s/include' % casa_path
 
 def cmake_cache_line(variable, value, type='STRING'):
     return "set(%s \"%s\" CACHE %s \"\")\n" % (variable, value, type)
@@ -43,7 +48,7 @@ def cmake_executable():
     from os import environ
     from distutils.spawn import find_executable
     cmake = find_executable('cmake')
-    if cmake is None and 'CASAPATH' in environ:
+    if cmake is None and isCASA:
         # Tries to out-smart CASA.
         # Look places cmake might be that casa removes from path.
         directories = [
@@ -79,7 +84,7 @@ class Build(dBuild):
             cmake_cache_line('PYTHON_EXECUTABLE', executable, 'PATH'),
             cmake_cache_line('dont_install_headers', 'TRUE', 'BOOL'),
             cmake_cache_line(
-                'LINK_TO_ABSOLUTE_PYTHON_PATH', 'CASAPATH' in environ, 'BOOL'),
+                'LINK_TO_ABSOLUTE_PYTHON_PATH', isCASA, 'BOOL'),
             '\n',
         ]
 
@@ -196,7 +201,7 @@ class Install(dInstall):
     def install_casa_task(self, install_dir, build_dir):
         from os import environ
         from subprocess import call
-        if 'CASAPATH' not in environ:
+        if isCASA:
             return
 
         pwd = getcwd()
@@ -284,14 +289,15 @@ class SDist(dSDist):
 try:
     cwd = getcwd()
     chdir(source_dir)
+    packages = ['cython', 'numpy', 'scipy', 'pytest', 'pandas']
     setup(
         name="purify",
         version="0.1.1",
 
         # NOTE: python-dateutil is required by pandas,
         # but is not installed by it (pandas == 0.13)
-        setup_requires=['cython', 'numpy', 'scipy', 'pytest'],
-        install_requires=['cython', 'numpy', 'scipy', 'pandas', 'pytest'],
+        setup_requires=packages,
+        install_requires=packages,
         platforms=['GNU/Linux', 'Unix', 'Mac OS-X'],
 
         zip_safe=False,
