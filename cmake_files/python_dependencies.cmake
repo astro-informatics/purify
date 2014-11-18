@@ -17,7 +17,7 @@ add_to_python_path("${EXTERNAL_ROOT}/python")
 add_python_eggs("${PROJECT_SOURCE_DIR}"
     EXCLUDE
         "${PROJECT_SOURCE_DIR}/purify*egg"
-        "${PROJECT_SOURCE_DIR}/Purify*egg"
+        "${PROJECT_BINARY_DIR}/Purify*egg"
 )
 set(LOCAL_PYTHON_EXECUTABLE "${PROJECT_BINARY_DIR}/localpython.sh")
 create_environment_script(
@@ -27,7 +27,6 @@ create_environment_script(
 )
 # Python interpreter + libraries
 find_package(CoherentPython)
-# Look for/install cython and nose
 # Only required for building
 lookup_python_package(Cython VERSION 0.21 REQUIRED
     PATH "${EXTERNAL_ROOT}/python")

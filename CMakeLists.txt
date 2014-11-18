@@ -43,9 +43,6 @@ endif()
 if(tests)  # Adds ctest
     enable_testing()
 endif()
-if(python) # CMake functions to build python and cython modules
-    include(cython)
-endif()
 
 include_directories(
     "${PROJECT_SOURCE_DIR}/include"
