@@ -85,8 +85,14 @@ class Build(dBuild):
             cmake_cache_line('dont_install_headers', 'TRUE', 'BOOL'),
             cmake_cache_line(
                 'LINK_TO_ABSOLUTE_PYTHON_PATH', isCASA, 'BOOL'),
-            '\n',
+            '\n'
         ]
+        if isCASA:
+            other_args.append(
+                cmake_cache_line('CMAKE_PREFIX_PATH',
+                    environ['CASAPATH'].split()[0], 'PATH')
+            )
+
 
         with open(filename, 'w') as file:
             file.writelines(other_args)
@@ -201,7 +207,7 @@ class Install(dInstall):
     def install_casa_task(self, install_dir, build_dir):
         from os import environ
         from subprocess import call
-        if isCASA:
+        if not isCASA:
             return
 
         pwd = getcwd()
