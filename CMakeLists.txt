@@ -63,5 +63,8 @@ if(LINK_TO_ABSOLUTE_PYTHON_PATH AND APPLE)
         "${PROJECT_BINARY_DIR}/post_install/CMakeLists.txt"
         "install(SCRIPT \"AbsolutePythonPath.cmake\")"
     )
-    add_subdirectory("${PROJECT_BINARY_DIR}/post_install")
+    add_subdirectory(
+        "${PROJECT_BINARY_DIR}/post_install" # Generated source dir
+        "${PROJECT_BINARY_DIR}/post_install/build" # Build dir
+    )
 endif()
