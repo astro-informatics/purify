@@ -8,7 +8,7 @@ if(CFitsIO_ARGUMENTS)
 endif()
 # Figures out this is a casa install from existence of CASAPATH environment
 # variables
-if(CFitsIO_CHECKCASA AND NOT "$ENV{CASAPATH}" STREQUAL "")
+if(CFitsIO_CHECKCASA AND NOT "$ENV{CASAPATH}" STREQUAL "" AND NOT APPLE)
     set(using_casa TRUE)
 else()
     set(using_casa FALSE)
@@ -25,6 +25,8 @@ endif()
 if(using_casa)
     # Library already exists, but is missing headers
     # Only copies headers to appropriate location
+    # NOTE: it might be that the Mac version packages a different cfitsio. In
+    # anycase, this doesn't work on mac
     set(script "${EXTERNAL_ROOT}/src/cfitsio.cmake")
     string(FIND "$ENV{CASAPATH}" " " endpath)
     string(SUBSTRING "$ENV{CASAPATH}" 0 ${endpath} casapath)
