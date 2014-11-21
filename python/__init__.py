@@ -32,6 +32,13 @@ def read_image(path, power_of_two=True):
         image = topleft
     return topleft
 
+
+def test():
+    from py.test import main
+    from os.path import dirname
+    main(dirname(__file__))
+
+
 # Register casa task on import if:
 #     - this is an IPython session
 #     - this is a casapy session

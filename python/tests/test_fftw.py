@@ -1,7 +1,6 @@
 def test_data_bindings():
     from purify.fftw import Fourier2D
     from numpy.testing import assert_allclose
-    from nose.tools import assert_equal
 
     image_size = 256, 256
     oversampling = 2, 2
@@ -9,13 +8,15 @@ def test_data_bindings():
 
     fourier = Fourier2D(image_size, oversampling, "forward")
 
-    # Changing the data twice makes sure we are binding to memory rather than python object
+    # Changing the data twice makes sure we are binding to memory rather than
+    # python object
     fourier.data[:] = 0
-    assert_equal(fourier.data.shape, shape)
+    assert fourier.data.shape == shape
     assert_allclose(fourier.data, 0)
 
     fourier.data[:] = 1
     assert_allclose(fourier.data, 1)
+
 
 def test_cycle_fftw():
     """ Apply forward and backward fft """

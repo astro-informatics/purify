@@ -89,7 +89,7 @@ Python Packages:
    python
 -  `cython <http://www.cython.org/>`__: C extensions for python made
    easy
--  `nose <https://nose.readthedocs.org/en/latest/>`__: unit-test
+-  `py.test <http://pytest.org>`__: unit-test
    framework for python. Only needed for running unit-tests.
 -  `virtualenv <https://nose.readthedocs.org/en/latest/>`__: creates an
    isolated python environment. Only needed for running tests.
@@ -158,7 +158,8 @@ installations, one can proceed as follows:
 CASA users
 ----------
 
-Run the following commands from the ``casapy`` ipython interface:
+Run the following commands from the ``casapy`` ipython interface (by
+copy/pasting them in one go and hitting return once or twice):
 
 .. code:: Python
 
@@ -172,17 +173,29 @@ recognize that it has just installed a module. Then install ``purify`` proper:
 
 .. code:: Python
 
+    # The following lines are needed on Linux only.
+    # They modify the compile flags to include CASA's numpy headers
+    from os import environ
+    environ['CFLAGS'] = "%s -I%s/include" % (
+        environ.get('CFLAGS', ''),
+        environ['CASAPATH'].split()[0]
+    )
     # Import pip so it can be run from ipython
     from pip import main as pip
-    # Now install purify directly from github: that's why we got pip in the first place
+    # Now install purify and dependencies directly from github: that's why we
+    # got pip in the first place
     pip(['install', 'git+https://github.com/UCL/purify.git'])
 
 This last snippet can be used to install other packages as well, by replacing
-the second element in the list with the name or location of a package.
+the second element in the list with the name or location of a package. It is
+possible to give different compile and link flags by modifying the first two
+lines appropriately. The version above makes sure CASA's numpy headers are
+accessible.
 
 Once again, please *exit* and *restart* casa to make sure it knows about the
 newly installed package. An example CASA script can be found in the ``scripts``
-directory.
+directory. Please note that the purify task will appear only *after* importing
+purify.
 
 NOTE: CASA has the unfortunate behavior of replacing environment
 variables with its own. Amongst other difficulties, it means that
@@ -194,6 +207,18 @@ the path from within ``casapy``. It should be done prior to calling
 
         from os import environ
         environ['PATH'] += ":/usr/local/bin"
+
+
+Testing the install
+-------------------
+
+The python wrappers for purify come with a set of tests. They can be run via
+the following code:
+
+.. code:: Python
+
+    import purify
+    purify.test()
 
 SUPPORT
 =======
