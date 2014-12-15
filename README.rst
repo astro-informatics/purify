@@ -153,7 +153,7 @@ installations, one can proceed as follows:
     # Install purify in this environment
     ./purify/bin/pip install git+https://github.com/UCL/purify.git
     # Run tests within the environment
-    ./purify/bin/python -c "import nose; nose.runmodule('purify')"
+    ./purify/bin/python -c "import purify; purify.test()"
 
 CASA users
 ----------
