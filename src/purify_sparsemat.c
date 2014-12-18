@@ -352,3 +352,83 @@ void purify_sparsemat_adj_complexr(complex double *y, complex double *x,
   }
 
 }
+
+/*!
+ * Multiply a complex vector by a real sparse matrix and a diagonal
+ * complex matrix i.e. compute
+ * \f$y = DA x\f$.
+ *
+ * \param[out] y Ouput vector of length nrows.
+ * \param[in] x Input vector of length ncols.
+ * \param[in] A Sparse matrix (passed by reference).
+ * \param[in] d Vector containing the elements of the diagonal
+ *            matrix (passed by reference).
+ *
+ * \note Space for the output vector must be allocated by the calling
+ * routine.
+ *
+ * \authors Rafael Carrillo
+ */
+void purify_sparsemat_fwd_complexrsc(complex double *y, complex double *x, 
+          purify_sparsemat_row *A, complex double *d) {
+
+  int rr, c;
+
+  if (A->real == 1){
+    for (c = 0; c < A->nrows; c++) {
+      y[c] = 0.0 + 0.0*I;
+      for (rr = A->rowptr[c]; rr < A->rowptr[c+1]; rr++)
+        y[c] += A->vals[rr] * x[A->colind[rr]];
+      y[c] = d[c] * y[c];
+    }
+  }
+  else{
+    for (c = 0; c < A->nrows; c++) {
+      y[c] = 0.0 + 0.0*I;
+      for (rr = A->rowptr[c]; rr < A->rowptr[c+1]; rr++)
+        y[c] += A->cvals[rr] * x[A->colind[rr]];
+      y[c] = d[c] * y[c];
+    }
+  }
+}
+
+
+/*!
+ * Multiply a complex vector by the adjoint of a real sparse matrix
+ * and a diagonal complex matrix i.e. computes
+ * \f$y = A^H Dx\f$, where \f$H\f$ is the Hermitian operator.
+ *
+ * \param[out] y Ouput vector of length ncols.
+ * \param[in] x Input vector of length nrows.
+ * \param[in] A Sparse matrix (passed by reference).
+ * \param[in] d Vector containing the elements of the diagonal
+ *            matrix (passed by reference).
+ *
+ * \note Space for the output vector must be allocated by the calling
+ * routine.
+ *
+ * \authors Rafael Carrillo
+ */
+void purify_sparsemat_adj_complexrsc(complex double *y, complex double *x, 
+          purify_sparsemat_row *A, complex double *d) {
+
+  int r, rr, c;
+  complex double temp;
+
+  for (r = 0; r < A->ncols; r++)
+    y[r] = 0.0 + 0.0*I;
+
+  if (A->real == 1){
+    for (c = 0; c < A->nrows; c++)
+      temp = conj(d[c]) * x[c];
+      for (rr = A->rowptr[c]; rr < A->rowptr[c+1]; rr++)
+        y[A->colind[rr]] += A->vals[rr] * temp;
+  }
+  else{
+    for (c = 0; c < A->nrows; c++)
+      temp = conj(d[c]) * x[c];
+      for (rr = A->rowptr[c]; rr < A->rowptr[c+1]; rr++)
+        y[A->colind[rr]] += conj(A->cvals[rr]) * temp;
+  }
+
+}

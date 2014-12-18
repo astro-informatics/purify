@@ -75,6 +75,10 @@ void purify_sparsemat_fwd_complexr(complex double *y, complex double *x,
           purify_sparsemat_row *A);
 void purify_sparsemat_adj_complexr(complex double *y, complex double *x, 
           purify_sparsemat_row *A);
+void purify_sparsemat_fwd_complexrsc(complex double *y, complex double *x, 
+          purify_sparsemat_row *A, complex double *d);
+void purify_sparsemat_adj_complexrsc(complex double *y, complex double *x, 
+          purify_sparsemat_row *A, complex double *d);
 
 
 #endif
