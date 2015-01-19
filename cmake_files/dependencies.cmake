@@ -7,11 +7,7 @@ include(PackageLookup)
 find_package(FFTW3 REQUIRED DOUBLE)
 find_package(TIFF REQUIRED)
 find_package(CBLAS REQUIRED)
-if(EXISTS "${BLAS_INCLUDE_DIR}/cblas.h")
-    set(PURIFY_BLAS_H cblas.h)
-elseif(EXISTS "${BLAS_INCLUDE_DIR}/mkl.h")
-    set(PURIFY_BLAS_H mkl.h)
-endif()
+set(PURIFY_BLAS_H "${BLAS_INCLUDE_FILENAME}")
 
 # Look up packages: if not found, installs them
 lookup_package(Sopt REQUIRED ARGUMENTS GIT_TAG features/cmake)
