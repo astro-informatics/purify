@@ -46,7 +46,7 @@ void purify_measurement_opfwd(void *out,
 			      void **data);
 
 void purify_measurement_init_cft(purify_sparsemat_row *mat, 
-                                 double *deconv, complex double *shifts
+                                 double *deconv, complex double *shifts,
                                  double *u, double *v, 
                                  purify_measurement_cparam *param);
 
