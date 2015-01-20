@@ -9,7 +9,7 @@ from purify.visibility cimport _wrap_visibility, _Visibility
 cdef extern from "purify_measurement.h":
     cdef void purify_measurement_init_cft(
             _SparseMatRow *mat,
-            double *deconv, double *u, double *v,
+            double *deconv, double complex *shifts, double *u, double *v,
             _MeasurementParams *param
     )
 
@@ -66,7 +66,7 @@ def kernels(visibility, dimensions, oversampling, interpolation):
             interpolation: (int, int)
                 Size of the interpolation kernel
 
-        :returns: (interpolation, deconvolution)
+        :returns: (interpolation, deconvolution, shifts)
            The interpolation kernel is a sparse CSR matrix, whereas the
            deconvolution kernel is a n by m matrix where n and m are the
            dimensions of the image.
@@ -78,6 +78,7 @@ def kernels(visibility, dimensions, oversampling, interpolation):
 
     py_u = visibility_column_as_numpy_array('u', visibility)
     py_v = visibility_column_as_numpy_array('v', visibility)
+    py_shifts = zeros(py_u.shape, dtype="complex128")
 
     deconvolution_kernel = zeros(dimensions, dtype='double', order="C")
     cdef:
@@ -87,18 +88,20 @@ def kernels(visibility, dimensions, oversampling, interpolation):
             untyped_pointer_to_data(deconvolution_kernel)
         double[::1] c_u = py_u
         double[::1] c_v = py_v
+        double complex[::1] c_shifts = py_shifts
 
     _sensing_params( &params, len(py_u), dimensions, oversampling,
         interpolation )
 
-    purify_measurement_init_cft(&sparse, c_deconvolution,
-            &c_u[0], &c_v[0], &params)
+    purify_measurement_init_cft(
+            &sparse, c_deconvolution, &c_shifts[0], &c_u[0], &c_v[0], &params)
 
     interpolation_kernel = _convert_sparsemat(&sparse).copy()
     purify_sparsemat_freer(&sparse)
 
-    Kernel = namedtuple('Kernel', ['interpolation', 'deconvolution'])
-    return Kernel(interpolation_kernel, deconvolution_kernel)
+    Kernel = namedtuple(
+            'Kernel', ['interpolation', 'deconvolution', 'shifts'])
+    return Kernel(interpolation_kernel, deconvolution_kernel, py_shifts)
 
 # Forward declaration so we can bind the parent
 # argument of _VoidedData.__init__
@@ -115,6 +118,9 @@ cdef class _VoidedData:
         self._data[0] = <void *> &parent._params
         self._data[1] = untyped_pointer_to_data(self.deconvolution)
         self._data[2] = <void *> &self._c_sparse
+
+        cdef double complex[::1] c_shifts = parent.kernels.shifts
+        self._data[5] = <void*> &c_shifts[0]
 
         if forward: parent._fftw_forward.set_ccall(&self._data[3])
         else: parent._fftw_backward.set_ccall(&self._data[3])

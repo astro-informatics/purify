@@ -21,7 +21,7 @@ cdef extern from "purify_measurement.h":
 # A class to hold C data needed by purify_measurement_cft*
 cdef class _VoidedData:
     cdef:
-        void * _data[5]
+        void * _data[6]
         _SparseMatRow _c_sparse
         object deconvolution
     cdef void** data(self)
