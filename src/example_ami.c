@@ -1019,6 +1019,7 @@ int main(int argc, char *argv[]) {
   free(xoutc);
   free(wdx);
   free(wdy);
+  free(shifts);
 
   sopt_sara_free(&param1);
   sopt_sara_free(&param2);
