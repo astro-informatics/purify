@@ -83,6 +83,7 @@ int main(int argc, char *argv[]) {
   void *dataadj[5];
   fftw_plan planfwd;
   fftw_plan planadj;
+  complex double *shifts;
 
   //Structures for sparsity operator
   sopt_wavelet_type *dict_types;
@@ -175,6 +176,8 @@ int main(int argc, char *argv[]) {
   PURIFY_ERROR_MEM_ALLOC_CHECK(error);
   xoutc = (complex double*)malloc((Nx) * sizeof(complex double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(xoutc);
+  shifts = (complex double*)malloc((vis_test.nmeas) * sizeof(complex double));
+  PURIFY_ERROR_MEM_ALLOC_CHECK(shifts);
 
  
   dummyr = malloc(Nr * sizeof(double));
@@ -200,7 +203,7 @@ int main(int argc, char *argv[]) {
   //Initialize griding matrix
   printf("Initializing griding matrix\n\n");
   assert((start = clock())!=-1);
-  purify_measurement_init_cft(&gmat, deconv, vis_test.u, vis_test.v, &param_m1);
+  purify_measurement_init_cft(&gmat, deconv, shifts, vis_test.u, vis_test.v, &param_m1);
   stop = clock();
   t = (double) (stop-start)/CLOCKS_PER_SEC;
   printf("Time griding matrix initalization: %f \n\n", t);
@@ -227,12 +230,14 @@ int main(int argc, char *argv[]) {
   datafwd[2] = (void*)&gmat;
   datafwd[3] = (void*)&planfwd;
   datafwd[4] = (void*)fft_temp1;
+  datafwd[5] = (void*)shifts;
 
   dataadj[0] = (void*)&param_m2;
   dataadj[1] = (void*)deconv;
   dataadj[2] = (void*)&gmat;
   dataadj[3] = (void*)&planadj;
   dataadj[4] = (void*)fft_temp2;
+  dataadj[5] = (void*)shifts;
 
 
   printf("FFT plan done \n\n");
@@ -443,6 +448,7 @@ int main(int argc, char *argv[]) {
   fftw_destroy_plan(planfwd);
   fftw_destroy_plan(planadj);
   purify_sparsemat_freer(&gmat);
+  free(shifts);
 
   free(dummyr);
   free(dummyc);
