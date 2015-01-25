@@ -419,16 +419,18 @@ void purify_sparsemat_adj_complexrsc(complex double *y, complex double *x,
     y[r] = 0.0 + 0.0*I;
 
   if (A->real == 1){
-    for (c = 0; c < A->nrows; c++)
+    for (c = 0; c < A->nrows; c++){
       temp = conj(d[c]) * x[c];
       for (rr = A->rowptr[c]; rr < A->rowptr[c+1]; rr++)
         y[A->colind[rr]] += A->vals[rr] * temp;
+    }
   }
   else{
-    for (c = 0; c < A->nrows; c++)
+    for (c = 0; c < A->nrows; c++){
       temp = conj(d[c]) * x[c];
       for (rr = A->rowptr[c]; rr < A->rowptr[c+1]; rr++)
         y[A->colind[rr]] += conj(A->cvals[rr]) * temp;
+    }
   }
 
 }

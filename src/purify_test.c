@@ -79,8 +79,8 @@ int main(int argc, char *argv[]) {
   purify_measurement_cparam param_m2;
   complex double *fft_temp1;
   complex double *fft_temp2;
-  void *datafwd[5];
-  void *dataadj[5];
+  void *datafwd[6];
+  void *dataadj[6];
   fftw_plan planfwd;
   fftw_plan planadj;
   complex double *shifts;
