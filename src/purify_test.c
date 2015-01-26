@@ -173,6 +173,8 @@ int main(int argc, char *argv[]) {
   PURIFY_ERROR_MEM_ALLOC_CHECK(error);
   xoutc = (complex double*)malloc((Nx) * sizeof(complex double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(xoutc);
+  shifts = (complex double*)malloc((vis_test.nmeas) * sizeof(complex double));
+  PURIFY_ERROR_MEM_ALLOC_CHECK(shifts);
 
  
   dummyr = malloc(Nr * sizeof(double));
@@ -438,7 +440,6 @@ int main(int argc, char *argv[]) {
   free(y0);
   free(error);
   free(xoutc);
-  free(shifts);
 
   sopt_sara_free(&param1);
   free(dict_types);
@@ -448,6 +449,7 @@ int main(int argc, char *argv[]) {
   fftw_destroy_plan(planfwd);
   fftw_destroy_plan(planadj);
   purify_sparsemat_freer(&gmat);
+  free(shifts);
 
   free(dummyr);
   free(dummyc);
