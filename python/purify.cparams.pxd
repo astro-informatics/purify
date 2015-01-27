@@ -5,8 +5,8 @@ cdef extern from "sopt_l1.h":
     ctypedef struct sopt_l1_sdmmparam:
         int verbose
         int max_iter
-        double gamma
         double rel_obj
+        double gamma
         double epsilon
         double epsilon_tol
         int real_data
@@ -35,8 +35,8 @@ cdef extern from "sopt_tv.h":
     ctypedef struct sopt_tv_sdmmparam:
         int verbose
         int max_iter
-        double gamma
         double rel_obj
+        double gamma
         double epsilon
         double epsilon_tol
         int real_data
