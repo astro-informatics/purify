@@ -29,6 +29,11 @@ def test_deconvolution_kernel():
 
     assert_allclose(expected, kernels.deconvolution)
 
+    shifts = exp(-1j * (
+        visibility['u'] * dims[0] * 0.5 + visibility['v'] * dims[1] * 0.5
+    ))
+    assert_allclose(shifts, kernels.shifts)
+
 
 def visibility_image_operator():
     """ Fixture: visibility, image, and sensing operator. """
