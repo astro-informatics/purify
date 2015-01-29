@@ -112,6 +112,7 @@ class Build(dBuild):
         cmake = cmake_executable()
 
         try:
+            print "build_dirt ", build_dir
             chdir(build_dir)
             spawn([cmake] + command_line + [source_dir])
         finally:
@@ -127,7 +128,7 @@ class Build(dBuild):
 
         try:
             chdir(build_dir)
-            spawn([cmake, '--build', '.'])
+            spawn([cmake, '--build', build_dir])
         finally:
             chdir(current_dir)
 
@@ -190,7 +191,7 @@ class Install(dInstall):
                 '-DLIBRARY_INSTALL_PATH=\'%s\'' % clib,
                 '..'
             ])
-            self.spawn([cmake, '--build', '.', '--target', 'install'])
+            self.spawn([cmake, '--build', build_dir, '--target', 'install'])
         finally:
             chdir(current_cwd)
 

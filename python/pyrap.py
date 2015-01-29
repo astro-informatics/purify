@@ -3,44 +3,40 @@ __docformat__ = 'restructuredtext en'
 __all__ = ['data_iterator', 'purified_iterator']
 from . import casa
 
-class DataTransform(casa.DataTransform):
+class DataTransform(casa.CasaTransform):
     def _get_table(self, name=None):
         """ A table object """
         # can't use standard import since it would identify pyrap as this very
         # module, rather than the global pyrap module.
         tables = __import__('pyrap.tables', globals(), locals(), ['table'], 0)
-        if name is None: return tables.table(self.measurement_set)
+        if name is None:
+            return tables.table(self.measurement_set)
         return tables.table("%s::%s" % (self.measurement_set, name))
     def _c_vs_fortran(self, value):
         """ Function to derive in pyrap wrappers """
-        print value.shape
         return value.T
 
 # Wraps around generators in purify.casa and makes them use the DataTransform
 # employed above, rather than the purify.casa one.
-def data_iterator(*args, **kwargs):
-    kwargs['DataTransform'] = DataTransform
-    for o in casa.data_iterator(*args, **kwargs): yield o
-data_iterator.__doc__ = casa.data_iterator.__doc__
-def purified_iterator(*args, **kwargs):
-    kwargs['DataTransform'] = DataTransform
-    for o in casa.purified_iterator(*args, **kwargs): yield o
-purified_iterator.__doc__ = casa.purified_iterator.__doc__
-
-def purify_image(imagename, *args, **kwargs):
+def purify_image(ms, imagename, imsize=(128, 128), datadescid=0, ignoreW=False,
+        channels=None, column=None, resolution=0.3, **kwargs):
     """ Creates an image from a given measurement set
 
         Parameters:
+            ms: str
+                Path to the measurement set
             imagename: str
                 Path to the output CASA image
             overwrite: bool
                 Whether to overwrite `imagename` if it already exists. Defaults
                 to False.
             *args, **kwargs:
-                See :py:func:`purified_iterator`
+                See :py:class:`purify.casa.CasaTransform` and
+                :py:func:`purify.casa.purify_measurement_set`
     """
     from numpy import real, array
     from os.path import abspath
+    from . import SDMM
     # can't use standard import since it would identify pyrap as this very
     # module, rather than the global pyrap module.
     images = __import__('pyrap.images', globals(), locals(), ['image'], 0)
@@ -51,14 +47,21 @@ def purify_image(imagename, *args, **kwargs):
         raise ValueError(msg)
     overwrite = kwargs.pop('overwrite', False)
 
+    transform = DataTransform(
+        ms, channels=channels, datadescid=datadescid, column=column,
+        ignoreW=ignoreW, resolution=resolution
+    )
+    sdmm = SDMM(image_size=imsize, **kwargs)
     data = array(
-        [real(x) for x in purified_iterator(*args, **kwargs)],
+        [real(sdmm(x)) for x in transform],
         dtype = 'double'
     )
     imagename = abspath(imagename)
-    return images.image(
+    # argument "value = something" seems to be broken
+    image = images.image(
         abspath(imagename),
         shape=data.shape,
-        values=data,
         overwrite=overwrite
     )
+    image.put(data)
+    return image

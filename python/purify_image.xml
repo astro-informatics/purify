@@ -46,9 +46,9 @@ file:///opt/casa/code/xmlcasa/xml/casa.xsd">
             <description>Column from which to get Y data</description>
             <value>None</value>
         </param>
-        <param name="width" type="float">
-            <description>Band-width of U and V (in meters). Defaults to max |U| and max |V| </description>
-            <value>None</value>
+        <param name="resolution" type="double">
+            <description>Resolution in arcsec per pixel</description>
+            <value>0.3</value>
         </param>
 
         <param type="int" name="nlevels">
@@ -57,7 +57,7 @@ file:///opt/casa/code/xmlcasa/xml/casa.xsd">
         </param>
         <param type="stringArray" name="wavelets">
             <description>Wavelet basis types. Can be one or more of Dirac and DB1 through DB10.</description>
-            <value>"DB1"</value>
+            <value>DB1</value>
         </param>
         <param name="interpolation" type="intArray">
             <description>Size of the interpolation kernel</description>
