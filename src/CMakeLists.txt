@@ -1,7 +1,7 @@
 set(EXAMPLE_SOURCES example_30dor.c example_ami.c example_m31.c)
 set(PURIFY_SOURCES
-  purify_measurement.c purify_error.c purify_ran.c purify_utils.c purify_image.c
-  purify_sparsemat.c purify_visibility.c
+  purify_measurement.c purify_error.c purify_ran.c purify_utils.c
+  purify_image.c purify_sparsemat.c purify_visibility.c
 )
 set(TEST_SOURCE purify_test.c)
 set(ABOUT_SOURCE purify_about.c)

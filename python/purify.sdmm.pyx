@@ -290,7 +290,8 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
         # correct otherwise.
         y = visibility_column_as_numpy_array('y', visibility)
         image = self._get_image(image, y.dtype)
-        if not self.reweighted: weights = self._get_weight(weights)
+        if not self.reweighted:
+            weights = self._get_weight(weights)
         elif weights is not None:
             msg = "weights input are not meaningfull in reweighted scheme"
             raise ValueError(msg)
@@ -350,9 +351,11 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
         from numpy import ones
         wshape = (2 if self.tv_norm else len(self), ) + self.image_size
         if weights is not None:
-            if weights.dtype != 'double': weights = weights.astype('double')
+            if weights.dtype != 'double':
+                weights = weights.astype('double')
             if weights.size != wshape:
                 message = 'The shape of the weights should be %s' % str(wshape)
                 raise ValueError(message)
-        else: weights = ones(wshape, dtype='double', order='C')
+        else:
+            weights = ones(wshape, dtype='double', order='C')
         return weights

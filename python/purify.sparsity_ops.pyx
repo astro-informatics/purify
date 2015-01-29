@@ -40,9 +40,12 @@ cdef class SparsityOperator:
         """
         allwavelets = set([u.lower() for u in self.wavelet_types.iterkeys()])
         if isinstance(wavelets, str):
-            if wavelets.lower() == "all": wavelets = allwavelets;
-            else: wavelets = set([wavelets.lower()])
-        else: wavelets = set([u.lower() for u in wavelets])
+            if wavelets.lower() == "all":
+                wavelets = allwavelets;
+            else:
+                wavelets = set([wavelets.lower()])
+        else:
+            wavelets = set([u.lower() for u in wavelets])
         if not (allwavelets  >= wavelets):
             raise ValueError(
                 "Acceptable wavelets: %s (not %s)" % (allwavelets, wavelets)
