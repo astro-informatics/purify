@@ -554,7 +554,7 @@ for (i=0; i < vis_test.nmeas; i++){
     
   //Structure for the L1 solver      
   param4.verbose = 2;
-  param4.max_iter = 50;
+  param4.max_iter = 5;
   param4.gamma = gamma;//*aux2*sqrt(aux4);
   param4.rel_obj = 0.0001;
   param4.epsilon = 0.01*aux1; //sqrt(Ny + 2*sqrt(Ny))*sigma/sqrt(aux4);
