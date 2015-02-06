@@ -36,6 +36,9 @@ typedef enum
     PURIFY_VISIBILITY_FILETYPE_VIS = 0,
     /*! PROFILE's visibility file format that only includes u and v coordinates. */
     PURIFY_VISIBILITY_FILETYPE_PROFILE_VIS,
+    /*! PROFILE's visibility file format that only includes u and v
+        coordinates (without a dummy counter). */
+    PURIFY_VISIBILITY_FILETYPE_PROFILE_VIS_NODUMMY,
     /*! PROFILE's visibility file format that also includes w coordinates. */
     PURIFY_VISIBILITY_FILETYPE_PROFILE_WIS,
   } purify_visibility_filetype;

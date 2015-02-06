@@ -97,7 +97,8 @@ PURIFYHEADERS = purify_error.h                   \
 PURIFYPROGS = $(PURIFYBIN)/purify_about         \
               $(PURIFYBIN)/example_m31          \
               $(PURIFYBIN)/example_30dor        \
-              $(PURIFYBIN)/example_ami  
+              $(PURIFYBIN)/example_ami          \
+              $(PURIFYBIN)/example_realdata
 
 
 # ======== MAKE RULES ========
