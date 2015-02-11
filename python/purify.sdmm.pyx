@@ -263,7 +263,7 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
                       'y'
 
                 weights:
-                    If present, an array of weights of shape
+                    If present, an array f weights of shape
                     (len(self), ) + self.shape.
                 scale:
                     Scaling factor applied to the visibility (and the
@@ -313,7 +313,10 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
             void **datafwd = forward_data.data()
             void **dataadj = adjoint_data.data()
 
-        if scale is not None: scaled_visibility = y * scale
+        if scale is not None:
+            scaled_visibility = y * scale
+        else:
+            scaled_visibility = y
 
         if self.tv_norm and self.reweighted:
             _tv_rw_sdmm( self, sensing_op, scaled_visibility,
