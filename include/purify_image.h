@@ -26,6 +26,7 @@ typedef enum
 {
   /*! Fits file format. */
   PURIFY_IMAGE_FILETYPE_FITS = 0,
+  PURIFY_IMAGE_FILETYPE_FITS_FLOAT = 1,
 } purify_image_filetype;
 
 
