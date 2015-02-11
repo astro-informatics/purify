@@ -8,7 +8,8 @@ cdef extern from "purify_image.h":
         double *pix
 
     ctypedef enum _IMAGE_FILETYPES "purify_image_filetype":
-        FITS "PURIFY_IMAGE_FILETYPE_FITS"
+        FITS_DOUBLE "PURIFY_IMAGE_FILETYPE_FITS"
+        FITS_FLOAT "PURIFY_IMAGE_FILETYPE_FITS_FLOAT"
 
     cdef void purify_image_free(_Image *img)
     cdef int purify_image_readfile( _Image *img, const char *filename,
@@ -45,7 +46,7 @@ cdef class Image:
 
         cdef:
             _Image image
-            _IMAGE_FILETYPES flag = FITS
+            _IMAGE_FILETYPES flag = FITS_DOUBLE
         read_result = purify_image_readfile(&image, filename, flag)
         if read_result != 0:
             raise RuntimeError("Unknown error when opening %s" % filename)
@@ -54,11 +55,11 @@ cdef class Image:
         purify_image_free(&image)
 
 
-    def write(self, const char * filename):
+    def write(self, const char * filename, asfloat = True):
         """ Writes image to file """
         cdef:
             _Image image
-            _IMAGE_FILETYPES flag = FITS
+            _IMAGE_FILETYPES flag = FITS_FLOAT if asfloat else FITS_DOUBLE
         self._fill_cpointer(&image)
         read_result = purify_image_writefile(&image, filename, flag)
         if read_result != 0:
@@ -86,8 +87,8 @@ cdef class Image:
         """ A numpy array holding the pixels of the image """
         def __get__(self): return self._pixels
         def __set__(self, value):
-            self._pixels.resize((len(value), 0 if len(value) == 0 else len(value[1])))
-            self._pixels[:] = value
+            from numpy import array
+            self._pixels = array(value, dtype="float64")
     property fov:
         """ Field of view """
         def __get__(self): return self._fov[0], self._fov[1]

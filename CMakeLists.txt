@@ -21,6 +21,17 @@ option(tests          "Enable testing"                                  on)
 option(openmp         "Enable OpenMP"                                   off)
 option(python         "Enable python bindings"                          on)
 
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  if(NOT "$ENV{VIRTUAL_ENV}" STREQUAL "")
+    set(CMAKE_INSTALL_PREFIX
+      "$ENV{VIRTUAL_ENV}" CACHE PATH "Installation location" FORCE)
+    message(STATUS
+      "Install dir unspecified and virtual env found. "
+      "Defaults to installing in ${CMAKE_INSTALL_PREFIX}"
+    )
+  endif()
+endif()
+
 # Extra parameters
 if(NOT DEFINED LIBRARY_INSTALL_PATH)
     set(LIBRARY_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/lib")

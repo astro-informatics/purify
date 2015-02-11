@@ -64,6 +64,7 @@ int main(int argc, char *argv[]) {
   complex double *xoutc;
   double *dummyr;
   complex double *dummyc;
+  complex double *shifts;
 
   
   //parameters for the continuos Fourier Transform
@@ -74,8 +75,8 @@ int main(int argc, char *argv[]) {
   purify_measurement_cparam param_m2;
   complex double *fft_temp1;
   complex double *fft_temp2;
-  void *datafwd[5];
-  void *dataadj[5];
+  void *datafwd[6];
+  void *dataadj[6];
   fftw_plan planfwd;
   fftw_plan planadj;
 
@@ -166,10 +167,14 @@ int main(int argc, char *argv[]) {
   PURIFY_ERROR_MEM_ALLOC_CHECK(noise);
   w = (double*)malloc((Nr) * sizeof(double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(w);
+  shifts = (complex double*)malloc((vis_test.nmeas) * sizeof(complex double));
+  PURIFY_ERROR_MEM_ALLOC_CHECK(shifts);
   error = (double*)malloc((Nx) * sizeof(double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(error);
   xoutc = (complex double*)malloc((Nx) * sizeof(complex double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(xoutc);
+  shifts = (complex double*)malloc((vis_test.nmeas) * sizeof(complex double));
+  PURIFY_ERROR_MEM_ALLOC_CHECK(shifts);
 
  
   dummyr = malloc(Nr * sizeof(double));
@@ -196,7 +201,8 @@ int main(int argc, char *argv[]) {
   printf("Initializing griding matrix\n\n");
   start = clock();
   assert(start != -1);
-  purify_measurement_init_cft(&gmat, deconv, vis_test.u, vis_test.v, &param_m1);
+  purify_measurement_init_cft(
+      &gmat, deconv, shifts, vis_test.u, vis_test.v, &param_m1);
   stop = clock();
   t = (double) (stop-start)/CLOCKS_PER_SEC;
   printf("Time griding matrix initalization: %f \n\n", t);
@@ -223,12 +229,14 @@ int main(int argc, char *argv[]) {
   datafwd[2] = (void*)&gmat;
   datafwd[3] = (void*)&planfwd;
   datafwd[4] = (void*)fft_temp1;
+  datafwd[5] = (void*)shifts;
 
   dataadj[0] = (void*)&param_m2;
   dataadj[1] = (void*)deconv;
   dataadj[2] = (void*)&gmat;
   dataadj[3] = (void*)&planadj;
   dataadj[4] = (void*)fft_temp2;
+  dataadj[5] = (void*)shifts;
 
 
   printf("FFT plan done \n\n");
@@ -441,6 +449,7 @@ int main(int argc, char *argv[]) {
   fftw_destroy_plan(planfwd);
   fftw_destroy_plan(planadj);
   purify_sparsemat_freer(&gmat);
+  free(shifts);
 
   free(dummyr);
   free(dummyc);

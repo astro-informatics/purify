@@ -1,5 +1,5 @@
 from os.path import dirname, join, exists
-from purify.pyrap import purify_image
+from purify.pyrap import purify_measurement_set
 
 # input measurement set is created in separate script.
 # This script requires CASA
@@ -9,7 +9,7 @@ if not exists(ms):
     msg = '%s does not exist.\nPlease run casapy %s first\n' % (ms, filename)
     raise RuntimeError(msg)
 
-image = purify_image(
+image = purify_measurement_set(
     imagename = 'outputimg',
     measurement_set = ms,
     overwrite = True,
@@ -17,5 +17,7 @@ image = purify_image(
     max_iter = 10,
     nlevels = 5,
     wavelets = ['DB%i' % i for i in range(1, 10)],
-    channels = [35, 36]
+    channels = [35, 36],
+    imsize = (128, 128),
+    resolution = 0.1 # arcsec per pixel
 )

@@ -230,6 +230,8 @@ void purify_measurement_opfwd(void *out, void *in, void **data) {
  * the interpolation kernels for each visibility. The matrix is 
  * stored in compressed row storage format.
  * \param[out] deconv (double*) Deconvolution kernel in real space
+ * \param[out] shifts (complex double*) Vector with the shifts for computing
+ *             centered Fourier transform.
  * \param[in] u (double*) u coodinates between -pi and pi
  * \param[in] v (double*) v coodinates between -pi and pi
  * \param[in] param structure storing information for the operator
@@ -237,7 +239,8 @@ void purify_measurement_opfwd(void *out, void *in, void **data) {
  * \authors Rafael Carrillo
  */
 void purify_measurement_init_cft(purify_sparsemat_row *mat, 
-                                 double *deconv, double *u, double *v, 
+                                 double *deconv, complex double *shifts, 
+                                 double *u, double *v, 
                                  purify_measurement_cparam *param) {
 
   int i, j, k, l;
@@ -657,6 +660,12 @@ void purify_measurement_init_cft(purify_sparsemat_row *mat,
       }
 
     }
+
+    //Computation of diagonal matrix storing the shifts necessary for centered
+    //Fourier transform
+    temp1 = (double)param->nx1/2.0;
+    temp2 = (double)param->ny1/2.0;
+    shifts[i] = cexp(-I*(u[i]*temp1 + v[i]*temp2));
         
   }
 
@@ -667,12 +676,12 @@ void purify_measurement_init_cft(purify_sparsemat_row *mat,
 
   //Deconvolution kernel in image domain
    
-  u2[0] = -(double)param->nx1/2;
+  u2[0] = -(double)param->nx1/2.0;
   for (i=1; i < param->nx1; i++){
     u2[i] = u2[i-1] + 1.0;
   }
  
-  v2[0] = -(double)param->ny1/2;
+  v2[0] = -(double)param->ny1/2.0;
   for (i=1; i < param->ny1; i++){
     v2[i] = v2[i-1] + 1.0;
   }
@@ -716,6 +725,8 @@ void purify_measurement_init_cft(purify_sparsemat_row *mat,
  *      computing the Fourier transform (passed as an input so that the
  *      FFTW can be FFTW_MEASUREd beforehand).
  * - data[4] (complex double*) Temporal memory for the zero padding.
+ * - data[5] (complex double*) Vector with the shifts for computing
+ *            centered Fourier transform.
  *
  * \authors Rafael Carrillo
  */
@@ -733,6 +744,7 @@ void purify_measurement_cftfwd(void *out, void *in, void **data){
   complex double *xin;
   complex double *yout;
   complex double alpha;
+  complex double *shifts;
 
   //Cast input pointers
   param = (purify_measurement_cparam*)data[0];
@@ -740,6 +752,7 @@ void purify_measurement_cftfwd(void *out, void *in, void **data){
   mat = (purify_sparsemat_row*)data[2];
   plan = (fftw_plan*)data[3];
   temp = (complex double*)data[4];
+  shifts = (complex double*)data[5];
 
   xin = (complex double*)in;
   yout = (complex double*)out;
@@ -749,7 +762,7 @@ void purify_measurement_cftfwd(void *out, void *in, void **data){
   
   alpha = 0.0 + 0.0*I;
   //Zero padding and decovoluntion. 
-  //Left top corner of thee image corresponf to the original image.
+  //Center part of the image corresponds to the original image.
   for (i=0; i < nx2*ny2; i++){
     *(temp + i) = alpha;
   }
@@ -757,11 +770,17 @@ void purify_measurement_cftfwd(void *out, void *in, void **data){
   //Scaling
   scale = 1/sqrt((double)(nx2*ny2));
 
+  //Offset for zero padding
+  int xo,yo;
+
+  xo = floor(nx2/2) - floor(param->nx1/2);
+  yo = floor(ny2/2) - floor(param->ny1/2);
+
   for (j=0; j < param->nx1; j++){
     st1 = j*param->ny1;
-    st2 = j*ny2;
+    st2 = (j + xo)*ny2;
     for (i=0; i < param->ny1; i++){
-      *(temp + st2 + i) = *(xin + st1 + i)**(deconv + st1 + i)*scale;
+      *(temp + st2 + i + yo) = *(xin + st1 + i)**(deconv + st1 + i)*scale;
     }
   }
 
@@ -769,7 +788,8 @@ void purify_measurement_cftfwd(void *out, void *in, void **data){
   fftw_execute_dft(*plan, temp, temp);
 
   //Multiplication by the sparse matrix storing the interpolation kernel
-  purify_sparsemat_fwd_complexr(yout, temp, mat);
+  //and the shifts
+  purify_sparsemat_fwd_complexrsc(yout, temp, mat, shifts);
 
 }
 
@@ -790,6 +810,8 @@ void purify_measurement_cftfwd(void *out, void *in, void **data){
  *            computing the inverse Fourier transform (passed as an input so 
  *            that the FFTW can be FFTW_MEASUREd beforehand).
  * - data[4] (complex double*) Temporal memory for the zero padding.
+ * - data[5] (complex double*) Vector with the shifts for computing
+ *            centered Fourier transform.
  *
  * \authors Rafael Carrillo
  */
@@ -806,6 +828,7 @@ void purify_measurement_cftadj(void *out, void *in, void **data){
   complex double *temp;
   complex double *yin;
   complex double *xout;
+  complex double *shifts;
 
   //Cast input pointers
   param = (purify_measurement_cparam*)data[0];
@@ -813,6 +836,7 @@ void purify_measurement_cftadj(void *out, void *in, void **data){
   mat = (purify_sparsemat_row*)data[2];
   plan = (fftw_plan*)data[3];
   temp = (complex double*)data[4];
+  shifts = (complex double*)data[5];
 
   yin = (complex double*)in;
   xout = (complex double*)out;
@@ -820,9 +844,10 @@ void purify_measurement_cftadj(void *out, void *in, void **data){
   nx2 = param->ofx*param->nx1;
   ny2 = param->ofy*param->ny1;
 
-  //Multiplication by the adjoint of the 
+  
+  //Multiplication by the shifts and the adjoint of the 
   //sparse matrix storing the interpolation kernel
-  purify_sparsemat_adj_complexr(temp, yin, mat);
+  purify_sparsemat_adj_complexrsc(temp, yin, mat, shifts);
 
   //Inverse FFT
   fftw_execute_dft(*plan, temp, temp);
@@ -830,13 +855,19 @@ void purify_measurement_cftadj(void *out, void *in, void **data){
   scale = 1/sqrt((double)(nx2*ny2));
   
   //Cropping and decovoluntion. 
-  //Top left corner of the image corresponf to the original image.
+  //Center part of the image corresponds to the original image.
+
+  //Offset for zero padding
+  int xo,yo;
+
+  xo = floor(nx2/2) - floor(param->nx1/2);
+  yo = floor(ny2/2) - floor(param->ny1/2);
 
   for (j=0; j < param->nx1; j++){
     st1 = j*param->ny1;
-    st2 = j*ny2;
+    st2 = (j + xo)*ny2;
     for (i=0; i < param->ny1; i++){
-      *(xout + st1 + i) = *(temp + st2 + i)**(deconv + st1 + i)*scale;
+      *(xout + st1 + i) = *(temp + st2 + i + yo)**(deconv + st1 + i)*scale;
     }
   }
 
@@ -975,7 +1006,7 @@ void purify_measurement_symcftfwd(void *out, void *in, void **data){
   ny = param->nmeas;
  
    
-  //Take real part and multiply by two.
+  //Fill second half with conjugate of measurements.
 
   for (i=0; i < ny; i++){
     yout[i + ny] = conj(yout[i]);

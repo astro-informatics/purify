@@ -24,4 +24,6 @@ max_iter = 10
 nlevels = 5
 wavelets = ['DB%i' % i for i in range(1, 10)]
 channels = [35, 36]
+resolution = 0.1 # arcsec per pixel
+imsize = 128, 128
 purify_image()

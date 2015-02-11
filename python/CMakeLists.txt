@@ -55,7 +55,7 @@ if(tests)
         PATTERN "images/Coverages/*.vis"
         PATTERN "images/*.fits"
         PATTERN "expected/*.fits"
-        PATTERN "test" EXCLUDE
+        PATTERN "test/*" EXCLUDE
     )
 endif()
 
