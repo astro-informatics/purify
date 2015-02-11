@@ -655,6 +655,38 @@ int purify_visibility_readfile(purify_visibility *vis,
     }
     break;
 
+  case PURIFY_VISIBILITY_FILETYPE_PROFILE_VIS_NODUMMY:
+    i = 0;
+    while(fgets(buffer, PURIFY_STRLEN, file) != NULL) {
+        tok = strtok(buffer, delimiters);
+        itok = 0;
+        while (tok != NULL) {
+          switch (itok) {
+            case 0:
+              vis->u[i] = atof(tok);
+              break;
+            case 1:
+              vis->v[i] = atof(tok);
+              break;
+            case 2:
+              vis->y[i] = atof(tok);
+              break;
+            case 3:
+              vis->y[i] += I * atof(tok);
+              break;
+            case 4:
+              vis->noise_std[i] = (1 + I) * atof(tok) / PURIFY_SQRT2;
+              break;
+            default:
+              break;
+          }
+          itok++;
+          tok = strtok(NULL, delimiters);
+        }
+        i++;
+      }
+      break;
+
   case PURIFY_VISIBILITY_FILETYPE_PROFILE_WIS:
     i = 0;
     while(fgets(buffer, PURIFY_STRLEN, file) != NULL) {
