@@ -87,8 +87,8 @@ cdef class Image:
         """ A numpy array holding the pixels of the image """
         def __get__(self): return self._pixels
         def __set__(self, value):
-            self._pixels.resize((len(value), 0 if len(value) == 0 else len(value[1])))
-            self._pixels[:] = value
+            from numpy import array
+            self._pixels = array(value, dtype="float64")
     property fov:
         """ Field of view """
         def __get__(self): return self._fov[0], self._fov[1]
