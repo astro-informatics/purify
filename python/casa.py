@@ -205,12 +205,12 @@ class CasaTransform(DataTransform):
         return channels
 
 class LambdaTransform(CasaTransform):
-    def __init__(self, measurement_set, resolution=0.3, **kwargs):
+    def __init__(self, measurement_set, resolution=0.3, norm=1.0, **kwargs):
         from numpy import loadtxt
         self.resolution = resolution
         data = loadtxt(measurement_set)
         u, v, y = data[:, 0], data[:, 1], data[:, 2] + 1.0j * data[:, 3]
-        self._data = u, v, y.reshape(1, len(y))
+        self._data = u, v, y.reshape(1, len(y)) / float(norm)
         self.resolution = resolution
         """ Resolution of the output image in arcsec per pixel """
 
