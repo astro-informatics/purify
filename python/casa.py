@@ -246,7 +246,7 @@ class LambdaTransform(CasaTransform):
         return x * scale
 
 def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
-        **kwargs):
+        coordsys=None, **kwargs):
     """ Creates an image using the Purify method
 
         Parameters:
@@ -279,13 +279,15 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
         raise IOError(msg % imagename)
 
     casalog.post('Starting Purify task')
+    scale = kwargs.pop('scale', 'default')
     sdmm = SDMM(image_size=imsize, **kwargs)
+
 
     # Contains images over all dimensions
     image = []
     for i, data in enumerate(datatransform):
         casalog.origin('Purifying plane %s' % str(i))
-        channel = sdmm(data)
+        channel = sdmm(data, scale=scale)
         image.append(channel)
 
     image = array(image, order='F')
@@ -294,7 +296,10 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     casalog.post('Creating CASA image')
     ia, = gentools(['ia'])
     # Only the real part is meaningful
-    ia.newimagefromarray(imagename, image.real, overwrite=overwrite)
+    if coordsys is None:
+        coordsys = cs.newcoordsys(stokes=["I"])
+    ia.newimagefromarray(imagename, image.real, overwrite=overwrite,
+            coordsys=coordsys)
 
 def purify_measurement_set(measurement_set, imagename, imsize=None,
         datadescid=0, ignoreW=False, channels=None, column=None,
