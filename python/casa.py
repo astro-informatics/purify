@@ -84,7 +84,8 @@ class DataTransform(object):
 class CasaTransform(DataTransform):
     """ Transforms measurement set to something purify understands """
     def __init__(self, measurement_set, datadescid=0, ignoreW=False,
-            channels=None, resolution=0.3, column=None, **kwargs):
+            channels=None, resolution=0.3, column=None,
+            query="mscal.stokes({0}, 'I')", **kwargs):
         """ Creates the transform
 
             :Parameters:
@@ -100,6 +101,12 @@ class CasaTransform(DataTransform):
                 column:
                     Name of the data column from which y is taken. Defaults to
                     'CORRECTED_DATA' or 'DATA'.
+                query:
+                    Query sent to figure out Y. It is a format string taking
+                    one argument, and resolving to a TaQL query. It defaults to
+                    "mscal.stokes({0}, 'I')", where %s is the argument. It is
+                    substituted wiht the value from column (e.g.
+                    'CORRECTED_DATA' or 'DATA').
         """
         super(DataTransform, self).__init__()
 
@@ -115,6 +122,14 @@ class CasaTransform(DataTransform):
         """ By default, fails if W terms are not zero """
         self.resolution = resolution
         """ Resolution of the output image in arcsec per pixel """
+        self.query = query
+        """ Query from which Y is obtained.
+
+            It is a format string taking one argument, and resolving to a TaQL
+            query. It defaults to  "mscal.stokes({0}, 'I')", where %s is the
+            argument. It is substituted wiht the value from column (e.g.
+            'CORRECTED_DATA' or 'DATA').
+        """
 
 
     def _get_table(self, name=None):
@@ -153,7 +168,8 @@ class CasaTransform(DataTransform):
         from numpy import ones
         allfreqs = self._all_frequencies
         if allfreqs.ndim == 0:
-            channels = [0] if self.channels is None else self.channels
+            condition = self.channels is None or self.channels == [None]
+            channels = [0] if condition else self.channels
             allfreqs = ones(max(channels) + 1, dtype='double') * allfreqs
         return allfreqs[self.channels].squeeze()
 
@@ -162,7 +178,7 @@ class CasaTransform(DataTransform):
         """ Data needed by Purify """
         from numpy import allclose, require
         query = 'DATA_DESC_ID == 0'
-        columns = "UVW, mscal.stokes(%s, 'I') as Y" % self.column
+        columns = "UVW, %s as Y" % self.query.format(self.column)
         tb = self._get_table().query(query=query, columns=columns)
         y = self._c_vs_fortran(tb.getcol('Y').squeeze())
         y_is_complex = str(y.dtype)[:7] == 'complex'
@@ -172,7 +188,9 @@ class CasaTransform(DataTransform):
         if not (self.ignoreW or allclose(w, 0)):
             raise NotImplementedError('Cannot purify data with W components')
 
-        return u, v, y[..., self.channels, :].squeeze()
+        # Just dealing with CASA difficulties
+        channels = None if self.channels == [None] else self.channels
+        return u, v, y[..., channels, :].squeeze()
 
     def _get_data_column_name(self, column):
         """ Name of the column to use for Y """
@@ -246,7 +264,7 @@ class LambdaTransform(CasaTransform):
         return x * scale
 
 def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
-        coordsys=None, **kwargs):
+        **kwargs):
     """ Creates an image using the Purify method
 
         Parameters:
@@ -295,15 +313,11 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     # Create image
     casalog.post('Creating CASA image')
     ia, = gentools(['ia'])
-    # Only the real part is meaningful
-    if coordsys is None:
-        coordsys = cs.newcoordsys(stokes=["I"])
-    ia.newimagefromarray(imagename, image.real, overwrite=overwrite,
-            coordsys=coordsys)
+    ia.newimagefromarray(imagename, image.real, overwrite=overwrite)
 
 def purify_measurement_set(measurement_set, imagename, imsize=None,
         datadescid=0, ignoreW=False, channels=None, column=None,
-        resolution=0.3, **kwargs):
+        resolution=0.3, query="mscal.stokes({0}, 'I')", **kwargs):
     """ Creates an image using the Purify method
 
         Parameters:
@@ -323,12 +337,18 @@ def purify_measurement_set(measurement_set, imagename, imsize=None,
             column:
                 Column to use for Y data. Defaults to 'CORRECTED_DATA' if
                 present, and 'DATA' otherwise.
+            query:
+                Query sent to figure out Y. It is a format string taking one
+                argument, and resolving to a TaQL query. It defaults to
+                "mscal.stokes({0}, 'I')", where %s is the argument. It is
+                substituted wiht the value from column (e.g. 'CORRECTED_DATA'
+                or 'DATA').
             other arguments:
                 See purify_image
     """
     transform = CasaTransform(
         measurement_set, channels=channels, datadescid=datadescid,
-        column=column, ignoreW=ignoreW, resolution=resolution
+        column=column, ignoreW=ignoreW, resolution=resolution, query=query
     )
     return purify_image(
             transform, imagename=imagename, imsize=imsize, **kwargs)
