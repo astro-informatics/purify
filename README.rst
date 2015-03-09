@@ -140,7 +140,7 @@ Python users
 
 .. code:: bash
 
-    pip install git+https://github.com/UCL/purify.git
+    pip install git+https://github.com/basp-group/purify.git
 
 It is highly recommended to do this within a `virtual
 environment <http://www.virtualenv.org/en/latest/>`__. With most python
@@ -151,7 +151,7 @@ installations, one can proceed as follows:
     # Create virtual environment in directory purify
     python -m virtualenv purify --system-site-packages
     # Install purify in this environment
-    ./purify/bin/pip install git+https://github.com/UCL/purify.git
+    ./purify/bin/pip install git+https://github.com/basp-group/purify.git
     # Run tests within the environment
     ./purify/bin/python -c "import purify; purify.test()"
 
@@ -184,7 +184,7 @@ recognize that it has just installed a module. Then install ``purify`` proper:
     from pip import main as pip
     # Now install purify and dependencies directly from github: that's why we
     # got pip in the first place
-    pip(['install', 'git+https://github.com/UCL/purify.git'])
+    pip(['install', 'git+https://github.com/basp-group/purify.git'])
 
 This last snippet can be used to install other packages as well, by replacing
 the second element in the list with the name or location of a package. It is
