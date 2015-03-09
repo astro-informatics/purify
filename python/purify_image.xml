@@ -61,7 +61,7 @@ file:///opt/casa/code/xmlcasa/xml/casa.xsd">
         </param>
         <param name="interpolation" type="intArray">
             <description>Size of the interpolation kernel</description>
-            <value type="vector"> <value>4</value><value>4</value> </value>
+            <value type="vector"> <value>24</value><value>24</value> </value>
         </param>
         <param name="oversampling" type="intArray">
             <description>Size of the interpolation kernel</description>
@@ -149,6 +149,10 @@ file:///opt/casa/code/xmlcasa/xml/casa.xsd">
         <param name="tv_norm" type="bool">
             <description>Whether to use TV norm</description>
             <value>False</value>
+        </param>
+        <param name="query" type="string">
+            <description>Queries for a specific column as the visibilities</description>
+            <value>mscal.stokes({0}, "I")</value>
         </param>
    </input>
 
