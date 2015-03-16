@@ -2,6 +2,7 @@
  * \file purify_image.c
  * Functionality to operate on images.
  */
+#include "purify_config.h"
 
 #include <fitsio.h>
 #include <stdio.h>
@@ -21,15 +22,8 @@
  *
  * \authors <a href="http://www.jasonmcewen.org">Jason McEwen</a>
  */
-inline void purify_image_ixiy2ind(int *ind, int ix, int iy, 
-				  purify_image *img) {
-
- if (ix >= img->nx || ix >= img->ny)
-    PURIFY_ERROR_GENERIC("Image index too large");
-
-  *ind = ix * img->ny + iy;
-
-}
+extern inline void purify_image_ixiy2ind(int *ind, int ix, int iy, 
+				  purify_image *img);
 
 
 /*!
@@ -42,16 +36,8 @@ inline void purify_image_ixiy2ind(int *ind, int ix, int iy,
  *
  * \authors <a href="http://www.jasonmcewen.org">Jason McEwen</a>
  */
-inline void purify_image_ind2iuiv(int *ix, int *iy, int ind, 
-				  purify_image *img) {
-
-  if (ind >= img->nx*img->ny)
-    PURIFY_ERROR_GENERIC("Image index too large");
-
-  *ix = ind / img->ny; // Integer division.
-  *iy = ind - *ix * img->ny;
-
-}
+extern void purify_image_ind2iuiv(int *ix, int *iy, int ind, 
+				  purify_image *img);
 
 
 /*!
@@ -64,6 +50,7 @@ inline void purify_image_ind2iuiv(int *ix, int *iy, int ind,
 void purify_image_free(purify_image *img) {
   
   if(img->pix != NULL) free(img->pix);
+  img->pix = NULL;
   img->fov_x = 0.0;
   img->fov_y = 0.0;
   img->nx = 0;
@@ -115,8 +102,8 @@ int purify_image_compare(purify_image *img1,
  * \authors <a href="http://www.jasonmcewen.org">Jason McEwen</a>
  */
 int purify_image_readfile(purify_image *img,
-			  const char *filename,
-			  purify_image_filetype filetype) {
+        const char *filename,
+        purify_image_filetype filetype) {
 
   char buffer[PURIFY_STRLEN];
   fitsfile *fptr;
@@ -127,6 +114,7 @@ int purify_image_readfile(purify_image *img,
 
   switch (filetype) {
   case PURIFY_IMAGE_FILETYPE_FITS:
+  case PURIFY_IMAGE_FILETYPE_FITS_FLOAT:
 
     // Open fits file.
     fits_open_file(&fptr, filename, READONLY, &fits_status);
@@ -188,6 +176,69 @@ int purify_image_readfile(purify_image *img,
 
 }
 
+int _purify_image_open_fits_file(
+    fitsfile** fptr, purify_image *img, const char *fname) {
+  int fits_status = 0;
+  long naxes[2];
+  // Open fits file.
+  fits_create_file(fptr, fname, &fits_status);
+  fits_report_error(stdout, fits_status);
+
+  // Create primary header.
+  naxes[0] = img->nx;
+  naxes[1] = img->ny;
+  fits_create_img(*fptr, DOUBLE_IMG, 2, naxes, &fits_status);
+  fits_report_error(stdout, fits_status);
+  fits_write_comment(*fptr, "--------------------------------------------",  &fits_status);
+  fits_write_comment(*fptr, "File written by PURIFY (www.jasonmcewen.org)",  &fits_status);
+  fits_write_comment(*fptr, "--------------------------------------------",  &fits_status);
+
+  return fits_status;
+}
+
+int _purify_image_writefits_file_double(purify_image *img,
+         const char *filename,
+         purify_image_filetype filetype) {
+  long fpixel[2];
+  fitsfile *fptr;
+  int fits_status = _purify_image_open_fits_file(&fptr, img, filename);
+
+  // Write image.
+  fpixel[0] = 1;
+  fpixel[1] = 1;
+  fits_write_pix(
+      fptr, TDOUBLE, fpixel, img->ny * img->nx, img->pix, &fits_status);
+
+  // Close fits file.
+  fits_close_file(fptr,  &fits_status);
+  fits_report_error(stdout, fits_status);
+  return fits_status;
+}
+
+int _purify_image_writefits_file_float(purify_image *img,
+         const char *filename,
+         purify_image_filetype filetype) {
+  long fpixel[2];
+  fitsfile *fptr;
+  int fits_status = _purify_image_open_fits_file(&fptr, img, filename);
+
+  // copy to a float array
+  float *array = (float*) malloc(sizeof(float) * img->nx * img->ny);
+  for(int i=0; i < img->nx * img->ny; ++i)
+    array[i] = (float) img->pix[i];
+
+  // Write image.
+  fpixel[0] = 1;
+  fpixel[1] = 1;
+  fits_write_pix(
+      fptr, TFLOAT, fpixel, img->ny * img->nx, array, &fits_status);
+
+  // Close fits file.
+  fits_close_file(fptr,  &fits_status);
+  fits_report_error(stdout, fits_status);
+  free(array);
+  return fits_status;
+}
 
 /*!
  * Write image to file.
@@ -200,49 +251,23 @@ int purify_image_readfile(purify_image *img,
  * \authors <a href="http://www.jasonmcewen.org">Jason McEwen</a>
  */
 int purify_image_writefile(purify_image *img,
-			   const char *filename,
-			   purify_image_filetype filetype) {
+         const char *filename,
+         purify_image_filetype filetype) {
 
   char buffer[PURIFY_STRLEN];
-  fitsfile *fptr;
-  int fits_status = 0;
-  long naxes[2], fpixel[2];
 
 
   switch (filetype) {
   case PURIFY_IMAGE_FILETYPE_FITS:
-
-    // Open fits file.
-    fits_create_file(&fptr, filename, &fits_status);
-    fits_report_error(stdout, fits_status);
-
-    // Create primary header.
-    naxes[0] = img->nx;
-    naxes[1] = img->ny;
-    fits_create_img(fptr, DOUBLE_IMG, 2, naxes, &fits_status);
-    fits_report_error(stdout, fits_status);
-    fits_write_comment(fptr, "--------------------------------------------",  &fits_status);
-    fits_write_comment(fptr, "File written by PURIFY (www.jasonmcewen.org)",  &fits_status);
-    fits_write_comment(fptr, "--------------------------------------------",  &fits_status);
-
-    // Write image.
-    fpixel[0] = 1;
-    fpixel[1] = 1;
-    fits_write_pix(fptr, TDOUBLE, fpixel, naxes[0]*naxes[1], img->pix, &fits_status);
-
-    // Close fits file.
-    fits_close_file(fptr,  &fits_status);
-    fits_report_error(stdout, fits_status);
-
-    break;
-
+    return _purify_image_writefits_file_double(img, filename, filetype);
+  case PURIFY_IMAGE_FILETYPE_FITS_FLOAT:
+    return _purify_image_writefits_file_float(img, filename, filetype);
   default:
     sprintf(buffer, 
-	    "Image filetype with id %d is not supported", 
-	    filetype);
+      "Image filetype with id %d is not supported", 
+      filetype);
     PURIFY_ERROR_GENERIC(buffer);
     break;
-    
   }
 
   return 0;

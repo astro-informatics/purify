@@ -1,6 +1,7 @@
 
 #ifndef PURIFY_MEASUREMENT
 #define PURIFY_MEASUREMENT
+#include "purify_config.h"
 
 /*!  
  * Structure storing parametrs for the interpolation operator.

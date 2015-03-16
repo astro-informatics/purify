@@ -1,0 +1,11 @@
+bin/
+lib/
+data/test/
+*.pyc
+.*.sw[p, o, n]
+*.egg*
+*build*/
+pkg_install/
+dist/
+casapy-*.log
+ipython-*.log

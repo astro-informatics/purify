@@ -4,6 +4,7 @@
 
 #ifndef PURIFY_TYPES
 #define PURIFY_TYPES
+#include "purify_config.h"
 
 #define PURIFY_STRLEN 256
 

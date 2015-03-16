@@ -2,6 +2,7 @@
  * \file purify_visibility.c
  * Functionality to operate on vsibilities.
  */
+#include "purify_config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +12,6 @@
 #include "purify_sparsemat.h"
 #include "purify_utils.h"
 #include "purify_ran.h"
-#include "purify_error.h"
 #include "purify_types.h"
 
 
@@ -33,16 +33,8 @@ double purify_visibility_modifypdf(double *pdf, double *new_pdf,
  *
  * \authors <a href="http://www.jasonmcewen.org">Jason McEwen</a>
  */
-inline void purify_visibility_iuiv2ind(int *ind, int iu, int iv, 
-				       int nx, int ny) {
-
-  if (iu >= nx || iv >= ny)
-    PURIFY_ERROR_GENERIC("Visibility index too large.");
-
-  *ind = iu * ny + iv;
-
-}
-
+extern inline void purify_visibility_iuiv2ind(int *ind, int iu, int iv, 
+				       int nx, int ny);
 
 /*!
  * Compute 2D visibility indices from 1D index.
@@ -55,17 +47,8 @@ inline void purify_visibility_iuiv2ind(int *ind, int iu, int iv,
  *
  * \authors <a href="http://www.jasonmcewen.org">Jason McEwen</a>
  */
-inline void purify_visibility_ind2iuiv(int *iu, int *iv, int ind, 
-				       int nx, int ny) {
-
-  if (ind >= nx*ny)
-    PURIFY_ERROR_GENERIC("Visibility index too large");
-
-  *iu = ind / ny; // Integer division.
-  *iv = ind - *iu * ny;
-
-}
-
+extern inline void purify_visibility_ind2iuiv(int *iu, int *iv, int ind, 
+				       int nx, int ny);
 
 /*!
  * Compute visibility spacing du from field-of-view.
@@ -75,9 +58,7 @@ inline void purify_visibility_ind2iuiv(int *iu, int *iv, int ind,
  *
  * \authors <a href="http://www.jasonmcewen.org">Jason McEwen</a>
  */
-inline double purify_visibility_du(double fov) {
-  return 1.0 / fov;
-}
+extern inline double purify_visibility_du(double fov);
 
 
 /*!
@@ -90,10 +71,7 @@ inline double purify_visibility_du(double fov) {
  *
  * \authors <a href="http://www.jasonmcewen.org">Jason McEwen</a>
  */
-inline double purify_visibility_umax(double fov, int n) {
-  return (double)n / (double)(2.0 * fov);
-}
-
+extern inline double purify_visibility_umax(double fov, int n);
 
 /*!
  * Allocate space for nmeas visibilities.

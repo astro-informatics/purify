@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" ?>
+<casaxml xmlns="http://casa.nrao.edu/schema/psetTypes.html"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://casa.nrao.edu/schema/casa.xsd
+file:///opt/casa/code/xmlcasa/xml/casa.xsd">
+
+<task type="function" name="purify_image" category="imaging">
+
+    <shortdescription>Invert and deconvolve images using Purify algorithms</shortdescription>
+
+    <description>Form images from visibilities</description>
+
+    <input>
+        <param type="any" name="vis" kind="ms" mustexist="true">
+        <description>Name of input visibility file</description>
+          <any type="variant" limittypes="string stringArray"/>
+          <value type="string"></value>
+        </param>
+
+        <param type="any" name="imagename">
+          <description>Pre-name of output images</description>
+          <any type="variant" limittypes="string stringArray"/>
+          <value type="string"></value>
+        </param>
+        <param type="intArray" name="imsize">
+            <description>x and y image size in pixels</description>
+            <value type="vector">
+                <value>256</value>
+                <value>256</value>
+            </value>
+        </param>
+        <param type="int" name="datadescid">
+            <description>Data description ID</description>
+            <value>0</value>
+        </param>
+        <param name="ignoreW" type="bool">
+            <description>Ignore value of W</description>
+            <value>False</value>
+        </param>
+        <param name="channels" type="intArray">
+            <description>Data selection criteria</description>
+            <value>None</value>
+        </param>
+        <param name="column" type="str">
+            <description>Column from which to get Y data</description>
+            <value>None</value>
+        </param>
+        <param name="resolution" type="double">
+            <description>Resolution in arcsec per pixel</description>
+            <value>0.3</value>
+        </param>
+
+        <param type="int" name="nlevels">
+            <description>Number of levels for each wavelet basis set</description>
+            <value>4</value>
+        </param>
+        <param type="stringArray" name="wavelets">
+            <description>Wavelet basis types. Can be one or more of Dirac and DB1 through DB10.</description>
+            <value>DB1</value>
+        </param>
+        <param name="interpolation" type="intArray">
+            <description>Size of the interpolation kernel</description>
+            <value type="vector"> <value>24</value><value>24</value> </value>
+        </param>
+        <param name="oversampling" type="intArray">
+            <description>Size of the interpolation kernel</description>
+            <value type="vector"> <value>2</value><value>2</value> </value>
+        </param>
+        <param name="gamma" type="double">
+            <description>convergence criteria</description>
+            <value>None</value>
+        </param>
+        <param name="radius" type="double">
+            <description>Radius of the L2 Ball</description>
+            <value>None</value>
+        </param>
+        <param name="relative_radius" type="double">
+            <description>Defines the range of the radius</description>
+            <value>1e-2</value>
+        </param>
+        <param name="max_iter" type="int">
+            <description>Maximum number of SDMM iterations</description>
+            <value>300</value>
+        </param>
+        <param name="relative_variation" type="double">
+            <description>Convergence criteria</description>
+            <value>1e-4</value>
+        </param>
+        <param name="verbose" type="string">
+            <description>String indicating the level of verbosity</description>
+            <value>high</value>
+            <allowed kind="enum">
+                <value>off</value>
+                <value>medium</value>
+                <value>high</value>
+            </allowed>
+        </param>
+        <param name="cg_max_iter" type="int">
+            <description>Maximum conjugate gradient iterations</description>
+            <value>100</value>
+        </param>
+        <param name="cg_tolerance" type="double">
+            <description>Conjugate gradient convergence criteria</description>
+            <value>1e-6</value>
+        </param>
+        <param name="reweighted" type="boolean">
+            <description>Whether to apply the reweighted schemes</description>
+            <value>False</value>
+        </param>
+        <param name="rw_max_iter" type="int">
+            <description>Maximum iterations of for RW-L1 problem</description>
+            <value>5</value>
+        </param>
+        <param name="rw_verbose" type="string">
+            <description>Verbosity for RW-L1 problem</description>
+            <value>high</value>
+            <allowed kind="enum">
+                <value>off</value>
+                <value>medium</value>
+                <value>high</value>
+            </allowed>
+        </param>
+        <param name="rw_sigma" type="double">
+            <description>Noise standard deviation</description>
+            <value>None</value>
+        </param>
+        <param name="rw_relative_variation" type="double">
+            <description>Convergence criteria for the L1 problem</description>
+            <value>1e-3</value>
+        </param>
+        <param name="tv_max_iter" type="int">
+            <description>Iterations for proximity operator</description>
+            <value>50</value>
+        </param>
+        <param name="tv_verbose" type="string">
+            <description>Verbosity for proximity operator</description>
+            <value>medium</value>
+            <allowed kind="enum">
+                <value>off</value>
+                <value>medium</value>
+                <value>high</value>
+            </allowed>
+        </param>
+        <param name="tv_relative_variation" type="double">
+            <description>Convergence criteria for proximity operator</description>
+            <value>1e-4</value>
+        </param>
+        <param name="tv_norm" type="bool">
+            <description>Whether to use TV norm</description>
+            <value>False</value>
+        </param>
+        <param name="query" type="string">
+            <description>Queries for a specific column as the visibilities</description>
+            <value>mscal.stokes({0}, "I")</value>
+        </param>
+   </input>
+
+   <returns type="void"/>
+
+  <example>
+      None yet
+  </example>
+
+</task>
+
+</casaxml>

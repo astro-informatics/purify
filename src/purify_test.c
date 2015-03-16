@@ -3,6 +3,7 @@
  * Test program to check purify routines.
  *
  */
+#include "purify_config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,13 +15,7 @@
 #ifdef _OPENMP 
   #include <omp.h>
 #endif 
-#ifdef __APPLE__
-  #include <Accelerate/Accelerate.h>
-#elif __unix__
-  #include <cblas.h>
-#else
-  #include <cblas.h>
-#endif 
+#include PURIFY_BLAS_H
 #include "purify_visibility.h"
 #include "purify_sparsemat.h"
 #include "purify_image.h"
@@ -69,6 +64,7 @@ int main(int argc, char *argv[]) {
   complex double *xoutc;
   double *dummyr;
   complex double *dummyc;
+  complex double *shifts;
 
   
   //parameters for the continuos Fourier Transform
@@ -83,7 +79,6 @@ int main(int argc, char *argv[]) {
   void *dataadj[6];
   fftw_plan planfwd;
   fftw_plan planadj;
-  complex double *shifts;
 
   //Structures for sparsity operator
   sopt_wavelet_type *dict_types;
@@ -172,6 +167,8 @@ int main(int argc, char *argv[]) {
   PURIFY_ERROR_MEM_ALLOC_CHECK(noise);
   w = (double*)malloc((Nr) * sizeof(double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(w);
+  shifts = (complex double*)malloc((vis_test.nmeas) * sizeof(complex double));
+  PURIFY_ERROR_MEM_ALLOC_CHECK(shifts);
   error = (double*)malloc((Nx) * sizeof(double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(error);
   xoutc = (complex double*)malloc((Nx) * sizeof(complex double));
@@ -202,8 +199,10 @@ int main(int argc, char *argv[]) {
   printf("***********************\n\n");
   //Initialize griding matrix
   printf("Initializing griding matrix\n\n");
-  assert((start = clock())!=-1);
-  purify_measurement_init_cft(&gmat, deconv, shifts, vis_test.u, vis_test.v, &param_m1);
+  start = clock();
+  assert(start != -1);
+  purify_measurement_init_cft(
+      &gmat, deconv, shifts, vis_test.u, vis_test.v, &param_m1);
   stop = clock();
   t = (double) (stop-start)/CLOCKS_PER_SEC;
   printf("Time griding matrix initalization: %f \n\n", t);
@@ -243,7 +242,8 @@ int main(int argc, char *argv[]) {
   printf("FFT plan done \n\n");
   
   printf("Simulating visibilities \n\n");
-  assert((start = clock())!=-1);
+  start = clock();
+  assert(start != -1);
   purify_measurement_cftfwd((void*)y0, (void*)xinc, datafwd);
   stop = clock();
   t = (double) (stop-start)/CLOCKS_PER_SEC;
@@ -383,7 +383,8 @@ int main(int argc, char *argv[]) {
       xoutc[i] = 0.0 + 0.0*I;
   }
  
-  assert((start = clock())!=-1);
+  start = clock();
+  assert(start != -1);
   sopt_l1_sdmm((void*)xoutc, Nx,
                    &purify_measurement_cftfwd,
                    datafwd,

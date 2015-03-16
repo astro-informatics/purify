@@ -2,19 +2,14 @@
  * \file purify_measurement.c
  * Functionality to define measurement operators.
  */
+#include "purify_config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h> 
 #include <complex.h>  // Must be before fftw3.h
 #include <fftw3.h>
-#ifdef __APPLE__
-  #include <Accelerate/Accelerate.h>
-#elif __unix__
-  #include <cblas.h>
-#else
-  #include <cblas.h>
-#endif 
+#include PURIFY_BLAS_H
 #include "purify_image.h"
 #include "purify_sparsemat.h"
 #include "purify_visibility.h"

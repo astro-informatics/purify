@@ -1,6 +1,7 @@
 
 #ifndef PURIFY_SPARSEMAT
 #define PURIFY_SPARSEMAT
+#include "purify_config.h"
 
 #include <complex.h>
 
