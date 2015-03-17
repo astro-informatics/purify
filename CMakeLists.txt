@@ -63,6 +63,7 @@ include_directories(
 add_subdirectory(src)
 add_subdirectory(include)
 add_subdirectory(python)
+add_subdirectory(doc)
 
 if(LINK_TO_ABSOLUTE_PYTHON_PATH AND APPLE)
     configure_file(
