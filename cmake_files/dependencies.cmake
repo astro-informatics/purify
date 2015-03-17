@@ -10,7 +10,7 @@ find_package(CBLAS REQUIRED)
 set(PURIFY_BLAS_H "${BLAS_INCLUDE_FILENAME}")
 
 # Look up packages: if not found, installs them
-lookup_package(Sopt REQUIRED ARGUMENTS GIT_TAG features/cmake)
+lookup_package(Sopt REQUIRED ARGUMENTS GIT_REPOSITORY git@github.com:astro-informatics/sopt.git)
 lookup_package(CFitsIO REQUIRED ARGUMENTS CHECKCASA)
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${BLAS_LINKER_FLAGS}")
