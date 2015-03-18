@@ -6,19 +6,25 @@ Description
 ===========
 
 PURIFY is a collection of routines written in C that implements
-different tools for radio-interferometric imaging including file
+different tools for radio interferometric imaging including file
 handling (for both visibilities and fits files), implementation of the
 measurement operator and set-up of the different optimization problems
 used for image deconvolution. The code calls the generic Sparse
 OPTimization (SOPT) package to solve the imaging optimization problems.
 
-Authors
-=======
+Creators
+========
 
 -  `R. E. Carrillo <http://people.epfl.ch/rafael.carrillo>`__
 -  `J. D. McEwen <http://www.jasonmcewen.org>`__
 -  `Y. Wiaux <http://basp.eps.hw.ac.uk>`__
 
+Contributors
+============
+
+- Mayeul d'Avezac
+
+   
 Experiments -- C code
 =====================
 
@@ -35,10 +41,10 @@ Reference
 =========
 
 When referencing this code, please cite our related paper:
-
-[1] R. E. Carrillo, J. D. McEwen and Y. Wiaux. "Why CLEAN when you can
-PURIFY?", submitted to MNRAS, 2013 (arXiv:arXiv:1307.4370). Preprint
-available at http://infoscience.epfl.ch/record/187457.
+[1] R. E. Carrillo, J. D. McEwen and Y. Wiaux.  "PURIFY: a new
+approach to radio-interferometric
+imaging". Mon. Not. Roy. Astron. Soc., 439(4):3591-3604, 2014,
+`arXiv:1307.4370 <http://arxiv.org/abs/1307.4370>`__
 
 Documentation
 =============
@@ -224,7 +230,7 @@ SUPPORT
 =======
 
 If you have any questions or comments, feel free to contact Rafael
-Carrillo at: rafael {DOT} carrillo {AT} epfl {DOT} ch.
+Carrillo or Jason McEwen.
 
 NOTES
 =====
