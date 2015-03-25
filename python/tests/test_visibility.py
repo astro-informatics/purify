@@ -28,8 +28,8 @@ def test_read_visibility():
         csv.to_csv(file.name, header=False, cols=['u', 'v', 'yreal', 'yimag', 'noise'])
         actual = read_visibility(file.name)
 
-        assert_equal(set(expected.keys()), set(expected.keys()))
-        for name in expected.keys(): 
+        assert_equal(set(actual.keys()), set(expected.keys()))
+        for name in expected.keys():
             assert_allclose( actual[name], expected[name], 
                              err_msg = "Columns %s did not compare" % name )
 
