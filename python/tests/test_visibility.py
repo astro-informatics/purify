@@ -3,7 +3,7 @@
 def test_read_visibility():
     # A fake visibility is first created and written to file
     # Then the file is read and the two visibilities (fake and reread) are compared. 
-    from pandas  import DataFrame
+    from pandas import DataFrame
     from numpy import sqrt
     from numpy.random import random
     from numpy.testing import assert_allclose, assert_equal
@@ -24,8 +24,10 @@ def test_read_visibility():
     })
 
     with NamedTemporaryFile(delete=True) as file:
-        file.close()
-        csv.to_csv(file.name, header=False, cols=['u', 'v', 'yreal', 'yimag', 'noise'])
+        for i in range(len(csv)):
+            msg = "{i}, {u}, {v}, {yreal}, {yimag}, {noise}\n"
+            file.write(msg.format(i=i, **csv.ix[i, :]))
+        file.flush()
         actual = read_visibility(file.name)
 
         assert_equal(set(actual.keys()), set(expected.keys()))
