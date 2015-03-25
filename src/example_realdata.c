@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
   // Define parameters.
   filetype_vis = PURIFY_VISIBILITY_FILETYPE_PROFILE_VIS_NODUMMY;
   filetype_img = PURIFY_IMAGE_FILETYPE_FITS;
-  strcpy(filename_vis, "data/vsa/at166B.3C129.c0.vis");
+  strcpy(filename_vis, "data/vla/at166B.3C129.c0.vis");
 
   // Read visibilities.
   purify_visibility_readfile(&vis_test,
@@ -289,7 +289,7 @@ int main(int argc, char *argv[]) {
   for (i=0; i < Nx; i++){
     img_copy.pix[i] = creal(xoutc[i]);
   }  
-  purify_image_writefile(&img_copy, "data/vsa/dirty_image.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/vla/dirty_image.fits", filetype_img);
 
   
   //L2 norm of the data
@@ -408,7 +408,7 @@ int main(int argc, char *argv[]) {
     img_copy.pix[i] = creal(xoutc[i]);
   }
   
-  purify_image_writefile(&img_copy, "data/vsa/bpsa_rec.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/vla/bpsa_rec.fits", filetype_img);
 
 
   //Residual image
@@ -421,7 +421,7 @@ int main(int argc, char *argv[]) {
     img_copy.pix[i] = creal(xinc[i]);
   }
   
-  purify_image_writefile(&img_copy, "data/vsa/residual.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/vla/residual.fits", filetype_img);
   
   
   /*
