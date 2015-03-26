@@ -1,7 +1,7 @@
 """ Purify package """
 __docformat__ = "restructuredtext en"
 __all__ = ['read_visibility', 'Image', 'kernels', 'SensingOperator',
-           'SparsityOperator', 'SDMM', 'read_image', 'RWSDMM']
+           'SparsityOperator', 'SDMM', 'read_image']
 from os.path import exists, join, dirname
 
 from .visibility import read_visibility

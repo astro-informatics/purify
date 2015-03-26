@@ -1,6 +1,6 @@
 """ Functionality for interfacing CASA and Purify via pyrap """
 __docformat__ = 'restructuredtext en'
-__all__ = ['data_iterator', 'purified_iterator']
+__all__ = ['purified_image', 'DataTransform', 'purify_measurement_set']
 from . import casa
 
 class DataTransform(casa.CasaTransform):
