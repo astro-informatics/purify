@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
   complex double *y0;
   complex double *y;
   double *xout;
-  double *w;
+  double *w_l1, *w_l2;
   complex double *xoutc;
   double *dummyr;
   complex double *dummyc;
@@ -100,6 +100,10 @@ int main(int argc, char *argv[]) {
   //Structures for the opmization problems
   sopt_l1_sdmmparam param4;
   //sopt_l1_rwparam param5;
+
+  sopt_prox_l1param param_l1param;
+  sopt_l1_param_padmm param_padmm;
+
 
   clock_t start, stop;
   double t = 0.0;
@@ -181,8 +185,10 @@ int main(int argc, char *argv[]) {
   PURIFY_ERROR_MEM_ALLOC_CHECK(y);
   y0 = (complex double*)malloc((vis_test.nmeas) * sizeof(complex double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(y0);
-  w = (double*)malloc((Nr) * sizeof(double));
-  PURIFY_ERROR_MEM_ALLOC_CHECK(w);
+  w_l1 = (double*)malloc((Nr) * sizeof(double));
+  PURIFY_ERROR_MEM_ALLOC_CHECK(w_l1);
+  w_l2 = (double*)malloc((Ny) * sizeof(double));
+  PURIFY_ERROR_MEM_ALLOC_CHECK(w_l2);
   xoutc = (complex double*)malloc((Nx) * sizeof(complex double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(xoutc);
   shifts = (complex double*)malloc((vis_test.nmeas) * sizeof(complex double));
@@ -289,7 +295,7 @@ int main(int argc, char *argv[]) {
   for (i=0; i < Nx; i++){
     img_copy.pix[i] = creal(xoutc[i]);
   }  
-  purify_image_writefile(&img_copy, "data/vla/dirty_image.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/vla/dirty_image_padmm.fits", filetype_img);
 
   
   //L2 norm of the data
@@ -347,9 +353,20 @@ int main(int argc, char *argv[]) {
   for (i=0; i < Nx; i++) {
       xoutc[i] = 0.0 + 0.0*I;
   }
-  for (i=0; i < Nr; i++){
-    w[i] = 1.0;
+  for (i=0; i < Nr; i++){   
+    w_l1[i] = 1.0;
   }
+
+
+
+  // Compute whitening weights.
+  double TOL = 1e-10;
+  for (i=0; i < Ny; i++) {
+    w_l2[i] = creal(vis_test.noise_std[i]);
+    assert(fabs(w_l2[i]) > TOL);
+    w_l2[i] = 1.0 ; // / w_l2[i];
+  }
+ 
   
 
   printf("**********************\n");
@@ -369,6 +386,32 @@ int main(int argc, char *argv[]) {
   param4.cg_max_iter = 100;
   param4.cg_tol = 0.000001;
 
+
+
+  //Structure for the L1 prox
+  param_l1param.verbose = 1;
+  param_l1param.max_iter = 10;
+  param_l1param.rel_obj = 0.01;
+  param_l1param.nu = 1;
+  param_l1param.tight = 0;
+  param_l1param.pos = 1;
+    
+  //Structure for the L1 solver    
+  param_padmm.verbose = 2;
+  param_padmm.max_iter = 200;
+  param_padmm.gamma = gamma*aux2;//0.01;
+  param_padmm.rel_obj = 0.0005;
+  param_padmm.epsilon = 0.01*aux1;//sqrt(Ny + 2*sqrt(Ny))*sigma;
+  param_padmm.real_out = 1;
+  param_padmm.real_meas = 0;
+  param_padmm.paraml1 = param_l1param;
+    
+  param_padmm.epsilon_tol_scale = 1.001;
+  param_padmm.lagrange_update_scale = 0.9;
+  param_padmm.nu = aux4; 
+
+
+
   
   //Initial solution
   for (i=0; i < Nx; i++) {
@@ -380,6 +423,7 @@ int main(int argc, char *argv[]) {
   #else
     assert((start = clock())!=-1);
   #endif
+  /*
   sopt_l1_sdmm((void*)xoutc, Nx,
                    &purify_measurement_cftfwd,
                    datafwd,
@@ -391,6 +435,19 @@ int main(int argc, char *argv[]) {
                    datas,
                    Nr,
                    (void*)y, Ny, w, param4);
+  */
+  sopt_l1_solver_padmm((void*)xout, Nx,
+		       &purify_measurement_cftfwd,
+		       datafwd,
+		       &purify_measurement_cftadj,
+		       dataadj,
+		       &sopt_sara_synthesisop,
+		       datas,
+		       &sopt_sara_analysisop,
+		       datas,
+		       Nr,
+		       (void*)y, Ny, w_l1, w_l2, param_padmm);
+  
 
   #ifdef _OPENMP 
     stop1 = omp_get_wtime();
@@ -408,7 +465,7 @@ int main(int argc, char *argv[]) {
     img_copy.pix[i] = creal(xoutc[i]);
   }
   
-  purify_image_writefile(&img_copy, "data/vla/bpsa_rec.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/vla/bpsa_rec_padmm.fits", filetype_img);
 
 
   //Residual image
@@ -421,7 +478,7 @@ int main(int argc, char *argv[]) {
     img_copy.pix[i] = creal(xinc[i]);
   }
   
-  purify_image_writefile(&img_copy, "data/vla/residual.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/vla/residual_padmm.fits", filetype_img);
   
   
   /*
@@ -508,7 +565,8 @@ int main(int argc, char *argv[]) {
   free(y);
   free(xinc);
   free(xout);
-  free(w);
+  free(w_l1);
+  free(w_l2);
   free(y0);
   free(xoutc);
 
