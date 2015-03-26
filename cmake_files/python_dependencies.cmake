@@ -28,8 +28,9 @@ create_environment_script(
 # Python interpreter + libraries
 find_package(CoherentPython)
 # Only required for building
-lookup_python_package(Cython VERSION 0.21 REQUIRED
-    PATH "${EXTERNAL_ROOT}/python")
+if(NOT cython_EXECUTABLE)
+    lookup_python_package(Cython REQUIRED PATH "${EXTERNAL_ROOT}/python")
+endif()
 # Also required for production
 find_python_package(numpy)
 find_python_package(scipy)
