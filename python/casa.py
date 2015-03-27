@@ -83,9 +83,8 @@ class DataTransform(object):
 
 class CasaTransform(DataTransform):
     """ Transforms measurement set to something purify understands """
-    def __init__(self, measurement_set, datadescid=0, ignoreW=False,
-            channels=None, resolution=0.3, column=None,
-            query="mscal.stokes({0}, 'I')", **kwargs):
+    def __init__(self, measurement_set, datadescid=0,
+            channels=None, resolution=0.3, column=None, **kwargs):
         """ Creates the transform
 
             :Parameters:
@@ -93,20 +92,11 @@ class CasaTransform(DataTransform):
                     Measurement set for which to get the data
                 datadescid:
                     Data descriptor id for which to select data
-                ignoreW:
-                    W is not yet implemented. By default, if w are present and
-                    non-zero, the call will fail
                 channels:
                     Channels over which to iterate. Defaults to all.
                 column:
                     Name of the data column from which y is taken. Defaults to
                     'CORRECTED_DATA' or 'DATA'.
-                query:
-                    Query sent to figure out Y. It is a format string taking
-                    one argument, and resolving to a TaQL query. It defaults to
-                    "mscal.stokes({0}, 'I')", where %s is the argument. It is
-                    substituted wiht the value from column (e.g.
-                    'CORRECTED_DATA' or 'DATA').
         """
         super(DataTransform, self).__init__()
 
@@ -118,18 +108,8 @@ class CasaTransform(DataTransform):
         """ Channels over which to iterate. Defaults to all. """
         self.column = self._get_data_column_name(column)
         """ Name of the data column from which y is taken """
-        self.ignoreW = ignoreW
-        """ By default, fails if W terms are not zero """
         self.resolution = resolution
         """ Resolution of the output image in arcsec per pixel """
-        self.query = query
-        """ Query from which Y is obtained.
-
-            It is a format string taking one argument, and resolving to a TaQL
-            query. It defaults to  "mscal.stokes({0}, 'I')", where %s is the
-            argument. It is substituted wiht the value from column (e.g.
-            'CORRECTED_DATA' or 'DATA').
-        """
 
 
     def _get_table(self, name=None):
@@ -176,21 +156,40 @@ class CasaTransform(DataTransform):
     @property
     def data(self):
         """ Data needed by Purify """
-        from numpy import allclose, require
+        from numpy import allclose, require, logical_and, sum
         query = 'DATA_DESC_ID == 0'
-        columns = "UVW, %s as Y" % self.query.format(self.column)
+        columns = "UVW, %s as Y, SIGMA as sigma" % self.column
         tb = self._get_table().query(query=query, columns=columns)
-        y = self._c_vs_fortran(tb.getcol('Y').squeeze())
-        y_is_complex = str(y.dtype)[:7] == 'complex'
-        y = require(y, 'complex' if y_is_complex else 'double')
-        u, v, w = self._c_vs_fortran(tb.getcol('UVW'))
 
-        if not (self.ignoreW or allclose(w, 0)):
-            raise NotImplementedError('Cannot purify data with W components')
+        # Compute stokes I component...  this could fail horribly if formula
+        # below is incorrect.
+        all_ys = self._c_vs_fortran(tb.getcol('Y').squeeze())
+        y_is_complex = str(all_ys.dtype)[:7] == 'complex'
+        if all_ys.shape[0] != 4:
+            msg = "Don't know how to deal with this kind of measurement set"
+            raise NotImplementedError(msg)
+        yview = all_ys.view()
+        yview.shape = all_ys.shape[0], -1
+        y = require(0.5 * (yview[0, :] + yview[3, :]),
+                    'complex' if y_is_complex else 'double')
+
+        # Remove tagged objects
+        sigma = self._c_vs_fortran(tb.getcol('sigma').squeeze())
+        if sigma.shape[0] != 4:
+            msg = "Don't know how to deal with this kind of measurement set"
+            raise NotImplementedError(msg)
+        sig_view = sigma.view()
+        sig_view.shape = (4, -1)
+        unflagged = logical_and(sig_view[0, :] >= 0e0, sig_view[3, :] >= 0e0)
+
+        u, v, w = self._c_vs_fortran(tb.getcol('UVW'))
+        u, v, w, y = u[unflagged], v[unflagged], w[unflagged], y[unflagged]
 
         # Just dealing with CASA difficulties
         channels = None if self.channels == [None] else self.channels
-        return u, v, y[..., channels, :].squeeze()
+        yview = y.view()
+        yview.shape = all_ys.shape[1:-1] + (-1,)
+        return u, v, yview[..., channels, :].squeeze()
 
     def _get_data_column_name(self, column):
         """ Name of the column to use for Y """
@@ -316,8 +315,8 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     ia.newimagefromarray(imagename, image.real, overwrite=overwrite)
 
 def purify_measurement_set(measurement_set, imagename, imsize=None,
-        datadescid=0, ignoreW=False, channels=None, column=None,
-        resolution=0.3, query="mscal.stokes({0}, 'I')", **kwargs):
+        datadescid=0, channels=None, column=None,
+        resolution=0.3, **kwargs):
     """ Creates an image using the Purify method
 
         Parameters:
@@ -329,26 +328,17 @@ def purify_measurement_set(measurement_set, imagename, imsize=None,
                 Width and height of the output image in pixels
             datadescid: int
                 Integer selecting the subset of consistent data
-            ignoreW: boolean
-                W is not yet implemented. If W values are non-zero, the call
-                will fail unless this parameter is set
             channels: [Int]
                 Channels for which to compute image
             column:
                 Column to use for Y data. Defaults to 'CORRECTED_DATA' if
                 present, and 'DATA' otherwise.
-            query:
-                Query sent to figure out Y. It is a format string taking one
-                argument, and resolving to a TaQL query. It defaults to
-                "mscal.stokes({0}, 'I')", where %s is the argument. It is
-                substituted wiht the value from column (e.g. 'CORRECTED_DATA'
-                or 'DATA').
             other arguments:
                 See purify_image
     """
     transform = CasaTransform(
         measurement_set, channels=channels, datadescid=datadescid,
-        column=column, ignoreW=ignoreW, resolution=resolution, query=query
+        column=column, resolution=resolution
     )
     return purify_image(
             transform, imagename=imagename, imsize=imsize, **kwargs)

@@ -72,7 +72,7 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
 # Wraps around generators in purify.casa and makes them use the DataTransform
 # employed above, rather than the purify.casa one.
 def purify_measurement_set(ms, imagename, imsize=(128, 128), datadescid=0,
-        ignoreW=False, channels=None, column=None, resolution=0.3, **kwargs):
+        channels=None, column=None, resolution=0.3, **kwargs):
     """ Creates an image from a given measurement set
 
         Parameters:
@@ -89,7 +89,7 @@ def purify_measurement_set(ms, imagename, imsize=(128, 128), datadescid=0,
     """
     transform = DataTransform(
         ms, channels=channels, datadescid=datadescid, column=column,
-        ignoreW=ignoreW, resolution=resolution
+        resolution=resolution
     )
 
     return purify_image(transform, imagename=imagename, imsize=imsize,
