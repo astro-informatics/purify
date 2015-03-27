@@ -265,12 +265,15 @@ int main(int argc, char *argv[]) {
                                       dataadj);
 
    printf("Operator norm = %f \n\n", aux4);
+
+  //This is no longer needed. We just need to compute the operator norm.
+  /* 
   for (i=0; i < Ny; i++) {
     y[i] = y[i] / sqrt(aux4);
   } 
   for (i=0; i < Nx; i++) {
     deconv[i] = deconv[i] / sqrt(aux4);
-  } 
+  } */
 
   // Output image.x
 
@@ -280,6 +283,7 @@ int main(int argc, char *argv[]) {
   img_copy.fov_y = img_copy.fov_x;
   for (i=0; i < Nx; i++){
     xoutc[i] = 0.0 + 0.0*I;
+
   }
   
 
@@ -290,10 +294,12 @@ int main(int argc, char *argv[]) {
   purify_measurement_cftadj((void*)xoutc, (void*)y, dataadj);
 
   // Copy dirty image pixel data to img.
+  //And copy the real part to xout
   img_copy.pix = (double*)malloc((Nx) * sizeof(double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(img_copy.pix);
   for (i=0; i < Nx; i++){
     img_copy.pix[i] = creal(xoutc[i]);
+    xout[i] = creal(xoutc[i]);
   }  
   purify_image_writefile(&img_copy, "data/vla/dirty_image_padmm.fits", filetype_img);
 
@@ -307,7 +313,7 @@ int main(int argc, char *argv[]) {
   //SARA structure initialization
 
   param1.ndict = Nb;
-  param1.real = 0;
+  param1.real = 1;  //For the admm we consider real images thus real sparsity operators
 
   dict_types = malloc(param1.ndict * sizeof(sopt_wavelet_type));
   PURIFY_ERROR_MEM_ALLOC_CHECK(dict_types);
@@ -331,11 +337,12 @@ int main(int argc, char *argv[]) {
 
   //Scaling constants in the diferent representation domains
 
-  sopt_sara_analysisop((void*)dummyc, (void*)xoutc, datas);
-
+  sopt_sara_analysisop((void*)dummyr, (void*)xout, datas);
+  //Not needed
+  /*
   for (i=0; i < Nr; i++) {
     dummyr[i] = creal(dummyc[i]);
-  }
+  } */
 
   aux2 = purify_utils_maxarray(dummyr, Nr);
 
@@ -351,7 +358,7 @@ int main(int argc, char *argv[]) {
 
   //Initial solution and weights
   for (i=0; i < Nx; i++) {
-      xoutc[i] = 0.0 + 0.0*I;
+      xout[i] = 0.0;
   }
   for (i=0; i < Nr; i++){   
     w_l1[i] = 1.0;
@@ -373,9 +380,10 @@ int main(int argc, char *argv[]) {
   printf("BPSA reconstruction\n");
   printf("**********************\n");
 
-  gamma = 0.01;
+  gamma = 0.1;
     
-  //Structure for the L1 solver      
+  //Structure for the L1 solver 
+  /*     
   param4.verbose = 2;
   param4.max_iter = 5;
   param4.gamma = gamma*aux2;//*sqrt(aux4);
@@ -385,39 +393,33 @@ int main(int argc, char *argv[]) {
   param4.real_data = 0;
   param4.cg_max_iter = 100;
   param4.cg_tol = 0.000001;
-
+  */
 
 
   //Structure for the L1 prox
   param_l1param.verbose = 1;
-  param_l1param.max_iter = 10;
-  param_l1param.rel_obj = 0.01;
-  param_l1param.nu = 1;
+  param_l1param.max_iter = 20;
+  param_l1param.rel_obj = 0.001;
+  param_l1param.nu = 1.0;
   param_l1param.tight = 0;
   param_l1param.pos = 1;
     
   //Structure for the L1 solver    
   param_padmm.verbose = 2;
-  param_padmm.max_iter = 200;
+  param_padmm.max_iter = 5;
   param_padmm.gamma = gamma*aux2;//0.01;
   param_padmm.rel_obj = 0.0005;
-  param_padmm.epsilon = 0.01*aux1;//sqrt(Ny + 2*sqrt(Ny))*sigma;
+  param_padmm.epsilon = 0.1*aux1;//sqrt(Ny + 2*sqrt(Ny))*sigma;
   param_padmm.real_out = 1;
   param_padmm.real_meas = 0;
   param_padmm.paraml1 = param_l1param;
     
   param_padmm.epsilon_tol_scale = 1.001;
-  param_padmm.lagrange_update_scale = 0.9;
-  param_padmm.nu = aux4; 
+  param_padmm.lagrange_update_scale = 0.1;
+  param_padmm.nu = 1.0*aux4; 
 
 
 
-  
-  //Initial solution
-  for (i=0; i < Nx; i++) {
-      xoutc[i] = 0.0 + 0.0*I;
-  }
- 
   #ifdef _OPENMP 
     start1 = omp_get_wtime();
   #else
@@ -462,7 +464,7 @@ int main(int argc, char *argv[]) {
  
     
   for (i=0; i < Nx; i++){
-    img_copy.pix[i] = creal(xoutc[i]);
+    img_copy.pix[i] = xout[i];
   }
   
   purify_image_writefile(&img_copy, "data/vla/bpsa_rec_padmm.fits", filetype_img);
