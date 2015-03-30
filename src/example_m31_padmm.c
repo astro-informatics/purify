@@ -410,17 +410,17 @@ int main(int argc, char *argv[]) {
   
     
   //Structure for the L1 solver  
-  /*    
-	param4.verbose = 2;
-	param4.max_iter = 300;
-	param4.gamma = gamma*aux2;
-	param4.rel_obj = 0.001;
-	param4.epsilon = sqrt(Ny + 2*sqrt(Ny))*sigma/sqrt(aux4);
-	param4.epsilon_tol = 0.01;
-	param4.real_data = 0;
-	param4.cg_max_iter = 100;
-	param4.cg_tol = 0.000001;
-  */
+      
+  //param4.verbose = 2;
+  //param4.max_iter = 300;
+  //param4.gamma = gamma*aux2;
+  //param4.rel_obj = 0.001;
+  //param4.epsilon = sqrt(Ny + 2*sqrt(Ny))*sigma/sqrt(aux4);
+  //param4.epsilon_tol = 0.01;
+  //param4.real_data = 0;
+  //param4.cg_max_iter = 100;
+  //param4.cg_tol = 0.000001;
+  
 
   //Structure for the L1 prox
   param_l1param.verbose = 1;
@@ -444,14 +444,15 @@ int main(int argc, char *argv[]) {
   param_padmm.lagrange_update_scale = 0.9;
   param_padmm.nu = 1.0*aux4; 
 
- 
+   
 #ifdef _OPENMP 
   start1 = omp_get_wtime();
 #else
   start = clock();
   assert(start != -1);
 #endif
-  /*  
+  
+  /*
       sopt_l1_sdmm((void*)xoutc, Nx,
       &purify_measurement_cftfwd,
       datafwd,
@@ -463,7 +464,7 @@ int main(int argc, char *argv[]) {
       datas,
       Nr,
       (void*)y, Ny, w, param4);
-  */                 
+  */              
   sopt_l1_solver_padmm((void*)xout, Nx,
 		       &purify_measurement_cftfwd,
 		       datafwd,
@@ -490,6 +491,7 @@ int main(int argc, char *argv[]) {
   //SNR
   for (i=0; i < Nx; i++) {
     error[i] = creal(xinc[i])-xout[i];
+//JDM: isn't this -1 times the eror computed for the sdmm m31 example?
   }
   mse = cblas_dnrm2(Nx, error, 1);
   a = cblas_dnrm2(Nx, xout, 1);
@@ -527,179 +529,219 @@ int main(int argc, char *argv[]) {
   }
   
   purify_image_writefile(&img_copy, "data/test/m31bpsaerror_padmm.fits", filetype_img);
-  
-  /*
-  
-    printf("**********************\n");
-    printf("Db8 reconstruction\n");
-    printf("**********************\n");
 
-    //Initial solution
-    for (i=0; i < Nx; i++) {
+
+  printf("**********************\n");
+  printf("Db8 reconstruction\n");
+  printf("**********************\n");
+
+  //Initial solution
+  for (i=0; i < Nx; i++) {
     xout[i] = 0.0;
-    }
+  }
   
-    param4.gamma = gamma*aux3;
+  //param4.gamma = gamma*aux3;
 
-    start = clock();
-    assert(start != -1);
+  start = clock();
+  assert(start != -1);
+
+/*
     sopt_l1_sdmm((void*)xoutc, Nx,
-    &purify_measurement_cftfwd,
-    datafwd,
-    &purify_measurement_cftadj,
-    dataadj,
-    &sopt_sara_synthesisop,
-    datas1,
-    &sopt_sara_analysisop,
-    datas1,
-    Nx,
-    (void*)y, Ny, w, param4);
+		 &purify_measurement_cftfwd,
+		 datafwd,
+		 &purify_measurement_cftadj,
+		 dataadj,
+		 &sopt_sara_synthesisop,
+		 datas1,
+		 &sopt_sara_analysisop,
+		 datas1,
+		 Nx,
+		 (void*)y, Ny, w, param4);
+*/
+  sopt_l1_solver_padmm((void*)xout, Nx,
+		       &purify_measurement_cftfwd,
+		       datafwd,
+		       &purify_measurement_cftadj,
+		       dataadj,
+		       &sopt_sara_synthesisop,
+		       datas1,
+		       &sopt_sara_analysisop,
+		       datas1,
+		       Nx,
+		       (void*)y, Ny, w_l1, w_l2, param_padmm);
 
-    stop = clock();
-    t = (double) (stop-start)/CLOCKS_PER_SEC;
+  stop = clock();
+  t = (double) (stop-start)/CLOCKS_PER_SEC;
 
-    printf("Time BPDb8: %f \n\n", t); 
+  printf("Time BPDb8: %f \n\n", t); 
 
-    //SNR
-    for (i=0; i < Nx; i++) {
-    error[i] = creal(xoutc[i])-xout[i];
-    }
-    mse = cblas_dnrm2(Nx, error, 1);
-    a = cblas_dnrm2(Nx, xout, 1);
-    snr_out = 20.0*log10(a/mse);
-    printf("SNR: %f dB\n\n", snr_out);
 
-    for (i=0; i < Nx; i++){
+  //SNR
+  for (i=0; i < Nx; i++) {
+    error[i] = creal(xinc[i])-xout[i];
+    //JDM: isn't this -1 times the eror computed for the sdmm m31 example?
+  }
+  mse = cblas_dnrm2(Nx, error, 1);
+  a = cblas_dnrm2(Nx, xout, 1);
+  snr_out = 20.0*log10(a/mse);
+  printf("SNR: %f dB\n\n", snr_out);
+
+  for (i=0; i < Nx; i++){
+    img_copy.pix[i] = xout[i];
+  }   
+  purify_image_writefile(&img_copy, "data/test/m31db8_padmm.fits", filetype_img);
+
+  //Residual image
+
+
+  for (i=0; i < Nx; i++){
+    xoutc[i] = xout[i] + 0.0*I;
+  }
+
+  purify_measurement_cftfwd((void*)y0, (void*)xoutc, datafwd);
+  alpha = -1.0 +0.0*I;
+  cblas_zaxpy(Ny, (void*)&alpha, y, 1, y0, 1);
+  purify_measurement_cftadj((void*)xoutc, (void*)y0, dataadj);
+
+  for (i=0; i < Nx; i++){
     img_copy.pix[i] = creal(xoutc[i]);
-    }
+  }
   
-    purify_image_writefile(&img_copy, "data/test/m31db8.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/test/m31db8res_padmm.fits", filetype_img);
 
-    //Residual image
-
-    purify_measurement_cftfwd((void*)y0, (void*)xoutc, datafwd);
-    alpha = -1.0 +0.0*I;
-    cblas_zaxpy(Ny, (void*)&alpha, y, 1, y0, 1);
-    purify_measurement_cftadj((void*)xinc, (void*)y0, dataadj);
-
-    for (i=0; i < Nx; i++){
-    img_copy.pix[i] = creal(xinc[i]);
-    }
-  
-    purify_image_writefile(&img_copy, "data/test/m31db8res.fits", filetype_img);
-
-    //Error image
-    for (i=0; i < Nx; i++){
+  //Error image
+  for (i=0; i < Nx; i++){
     img_copy.pix[i] = error[i];
-    }
+  }
   
-    purify_image_writefile(&img_copy, "data/test/m31db8error.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/test/m31db8error_padmm.fits", filetype_img);
 
   
 
 
 
-    printf("**********************\n");
-    printf("BP reconstruction\n");
-    printf("**********************\n");
+  printf("**********************\n");
+  printf("BP reconstruction\n");
+  printf("**********************\n");
 
-    param4.gamma = gamma*aux1;
+  param4.gamma = gamma*aux1;
 
-    //Initial solution
-    for (i=0; i < Nx; i++) {
-    xoutc[i] = 0.0 + 0.0*I;
-    }
+  //Initial solution
+  for (i=0; i < Nx; i++) {
+    xout[i] = 0.0;
+  }
 
-    start = clock();
-    assert(start != -1);
+  start = clock();
+  assert(start != -1);
+    /*
     sopt_l1_sdmm((void*)xoutc, Nx,
-    &purify_measurement_cftfwd,
-    datafwd,
-    &purify_measurement_cftadj,
-    dataadj,
-    &sopt_sara_synthesisop,
-    datas2,
-    &sopt_sara_analysisop,
-    datas2,
-    Nx,
-    (void*)y, Ny, w, param4); 
+		 &purify_measurement_cftfwd,
+		 datafwd,
+		 &purify_measurement_cftadj,
+		 dataadj,
+		 &sopt_sara_synthesisop,
+		 datas2,
+		 &sopt_sara_analysisop,
+		 datas2,
+		 Nx,
+		 (void*)y, Ny, w, param4); 
+    */
+  sopt_l1_solver_padmm((void*)xout, Nx,
+		       &purify_measurement_cftfwd,
+		       datafwd,
+		       &purify_measurement_cftadj,
+		       dataadj,
+		       &sopt_sara_synthesisop,
+		       datas2,
+		       &sopt_sara_analysisop,
+		       datas2,
+		       Nx,
+		       (void*)y, Ny, w_l1, w_l2, param_padmm);
 
-    stop = clock();
-    t = (double) (stop-start)/CLOCKS_PER_SEC;
+    
+  stop = clock();
+  t = (double) (stop-start)/CLOCKS_PER_SEC;
 
-    printf("Time BP: %f \n\n", t); 
+  printf("Time BP: %f \n\n", t); 
 
-    //SNR
-    for (i=0; i < Nx; i++) {
-    error[i] = creal(xoutc[i])-xout[i];
-    }
-    mse = cblas_dnrm2(Nx, error, 1);
-    a = cblas_dnrm2(Nx, xout, 1);
-    snr_out = 20.0*log10(a/mse);
-    printf("SNR: %f dB\n\n", snr_out);
 
-    for (i=0; i < Nx; i++){
+  //SNR
+  for (i=0; i < Nx; i++) {
+    error[i] = creal(xinc[i])-xout[i];
+    //JDM: isn't this -1 times the eror computed for the sdmm m31 example?
+  }
+  mse = cblas_dnrm2(Nx, error, 1);
+  a = cblas_dnrm2(Nx, xout, 1);
+  snr_out = 20.0*log10(a/mse);
+  printf("SNR: %f dB\n\n", snr_out);
+
+  for (i=0; i < Nx; i++){
+    img_copy.pix[i] = xout[i];
+  }   
+   
+  purify_image_writefile(&img_copy, "data/test/m31bp_padmm.fits", filetype_img);
+
+  //Residual image
+
+    
+  for (i=0; i < Nx; i++){
+    xoutc[i] = xout[i] + 0.0*I;
+  }
+  
+  purify_measurement_cftfwd((void*)y0, (void*)xoutc, datafwd);
+  alpha = -1.0 +0.0*I;
+  cblas_zaxpy(Ny, (void*)&alpha, y, 1, y0, 1);
+  purify_measurement_cftadj((void*)xoutc, (void*)y0, dataadj);
+
+  for (i=0; i < Nx; i++){
     img_copy.pix[i] = creal(xoutc[i]);
-    }
+  }
   
-    purify_image_writefile(&img_copy, "data/test/m31bp.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/test/m31bpres_padmm.fits", filetype_img);
 
-    //Residual image
-
-    purify_measurement_cftfwd((void*)y0, (void*)xoutc, datafwd);
-    alpha = -1.0 +0.0*I;
-    cblas_zaxpy(Ny, (void*)&alpha, y, 1, y0, 1);
-    purify_measurement_cftadj((void*)xinc, (void*)y0, dataadj);
-
-    for (i=0; i < Nx; i++){
-    img_copy.pix[i] = creal(xinc[i]);
-    }
-  
-    purify_image_writefile(&img_copy, "data/test/m31bpres.fits", filetype_img);
-
-    //Error image
-    for (i=0; i < Nx; i++){
+  //Error image
+  for (i=0; i < Nx; i++){
     img_copy.pix[i] = error[i];
-    }
+  }
   
-    purify_image_writefile(&img_copy, "data/test/m31bperror.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/test/m31bperror_padmm.fits", filetype_img);
 
   
   
   
   
-    //Free all memory
-    purify_image_free(&img);
-    purify_image_free(&img_copy);
-    free(deconv);
-    purify_visibility_free(&vis_test);
-    free(y);
-    free(xinc);
-    free(xout);
-    free(w_l1);
-    free(noise);
-    free(y0);
-    free(error);
-    free(xoutc);
-    free(w_l2);
-    free(shifts);
+  //Free all memory
+  purify_image_free(&img);
+  purify_image_free(&img_copy);
+  free(deconv);
+  purify_visibility_free(&vis_test);
+  free(y);
+  free(xinc);
+  free(xout);
+  free(w_l1);
+  free(noise);
+  free(y0);
+  free(error);
+  free(xoutc);
+  free(w_l2);
+  free(shifts);
 
-    sopt_sara_free(&param1);
-    sopt_sara_free(&param2);
-    sopt_sara_free(&param3);
-    free(dict_types);
-    free(dict_types1);
-    free(dict_types2);
+  sopt_sara_free(&param1);
+  sopt_sara_free(&param2);
+  sopt_sara_free(&param3);
+  free(dict_types);
+  free(dict_types1);
+  free(dict_types2);
 
-    free(fft_temp1);
-    free(fft_temp2);
-    fftw_destroy_plan(planfwd);
-    fftw_destroy_plan(planadj);
-    purify_sparsemat_freer(&gmat);
+  free(fft_temp1);
+  free(fft_temp2);
+  fftw_destroy_plan(planfwd);
+  fftw_destroy_plan(planadj);
+  purify_sparsemat_freer(&gmat);
 
-    free(dummyr);
-    free(dummyc);
-  */
+  free(dummyr);
+  free(dummyc);
+  
 
   return 0;
 
