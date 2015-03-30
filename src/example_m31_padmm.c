@@ -15,7 +15,7 @@
 #include <assert.h>
 #include <time.h> 
 #ifdef _OPENMP 
-  #include <omp.h>
+#include <omp.h>
 #endif 
 #include PURIFY_BLAS_H
 #include "purify_visibility.h"
@@ -105,9 +105,9 @@ int main(int argc, char *argv[]) {
 
   clock_t start, stop;
   double t = 0.0;
-  #ifdef _OPENMP 
+#ifdef _OPENMP 
   double start1, stop1;
-  #endif
+#endif
   int dimy, dimx;
   
   //Image dimension of the zero padded image
@@ -121,8 +121,8 @@ int main(int argc, char *argv[]) {
 
   //Read coverage
   purify_visibility_readfile(&vis_test,
-             "./data/images/Coverages/cont_sim4.vis",
-             filetype_vis); 
+			     "./data/images/Coverages/cont_sim4.vis",
+			     filetype_vis); 
   printf("Number of visibilities: %i \n\n", vis_test.nmeas);  
 
    
@@ -205,7 +205,7 @@ int main(int argc, char *argv[]) {
   start = clock();
   assert(start != -1);
   purify_measurement_init_cft(&gmat, deconv, shifts,
-      vis_test.u, vis_test.v, &param_m1);
+			      vis_test.u, vis_test.v, &param_m1);
   stop = clock();
   t = (double) (stop-start)/CLOCKS_PER_SEC;
   printf("Time initalization: %f \n\n", t);
@@ -219,12 +219,12 @@ int main(int argc, char *argv[]) {
 
   //FFT plan  
   planfwd = fftw_plan_dft_2d(param_m1.nx1*param_m1.ofx, param_m1.ny1*param_m1.ofy, 
-              fft_temp1, fft_temp1, 
-              FFTW_FORWARD, FFTW_MEASURE);
+			     fft_temp1, fft_temp1, 
+			     FFTW_FORWARD, FFTW_MEASURE);
 
   planadj = fftw_plan_dft_2d(param_m1.nx1*param_m1.ofx, param_m1.ny1*param_m1.ofy, 
-              fft_temp2, fft_temp2, 
-              FFTW_BACKWARD, FFTW_MEASURE);
+			     fft_temp2, fft_temp2, 
+			     FFTW_BACKWARD, FFTW_MEASURE);
 
 
   datafwd[0] = (void*)&param_m1;
@@ -261,8 +261,8 @@ int main(int argc, char *argv[]) {
 
     
   for (i=0; i < Ny; i++) {
-      noise[i] = (sopt_ran_gasdev2(seedn) + sopt_ran_gasdev2(seedn)*I)*(sigma/sqrt(2));
-      y[i] = y0[i] + noise[i];
+    noise[i] = (sopt_ran_gasdev2(seedn) + sopt_ran_gasdev2(seedn)*I)*(sigma/sqrt(2));
+    y[i] = y0[i] + noise[i];
   }
 
   //Rescaling the measurements
@@ -271,16 +271,16 @@ int main(int argc, char *argv[]) {
   //Estimate operator norm usin the power method.
   aux4 = purify_measurement_pow_meth(&purify_measurement_cftfwd,
                                      datafwd,
-                                      &purify_measurement_cftadj,
-                                      dataadj);
+				     &purify_measurement_cftadj,
+				     dataadj);
 
   /*for (i=0; i < Ny; i++) {
     y[i] = y[i]/sqrt(aux4);
-  }
+    }
 
-  for (i=0; i < Nx; i++) {
+    for (i=0; i < Nx; i++) {
     deconv[i] = deconv[i]/sqrt(aux4);
-  }*/
+    }*/
   
   
   // Output image.
@@ -304,7 +304,7 @@ int main(int argc, char *argv[]) {
 
   
 
-   img_copy.pix = (double*)malloc((Nx) * sizeof(double));
+  img_copy.pix = (double*)malloc((Nx) * sizeof(double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(img_copy.pix);
 
   for (i=0; i < Nx; i++){
@@ -312,59 +312,59 @@ int main(int argc, char *argv[]) {
     xout[i] = creal(xoutc[i]);
   }
   
-  purify_image_writefile(&img_copy, "data/test/m31dirty.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/test/m31dirty_padmm.fits", filetype_img);
   
 
   
   //SARA structure initialization
 
-    param1.ndict = Nb;
-    param1.real = 1;
+  param1.ndict = Nb;
+  param1.real = 1;
 
-    dict_types = malloc(param1.ndict * sizeof(sopt_wavelet_type));
-    PURIFY_ERROR_MEM_ALLOC_CHECK(dict_types);
+  dict_types = malloc(param1.ndict * sizeof(sopt_wavelet_type));
+  PURIFY_ERROR_MEM_ALLOC_CHECK(dict_types);
 
 
-    dict_types[0] = SOPT_WAVELET_DB1;
-    dict_types[1] = SOPT_WAVELET_DB2;
-    dict_types[2] = SOPT_WAVELET_DB3;
-    dict_types[3] = SOPT_WAVELET_DB4;
-    dict_types[4] = SOPT_WAVELET_DB5;
-    dict_types[5] = SOPT_WAVELET_DB6;
-    dict_types[6] = SOPT_WAVELET_DB7;
-    dict_types[7] = SOPT_WAVELET_DB8;
-    dict_types[8] = SOPT_WAVELET_Dirac;
+  dict_types[0] = SOPT_WAVELET_DB1;
+  dict_types[1] = SOPT_WAVELET_DB2;
+  dict_types[2] = SOPT_WAVELET_DB3;
+  dict_types[3] = SOPT_WAVELET_DB4;
+  dict_types[4] = SOPT_WAVELET_DB5;
+  dict_types[5] = SOPT_WAVELET_DB6;
+  dict_types[6] = SOPT_WAVELET_DB7;
+  dict_types[7] = SOPT_WAVELET_DB8;
+  dict_types[8] = SOPT_WAVELET_Dirac;
     
 
-    sopt_sara_initop(&param1, param_m1.ny1, param_m1.nx1, 4, dict_types);
+  sopt_sara_initop(&param1, param_m1.ny1, param_m1.nx1, 4, dict_types);
 
-    datas[0] = (void*)&param1;
+  datas[0] = (void*)&param1;
 
-    //Db8 structure initialization
+  //Db8 structure initialization
 
-    param2.ndict = 1;
-    param2.real = 1;
+  param2.ndict = 1;
+  param2.real = 1;
 
-    dict_types1 = malloc(param2.ndict * sizeof(sopt_wavelet_type));
-    PURIFY_ERROR_MEM_ALLOC_CHECK(dict_types1);
+  dict_types1 = malloc(param2.ndict * sizeof(sopt_wavelet_type));
+  PURIFY_ERROR_MEM_ALLOC_CHECK(dict_types1);
 
-    dict_types1[0] = SOPT_WAVELET_DB8;
+  dict_types1[0] = SOPT_WAVELET_DB8;
     
-    sopt_sara_initop(&param2, param_m1.ny1, param_m1.nx1, 4, dict_types1);
+  sopt_sara_initop(&param2, param_m1.ny1, param_m1.nx1, 4, dict_types1);
 
   datas1[0] = (void*)&param2;
 
   //Dirac structure initialization
 
-    param3.ndict = 1;
-    param3.real = 1;
+  param3.ndict = 1;
+  param3.real = 1;
 
-    dict_types2 = malloc(param3.ndict * sizeof(sopt_wavelet_type));
-    PURIFY_ERROR_MEM_ALLOC_CHECK(dict_types2);
+  dict_types2 = malloc(param3.ndict * sizeof(sopt_wavelet_type));
+  PURIFY_ERROR_MEM_ALLOC_CHECK(dict_types2);
 
-    dict_types2[0] = SOPT_WAVELET_Dirac;
+  dict_types2[0] = SOPT_WAVELET_Dirac;
     
-    sopt_sara_initop(&param3, param_m1.ny1, param_m1.nx1, 4, dict_types2);
+  sopt_sara_initop(&param3, param_m1.ny1, param_m1.nx1, 4, dict_types2);
 
   datas2[0] = (void*)&param3;
 
@@ -391,7 +391,7 @@ int main(int argc, char *argv[]) {
 
   //Initial solution and weights
   for (i=0; i < Nx; i++) {
-      xout[i] = 0.0;
+    xout[i] = 0.0;
   }
   for (i=0; i < Nr; i++){
     w_l1[i] = 1.0;
@@ -411,15 +411,15 @@ int main(int argc, char *argv[]) {
     
   //Structure for the L1 solver  
   /*    
-  param4.verbose = 2;
-  param4.max_iter = 300;
-  param4.gamma = gamma*aux2;
-  param4.rel_obj = 0.001;
-  param4.epsilon = sqrt(Ny + 2*sqrt(Ny))*sigma/sqrt(aux4);
-  param4.epsilon_tol = 0.01;
-  param4.real_data = 0;
-  param4.cg_max_iter = 100;
-  param4.cg_tol = 0.000001;
+	param4.verbose = 2;
+	param4.max_iter = 300;
+	param4.gamma = gamma*aux2;
+	param4.rel_obj = 0.001;
+	param4.epsilon = sqrt(Ny + 2*sqrt(Ny))*sigma/sqrt(aux4);
+	param4.epsilon_tol = 0.01;
+	param4.real_data = 0;
+	param4.cg_max_iter = 100;
+	param4.cg_tol = 0.000001;
   */
 
   //Structure for the L1 prox
@@ -445,56 +445,56 @@ int main(int argc, char *argv[]) {
   param_padmm.nu = 1.0*aux4; 
 
  
-  #ifdef _OPENMP 
-    start1 = omp_get_wtime();
-  #else
-    start = clock();
-    assert(start != -1);
-  #endif
+#ifdef _OPENMP 
+  start1 = omp_get_wtime();
+#else
+  start = clock();
+  assert(start != -1);
+#endif
   /*  
-  sopt_l1_sdmm((void*)xoutc, Nx,
-                   &purify_measurement_cftfwd,
-                   datafwd,
-                   &purify_measurement_cftadj,
-                   dataadj,
-                   &sopt_sara_synthesisop,
-                   datas,
-                   &sopt_sara_analysisop,
-                   datas,
-                   Nr,
-                   (void*)y, Ny, w, param4);
+      sopt_l1_sdmm((void*)xoutc, Nx,
+      &purify_measurement_cftfwd,
+      datafwd,
+      &purify_measurement_cftadj,
+      dataadj,
+      &sopt_sara_synthesisop,
+      datas,
+      &sopt_sara_analysisop,
+      datas,
+      Nr,
+      (void*)y, Ny, w, param4);
   */                 
   sopt_l1_solver_padmm((void*)xout, Nx,
-           &purify_measurement_cftfwd,
-           datafwd,
-           &purify_measurement_cftadj,
-           dataadj,
-           &sopt_sara_synthesisop,
-           datas,
-           &sopt_sara_analysisop,
-           datas,
-           Nr,
-           (void*)y, Ny, w_l1, w_l2, param_padmm);
+		       &purify_measurement_cftfwd,
+		       datafwd,
+		       &purify_measurement_cftadj,
+		       dataadj,
+		       &sopt_sara_synthesisop,
+		       datas,
+		       &sopt_sara_analysisop,
+		       datas,
+		       Nr,
+		       (void*)y, Ny, w_l1, w_l2, param_padmm);
 
-  #ifdef _OPENMP 
-    stop1 = omp_get_wtime();
-    t = stop1 - start1;
-  #else
-    stop = clock();
-    t = (double) (stop-start)/CLOCKS_PER_SEC;
-  #endif
+#ifdef _OPENMP 
+  stop1 = omp_get_wtime();
+  t = stop1 - start1;
+#else
+  stop = clock();
+  t = (double) (stop-start)/CLOCKS_PER_SEC;
+#endif
 
   printf("Time BPSA: %f \n\n", t); 
 
   
-    //SNR
-    for (i=0; i < Nx; i++) {
-        error[i] = creal(xinc[i])-xout[i];
-    }
-    mse = cblas_dnrm2(Nx, error, 1);
-    a = cblas_dnrm2(Nx, xout, 1);
-    snr_out = 20.0*log10(a/mse);
-    printf("SNR: %f dB\n\n", snr_out);
+  //SNR
+  for (i=0; i < Nx; i++) {
+    error[i] = creal(xinc[i])-xout[i];
+  }
+  mse = cblas_dnrm2(Nx, error, 1);
+  a = cblas_dnrm2(Nx, xout, 1);
+  snr_out = 20.0*log10(a/mse);
+  printf("SNR: %f dB\n\n", snr_out);
 
 
     
@@ -502,7 +502,7 @@ int main(int argc, char *argv[]) {
     img_copy.pix[i] = xout[i];
   }
   
-  purify_image_writefile(&img_copy, "data/test/m31bpsa.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/test/m31bpsa_padmm.fits", filetype_img);
 
   //Residual image
 
@@ -519,187 +519,187 @@ int main(int argc, char *argv[]) {
     img_copy.pix[i] = creal(xoutc[i]);
   }
   
-  purify_image_writefile(&img_copy, "data/test/m31bpsares.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/test/m31bpsares_padmm.fits", filetype_img);
   
   //Error image
   for (i=0; i < Nx; i++){
     img_copy.pix[i] = error[i];
   }
   
-  purify_image_writefile(&img_copy, "data/test/m31bpsaerror.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/test/m31bpsaerror_padmm.fits", filetype_img);
   
-
+  /*
   
-  printf("**********************\n");
-  printf("Db8 reconstruction\n");
-  printf("**********************\n");
+    printf("**********************\n");
+    printf("Db8 reconstruction\n");
+    printf("**********************\n");
 
-  //Initial solution
-  for (i=0; i < Nx; i++) {
-        xout[i] = 0.0;
-  }
+    //Initial solution
+    for (i=0; i < Nx; i++) {
+    xout[i] = 0.0;
+    }
   
-  param4.gamma = gamma*aux3;
+    param4.gamma = gamma*aux3;
 
-  start = clock();
-  assert(start != -1);
-   sopt_l1_sdmm((void*)xoutc, Nx,
-                   &purify_measurement_cftfwd,
-                   datafwd,
-                   &purify_measurement_cftadj,
-                   dataadj,
-                   &sopt_sara_synthesisop,
-                   datas1,
-                   &sopt_sara_analysisop,
-                   datas1,
-                   Nx,
-                   (void*)y, Ny, w, param4);
+    start = clock();
+    assert(start != -1);
+    sopt_l1_sdmm((void*)xoutc, Nx,
+    &purify_measurement_cftfwd,
+    datafwd,
+    &purify_measurement_cftadj,
+    dataadj,
+    &sopt_sara_synthesisop,
+    datas1,
+    &sopt_sara_analysisop,
+    datas1,
+    Nx,
+    (void*)y, Ny, w, param4);
 
-  stop = clock();
-  t = (double) (stop-start)/CLOCKS_PER_SEC;
+    stop = clock();
+    t = (double) (stop-start)/CLOCKS_PER_SEC;
 
-  printf("Time BPDb8: %f \n\n", t); 
+    printf("Time BPDb8: %f \n\n", t); 
 
-  //SNR
-  for (i=0; i < Nx; i++) {
-        error[i] = creal(xoutc[i])-xout[i];
+    //SNR
+    for (i=0; i < Nx; i++) {
+    error[i] = creal(xoutc[i])-xout[i];
     }
     mse = cblas_dnrm2(Nx, error, 1);
     a = cblas_dnrm2(Nx, xout, 1);
     snr_out = 20.0*log10(a/mse);
     printf("SNR: %f dB\n\n", snr_out);
 
-  for (i=0; i < Nx; i++){
+    for (i=0; i < Nx; i++){
     img_copy.pix[i] = creal(xoutc[i]);
-  }
+    }
   
-  purify_image_writefile(&img_copy, "data/test/m31db8.fits", filetype_img);
+    purify_image_writefile(&img_copy, "data/test/m31db8.fits", filetype_img);
 
-   //Residual image
+    //Residual image
 
-  purify_measurement_cftfwd((void*)y0, (void*)xoutc, datafwd);
-  alpha = -1.0 +0.0*I;
-  cblas_zaxpy(Ny, (void*)&alpha, y, 1, y0, 1);
-  purify_measurement_cftadj((void*)xinc, (void*)y0, dataadj);
+    purify_measurement_cftfwd((void*)y0, (void*)xoutc, datafwd);
+    alpha = -1.0 +0.0*I;
+    cblas_zaxpy(Ny, (void*)&alpha, y, 1, y0, 1);
+    purify_measurement_cftadj((void*)xinc, (void*)y0, dataadj);
 
-  for (i=0; i < Nx; i++){
+    for (i=0; i < Nx; i++){
     img_copy.pix[i] = creal(xinc[i]);
-  }
+    }
   
-  purify_image_writefile(&img_copy, "data/test/m31db8res.fits", filetype_img);
+    purify_image_writefile(&img_copy, "data/test/m31db8res.fits", filetype_img);
 
-  //Error image
-  for (i=0; i < Nx; i++){
+    //Error image
+    for (i=0; i < Nx; i++){
     img_copy.pix[i] = error[i];
-  }
+    }
   
-  purify_image_writefile(&img_copy, "data/test/m31db8error.fits", filetype_img);
+    purify_image_writefile(&img_copy, "data/test/m31db8error.fits", filetype_img);
 
   
 
 
 
-  printf("**********************\n");
-  printf("BP reconstruction\n");
-  printf("**********************\n");
+    printf("**********************\n");
+    printf("BP reconstruction\n");
+    printf("**********************\n");
 
-  param4.gamma = gamma*aux1;
+    param4.gamma = gamma*aux1;
 
-  //Initial solution
-  for (i=0; i < Nx; i++) {
-      xoutc[i] = 0.0 + 0.0*I;
-  }
+    //Initial solution
+    for (i=0; i < Nx; i++) {
+    xoutc[i] = 0.0 + 0.0*I;
+    }
 
-  start = clock();
-  assert(start != -1);
-  sopt_l1_sdmm((void*)xoutc, Nx,
-                   &purify_measurement_cftfwd,
-                   datafwd,
-                   &purify_measurement_cftadj,
-                   dataadj,
-                   &sopt_sara_synthesisop,
-                   datas2,
-                   &sopt_sara_analysisop,
-                   datas2,
-                   Nx,
-                   (void*)y, Ny, w, param4); 
+    start = clock();
+    assert(start != -1);
+    sopt_l1_sdmm((void*)xoutc, Nx,
+    &purify_measurement_cftfwd,
+    datafwd,
+    &purify_measurement_cftadj,
+    dataadj,
+    &sopt_sara_synthesisop,
+    datas2,
+    &sopt_sara_analysisop,
+    datas2,
+    Nx,
+    (void*)y, Ny, w, param4); 
 
-  stop = clock();
-  t = (double) (stop-start)/CLOCKS_PER_SEC;
+    stop = clock();
+    t = (double) (stop-start)/CLOCKS_PER_SEC;
 
-  printf("Time BP: %f \n\n", t); 
+    printf("Time BP: %f \n\n", t); 
 
-  //SNR
-  for (i=0; i < Nx; i++) {
-        error[i] = creal(xoutc[i])-xout[i];
+    //SNR
+    for (i=0; i < Nx; i++) {
+    error[i] = creal(xoutc[i])-xout[i];
     }
     mse = cblas_dnrm2(Nx, error, 1);
     a = cblas_dnrm2(Nx, xout, 1);
     snr_out = 20.0*log10(a/mse);
     printf("SNR: %f dB\n\n", snr_out);
 
-  for (i=0; i < Nx; i++){
+    for (i=0; i < Nx; i++){
     img_copy.pix[i] = creal(xoutc[i]);
-  }
+    }
   
-  purify_image_writefile(&img_copy, "data/test/m31bp.fits", filetype_img);
+    purify_image_writefile(&img_copy, "data/test/m31bp.fits", filetype_img);
 
-   //Residual image
+    //Residual image
 
-  purify_measurement_cftfwd((void*)y0, (void*)xoutc, datafwd);
-  alpha = -1.0 +0.0*I;
-  cblas_zaxpy(Ny, (void*)&alpha, y, 1, y0, 1);
-  purify_measurement_cftadj((void*)xinc, (void*)y0, dataadj);
+    purify_measurement_cftfwd((void*)y0, (void*)xoutc, datafwd);
+    alpha = -1.0 +0.0*I;
+    cblas_zaxpy(Ny, (void*)&alpha, y, 1, y0, 1);
+    purify_measurement_cftadj((void*)xinc, (void*)y0, dataadj);
 
-  for (i=0; i < Nx; i++){
+    for (i=0; i < Nx; i++){
     img_copy.pix[i] = creal(xinc[i]);
-  }
+    }
   
-  purify_image_writefile(&img_copy, "data/test/m31bpres.fits", filetype_img);
+    purify_image_writefile(&img_copy, "data/test/m31bpres.fits", filetype_img);
 
-  //Error image
-  for (i=0; i < Nx; i++){
+    //Error image
+    for (i=0; i < Nx; i++){
     img_copy.pix[i] = error[i];
-  }
+    }
   
-  purify_image_writefile(&img_copy, "data/test/m31bperror.fits", filetype_img);
+    purify_image_writefile(&img_copy, "data/test/m31bperror.fits", filetype_img);
 
   
   
   
   
-  //Free all memory
-  purify_image_free(&img);
-  purify_image_free(&img_copy);
-  free(deconv);
-  purify_visibility_free(&vis_test);
-  free(y);
-  free(xinc);
-  free(xout);
-  free(w_l1);
-  free(noise);
-  free(y0);
-  free(error);
-  free(xoutc);
-  free(w_l2);
-  free(shifts);
+    //Free all memory
+    purify_image_free(&img);
+    purify_image_free(&img_copy);
+    free(deconv);
+    purify_visibility_free(&vis_test);
+    free(y);
+    free(xinc);
+    free(xout);
+    free(w_l1);
+    free(noise);
+    free(y0);
+    free(error);
+    free(xoutc);
+    free(w_l2);
+    free(shifts);
 
-  sopt_sara_free(&param1);
-  sopt_sara_free(&param2);
-  sopt_sara_free(&param3);
-  free(dict_types);
-  free(dict_types1);
-  free(dict_types2);
+    sopt_sara_free(&param1);
+    sopt_sara_free(&param2);
+    sopt_sara_free(&param3);
+    free(dict_types);
+    free(dict_types1);
+    free(dict_types2);
 
-  free(fft_temp1);
-  free(fft_temp2);
-  fftw_destroy_plan(planfwd);
-  fftw_destroy_plan(planadj);
-  purify_sparsemat_freer(&gmat);
+    free(fft_temp1);
+    free(fft_temp2);
+    fftw_destroy_plan(planfwd);
+    fftw_destroy_plan(planadj);
+    purify_sparsemat_freer(&gmat);
 
-  free(dummyr);
-  free(dummyc);
-
+    free(dummyr);
+    free(dummyc);
+  */
 
   return 0;
 
