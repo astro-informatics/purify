@@ -343,7 +343,7 @@ int main(int argc, char *argv[]) {
   //Db8 structure initialization
 
   param2.ndict = 1;
-  param2.real = 1;
+  param2.real = 0;
 
   dict_types1 = malloc(param2.ndict * sizeof(sopt_wavelet_type));
   PURIFY_ERROR_MEM_ALLOC_CHECK(dict_types1);
@@ -423,16 +423,16 @@ int main(int argc, char *argv[]) {
   
 
   //Structure for the L1 prox
-  param_l1param.verbose = 1;
+  param_l1param.verbose = 2;
   param_l1param.max_iter = 20;
-  param_l1param.rel_obj = 0.001;
+  param_l1param.rel_obj = 0.01;
   param_l1param.nu = 1.0;
   param_l1param.tight = 0;
   param_l1param.pos = 1;
     
   //Structure for the L1 solver    
   param_padmm.verbose = 2;
-  param_padmm.max_iter = 300;
+  param_padmm.max_iter = 10;
   param_padmm.gamma = 0.01;
   param_padmm.rel_obj = 0.0005;
   param_padmm.epsilon = sqrt(Ny + 2*sqrt(Ny))*sigma;
@@ -464,7 +464,7 @@ int main(int argc, char *argv[]) {
       datas,
       Nr,
       (void*)y, Ny, w, param4);
-  */              
+                
   sopt_l1_solver_padmm((void*)xout, Nx,
 		       &purify_measurement_cftfwd,
 		       datafwd,
@@ -494,7 +494,7 @@ int main(int argc, char *argv[]) {
 //JDM: isn't this -1 times the eror computed for the sdmm m31 example?
   }
   mse = cblas_dnrm2(Nx, error, 1);
-  a = cblas_dnrm2(Nx, xout, 1);
+  a = cblas_dznrm2(Nx, (void*)xinc, 1);
   snr_out = 20.0*log10(a/mse);
   printf("SNR: %f dB\n\n", snr_out);
 
@@ -529,7 +529,7 @@ int main(int argc, char *argv[]) {
   }
   
   purify_image_writefile(&img_copy, "data/test/m31bpsaerror_padmm.fits", filetype_img);
-
+*/
 
   printf("**********************\n");
   printf("Db8 reconstruction\n");
@@ -582,7 +582,7 @@ int main(int argc, char *argv[]) {
     //JDM: isn't this -1 times the eror computed for the sdmm m31 example?
   }
   mse = cblas_dnrm2(Nx, error, 1);
-  a = cblas_dnrm2(Nx, xout, 1);
+  a = cblas_dznrm2(Nx, (void*)xinc, 1);
   snr_out = 20.0*log10(a/mse);
   printf("SNR: %f dB\n\n", snr_out);
 
@@ -671,7 +671,7 @@ int main(int argc, char *argv[]) {
     //JDM: isn't this -1 times the eror computed for the sdmm m31 example?
   }
   mse = cblas_dnrm2(Nx, error, 1);
-  a = cblas_dnrm2(Nx, xout, 1);
+  a = cblas_dznrm2(Nx, (void*)xinc, 1);
   snr_out = 20.0*log10(a/mse);
   printf("SNR: %f dB\n\n", snr_out);
 
