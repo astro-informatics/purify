@@ -343,7 +343,7 @@ int main(int argc, char *argv[]) {
   //Db8 structure initialization
 
   param2.ndict = 1;
-  param2.real = 0;
+  param2.real = 1;
 
   dict_types1 = malloc(param2.ndict * sizeof(sopt_wavelet_type));
   PURIFY_ERROR_MEM_ALLOC_CHECK(dict_types1);
@@ -432,7 +432,7 @@ int main(int argc, char *argv[]) {
     
   //Structure for the L1 solver    
   param_padmm.verbose = 2;
-  param_padmm.max_iter = 10;
+  param_padmm.max_iter = 200;
   param_padmm.gamma = 0.01;
   param_padmm.rel_obj = 0.0005;
   param_padmm.epsilon = sqrt(Ny + 2*sqrt(Ny))*sigma;
@@ -442,7 +442,7 @@ int main(int argc, char *argv[]) {
     
   param_padmm.epsilon_tol_scale = 1.001;
   param_padmm.lagrange_update_scale = 0.9;
-  param_padmm.nu = 1.0*aux4; 
+  param_padmm.nu = 0.88;//1.0*aux4; 
 
    
 #ifdef _OPENMP 
@@ -464,7 +464,7 @@ int main(int argc, char *argv[]) {
       datas,
       Nr,
       (void*)y, Ny, w, param4);
-                
+  */              
   sopt_l1_solver_padmm((void*)xout, Nx,
 		       &purify_measurement_cftfwd,
 		       datafwd,
@@ -495,6 +495,7 @@ int main(int argc, char *argv[]) {
   }
   mse = cblas_dnrm2(Nx, error, 1);
   a = cblas_dznrm2(Nx, (void*)xinc, 1);
+  printf("Norm image: %f \n\n", a);
   snr_out = 20.0*log10(a/mse);
   printf("SNR: %f dB\n\n", snr_out);
 
@@ -529,7 +530,7 @@ int main(int argc, char *argv[]) {
   }
   
   purify_image_writefile(&img_copy, "data/test/m31bpsaerror_padmm.fits", filetype_img);
-*/
+
 
   printf("**********************\n");
   printf("Db8 reconstruction\n");
@@ -583,6 +584,7 @@ int main(int argc, char *argv[]) {
   }
   mse = cblas_dnrm2(Nx, error, 1);
   a = cblas_dznrm2(Nx, (void*)xinc, 1);
+  printf("Norm image: %f \n\n", a);
   snr_out = 20.0*log10(a/mse);
   printf("SNR: %f dB\n\n", snr_out);
 
@@ -672,6 +674,7 @@ int main(int argc, char *argv[]) {
   }
   mse = cblas_dnrm2(Nx, error, 1);
   a = cblas_dznrm2(Nx, (void*)xinc, 1);
+  printf("Norm image: %f \n\n", a);
   snr_out = 20.0*log10(a/mse);
   printf("SNR: %f dB\n\n", snr_out);
 
