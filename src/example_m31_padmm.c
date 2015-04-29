@@ -274,6 +274,8 @@ int main(int argc, char *argv[]) {
 				     &purify_measurement_cftadj,
 				     dataadj);
 
+  printf("Operator norm: %f \n\n", aux4);
+
   /*for (i=0; i < Ny; i++) {
     y[i] = y[i]/sqrt(aux4);
     }
@@ -400,8 +402,8 @@ int main(int argc, char *argv[]) {
     w_l2[i] = 1.0;
   }
   
-
-
+//complex double *ycopy = malloc(Ny * sizeof(*ycopy));
+//cblas_zcopy(Ny, (void*)y, 1, (void*)ycopy, 1);
 
   printf("**********************\n");
   printf("BPSA reconstruction\n");
@@ -423,7 +425,7 @@ int main(int argc, char *argv[]) {
   
 
   //Structure for the L1 prox
-  param_l1param.verbose = 2;
+  param_l1param.verbose = 0;
   param_l1param.max_iter = 20;
   param_l1param.rel_obj = 0.01;
   param_l1param.nu = 1.0;
@@ -434,7 +436,7 @@ int main(int argc, char *argv[]) {
   param_padmm.verbose = 2;
   param_padmm.max_iter = 200;
   param_padmm.gamma = 0.01;
-  param_padmm.rel_obj = 0.0005;
+  param_padmm.rel_obj = 0.0001;
   param_padmm.epsilon = sqrt(Ny + 2*sqrt(Ny))*sigma;
   param_padmm.real_out = 1;
   param_padmm.real_meas = 0;
@@ -442,7 +444,10 @@ int main(int argc, char *argv[]) {
     
   param_padmm.epsilon_tol_scale = 1.001;
   param_padmm.lagrange_update_scale = 0.9;
-  param_padmm.nu = 0.88;//1.0*aux4; 
+  //param_padmm.nu = 1.0*aux4; 
+
+  param_padmm.nu = 0.88;
+  
 
    
 #ifdef _OPENMP 
@@ -452,19 +457,7 @@ int main(int argc, char *argv[]) {
   assert(start != -1);
 #endif
   
-  /*
-      sopt_l1_sdmm((void*)xoutc, Nx,
-      &purify_measurement_cftfwd,
-      datafwd,
-      &purify_measurement_cftadj,
-      dataadj,
-      &sopt_sara_synthesisop,
-      datas,
-      &sopt_sara_analysisop,
-      datas,
-      Nr,
-      (void*)y, Ny, w, param4);
-  */              
+
   sopt_l1_solver_padmm((void*)xout, Nx,
 		       &purify_measurement_cftfwd,
 		       datafwd,
@@ -529,8 +522,10 @@ int main(int argc, char *argv[]) {
     img_copy.pix[i] = error[i];
   }
   
-  purify_image_writefile(&img_copy, "data/test/m31bpsaerror_padmm.fits", filetype_img);
 
+  purify_image_writefile(&img_copy, "data/test/m31bpsaerror_padmm.fits", filetype_img); 
+
+/
 
   printf("**********************\n");
   printf("Db8 reconstruction\n");
@@ -546,19 +541,6 @@ int main(int argc, char *argv[]) {
   start = clock();
   assert(start != -1);
 
-/*
-    sopt_l1_sdmm((void*)xoutc, Nx,
-		 &purify_measurement_cftfwd,
-		 datafwd,
-		 &purify_measurement_cftadj,
-		 dataadj,
-		 &sopt_sara_synthesisop,
-		 datas1,
-		 &sopt_sara_analysisop,
-		 datas1,
-		 Nx,
-		 (void*)y, Ny, w, param4);
-*/
   sopt_l1_solver_padmm((void*)xout, Nx,
 		       &purify_measurement_cftfwd,
 		       datafwd,
@@ -616,9 +598,8 @@ int main(int argc, char *argv[]) {
     img_copy.pix[i] = error[i];
   }
   
-  purify_image_writefile(&img_copy, "data/test/m31db8error_padmm.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/test/m31db8error_padmm.fits", filetype_img); 
 
-  
 
 
 
@@ -635,19 +616,7 @@ int main(int argc, char *argv[]) {
 
   start = clock();
   assert(start != -1);
-    /*
-    sopt_l1_sdmm((void*)xoutc, Nx,
-		 &purify_measurement_cftfwd,
-		 datafwd,
-		 &purify_measurement_cftadj,
-		 dataadj,
-		 &sopt_sara_synthesisop,
-		 datas2,
-		 &sopt_sara_analysisop,
-		 datas2,
-		 Nx,
-		 (void*)y, Ny, w, param4); 
-    */
+    
   sopt_l1_solver_padmm((void*)xout, Nx,
 		       &purify_measurement_cftfwd,
 		       datafwd,
@@ -707,7 +676,7 @@ int main(int argc, char *argv[]) {
     img_copy.pix[i] = error[i];
   }
   
-  purify_image_writefile(&img_copy, "data/test/m31bperror_padmm.fits", filetype_img);
+  purify_image_writefile(&img_copy, "data/test/m31bperror_padmm.fits", filetype_img); 
 
   
   
@@ -719,6 +688,7 @@ int main(int argc, char *argv[]) {
   free(deconv);
   purify_visibility_free(&vis_test);
   free(y);
+  //free(ycopy);
   free(xinc);
   free(xout);
   free(w_l1);
