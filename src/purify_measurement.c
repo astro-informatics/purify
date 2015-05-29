@@ -920,7 +920,7 @@ double purify_measurement_pow_meth(void (*A)(void *out, void *in, void **data),
     norm = 1.0;
 
     //main loop
-    while (iter < 200){
+    while (iter < 500){
       A((void*)y, (void*)x, A_data);
       At((void*)x, (void*)y, At_data);
       bound = cblas_dznrm2(nx, (void*)x, 1);
@@ -946,7 +946,7 @@ double purify_measurement_pow_meth(void (*A)(void *out, void *in, void **data),
     norm = 1.0;
 
     //main loop
-    while (iter < 200){
+    while (iter < 500){
       At((void*)x, (void*)y, At_data);
       A((void*)y, (void*)x, A_data);
       bound = cblas_dznrm2(ny, (void*)y, 1);

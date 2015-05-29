@@ -68,7 +68,8 @@ int main(int argc, char *argv[]) {
   complex double *y0;
   complex double *y;
   double *xout;
-  double *w;
+  double *w_l1;
+  double *w_l2;
   complex double *xoutc;
   double *dummyr;
   complex double *dummyc;
@@ -181,8 +182,10 @@ int main(int argc, char *argv[]) {
   PURIFY_ERROR_MEM_ALLOC_CHECK(y);
   y0 = (complex double*)malloc((vis_test.nmeas) * sizeof(complex double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(y0);
-  w = (double*)malloc((Nr) * sizeof(double));
-  PURIFY_ERROR_MEM_ALLOC_CHECK(w);
+  w_l1 = (double*)malloc((Nr) * sizeof(double));
+  PURIFY_ERROR_MEM_ALLOC_CHECK(w_l1);
+  w_l2 = (double*)malloc((Ny) * sizeof(double));
+  PURIFY_ERROR_MEM_ALLOC_CHECK(w_l2);
   xoutc = (complex double*)malloc((Nx) * sizeof(complex double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(xoutc);
   shifts = (complex double*)malloc((vis_test.nmeas) * sizeof(complex double));
@@ -348,7 +351,15 @@ int main(int argc, char *argv[]) {
       xoutc[i] = 0.0 + 0.0*I;
   }
   for (i=0; i < Nr; i++){
-    w[i] = 1.0;
+    w_l1[i] = 1.0;
+  }
+
+  // Compute whitening weights.
+  double TOL = 1e-10;
+  for (i=0; i < Ny; i++) {
+    w_l2[i] = creal(vis_test.noise_std[i]);
+    assert(fabs(w_l2[i]) > TOL);
+    w_l2[i] = 1.0 / w_l2[i];
   }
   
 
@@ -356,14 +367,14 @@ int main(int argc, char *argv[]) {
   printf("BPSA reconstruction\n");
   printf("**********************\n");
 
-  gamma = 0.01;
+  gamma = 0.001;
     
   //Structure for the L1 solver      
   param4.verbose = 2;
-  param4.max_iter = 5;
+  param4.max_iter = 300;
   param4.gamma = gamma*aux2;//*sqrt(aux4);
   param4.rel_obj = 0.0001;
-  param4.epsilon = 0.01*aux1; //sqrt(Ny + 2*sqrt(Ny))*sigma/sqrt(aux4);
+  param4.epsilon =  sqrt(Ny + 2*sqrt(Ny)); //0.01*aux1;
   param4.epsilon_tol = 0.01;
   param4.real_data = 0;
   param4.cg_max_iter = 100;
@@ -380,7 +391,7 @@ int main(int argc, char *argv[]) {
   #else
     assert((start = clock())!=-1);
   #endif
-  sopt_l1_sdmm((void*)xoutc, Nx,
+  sopt_l1_sdmm2((void*)xoutc, Nx,
                    &purify_measurement_cftfwd,
                    datafwd,
                    &purify_measurement_cftadj,
@@ -390,7 +401,7 @@ int main(int argc, char *argv[]) {
                    &sopt_sara_analysisop,
                    datas,
                    Nr,
-                   (void*)y, Ny, w, param4);
+                   (void*)y, Ny, w_l1, w_l2, param4);
 
   #ifdef _OPENMP 
     stop1 = omp_get_wtime();
@@ -508,7 +519,8 @@ int main(int argc, char *argv[]) {
   free(y);
   free(xinc);
   free(xout);
-  free(w);
+  free(w_l1);
+  free(w_l2);
   free(y0);
   free(xoutc);
 
