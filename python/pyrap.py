@@ -1,7 +1,9 @@
 """ Functionality for interfacing CASA and Purify via pyrap """
-__docformat__ = 'restructuredtext en'
-__all__ = ['purified_image', 'DataTransform', 'purify_measurement_set']
 from . import casa
+
+__docformat__ = 'restructuredtext en'
+__all__ = ['DataTransform', 'purify_measurement_set']
+
 
 class DataTransform(casa.CasaTransform):
     def _get_table(self, name=None):
@@ -12,14 +14,14 @@ class DataTransform(casa.CasaTransform):
         if name is None:
             return tables.table(self.measurement_set)
         return tables.table("%s::%s" % (self.measurement_set, name))
+
     def _c_vs_fortran(self, value):
         """ Function to derive in pyrap wrappers """
         return value.T
 
-# Wraps around generators in purify.casa and makes them use the DataTransform
-# employed above, rather than the purify.casa one.
+
 def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
-        coordsys=None, **kwargs):
+                 coordsys=None, **kwargs):
     """ Creates an image from a given measurement set
 
         Parameters:
@@ -34,6 +36,8 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
                 See :py:class:`purify.casa.CasaTransform` and
                 :py:func:`purify.casa.purify_measurement_set`
     """
+    # Wraps around generators in purify.casa and makes them use the
+    # DataTransform employed above, rather than the purify.casa one.
     from numpy import real, array
     from os.path import abspath
     from . import SDMM
@@ -54,7 +58,7 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     sdmm = SDMM(image_size=imsize, **kwargs)
     data = array(
         [real(sdmm(x, scale=scale)) for x in datatransform],
-        dtype = 'double'
+        dtype='double'
     )
     imagename = abspath(imagename)
     # argument "value = something" seems to be broken
@@ -69,10 +73,10 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     image.put(data)
     return image
 
-# Wraps around generators in purify.casa and makes them use the DataTransform
-# employed above, rather than the purify.casa one.
+
 def purify_measurement_set(ms, imagename, imsize=(128, 128), datadescid=0,
-        channels=None, column=None, resolution=0.3, **kwargs):
+                           channels=None, column=None, resolution=0.3,
+                           **kwargs):
     """ Creates an image from a given measurement set
 
         Parameters:
@@ -93,4 +97,4 @@ def purify_measurement_set(ms, imagename, imsize=(128, 128), datadescid=0,
     )
 
     return purify_image(transform, imagename=imagename, imsize=imsize,
-            **kwargs)
+                        **kwargs)
