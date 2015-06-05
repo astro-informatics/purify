@@ -332,7 +332,7 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     # Create image
     casalog.post('Creating CASA image')
     ia, = gentools(['ia'])
-    ia.newimagefromarray(imagename, image.real, overwrite=overwrite)
+    ia.newimagefromarray(imagename, image.real.T, overwrite=overwrite)
 
     set_image_coordinate(datatransform, imagename)
 
