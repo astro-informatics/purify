@@ -1,6 +1,7 @@
 """ Functionality for interfacing CASA and Purify """
 __docformat__ = 'restructuredtext en'
-__all__ = ['data_iterator', 'purified_image', 'purify_measurement_set']
+__all__ = ['purify_measurement_set']
+
 
 class DataTransform(object):
     """ Base class to transform data to something purify understands """
@@ -53,7 +54,6 @@ class DataTransform(object):
             vis = y[..., i, :].squeeze() if y.ndim != 1 else y
             yield conv(u, i), conv(v, i), vis
 
-
     @staticmethod
     def convert_to_purify(x, frequency, resolution=0.3):
         """ Transforms x to purify units given frequency and resolution
@@ -81,10 +81,11 @@ class DataTransform(object):
         scale = wavelength * 2.0 * pi / umax
         return x * scale
 
+
 class CasaTransform(DataTransform):
     """ Transforms measurement set to something purify understands """
-    def __init__(self, measurement_set, datadescid=0,
-            channels=None, resolution=0.3, column=None, **kwargs):
+    def __init__(self, measurement_set, datadescid=0, channels=None,
+                 resolution=0.3, column=None, **kwargs):
         """ Creates the transform
 
             :Parameters:
@@ -111,7 +112,6 @@ class CasaTransform(DataTransform):
         self.resolution = resolution
         """ Resolution of the output image in arcsec per pixel """
 
-
     def _get_table(self, name=None):
         """ A table object """
         from taskinit import gentools
@@ -133,14 +133,14 @@ class CasaTransform(DataTransform):
     @property
     def spectral_window_id(self):
         """ ID of the spectral window """
-        return self._get_table('DATA_DESCRIPTION')\
-                .getcol('SPECTRAL_WINDOW_ID')[self.datadescid]
+        return self._get_table('DATA_DESCRIPTION') \
+            .getcol('SPECTRAL_WINDOW_ID')[self.datadescid]
 
     @property
     def _all_frequencies(self):
         """ Frequencies (Hz) associated with each channel """
         return self._get_table('SPECTRAL_WINDOW')\
-                .getcol('CHAN_FREQ')[:, self.spectral_window_id].squeeze()
+            .getcol('CHAN_FREQ')[:, self.spectral_window_id].squeeze()
 
     @property
     def frequencies(self):
@@ -156,7 +156,7 @@ class CasaTransform(DataTransform):
     @property
     def data(self):
         """ Data needed by Purify """
-        from numpy import allclose, require, logical_and, sum
+        from numpy import require, logical_and
         query = 'DATA_DESC_ID == 0'
         columns = "UVW, %s as Y, SIGMA as sigma" % self.column
         tb = self._get_table().query(query=query, columns=columns)
@@ -215,11 +215,12 @@ class CasaTransform(DataTransform):
         else:
             channels = [int(channels)]
         if len(channels) == 0:
-            return  list(range(len(frequencies)))
+            return list(range(len(frequencies)))
         if any(u >= len(frequencies) for u in channels)    \
                 or any(u < -len(frequencies) for u in channels):
             raise IndexError("Channels out of range")
         return channels
+
 
 class LambdaTransform(CasaTransform):
     def __init__(self, measurement_set, resolution=0.3, norm=1.0, **kwargs):
@@ -262,8 +263,9 @@ class LambdaTransform(CasaTransform):
         scale = 2.0 * pi / umax
         return x * scale
 
+
 def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
-        **kwargs):
+                 **kwargs):
     """ Creates an image using the Purify method
 
         Parameters:
@@ -299,7 +301,6 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     scale = kwargs.pop('scale', 'default')
     sdmm = SDMM(image_size=imsize, **kwargs)
 
-
     # Contains images over all dimensions
     image = []
     for i, data in enumerate(datatransform):
@@ -314,9 +315,10 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     ia, = gentools(['ia'])
     ia.newimagefromarray(imagename, image.real, overwrite=overwrite)
 
+
 def purify_measurement_set(measurement_set, imagename, imsize=None,
-        datadescid=0, channels=None, column=None,
-        resolution=0.3, **kwargs):
+                           datadescid=0, channels=None, column=None,
+                           resolution=0.3, **kwargs):
     """ Creates an image using the Purify method
 
         Parameters:
