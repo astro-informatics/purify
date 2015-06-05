@@ -273,12 +273,13 @@ class LambdaTransform(CasaTransform):
 
 def set_image_coordinate(datatransform, imagename):
     """ Tries and sets an image coordinates from a measurement set """
-    from numpy import array, mod
+    from numpy import array, mod, pi
     table = datatransform._get_table(filename=imagename, readonly=False)
     coords = table.getkeyword("coords")
-    coords["direction0"]["cdelt"] = array([-1, 1]) * datatransform.resolution
-    coords["direction0"]["crval"] = mod(datatransform.phase_dir[[0, 1], 0, 0])
-    coords["direction0"]["units"] = array(["arcsec"]*2)
+    coords["direction0"]["cdelt"] = \
+        array([-1, 1]) * datatransform.resolution * 180 / pi
+    coords["direction0"]["crval"] = \
+        mod(datatransform.phase_dir[:, 0, 0], 2*pi) * 180 / pi
     table.putkeyword("coords", coords)
     table.close()
 
