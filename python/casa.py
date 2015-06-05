@@ -112,14 +112,16 @@ class CasaTransform(DataTransform):
         self.resolution = resolution
         """ Resolution of the output image in arcsec per pixel """
 
-    def _get_table(self, name=None):
+    def _get_table(self, name=None, filename=None, readonly=True):
         """ A table object """
         from taskinit import gentools
         tb, = gentools(['tb'])
+        if filename is None:
+            filename = self.measurement_set
         if name is None:
-            tb.open('%s' % self.measurement_set)
+            tb.open('%s' % filename, nomodify=readonly)
         else:
-            tb.open('%s/%s' % (self.measurement_set, name))
+            tb.open('%s/%s' % (filename, name), nomodify=readonly)
         return tb
 
     def _c_vs_fortran(self, value):
@@ -152,6 +154,11 @@ class CasaTransform(DataTransform):
             channels = [0] if condition else self.channels
             allfreqs = ones(max(channels) + 1, dtype='double') * allfreqs
         return allfreqs[self.channels].squeeze()
+
+    @property
+    def phase_dir(self):
+        """ Measurement set phase center """
+        return self._c_vs_fortran(self._get_table("FIELD").getcol("PHASE_DIR"))
 
     @property
     def data(self):
@@ -264,6 +271,18 @@ class LambdaTransform(CasaTransform):
         return x * scale
 
 
+def set_image_coordinate(datatransform, imagename):
+    """ Tries and sets an image coordinates from a measurement set """
+    from numpy import array, mod
+    table = datatransform._get_table(filename=imagename, readonly=False)
+    coords = table.getkeyword("coords")
+    coords["direction0"]["cdelt"] = array([-1, 1]) * datatransform.resolution
+    coords["direction0"]["crval"] = mod(datatransform.phase_dir[[0, 1], 0, 0])
+    coords["direction0"]["units"] = array(["arcsec"]*2)
+    table.putkeyword("coords", coords)
+    table.close()
+
+
 def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
                  **kwargs):
     """ Creates an image using the Purify method
@@ -315,6 +334,8 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     ia, = gentools(['ia'])
     ia.newimagefromarray(imagename, image.real, overwrite=overwrite)
 
+    set_image_coordinate(datatransform, imagename)
+
 
 def purify_measurement_set(measurement_set, imagename, imsize=None,
                            datadescid=0, channels=None, column=None,
@@ -342,5 +363,5 @@ def purify_measurement_set(measurement_set, imagename, imsize=None,
         measurement_set, channels=channels, datadescid=datadescid,
         column=column, resolution=resolution
     )
-    return purify_image(
-            transform, imagename=imagename, imsize=imsize, **kwargs)
+    return purify_image(transform, imagename=imagename, imsize=imsize,
+                        **kwargs)

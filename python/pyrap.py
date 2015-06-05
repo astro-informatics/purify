@@ -6,14 +6,16 @@ __all__ = ['DataTransform', 'purify_measurement_set']
 
 
 class DataTransform(casa.CasaTransform):
-    def _get_table(self, name=None):
+    def _get_table(self, name=None, filename=None, nomodify=readonly):
         """ A table object """
         # can't use standard import since it would identify pyrap as this very
         # module, rather than the global pyrap module.
         tables = __import__('pyrap.tables', globals(), locals(), ['table'], 0)
+        if filename is None:
+            filename = self.measurement_set
         if name is None:
-            return tables.table(self.measurement_set)
-        return tables.table("%s::%s" % (self.measurement_set, name))
+            return tables.table(filename, readonly=readonly)
+        return tables.table("%s::%s" % (filename, name), readonly=readonly)
 
     def _c_vs_fortran(self, value):
         """ Function to derive in pyrap wrappers """
@@ -44,10 +46,6 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     # can't use standard import since it would identify pyrap as this very
     # module, rather than the global pyrap module.
     images = __import__('pyrap.images', globals(), locals(), ['image'], 0)
-    stokes = __import__(
-            'pyrap.images.coordinates', globals(), locals(),
-            ['stokescoordinate'], 0
-    )
 
     # Input sanitizing
     if 'image_size' in kwargs:
@@ -68,8 +66,6 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
         overwrite=overwrite,
         coordsys=coordsys
     )
-    if coordsys is None:
-        coordsys = stokes.stokescoordinate("I")
     image.put(data)
     return image
 
