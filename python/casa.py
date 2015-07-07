@@ -285,7 +285,7 @@ def set_image_coordinate(datatransform, imagename):
 
 
 def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
-                 **kwargs):
+                 weights=None, L2weights=None, **kwargs):
     """ Creates an image using the Purify method
 
         Parameters:
@@ -297,6 +297,10 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
                 Width and height of the output image in pixels
             overwrite: bool
                 Whether to overwrite existing image. Defaults to False.
+            weights: None or array
+                l1weights for sdmm
+            L2weights: None or array
+                l2weights for sdmm
             other arguments:
                 See purify.SDMM
     """
@@ -325,7 +329,7 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     image = []
     for i, data in enumerate(datatransform):
         casalog.origin('Purifying plane %s' % str(i))
-        channel = sdmm(data, scale=scale)
+        channel = sdmm(data, scale=scale, weights=weights, L2weights=L2weights)
         image.append(channel)
 
     image = array(image, order='F')
