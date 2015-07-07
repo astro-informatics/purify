@@ -6,7 +6,7 @@ __all__ = ['DataTransform', 'purify_measurement_set']
 
 
 class DataTransform(casa.CasaTransform):
-    def _get_table(self, name=None, filename=None, nomodify=readonly):
+    def _get_table(self, name=None, filename=None, readonly=True):
         """ A table object """
         # can't use standard import since it would identify pyrap as this very
         # module, rather than the global pyrap module.
@@ -42,6 +42,7 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     # DataTransform employed above, rather than the purify.casa one.
     from numpy import real, array
     from os.path import abspath
+    from .casa import set_image_coordinate
     from . import SDMM
     # can't use standard import since it would identify pyrap as this very
     # module, rather than the global pyrap module.
@@ -67,6 +68,8 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
         coordsys=coordsys
     )
     image.put(data)
+
+    set_image_coordinate(datatransform, abspath(imagename))
     return image
 
 
