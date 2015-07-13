@@ -40,24 +40,23 @@ add_python_module(purify
     ${PYTHON_SOURCES} ${PXD_HEADERS}
     LIBRARIES libpurify
 )
-if(tests)
-    # Files only needed in testing. Added here cos here is where the copy
-    # target is defined.
-    add_copy_directory(copy
-        "${PROJECT_SOURCE_DIR}/data/"
-        GLOB *.vis *.fits
-        DESTINATION "${PYTHON_BINARY_DIR}/purify/data"
-    )
-    install_python(
-        DIRECTORY "${PROJECT_SOURCE_DIR}/data/"
-        DESTINATION ${PYTHON_PKG_DIR}/purify/data
-        FILES_MATCHING
-        PATTERN "images/Coverages/*.vis"
-        PATTERN "images/*.fits"
-        PATTERN "expected/*.fits"
-        PATTERN "test/*" EXCLUDE
-    )
-endif()
+
+# Files only needed in testing. Added here cos here is where the copy
+# target is defined.
+add_copy_directory(copy
+    "${PROJECT_SOURCE_DIR}/data/"
+    GLOB *.vis *.fits
+    DESTINATION "${PYTHON_BINARY_DIR}/purify/data"
+)
+install_python(
+    DIRECTORY "${PROJECT_SOURCE_DIR}/data/"
+    DESTINATION ${PYTHON_PKG_DIR}/purify/data
+    FILES_MATCHING
+    PATTERN "images/Coverages/*.vis"
+    PATTERN "images/*.fits"
+    PATTERN "expected/*.fits"
+    PATTERN "test/*" EXCLUDE
+)
 
 add_copy_files(copy
     FILES purify_image.xml task_purify_image.py

@@ -34,10 +34,6 @@ file:///opt/casa/code/xmlcasa/xml/casa.xsd">
             <description>Data description ID</description>
             <value>0</value>
         </param>
-        <param name="ignoreW" type="bool">
-            <description>Ignore value of W</description>
-            <value>False</value>
-        </param>
         <param name="channels" type="intArray">
             <description>Data selection criteria</description>
             <value>None</value>
@@ -149,10 +145,6 @@ file:///opt/casa/code/xmlcasa/xml/casa.xsd">
         <param name="tv_norm" type="bool">
             <description>Whether to use TV norm</description>
             <value>False</value>
-        </param>
-        <param name="query" type="string">
-            <description>Queries for a specific column as the visibilities</description>
-            <value>mscal.stokes({0}, "I")</value>
         </param>
    </input>
 

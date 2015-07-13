@@ -48,8 +48,25 @@ cdef extern from "sopt_l1.h":
         sopt_l1_sdmmparam paraml1,
         sopt_l1_rwparam paramrwl1)
 
+    cdef void sopt_l1_sdmm2(void *xsol,
+        int nx,
+        void (*A)(void *out, void *into, void **data),
+        void **A_data,
+        void (*At)(void *out, void *into, void **data),
+        void **At_data,
+        void (*Psi)(void *out, void *into, void **data),
+        void **Psi_data,
+        void (*Psit)(void *out, void *into, void **data),
+        void **Psit_data,
+        int nr,
+        void *y,
+        int ny,
+        double *weights_l1,
+        double *weights_l2,
+        sopt_l1_sdmmparam param)
+
 cdef void _l1_sdmm( self, sensingop, visibility, _image, int _image_size,
-        void **_datafwd, void **_dataadj, weights ) except *:
+        void **_datafwd, void **_dataadj, weights, weights_l2 ) except *:
     """ Calls L1 SDMM """
     cdef:
         sopt_l1_sdmmparam sdparams
@@ -61,15 +78,26 @@ cdef void _l1_sdmm( self, sensingop, visibility, _image, int _image_size,
     _convert_l1param(&sdparams, self, sensingop, visibility)
     SparsityOperator.set_wavelet_pointer(self, &c_wavelets)
 
-    sopt_l1_sdmm(
-        c_image, _image_size,
-        &purify_measurement_cftfwd, _datafwd,
-        &purify_measurement_cftadj, _dataadj,
-        &sopt_sara_synthesisop, &c_wavelets,
-        &sopt_sara_analysisop, &c_wavelets,
-        Nr, c_visibility, len(visibility),
-        c_weights, sdparams
-    )
+    if weights_l2 is None:
+      sopt_l1_sdmm(
+          c_image, _image_size,
+          &purify_measurement_cftfwd, _datafwd,
+          &purify_measurement_cftadj, _dataadj,
+          &sopt_sara_synthesisop, &c_wavelets,
+          &sopt_sara_analysisop, &c_wavelets,
+          Nr, c_visibility, len(visibility),
+          c_weights, sdparams
+      )
+    else:
+      sopt_l1_sdmm2(
+          c_image, _image_size,
+          &purify_measurement_cftfwd, _datafwd,
+          &purify_measurement_cftadj, _dataadj,
+          &sopt_sara_synthesisop, &c_wavelets,
+          &sopt_sara_analysisop, &c_wavelets,
+          Nr, c_visibility, len(visibility),
+          c_weights, <double*> untyped_pointer_to_data(weights_l2), sdparams
+      )
 
 cdef void _l1_rw_sdmm( self, sensingop, visibility, _image,
         int _image_size, void **_datafwd, void **_dataadj ) except *:
@@ -253,17 +281,18 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
 
             :Parameters:
                 visibility:
-                    U, V, Y, and visibility data, in one of the following
-                    formats:
+                    U, V, Y, (optionally L2 weights), and visibility data, in
+                    one of the following formats:
 
                     - a pandas dataframe with a 'u', 'v', 'y' (visibility per
-                      se) columns
-                    - a dictionary with 'u', 'v', and 'y' keys
+                      se) columns [+ 'w' optionally]
+                    - a dictionary with 'u', 'v', and 'y' keys [+ 'w'
+                    optionally]
                     - a seqence of three numpy arrays in the order 'u', 'v',
-                      'y'
+                      'y' [optional fourth array is 'w' the L2 weights]
 
                 weights:
-                    If present, an array f weights of shape
+                    If present, an array of weights of shape
                     (len(self), ) + self.shape.
                 scale:
                     Scaling factor applied to the visibility (and the
@@ -289,6 +318,7 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
         # Create missing weights and image objects if needed. Check they are
         # correct otherwise.
         y = visibility_column_as_numpy_array('y', visibility)
+        weights_l2 = visibility_column_as_numpy_array('w', visibility)
         image = self._get_image(image, y.dtype)
         if not self.reweighted:
             weights = self._get_weight(weights)
@@ -331,7 +361,7 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
         else:
             _l1_sdmm( self, sensing_op, scaled_visibility,
                       image, image.size, datafwd, dataadj,
-                      weights )
+                      weights, weights_l2 )
 
         return image
 

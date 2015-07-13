@@ -20,6 +20,7 @@ if isCASA:
     casa_path = environ['CASAPATH'].split()[0]
     environ['CFLAGS'] = environ.get('CFLAGS', '') + ' -I%s/include' % casa_path
 
+
 def cmake_cache_line(variable, value, type='STRING'):
     return "set(%s \"%s\" CACHE %s \"\")\n" % (variable, value, type)
 
@@ -90,9 +91,8 @@ class Build(dBuild):
         if isCASA:
             other_args.append(
                 cmake_cache_line('CMAKE_PREFIX_PATH',
-                    environ['CASAPATH'].split()[0], 'PATH')
+                                 environ['CASAPATH'].split()[0], 'PATH')
             )
-
 
         with open(filename, 'w') as file:
             file.writelines(other_args)
@@ -206,7 +206,6 @@ class Install(dInstall):
         self.install_casa_task(pkg, build_dir)
 
     def install_casa_task(self, install_dir, build_dir):
-        from os import environ
         from subprocess import call
         if not isCASA:
             return
@@ -299,7 +298,7 @@ try:
     packages = ['cython', 'numpy', 'scipy', 'pytest', 'pandas']
     setup(
         name="purify",
-        version="0.1.1",
+        version="0.1.2",
 
         # NOTE: python-dateutil is required by pandas,
         # but is not installed by it (pandas == 0.13)
