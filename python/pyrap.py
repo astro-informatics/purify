@@ -23,7 +23,7 @@ class DataTransform(casa.CasaTransform):
 
 
 def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
-                 coordsys=None, weights=None, L2weights=None, **kwargs):
+                 coordsys=None, weights=None, **kwargs):
     """ Creates an image from a given measurement set
 
         Parameters:
@@ -56,7 +56,7 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     scale = kwargs.pop('scale', 'default')
     sdmm = SDMM(image_size=imsize, **kwargs)
     data = array(
-        [real(sdmm(x, scale=scale, weights=weights, L2weights=L2weights))
+        [real(sdmm(x, scale=scale, weights=weights))
          for x in datatransform],
         dtype='double'
     )

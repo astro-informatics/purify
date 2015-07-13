@@ -42,7 +42,7 @@ class DataTransform(object):
     def __iter__(self):
         """ Iterates over channel data """
         # Can use a slightly different DataTransform object in pyrap interface
-        u, v, y = self.data
+        u, v, y, sigma = self.data
         frequencies = self.frequencies
 
         def conv(x, i):
@@ -52,7 +52,8 @@ class DataTransform(object):
 
         for i in range(1 if y.ndim == 1 else y.shape[-2]):
             vis = y[..., i, :].squeeze() if y.ndim != 1 else y
-            yield conv(u, i), conv(v, i), vis
+            yield conv(u, i), conv(v, i),\
+                vis, sigma[..., i].squeeze()
 
     @staticmethod
     def convert_to_purify(x, frequency, resolution=0.3):
@@ -165,7 +166,7 @@ class CasaTransform(DataTransform):
         """ Data needed by Purify """
         from numpy import require, logical_and
         query = 'DATA_DESC_ID == 0'
-        columns = "UVW, %s as Y, SIGMA as sigma" % self.column
+        columns = "UVW, %s as Y, 1e0/SIGMA as stddev" % self.column
         tb = self._get_table().query(query=query, columns=columns)
 
         # Compute stokes I component...  this could fail horribly if formula
@@ -181,22 +182,23 @@ class CasaTransform(DataTransform):
                     'complex' if y_is_complex else 'double')
 
         # Remove tagged objects
-        sigma = self._c_vs_fortran(tb.getcol('sigma').squeeze())
-        if sigma.shape[0] != 4:
+        stddev = self._c_vs_fortran(tb.getcol('stddev').squeeze())
+        if stddev.shape[0] != 4:
             msg = "Don't know how to deal with this kind of measurement set"
             raise NotImplementedError(msg)
-        sig_view = sigma.view()
+        sig_view = stddev.view()
         sig_view.shape = (4, -1)
         unflagged = logical_and(sig_view[0, :] >= 0e0, sig_view[3, :] >= 0e0)
 
-        u, v, w = self._c_vs_fortran(tb.getcol('UVW'))
-        u, v, w, y = u[unflagged], v[unflagged], w[unflagged], y[unflagged]
+        u, v, stddev = self._c_vs_fortran(tb.getcol('UVW'))
+        u, v, stddev, y = u[unflagged], v[unflagged],\
+            stddev[unflagged], y[unflagged]
 
         # Just dealing with CASA difficulties
         channels = None if self.channels == [None] else self.channels
         yview = y.view()
         yview.shape = all_ys.shape[1:-1] + (-1,)
-        return u, v, yview[..., channels, :].squeeze()
+        return u, v, yview[..., channels, :].squeeze(), stddev[..., channels]
 
     def _get_data_column_name(self, column):
         """ Name of the column to use for Y """
@@ -285,7 +287,7 @@ def set_image_coordinate(datatransform, imagename):
 
 
 def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
-                 weights=None, L2weights=None, **kwargs):
+                 weights=None, **kwargs):
     """ Creates an image using the Purify method
 
         Parameters:
@@ -299,8 +301,6 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
                 Whether to overwrite existing image. Defaults to False.
             weights: None or array
                 l1weights for sdmm
-            L2weights: None or array
-                l2weights for sdmm
             other arguments:
                 See purify.SDMM
     """
@@ -329,7 +329,7 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     image = []
     for i, data in enumerate(datatransform):
         casalog.origin('Purifying plane %s' % str(i))
-        channel = sdmm(data, scale=scale, weights=weights, L2weights=L2weights)
+        channel = sdmm(data, scale=scale, weights=weights)
         image.append(channel)
 
     image = array(image, order='F')
