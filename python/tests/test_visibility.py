@@ -15,7 +15,7 @@ def test_read_visibility():
     N = 10
     noise = random(N)
     expected = DataFrame({
-        'u': random(N), 'v': random(N), 'w': [0] * N,
+        'u': random(N), 'v': random(N),
         'noise': (1+1j) / sqrt(2) * noise, 'y': random(N) + 1j * random(N)
     })
 
