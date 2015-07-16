@@ -16,7 +16,7 @@ cdef extern from "purify_visibility.h":
 cdef object _convert_visibility(_Visibility *_visibility):
     """ Copies a C visibility iNto a dataframe """
     from pandas import DataFrame
-    from numpy import array
+    from numpy import array, all, abs
 
     cdef int N = _visibility[0].nmeas
     cdef:
@@ -26,9 +26,15 @@ cdef object _convert_visibility(_Visibility *_visibility):
       double complex[::1] noise = <double complex[:N:]> _visibility[0].noise_std
       double complex[::1] y = <double complex[:N:]> _visibility[0].y
 
-    return DataFrame({
-      'u': array(u), 'v': array(v), 'w': array(w), 'noise': array(noise), 'y': array(y)
-    })
+    w = array(w)
+    if all(abs(w) < 1e-12):
+        return DataFrame({
+          'u': array(u), 'v': array(v), 'noise': array(noise), 'y': array(y)
+        })
+    else:
+        return DataFrame({
+            'u': array(u), 'v': array(v), 'w': w, 'noise': array(noise), 'y': array(y)
+        })
 
 cdef void _wrap_visibility(py_visibility, _Visibility *c_visibility) except *:
     """ Wraps a visibility c-structure around python dataframe """

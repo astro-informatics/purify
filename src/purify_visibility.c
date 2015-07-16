@@ -997,7 +997,7 @@ int purify_visibility_vdsmask(purify_sparsemat *mask, purify_image *img,
     else
       d=d-0.1;
     iter++;    
-  } while ( (abs(alpha)>0.01) && (iter<maxiter_pdf));
+  } while ( (fabs(alpha)>0.01) && (iter<maxiter_pdf));
 
   // Construct indicies of measured visibilities.
   ivis = (int*)calloc(M*N, sizeof(int));

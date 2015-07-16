@@ -1,14 +1,13 @@
 from purify.casa import purify_measurement_set
 
 def purify_image(vis, imagename, imsize=None, datadescid=0,
-        ignoreW=False, channels=None, column=None, resolution=0.3, nlevels=4,
+        channels=None, column=None, resolution=0.3, nlevels=4,
         wavelets=None, interpolation=None, oversampling=None, gamma=None,
         radius=None, relative_radius=None, max_iter=None,
         relative_variation=None, verbose=None, cg_max_iter=None,
         cg_tolerance=None, reweighted=None, rw_max_iter=None, rw_verbose=None,
         rw_sigma=None, rw_relative_variation=None, tv_max_iter=None,
-        tv_verbose=None, tv_relative_variation=None, tv_norm=None,
-        query="mscal.stokes({0}, 'I')"):
+        tv_verbose=None, tv_relative_variation=None, tv_norm=None):
     """ Deals with CASA awkwardness
 
         Why do things once when you can do 'em twice and thrice as bad?
@@ -21,7 +20,7 @@ def purify_image(vis, imagename, imsize=None, datadescid=0,
     try:
         purify_measurement_set(
                 measurement_set=vis, imagename=imagename, imsize=imsize,
-                datadescid=datadescid, ignoreW=ignoreW, channels=channels,
+                datadescid=datadescid, channels=channels,
                 column=column, resolution=resolution, nlevels=nlevels,
                 wavelets=wavelets, interpolation=interpolation,
                 oversampling=oversampling, gamma=gamma, radius=radius,
@@ -32,8 +31,7 @@ def purify_image(vis, imagename, imsize=None, datadescid=0,
                 rw_verbose=rw_verbose, rw_sigma=rw_sigma,
                 rw_relative_variation=rw_relative_variation,
                 tv_max_iter=tv_max_iter, tv_verbose=tv_verbose,
-                tv_relative_variation=tv_relative_variation, tv_norm=tv_norm,
-                query=query
+                tv_relative_variation=tv_relative_variation, tv_norm=tv_norm
         )
     except:
         from traceback import print_exc
