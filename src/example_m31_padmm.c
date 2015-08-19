@@ -444,9 +444,9 @@ int main(int argc, char *argv[]) {
     
   param_padmm.epsilon_tol_scale = 1.001;
   param_padmm.lagrange_update_scale = 0.9;
-  //param_padmm.nu = 1.0*aux4; 
+  param_padmm.nu = 1.0*aux4; 
 
-  param_padmm.nu = 0.88;
+  //param_padmm.nu = 0.88;
   
 
    
@@ -525,7 +525,7 @@ int main(int argc, char *argv[]) {
 
   purify_image_writefile(&img_copy, "data/test/m31bpsaerror_padmm.fits", filetype_img); 
 
-/
+
 
   printf("**********************\n");
   printf("Db8 reconstruction\n");

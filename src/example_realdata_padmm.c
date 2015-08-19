@@ -339,10 +339,10 @@ int main(int argc, char *argv[]) {
 
   sopt_sara_analysisop((void*)dummyr, (void*)xout, datas);
   //Not needed
-  /*
+  
   for (i=0; i < Nr; i++) {
-    dummyr[i] = creal(dummyc[i]);
-  } */
+    dummyr[i] = fabs(dummyr[i]);
+  } 
 
   aux2 = purify_utils_maxarray(dummyr, Nr);
 
@@ -371,7 +371,7 @@ int main(int argc, char *argv[]) {
   for (i=0; i < Ny; i++) {
     w_l2[i] = creal(vis_test.noise_std[i]);
     assert(fabs(w_l2[i]) > TOL);
-    w_l2[i] = 1.0 ; // / w_l2[i];
+    w_l2[i] = 1.0 / w_l2[i];
   }
  
   
@@ -380,43 +380,30 @@ int main(int argc, char *argv[]) {
   printf("BPSA reconstruction\n");
   printf("**********************\n");
 
-  gamma = 0.1;
-    
-  //Structure for the L1 solver 
-  /*     
-  param4.verbose = 2;
-  param4.max_iter = 5;
-  param4.gamma = gamma*aux2;//*sqrt(aux4);
-  param4.rel_obj = 0.0001;
-  param4.epsilon = 0.01*aux1; //sqrt(Ny + 2*sqrt(Ny))*sigma/sqrt(aux4);
-  param4.epsilon_tol = 0.01;
-  param4.real_data = 0;
-  param4.cg_max_iter = 100;
-  param4.cg_tol = 0.000001;
-  */
-
+  gamma = 0.001;
+  a = 0.5*aux4;
 
   //Structure for the L1 prox
-  param_l1param.verbose = 1;
+  param_l1param.verbose = 2;
   param_l1param.max_iter = 20;
-  param_l1param.rel_obj = 0.001;
+  param_l1param.rel_obj = 0.05;
   param_l1param.nu = 1.0;
   param_l1param.tight = 0;
   param_l1param.pos = 1;
     
   //Structure for the L1 solver    
   param_padmm.verbose = 2;
-  param_padmm.max_iter = 5;
-  param_padmm.gamma = gamma*aux2;//0.01;
+  param_padmm.max_iter = 500;
+  param_padmm.gamma = gamma*aux2/a;
   param_padmm.rel_obj = 0.0005;
-  param_padmm.epsilon = 0.1*aux1;//sqrt(Ny + 2*sqrt(Ny))*sigma;
+  param_padmm.epsilon = sqrt(Ny + 2*sqrt(Ny));//0.1*aux1;//sqrt(Ny + 2*sqrt(Ny))*sigma;
   param_padmm.real_out = 1;
   param_padmm.real_meas = 0;
   param_padmm.paraml1 = param_l1param;
     
   param_padmm.epsilon_tol_scale = 1.001;
-  param_padmm.lagrange_update_scale = 0.1;
-  param_padmm.nu = 1.0*aux4; 
+  param_padmm.lagrange_update_scale = 0.9;
+  param_padmm.nu = a; 
 
 
 
@@ -465,6 +452,7 @@ int main(int argc, char *argv[]) {
     
   for (i=0; i < Nx; i++){
     img_copy.pix[i] = xout[i];
+    xoutc[i] = xout[i] + 0.0*I;
   }
   
   purify_image_writefile(&img_copy, "data/vla/bpsa_rec_padmm.fits", filetype_img);

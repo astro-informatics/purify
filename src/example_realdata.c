@@ -367,7 +367,7 @@ int main(int argc, char *argv[]) {
   printf("BPSA reconstruction\n");
   printf("**********************\n");
 
-  gamma = 0.001;
+  gamma = 0.1;
     
   //Structure for the L1 solver      
   param4.verbose = 2;

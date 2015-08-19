@@ -883,90 +883,103 @@ void purify_measurement_cftadj(void *out, void *in, void **data){
  * \param[in] At Pointer to the the adjoint of the measurement operator.
  * \param[in] At_data Data structure associated to At.
  *
- * \authors Rafael Carrillo
+ * \authors Rafael Carrillo and Alexandru Onose
  */
-double purify_measurement_pow_meth(void (*A)(void *out, void *in, void **data), 
+double purify_measurement_pow_meth(void (*A)(void *out, void *in, void **data),
                                    void **A_data,
-                                   void (*At)(void *out, void *in, void **data), 
+                                   void (*At)(void *out, void *in, void **data),
                                    void **At_data) {
-
+  
   int i, iter, nx, ny;
   int seedn = 51;
   double bound, norm, rel_ob;
   purify_measurement_cparam *param;
   complex double *y;
   complex double *x;
-
+  
   
   //Cast input pointers
   param = (purify_measurement_cparam*)A_data[0];
   nx = param->nx1*param->ny1;
   ny = param->nmeas;
   iter = 0;
-
+  
   y = (complex double*)malloc((ny) * sizeof( complex double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(y);
   x = (complex double*)malloc((nx) * sizeof( complex double));
   PURIFY_ERROR_MEM_ALLOC_CHECK(x);
-
+  
   if (param->nmeas > nx){
     for (i=0; i < nx; i++) {
-        x[i] = purify_ran_gasdev2(seedn) + purify_ran_gasdev2(seedn)*I;
+      x[i] = purify_ran_gasdev2(seedn) + purify_ran_gasdev2(seedn)*I;
     }
     norm = cblas_dznrm2(nx, (void*)x, 1);
-    for (i=0; i < nx; i++) {
-        x[i] = x[i]/norm;
-    }
+    norm = norm/nx;
+    
+    cblas_zdscal(nx, 1.0/norm, (void*)x, 1);
+    
     norm = 1.0;
-
+    
     //main loop
-    while (iter < 500){
+    while (iter < 200){
       A((void*)y, (void*)x, A_data);
       At((void*)x, (void*)y, At_data);
       bound = cblas_dznrm2(nx, (void*)x, 1);
-      rel_ob = (bound - norm)/norm;
+      bound = bound/nx;
+      
+      
+      rel_ob = fabs(bound - norm)/norm;
+      
+      printf("Norm at iteration %d = %f \n", iter, norm);
+      printf("Rel Norm at iteration %d = %f \n", iter, rel_ob);
       if (rel_ob <= 0.001)
         break;
       norm = bound;
-      for (i=0; i < nx; i++) {
-          x[i] = x[i]/norm;
-      }
+      
+      cblas_zdscal(nx, 1.0/norm, (void*)x, 1);
+      
       iter++;
     }
-
+    
   }
   else{
     for (i=0; i < ny; i++) {
-        y[i] = purify_ran_gasdev2(seedn) + purify_ran_gasdev2(seedn)*I;
+      y[i] = purify_ran_gasdev2(seedn) + purify_ran_gasdev2(seedn)*I;
     }
     norm = cblas_dznrm2(ny, (void*)y, 1);
-    for (i=0; i < ny; i++) {
-        y[i] = y[i]/norm;
-    }
+    norm = norm/ny;
+    
+    cblas_zdscal(ny, 1.0/norm, (void*)x, 1);
+    
     norm = 1.0;
-
+    
     //main loop
-    while (iter < 500){
+    while (iter < 200){
       At((void*)x, (void*)y, At_data);
       A((void*)y, (void*)x, A_data);
+      
       bound = cblas_dznrm2(ny, (void*)y, 1);
-      rel_ob = (bound - norm)/norm;
+      bound = bound/ny;
+      
+      rel_ob = fabs(bound - norm)/norm;
+      printf("Norm at iteration %d = %f \n", iter, norm);
+      printf("Rel Norm at iteration %d = %f \n", iter, rel_ob);
       if (rel_ob <= 0.001)
         break;
       norm = bound;
-      for (i=0; i < ny; i++) {
-          y[i] = y[i]/norm;
-      }
+      
+      cblas_zdscal(ny, 1.0/norm, (void*)y, 1);
+      
       iter++;
     }
-
+    
   }
-
+  
   free(y);
   free(x);
-
+  
   return bound;
-
+  
 }
 
 /*!
