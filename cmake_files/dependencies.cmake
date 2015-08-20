@@ -7,7 +7,7 @@ include(PackageLookup)
 find_package(FFTW3 REQUIRED DOUBLE)
 find_package(TIFF REQUIRED)
 find_package(CBLAS REQUIRED)
-set(PURIFY_BLAS_H "${BLAS_INCLUDE_FILENAME}")
+set(PURIFY_BLAS_H "${BLAS_INCLUDE_FILENAME}" CACHE PATH "Path to blas include file")
 
 # Look up packages: if not found, installs them
 lookup_package(Sopt REQUIRED ARGUMENTS GIT_REPOSITORY git@github.com:astro-informatics/sopt.git)
