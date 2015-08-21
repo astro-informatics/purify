@@ -37,6 +37,7 @@ add_custom_target(copy ALL)
 add_python_module(purify
     purify.visibility.pyx purify.image.pyx purify.sparse.pyx purify.sensing.pyx
     purify.fftw.pyx purify.sparsity_ops.pyx purify.sdmm.pyx purify.cparams.pyx
+    purify.base.pyx
     ${PYTHON_SOURCES} ${PXD_HEADERS}
     LIBRARIES libpurify
 )

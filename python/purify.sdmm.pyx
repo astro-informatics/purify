@@ -10,6 +10,7 @@ from purify.cparams cimport sopt_l1_sdmmparam, _convert_l1_sdmm_param, \
                             sopt_l1_rwparam, _convert_rwparams, \
                             sopt_tv_rwparam, sopt_tv_sdmmparam, \
                             _convert_tvparam
+from .base import ProximalMinimizationBase
 
 cdef extern from "sopt_l1.h":
     cdef void sopt_tv_sdmm(void *xsol, int nx1, int nx2,
@@ -170,7 +171,9 @@ cdef void _tv_rw_sdmm(self, sensingop, visibility, _image, _image_shape,
         sdparams, rwparams
     )
 
-class SDMM(params.Measurements, params.SDMM, SparsityOperator):
+
+class SDMM(params.Measurements, params.SDMM, SparsityOperator,
+           ProximalMinimizationBase):
     """ Performs Simultaneous Direction Method of Mulitpliers
 
         Once instantiated for a give output image size and a given input set
@@ -275,10 +278,6 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
         self.reweighted = kwargs.pop('reweighted', False) == True
         self.tv_norm = kwargs.get('tv_norm', False)
 
-    def sensing_operator(self, visibility):
-        """ Measurement operator used when purifying """
-        return SensingOperator(visibility, self.image_size,
-                            self.oversampling, self.interpolation)
     @params.apply_params
     def __call__(self, visibility, weights=None, image=None, scale='default'):
         """ Computes image from input visibility.
@@ -351,53 +350,3 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
                       weights, weights_l2 )
 
         return image
-
-
-    def _normalize_input(self, visibility, scale, image):
-        """ Common input normalization operations """
-        from numpy import sqrt
-        from purify.sensing import visibility_column_as_numpy_array
-        # Create missing weights and image objects if needed. Check they are
-        # correct otherwise.
-        y = visibility_column_as_numpy_array('y', visibility)
-        weights_l2 = visibility_column_as_numpy_array('w', visibility)
-        image = self._get_image(image, y.dtype)
-
-        # define all common C objects
-        if str(scale).lower() in ('auto', 'default'):
-            scale = sqrt(image.size) / sqrt(len(y))
-        elif scale is None and str(scale).lower() == 'none':
-            scale = None
-        else:
-            scale = float(scale)
-
-        scaled_y = y * scale if scale is not None else y
-        return scaled_y, weights_l2, image, scale
-
-    def _get_image(self, image, dtype):
-        """ Check/create input image """
-        from numpy import zeros
-        if image is not None:
-            if image.dtype != dtype: image = image.astype(dtype)
-            if image.shape != self.image_size:
-                raise ValueError(
-                    "Shape of input image should be %s, not %s." \
-                    % (str(self.image_size), str(image.shape))
-                )
-        else: image = zeros(self.image_size, dtype=dtype, order='C')
-        return image
-
-    def _get_weight(self, weights):
-        """ Check/create input weights """
-        from numpy import ones
-        wshape = (2 if getattr(self, 'tv_norm', False) else len(self), ) \
-                + self.image_size
-        if weights is not None:
-            if weights.dtype != 'double':
-                weights = weights.astype('double')
-            if weights.size != wshape:
-                message = 'The shape of the weights should be %s' % str(wshape)
-                raise ValueError(message)
-        else:
-            weights = ones(wshape, dtype='double', order='C')
-        return weights
