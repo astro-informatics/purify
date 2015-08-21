@@ -1,3 +1,14 @@
+from purify.sensing cimport purify_measurement_cftfwd, \
+                            purify_measurement_cftadj, \
+                            SensingOperator, _VoidedData
+
+cdef extern from "purify_measurement.h":
+    double purify_measurement_pow_meth(
+        void (*A)(void *out, void *invec, void **data),
+        void **A_data,
+        void (*At)(void *out, void *invec, void **data),
+        void **At_data);
+
 cdef double _default_sigma(visibilities) except *:
     from numpy import sqrt
     from numpy.linalg import norm
@@ -32,11 +43,51 @@ cdef double guess_sigma(sdmm, visibility, SensingOperator sensing_op) except *:
     return _default_sigma(visibility) \
             * nvis / npixels / sqrt(len(float(sdmm)))
 
+cdef double guess_nu(SensingOperator sensing_op) except *:
+    cdef:
+        _VoidedData forward_data = sensing_op.forward_voided_data(None)
+        _VoidedData adjoint_data = sensing_op.adjoint_voided_data(None)
+
+        void **datafwd = forward_data.data()
+        void **dataadj = adjoint_data.data()
+
+    return purify_measurement_pow_meth(
+          &purify_measurement_cftfwd, datafwd,
+          &purify_measurement_cftadj, dataadj)
+
 cdef void _convert_prox_tvparam(sopt_prox_tvparam* c_params, pyinput):
     """ Sets c parameters from python object """
     c_params.verbose = {'off': 0, 'medium': 1, 'high': 2}[pyinput.verbose]
     c_params.max_iter = pyinput.max_iter
     c_params.rel_obj = pyinput.relative_variation
+
+cdef void _convert_prox_l1_params(sopt_prox_l1param* c_params, pyinput):
+    """ Sets c parameters from python object """
+    _convert_prox_tvparam(<sopt_prox_tvparam*>c_params, pyinput)
+    c_params.nu = pyinput.nu
+    c_params.tight = 1 if pyinput.tight_frame else 0
+    c_params.pos = 1 if pyinput.positivity else 0
+
+cdef void _convert_l1_padmm_param(
+        sopt_l1_param_padmm* c_params, padmm,
+        SensingOperator sensing_op, visibility) except *:
+    """ Sets c parameters from python object """
+    c_params.verbose = {'off': 0, 'medium': 1, 'high': 2}[padmm.verbose]
+    c_params.max_iter = padmm.max_iter
+    c_params.rel_obj = padmm.relative_variation
+
+    c_params.gamma = padmm.gamma if padmm.gamma is not None \
+        else guess_gamma_penalty(padmm, visibility, sensing_op)
+    c_params.epsilon = padmm.radius if padmm.radius is not None \
+        else guess_radius(padmm, visibility, sensing_op)
+
+    c_params.real_out = 1;
+    c_params.real_meas = 0;
+    _convert_prox_l1_params(&c_params.paraml1, padmm.l1)
+    c_params.epsilon_tol_scale = padmm.epsilon_tol_scale
+    c_params.lagrange_update_scale = padmm.lagrange_update_scale
+    c_params.nu = guess_nu(sensing_op)
+
 
 cdef void _convert_l1_sdmm_param( sopt_l1_sdmmparam* c_params, sdmm,
                                   SensingOperator sensing_op,

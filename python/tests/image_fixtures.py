@@ -5,19 +5,23 @@ from purify import __file__ as datadir
 datadir = join(dirname(datadir), "data")
 visibility_files = {
     '30dor': join(datadir, "images", "Coverages", "cont_sim4.vis"),
+    'M31': join(datadir, 'images', 'Coverages', 'cont_sim4.vis')
 }
 """ Path to visibility (u, v) files """
 image_files = {
     '30dor': join(datadir, "images", "M31.fits"),
+    'M31': join(datadir, "images", "M31.fits"),
 }
 """ Path oracle images from which dirty images are created """
 expected_image_files = {
     '30dor': join(datadir, 'expected', "m31bpsa.fits"),
     '30dor_sara': join(datadir, 'expected', "m31sara.fits"),
     '30dor_tv': join(datadir, 'expected', "m31tv.fits"),
-    '30dor_tvrw': join(datadir, 'expected', "m31rwtv.fits")
+    '30dor_tvrw': join(datadir, 'expected', "m31rwtv.fits"),
+    'M31_padmm': join(datadir, 'expected', "m31bpsa_padmm.fits")
 }
 """ Path to expected outcome images """
+
 
 def image_and_visibilities(name='30dor'):
     """ Reads input image and visibility from disk.
@@ -37,7 +41,7 @@ def expected_images(name='30dor', method='sdmm'):
     """ Reads image results from disk. """
     from purify import read_image
     method = {'sdmm': '', 'sara': '_sara',
-              'tv': '_tv', 'tvrw': '_tvrw'}[method]
+              'tv': '_tv', 'tvrw': '_tvrw', 'padmm': '_padmm'}[method]
     return read_image(expected_image_files[name + method])
 
 
@@ -48,7 +52,8 @@ def make_some_noise(visibility, n=None):
     from purify.tests.random import gaussian_distribution as gd
 
     sigma = norm(visibility['y0']) * 10.0**(-1.5) / sqrt(len(visibility))
-    if n is None: n = len(visibility)
+    if n is None:
+        n = len(visibility)
     return array([gd() + gd() * 1j for i in range(n)]) * sigma / sqrt(2)
 
 

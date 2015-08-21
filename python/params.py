@@ -9,7 +9,7 @@
     The parameters are grouped in a way to reflect the C parameter structures.
 """
 __all__ = ['ConjugateGradient', 'SDMM', 'RW', 'TVProximal', 'Measurements',
-           'apply_params']
+           'apply_params', 'L1Proximal', 'PADMM']
 __docformat__ = "restructuredtext en"
 
 
@@ -137,7 +137,7 @@ class TVProximal(object):
 
     def __init__(self, verbose='high', max_iter=300, relative_variation=1e-4,
                  **kwargs):
-        super(TVProximal, self).__init__()
+        super(TVProximal, self).__init__(**kwargs)
         self.verbose = verbose
         self.max_iter = max_iter
         self.relative_variation = relative_variation
@@ -159,6 +159,44 @@ class SDMM(TVProximal):
         self.cg = ConjugateGradient(
             max_iter=cg_max_iter, tolerance=cg_tolerance)
         """ Conjugate gradient parameters """
+
+
+class L1Proximal(TVProximal):
+    """ Parameters for the L1 proximal """
+    nu = positive_real('nu', "Bound on the squared norm of the Psi operator")
+    tight_frame = boolean('tight_frame', "Whether Psi^T is a tight frame")
+    positivity = boolean('positivity',
+                         "Whether to use positivity constraint")
+
+    def __init__(self, nu=1e0, tight_frame=True, positivity=True, **kwargs):
+        super(L1Proximal, self).__init__(**kwargs)
+        self.nu = nu
+        self.tight_frame = tight_frame
+        self.positivity = positivity
+
+
+class PADMM(TVProximal):
+    """ P-ADMM related parameters """
+    gamma = positive_real_or_none('gamma', "SDMM convergence criteria")
+    radius = positive_real_or_none('radius', "L2 ball radius")
+    epsilon_tol_scale = positive_real('epsilon_tol_scale',
+                                      "Scale tolerance on epsilon")
+    lagrange_update_scale = positive_real(
+        'lagrange_update_scale',
+        "Scale parameter when updating Lagrange multipliers (e.g. 0.9)."
+    )
+    nu = positive_real_or_none('nu', "Measurement operator norm squared")
+
+    def __init__(self, gamma=None, radius=None,
+                 epsilon_tol_scale=1.001, lagrange_update_scale=0.9,
+                 nu=None, l1=None, **kwargs):
+        super(PADMM, self).__init__(**kwargs)
+        self.gamma = gamma
+        self.radius = radius
+        self.epsilon_tol_scale = epsilon_tol_scale
+        self.lagrange_update_scale = lagrange_update_scale
+        self.nu = nu
+        self.l1 = L1Proximal() if l1 is None else L1Proximal(**l1)
 
 
 class RW(TVProximal):

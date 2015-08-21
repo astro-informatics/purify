@@ -6,10 +6,11 @@ from .image import Image
 from .sensing import kernels, SensingOperator
 from .sparsity_ops import SparsityOperator
 from .sdmm import SDMM
+from .padmm import PADMM
 
 __docformat__ = "restructuredtext en"
 __all__ = ['read_visibility', 'Image', 'kernels', 'SensingOperator',
-           'SparsityOperator', 'SDMM', 'read_image']
+           'SparsityOperator', 'SDMM', 'read_image', 'PADMM']
 
 
 def read_image(path, power_of_two=True):
