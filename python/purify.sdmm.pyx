@@ -68,6 +68,7 @@ cdef extern from "sopt_l1.h":
 cdef void _l1_sdmm( self, sensingop, visibility, _image, int _image_size,
         void **_datafwd, void **_dataadj, weights, weights_l2 ) except *:
     """ Calls L1 SDMM """
+    from numpy import iscomplexobj
     cdef:
         sopt_l1_sdmmparam sdparams
         void* c_wavelets
@@ -77,6 +78,7 @@ cdef void _l1_sdmm( self, sensingop, visibility, _image, int _image_size,
         int Nr = len(self) * _image_size
     _convert_l1_sdmm_param(&sdparams, self, sensingop, visibility)
     SparsityOperator.set_wavelet_pointer(self, &c_wavelets)
+    sdparams.real_data = 0 if iscomplexobj(visibility) else 1
 
     if weights_l2 is None:
       sopt_l1_sdmm(
@@ -127,6 +129,7 @@ cdef void _tv_sdmm( self, sensingop, visibility,
         _image, _image_shape, void **_datafwd, void **_dataadj,
         weights ) except *:
     """ Calls TV SDMM """
+    from numpy import iscomplexobj
     cdef:
         sopt_tv_sdmmparam sdparams
         int stride = weights.strides[0]
@@ -137,6 +140,7 @@ cdef void _tv_sdmm( self, sensingop, visibility,
         void* c_image = untyped_pointer_to_data(_image)
         void* c_visibility = untyped_pointer_to_data(visibility)
     _convert_tvparam(&sdparams, self, sensingop, visibility)
+    sdparams.real_data = 0 if iscomplexobj(visibility) else 1
 
     sopt_tv_sdmm(
         c_image, _image_shape[0], _image_shape[1],
@@ -369,7 +373,6 @@ class SDMM(params.Measurements, params.SDMM, SparsityOperator):
 
         scaled_y = y * scale if scale is not None else y
         return scaled_y, weights_l2, image, scale
-
 
     def _get_image(self, image, dtype):
         """ Check/create input image """
