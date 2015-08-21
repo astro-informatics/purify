@@ -38,9 +38,9 @@ cdef void _convert_prox_tvparam(sopt_prox_tvparam* c_params, pyinput):
     c_params.max_iter = pyinput.max_iter
     c_params.rel_obj = pyinput.relative_variation
 
-cdef void _convert_l1param( sopt_l1_sdmmparam* c_params, sdmm,
-                            SensingOperator sensing_op,
-                            visibility ) except *:
+cdef void _convert_l1_sdmm_param( sopt_l1_sdmmparam* c_params, sdmm,
+                                  SensingOperator sensing_op,
+                                  visibility ) except *:
     """ Sets c parameters from python object """
     from numpy import max, product, sqrt
     from numpy.linalg import norm
@@ -74,6 +74,6 @@ cdef void _convert_tvparam( sopt_tv_sdmmparam* c_params, sdmm,
                             visibility ) except *:
     _convert_prox_tvparam(<sopt_prox_tvparam*>c_params, sdmm)
     c_params.rel_obj = c_params.gamma # Order changes depending on structure
-    _convert_l1param(<sopt_l1_sdmmparam*>c_params, sdmm, sensing_op,
-                    visibility)
+    _convert_l1_sdmm_param(<sopt_l1_sdmmparam*>c_params, sdmm, sensing_op,
+                           visibility)
     _convert_prox_tvparam(<sopt_prox_tvparam*>&(c_params.paramtv), sdmm.tv)

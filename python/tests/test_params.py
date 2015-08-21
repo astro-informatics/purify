@@ -143,9 +143,9 @@ def test_rw():
 
 
 def test_tvprox():
-    from purify.params import TVProx
+    from purify.params import TVProximal
 
-    param = TVProx(verbose='medium', max_iter=30, relative_variation=1e-4)
+    param = TVProximal(verbose='medium', max_iter=30, relative_variation=1e-4)
     assert param.verbose == 'medium'
     assert param.max_iter == 30
     assert abs(param.relative_variation - 1e-4) < 1e-8
@@ -193,9 +193,9 @@ def test_measurements():
 
 def test_apply_params():
     """ Test that apply params does apply parameters. """
-    from purify.params import TVProx, apply_params
+    from purify.params import TVProximal, apply_params
 
-    class ApplyParamsChecker(TVProx):
+    class ApplyParamsChecker(TVProximal):
         def __init__(self, **kwargs):
             super(ApplyParamsChecker, self).__init__(**kwargs)
             self.called = False
@@ -230,9 +230,9 @@ def test_apply_params():
 
 def test_apply_params_with_exception():
     """ Test that apply params unmodifies function when raising exception. """
-    from purify.params import TVProx, apply_params
+    from purify.params import TVProximal, apply_params
 
-    class ApplyParamsChecker(TVProx):
+    class ApplyParamsChecker(TVProximal):
         def __init__(self, **kwargs):
             super(ApplyParamsChecker, self).__init__(**kwargs)
             self.called = False

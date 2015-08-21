@@ -56,9 +56,9 @@ cdef extern from "sopt_tv.h":
 
 
 # Populates C parameter structures from python
-cdef void _convert_l1param( sopt_l1_sdmmparam* c_params, sdmm,
-                            SensingOperator sensing_op,
-                            visibility ) except *
+cdef void _convert_l1_sdmm_param( sopt_l1_sdmmparam* c_params, sdmm,
+                                  SensingOperator sensing_op,
+                                  visibility ) except *
 cdef void _convert_rwparams( sopt_l1_rwparam *c_params, sdmm,
         SensingOperator sensing_op, visibility ) except *
 cdef void _convert_tvparam( sopt_tv_sdmmparam* c_params, sdmm,

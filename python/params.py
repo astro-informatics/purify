@@ -8,7 +8,7 @@
 
     The parameters are grouped in a way to reflect the C parameter structures.
 """
-__all__ = ['ConjugateGradient', 'SDMM', 'RW', 'TVProx', 'Measurements',
+__all__ = ['ConjugateGradient', 'SDMM', 'RW', 'TVProximal', 'Measurements',
            'apply_params']
 __docformat__ = "restructuredtext en"
 
@@ -127,7 +127,7 @@ class ConjugateGradient(object):
         self.tolerance = tolerance
 
 
-class TVProx(object):
+class TVProximal(object):
     verbose = verbosity()
     max_iter = positive_int('max_iter', "Maximum number of iterations")
     relative_variation = positive_real(
@@ -137,13 +137,13 @@ class TVProx(object):
 
     def __init__(self, verbose='high', max_iter=300, relative_variation=1e-4,
                  **kwargs):
-        super(TVProx, self).__init__()
+        super(TVProximal, self).__init__()
         self.verbose = verbose
         self.max_iter = max_iter
         self.relative_variation = relative_variation
 
 
-class SDMM(TVProx):
+class SDMM(TVProximal):
     """ SDMM related parameters """
     gamma = positive_real_or_none('gamma', "SDMM convergence criteria")
     radius = positive_real_or_none('radius', "L2 ball radius")
@@ -161,7 +161,7 @@ class SDMM(TVProx):
         """ Conjugate gradient parameters """
 
 
-class RW(TVProx):
+class RW(TVProximal):
     """ Reweighted L1 optimization problem """
     sigma = positive_real_or_none(
         'sigma',
@@ -181,8 +181,9 @@ class TV_SDMM(SDMM):
     def __init__(self, tv_verbose='high', tv_max_iter=50,
                  tv_relative_variation=1e-4, **kwargs):
         super(TV_SDMM, self).__init__(**kwargs)
-        self.tv = TVProx(verbose=tv_verbose, max_iter=tv_max_iter,
-                         relative_variation=tv_relative_variation)
+        self.tv = TVProximal(
+            verbose=tv_verbose, max_iter=tv_max_iter,
+            relative_variation=tv_relative_variation)
 
 
 class Measurements(object):
