@@ -57,6 +57,13 @@ def make_some_noise(visibility, n=None):
     return array([gd() + gd() * 1j for i in range(n)]) * sigma / sqrt(2)
 
 
+def read_dirty_visibility(name):
+    from numpy import array
+    all = open(join(datadir, "dirty", name + ".txt"), "r").read()
+    all = array(all.split(), dtype="float64")
+    return all[::2] + 1j * all[1::2]
+
+
 def dirty_measurements(image, visibility):
     """ Creates fake dirty measurements. """
     return (visibility['y0'] + make_some_noise(visibility))

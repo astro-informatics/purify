@@ -109,7 +109,7 @@ class PADMM(params.Measurements, params.PADMM, SparsityOperator,
         from numpy import ones, iscomplexobj
 
         scaled_y, weights_l2, image, scale \
-                = self._normalize_input(visibility, scale, image)
+                = self._normalize_input(visibility, scale, image, "float64")
         weights = self._get_weight(weights)
         if weights_l2 is None:
             weights_l2 = ones(scaled_y.shape, dtype=weights.dtype)
@@ -136,7 +136,8 @@ class PADMM(params.Measurements, params.PADMM, SparsityOperator,
         _convert_l1_padmm_param(&params, self, sensing_op, scaled_y)
         params.real_out = 1
         params.real_meas = 0 if iscomplexobj(scaled_y) else 1
-        SparsityOperator.set_wavelet_pointer(self, &c_wavelets)
+        SparsityOperator.set_wavelet_pointer(self, &c_wavelets,
+                                             params.real_out)
 
         sopt_l1_solver_padmm(
             c_image, image.size,

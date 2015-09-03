@@ -46,7 +46,7 @@ add_python_module(purify
 # target is defined.
 add_copy_directory(copy
     "${PROJECT_SOURCE_DIR}/data/"
-    GLOB *.vis *.fits
+    GLOB *.vis *.fits *.txt
     DESTINATION "${PYTHON_BINARY_DIR}/purify/data"
 )
 install_python(
@@ -56,6 +56,7 @@ install_python(
     PATTERN "images/Coverages/*.vis"
     PATTERN "images/*.fits"
     PATTERN "expected/*.fits"
+    PATTERN "dirty/*.txt"
     PATTERN "test/*" EXCLUDE
 )
 

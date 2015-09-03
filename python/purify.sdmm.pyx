@@ -78,8 +78,8 @@ cdef void _l1_sdmm( self, sensingop, visibility, _image, int _image_size,
         void* c_visibility = untyped_pointer_to_data(visibility)
         int Nr = len(self) * _image_size
     _convert_l1_sdmm_param(&sdparams, self, sensingop, visibility)
-    SparsityOperator.set_wavelet_pointer(self, &c_wavelets)
     sdparams.real_data = 0 if iscomplexobj(visibility) else 1
+    SparsityOperator.set_wavelet_pointer(self, &c_wavelets, sdparams.real_data)
 
     if weights_l2 is None:
       sopt_l1_sdmm(
@@ -105,6 +105,7 @@ cdef void _l1_sdmm( self, sensingop, visibility, _image, int _image_size,
 cdef void _l1_rw_sdmm( self, sensingop, visibility, _image,
         int _image_size, void **_datafwd, void **_dataadj ) except *:
     """ Calls L1 SDMM """
+    from numpy import iscomplexobj
     cdef:
         sopt_l1_sdmmparam sdparams
         sopt_l1_rwparam rwparams
@@ -114,7 +115,8 @@ cdef void _l1_rw_sdmm( self, sensingop, visibility, _image,
         void* c_visibility = untyped_pointer_to_data(visibility)
     _convert_l1_sdmm_param(&sdparams, self, sensingop, visibility)
     _convert_rwparams(&rwparams, self, sensingop, visibility)
-    SparsityOperator.set_wavelet_pointer(self, &c_wavelets)
+    real_data = 0 if iscomplexobj(visibility) else 1
+    SparsityOperator.set_wavelet_pointer(self, &c_wavelets, real_data)
 
     sopt_l1_rwsdmm(
         c_image, _image_size,

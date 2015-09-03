@@ -33,16 +33,15 @@ def test_params():
 
 def test_padmm():
     from numpy.linalg import norm
-    # from numpy.testing import assert_allclose
+    from numpy.testing import assert_allclose
     from numpy import sqrt
     from purify.tests.random import reset
     from purify import PADMM
     from purify.tests.image_fixtures import image_and_visibilities, \
-        dirty_measurements
-    # , expected_images
+        read_dirty_visibility, expected_images
 
     image, visibility = image_and_visibilities()
-    # expected = expected_images('M31', method='padmm')
+    expected = expected_images('M31', method='padmm')
 
     reset()
     wavelets = ['DB%i' % i for i in range(1, 9)] + ['Dirac']
@@ -56,13 +55,10 @@ def test_padmm():
             'nu': 1e0, 'tight_frame': False, 'positivity': True
         }
     )
-    visibility['y'] = dirty_measurements(image, visibility)
+    visibility['y'] = read_dirty_visibility("m31")
 
     sigma = norm(visibility['y0']) * 10.0**(-1.5) / sqrt(len(visibility))
     radius = sqrt(len(visibility) + 2.0 * sqrt(len(visibility))) * sigma
-    padmm(visibility, radius=radius, max_iter=5, scale=None)
-    # actual = padmm(visibility, radius=radius, max_iter=5)
+    actual = padmm(visibility, radius=radius, max_iter=5, scale=None)
 
-    # assert_allclose(actual.real, expected)
-
-test_padmm()
+    assert_allclose(actual, expected, rtol=1e-2)

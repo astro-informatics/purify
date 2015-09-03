@@ -9,9 +9,9 @@ class ProximalMinimizationBase(object):
     def sensing_operator(self, visibility):
         """ Measurement operator used when purifying """
         return SensingOperator(visibility, self.image_size,
-                            self.oversampling, self.interpolation)
+                               self.oversampling, self.interpolation)
 
-    def _normalize_input(self, visibility, scale, image):
+    def _normalize_input(self, visibility, scale, image, image_dtype=None):
         """ Common input normalization operations """
         from numpy import sqrt
         from purify.sensing import visibility_column_as_numpy_array
@@ -19,7 +19,9 @@ class ProximalMinimizationBase(object):
         # correct otherwise.
         y = visibility_column_as_numpy_array('y', visibility)
         weights_l2 = visibility_column_as_numpy_array('w', visibility)
-        image = self._get_image(image, y.dtype)
+        if image_dtype is None:
+            image_dtype = y.dtype
+        image = self._get_image(image, image_dtype)
 
         # define all common C objects
         if str(scale).lower() in ('auto', 'default'):
@@ -36,20 +38,22 @@ class ProximalMinimizationBase(object):
         """ Check/create input image """
         from numpy import zeros
         if image is not None:
-            if image.dtype != dtype: image = image.astype(dtype)
+            if image.dtype != dtype:
+                image = image.astype(dtype)
             if image.shape != self.image_size:
                 raise ValueError(
-                    "Shape of input image should be %s, not %s." \
+                    "Shape of input image should be %s, not %s."
                     % (str(self.image_size), str(image.shape))
                 )
-        else: image = zeros(self.image_size, dtype=dtype, order='C')
+        else:
+            image = zeros(self.image_size, dtype=dtype, order='C')
         return image
 
     def _get_weight(self, weights):
         """ Check/create input weights """
         from numpy import ones
         wshape = (2 if getattr(self, 'tv_norm', False) else len(self), ) \
-                + self.image_size
+            + self.image_size
         if weights is not None:
             if weights.dtype != 'double':
                 weights = weights.astype('double')

@@ -6,7 +6,7 @@ cdef extern from "sopt_ran.h":
 
 def gaussian_distribution(unsigned int seed = 54):
     """ Returns random number from gaussian distribution 
-    
+
         There is no reason to use this function other than testing results against the C code. 
         If true random numbers are needed, it is better to use any one of the libraries provided for
         this in python or numpy.
