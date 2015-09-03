@@ -137,7 +137,7 @@ class TVProximal(object):
 
     def __init__(self, verbose='high', max_iter=300, relative_variation=1e-4,
                  **kwargs):
-        super(TVProximal, self).__init__(**kwargs)
+        super(TVProximal, self).__init__()
         self.verbose = verbose
         self.max_iter = max_iter
         self.relative_variation = relative_variation
