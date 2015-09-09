@@ -23,8 +23,9 @@ cdef double guess_gamma_penalty(
     cdef double nvis = float(len(visibility))
     cdef double npixels = product(sensing_op.sizes.image)
     cdef double scale = sqrt(npixels / nvis)
+    tv_norm = getattr(sdmm, 'tv_norm', False)
     cdef:
-        double gamma = max((xout if sdmm.tv_norm else sdmm.analyze(xout)).real)
+        double gamma = max((xout if tv_norm else sdmm.analyze(xout)).real)
     return  gamma * 1e-3 * scale
 
 cdef double guess_radius(
