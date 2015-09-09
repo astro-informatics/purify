@@ -342,7 +342,7 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     set_image_coordinate(datatransform, imagename)
 
 
-def purify_measurement_set(measurement_set, imagename, imsize=None,
+def purify_measurement_set(measurement_set, imagename, imsize=(256, 256),
                            datadescid=0, channels=None, column=None,
                            resolution=0.3, **kwargs):
     """ Creates an image using the Purify method
