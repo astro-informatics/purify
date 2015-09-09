@@ -66,8 +66,34 @@ class PADMM(params.Measurements, params.PADMM, SparsityOperator,
                 verbose: off|medium|high
                     String indicating the level of verbosity. Defaults to
                     'high'.
+                epsilon__tol_scale:
+                    Scale tolerance on epsilon
+                lagrange_update_scale:
+                    Scale parameter when updating lagrange multiplier
+                nu:
+                    Measurement operator norm squared
+                l1_max_iter: int
+                    Maximum number of iterations for l1 proximal computation.
+                    Defaults to 300.
+                l1_positivity: bool
+                    Whether to include positivity constraints.
+                    Defaults to True.
+                l1_relative_variation: float
+                    Convergence criteria against changes in the objective
+                    function during L1 proximal computations. Defaults to 1e-4.
+                l1_thight_frame: bool
+                    Whether Psi^T is a tight frame. Defaults to True.
+                l1_verbose: off|medium|high
+                    Verbosity of L1 proximal computations. Defaults to 'high'.
+                l1_nu: float
+                    Bounds on the squared norm of the Psi operator.
+                    Defaults to 1.0.
         """
-        super(PADMM, self).__init__(**kwargs)
+        l1 = kwargs.pop('l1', {})
+        for key in [u for u in kwargs.keys()]:
+            if len(key) > 3 and key[:3] == "l1_":
+                l1[key[3:]] = kwargs.pop(key)
+        super(PADMM, self).__init__(l1=l1, **kwargs)
 
     @params.apply_params
     def __call__(self, visibility, weights=None, image=None, scale='default'):
