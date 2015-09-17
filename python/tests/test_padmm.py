@@ -32,6 +32,7 @@ def test_params():
 
 
 def test_padmm():
+    from numpy import abs, max
     from numpy.linalg import norm
     from numpy.testing import assert_allclose
     from numpy import sqrt
@@ -48,7 +49,7 @@ def test_padmm():
     padmm = PADMM(
         image_size=image.shape, nblevels=4, wavelets=wavelets,
         oversampling=(2, 2), interpolation=(24, 24),
-        verbose=2, max_iter=200, gamma=0.01, relative_variation=1e-4,
+        verbose=2, max_iter=1, gamma=0.01, relative_variation=1e-4,
         epsilon_tol_scale=1.001, lagrange_update_scale=0.9,
         l1={
             'verbose': 0, 'max_iter': 20, 'relative_variation': 1e-2,
@@ -61,4 +62,5 @@ def test_padmm():
     radius = sqrt(len(visibility) + 2.0 * sqrt(len(visibility))) * sigma
     actual = padmm(visibility, radius=radius, max_iter=5, scale=None)
 
-    assert_allclose(actual, expected, rtol=1e-2)
+    assert_allclose(actual, expected, rtol=1e-4, atol=1e-5)
+test_padmm()
