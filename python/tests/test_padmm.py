@@ -63,4 +63,3 @@ def test_padmm():
     actual = padmm(visibility, radius=radius, max_iter=5, scale=None)
 
     assert_allclose(actual, expected, rtol=1e-4, atol=1e-5)
-test_padmm()
