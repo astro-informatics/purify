@@ -287,7 +287,7 @@ def set_image_coordinate(datatransform, imagename):
 
 
 def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
-                 weights=None, **kwargs):
+                 weights=None, padmm=False, **kwargs):
     """ Creates an image using the Purify method
 
         Parameters:
@@ -301,13 +301,15 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
                 Whether to overwrite existing image. Defaults to False.
             weights: None or array
                 l1weights for sdmm
+            padmm: bool
+                If True, selects padmm algorithm
             other arguments:
-                See purify.SDMM
+                See purify.SDMM and purify.PADMM
     """
     from os.path import exists, abspath
     from numpy import array
     from taskinit import gentools, casalog
-    from . import SDMM
+    from . import SDMM, PADMM
 
     # Input sanitizing
     if 'image_size' in kwargs:
@@ -323,13 +325,13 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
 
     casalog.post('Starting Purify task')
     scale = kwargs.pop('scale', 'default')
-    sdmm = SDMM(image_size=imsize, **kwargs)
+    algorithm = (PADMM if padmm else SDMM)(image_size=imsize, **kwargs)
 
     # Contains images over all dimensions
     image = []
     for i, data in enumerate(datatransform):
         casalog.origin('Purifying plane %s' % str(i))
-        channel = sdmm(data, scale=scale, weights=weights)
+        channel = algorithm(data, scale=scale, weights=weights)
         image.append(channel)
 
     image = array(image, order='F')
@@ -342,7 +344,7 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     set_image_coordinate(datatransform, imagename)
 
 
-def purify_measurement_set(measurement_set, imagename, imsize=None,
+def purify_measurement_set(measurement_set, imagename, imsize=(256, 256),
                            datadescid=0, channels=None, column=None,
                            resolution=0.3, **kwargs):
     """ Creates an image using the Purify method

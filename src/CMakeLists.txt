@@ -1,4 +1,4 @@
-set(EXAMPLE_SOURCES example_30dor.c example_ami.c example_m31.c)
+set(EXAMPLE_SOURCES example_30dor.c example_ami.c example_m31.c example_m31_padmm.c example_realdata.c example_realdata_padmm.c)
 set(PURIFY_SOURCES
   purify_measurement.c purify_error.c purify_ran.c purify_utils.c
   purify_image.c purify_sparsemat.c purify_visibility.c
