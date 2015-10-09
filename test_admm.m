@@ -1,8 +1,13 @@
 clear
-addpath test_images/
-addpath misc/
-addpath prox_operators/
-
+%Linking Sopt
+addpath ../sopt/matlab/test_images/
+addpath ../sopt/matlab/misc/
+addpath ../sopt/matlab/prox_operators/
+addpath ../sopt/matlab
+%Linking Nufft
+addpath ../../Software/irt/nufft
+addpath ../../Software/irt/utilities
+addpath ../../Software/irt/systems
 
 stringname='M31.fits';
 
