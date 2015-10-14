@@ -2,7 +2,9 @@ function km = omega_to_k(fftsize, omega_m, J)
 % A function that maps omega_m to k_m, where omega_m is a `digital' frequency
 % off the grid, and gamma * k_m is on the grid.
 % This calculation follows the min-max method in Fessler et al, 2003.
-% 
+% The grid frequencies are also shifted by J/2 for interpolation.
+
+
 %|in
 %|
 %| fftsize - Array size of fft dimensions
@@ -27,7 +29,6 @@ if mod(J, 2) == 0
             km(m,l) = minI;
         end
     end
-    km
     km = km - J/2;
 else
     for l = 1:length(fftsize)
@@ -39,6 +40,5 @@ else
             km(m,l) = minI;
         end
     end
-    km
     km = km - (J+1)/2;
 end
