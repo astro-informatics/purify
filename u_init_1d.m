@@ -5,7 +5,6 @@ function [u, T, r] = u_init_1d(m, imsize, fftsize, J, T, omega_m, km, alpha, bet
 %
 % 
 
-
 %|in
 %| m - frequency index to interpolate (scalar)
 %| imsize - imsize of dimension (scalar)
@@ -24,7 +23,7 @@ function [u, T, r] = u_init_1d(m, imsize, fftsize, J, T, omega_m, km, alpha, bet
 r = zeros(J,1);
 %Calculating r vector for given m
 for j = 1:J
-    r(j) = sum(sum(alpha .* diric(omega_m(m) - km(m) - j + beta*L, imsize)));
+    r(j) = sum(sum(alpha .* diric((omega_m(m) - km(m) - j + beta*L)* 2*pi/fftsize, imsize)));
 end
 
 %calculating delta matrix
