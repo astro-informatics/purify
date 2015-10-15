@@ -10,8 +10,8 @@ function km = omega_to_k(fftsize, omega_m, J)
 %| fftsize - Array size of fft dimensions (row)
 %| omega_m - Array of 'digital' frequency coordinates (takes in a column
 %| for each dimension)
-%| J - Number of nearest neighbours in interpolation
-%| out (scalar)
+%| J - Number of nearest neighbours in interpolation (scalar)
+%| out 
 %| km - Array of gridded frequency coordinates (column for each dimension)
 
 
