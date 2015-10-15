@@ -7,12 +7,12 @@ function km = omega_to_k(fftsize, omega_m, J)
 
 %|in
 %|
-%| fftsize - Array size of fft dimensions
+%| fftsize - Array size of fft dimensions (row)
 %| omega_m - Array of 'digital' frequency coordinates (takes in a column
-%| for each dimension
+%| for each dimension)
 %| J - Number of nearest neighbours in interpolation
-%| out
-%| km - Array of gridded frequency coordinates
+%| out (scalar)
+%| km - Array of gridded frequency coordinates (column for each dimension)
 
 
 km = omega_m * nan;
@@ -21,23 +21,23 @@ km = omega_m * nan;
 %interpolation by J/2.
 if mod(J, 2) == 0
     for l = 1:length(fftsize) 
-        kRange = (0:fftsize(l)) - fftsize(l)/2;
+        kRange = (1:fftsize(l)) - fftsize(l)/2;
         for m = 1: length(omega_m(:,l))
             temp = omega_m(m, l) - kRange;
             temp(temp<0)=nan;
             [~, minI] = min(temp);
-            km(m,l) = minI;
+            km(m,l) = minI - fftsize(l)/2;
         end
     end
     km = km - J/2;
 else
     for l = 1:length(fftsize)
-        kRange = (0:fftsize(l)) - fftsize(l)/2;
+        kRange = (1:fftsize(l)) - fftsize(l)/2;
         for m = 1: length(omega_m(:,l))
             temp = abs(omega_m(m, l) - kRange);
             temp(temp<0)=nan;
             [~, minI] = min(temp);
-            km(m,l) = minI;
+            km(m,l) = minI - fftsize(l)/2;
         end
     end
     km = km - (J+1)/2;

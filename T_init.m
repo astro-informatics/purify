@@ -1,24 +1,22 @@
-function [T, alpha, beta, L] = T_init(K, imsize, J, alpha, beta)
+function [T, alpha, beta, L] = T_init(fftsize, imsize, J, alpha, beta)
 % A function that constructs T, needed to grid non-uniformly
 % distributed fourier data using the min-max method. 
 % This calculation follows the min-max method in Fessler et al, 2003.
 % 
 %|in
 %|
-%| K - oversampling factor fftsize/imsize, 2 is a good/best choice
-%| imsize - Array of dimensions of final image
-%| J - Number of neighbours to use in interpolation kernel
+%| fftsize - Array size of fft grid, fftsize/imsize=2 is good (row)
+%| imsize - Array of dimensions of final image (row)
+%| J - Number of neighbours to use in interpolation kernel (scalar)
 %| alpha - array of scaling factors, L>0 (assume the same coefficients for
-%|  L<0. See Table 2 of Fessler et al, 2003.
-%| beta - scaling parameter. See Table 2 of Fessler et al, 2003.
+%|  L<0. See Table 2 of Fessler et al, 2003. (row)
+%| beta - scaling parameter. See Table 2 of Fessler et al, 2003. (scalar)
 %|out
-%| T - frequency independent interpolation matrix.
-%| alpha - array of scaling factors, for all +/- L
-%| beta - scaling parameter.
-%| L - +/- L values.
+%| T - frequency independent interpolation matrix. (matrix)
+%| alpha - array of scaling factors, for all +/- L (row)
+%| beta - scaling parameter. (scalar)
+%| L - +/- L values. (row)
 
-% Defines oversampling of FFT by factor of 2 (K/N = 2)
-fftsize = imsize*K;
 
 
 alpha = horzcat(fliplr(alpha(2:length(alpha))), alpha); % Positive and negative scaling factors
