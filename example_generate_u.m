@@ -1,15 +1,18 @@
 %Tests generating the interpolation kernel in 1D, and creates plots
 %for each frequency omega_m (digital).
 
+% This example will plot the same interpolation function in Fig. 7 of
+% Fessler et al. 2003, where alpha = [1] and beta = 0.
 
 
-J=7; % Number of nearest neighbours
+
+J=6; % Number of nearest neighbours
 imsize= 128; % Image size
 fftsize = imsize*2; % FFT grid size
 omega_m = ((-1):0.01:1)'; % Ungridded frequencies.
 
-alpha = [1, -0.5319, 0.1522, -0.0199]; % Scaling factors
-beta = 0.6339; % Scaling parameter
+alpha = [1]; % Scaling factors
+beta = 0; % Scaling parameter
 
 
 % Generate T from scaling variables alpha and beta.
@@ -20,17 +23,6 @@ km = omega_to_k(fftsize, omega_m, J);
 
 M = length(omega_m); % Number of interpolation kernels to calculate
 U = zeros(J,length(omega_m));
-
-% Loop to generate and plot the interpolation kernels 
-% for m = 1:M
-%     subplot(ceil(sqrt(M)), ceil(sqrt(M)),m)
-%     [u, T, r] = u_init_1d(imsize, fftsize, J, T, omega_m(m), km(m), alpha, beta, L);
-%     plot(1:J,abs(u))
-%     t = sprintf('\\omega_m = %.2f',omega_m(m));
-%     title(t)
-%     xlabel('J') % x-axis label
-%     ylabel('u_J') % y-axis label
-% end
 
 figure;
 
