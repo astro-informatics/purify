@@ -38,7 +38,7 @@ for i = 1:length(imsize)
         for l = 1:J
             % The matlab diric function takes in different units from the
             % Fessler paper.
-            Tinverse(j,l,i) = sum(sum(alphaproduct * diric((j - l + beta*(one' * L - L' * one))*2*pi/fftsize(i), imsize(i)))); 
+            Tinverse(j,l,i) = sum(sum(alphaproduct .* diric((j - l + beta*(one' * L - L' * one))*2*pi/fftsize(i), imsize(i)))); 
         end;
     end;
 end;
