@@ -2,13 +2,14 @@
 %for each frequency omega_m (digital).
 
 
-alpha = [1, -0.57, 0.185]; % Scaling factors
-beta = 0.43; % Scaling parameter
-J=10; % Number of nearest neighbours
-imsize= [1024]; % Image size
-fftsize = [2048]; % FFT grid size
-omega_m = ((-4):1:4)'; % Ungridded frequencies.
 
+J=7; % Number of nearest neighbours
+imsize= 128; % Image size
+fftsize = imsize*2; % FFT grid size
+omega_m = ((-1):0.01:1)'; % Ungridded frequencies.
+
+alpha = [1, -0.5319, 0.1522, -0.0199]; % Scaling factors
+beta = 0.6339; % Scaling parameter
 
 
 % Generate T from scaling variables alpha and beta.
@@ -18,14 +19,40 @@ omega_m = ((-4):1:4)'; % Ungridded frequencies.
 km = omega_to_k(fftsize, omega_m, J);
 
 M = length(omega_m); % Number of interpolation kernels to calculate
+U = zeros(J,length(omega_m));
 
 % Loop to generate and plot the interpolation kernels 
-for m = 1:length(omega_m)
-    subplot(ceil(sqrt(M)), ceil(sqrt(M)),m)
-    [u, T, r] = u_init_1d(m, imsize, fftsize, J, T, omega_m, km, alpha, beta, L);
-    plot(1:J,abs(u))
-    t = sprintf('\\omega_m = %.2f',omega_m(m));
+% for m = 1:M
+%     subplot(ceil(sqrt(M)), ceil(sqrt(M)),m)
+%     [u, T, r] = u_init_1d(imsize, fftsize, J, T, omega_m(m), km(m), alpha, beta, L);
+%     plot(1:J,abs(u))
+%     t = sprintf('\\omega_m = %.2f',omega_m(m));
+%     title(t)
+%     xlabel('J') % x-axis label
+%     ylabel('u_J') % y-axis label
+% end
+
+figure;
+
+for m = 1:M
+    [u, T, r, D] = u_init_1d(imsize, fftsize, J, T, omega_m(m), km(m), alpha, beta, L);
+    U(:,m) = u;
+end
+hold on
+for j = 1:J
+    plot(omega_m,abs(U(j,:)))
+end
+t = sprintf('J= %d', 1:J);
+title(t)
+xlabel('\frac{\omega}{\gamma}') % x-axis label
+ylabel('u_J') % y-axis label
+hold off
+figure;
+for j = 1:J
+    subplot(1, J, j)
+    plot(omega_m,abs(U(j,:)))
+    t= sprintf('J = %d',j);
     title(t)
-    xlabel('J') % x-axis label
+    xlabel('\omega/\gamma') % x-axis label
     ylabel('u_J') % y-axis label
 end
