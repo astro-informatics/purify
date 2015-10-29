@@ -1,4 +1,4 @@
-function im_est = ftgridadj(vis,st)
+function im_est = purify_mtlb_ftgridadj(vis,st)
 
 Nx1=st.Nx1;
 Ny1=st.Ny1;

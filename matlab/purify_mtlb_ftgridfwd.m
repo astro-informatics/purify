@@ -1,4 +1,4 @@
-function vis = ftgridfwd(im,st)
+function vis = purify_mtlb_ftgridfwd(im,st)
 
 Nx1=st.Nx1;
 Ny1=st.Ny1;

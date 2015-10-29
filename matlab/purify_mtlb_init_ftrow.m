@@ -1,4 +1,4 @@
-function row = init_ftrow(u,v,x,y,x3,y3,tau1,tau2,Kx,Ky,Nx2,Ny2)
+function row = purify_mtlb_init_ftrow(u,v,x,y,x3,y3,tau1,tau2,Kx,Ky,Nx2,Ny2)
 %init_ftrow Initialize each row of the interpolation matrix
 %   Detailed explanation goes here
 
