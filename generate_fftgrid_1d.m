@@ -13,16 +13,14 @@ u = zeros(J, length(omega_m), length(fftsize));
 
 % Loop over sample locations
 for m = 1:length(omega_m)
-    [u(:, m),T,r,D] = u_init_1d(imsize, fftsize, J, T(:,:), omega_m(m), km(m), alpha, beta, L);
+    [u(:, m), realu] = u_init_1d(imsize, fftsize, J, T(:,:), omega_m(m), km(m), alpha, beta, L);
 end
 
 
-Yk = zeros([fftsize, 1]); % empty fft grid
+fftgrid = zeros([fftsize, 1]); % empty fft grid
 
 % Interpolating fft grid
 for m = 1:length(omega_m)
-    Yk(mod(km(m)+fftsize*0.5 + (1:J)', fftsize)) = Yk(mod(km(m)+fftsize*0.5 + (1:J)',fftsize)) + data_m(m)*u(: ,m);
+    fftgrid(mod(km(m)+fftsize*0.5 + (1:J)', fftsize)) = fftgrid(mod(km(m)+fftsize*0.5 + (1:J)',fftsize)) + data_m(m)*u(: ,m);
     
 end
-
-fftgrid = Yk;

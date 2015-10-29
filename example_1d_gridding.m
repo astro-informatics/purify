@@ -1,28 +1,32 @@
 % Example of 1d gridding.
 
+clear
 
 imsize = 1024; % output image size
 
-fftsize = 2 *imsize; % output fftsize
+fftsize = 2 * imsize; % output fftsize
 
-M = 1000; % Number of frequencies to grid
+M = 500; % Number of frequencies to grid
 
-omega_m = ((-M/2):0.5:M/2)'; % Frequencies to grid
+omega_m = normrnd(0,fftsize*0.05, [M,1]); % Frequencies to grid
 
 data = omega_m * 0 + 1; % Phase and amplitude
 
-J = 10; % Number of neighbours to interpolate
+J = 4; % Number of neighbours to interpolate
 
-alpha = [1]; % Scaling factors
+alpha = [1, -0.5319, 0.1522, -0.0199]; % Scaling factors
 
-beta = 0; % Scaling parameter
+beta = 0.6339; % Scaling parameter
 
 grid = generate_fftgrid_1d(data, omega_m, imsize, fftsize, J, alpha, beta); % data put onto a grid
 
 x=fftshift(ifft(grid)); % Inverse FFT of data
 
-plot(1:length(x),abs(x)); % Plot of data
+figure;
+plot(1:length(x),abs(x)); % Plot of data absolute value
+figure;
+plot(1:length(x),real(x)); % Plot of data real part
+figure;
+plot(1:length(x),imag(x)); % Plot of data imaginary part
 
-plot(1:length(x),real(x)); % Plot of data
-
-plot(1:length(x),imag(x)); % Plot of data
+spy(abs(grid)) % Showing how sparse the grid is

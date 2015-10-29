@@ -1,4 +1,4 @@
-function [u, T, r, D] = u_init_1d(imsize, fftsize, J, T, omega_m, km, alpha, beta, L)
+function [u, realu] = u_init_1d(imsize, fftsize, J, T, omega_m, km, alpha, beta, L)
 % A function that calculates a 1D u, the 1D interpolation kernel, for a given
 % frequency omega_m.
 %
@@ -22,10 +22,11 @@ function [u, T, r, D] = u_init_1d(imsize, fftsize, J, T, omega_m, km, alpha, bet
 r = zeros(J,1);
 % Calculating r(omega) as in Fessler paper.
 for j = 1:J
-    r(j) = sum(sum(alpha .* diric((omega_m - km - j + beta*L)*2*pi/fftsize, imsize)));
+    r(j) = sum(alpha .* diric((omega_m - km - j + beta*L)*2*pi/fftsize, imsize));
 end
 
 %calculating delta matrix
-D = exp(1j*(omega_m-km + (1:J)' )*(imsize-1)/2 * 2 * pi/fftsize); %with complex conjugate applied
+D = exp(1j*(omega_m - km + (1:J)')*(imsize - 1)/2 * 2 * pi/fftsize); %with complex conjugate applied
 
-u = D .*(T * r);
+realu = (T * r);
+u = D .*realu;

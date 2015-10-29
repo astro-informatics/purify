@@ -35,10 +35,9 @@ else
         kRange = (1:fftsize(l)) - fftsize(l)/2;
         for m = 1: length(omega_m(:,l))
             temp = abs(omega_m(m, l) - kRange);
-            temp(temp<0)=nan;
             [~, minI] = min(temp);
             km(m,l) = minI - fftsize(l)/2;
         end
     end
-    km = km - (J+1)/2;
+    km = km - (J+1)/2 ;
 end
