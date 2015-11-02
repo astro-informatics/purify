@@ -18,24 +18,18 @@ Nx1 = size(im, 1);
 Ny1 = size(im, 2);
 Kx = 4;
 Ky = 4;
-tau1 = pi/Nx1*0.1;
-tau2 = pi/Ny1*0.1;
+tau1 = (0.31*Kx^(0.52))/Nx1*pi;
+tau2 = tau1;
 Ofy = 2;
 Ofx = 2;
 %% Load data
 %stringname='AMI_01.vis';
 %Y = importdata(stringname);
 
-u = (1:Nx1)';
-v = (1:Ny1)';
-% u = Y(:,1);
-% v = Y(:,2);
 
-[u, v] = meshgrid(u,v);
-u = reshape(u, [Nx1*Ny1,1]);
-v = reshape(v, [Nx1*Ny1,1]);
-freq = [u,v];
-freq = freq/sqrt(max(u.^2+v.^2)) * pi;
+[u,v] = ind2sub([Nx1, Ny1], 1:(Nx1*Ny1)) ;
+freq = [u'-1,v'-1];
+freq = freq/sqrt(Nx1*Ny1)*pi*2 -pi;
 
 % Generating interpolation matrix
 st = purify_mtlb_init_ftgrid(freq,Ny1,Nx1,Ky,Kx,tau2,tau1,Ofy,Ofx);
@@ -45,3 +39,4 @@ vis = purify_mtlb_ftgridfwd(im,st);
 
 %Putting data onto the grid
 im_est = purify_mtlb_ftgridadj(vis,st);
+image(real(im_est)*Nx1*Ny1);
