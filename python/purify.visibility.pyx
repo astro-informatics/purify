@@ -3,6 +3,7 @@ cdef extern from "purify_visibility.h":
     ctypedef enum _VISIBILITY_FILETYPES "purify_visibility_filetype":
         VIS "PURIFY_VISIBILITY_FILETYPE_VIS"
         PROFILE_VIS "PURIFY_VISIBILITY_FILETYPE_PROFILE_VIS"
+        PROFILE_VIS_NODUMMY "PURIFY_VISIBILITY_FILETYPE_PROFILE_VIS_NODUMMY"
         PROFILE_WIS "PURIFY_VISIBILITY_FILETYPE_PROFILE_WIS"
 
     cdef int purify_visibility_readfile(
@@ -59,7 +60,7 @@ cdef void _wrap_visibility(py_visibility, _Visibility *c_visibility) except *:
     c_visibility.y = &y[0]
 
 
-def read_visibility(const char * filename):
+def read_visibility(const char * filename, visflag = "vis"):
     """ Reads visibility from input file
 
         :Parameters:
@@ -70,7 +71,7 @@ def read_visibility(const char * filename):
 
     cdef:
         _Visibility visibility
-        _VISIBILITY_FILETYPES flag = PROFILE_VIS
+        _VISIBILITY_FILETYPES flag = PROFILE_VIS_NODUMMY if visflag == "vis" else PROFILE_WIS
 
     result = purify_visibility_readfile(&visibility, filename, flag)
     data = None if result < 0 else _convert_visibility(&visibility)
