@@ -34,7 +34,7 @@ def visibility_column_as_numpy_array(name, visibility):
         arrays with other precision (single, quad...) are converted to double
         precision.
     """
-    from numpy import array, iscomplex, any
+    from numpy import array, iscomplexobj
     # Input name should be explicit, rather than a number
     names = {'u': 0, 'v': 1, 'y': 2, 'w': 3}
     assert name in names.keys()
@@ -52,9 +52,9 @@ def visibility_column_as_numpy_array(name, visibility):
     arg = getattr(arg, 'values', arg)
     # Convert to expected type, unless None
     if not hasattr(arg, 'dtype'):
-        arg = array(arg, dtype='complex' if any(iscomplex(arg)) else 'double')
+        arg = array(arg, dtype='complex' if iscomplexobj(arg) else 'double')
     elif arg.dtype not in ['complex', 'double']:
-        arg = arg.astype('complex' if any(iscomplex(arg)) else 'double')
+        arg = arg.astype('complex' if iscomplexobj(arg) else 'double')
     return arg
 
 def kernels(visibility, dimensions, oversampling, interpolation):
