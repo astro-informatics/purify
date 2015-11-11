@@ -13,12 +13,15 @@ class ProximalMinimizationBase(object):
 
     def _normalize_input(self, visibility, scale, image, image_dtype=None):
         """ Common input normalization operations """
-        from numpy import sqrt
+        from numpy import sqrt, iscomplexobj
         from purify.sensing import visibility_column_as_numpy_array
         # Create missing weights and image objects if needed. Check they are
         # correct otherwise.
         y = visibility_column_as_numpy_array('y', visibility)
         weights_l2 = visibility_column_as_numpy_array('w', visibility)
+        if weights_l2 != None and iscomplexobj(weights_l2):
+            raise TypeError("L2 weights should not be complex")
+
         if image_dtype is None:
             image_dtype = y.dtype
         image = self._get_image(image, image_dtype)
