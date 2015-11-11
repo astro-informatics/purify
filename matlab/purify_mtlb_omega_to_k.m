@@ -1,4 +1,4 @@
-function km = omega_to_k(fftsize, omega_m, J)
+function km = purify_mtlb_omega_to_k(fftsize, omega_m, J)
 % A function that maps omega_m to k_m, where omega_m is a `digital' frequency
 % off the grid, and gamma * k_m is on the grid.
 % This calculation follows the min-max method in Fessler et al, 2003.
