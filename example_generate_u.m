@@ -6,7 +6,7 @@
 
 
 
-J = 6; % Number of nearest neighbours
+J = 4; % Number of nearest neighbours
 imsize = 128; % Image size
 fftsize = imsize * 2; % FFT grid size
 omega_m = (0:0.001:0.99)'; % Ungridded frequencies.

@@ -26,7 +26,7 @@ for j = 1:J
 end
 
 %calculating delta matrix
-D = exp(1j*(omega_m - km + (1:J)')*(imsize - 1)/2 * 2 * pi/fftsize); %with complex conjugate applied
+D = exp(-1j*(omega_m - km - (1:J)')*(imsize - 1)/2 * 2 * pi/fftsize); %with complex conjugate applied
 
 realu = (T * r);
 u = D .*realu;
