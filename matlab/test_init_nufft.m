@@ -2,10 +2,10 @@ clear
 Ju = 4;
 Jv = Ju;
 cellsize = 0.3; %arcsec
-imsize = [128, 128];
-oversample_rate = 2; %most of the kernel parameters are optimized for K/N=2
+imsize = [1024, 1024];
+oversample_rate = 3; %most of the kernel parameters are optimized for K/N=2
 FTsize = imsize*oversample_rate;
-kernel_type = 'kb';
+kernel_type = 'minmax';
 stringname = 'at166B.3C129.c0.vis';
 parallel_type = 2; %I think choosing 2 is faster than choosing 1
 
@@ -23,9 +23,13 @@ st = purify_mtlb_init_nufft([U, V], imsize, oversample_rate, kernel_type, [Ju, J
 fftdata = st.G' * vis;
 fftdata = transpose(reshape(fftdata, FTsize(1), FTsize(2)));
 
-im = ifftshift(ifft2(fftdata));%*sqrt(fftsize(1)*fftsize(2));
+im = ifftshift(ifft2(fftdata))*sqrt(FTsize(1)*FTsize(2));
 im_deconv = im./st.S;
 
+c = (FTsize + mod(FTsize,2))/2 - (imsize+mod(imsize,2))/2+1;
+
+im = im(c(1):c(1)+imsize(1), c(2):c(2)+imsize(2));
+im_deconv = im_deconv(c(1):c(1)+imsize(1)-1, c(2):c(2)+imsize(2)-1);
 figure
 realim_deconv = real(im_deconv);
 image(realim_deconv/max(max(realim_deconv))*100);
