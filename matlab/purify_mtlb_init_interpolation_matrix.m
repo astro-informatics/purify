@@ -21,7 +21,6 @@ vm = purify_mtlb_omega_to_k(FTv, V, Jv);
 % Number of visibilities
 M = length(um);
 
-interpolation_matrix = spalloc(M,FTu*FTv,M*Ju*Jv);
 
 % Parallel method 1, where Ju and Jv are done in parallel, and M is
 % vectorized.
@@ -53,8 +52,8 @@ end
 
 if parallel_type == 2
     %Temp variables for parallel loop.
-    temp_interp = cell(Ju, Jv, M);
-    temp_index = cell(Ju, Jv, M);
+    temp_interp = zeros(Ju, Jv, M);
+    temp_index = zeros(Ju, Jv, M);
     % Using a parrallel loop to quickly calculating gridding matrix
     % interpolation kernel.
     for ju = 1:Ju
@@ -65,13 +64,13 @@ if parallel_type == 2
                 j = mod(vm(m)+jv,FTv)+1;
                 cols = sub2ind([FTu, FTv], i, j); % Columns for each value of (u+ju, v+jv) at each visibility
                 index = sub2ind([M,FTu*FTv], m, cols'); % Convert the columns into an index for sparse matrix
-                temp_index{ju, jv, m} = index;
-                temp_interp{ju, jv, m} =+ kernelu(U(m)-um(m),ju).*kernelv(V(m)-vm(m),jv);
+                temp_index(ju, jv, m) = index;
+                temp_interp(ju, jv, m) =+ kernelu(U(m)-um(m),ju).*kernelv(V(m)-vm(m),jv);
             end
         end
     end
     %Storing temp variables into sparse matrix structure.
-    fprintf('Storing interpolation matrix')
+    fprintf('Finished generating interpolation matrix\n')
 %     parfor ju = 1:Ju
 %         for jv = 1:Jv
 %             for m = 1:M
@@ -79,9 +78,11 @@ if parallel_type == 2
 %             end
 %         end
 %     end
-    temp_index = reshape(cell2mat(temp_index),Ju*Jv*M,1);
-    temp_interp = reshape(cell2mat(temp_interp),Ju*Jv*M,1);
-    interpolation_matrix(temp_index) = temp_interp;
+    [I, J] = ind2sub([M,FTu*FTv], reshape(temp_index,Ju*Jv*M,1));
+    clear temp_index;
+    fprintf('Storing interpolation matrix\n')
+    interpolation_matrix = sparse(I, J, reshape(temp_interp,Ju*Jv*M,1), M, FTu*FTv);
+    
 end
 
 end
