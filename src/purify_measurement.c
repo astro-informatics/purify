@@ -663,8 +663,8 @@ void purify_measurement_init_cft(purify_sparsemat_row *mat,
 
     //Computation of diagonal matrix storing the shifts necessary for centered
     //Fourier transform
-    temp1 = (double)param->nx1/2.0;
-    temp2 = (double)param->ny1/2.0;
+    temp1 = (double)nx2/2.0;
+    temp2 = (double)ny2/2.0;
     shifts[i] = cexp(-I*(u[i]*temp1 + v[i]*temp2));
         
   }
