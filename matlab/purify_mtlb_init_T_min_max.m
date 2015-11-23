@@ -1,11 +1,11 @@
-function [T, alpha, beta, L] = purify_mtlb_init_T_min_max(FTsize, imsize, J, alpha, beta)
+function [T, alpha, beta, L] = purify_mtlb_init_T_min_max(imsize, FTsize, J, alpha, beta)
 % A function that constructs T, needed to grid non-uniformly
 % distributed fourier data using the min-max method. 
 % This calculation follows the min-max method in Fessler et al, 2003.
 % 
 %|in
 %|
-%| fftsize - Array size of fft grid, fftsize/imsize=2 is good (row)
+%| FTsize - Array size of fft grid, fftsize/imsize=2 is good (row)
 %| imsize - Array of dimensions of final image (row)
 %| J - Number of neighbours to use in interpolation kernel (scalar)
 %| alpha - array of scaling factors, L>0 (assume the same coefficients for
@@ -18,35 +18,24 @@ function [T, alpha, beta, L] = purify_mtlb_init_T_min_max(FTsize, imsize, J, alp
 %| L - +/- L values. (row)
 
 
+L = length(alpha)-1; %Labels of scaling factors
 
-alpha = horzcat(fliplr(alpha(2:length(alpha))), alpha); % Positive and negative scaling factors
+%alpha = horzcat(fliplr(conj(alpha(2:length(alpha)))), alpha); % Positive and negative scaling factors
 
-L = 1:length(alpha); %Labels of scaling factors
-L = L - (length(alpha)+1)/2;
-
-
-alphaproduct = alpha' * alpha; % Outerproduct for summation later
-
-
-one = L*0 + 1; % ones for outer product in summation
 
 Tinverse =  zeros(J,J,length(imsize)); 
-
+[J1, J2] = ndgrid(1:J,1:J);
 %Calculate the inverse of T
-for i = 1:length(imsize)
-    for j = 1:J
-        for l = 1:J
-            % The matlab diric function takes in different units from the
-            % Fessler paper.
-            Tinverse(j,l,i) = sum(sum(alphaproduct .* diric((j - l + beta*(one' * L - L' * one))*2*pi/FTsize(i), imsize(i)))); 
-        end;
+for l1  = (-L):L
+    for l2 = (-L):L
+        Tinverse =+ alpha(abs(l1)+1)*alpha(abs(l2)+1)* purify_mtlb_diric((J1 - J2 + beta*(l1 - l2))*pi/FTsize, imsize);
     end;
 end;
 
-T =  zeros(J,J,length(imsize));
+T =  zeros(J,J);
 %Invert Tinverse to find T
-for i = 1:length(imsize)
-    T(:,:,i) = inv(Tinverse(:,:,i));
+T = inv(Tinverse);
+
 end
 
         

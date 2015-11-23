@@ -56,6 +56,7 @@ if parallel_type == 2
     temp_index = zeros(Ju, Jv, M);
     % Using a parrallel loop to quickly calculating gridding matrix
     % interpolation kernel.
+    fprintf('Using a support of (%d %d)\n', Ju, Jv)
     for ju = 1:Ju
         for jv = 1:Jv
             fprintf('Generating interpolation matrix entry (%d %d)\n', ju, jv)
@@ -65,7 +66,7 @@ if parallel_type == 2
                 cols = sub2ind([FTu, FTv], i, j); % Columns for each value of (u+ju, v+jv) at each visibility
                 index = sub2ind([M,FTu*FTv], m, cols'); % Convert the columns into an index for sparse matrix
                 temp_index(ju, jv, m) = index;
-                temp_interp(ju, jv, m) =+ kernelu(U(m)-um(m),ju).*kernelv(V(m)-vm(m),jv);
+                temp_interp(ju, jv, m) = kernelu(U(m)-um(m),ju).*kernelv(V(m)-vm(m),jv);
             end
         end
     end
