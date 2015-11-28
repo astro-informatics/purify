@@ -6,49 +6,68 @@
 
 
 
-Ju = 1; % Number of nearest neighbours
+Ju = 6; % Number of nearest neighbours
 imsize = 128; % Image size
-fftsize = imsize * 2; % FFT grid size
+FTsize = imsize * 2; % FFT grid size
 omega_m = (0:0.001:0.99)' - mod(Ju,2)/2; % Ungridded frequencies.
 
-alphau = [1]; % Scaling factors
-betau = 0; % Scaling parameter
+alphau = [1, -0.2, -0.04]; % Scaling factors
+betau =0.34; % Scaling parameter
 
 
 % Generate T from scaling variables alpha and beta.
-[Tu, alphau, betau, Lu] = purify_mtlb_init_T_min_max(FTsize(1) ,imsize(1), Ju, alphau, betau);
+[Tu, alphau, betau, Lu] = purify_mtlb_init_T_min_max(imsize(1), FTsize(1), Ju, alphau, betau);
 
 % Match omega_m values to km (on the grid), and offset them by J/2
 
-km = purify_mtlb_omega_to_k(fftsize, omega_m, Ju);
+km = purify_mtlb_omega_to_k(FTsize, omega_m, Ju);
 
 M = length(omega_m); % Number of interpolation kernels to calculate
 U = zeros(Ju,length(omega_m));
 
-[minmax, rminmax] = purify_mtlb_init_min_max(imsize(1), FTsize(1), Ju, Tu, alphau, betau, Lu);
+[minmax, rminmax, r] = purify_mtlb_init_min_max(imsize(1), FTsize(1), Ju, Tu, alphau, betau);
 
 figure;
 
 for m = 1:M
     for i = 1:Ju
-        U(i,m) = rminmax(omega_m(m)-km(m), i);
+        U(i, m) = rminmax(omega_m(m) - km(m), i);
     end
 end
 hold on
 for j = 1:Ju
-    plot(omega_m-j, U(j,:))
+    plot(omega_m+ Ju/2-j, U(j,:))
 end
 t = sprintf('j= %d',  (1:Ju) );
 title(t)
 xlabel('\omega/\gamma') % x-axis label
 ylabel('|u_j|') % y-axis label
 hold off
-figure;
+% figure;
+% for j = 1:Ju
+%     subplot(1, Ju, j)
+%     plot(omega_m,(U(j,:)))
+%     t = sprintf('j = %d',j);
+%     title(t)
+%     xlabel('\omega/\gamma') % x-axis label
+%     ylabel('|u_j|') % y-axis label
+% end
+
+[rr, ~] = nufft_r(omega_m*2*pi/FTsize, imsize, Ju, FTsize, alphau, betau, 0);
+Uf = zeros(Ju,length(omega_m));
+for m = 1:M
+        Uf(:, m) = Tu*rr(:,m)-U(:, m);
+end
+figure
+hold on
 for j = 1:Ju
-    subplot(1, Ju, j)
-    plot(omega_m,abs(U(j,:)))
-    t = sprintf('j = %d',j);
-    title(t)
-    xlabel('\omega/\gamma') % x-axis label
-    ylabel('|u_j|') % y-axis label
+    plot(omega_m+ Ju/2-j, Uf(j,:))
+end
+for m = 1:M
+        Uf(:, m) = Tu*rr(:,m);
+end
+figure
+hold on
+for j = 1:Ju
+    plot(omega_m+ Ju/2-j, Uf(j,:))
 end
