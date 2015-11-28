@@ -1,11 +1,11 @@
 clear
-Ju = 2;
+Ju = 1;
 Jv = Ju;
 cellsize = 0.3; %arcsec
 imsize = [1024, 1024];
 oversample_rate = 2; %most of the kernel parameters are optimized for K/N=2
 FTsize = imsize*oversample_rate;
-kernel_type = 'gauss';
+kernel_type = 'kb';
 %kernel_type = 'kb';
 %kernel_type = 'minmax:uniform';
 stringname = 'at166B.3C129.c0.vis';
@@ -26,7 +26,7 @@ fftdata = st.weights' * vis;
 fftdata = transpose(reshape(fftdata, FTsize(1), FTsize(2)));
 
 im = ifftshift(ifft2(fftdata))*sqrt(FTsize(1)*FTsize(2));
-im_deconv = im./st.deconv;
+im_deconv = im.*st.deconv;
 
 c = (FTsize + mod(FTsize,2))/2 - (imsize+mod(imsize,2))/2+1;
 

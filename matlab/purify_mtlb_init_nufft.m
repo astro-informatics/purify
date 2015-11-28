@@ -13,6 +13,9 @@ st.Nx1 = imsize(1);
 st.Ny1 = imsize(2);
 st.Nx2 = FTsize(1);
 st.Ny2 = FTsize(2);
+UV(:,1) = UV(:,1)/(pi)*st.Nx2;
+UV(:,2) = UV(:,2)/(pi)*st.Ny2;
+
 %Setup for kernels. Mostly choosing support and widths of kernels.
 switch kernelname
     case 'kb'
@@ -30,16 +33,26 @@ switch kernelname
         %storing kernels
         kernelu =  @ (u, j) kb_kernel(u,j,alphau, Ju);
         kernelv =  @ (v, j) kb_kernel(v,j,alphav, Jv);
+    case 'pswf'
+        %Fessler et al suggests this value of sigma for gauss kernels.
+        alphau = 1;
+        alphav = 1;
+        %gaussian kernel
+        kernelu = @(u, j) purify_mtlb_opt_PSWF(u - j, Ju, alphau);
+        kernelv = @(v, j) purify_mtlb_opt_PSWF(v - j, Jv, alphav);
+        %scaling factor for the image due to the gauss kernel
+        st.deconv = purify_mtlb_scalefactor_fft2(@(u) kernelu(u, st.Nx2/2), @(v) kernelv(v, st.Ny2/2), X, Y);
+        %storing kernel
     case 'gauss'
         %Fessler et al suggests this value of sigma for gauss kernels.
         sigmau = (0.31*Ju^(0.52));
         sigmav = (0.31*Jv^(0.52));
         %gaussian kernel
-        gauss_kernel = @(u, j, sigma) exp(-(((u-j)/(sigma)).^2)/2);
+        gauss_kernel = @(u, j, sigma) exp(-((u-j)/sigma).^2);
         %ft of guassian
-        ftgauss_kernel = @(x, sigma) exp(-2*((x*sigma).^2))*sigma*sqrt(2*pi);
+        ftgauss_kernel = @(x, sigma) exp(-((x*sigma).^2)); %*sigma*sqrt(2*pi);
         %scaling factor for the image due to the gauss kernel
-        st.deconv = ftgauss_kernel(X./FTsize(1)-0.5,2*sigmau).*ftgauss_kernel(Y/FTsize(2) - 0.5,2*sigmav);
+        st.deconv = ftgauss_kernel(X./FTsize(1)-0.5,2*sigmau).*ftgauss_kernel(Y/FTsize(2) - 0.5,sigmav);
         %storing kernel
         kernelu =  @ (u, j) gauss_kernel(u, j, sigmau);
         kernelv =  @ (v, j) gauss_kernel(v, j, sigmav);
@@ -62,4 +75,5 @@ switch kernelname
         st.deconv = ones(FTsize);
 end
 st.weights = purify_mtlb_init_interpolation_matrix(UV, kernelu, kernelv, FTsize, Ju, Jv, parallel_type);
+st.deconv = 1./st.deconv;
 end

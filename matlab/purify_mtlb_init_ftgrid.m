@@ -63,7 +63,7 @@ parfor k=1:num_meas
     
     fprintf('Iteration: %i \n',k);
     
-    weights(k,:)=purify_mtlb_init_ftrow(u2(k),v2(k),x,y,x3,y3,tau1,tau2,Kx,Ky,Nx2,Ny2);
+    weights(k,:)=purify_mtlb_init_ftrow_guass(u2(k),v2(k),x,y,x3,y3,tau1,tau2,Kx,Ky,Nx2,Ny2);
         
 end
 
