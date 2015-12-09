@@ -5,23 +5,22 @@ cellsize = 0.3; %arcsec
 imsize = [1024, 1024];
 oversample_rate = 2; %most of the kernel parameters are optimized for K/N=2
 FTsize = imsize*oversample_rate;
+%kernel_type = 'gauss';
 kernel_type = 'kb';
-%kernel_type = 'kb';
 %kernel_type = 'minmax:uniform';
 stringname = 'at166B.3C129.c0.vis';
-parallel_type = 2; %I think choosing 2 is faster than choosing 1
 
 Y = importdata(stringname);
 U = Y(:,1);
 V = Y(:,2);
 vis = Y(:,3)+1j*Y(:,4);
 %m = sqrt(max(max(U.^2+V.^2)))/3;
-m = 180/pi*3600/cellsize;
-U = [U;-U]/m * FTsize(1);
-V = [V;-V]/m * FTsize(2);
+m = 180*3600/cellsize/pi;
+U = [U;-U]/m*2*pi;
+V = [V;-V]/m*2*pi;
 vis = [vis; conj(vis)];
 
-st = purify_mtlb_init_nufft([U, V], imsize, oversample_rate, kernel_type, [Ju, Jv], parallel_type);
+st = purify_mtlb_init_nufft([U, V], imsize, oversample_rate, kernel_type, [Ju, Jv]);
 fftdata = st.weights' * vis;
 fftdata = transpose(reshape(fftdata, FTsize(1), FTsize(2)));
 
@@ -39,7 +38,7 @@ image(realim_deconv/max(max(realim_deconv))*100);
 figure
 realim = real(im);
 image(realim/max(max(realim))*100);
-figure
+%figure
 %imagim = imag(im);
 %image(imagim);
 realname = sprintf('at166BtestReal_deconvJ%d%s%d.fits',Ju, kernel_type, oversample_rate);
