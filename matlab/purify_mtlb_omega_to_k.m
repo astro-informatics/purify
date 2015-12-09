@@ -14,38 +14,44 @@ function km = purify_mtlb_omega_to_k(fftsize, omega_m, J)
 %| out 
 %| km - Array of gridded frequency coordinates (column for each dimension)
 
+old = false;
 
-km = omega_m * nan;
 
-%Calculating gridded frequency coordinates k_m, which have been shifted for
-%interpolation by J/2.
-if mod(J, 2) == 0
-    for l = 1:length(fftsize)
-        kRange = (1:fftsize(l)) - fftsize(l)/2;
-        for m = 1: length(omega_m(:,l))
-            temp = omega_m(m, l) - kRange;
-            temp(temp<0)=nan;
-            [~, minI] = min(temp);
-            if mod(fftsize(l), 2) == 0
-                km(m,l) = minI - fftsize(l)/2;
-            else
-                km(m,l) = minI - (fftsize(l)+1)/2;
+if old == true
+    km = omega_m * nan;
+    
+    %Calculating gridded frequency coordinates k_m, which have been shifted for
+    %interpolation by J/2.
+    if mod(J, 2) == 0
+        for l = 1:length(fftsize)
+            kRange = (1:fftsize(l)) - fftsize(l)/2;
+            for m = 1: length(omega_m(:,l))
+                temp = omega_m(m, l) - kRange;
+                temp(temp<0)=nan;
+                [~, minI] = min(temp);
+                if mod(fftsize(l), 2) == 0
+                    km(m,l) = minI - fftsize(l)/2;
+                else
+                    km(m,l) = minI - (fftsize(l)+1)/2;
+                end
             end
         end
+        km = km - J/2;
+    else
+        for l = 1:length(fftsize)
+            kRange = (1:fftsize(l)) - fftsize(l)/2;
+            for m = 1: length(omega_m(:,l))
+                temp = abs(omega_m(m, l) - kRange);
+                [~, minI] = min(temp);
+                if mod(fftsize(l), 2) == 0
+                    km(m,l) = minI - fftsize(l)/2;
+                else
+                    km(m,l) = minI - (fftsize(l)+1)/2;
+                end
+            end
+        end
+        km = km - (J+1)/2 ;
     end
-    km = km - J/2;
 else
-    for l = 1:length(fftsize)
-        kRange = (1:fftsize(l)) - fftsize(l)/2;
-        for m = 1: length(omega_m(:,l))
-            temp = abs(omega_m(m, l) - kRange);
-            [~, minI] = min(temp);
-            if mod(fftsize(l), 2) == 0
-                km(m,l) = minI - fftsize(l)/2;
-            else
-                km(m,l) = minI - (fftsize(l)+1)/2;
-            end
-        end
-    end
-    km = km - (J+1)/2 ;
+   km = floor(omega_m - J/2); 
 end
