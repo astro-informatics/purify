@@ -5,6 +5,12 @@ clear;
 addpath src/
 addpath data/
 addpath ../../sopt/matlab
+addpath ../../sopt/matlab/prox_operators
+addpath ../../sopt/matlab/misc
+%Linking Nufft
+addpath ../../../Software/irt/nufft
+addpath ../../../Software/irt/utilities
+addpath ../../../Software/irt/systems
 
 %stringname='ppdisk672_GHz_50pc';
 stringname='cluster';
@@ -50,7 +56,6 @@ v1 = Data(:,3)*pi/2000;
 
 u1 = [u1; -u1];
 v1 = [v1; -v1];
-
 num_meas=length(u1);
 clear Data
 
@@ -60,22 +65,24 @@ clear Data
 Kx = 4;
 Ky = 4;
 Fa = 2;
-tau1 = (Fa/Nx2)*pi;
-tau2 = (Fa/Ny2)*pi;
-
-%tau1 = (Fa/Nx2);
-%tau2 = (Fa/Ny2);
-
-% tau1 = sqrt(2)*(0.31*(Kx)^(0.52))/Nx1;
-% tau2 = sqrt(2)*(0.31*(Ky)^(0.52))/Ny1;
-st = purify_mtlb_init_ftgrid([u1 v1],Ny1,Nx1,Ky,Kx,tau2,tau1,Of,Of);
+% %tau1 = (Fa/Nx1)*2*pi;
+% %tau2 = (Fa/Ny1)*2*pi;
+% 
+% tau1 = (Fa/Nx1);
+% tau2 = (Fa/Ny1);
 
 
-%Define operators
-A = @(x) purify_mtlb_ftgridfwd(x,st);
+%Initialize nufft parameters
+fprintf('Initializing the NUFFT operator\n\n');
+tstart1=tic;
+st = nufft_init([v1 u1],[Ny1 Nx1],[Ky Kx],[Ny2 Nx2], [Ny1/2 Nx1/2], 'kaiser');
+tend1=toc(tstart1);
+fprintf('Time for the initialization: %e\n\n', tend1);
 
-At = @(y) purify_mtlb_ftgridadj(y,st);
+%Operator functions
 
+A = @(x) nufft(x, st);
+At = @(x) nufft_adj(x, st);
 
 % Select p% of Fourier coefficients
 y0 = A(im);
@@ -166,6 +173,5 @@ tend = toc(tstart)
 soln = sol/max(sol(:));
 
 figure, imagesc(log10(soln + 1e-2)), colorbar, axis image
-
-realname = sprintf('Ex_AMI_original_gauss.fits');
-fitswrite(real(soln)/max(max(real(soln))), realname)
+realname = sprintf('Ex_AMI_fessler_gridding.fits');
+fitswrite(real(sol)/max(max(real(sol))), realname)

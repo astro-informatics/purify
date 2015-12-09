@@ -5,6 +5,8 @@ clear;
 addpath src/
 addpath data/
 addpath ../../sopt/matlab
+addpath ../../sopt/matlab/prox_operators
+addpath ../../sopt/matlab/misc
 
 %stringname='ppdisk672_GHz_50pc';
 stringname='cluster';
@@ -27,7 +29,7 @@ data = fitsread(stringname1);
 data=flipud(data);
 im=im2double(data);
 im=im/max(max(im));
-im(im<0)=0;
+%im(im<0)=0;
 
 
 %% Parameters
@@ -66,7 +68,7 @@ Fa = 2;
 % tau2 = (Fa/Ny1);
 
 
-st = purify_mtlb_init_nufft([u1, v1], [Nx1, Ny1], Of, 'gauss', [Kx, Ky], 2);
+st = purify_mtlb_init_nufft([v1, u1], [Ny1, Nx1], Of, 'kb', [Ky, Kx]);
 
 
 %Define operators
@@ -97,7 +99,7 @@ epsilon = sqrt(M + 2*sqrt(M))*sigma_noise;
 %Dirty image
 dirty = At(y);
 dirty1 = 2*real(dirty)/eval;
-dirty1(dirty1<0) = 0;
+%dirty1(dirty1<0) = 0;
 
 %% Sparsity operator definition
 
@@ -146,7 +148,7 @@ Psi = @(x) (waverec2(x(1:ncoef1),S1,'db1')+...
 param1.verbose = 1; % Print log or not
 param1.gamma = 1e-3; % Converge parameter
 param1.rel_obj = 1e-2; % Stopping criterion for the L1 problem
-param1.max_iter = 500; % Max. number of iterations for the L1 problem
+param1.max_iter = 100; % Max. number of iterations for the L1 problem
 param1.nu = eval; % Bound on the norm of the operator A
 param1.tight_L1 = 0; % Indicate if Psit is a tight frame (1) or not (0)
 param1.max_iter_L1 = 100;
@@ -164,3 +166,6 @@ tend = toc(tstart)
 soln = sol/max(sol(:));
 
 figure, imagesc(log10(soln + 1e-2)), colorbar, axis image
+
+realname = sprintf('Ex_AMI_new_gridding.fits');
+fitswrite(real(soln)/max(max(real(soln))), realname)
