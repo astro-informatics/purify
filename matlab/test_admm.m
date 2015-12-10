@@ -142,7 +142,7 @@ param1.initsol = dirty1;
      
 %Solve BPDN
 tstart = tic;
-[sol, z] = sopt_mltb_admm_bpcon(y, epsilon, A, At, Psi, Psit, param1);
+[sol, z] = sopt_admm_bpcon(y, epsilon, A, At, Psi, Psit, param1);
 tend = toc(tstart)
 
 error = im - sol;

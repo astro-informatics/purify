@@ -2,8 +2,7 @@ clc
 clear;
 
 %%
-addpath src/
-addpath data/
+addpath ../data/
 addpath ../../sopt/matlab
 addpath ../../sopt/matlab/misc
 %Linking Nufft
@@ -61,8 +60,8 @@ clear Data
 %% Compute nufft parameters
 
     
-Ju = 4;
-Jv = 4;
+Ju = 6;
+Jv = 6;
 Fa = 2;
 % %tau1 = (Fa/Nx1)*2*pi;
 % %tau2 = (Fa/Ny1)*2*pi;
@@ -142,7 +141,7 @@ epsilon = sqrt(M + 2*sqrt(M))*sigma_noise;
 dirty = At(y2);
 dirty2 = 2*real(dirty)/eval;
 
-st = purify_mtlb_init_nufft([v1, u1], [Ny1, Nx1], Of, 'gauss', [Jv, Ju]);
+st = purify_mtlb_init_nufft([v1, u1], [Ny1, Nx1], Of, 'pswf', [Jv, Ju]);
 
 %Define operators
 A = @(x) purify_mtlb_degrid(x,st);
@@ -173,14 +172,47 @@ epsilon = sqrt(M + 2*sqrt(M))*sigma_noise;
 dirty = At(y3);
 dirty3 = 2*real(dirty)/eval;
 
+st = purify_mtlb_init_nufft([v1, u1], [Ny1, Nx1], Of, 'kb', [Jv, Ju]);
 
-figure; image(real(dirty1)/max(max(real(dirty1)))*100);
-figure; image(real(dirty2)/max(max(real(dirty2)))*100);
-figure; image(real(dirty3)/max(max(real(dirty3)))*100);
+%Define operators
+A = @(x) purify_mtlb_degrid(x,st);
 
-figure;image(abs(fftshift(fft2(dirty1)))/max(max(abs(fftshift(fft2(dirty1)))))*100);
-figure;image(abs(fftshift(fft2(dirty2)))/max(max(abs(fftshift(fft2(dirty2)))))*100);
-figure;image(abs(fftshift(fft2(dirty3)))/max(max(abs(fftshift(fft2(dirty3)))))*100);
+At = @(y) purify_mtlb_grid(y,st);
+
+
+% Select p% of Fourier coefficients
+y0 = A(im);
+% Add Gaussian i.i.d. noise
+%sigma_noise = 10^(-input_snr/20)*std(im(:));
+sigma_noise = 10^(-input_snr/20)*(norm(y0)/sqrt(num_meas));
+noise = (randn(size(y0)) + 1i*randn(size(y0)))*sigma_noise/sqrt(2);
+y4 = y0 + noise;
+
+%Size of the problem
+M = length(y4);
+N = Ny1*Nx1;
+
+  
+%Maximum eigenvalue of operato A^TA
+eval = pow_method(A, At, [Ny1,Nx1], 1e-4, 100, 1);
+
+%Bound for the L2 residual/
+epsilon = sqrt(M + 2*sqrt(M))*sigma_noise;
+
+%Dirty image
+dirty = At(y4);
+dirty4 = 2*real(dirty)/eval;
+
+
+figure; imagesc(real(dirty1));
+figure; imagesc(real(dirty2));
+figure; imagesc(real(dirty3));
+figure; imagesc(real(dirty4));
+
+figure;imagesc(abs(fftshift(fft2(dirty1))));
+figure;imagesc(abs(fftshift(fft2(dirty2))));
+figure;imagesc(abs(fftshift(fft2(dirty3))));
+figure;imagesc(abs(fftshift(fft2(dirty4))));
 
 realname = sprintf('dirty1.fits');
 fitswrite(real(dirty1)/max(max(real(dirty1))), realname)
@@ -188,3 +220,5 @@ realname = sprintf('dirty2.fits');
 fitswrite(real(dirty2)/max(max(real(dirty2))), realname)
 realname = sprintf('dirty3.fits');
 fitswrite(real(dirty3)/max(max(real(dirty3))), realname)
+realname = sprintf('dirty4.fits');
+fitswrite(real(dirty4)/max(max(real(dirty4))), realname)
