@@ -43,7 +43,7 @@ def visibility_image_operator():
 
     visibility_path = join(dirname(path), "data", "images",
                            "Coverages", "cont_sim4.vis")
-    visibility = read_visibility(visibility_path)
+    visibility = read_visibility(visibility_path, visflag="vis dummy")
 
     image_path = join(dirname(path), "data", "images", "M31.fits")
     image = Image(image_path)

@@ -71,7 +71,8 @@ def read_visibility(const char * filename, visflag = "vis"):
 
     cdef:
         _Visibility visibility
-        _VISIBILITY_FILETYPES flag = PROFILE_VIS_NODUMMY if visflag == "vis" else PROFILE_WIS
+        _VISIBILITY_FILETYPES flag = {
+            "vis": PROFILE_VIS_NODUMMY, "vis dummy": PROFILE_VIS}.get(visflag, PROFILE_WIS)
 
     result = purify_visibility_readfile(&visibility, filename, flag)
     data = None if result < 0 else _convert_visibility(&visibility)
