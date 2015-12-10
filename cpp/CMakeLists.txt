@@ -1,0 +1,8 @@
+if(tests)
+  if(EIGEN3_INCLUDE_DIR)
+    include_directories(${EIGEN3_INCLUDE_DIR})
+  endif()
+  add_library(cppurify MeasurementOperator.cc)
+  add_dependencies(cppurify lookup_dependencies)
+  add_subdirectory(tests)
+endif()

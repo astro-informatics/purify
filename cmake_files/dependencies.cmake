@@ -9,6 +9,8 @@ find_package(TIFF REQUIRED)
 find_package(CBLAS REQUIRED)
 set(PURIFY_BLAS_H "${BLAS_INCLUDE_FILENAME}" CACHE PATH "Path to blas include file")
 
+lookup_package(Eigen3 REQUIRED)
+
 # Look up packages: if not found, installs them
 # Unless otherwise specified, if purify is not on master, then sopt will be
 # downloaded from development branch.
