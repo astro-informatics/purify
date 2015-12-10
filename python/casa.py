@@ -1,6 +1,7 @@
 """ Functionality for interfacing CASA and Purify """
 __docformat__ = 'restructuredtext en'
-__all__ = ['data_iterator', 'purified_image', 'purify_measurement_set']
+__all__ = ['purify_measurement_set']
+
 
 class DataTransform(object):
     """ Base class to transform data to something purify understands """
@@ -41,7 +42,7 @@ class DataTransform(object):
     def __iter__(self):
         """ Iterates over channel data """
         # Can use a slightly different DataTransform object in pyrap interface
-        u, v, y = self.data
+        u, v, y, sigma = self.data
         frequencies = self.frequencies
 
         def conv(x, i):
@@ -51,8 +52,8 @@ class DataTransform(object):
 
         for i in range(1 if y.ndim == 1 else y.shape[-2]):
             vis = y[..., i, :].squeeze() if y.ndim != 1 else y
-            yield conv(u, i), conv(v, i), vis
-
+            yield conv(u, i), conv(v, i),\
+                vis, sigma[..., i].squeeze()
 
     @staticmethod
     def convert_to_purify(x, frequency, resolution=0.3):
@@ -81,11 +82,11 @@ class DataTransform(object):
         scale = wavelength * 2.0 * pi / umax
         return x * scale
 
+
 class CasaTransform(DataTransform):
     """ Transforms measurement set to something purify understands """
-    def __init__(self, measurement_set, datadescid=0, ignoreW=False,
-            channels=None, resolution=0.3, column=None,
-            query="mscal.stokes({0}, 'I')", **kwargs):
+    def __init__(self, measurement_set, datadescid=0, channels=None,
+                 resolution=0.3, column=None, **kwargs):
         """ Creates the transform
 
             :Parameters:
@@ -93,20 +94,11 @@ class CasaTransform(DataTransform):
                     Measurement set for which to get the data
                 datadescid:
                     Data descriptor id for which to select data
-                ignoreW:
-                    W is not yet implemented. By default, if w are present and
-                    non-zero, the call will fail
                 channels:
                     Channels over which to iterate. Defaults to all.
                 column:
                     Name of the data column from which y is taken. Defaults to
                     'CORRECTED_DATA' or 'DATA'.
-                query:
-                    Query sent to figure out Y. It is a format string taking
-                    one argument, and resolving to a TaQL query. It defaults to
-                    "mscal.stokes({0}, 'I')", where %s is the argument. It is
-                    substituted wiht the value from column (e.g.
-                    'CORRECTED_DATA' or 'DATA').
         """
         super(DataTransform, self).__init__()
 
@@ -118,28 +110,19 @@ class CasaTransform(DataTransform):
         """ Channels over which to iterate. Defaults to all. """
         self.column = self._get_data_column_name(column)
         """ Name of the data column from which y is taken """
-        self.ignoreW = ignoreW
-        """ By default, fails if W terms are not zero """
         self.resolution = resolution
         """ Resolution of the output image in arcsec per pixel """
-        self.query = query
-        """ Query from which Y is obtained.
 
-            It is a format string taking one argument, and resolving to a TaQL
-            query. It defaults to  "mscal.stokes({0}, 'I')", where %s is the
-            argument. It is substituted wiht the value from column (e.g.
-            'CORRECTED_DATA' or 'DATA').
-        """
-
-
-    def _get_table(self, name=None):
+    def _get_table(self, name=None, filename=None, readonly=True):
         """ A table object """
         from taskinit import gentools
         tb, = gentools(['tb'])
+        if filename is None:
+            filename = self.measurement_set
         if name is None:
-            tb.open('%s' % self.measurement_set)
+            tb.open('%s' % filename, nomodify=readonly)
         else:
-            tb.open('%s/%s' % (self.measurement_set, name))
+            tb.open('%s/%s' % (filename, name), nomodify=readonly)
         return tb
 
     def _c_vs_fortran(self, value):
@@ -153,14 +136,14 @@ class CasaTransform(DataTransform):
     @property
     def spectral_window_id(self):
         """ ID of the spectral window """
-        return self._get_table('DATA_DESCRIPTION')\
-                .getcol('SPECTRAL_WINDOW_ID')[self.datadescid]
+        return self._get_table('DATA_DESCRIPTION') \
+            .getcol('SPECTRAL_WINDOW_ID')[self.datadescid]
 
     @property
     def _all_frequencies(self):
         """ Frequencies (Hz) associated with each channel """
         return self._get_table('SPECTRAL_WINDOW')\
-                .getcol('CHAN_FREQ')[:, self.spectral_window_id].squeeze()
+            .getcol('CHAN_FREQ')[:, self.spectral_window_id].squeeze()
 
     @property
     def frequencies(self):
@@ -174,23 +157,48 @@ class CasaTransform(DataTransform):
         return allfreqs[self.channels].squeeze()
 
     @property
+    def phase_dir(self):
+        """ Measurement set phase center """
+        return self._c_vs_fortran(self._get_table("FIELD").getcol("PHASE_DIR"))
+
+    @property
     def data(self):
         """ Data needed by Purify """
-        from numpy import allclose, require
+        from numpy import require, logical_and
         query = 'DATA_DESC_ID == 0'
-        columns = "UVW, %s as Y" % self.query.format(self.column)
+        columns = "UVW, %s as Y, 1e0/SIGMA as stddev" % self.column
         tb = self._get_table().query(query=query, columns=columns)
-        y = self._c_vs_fortran(tb.getcol('Y').squeeze())
-        y_is_complex = str(y.dtype)[:7] == 'complex'
-        y = require(y, 'complex' if y_is_complex else 'double')
-        u, v, w = self._c_vs_fortran(tb.getcol('UVW'))
 
-        if not (self.ignoreW or allclose(w, 0)):
-            raise NotImplementedError('Cannot purify data with W components')
+        # Compute stokes I component...  this could fail horribly if formula
+        # below is incorrect.
+        all_ys = self._c_vs_fortran(tb.getcol('Y').squeeze())
+        y_is_complex = str(all_ys.dtype)[:7] == 'complex'
+        if all_ys.shape[0] != 4:
+            msg = "Don't know how to deal with this kind of measurement set"
+            raise NotImplementedError(msg)
+        yview = all_ys.view()
+        yview.shape = all_ys.shape[0], -1
+        y = require(0.5 * (yview[0, :] + yview[3, :]),
+                    'complex' if y_is_complex else 'double')
+
+        # Remove tagged objects
+        stddev = self._c_vs_fortran(tb.getcol('stddev').squeeze())
+        if stddev.shape[0] != 4:
+            msg = "Don't know how to deal with this kind of measurement set"
+            raise NotImplementedError(msg)
+        sig_view = stddev.view()
+        sig_view.shape = (4, -1)
+        unflagged = logical_and(sig_view[0, :] >= 0e0, sig_view[3, :] >= 0e0)
+
+        u, v, stddev = self._c_vs_fortran(tb.getcol('UVW'))
+        u, v, stddev, y = u[unflagged], v[unflagged],\
+            stddev[unflagged], y[unflagged]
 
         # Just dealing with CASA difficulties
         channels = None if self.channels == [None] else self.channels
-        return u, v, y[..., channels, :].squeeze()
+        yview = y.view()
+        yview.shape = all_ys.shape[1:-1] + (-1,)
+        return u, v, yview[..., channels, :].squeeze(), stddev[..., channels]
 
     def _get_data_column_name(self, column):
         """ Name of the column to use for Y """
@@ -216,11 +224,12 @@ class CasaTransform(DataTransform):
         else:
             channels = [int(channels)]
         if len(channels) == 0:
-            return  list(range(len(frequencies)))
+            return list(range(len(frequencies)))
         if any(u >= len(frequencies) for u in channels)    \
                 or any(u < -len(frequencies) for u in channels):
             raise IndexError("Channels out of range")
         return channels
+
 
 class LambdaTransform(CasaTransform):
     def __init__(self, measurement_set, resolution=0.3, norm=1.0, **kwargs):
@@ -263,8 +272,22 @@ class LambdaTransform(CasaTransform):
         scale = 2.0 * pi / umax
         return x * scale
 
+
+def set_image_coordinate(datatransform, imagename):
+    """ Tries and sets an image coordinates from a measurement set """
+    from numpy import array, mod, pi
+    table = datatransform._get_table(filename=imagename, readonly=False)
+    coords = table.getkeyword("coords")
+    coords["direction0"]["cdelt"] = \
+        array([-1, 1]) * datatransform.resolution * 180 / pi
+    coords["direction0"]["crval"] = \
+        mod(datatransform.phase_dir[:, 0, 0], 2*pi) * 180 / pi
+    table.putkeyword("coords", coords)
+    table.close()
+
+
 def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
-        **kwargs):
+                 weights=None, padmm=False, **kwargs):
     """ Creates an image using the Purify method
 
         Parameters:
@@ -276,13 +299,17 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
                 Width and height of the output image in pixels
             overwrite: bool
                 Whether to overwrite existing image. Defaults to False.
+            weights: None or array
+                l1weights for sdmm
+            padmm: bool
+                If True, selects padmm algorithm
             other arguments:
-                See purify.SDMM
+                See purify.SDMM and purify.PADMM
     """
     from os.path import exists, abspath
     from numpy import array
     from taskinit import gentools, casalog
-    from . import SDMM
+    from . import SDMM, PADMM
 
     # Input sanitizing
     if 'image_size' in kwargs:
@@ -298,14 +325,13 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
 
     casalog.post('Starting Purify task')
     scale = kwargs.pop('scale', 'default')
-    sdmm = SDMM(image_size=imsize, **kwargs)
-
+    algorithm = (PADMM if padmm else SDMM)(image_size=imsize, **kwargs)
 
     # Contains images over all dimensions
     image = []
     for i, data in enumerate(datatransform):
         casalog.origin('Purifying plane %s' % str(i))
-        channel = sdmm(data, scale=scale)
+        channel = algorithm(data, scale=scale, weights=weights)
         image.append(channel)
 
     image = array(image, order='F')
@@ -313,11 +339,14 @@ def purify_image(datatransform, imagename, imsize=(128, 128), overwrite=False,
     # Create image
     casalog.post('Creating CASA image')
     ia, = gentools(['ia'])
-    ia.newimagefromarray(imagename, image.real, overwrite=overwrite)
+    ia.newimagefromarray(imagename, image.real.T, overwrite=overwrite)
 
-def purify_measurement_set(measurement_set, imagename, imsize=None,
-        datadescid=0, ignoreW=False, channels=None, column=None,
-        resolution=0.3, query="mscal.stokes({0}, 'I')", **kwargs):
+    set_image_coordinate(datatransform, imagename)
+
+
+def purify_measurement_set(measurement_set, imagename, imsize=(256, 256),
+                           datadescid=0, channels=None, column=None,
+                           resolution=0.3, **kwargs):
     """ Creates an image using the Purify method
 
         Parameters:
@@ -329,26 +358,17 @@ def purify_measurement_set(measurement_set, imagename, imsize=None,
                 Width and height of the output image in pixels
             datadescid: int
                 Integer selecting the subset of consistent data
-            ignoreW: boolean
-                W is not yet implemented. If W values are non-zero, the call
-                will fail unless this parameter is set
             channels: [Int]
                 Channels for which to compute image
             column:
                 Column to use for Y data. Defaults to 'CORRECTED_DATA' if
                 present, and 'DATA' otherwise.
-            query:
-                Query sent to figure out Y. It is a format string taking one
-                argument, and resolving to a TaQL query. It defaults to
-                "mscal.stokes({0}, 'I')", where %s is the argument. It is
-                substituted wiht the value from column (e.g. 'CORRECTED_DATA'
-                or 'DATA').
             other arguments:
                 See purify_image
     """
     transform = CasaTransform(
         measurement_set, channels=channels, datadescid=datadescid,
-        column=column, ignoreW=ignoreW, resolution=resolution, query=query
+        column=column, resolution=resolution
     )
-    return purify_image(
-            transform, imagename=imagename, imsize=imsize, **kwargs)
+    return purify_image(transform, imagename=imagename, imsize=imsize,
+                        **kwargs)

@@ -111,8 +111,9 @@ cdef class SparsityOperator:
             for i in xrange(len(self)): yield self[i]
         return generator()
 
-    cdef set_wavelet_pointer(self, void **data):
+    cdef set_wavelet_pointer(self, void **data, int is_real):
         """ Sets pointer for C callbacks. """
+        self._wavelets.real = 1 if is_real else 0
         data[0] = <void*>&self._wavelets
 
     cpdef analyze(self, image):
@@ -133,7 +134,8 @@ cdef class SparsityOperator:
 
         # Checks type of the input and transform it if need be
         dtype = np_dtype('double' if self._wavelets.real else 'complex')
-        if dtype != image.dtype: image = image.astype(dtype)
+        if dtype != image.dtype:
+            image = image.astype(dtype)
         if not (image.flags['C_CONTIGUOUS'] or image.flags['F_CONTIGUOUS']):
             msg = "Expected a C or Fortan contiguous numpy array on input"
             raise TypeError("msg")
@@ -147,7 +149,7 @@ cdef class SparsityOperator:
             void* c_image = untyped_pointer_to_data(image)
             void* c_result = untyped_pointer_to_data(result)
             void* c_voidify
-        self.set_wavelet_pointer(&c_voidify)
+        self.set_wavelet_pointer(&c_voidify, self._wavelets.real)
         sopt_sara_analysisop(c_result, c_image, &c_voidify)
 
         return result
@@ -177,7 +179,7 @@ cdef class SparsityOperator:
             void* c_inout = untyped_pointer_to_data(inout)
             void* c_result = untyped_pointer_to_data(result)
             void *c_voidify
-        self.set_wavelet_pointer(&c_voidify)
+        self.set_wavelet_pointer(&c_voidify, self._wavelets.real)
         sopt_sara_synthesisop(c_result, c_inout, &c_voidify)
 
         return result

@@ -26,28 +26,35 @@ def visibility_column_as_numpy_array(name, visibility):
 
         This function avoids copies whenever possible.
         The U, V, and Y components should be available from the visibility as
-        indices 'u', 'v', 'y', or 0, 1, 2. The string format is tried first.
+        indices 'u', 'v', 'y', 'w', or 0, 1, 2, 3. The string format is tried
+        first.
 
         If the input column of interest is complex, then a complex numpy aray
         is returned. Otherwise an array of doubles is returned. Complex/real
         arrays with other precision (single, quad...) are converted to double
         precision.
     """
-    from numpy import array, iscomplex, any
+    from numpy import array, iscomplexobj
     # Input name should be explicit, rather than a number
-    names = {'u': 0, 'v': 1, 'y': 2}
+    names = {'u': 0, 'v': 1, 'y': 2, 'w': 3}
     assert name in names.keys()
 
-    try: arg = visibility[name]
-    except: arg = visibility[names[name]]
+    try:
+        arg = visibility[name]
+    except:
+        try:
+            arg = visibility[names[name]]
+        except:
+            if name == 3 or name == 'w':
+                return None
 
     # Goes from columns of dataframes to numpy arrays
     arg = getattr(arg, 'values', arg)
     # Convert to expected type, unless None
     if not hasattr(arg, 'dtype'):
-        arg = array(arg, dtype='complex' if any(iscomplex(arg)) else 'double')
+        arg = array(arg, dtype='complex' if iscomplexobj(arg) else 'double')
     elif arg.dtype not in ['complex', 'double']:
-        arg = arg.astype('complex' if any(iscomplex(arg)) else 'double')
+        arg = arg.astype('complex' if iscomplexobj(arg) else 'double')
     return arg
 
 def kernels(visibility, dimensions, oversampling, interpolation):

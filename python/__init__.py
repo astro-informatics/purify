@@ -1,7 +1,4 @@
 """ Purify package """
-__docformat__ = "restructuredtext en"
-__all__ = ['read_visibility', 'Image', 'kernels', 'SensingOperator',
-           'SparsityOperator', 'SDMM', 'read_image']
 from os.path import exists, join, dirname
 
 from .visibility import read_visibility
@@ -9,6 +6,11 @@ from .image import Image
 from .sensing import kernels, SensingOperator
 from .sparsity_ops import SparsityOperator
 from .sdmm import SDMM
+from .padmm import PADMM
+
+__docformat__ = "restructuredtext en"
+__all__ = ['read_visibility', 'Image', 'kernels', 'SensingOperator',
+           'SparsityOperator', 'SDMM', 'read_image', 'PADMM']
 
 
 def read_image(path, power_of_two=True):
@@ -51,8 +53,6 @@ try:
         if 'casalog' in api.user_ns and exists(task_file):
             execfile(task_file, api.user_ns)
 
-        from .casa import data_iterator, purified_iterator
-        __all__.extend(['data_iterator', 'purified_iterator'])
         # Clean-up purify namespace
         del api
         del task_file

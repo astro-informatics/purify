@@ -30,13 +30,13 @@ file:///opt/casa/code/xmlcasa/xml/casa.xsd">
                 <value>256</value>
             </value>
         </param>
+        <param type="bool" name="padmm">
+            <description>If true, uses PADMM algorithm, and SDMM family otherwise</description>
+            <value>False</value>
+        </param>
         <param type="int" name="datadescid">
             <description>Data description ID</description>
             <value>0</value>
-        </param>
-        <param name="ignoreW" type="bool">
-            <description>Ignore value of W</description>
-            <value>False</value>
         </param>
         <param name="channels" type="intArray">
             <description>Data selection criteria</description>
@@ -150,9 +150,38 @@ file:///opt/casa/code/xmlcasa/xml/casa.xsd">
             <description>Whether to use TV norm</description>
             <value>False</value>
         </param>
-        <param name="query" type="string">
-            <description>Queries for a specific column as the visibilities</description>
-            <value>mscal.stokes({0}, "I")</value>
+        <param name='nu' type="double">
+            <description>Measurement operator norm squared</description>
+            <value>None</value>
+        </param>
+        <param name="l1_max_iter" type="int">
+            <description>Maximum number of iterations for l1 proximal computation</description>
+            <value>300</value>
+        </param>
+        <param name="l1_positivity" type="bool">
+            <description>Whether to include positivity constraints</description>
+            <value>True</value>
+        </param>
+        <param name="l1_relative_variation" type="double">
+            <description>Convergence criteria against changes in the objective function during L1 proximal computations</description>
+            <value>1e-4</value>
+        </param>
+        <param name="l1_thight_frame" type="bool">
+            <description>Whether Psi^T is a tight frame</description>
+            <value>True</value>
+        </param>
+        <param name="l1_verbose" type="string">
+            <description>Verbosity of l1 proximal computations</description>
+            <value>medium</value>
+            <allowed kind="enum">
+                <value>off</value>
+                <value>medium</value>
+                <value>high</value>
+            </allowed>
+        </param>
+        <param name="l1_nu" type="double">
+            <description>Bounds on the squared norm of the Psi operator</description>
+            <value>1.0</value>
         </param>
    </input>
 
