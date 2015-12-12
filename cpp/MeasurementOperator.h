@@ -18,6 +18,10 @@ namespace purify {
 
       //! Does the measurement?
       Vector<> operator()(t_real _a) const;
+      //! Converts from subscript to index for matrix.
+      t_uint sub2ind(const t_uint row, const t_uint col, const t_uint cols, const t_uint rows);
+      //! Converts from index to subscript for matrix.
+      void ind2sub(const t_uint sub, const t_uint cols, const t_uint rows, t_uint* row, t_uint* col);
 
     protected:
       Vector<> something_;
