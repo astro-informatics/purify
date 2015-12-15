@@ -4,6 +4,7 @@
 #include <complex>
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+#include <unsupported/Eigen/FFT>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

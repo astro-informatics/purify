@@ -16,6 +16,14 @@ namespace purify {
         t_int ftsizeu;
         t_int ftsizev;
       };
+      //! Degridding operator that degrids image to visibilities
+      Vector<t_complex> degrid(Image <t_complex> eigen_image, MeasurementOperator::operator_params st);
+      //! Gridding operator that grids image from visibilities
+      Image<t_complex> grid(Vector <t_complex> visibilities, MeasurementOperator::operator_params st);
+      //! Uses Eigen's 1D FFT to perform 2D FFT
+      Matrix<t_complex> fft2d(Matrix<t_complex> input);
+      //! Uses Eigen's 1D IFFT to perform 2D IFFT
+      Matrix<t_complex> ifft2d(Matrix<t_complex> input);
       //! Converts from subscript to index for matrix.
       t_int sub2ind(const t_int row, const t_int col, const t_int rows, const t_int cols);
       //! Converts from index to subscript for matrix.

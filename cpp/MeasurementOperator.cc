@@ -2,6 +2,109 @@
 
 namespace purify {
 
+  Vector<t_complex> MeasurementOperator::degrid(Image <t_complex> eigen_image, MeasurementOperator::operator_params st)
+  {
+    /*
+      An operator that degrids an image and returns a vector of visibilities.
+
+      eigen_image:: input image to be degridded
+      st:: gridding parameters
+    */
+      Matrix<t_complex> padded_image(st.ftsizeu, st.ftsizev);
+      Matrix<t_complex> ft_vector(st.ftsizeu, st.ftsizev);
+      for (t_int i = 0; i < st.ftsizeu; ++i)
+      {
+        for (t_int j = 0; j < st.ftsizev; ++j)
+        {
+          if ( ((i > (st.ftsizeu - st.imsizex)*0.5) and (i < (st.ftsizeu + st.imsizex)*0.5)) and ((j > (st.ftsizev - st.imsizey)*0.5) and (j < (st.ftsizev + st.imsizey)*0.5)))
+          {
+            padded_image(i,j) = st.S(i - st.imsizex, j - st.imsizey) * eigen_image(i - st.imsizex, j - st.imsizey);
+          }else{
+            padded_image(i,j) = 0;
+          }
+        }
+      }
+      ft_vector = MeasurementOperator::fft2d(padded_image);
+      ft_vector.resize(st.ftsizeu*st.ftsizev, 1);
+
+      Vector<t_complex> visibilities = st.G * ft_vector;
+      return visibilities;
+      
+  }
+  Image<t_complex> MeasurementOperator::grid(Vector <t_complex> visibilities, MeasurementOperator::operator_params st)
+  {
+    /*
+      An operator that degrids an image and returns a vector of visibilities.
+
+      visibilities:: input visibilities to be gridded
+      st:: gridding parameters
+    */
+      Matrix<t_complex> ft_vector(st.ftsizeu * st.ftsizev, 1);
+      ft_vector = st.G.adjoint() * visibilities;
+      ft_vector.resize(st.ftsizeu, st.ftsizev);
+      Matrix<t_complex> padded_image = MeasurementOperator::ifft2d(ft_vector);
+      Image<t_complex> eigen_image(st.ftsizeu, st.ftsizev);
+      t_int x_start = floor(st.ftsizeu * 0.5 + st.imsizex * 0.5);
+      t_int y_start = floor(st.ftsizev * 0.5 + st.imsizey * 0.5);
+      for (t_int i = 0; i < st.imsizex; ++i)
+      {
+        for (t_int j = 0; j < st.imsizey; ++j)
+        {
+            eigen_image(i, j) = st.S(i, j) * padded_image(i + x_start, j + y_start);
+        }
+      }
+    return eigen_image;
+      
+  }
+
+  Matrix<t_complex> MeasurementOperator::fft2d(Matrix<t_complex> input)
+  {
+    /*
+      Returns FFT of a 2D matrix.
+
+      input:: complex valued image
+    */
+    Eigen::FFT<t_real> fft;
+    t_int dim_x = input.rows();
+    t_int dim_y = input.cols();
+    Matrix<t_complex> output(dim_x, dim_y);
+    for (t_int k = 0; k < dim_x; k++) {
+      Vector<t_complex> tmpOut(dim_y);
+      fft.fwd(tmpOut, input.row(k));
+      output.row(k) = tmpOut;
+    }
+
+    for (t_int k = 0; k < dim_y; k++) {
+      Vector<t_complex> tmpOut(dim_x);
+      fft.fwd(tmpOut, output.col(k));
+      output.col(k) = tmpOut;
+    }
+    return output;
+  }
+  Matrix<t_complex> MeasurementOperator::ifft2d(Matrix<t_complex> input)
+  {
+    /*
+      Returns FFT of a 2D matrix.
+
+      input:: complex valued image
+    */
+    Eigen::FFT<t_real> fft;
+    t_int dim_x = input.rows();
+    t_int dim_y = input.cols();
+    Matrix<t_complex> output(dim_x, dim_y);
+    for (t_int k = 0; k < dim_x; k++) {
+      Vector<t_complex> tmpOut(dim_y);
+      fft.inv(tmpOut, input.row(k));
+      output.row(k) = tmpOut;
+    }
+
+    for (t_int k = 0; k < dim_y; k++) {
+      Vector<t_complex> tmpOut(dim_x);
+      fft.inv(tmpOut, output.col(k));
+      output.col(k) = tmpOut;
+    }
+    return output;
+  }
   t_int MeasurementOperator::sub2ind(const t_int row, const t_int col, const t_int rows, const t_int cols) {
     /*
       Converts (row, column) of a matrix to a single index. This does the same as the matlab funciton sub2ind, converts subscript to index.
@@ -38,6 +141,8 @@ namespace purify {
     return omega.unaryExpr(std::ptr_fun<double,double>(std::floor));     
   }
 
+
+
   void MeasurementOperator::writefits2d(Image<t_real> eigen_image, const std::string fits_name) 
   {
     /*
@@ -47,18 +152,17 @@ namespace purify {
     */
     std::auto_ptr<CCfits::FITS> pFits(0);
     long naxes[2] = {static_cast<long>(eigen_image.rows()), static_cast<long>(eigen_image.cols())};
-    pFits.reset(new CCfits::FITS(fits_name, DOUBLE_IMG, 2, naxes));
-    long fpixel ( 1 );
-    std::vector<long> extAx;
-    extAx.push_back(2); 
+    pFits.reset(new CCfits::FITS(fits_name, FLOAT_IMG, 2, naxes));
+    long fpixel (1);
+    std::vector<long> extAx; 
     extAx.push_back(naxes[0]);
     extAx.push_back(naxes[1]);
-    CCfits::ExtHDU* imageExt = pFits->addImage(fits_name, DOUBLE_IMG, extAx);
+    CCfits::ExtHDU* imageExt = pFits->addImage(fits_name, FLOAT_IMG, extAx);
     eigen_image.resize(naxes[0]*naxes[1], 1);
     std::valarray<double> image(naxes[0]*naxes[1]);
     for (int i = 0; i < static_cast<int>(naxes[0]*naxes[1]); ++i)
     {
-      image[i] = eigen_image(i);
+      image[i] = static_cast<float>(eigen_image(i));
     }
     imageExt->write(fpixel, naxes[0]*naxes[1], image);
   }
@@ -86,6 +190,7 @@ namespace purify {
         eigen_image(i, j) = contents[index];
       }
     }
+    eigen_image.transposeInPlace();
     return eigen_image;
   }
 
@@ -203,7 +308,7 @@ namespace purify {
       t_real a = x / sigma;
       return std::exp(-a * a * 0.5);
   }
-  
+
   t_real MeasurementOperator::ftgaussian(const t_real x, const t_int J)
   {
       t_real sigma = 0.31 * std::pow(J, 0.52);
