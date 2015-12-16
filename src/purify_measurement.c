@@ -844,7 +844,6 @@ void purify_measurement_cftadj(void *out, void *in, void **data){
   nx2 = param->ofx*param->nx1;
   ny2 = param->ofy*param->ny1;
 
-  
   //Multiplication by the shifts and the adjoint of the 
   //sparse matrix storing the interpolation kernel
   purify_sparsemat_adj_complexrsc(temp, yin, mat, shifts);
@@ -911,7 +910,10 @@ double purify_measurement_pow_meth(void (*A)(void *out, void *in, void **data),
   
   if (param->nmeas > nx){
     for (i=0; i < nx; i++) {
-      x[i] = purify_ran_gasdev2(seedn) + purify_ran_gasdev2(seedn)*I;
+      // Call random function in two lines to ensure call order
+      double const real = purify_ran_gasdev2(seedn);
+      double const imag = purify_ran_gasdev2(seedn);
+      x[i] = real + imag*I;
     }
     norm = cblas_dznrm2(nx, (void*)x, 1);
     norm = norm/nx;
@@ -944,7 +946,10 @@ double purify_measurement_pow_meth(void (*A)(void *out, void *in, void **data),
   }
   else{
     for (i=0; i < ny; i++) {
-      y[i] = purify_ran_gasdev2(seedn) + purify_ran_gasdev2(seedn)*I;
+      // Call random function in two lines to ensure call order
+      double const real = purify_ran_gasdev2(seedn);
+      double const imag = purify_ran_gasdev2(seedn);
+      y[i] = real + imag*I;
     }
     norm = cblas_dznrm2(ny, (void*)y, 1);
     norm = norm/ny;
