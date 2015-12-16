@@ -30,7 +30,7 @@ def test_read_visibility():
             msg = "{i}, {u}, {v}, {yreal}, {yimag}, {noise}\n"
             file.write(msg.format(i=i, **csv.ix[i, :]))
         file.flush()
-        actual = read_visibility(file.name)
+        actual = read_visibility(file.name, visflag="vis dummy")
 
         assert_equal(set(actual.keys()), set(expected.keys()))
         for name in expected.keys():

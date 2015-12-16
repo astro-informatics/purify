@@ -30,7 +30,7 @@ def image_and_visibilities(name='30dor'):
     """
     from purify import read_visibility, read_image, SensingOperator as SO
 
-    visibility = read_visibility(visibility_files[name])
+    visibility = read_visibility(visibility_files[name], visflag="vis dummy")
     image = read_image(image_files[name])
     sensing_op = SO(visibility, image.shape, (2, 2), (24, 24))
     visibility['y0'] = sensing_op.forward(image)

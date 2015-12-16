@@ -25,6 +25,9 @@ if(NOT sopt_tag)
     endif()
     set(sopt_tag ${sopt_tag} CACHE STRING "Branch/tag when downloading sopt")
 endif()
+if(NOT Sopt_FOUND)
+  message(STATUS "If downloading Sopt locally, then it will be branch ${sopt_tag}")
+endif()
 lookup_package(
     Sopt REQUIRED ARGUMENTS
     GIT_REPOSITORY git@github.com:astro-informatics/sopt.git
