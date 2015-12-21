@@ -8,9 +8,8 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include <string>
 
-#include <CCfits>
+
 
 #define pi           3.14159265358979323846 
 
@@ -25,7 +24,7 @@ namespace purify {
   //! Root of the type hierarchy for real numbers
   typedef double t_real;
   //! Root of the type hierarchy for triplet lists
-  typedef Eigen::Triplet<double> t_tripletList;
+  typedef Eigen::Triplet<t_real> t_tripletList;
   //! Root of the type hierarchy for (real) complex numbers
   typedef std::complex<t_real> t_complex;
 
