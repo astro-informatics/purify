@@ -2,7 +2,7 @@
 
 namespace purify {
 
-  MeasurementOperator::vis_params MeasurementOperator::read_visibility(const std::string vis_name)
+  MeasurementOperator::vis_params MeasurementOperator::read_visibility(const std::string& vis_name)
   {
     /*
       Reads an csv file with u, v, visibilities and returns the vectors.
@@ -46,8 +46,26 @@ namespace purify {
     return uv_vis;
   }
 
-  MeasurementOperator::vis_params MeasurementOperator::uv_symmetry(const MeasurementOperator::vis_params uv_vis)
+  MeasurementOperator::vis_params MeasurementOperator::uv_scale(const MeasurementOperator::vis_params& uv_vis, const t_int& ftsizeu, const t_int& ftsizev)
   {
+    /*
+      scales the uv coordinates from being in units of 2 * pi to units of pixels.
+    */
+      MeasurementOperator::vis_params scaled_vis;
+      scaled_vis.u = uv_vis.u / (2 * purify_pi) * ftsizeu;
+      scaled_vis.v = uv_vis.v / (2 * purify_pi) * ftsizev;
+      scaled_vis.vis = uv_vis.vis;
+
+      return scaled_vis;
+  }
+
+  MeasurementOperator::vis_params MeasurementOperator::uv_symmetry(const MeasurementOperator::vis_params& uv_vis)
+  {
+    /*
+      Adds in reflection of the fourier plane using the condjugate symmetry for a real image.
+
+      uv_vis:: uv coordinates for the fourier plane
+    */
     t_int total = uv_vis.u.size();
     Vector<t_real> utemp(2 * total);
     Vector<t_real> vtemp(2 * total);
@@ -153,7 +171,7 @@ namespace purify {
     return output;
   }
 
-  Vector<t_complex> MeasurementOperator::degrid(Image <t_complex> eigen_image, const MeasurementOperator::operator_params st)
+  Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex>& eigen_image, const MeasurementOperator::operator_params st)
   {
     /*
       An operator that degrids an image and returns a vector of visibilities.
@@ -190,7 +208,8 @@ namespace purify {
       return visibilities;
       
   }
-  Image<t_complex> MeasurementOperator::grid(Vector <t_complex> visibilities, const MeasurementOperator::operator_params st)
+
+  Image<t_complex> MeasurementOperator::grid(const Vector<t_complex>& visibilities, const MeasurementOperator::operator_params st)
   {
     /*
       An operator that degrids an image and returns a vector of visibilities.
@@ -217,7 +236,7 @@ namespace purify {
       
   }
 
-  Matrix<t_complex> MeasurementOperator::fft2d(const Matrix<t_complex> input)
+  Matrix<t_complex> MeasurementOperator::fft2d(const Matrix<t_complex>& input)
   {
     /*
       Returns FFT of a 2D matrix.
@@ -244,7 +263,7 @@ namespace purify {
     return output;
   }
 
-  Matrix<t_complex> MeasurementOperator::ifft2d(const Matrix<t_complex> input)
+  Matrix<t_complex> MeasurementOperator::ifft2d(const Matrix<t_complex>& input)
   {
     /*
       Returns FFT of a 2D matrix.
@@ -270,7 +289,8 @@ namespace purify {
     }
     return output;
   }
-  t_int MeasurementOperator::sub2ind(const t_int row, const t_int col, const t_int rows, const t_int cols) 
+
+  t_int MeasurementOperator::sub2ind(const t_int& row, const t_int& col, const t_int& rows, const t_int& cols) 
   {
     /*
       Converts (row, column) of a matrix to a single index. This does the same as the matlab funciton sub2ind, converts subscript to index.
@@ -298,7 +318,8 @@ namespace purify {
     *col = sub % cols;
     *row = (sub - *col) / cols;
   }
-  t_int MeasurementOperator::mod(const t_real x, const t_real y) 
+
+  t_int MeasurementOperator::mod(const t_real& x, const t_real& y) 
   {
     /*
       returns x % y, and warps circularly around y for negative values.
@@ -308,7 +329,8 @@ namespace purify {
         r = y + r;
       return static_cast<t_int>(r);
   }
-  Vector<t_real> MeasurementOperator::omega_to_k(const Vector<t_real> omega) {
+
+  Vector<t_real> MeasurementOperator::omega_to_k(const Vector<t_real>& omega) {
     /*
       Maps fourier coordinates (u or v) to integer grid coordinates.
 
@@ -317,9 +339,7 @@ namespace purify {
     return omega.unaryExpr(std::ptr_fun<double,double>(std::floor));     
   }
 
-
-
-  void MeasurementOperator::writefits2d(Image<t_real> eigen_image, const std::string fits_name, const bool overwrite) 
+  void MeasurementOperator::writefits2d(Image<t_real> eigen_image, const std::string& fits_name, const bool& overwrite, const bool& flip) 
   {
     /*
       Writes an image to a fits file.
@@ -335,6 +355,10 @@ namespace purify {
     extAx.push_back(naxes[0]);
     extAx.push_back(naxes[1]);
     CCfits::ExtHDU* imageExt = pFits->addImage(fits_name, FLOAT_IMG, extAx);
+    if (flip == true)
+    {
+      eigen_image = eigen_image.rowwise().reverse().eval();
+    }
     eigen_image.resize(naxes[0]*naxes[1], 1);
     std::valarray<double> image(naxes[0]*naxes[1]);
     for (int i = 0; i < static_cast<int>(naxes[0]*naxes[1]); ++i)
@@ -344,7 +368,7 @@ namespace purify {
     imageExt->write(fpixel, naxes[0]*naxes[1], image);
   }
   
-  Image<t_complex> MeasurementOperator::readfits2d(const std::string fits_name)
+  Image<t_complex> MeasurementOperator::readfits2d(const std::string& fits_name)
   {
     /*
       Reads in an image from a fits file and returns the image.
@@ -371,7 +395,7 @@ namespace purify {
     return eigen_image;
   }
 
-  Sparse<t_real> MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real> u, const Vector<t_real> v, const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev) 
+  Sparse<t_real> MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev) 
   {
     /* 
       Given u and v coordinates, creates a gridding interpolation matrix that maps between visibilities and the fourier transform grid.
@@ -438,12 +462,34 @@ namespace purify {
 
   }
 
-  MeasurementOperator::operator_params MeasurementOperator::init_nufft2d(Vector<t_real> u, Vector<t_real> v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_int oversample_factor)
+  Image<t_real> MeasurementOperator::init_correction2d_fft(const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev, const t_int Ju, const t_int Jv)
+  {
+    /*
+      Given the gridding kernel, creates the scaling image for gridding correction using an fft.
+
+    */
+    Matrix<t_complex> K(ftsizeu, ftsizev);
+    for (int i = 0; i < Ju; ++i)
+    {
+      for (int j = 0; j < Jv; ++j)
+      {
+        t_int n = MeasurementOperator::mod(i - Ju/2, ftsizeu);
+        t_int m = MeasurementOperator::mod(j - Jv/2, ftsizev);
+        K(n ,m) = (kernelu(i - Ju/2) * kernelv(j - Jv/2));
+      }
+    }
+    Matrix<t_complex> S = MeasurementOperator::fftshift_2d(MeasurementOperator::ifft2d(K));
+    return (1/(S.array())).real();
+
+  }  
+
+  MeasurementOperator::operator_params MeasurementOperator::init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_int oversample_factor)
   {
     /*
       Generates tools/operators needed for gridding and degridding.
 
-      u:: visibilities in units of 2*pi;
+      u:: visibilities in units of ftsizeu
+      v:: visibilities in units of ftsizev
 
     */
     std::cout << "Constructing Gridding Operator" << '\n';
@@ -452,21 +498,27 @@ namespace purify {
     st.imsizey = imsizey;
     st.ftsizeu = oversample_factor * imsizex;
     st.ftsizev = oversample_factor * imsizey;
-    u = u / (2 * pi) * st.ftsizeu;
-    v = v / (2 * pi) * st.ftsizev;
+    if ((kernel_name == "pswf") and (Ju != 6 or Jv != 6))
+    {
+      std::cout << "Error: Only a support of 6 is implimented for PSWFs.";
+
+    }
     auto kernelu = [&] (t_real x) { return MeasurementOperator::choose_kernel(x, Ju, kernel_name); };
     auto kernelv = [&] (t_real x) { return MeasurementOperator::choose_kernel(x, Jv, kernel_name); };
     auto ftkernelu = [&] (t_real x) { return MeasurementOperator::choose_ftkernel(x/st.ftsizeu - 0.5, Ju, kernel_name); };
     auto ftkernelv = [&] (t_real x) { return MeasurementOperator::choose_ftkernel(x/st.ftsizev - 0.5, Jv, kernel_name); };
-    std::cout << "Support of Kernel" << '\n';
+    std::cout << "Support of Kernel " << kernel_name << '\n';
     std::cout << "Ju: " << Ju << '\n';
     std::cout << "Jv: " << Jv << '\n';
-    st.S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv, st.ftsizeu, st.ftsizev);
+    //st.S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv, st.ftsizeu, st.ftsizev);
+    st.S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, st.ftsizeu, st.ftsizev, Ju, Jv);
     st.G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv, st.ftsizeu, st.ftsizev);
+    std::cout << "Gridding Operator Constructed" << '\n';
+    std::cout << "------" << '\n';
     return st;
   }
 
-  t_real MeasurementOperator::choose_kernel(const t_real x, const t_int J, const std::string kernel_name)
+  t_real MeasurementOperator::choose_kernel(const t_real& x, const t_int& J, const std::string& kernel_name)
   {
     /*
       Chooses gridding kernel to use, and returns a value of that kernel
@@ -481,6 +533,10 @@ namespace purify {
       {
         output = MeasurementOperator::gaussian(x, J);
       }
+      else if (kernel_name == "pswf")
+      {
+        output = MeasurementOperator::pswf(x, J);
+      }
       else if (kernel_name == "kb")
       {
         output = MeasurementOperator::kaiser_bessel(x, J);
@@ -488,7 +544,7 @@ namespace purify {
       return output;
   }
 
-  t_real MeasurementOperator::choose_ftkernel(const t_real x, const t_int J, const std::string kernel_name)
+  t_real MeasurementOperator::choose_ftkernel(const t_real& x, const t_int& J, const std::string& kernel_name)
   {
     /*
       Chooses fourier transform of gridding kernel to use, and returns a value of that kernel
@@ -501,26 +557,30 @@ namespace purify {
 
       if (kernel_name == "gauss")
       {
-        output = MeasurementOperator::ftgaussian(x, J);
+        output = MeasurementOperator::ft_gaussian(x, J);
+      }
+      else if (kernel_name == "pswf")
+      {
+        output = MeasurementOperator::pswf(x, J);
       }
       else if (kernel_name == "kb")
       {
-        output = MeasurementOperator::ftkaiser_bessel(x, J);
+        output = MeasurementOperator::ft_kaiser_bessel(x, J);
       }
       return output;
   }
 
-  t_real MeasurementOperator::kaiser_bessel(const t_real x, const t_int J)
+  t_real MeasurementOperator::kaiser_bessel(const t_real& x, const t_int& J)
   {
       //need boost to create function
       return 0;
   }
-  t_real MeasurementOperator::ftkaiser_bessel(const t_real x, const t_int J)
+  t_real MeasurementOperator::ft_kaiser_bessel(const t_real& x, const t_int& J)
   {
       //need boost to create function
       return 0;
   }
-  t_real MeasurementOperator::gaussian(const t_real x, const t_int J)
+  t_real MeasurementOperator::gaussian(const t_real& x, const t_int& J)
   {
     /*
       Guassian gridding kernel
@@ -533,7 +593,7 @@ namespace purify {
       return std::exp(-a * a * 0.5);
   }
 
-  t_real MeasurementOperator::ftgaussian(const t_real x, const t_int J)
+  t_real MeasurementOperator::ft_gaussian(const t_real& x, const t_int& J)
   {
     /*
       Fourier transform of guassian gridding kernel
@@ -542,7 +602,157 @@ namespace purify {
       J:: support size of gridding kernel
     */
       t_real sigma = 0.31 * std::pow(J, 0.52);
-      t_real a = x * sigma * pi;
-      return std::sqrt(pi / 2) / sigma * std::exp(-a * a * 2);
+      t_real a = x * sigma * purify_pi;
+      return std::sqrt(purify_pi / 2) / sigma * std::exp(-a * a * 2);
+  }
+  t_real MeasurementOperator::pswf(const t_real& x, const t_int& J)
+  {
+    /*
+      Calculates the standard PSWF for radio astronomy, with a support of J = 6 and alpha = 1.
+
+      x:: value to evaluate
+      J:: support size of gridding kernel
+
+      The tailored prolate spheroidal wave functions for gridding radio astronomy.
+      Details are explained in Optimal Gridding of Visibility Data in Radio
+      Astronomy, F. R. Schwab 1983.
+
+    */
+      t_real output;
+      t_real alpha;
+      if (J != 6)
+      {
+        return 0;
+      }
+
+      //Maybe it would be better not to redefine everytime PSWF are calculated?
+      t_real p1[] = {8.203343e-2, -3.644705e-1, 6.278660e-1, -5.335581e-1, 2.312756e-1, 2*0.0};
+      t_real p2[] = {4.028559e-3, -3.697768e-2, 1.021332e-1, -1.201436e-1, 6.412774e-2, 2*0.0};
+      t_real q1[] = {1., 8.212018e-1, 2.078043e-1};
+      t_real q2[] = {1., 9.599102e-1, 2.918724e-1};
+      alpha = 1;
+      //Calculating numerator and denominator using Horner's rule.
+      // PSWF = numerator / denominator
+      t_real eta0 = 2 * x / J;
+      t_real numerator = 0;
+      t_real denominator = 0;
+
+      t_int p_size = 0;
+      t_int q_size = 0;
+      if (0 <= std::abs(eta0) and std::abs(eta0) <= 0.75)
+      {
+        t_real eta = eta0 * eta0 - 0.75 * 0.75;
+        p_size = sizeof(p1) / sizeof(*p1);
+        q_size = sizeof(q1) / sizeof(*q1);
+        numerator = p1[p_size];
+
+        for (t_int i = 1; i < p_size + 1; ++i)
+        {
+          numerator = eta * numerator + p1[p_size - i];
+        }
+
+        denominator = q1[q_size];
+        for (t_int i = 1; i < q_size + 1; ++i)
+        {
+          denominator = eta * denominator + q1[q_size - i];
+        }
+
+      }else if (0.75 < std::abs(eta0) and std::abs(eta0) <= 1)
+      {
+        t_real eta = eta0 * eta0 - 1 * 1;
+        p_size = sizeof(p2) / sizeof(*p2);
+        q_size = sizeof(q2) / sizeof(*q2);
+      
+        numerator = p2[p_size];
+
+        for (t_int i = 1; i < p_size + 1; ++i)
+        {
+          numerator = eta * numerator + p2[p_size - i];
+        }
+
+        denominator = q1[q_size];
+        for (t_int i = 1; i < q_size + 1; ++i)
+        {
+          denominator = eta * denominator + q2[q_size - i];
+        }
+      }
+      output = numerator / denominator * std::pow(1 - eta0 * eta0, alpha);
+      return output;
+  }
+
+  t_real MeasurementOperator::ft_pswf(const t_real& x, const t_int& J)
+  {
+    /*
+      Calculates the fourier transform of the standard PSWF for radio astronomy, with a support of J = 6 and alpha = 1.
+
+      x:: value to evaluate
+      J:: support size of gridding kernel
+
+      The tailored prolate spheroidal wave functions for gridding radio astronomy.
+      Details are explained in Optimal Gridding of Visibility Data in Radio
+      Astronomy, F. R. Schwab 1983.
+
+    */
+      t_real output;
+      t_real alpha;
+      if (J != 6)
+      {
+        return 0;
+      }
+
+      //Maybe it would be better not to redefine everytime PSWF are calculated?
+      t_real p1[] = {8.203343e-2, -3.644705e-1, 6.278660e-1, -5.335581e-1, 2.312756e-1, 2*0.0};
+      t_real p2[] = {4.028559e-3, -3.697768e-2, 1.021332e-1, -1.201436e-1, 6.412774e-2, 2*0.0};
+      t_real q1[] = {1., 8.212018e-1, 2.078043e-1};
+      t_real q2[] = {1., 9.599102e-1, 2.918724e-1};
+      alpha = 1;
+      //Calculating numerator and denominator using Horner's rule.
+      // PSWF = numerator / denominator
+      t_real eta0 = 2 * x * J;
+      t_real numerator = 0;
+      t_real denominator = 0;
+
+      t_int p_size = 0;
+      t_int q_size = 0;
+      if (0 <= std::abs(eta0) and std::abs(eta0) <= 0.75)
+      {
+        t_real eta = eta0 * eta0 - 0.75 * 0.75;
+        p_size = sizeof(p1) / sizeof(*p1);
+        q_size = sizeof(q1) / sizeof(*q1);
+        numerator = p1[p_size];
+
+        for (t_int i = 1; i < p_size + 1; ++i)
+        {
+          numerator = eta * numerator + p1[p_size - i];
+        }
+
+        denominator = q1[q_size];
+        for (t_int i = 1; i < q_size + 1; ++i)
+        {
+          denominator = eta * denominator + q1[q_size - i];
+        }
+
+      }else if (0.75 < std::abs(eta0) and std::abs(eta0) <= 1)
+      {
+        t_real eta = eta0 * eta0 - 1 * 1;
+        p_size = sizeof(p2) / sizeof(*p2);
+        q_size = sizeof(q2) / sizeof(*q2);
+      
+        numerator = p2[p_size];
+
+        for (t_int i = 1; i < p_size + 1; ++i)
+        {
+          numerator = eta * numerator + p2[p_size - i];
+        }
+
+        denominator = q1[q_size];
+        for (t_int i = 1; i < q_size + 1; ++i)
+        {
+          denominator = eta * denominator + q2[q_size - i];
+        }
+      }
+      output = numerator / denominator;
+      return output;
+
   }
 }
