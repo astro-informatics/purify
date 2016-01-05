@@ -416,8 +416,7 @@ namespace purify {
   t_int q;
   t_int p;
   t_int index;
-  Vector<t_real> ones = u * 0;
-  ones.setOnes();  
+  Vector<t_real> ones = u * 0; ones.setOnes();
   Vector<t_real> k_u = MeasurementOperator::omega_to_k(u - ones * Ju * 0.5);
   Vector<t_real> k_v = MeasurementOperator::omega_to_k(v - ones * Jv * 0.5);
   std::vector<t_tripletList> entries;
@@ -468,18 +467,18 @@ namespace purify {
       Given the gridding kernel, creates the scaling image for gridding correction using an fft.
 
     */
-    Matrix<t_complex> K(ftsizeu, ftsizev);
+    Matrix<t_complex> K= Matrix<t_complex>::Zero(ftsizeu, ftsizev);
     for (int i = 0; i < Ju; ++i)
     {
+      t_int n = MeasurementOperator::mod(i - Ju/2, ftsizeu);
       for (int j = 0; j < Jv; ++j)
       {
-        t_int n = MeasurementOperator::mod(i - Ju/2, ftsizeu);
         t_int m = MeasurementOperator::mod(j - Jv/2, ftsizev);
-        K(n ,m) = (kernelu(i - Ju/2) * kernelv(j - Jv/2));
+        K(n, m) = kernelu(i - Ju/2) * kernelv(j - Jv/2);
       }
     }
-    Matrix<t_complex> S = MeasurementOperator::fftshift_2d(MeasurementOperator::ifft2d(K));
-    return (1/(S.array())).real();
+    Image<t_real> S = MeasurementOperator::fftshift_2d(MeasurementOperator::ifft2d(K)).array().real();
+    return 1/S;
 
   }  
 
@@ -510,8 +509,8 @@ namespace purify {
     std::cout << "Support of Kernel " << kernel_name << '\n';
     std::cout << "Ju: " << Ju << '\n';
     std::cout << "Jv: " << Jv << '\n';
-    //st.S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv, st.ftsizeu, st.ftsizev);
-    st.S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, st.ftsizeu, st.ftsizev, Ju, Jv);
+    st.S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv, st.ftsizeu, st.ftsizev);
+    //st.S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, st.ftsizeu, st.ftsizev, Ju, Jv);
     st.G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv, st.ftsizeu, st.ftsizev);
     std::cout << "Gridding Operator Constructed" << '\n';
     std::cout << "------" << '\n';
@@ -570,16 +569,32 @@ namespace purify {
       return output;
   }
 
-  t_real MeasurementOperator::kaiser_bessel(const t_real& x, const t_int& J)
+  t_real MeasurementOperator::kaiser_bessel(const t_real& x, const t_int& J, t_real alpha)
   {
-      //need boost to create function
-      return 0;
+      /*
+        kaiser bessel gridding kernel
+      */
+      t_real a = 2 * x / J;
+      if (alpha == 0)
+      {
+        alpha = 2.34 * J;
+      } 
+      return boost::math::cyl_bessel_i(0, std::real(alpha * std::sqrt(1 - a * a))) / boost::math::cyl_bessel_i(0, alpha);
   }
-  t_real MeasurementOperator::ft_kaiser_bessel(const t_real& x, const t_int& J)
+
+  t_real MeasurementOperator::ft_kaiser_bessel(const t_real& x, const t_int& J, t_real alpha)
   {
-      //need boost to create function
-      return 0;
+      /*
+        Fourier transform of kaiser bessel gridding kernel
+      */
+      if (alpha == 0)
+      {
+        alpha = 2.34 * J; // value said to be optimal in Fessler et. al. 2003
+      } 
+      t_complex eta = std::sqrt(static_cast<t_complex>((purify_pi * x * J)*(purify_pi * x * J) - alpha * alpha));
+      return std::real(std::sin(eta)/eta);
   }
+
   t_real MeasurementOperator::gaussian(const t_real& x, const t_int& J)
   {
     /*
@@ -605,6 +620,7 @@ namespace purify {
       t_real a = x * sigma * purify_pi;
       return std::sqrt(purify_pi / 2) / sigma * std::exp(-a * a * 2);
   }
+
   t_real MeasurementOperator::pswf(const t_real& x, const t_int& J)
   {
     /*
@@ -693,6 +709,8 @@ namespace purify {
       Astronomy, F. R. Schwab 1983.
 
     */
+      // Does not produce the correct scaling factor!!! Use the fft gridding correction method!
+
       t_real output;
       t_real alpha;
       if (J != 6)
@@ -754,5 +772,44 @@ namespace purify {
       output = numerator / denominator;
       return output;
 
+  }
+
+  Vector<t_real> MeasurementOperator::kernel_samples(const t_int& total_samples, const std::function<t_real(t_real)> kernelu, const t_int& J)
+  {
+    /*
+      Pre-calculates samples of a kernel, that can be used with linear interpolation (see Rapid gridding reconstruction with a minimal oversampling ratio, Beatty et. al. 2005)
+    */
+      Vector<t_real> samples(total_samples);
+      for (t_int i = 0; i < total_samples; ++i)
+      {
+        samples(i) = kernelu(i/total_samples * J - J/2);
+      }
+      return samples;
+  }
+
+  t_real MeasurementOperator::kernel_linear_interp(const Vector<t_real>& samples, const t_real& x, const t_int& J)
+  {
+    /*
+      Calculates kernel using linear interpolation between pre-calculated samples. (see Rapid gridding reconstruction with a minimal oversampling ratio, Beatty et. al. 2005)
+    */
+    t_int i_hat = samples.size() + 1;
+    t_real x_dist = 2 * J;
+    t_int total_samples = samples.size();
+
+    //loop to find sample that is nearest neighbour.
+    for (int i = 0; i < samples.size(); ++i)
+    {
+      if (std::abs(i / total_samples * J - J / 2 - x) < x_dist)
+      {
+        i_hat = i;
+        x_dist = std::abs(i / total_samples * J - J / 2 - x);
+      } else if (std::abs(i / total_samples * J - J / 2 - x) > x_dist)
+      {
+        break;
+      }
+    }
+    //linearly interpolate from nearest neighbour
+    t_real output = std::max(0.0, 1 - x_dist/total_samples) * samples(i_hat);
+    return output;
   }
 }

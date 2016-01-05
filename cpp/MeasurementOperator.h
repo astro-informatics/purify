@@ -8,6 +8,8 @@
 #include <fstream>
 #include <iostream>
 #include <stdio.h>
+#include <algorithm>
+#include <boost/math/special_functions/bessel.hpp>
 
 namespace purify {
 
@@ -74,9 +76,9 @@ namespace purify {
       //! Function that chooses what gridding correction to calculate
       t_real choose_ftkernel(const t_real& x, const t_int& J, const std::string& kernel_name);
       //! Kaiser-Bessel kernel
-      t_real kaiser_bessel(const t_real& x, const t_int& J); 
+      t_real kaiser_bessel(const t_real& x, const t_int& J, t_real alpha = 0.0);
       //! Fourier transform of kaiser bessel kernel
-      t_real ft_kaiser_bessel(const t_real& x, const t_int& J);
+      t_real ft_kaiser_bessel(const t_real& x, const t_int& J, t_real alpha = 0.0);
       //! Gaussian kernel
       t_real gaussian(const t_real& x, const t_int& J);
       //! Fourier transform of Gaussian kernel
@@ -85,6 +87,10 @@ namespace purify {
       t_real pswf(const t_real& x, const t_int& J);
       //! Fourier transform of PSWF kernel
       t_real ft_pswf(const t_real& x, const t_int& J);
+      //! Calculates samples of a kernel
+      Vector<t_real> kernel_samples(const t_int& total_samples, const std::function<t_real(t_real)> kernelu, const t_int& J);
+      //! linearly interpolates from samples of kernel
+      t_real kernel_linear_interp(const Vector<t_real>& samples, const t_real& x, const t_int& J);
     protected:
       Vector<> something_;
   };
