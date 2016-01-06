@@ -41,7 +41,7 @@ namespace purify {
     }
     MeasurementOperator::vis_params uv_vis;
     uv_vis.u = utemp;
-    uv_vis.v = vtemp;
+    uv_vis.v = -vtemp;
     uv_vis.vis = vistemp;
     return uv_vis;
   }
@@ -211,9 +211,9 @@ namespace purify {
         {
           if ( (i >= x_start) and (i < x_end) and (j >= y_start) and (j < y_end))
           {
-            padded_image(i, j) = st.S(i, j) * eigen_image(i - x_start, j - y_start);
+            padded_image(j, i) = st.S(j, i) * eigen_image(j - y_start, i - x_start);
           }else{
-            padded_image(i, j) = 0;
+            padded_image(j, i) = 0;
           }
         }
       }
@@ -247,7 +247,7 @@ namespace purify {
       {
         for (t_int j = 0; j < st.imsizey; ++j)
         {
-            eigen_image(i, j) = st.S(i + x_start, j + y_start) * padded_image(i + x_start, j + y_start);
+            eigen_image(j, i) = st.S(j + y_start + 1, i + x_start + 1) * padded_image(j + y_start, i + x_start + 1);
         }
       }
       return eigen_image;
@@ -361,6 +361,7 @@ namespace purify {
   {
     /*
       Writes an image to a fits file.
+
       image:: image data, a 2d Image.
       fits_name:: string contating the file name of the fits file.
     */
@@ -449,10 +450,6 @@ namespace purify {
             p = MeasurementOperator::mod(k_v(m) + jv, ftsizev);
             index = MeasurementOperator::sub2ind(p, q, ftsizev, ftsizeu);
             entries.push_back(t_tripletList(m, index, kernelu(u(m)-(k_u(m)+ju)) * kernelv(v(m)-(k_v(m)+jv))));
-            if (index < 0)
-            {
-              std::cout << q << ", " << p << '\n';
-            }
           }
         }
       }    
@@ -472,7 +469,7 @@ namespace purify {
     {
       for (int j = 0; j < ftsizev; ++j)
       {
-        S(i ,j) = 1/(ftkernelu(i) * ftkernelv(j));
+        S(j ,i) = 1/(ftkernelu(i) * ftkernelv(j));
       }
     }
     return S;
