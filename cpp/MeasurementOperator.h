@@ -76,9 +76,9 @@ namespace purify {
       //! Function that chooses what gridding correction to calculate
       t_real choose_ftkernel(const t_real& x, const t_int& J, const std::string& kernel_name);
       //! Kaiser-Bessel kernel
-      t_real kaiser_bessel(const t_real& x, const t_int& J, t_real alpha = 0.0);
+      t_real kaiser_bessel(const t_real& x, const t_int& J);
       //! Fourier transform of kaiser bessel kernel
-      t_real ft_kaiser_bessel(const t_real& x, const t_int& J, t_real alpha = 0.0);
+      t_real ft_kaiser_bessel(const t_real& x, const t_int& J);
       //! Gaussian kernel
       t_real gaussian(const t_real& x, const t_int& J);
       //! Fourier transform of Gaussian kernel
@@ -93,6 +93,12 @@ namespace purify {
       t_real kernel_linear_interp(const Vector<t_real>& samples, const t_real& x, const t_int& J);
     protected:
       Vector<> something_;
+    private:
+      //polynomial coefficients for prolate spheriodal wave function rational approximation
+      t_real p1[6] = {8.203343e-2, -3.644705e-1, 6.278660e-1, -5.335581e-1, 2.312756e-1, 2*0.0};
+      t_real p2[6] = {4.028559e-3, -3.697768e-2, 1.021332e-1, -1.201436e-1, 6.412774e-2, 2*0.0};
+      t_real q1[3] = {1., 8.212018e-1, 2.078043e-1};
+      t_real q2[3] = {1., 9.599102e-1, 2.918724e-1};
   };
 }
 

@@ -489,6 +489,12 @@ namespace purify {
 
       u:: visibilities in units of ftsizeu
       v:: visibilities in units of ftsizev
+      Ju:: support size for u axis
+      Jv:: support size for v axis
+      kernel_name:: flag that determines what kernel to use (gauss, pswf, kb)
+      imsizex:: size of image along xaxis
+      imsizey:: size of image along yaxis
+      oversample_factor:: factor for oversampling the FFT grid
 
     */
     std::cout << "Constructing Gridding Operator" << '\n';
@@ -497,20 +503,58 @@ namespace purify {
     st.imsizey = imsizey;
     st.ftsizeu = oversample_factor * imsizex;
     st.ftsizev = oversample_factor * imsizey;
+    std::function<t_real(t_real)>  kernelu;
+    std::function<t_real(t_real)> kernelv;
+    std::function<t_real(t_real)> ftkernelu;
+    std::function<t_real(t_real)> ftkernelv;
+    //list of kernels
+    auto kbu = [&] (t_real x) { return MeasurementOperator::kaiser_bessel(x, Ju); };
+    auto kbv = [&] (t_real x) { return MeasurementOperator::kaiser_bessel(x, Jv); };
+    auto ftkbu = [&] (t_real x) { return MeasurementOperator::ft_kaiser_bessel(x/st.ftsizeu - 0.5, Ju); };
+    auto ftkbv = [&] (t_real x) { return MeasurementOperator::ft_kaiser_bessel(x/st.ftsizev - 0.5, Jv); };
+    auto pswfu = [&] (t_real x) { return MeasurementOperator::pswf(x, Ju); };
+    auto pswfv = [&] (t_real x) { return MeasurementOperator::pswf(x, Jv); };
+    auto ftpswfu = [&] (t_real x) { return MeasurementOperator::ft_pswf(x/st.ftsizeu - 0.5, Ju); };
+    auto ftpswfv = [&] (t_real x) { return MeasurementOperator::ft_pswf(x/st.ftsizev - 0.5, Jv); };
+    auto gaussu = [&] (t_real x) { return MeasurementOperator::gaussian(x, Ju); };
+    auto gaussv = [&] (t_real x) { return MeasurementOperator::gaussian(x, Jv); };
+    auto ftgaussu = [&] (t_real x) { return MeasurementOperator::ft_gaussian(x/st.ftsizeu - 0.5, Ju); };
+    auto ftgaussv = [&] (t_real x) { return MeasurementOperator::ft_gaussian(x/st.ftsizev - 0.5, Jv); };
     if ((kernel_name == "pswf") and (Ju != 6 or Jv != 6))
     {
       std::cout << "Error: Only a support of 6 is implimented for PSWFs.";
-
     }
-    auto kernelu = [&] (t_real x) { return MeasurementOperator::choose_kernel(x, Ju, kernel_name); };
-    auto kernelv = [&] (t_real x) { return MeasurementOperator::choose_kernel(x, Jv, kernel_name); };
-    auto ftkernelu = [&] (t_real x) { return MeasurementOperator::choose_ftkernel(x/st.ftsizeu - 0.5, Ju, kernel_name); };
-    auto ftkernelv = [&] (t_real x) { return MeasurementOperator::choose_ftkernel(x/st.ftsizev - 0.5, Jv, kernel_name); };
+    if (kernel_name == "kb")
+    {
+      kernelu = kbu;
+      kernelv = kbv;
+      ftkernelu = ftkbu;
+      ftkernelv = ftkbv;
+    }
+    if (kernel_name == "pswf")
+    {
+      kernelu = pswfu;
+      kernelv = pswfv;
+      ftkernelu = ftpswfu;
+      ftkernelv = ftpswfv;
+    }
+    if (kernel_name == "gauss")
+    {
+      kernelu = gaussu;
+      kernelv = gaussv;
+      ftkernelu = ftgaussu;
+      ftkernelv = ftgaussv;
+    }
+
+    //auto kernelu = [&] (t_real x) { return kernelu_choice(x, Ju); };
+    //auto kernelv = [&] (t_real x) { return kernelv_choice(x, Jv); };
+    //auto ftkernelu = [&] (t_real x) { return MeasurementOperator::choose_ftkernel(x/st.ftsizeu - 0.5, Ju, kernel_name); };
+    //auto ftkernelv = [&] (t_real x) { return MeasurementOperator::choose_ftkernel(x/st.ftsizev - 0.5, Jv, kernel_name); };
     std::cout << "Support of Kernel " << kernel_name << '\n';
     std::cout << "Ju: " << Ju << '\n';
     std::cout << "Jv: " << Jv << '\n';
-    st.S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv, st.ftsizeu, st.ftsizev);
-    //st.S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, st.ftsizeu, st.ftsizev, Ju, Jv);
+    //st.S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv, st.ftsizeu, st.ftsizev);
+    st.S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, st.ftsizeu, st.ftsizev, Ju, Jv);
     st.G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv, st.ftsizeu, st.ftsizev);
     std::cout << "Gridding Operator Constructed" << '\n';
     std::cout << "------" << '\n';
@@ -560,7 +604,7 @@ namespace purify {
       }
       else if (kernel_name == "pswf")
       {
-        output = MeasurementOperator::pswf(x, J);
+        output = MeasurementOperator::ft_pswf(x, J);
       }
       else if (kernel_name == "kb")
       {
@@ -569,28 +613,23 @@ namespace purify {
       return output;
   }
 
-  t_real MeasurementOperator::kaiser_bessel(const t_real& x, const t_int& J, t_real alpha)
+  t_real MeasurementOperator::kaiser_bessel(const t_real& x, const t_int& J)
   {
       /*
         kaiser bessel gridding kernel
       */
       t_real a = 2 * x / J;
-      if (alpha == 0)
-      {
-        alpha = 2.34 * J;
-      } 
+      t_real alpha = 2.34 * J;
       return boost::math::cyl_bessel_i(0, std::real(alpha * std::sqrt(1 - a * a))) / boost::math::cyl_bessel_i(0, alpha);
   }
 
-  t_real MeasurementOperator::ft_kaiser_bessel(const t_real& x, const t_int& J, t_real alpha)
+  t_real MeasurementOperator::ft_kaiser_bessel(const t_real& x, const t_int& J)
   {
       /*
         Fourier transform of kaiser bessel gridding kernel
       */
-      if (alpha == 0)
-      {
-        alpha = 2.34 * J; // value said to be optimal in Fessler et. al. 2003
-      } 
+
+      t_real alpha = 2.34 * J; // value said to be optimal in Fessler et. al. 2003
       t_complex eta = std::sqrt(static_cast<t_complex>((purify_pi * x * J)*(purify_pi * x * J) - alpha * alpha));
       return std::real(std::sin(eta)/eta);
   }
@@ -641,11 +680,6 @@ namespace purify {
         return 0;
       }
 
-      //Maybe it would be better not to redefine everytime PSWF are calculated?
-      t_real p1[] = {8.203343e-2, -3.644705e-1, 6.278660e-1, -5.335581e-1, 2.312756e-1, 2*0.0};
-      t_real p2[] = {4.028559e-3, -3.697768e-2, 1.021332e-1, -1.201436e-1, 6.412774e-2, 2*0.0};
-      t_real q1[] = {1., 8.212018e-1, 2.078043e-1};
-      t_real q2[] = {1., 9.599102e-1, 2.918724e-1};
       alpha = 1;
       //Calculating numerator and denominator using Horner's rule.
       // PSWF = numerator / denominator
@@ -718,11 +752,6 @@ namespace purify {
         return 0;
       }
 
-      //Maybe it would be better not to redefine everytime PSWF are calculated?
-      t_real p1[] = {8.203343e-2, -3.644705e-1, 6.278660e-1, -5.335581e-1, 2.312756e-1, 2*0.0};
-      t_real p2[] = {4.028559e-3, -3.697768e-2, 1.021332e-1, -1.201436e-1, 6.412774e-2, 2*0.0};
-      t_real q1[] = {1., 8.212018e-1, 2.078043e-1};
-      t_real q2[] = {1., 9.599102e-1, 2.918724e-1};
       alpha = 1;
       //Calculating numerator and denominator using Horner's rule.
       // PSWF = numerator / denominator
