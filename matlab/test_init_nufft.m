@@ -1,14 +1,14 @@
 clear
-Ju = 1;
+Ju = 6;
 Jv = Ju;
 cellsize = 0.3; %arcsec
 imsize = [1024, 1024];
 oversample_rate = 2; %most of the kernel parameters are optimized for K/N=2
 FTsize = imsize*oversample_rate;
-%kernel_type = 'gauss';
-kernel_type = 'kb';
+kernel_type = 'gauss';
+%kernel_type = 'pswf';
 %kernel_type = 'minmax:uniform';
-stringname = 'at166B.3C129.c0.vis';
+stringname = '../data/vla/at166B.3C129.c0.vis';
 
 Y = importdata(stringname);
 U = Y(:,1);
@@ -21,11 +21,11 @@ V = [V;-V]/m*2*pi;
 vis = [vis; conj(vis)];
 
 st = purify_mtlb_init_nufft([U, V], imsize, oversample_rate, kernel_type, [Ju, Jv]);
-fftdata = st.weights' * vis;
+fftdata = st.gridding_matrix' * vis;
 fftdata = transpose(reshape(fftdata, FTsize(1), FTsize(2)));
 
 im = ifftshift(ifft2(fftdata))*sqrt(FTsize(1)*FTsize(2));
-im_deconv = im.*st.deconv;
+im_deconv = im.*st.gridding_correction;
 
 c = (FTsize + mod(FTsize,2))/2 - (imsize+mod(imsize,2))/2+1;
 

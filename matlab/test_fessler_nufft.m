@@ -6,7 +6,7 @@ addpath ../../../Software/irt/systems
 
 
 %% Load data
-stringname='at166B.3C129.c0.vis';
+stringname='../data/vla/at166B.3C129.c0.vis';
 Y = importdata(stringname);
 
 %Measurement vector
@@ -44,8 +44,8 @@ ox = 2;
 oy = 2;
 
 %Number of neighbours for nufft
-Ju = 4;
-Jv = 4;
+Ju = 6;
+Jv = 6;
 
 
 %Initialize nufft parameters
