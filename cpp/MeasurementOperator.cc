@@ -46,6 +46,24 @@ namespace purify {
     return uv_vis;
   }
 
+  MeasurementOperator::vis_params MeasurementOperator::set_cell_size(const MeasurementOperator::vis_params& uv_vis, const t_real cell_size)
+  {
+      /*
+        Converts the units of visibilities to units of 2 * pi, while scaling for the size of a pixel (cell_size)
+
+        uv_vis:: visibilities
+        cell_size:: size of a pixel in arcseconds
+      */
+
+      MeasurementOperator::vis_params scaled_vis;
+
+      t_real scale_factor = 180 * 3600 / cell_size / purify_pi;
+      scaled_vis.u = uv_vis.u / scale_factor * 2 * purify_pi;
+      scaled_vis.v = uv_vis.v / scale_factor * 2 * purify_pi;
+      scaled_vis.vis = uv_vis.vis;
+      return scaled_vis;
+  }
+
   MeasurementOperator::vis_params MeasurementOperator::uv_scale(const MeasurementOperator::vis_params& uv_vis, const t_int& ftsizeu, const t_int& ftsizev)
   {
     /*
@@ -545,7 +563,7 @@ namespace purify {
       ftkernelu = ftgaussu;
       ftkernelv = ftgaussv;
     }
-    
+
     std::cout << "Support of Kernel " << kernel_name << '\n';
     std::cout << "Ju: " << Ju << '\n';
     std::cout << "Jv: " << Jv << '\n';

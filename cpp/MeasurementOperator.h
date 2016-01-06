@@ -31,6 +31,8 @@ namespace purify {
       };
       //! Reads in visibility file
       MeasurementOperator::vis_params read_visibility(const std::string& vis_name);
+      //! Scales visibilities to a given pixel size in arcseconds
+      MeasurementOperator::vis_params set_cell_size(const MeasurementOperator::vis_params& uv_vis, const t_real cell_size);
       //! scales the visibilities to units of pixels
       MeasurementOperator::vis_params uv_scale(const MeasurementOperator::vis_params& uv_vis, const t_int& ftsizeu, const t_int& ftsizev);
       //! Puts in conjugate visibilities

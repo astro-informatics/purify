@@ -16,10 +16,10 @@ TEST_CASE("Measurement Operator", "[something]") {
   //Degridding example
   t_int over_sample = 2;
 
+
+
   t_real cellsize = 0.3;
-  t_real m = 180 * 3600 / cellsize / purify_pi;
-  uv_vis1.u = uv_vis1.u / m * 2 * purify_pi;
-  uv_vis1.v = uv_vis1.v / m * 2 * purify_pi;
+  uv_vis1 = op.set_cell_size(uv_vis1, cellsize);
   
   Image<t_complex> test_image = op.readfits2d("../data/images/M31.fits");
   uv_vis1 = op.uv_scale(uv_vis1, test_image.cols() * over_sample, test_image.rows() * over_sample);
@@ -37,12 +37,11 @@ TEST_CASE("Measurement Operator", "[something]") {
   t_int J = 6;
   std::string kernel = "kb";
   uv_vis2 = op.read_visibility("../data/vla/at166B.3C129.c0.vis");
+  cellsize = 0.3;
+  uv_vis2 = op.set_cell_size(uv_vis2, cellsize);
   uv_vis2 = op.uv_scale(uv_vis2, 1024 * over_sample, 1024 * over_sample);
   uv_vis2 = op.uv_symmetry(uv_vis2);
-  cellsize = 0.3;
-  m = 180 * 3600 / cellsize / purify_pi;
-  uv_vis2.u = uv_vis2.u / m * 2 * purify_pi;
-  uv_vis2.v = uv_vis2.v / m * 2 * purify_pi;
+
   
 
   MeasurementOperator::operator_params st2 = op.init_nufft2d(uv_vis2.u, uv_vis2.v, J, J, kernel, 1024, 1024, over_sample);
@@ -65,11 +64,7 @@ TEST_CASE("Measurement Operator", "[something]") {
   
   
   SECTION("check one case") {
-    CHECK(op.choose_kernel(0, 1, "gauss") == 1);
+    CHECK(op.gaussian(0, 1) == 1);
   }
-  /*
-  SECTION("check one case") {
-    CHECK(op.pswf(0,6) > 0);
-  }
-  */
+
 }
