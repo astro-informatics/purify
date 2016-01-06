@@ -545,11 +545,7 @@ namespace purify {
       ftkernelu = ftgaussu;
       ftkernelv = ftgaussv;
     }
-
-    //auto kernelu = [&] (t_real x) { return kernelu_choice(x, Ju); };
-    //auto kernelv = [&] (t_real x) { return kernelv_choice(x, Jv); };
-    //auto ftkernelu = [&] (t_real x) { return MeasurementOperator::choose_ftkernel(x/st.ftsizeu - 0.5, Ju, kernel_name); };
-    //auto ftkernelv = [&] (t_real x) { return MeasurementOperator::choose_ftkernel(x/st.ftsizev - 0.5, Jv, kernel_name); };
+    
     std::cout << "Support of Kernel " << kernel_name << '\n';
     std::cout << "Ju: " << Ju << '\n';
     std::cout << "Jv: " << Jv << '\n';
@@ -561,57 +557,6 @@ namespace purify {
     return st;
   }
 
-  t_real MeasurementOperator::choose_kernel(const t_real& x, const t_int& J, const std::string& kernel_name)
-  {
-    /*
-      Chooses gridding kernel to use, and returns a value of that kernel
-
-      x:: value to evaluate of kernel
-      J:: support size of kernel
-      kernel_name:: name used to choose kernel to evaluate
-    */
-      t_real output = 0;
-
-      if (kernel_name == "gauss")
-      {
-        output = MeasurementOperator::gaussian(x, J);
-      }
-      else if (kernel_name == "pswf")
-      {
-        output = MeasurementOperator::pswf(x, J);
-      }
-      else if (kernel_name == "kb")
-      {
-        output = MeasurementOperator::kaiser_bessel(x, J);
-      }
-      return output;
-  }
-
-  t_real MeasurementOperator::choose_ftkernel(const t_real& x, const t_int& J, const std::string& kernel_name)
-  {
-    /*
-      Chooses fourier transform of gridding kernel to use, and returns a value of that kernel
-
-      x:: value to evaluate of kernel
-      J:: support size of kernel
-      kernel_name:: name used to choose kernel to evaluate
-    */
-      t_real output = 0;
-
-      if (kernel_name == "gauss")
-      {
-        output = MeasurementOperator::ft_gaussian(x, J);
-      }
-      else if (kernel_name == "pswf")
-      {
-        output = MeasurementOperator::ft_pswf(x, J);
-      }
-      else if (kernel_name == "kb")
-      {
-        output = MeasurementOperator::ft_kaiser_bessel(x, J);
-      }
-      return output;
-  }
 
   t_real MeasurementOperator::kaiser_bessel(const t_real& x, const t_int& J)
   {

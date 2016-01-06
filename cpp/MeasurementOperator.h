@@ -71,10 +71,6 @@ namespace purify {
       Image<t_real> init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv, const t_int ftsizeu, const t_int ftsizev);
       //! Generate gridding parameters, such as interpolation matrix
       MeasurementOperator::operator_params init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_int oversample_factor);
-      //! Function that chooses what gridding kernel to calculate
-      t_real choose_kernel(const t_real& x, const t_int& J, const std::string& kernel_name);
-      //! Function that chooses what gridding correction to calculate
-      t_real choose_ftkernel(const t_real& x, const t_int& J, const std::string& kernel_name);
       //! Kaiser-Bessel kernel
       t_real kaiser_bessel(const t_real& x, const t_int& J);
       //! Fourier transform of kaiser bessel kernel
