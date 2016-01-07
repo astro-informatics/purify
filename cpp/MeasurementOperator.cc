@@ -512,6 +512,7 @@ namespace purify {
       oversample_factor:: factor for oversampling the FFT grid
 
     */
+    std::cout << "------" << '\n';
     std::cout << "Constructing Gridding Operator" << '\n';
     MeasurementOperator::operator_params st;
     st.imsizex = imsizex;
