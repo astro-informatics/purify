@@ -11,7 +11,7 @@ addpath ../../../Software/irt/utilities
 addpath ../../../Software/irt/systems
 
 %stringname='ppdisk672_GHz_50pc';
-stringname='cluster';
+%stringname='cluster';
 %stringname='g41.1-0.3.b';
 %stringname='HCO+_4-3_60';
 %stringname='3c288';
@@ -19,10 +19,10 @@ stringname='cluster';
 %stringname='CYGCBEST';
 %stringname='M87ABABCPCONV6';
 %stringname='M51HA'; 
-%stringname='M31';
+stringname='M31';
 %stringname='eta-carinae_ref-img';
 
-stringname1=[stringname '.fits'];
+stringname1=['../data/' stringname '.fits'];
 %info = fitsinfo(stringname1)
 
 
