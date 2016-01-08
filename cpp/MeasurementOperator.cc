@@ -247,7 +247,7 @@ namespace purify {
       {
         for (t_int j = 0; j < st.imsizey; ++j)
         {
-            eigen_image(j, i) = st.S(j + y_start + 1, i + x_start + 1) * padded_image(j + y_start, i + x_start + 1);
+            eigen_image(j, i) = st.S(j + y_start, i + x_start) * padded_image(j + y_start, i + x_start);
         }
       }
       return eigen_image;
