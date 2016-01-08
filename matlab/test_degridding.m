@@ -49,11 +49,11 @@ Ny2 = Of*Ny1;
 
 load AMI_02
 
-u1 = Data(:,2)*pi/2000;
-v1 = Data(:,3)*pi/2000;
+u1 = Data(:,2)*pi/2000 * sqrt(2);
+v1 = Data(:,3)*pi/2000 * sqrt(2);
 
 u1 = [u1; -u1];
-v1 = [v1; -v1];
+v1 = -[v1; -v1];
 num_meas=length(u1);
 clear Data
 
@@ -89,6 +89,7 @@ y0 = A(im);
 %sigma_noise = 10^(-input_snr/20)*std(im(:));
 sigma_noise = 10^(-input_snr/20)*(norm(y0)/sqrt(num_meas));
 noise = (randn(size(y0)) + 1i*randn(size(y0)))*sigma_noise/sqrt(2);
+noise = 0;
 y1 = y0 + noise;
 
 %Size of the problem
@@ -124,6 +125,7 @@ y0 = A(im);
 %sigma_noise = 10^(-input_snr/20)*std(im(:));
 sigma_noise = 10^(-input_snr/20)*(norm(y0)/sqrt(num_meas));
 noise = (randn(size(y0)) + 1i*randn(size(y0)))*sigma_noise/sqrt(2);
+noise = 0;
 y2 = y0 + noise;
 
 %Size of the problem
@@ -155,6 +157,7 @@ y0 = A(im);
 %sigma_noise = 10^(-input_snr/20)*std(im(:));
 sigma_noise = 10^(-input_snr/20)*(norm(y0)/sqrt(num_meas));
 noise = (randn(size(y0)) + 1i*randn(size(y0)))*sigma_noise/sqrt(2);
+noise = 0;
 y3 = y0 + noise;
 
 %Size of the problem
@@ -186,6 +189,7 @@ y0 = A(im);
 %sigma_noise = 10^(-input_snr/20)*std(im(:));
 sigma_noise = 10^(-input_snr/20)*(norm(y0)/sqrt(num_meas));
 noise = (randn(size(y0)) + 1i*randn(size(y0)))*sigma_noise/sqrt(2);
+noise = 0;
 y4 = y0 + noise;
 
 %Size of the problem
@@ -215,10 +219,10 @@ figure;imagesc(abs(fftshift(fft2(dirty3))));
 figure;imagesc(abs(fftshift(fft2(dirty4))));
 
 realname = sprintf('dirty1.fits');
-fitswrite(real(dirty1)/max(max(real(dirty1))), realname)
+fitswrite(flipud(real(dirty1)/max(max(real(dirty1)))), realname)
 realname = sprintf('dirty2.fits');
-fitswrite(real(dirty2)/max(max(real(dirty2))), realname)
+fitswrite(flipud(real(dirty2)/max(max(real(dirty2)))), realname)
 realname = sprintf('dirty3.fits');
-fitswrite(real(dirty3)/max(max(real(dirty3))), realname)
+fitswrite(flipud(real(dirty3)/max(max(real(dirty3)))), realname)
 realname = sprintf('dirty4.fits');
-fitswrite(real(dirty4)/max(max(real(dirty4))), realname)
+fitswrite(flipud(real(dirty4)/max(max(real(dirty4)))), realname)
