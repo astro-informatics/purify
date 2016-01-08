@@ -56,11 +56,11 @@ TEST_CASE("Measurement Operator [Gridding]", "[Gridding]") {
         {
           max_diff = std::abs(kb_img(j, i) - kb_test_image(j + j_shift, i + i_shift));
         }
-        if (std::abs(kb_img(j, i) - kb_test_image(j + j_shift, i + i_shift)) >= 0.1)
+        if (std::abs(kb_img(j, i) - kb_test_image(j + j_shift, i + i_shift)) >= 0.03)
         {
           std::cout << i << " " << j << '\n';
         }
-        CHECK( std::abs(kb_img(j, i) - kb_test_image(j + j_shift, i + i_shift)) < 0.05 );
+        CHECK( std::abs(kb_img(j, i) - kb_test_image(j + j_shift, i + i_shift)) < 0.005 );
       }
     }
     std::cout << "Percentage max difference in Kaiser Bessel gridding: " << max_diff * 100 << "%" << '\n';
