@@ -23,14 +23,24 @@ TEST_CASE("Measurement Operator [Gridding]", "[Gridding]") {
   uv_vis = op.set_cell_size(uv_vis, cellsize);
   uv_vis = op.uv_scale(uv_vis, 1024 * over_sample, 1024 * over_sample);
   uv_vis = op.uv_symmetry(uv_vis);
-  
+  Vector<t_complex> point_source = uv_vis.vis * 0; point_source.setOnes();  
+  Image<t_complex> psf;
 
   SECTION("Kaiser Bessel Gridding") {
     kernel = "kb";
     st = op.init_nufft2d(uv_vis.u, uv_vis.v, J, J, kernel, 1024, 1024, over_sample);
+
+    psf = op.grid(point_source, st);
+    max = psf.real().maxCoeff();
+    psf = psf / max;
+    op.writefits2d(psf.real(), "kb_psf.fits", true, false);
+
+
     Image<t_real> kb_img = op.grid(uv_vis.vis, st).real();
     max = kb_img.maxCoeff();
     kb_img = kb_img / max;
+
+
 
     Image<t_real> kb_test_image = op.readfits2d("../data/expected/gridding/at166BtestJ6kb.fits").real();
     Image<t_real> kb_difference = kb_img - kb_test_image;
@@ -109,6 +119,9 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
   std::string kernel;
   MeasurementOperator::operator_params st;
   Image<t_complex> img;
+  Image<t_complex> point;
+  Vector<t_complex> psf_vis;
+  Image<t_complex> psf;
 
   SECTION("Kaiser Bessel Gridding") {
     kernel = "kb";
@@ -118,6 +131,14 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     img = op.readfits2d("../data/images/M31.fits");
     uv_vis = op.uv_scale(uv_vis, img.cols() * over_sample, img.rows() * over_sample);
     st = op.init_nufft2d(uv_vis.u, -uv_vis.v, J, J, kernel, img.cols(), img.rows(), over_sample);
+
+    point = Image<t_complex>::Zero(img.cols(), img.rows()); point(floor(img.cols()/2), floor(img.rows()/2)) = 1;
+    psf_vis = op.degrid(point, st);
+    psf = op.grid(psf_vis, st);
+    max = psf.real().maxCoeff();
+    psf = psf / max;
+    op.writefits2d(psf.real(), "kb_psf_M31_degridding.fits", true, false);
+
     Vector<t_complex> kb_vis = op.degrid(img, st);
     Image<t_complex> kb_img = op.grid(kb_vis, st);
     op.writefits2d(kb_img.real(), "kb_test.fits", true, false);
