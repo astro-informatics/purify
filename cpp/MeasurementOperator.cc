@@ -646,43 +646,44 @@ namespace purify {
       // PSWF = numerator / denominator
       t_real eta0 = 2 * x / J;
       t_real numerator = 0;
-      t_real denominator = 0;
+      t_real denominator = 1;
 
       t_int p_size = 0;
       t_int q_size = 0;
       if (0 <= std::abs(eta0) and std::abs(eta0) <= 0.75)
       {
         t_real eta = eta0 * eta0 - 0.75 * 0.75;
-        p_size = sizeof(p1) / sizeof(*p1);
-        q_size = sizeof(q1) / sizeof(*q1);
-        numerator = p1[p_size];
+        p_size = sizeof(p1) / sizeof(p1[0]) - 1;
+        q_size = sizeof(q1) / sizeof(q1[0]) - 1;
 
-        for (t_int i = 1; i < p_size + 1; ++i)
+        numerator = p1[p_size];
+        for (t_int i = 1; i <= p_size; ++i)
         {
           numerator = eta * numerator + p1[p_size - i];
         }
 
         denominator = q1[q_size];
-        for (t_int i = 1; i < q_size + 1; ++i)
+        for (t_int i = 1; i <= q_size; ++i)
         {
           denominator = eta * denominator + q1[q_size - i];
         }
 
-      }else if (0.75 < std::abs(eta0) and std::abs(eta0) <= 1)
+      }
+      if (0.75 < std::abs(eta0) and std::abs(eta0) <= 1)
       {
         t_real eta = eta0 * eta0 - 1 * 1;
-        p_size = sizeof(p2) / sizeof(*p2);
-        q_size = sizeof(q2) / sizeof(*q2);
+        p_size = sizeof(p2) / sizeof(p2[0]) - 1;
+        q_size = sizeof(q2) / sizeof(q2[0]) - 1;
       
         numerator = p2[p_size];
 
-        for (t_int i = 1; i < p_size + 1; ++i)
+        for (t_int i = 1; i <= p_size; ++i)
         {
           numerator = eta * numerator + p2[p_size - i];
         }
 
-        denominator = q1[q_size];
-        for (t_int i = 1; i < q_size + 1; ++i)
+        denominator = q2[q_size];
+        for (t_int i = 1; i <= q_size; ++i)
         {
           denominator = eta * denominator + q2[q_size - i];
         }
