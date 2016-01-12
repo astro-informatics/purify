@@ -497,7 +497,7 @@ namespace purify {
 
   }  
 
-  MeasurementOperator::operator_params MeasurementOperator::init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_int oversample_factor)
+  MeasurementOperator::operator_params MeasurementOperator::init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor)
   {
     /*
       Generates tools/operators needed for gridding and degridding.
@@ -517,31 +517,38 @@ namespace purify {
     MeasurementOperator::operator_params st;
     st.imsizex = imsizex;
     st.imsizey = imsizey;
-    st.ftsizeu = oversample_factor * imsizex;
-    st.ftsizev = oversample_factor * imsizey;
+    st.ftsizeu = floor(oversample_factor * imsizex);
+    st.ftsizev = floor(oversample_factor * imsizey);
     std::function<t_real(t_real)>  kernelu;
     std::function<t_real(t_real)> kernelv;
     std::function<t_real(t_real)> ftkernelu;
     std::function<t_real(t_real)> ftkernelv;
+
     //list of kernels
-    auto kbu = [&] (t_real x) { return MeasurementOperator::kaiser_bessel(x, Ju); };
-    auto kbv = [&] (t_real x) { return MeasurementOperator::kaiser_bessel(x, Jv); };
-    auto ftkbu = [&] (t_real x) { return MeasurementOperator::ft_kaiser_bessel(x/st.ftsizeu - 0.5, Ju); };
-    auto ftkbv = [&] (t_real x) { return MeasurementOperator::ft_kaiser_bessel(x/st.ftsizev - 0.5, Jv); };
-    auto pswfu = [&] (t_real x) { return MeasurementOperator::pswf(x, Ju); };
-    auto pswfv = [&] (t_real x) { return MeasurementOperator::pswf(x, Jv); };
-    auto ftpswfu = [&] (t_real x) { return MeasurementOperator::ft_pswf(x/st.ftsizeu - 0.5, Ju); };
-    auto ftpswfv = [&] (t_real x) { return MeasurementOperator::ft_pswf(x/st.ftsizev - 0.5, Jv); };
-    auto gaussu = [&] (t_real x) { return MeasurementOperator::gaussian(x, Ju); };
-    auto gaussv = [&] (t_real x) { return MeasurementOperator::gaussian(x, Jv); };
-    auto ftgaussu = [&] (t_real x) { return MeasurementOperator::ft_gaussian(x/st.ftsizeu - 0.5, Ju); };
-    auto ftgaussv = [&] (t_real x) { return MeasurementOperator::ft_gaussian(x/st.ftsizev - 0.5, Jv); };
+
+    //samples for kb_interp
+    if (kernel_name == "kb_interp")
+    {
+
+      t_real kb_interp_alpha = purify_pi * std::sqrt(Ju * Ju/(oversample_factor * oversample_factor) * (oversample_factor - 0.5) * (oversample_factor - 0.5) - 0.8);
+      t_int total_samples = 1e5 * Ju;
+      auto kb_general = [&] (t_real x) { return MeasurementOperator::kaiser_bessel_general(x, Ju, kb_interp_alpha); };
+      Vector<t_real> samples = MeasurementOperator::kernel_samples(total_samples, kb_general, Ju);
+      auto kb_interp = [&] (t_real x) { return MeasurementOperator::kernel_linear_interp(samples, x, Ju); };
+      kernelu = kb_interp;
+      kernelv = kb_interp;
+    }
+
     if ((kernel_name == "pswf") and (Ju != 6 or Jv != 6))
     {
       std::cout << "Error: Only a support of 6 is implimented for PSWFs.";
     }
     if (kernel_name == "kb")
     {
+      auto kbu = [&] (t_real x) { return MeasurementOperator::kaiser_bessel(x, Ju); };
+      auto kbv = [&] (t_real x) { return MeasurementOperator::kaiser_bessel(x, Jv); };
+      auto ftkbu = [&] (t_real x) { return MeasurementOperator::ft_kaiser_bessel(x/st.ftsizeu - 0.5, Ju); };
+      auto ftkbv = [&] (t_real x) { return MeasurementOperator::ft_kaiser_bessel(x/st.ftsizev - 0.5, Jv); };
       kernelu = kbu;
       kernelv = kbv;
       ftkernelu = ftkbu;
@@ -549,6 +556,10 @@ namespace purify {
     }
     if (kernel_name == "pswf")
     {
+      auto pswfu = [&] (t_real x) { return MeasurementOperator::pswf(x, Ju); };
+      auto pswfv = [&] (t_real x) { return MeasurementOperator::pswf(x, Jv); };
+      auto ftpswfu = [&] (t_real x) { return MeasurementOperator::ft_pswf(x/st.ftsizeu - 0.5, Ju); };
+      auto ftpswfv = [&] (t_real x) { return MeasurementOperator::ft_pswf(x/st.ftsizev - 0.5, Jv); };
       kernelu = pswfu;
       kernelv = pswfv;
       ftkernelu = ftpswfu;
@@ -556,6 +567,10 @@ namespace purify {
     }
     if (kernel_name == "gauss")
     {
+      auto gaussu = [&] (t_real x) { return MeasurementOperator::gaussian(x, Ju); };
+      auto gaussv = [&] (t_real x) { return MeasurementOperator::gaussian(x, Jv); };
+      auto ftgaussu = [&] (t_real x) { return MeasurementOperator::ft_gaussian(x/st.ftsizeu - 0.5, Ju); };
+      auto ftgaussv = [&] (t_real x) { return MeasurementOperator::ft_gaussian(x/st.ftsizev - 0.5, Jv); };      
       kernelu = gaussu;
       kernelv = gaussv;
       ftkernelu = ftgaussu;
@@ -581,6 +596,15 @@ namespace purify {
       */
       t_real a = 2 * x / J;
       t_real alpha = 2.34 * J;
+      return boost::math::cyl_bessel_i(0, std::real(alpha * std::sqrt(1 - a * a))) / boost::math::cyl_bessel_i(0, alpha);
+  }
+
+  t_real MeasurementOperator::kaiser_bessel_general(const t_real& x, const t_int& J, const t_real& alpha)
+  {
+      /*
+        kaiser bessel gridding kernel
+      */
+      t_real a = 2 * x / J;
       return boost::math::cyl_bessel_i(0, std::real(alpha * std::sqrt(1 - a * a))) / boost::math::cyl_bessel_i(0, alpha);
   }
 
@@ -771,7 +795,7 @@ namespace purify {
       Pre-calculates samples of a kernel, that can be used with linear interpolation (see Rapid gridding reconstruction with a minimal oversampling ratio, Beatty et. al. 2005)
     */
       Vector<t_real> samples(total_samples);
-      for (t_int i = 0; i < total_samples; ++i)
+      for (t_real i = 0; i < total_samples; ++i)
       {
         samples(i) = kernelu(i/total_samples * J - J/2);
       }
@@ -783,24 +807,32 @@ namespace purify {
     /*
       Calculates kernel using linear interpolation between pre-calculated samples. (see Rapid gridding reconstruction with a minimal oversampling ratio, Beatty et. al. 2005)
     */
-    t_int i_hat = samples.size() + 1;
-    t_real x_dist = 2 * J;
     t_int total_samples = samples.size();
 
-    //loop to find sample that is nearest neighbour.
-    for (int i = 0; i < samples.size(); ++i)
+    t_real i_effective = (x + J/2) * total_samples / J;
+    t_real i_0 = floor(i_effective);
+    t_real i_1 = ceil(i_effective);
+    //case where i_effective is a sample point
+    if (i_0 == i_1)
     {
-      if (std::abs(i / total_samples * J - J / 2 - x) < x_dist)
-      {
-        i_hat = i;
-        x_dist = std::abs(i / total_samples * J - J / 2 - x);
-      } else if (std::abs(i / total_samples * J - J / 2 - x) > x_dist)
-      {
-        break;
-      }
+      return samples(i_0);
     }
     //linearly interpolate from nearest neighbour
-    t_real output = std::max(0.0, 1 - x_dist/total_samples) * samples(i_hat);
+    t_real y_0; 
+    t_real y_1;
+    if (i_0 < 0 or i_0 >= total_samples)
+    {
+      y_0 = 0;
+    }else{
+      y_0 = samples(i_0);
+    }
+    if (i_1 < 0 or i_1 >= total_samples)
+    {
+      y_1 = 0;
+    }else{
+      y_1 = samples(i_1);
+    }
+    t_real output = y_0 + (y_1 - y_0)/(i_1 - i_0) * (i_effective - i_0);
     return output;
   }
 }
