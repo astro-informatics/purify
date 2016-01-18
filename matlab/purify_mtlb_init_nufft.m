@@ -50,9 +50,9 @@ switch kernelname
         %the moment.
         kernelu = @(u, j) purify_mtlb_opt_PSWF(u - j, Ju, alphau);
         kernelv = @(v, j) purify_mtlb_opt_PSWF(v - j, Jv, alphav);      
-        %st.deconv = 1./((purify_mtlb_opt_ftPSWF(X./FTsize(1)-0.5, Ju, alphau).*purify_mtlb_opt_ftPSWF(Y/FTsize(2)-0.5, Jv, alphav)));         
+        st.gridding_correction = 1./((purify_mtlb_opt_ftPSWF(X./FTsize(1)-0.5, Ju, alphau).*purify_mtlb_opt_ftPSWF(Y/FTsize(2)-0.5, Jv, alphav)));         
         %scaling factor for the image due to the kernel, computed using FFT
-        st.gridding_correction = 1./purify_mtlb_scalefactor_fft2(@(u) kernelu(u, st.Nx2/2), @(v) kernelv(v, st.Ny2/2), X, Y);
+        %st.gridding_correction = 1./purify_mtlb_scalefactor_fft2(@(u) kernelu(u, st.Nx2/2), @(v) kernelv(v, st.Ny2/2), X, Y);
     case 'gauss'
         %Fessler et al suggests this value of sigma for gauss kernels.
         sigmau = (0.31*Ju^(0.52));

@@ -5,8 +5,8 @@ cellsize = 0.3; %arcsec
 imsize = [1024, 1024];
 oversample_rate = 2; %most of the kernel parameters are optimized for K/N=2
 FTsize = imsize*oversample_rate;
-kernel_type = 'gauss';
-%kernel_type = 'pswf';
+%kernel_type = 'gauss';
+kernel_type = 'pswf';
 %kernel_type = 'minmax:uniform';
 stringname = '../data/vla/at166B.3C129.c0.vis';
 
