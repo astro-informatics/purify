@@ -12,17 +12,18 @@ TEST_CASE("Measurement Operator [Kaiser Bessel Linear Interpolation]", "[KB_Inte
   t_real cellsize;
   std::string kernel;
   MeasurementOperator::operator_params st;
-  std::string vis_file = "../data/vla/at166B.3C129.c0.vis";
-  //std::string vis_file = "../data/ATCA/1637-77.vis";
+  //std::string vis_file = "../data/vla/at166B.3C129.c0.vis";
+  std::string vis_file = "../data/ATCA/1637-77.vis";
    
 
   //Gridding example
+  cellsize = 1;
   over_sample = 1.375;
   t_int J = 4;
   uv_vis = op.read_visibility(vis_file); // visibility data being read in
-  t_int width = 1024;
-  t_int height = 1024;
-  uv_vis = op.set_cell_size(uv_vis); // scale uv coordinates to correct pixel size and to units of 2pi
+  t_int width = 2048;
+  t_int height = 2048;
+  uv_vis = op.set_cell_size(uv_vis, cellsize); // scale uv coordinates to correct pixel size and to units of 2pi
   uv_vis = op.uv_scale(uv_vis, floor(width * over_sample), floor(height * over_sample)); // scale uv coordinates to units of Fourier grid size
   uv_vis = op.uv_symmetry(uv_vis); // Enforce condjugate symmetry by reflecting measurements in uv coordinates
 
@@ -53,16 +54,17 @@ TEST_CASE("Measurement Operator [Kaiser Bessel]", "[KB_Non-Interp]") {
   t_real cellsize;
   std::string kernel;
   MeasurementOperator::operator_params st;
-  std::string vis_file = "../data/vla/at166B.3C129.c0.vis";
-  //std::string vis_file = "../data/ATCA/1637-77.vis";
+  //std::string vis_file = "../data/vla/at166B.3C129.c0.vis";
+  std::string vis_file = "../data/ATCA/1637-77.vis";
 
 
   //Gridding example
+  cellsize = 1;
   over_sample = 2;
   t_int J = 4;
   uv_vis = op.read_visibility(vis_file); // visibility data being read in
-  t_int width = 1024;
-  t_int height = 1024;
+  t_int width = 2048;
+  t_int height = 2048;
   uv_vis = op.set_cell_size(uv_vis); // scale uv coordinates to correct pixel size and to units of 2pi
   uv_vis = op.uv_scale(uv_vis, floor(width * over_sample), floor(height * over_sample)); // scale uv coordinates to units of Fourier grid size
   uv_vis = op.uv_symmetry(uv_vis); // Enforce condjugate symmetry by reflecting measurements in uv coordinates

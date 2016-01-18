@@ -519,7 +519,7 @@ namespace purify {
 
   }  
 
-  MeasurementOperator::operator_params MeasurementOperator::init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, const bool& fft_grid_correction)
+  MeasurementOperator::operator_params MeasurementOperator::init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, bool fft_grid_correction)
   {
     /*
       Generates tools/operators needed for gridding and degridding.
@@ -560,6 +560,10 @@ namespace purify {
       auto kb_interp = [&] (t_real x) { return MeasurementOperator::kernel_linear_interp(samples, x, Ju); };
       kernelu = kb_interp;
       kernelv = kb_interp;
+      if (fft_grid_correction == false)
+      {
+        fft_grid_correction = true;
+      }
     }
 
     if ((kernel_name == "pswf") and (Ju != 6 or Jv != 6))
