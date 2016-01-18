@@ -2,6 +2,7 @@
 
 namespace purify {
 
+
   MeasurementOperator::vis_params MeasurementOperator::read_visibility(const std::string& vis_name)
   {
     /*
@@ -12,6 +13,7 @@ namespace purify {
     std::ifstream temp_file(vis_name);
     t_int row = 0;
     std::string line;
+    //counts size of vis file
     while (std::getline(temp_file, line))
       ++row;
     Vector<t_real> utemp(row);
@@ -19,6 +21,7 @@ namespace purify {
     Vector<t_complex> vistemp(row);
     std::ifstream vis_file(vis_name);
 
+    // reads in vis file
     row = 0;
     t_real real;
     t_real imag;
@@ -41,12 +44,12 @@ namespace purify {
     }
     MeasurementOperator::vis_params uv_vis;
     uv_vis.u = utemp;
-    uv_vis.v = -vtemp;
+    uv_vis.v = -vtemp; // found that a reflection is needed for the orientation of the gridded image to be correct
     uv_vis.vis = vistemp;
     return uv_vis;
   }
 
-  MeasurementOperator::vis_params MeasurementOperator::set_cell_size(const MeasurementOperator::vis_params& uv_vis, const t_real cell_size)
+  MeasurementOperator::vis_params MeasurementOperator::set_cell_size(const MeasurementOperator::vis_params& uv_vis, t_real cell_size_u, t_real cell_size_v)
   {
       /*
         Converts the units of visibilities to units of 2 * pi, while scaling for the size of a pixel (cell_size)
@@ -57,9 +60,28 @@ namespace purify {
 
       MeasurementOperator::vis_params scaled_vis;
 
-      t_real scale_factor = 180 * 3600 / cell_size / purify_pi;
-      scaled_vis.u = uv_vis.u / scale_factor * 2 * purify_pi;
-      scaled_vis.v = uv_vis.v / scale_factor * 2 * purify_pi;
+      if (cell_size_u == 0 and cell_size_v == 0)
+      {
+        Vector<t_real> u_dist = uv_vis.u.array() * uv_vis.u.array();
+        t_real max_u = std::sqrt(u_dist.maxCoeff());
+        cell_size_u = (180 * 3600) / max_u / purify_pi / 3 * 1.02; //Calculate cell size if not given one
+
+        Vector<t_real> v_dist = uv_vis.v.array() * uv_vis.v.array();
+        t_real max_v = std::sqrt(v_dist.maxCoeff());
+        cell_size_v = (180 * 3600) / max_v / purify_pi / 3  * 1.02; //Calculate cell size if not given one
+      }
+      if (cell_size_v == 0)
+      {
+        cell_size_v = cell_size_u;
+      }
+
+      std::cout << "PSF has a FWHM of " << cell_size_u * 3 << " x " << cell_size_v * 3 << " arcseconds" << '\n';
+      std::cout << "Using a pixel size of " << cell_size_u << " x " << cell_size_v << " arcseconds" << '\n';
+
+      t_real scale_factor_u = 180 * 3600 / cell_size_u / purify_pi;
+      t_real scale_factor_v = 180 * 3600 / cell_size_v / purify_pi;
+      scaled_vis.u = uv_vis.u / scale_factor_u * 2 * purify_pi;
+      scaled_vis.v = uv_vis.v / scale_factor_v * 2 * purify_pi;
       scaled_vis.vis = uv_vis.vis;
       return scaled_vis;
   }
@@ -497,7 +519,7 @@ namespace purify {
 
   }  
 
-  MeasurementOperator::operator_params MeasurementOperator::init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor)
+  MeasurementOperator::operator_params MeasurementOperator::init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, const bool& fft_grid_correction)
   {
     /*
       Generates tools/operators needed for gridding and degridding.
@@ -514,6 +536,8 @@ namespace purify {
     */
     std::cout << "------" << '\n';
     std::cout << "Constructing Gridding Operator" << '\n';
+
+
     MeasurementOperator::operator_params st;
     st.imsizex = imsizex;
     st.imsizey = imsizey;
@@ -524,14 +548,13 @@ namespace purify {
     std::function<t_real(t_real)> ftkernelu;
     std::function<t_real(t_real)> ftkernelv;
 
-    //list of kernels
 
     //samples for kb_interp
     if (kernel_name == "kb_interp")
     {
 
       t_real kb_interp_alpha = purify_pi * std::sqrt(Ju * Ju/(oversample_factor * oversample_factor) * (oversample_factor - 0.5) * (oversample_factor - 0.5) - 0.8);
-      t_int total_samples = 1e5 * Ju;
+      t_int total_samples = 2e5 * Ju;
       auto kb_general = [&] (t_real x) { return MeasurementOperator::kaiser_bessel_general(x, Ju, kb_interp_alpha); };
       Vector<t_real> samples = MeasurementOperator::kernel_samples(total_samples, kb_general, Ju);
       auto kb_interp = [&] (t_real x) { return MeasurementOperator::kernel_linear_interp(samples, x, Ju); };
@@ -580,8 +603,16 @@ namespace purify {
     std::cout << "Support of Kernel " << kernel_name << '\n';
     std::cout << "Ju: " << Ju << '\n';
     std::cout << "Jv: " << Jv << '\n';
-    //st.S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv, st.ftsizeu, st.ftsizev);
-    st.S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, st.ftsizeu, st.ftsizev, Ju, Jv);
+    st.S = Image<t_real>::Zero(st.ftsizev, st.ftsizeu);
+    if ( fft_grid_correction == true )
+    {
+      st.S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, st.ftsizeu, st.ftsizev, Ju, Jv); // Does gridding correction with FFT
+    }
+    if ( fft_grid_correction == false )
+    {
+      st.S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv, st.ftsizeu, st.ftsizev); // Does gridding correction using analytic formula
+    }
+    
     st.G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv, st.ftsizeu, st.ftsizev);
     std::cout << "Gridding Operator Constructed" << '\n';
     std::cout << "------" << '\n';
@@ -645,30 +676,29 @@ namespace purify {
       return std::sqrt(purify_pi / 2) / sigma * std::exp(-a * a * 2);
   }
 
-  t_real MeasurementOperator::pswf(const t_real& x, const t_int& J)
+
+  t_real MeasurementOperator::calc_for_pswf(const t_real& x, const t_int& J, const t_real& alpha)
   {
     /*
-      Calculates the standard PSWF for radio astronomy, with a support of J = 6 and alpha = 1.
-
+      Calculates Horner's Rule the standard PSWF for radio astronomy, with a support of J = 6 and alpha = 1.
+      
       x:: value to evaluate
       J:: support size of gridding kernel
+      alpha:: type of special PSWF to calculate
 
       The tailored prolate spheroidal wave functions for gridding radio astronomy.
       Details are explained in Optimal Gridding of Visibility Data in Radio
       Astronomy, F. R. Schwab 1983.
 
     */
-      t_real output;
-      t_real alpha;
-      if (J != 6)
+
+      if (J != 6 or alpha != 1)
       {
         return 0;
       }
-
-      alpha = 1;
       //Calculating numerator and denominator using Horner's rule.
       // PSWF = numerator / denominator
-      t_real eta0 = 2 * x / J;
+      t_real eta0 = x;
       t_real numerator = 0;
       t_real denominator = 1;
 
@@ -712,8 +742,25 @@ namespace purify {
           denominator = eta * denominator + q2[q_size - i];
         }
       }
-      output = numerator / denominator * std::pow(1 - eta0 * eta0, alpha);
-      return output;
+      return numerator / denominator;
+  }
+
+  t_real MeasurementOperator::pswf(const t_real& x, const t_int& J)
+  {
+    /*
+      Calculates the standard PSWF for radio astronomy, with a support of J = 6 and alpha = 1.
+
+      x:: value to evaluate
+      J:: support size of gridding kernel
+
+      The tailored prolate spheroidal wave functions for gridding radio astronomy.
+      Details are explained in Optimal Gridding of Visibility Data in Radio
+      Astronomy, F. R. Schwab 1983.
+
+    */
+      const t_real eta0 = 2 * x / J;
+      const t_real alpha = 1;
+      return MeasurementOperator::calc_for_pswf(eta0, J, alpha) * std::pow(1 - eta0 * eta0, alpha);
   }
 
   t_real MeasurementOperator::ft_pswf(const t_real& x, const t_int& J)
@@ -731,61 +778,10 @@ namespace purify {
     */
       // Does not produce the correct scaling factor!!! Use the fft gridding correction method!
 
-      t_real output;
-      t_real alpha;
-      if (J != 6)
-      {
-        return 0;
-      }
+      const t_real alpha = 1;
+      const t_real eta0 = 2 * x;
 
-      alpha = 1;
-      //Calculating numerator and denominator using Horner's rule.
-      // PSWF = numerator / denominator
-      t_real eta0 = 2 * x * J;
-      t_real numerator = 0;
-      t_real denominator = 0;
-
-      t_int p_size = 0;
-      t_int q_size = 0;
-      if (0 <= std::abs(eta0) and std::abs(eta0) <= 0.75)
-      {
-        t_real eta = eta0 * eta0 - 0.75 * 0.75;
-        p_size = sizeof(p1) / sizeof(*p1);
-        q_size = sizeof(q1) / sizeof(*q1);
-        numerator = p1[p_size];
-
-        for (t_int i = 1; i < p_size + 1; ++i)
-        {
-          numerator = eta * numerator + p1[p_size - i];
-        }
-
-        denominator = q1[q_size];
-        for (t_int i = 1; i < q_size + 1; ++i)
-        {
-          denominator = eta * denominator + q1[q_size - i];
-        }
-
-      }else if (0.75 < std::abs(eta0) and std::abs(eta0) <= 1)
-      {
-        t_real eta = eta0 * eta0 - 1 * 1;
-        p_size = sizeof(p2) / sizeof(*p2);
-        q_size = sizeof(q2) / sizeof(*q2);
-      
-        numerator = p2[p_size];
-
-        for (t_int i = 1; i < p_size + 1; ++i)
-        {
-          numerator = eta * numerator + p2[p_size - i];
-        }
-
-        denominator = q1[q_size];
-        for (t_int i = 1; i < q_size + 1; ++i)
-        {
-          denominator = eta * denominator + q2[q_size - i];
-        }
-      }
-      output = numerator / denominator;
-      return output;
+      return MeasurementOperator::calc_for_pswf(eta0, J, alpha);
 
   }
 

@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <boost/math/special_functions/bessel.hpp>
 
+
 namespace purify {
 
   //! This does something
@@ -32,7 +33,7 @@ namespace purify {
       //! Reads in visibility file
       MeasurementOperator::vis_params read_visibility(const std::string& vis_name);
       //! Scales visibilities to a given pixel size in arcseconds
-      MeasurementOperator::vis_params set_cell_size(const MeasurementOperator::vis_params& uv_vis, const t_real cell_size);
+      MeasurementOperator::vis_params set_cell_size(const MeasurementOperator::vis_params& uv_vis, t_real cell_size_u = 0, t_real cell_size_v = 0);
       //! scales the visibilities to units of pixels
       MeasurementOperator::vis_params uv_scale(const MeasurementOperator::vis_params& uv_vis, const t_int& ftsizeu, const t_int& ftsizev);
       //! Puts in conjugate visibilities
@@ -72,7 +73,7 @@ namespace purify {
       //! Generates scaling factors for gridding correction
       Image<t_real> init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv, const t_int ftsizeu, const t_int ftsizev);
       //! Generate gridding parameters, such as interpolation matrix
-      MeasurementOperator::operator_params init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor);
+      MeasurementOperator::operator_params init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, const bool& fft_grid_correction = false);
       //! Kaiser-Bessel kernel
       t_real kaiser_bessel(const t_real& x, const t_int& J);
       //! More general Kaiser-Bessel kernel
@@ -83,6 +84,8 @@ namespace purify {
       t_real gaussian(const t_real& x, const t_int& J);
       //! Fourier transform of Gaussian kernel
       t_real ft_gaussian(const t_real& x, const t_int& J);
+      //! Performs calculations for PSWF and its Fourier Transform
+      t_real calc_for_pswf(const t_real& x, const t_int& J, const t_real& alpha);
       //! PSWF kernel
       t_real pswf(const t_real& x, const t_int& J);
       //! Fourier transform of PSWF kernel
