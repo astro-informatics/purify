@@ -26,14 +26,17 @@ namespace purify {
         t_int ftsizev;
       };
       struct vis_params {
-        Vector<t_real> u;
-        Vector<t_real> v;
-        Vector<t_complex> vis;
+        Vector<t_real> u; // u coordinates
+        Vector<t_real> v; // v coordinates
+        Vector<t_complex> vis; // complex visiblities
+        Vector<t_complex> weights; // weights for visibilities
       };
       //! Reads in visibility file
       MeasurementOperator::vis_params read_visibility(const std::string& vis_name);
       //! Scales visibilities to a given pixel size in arcseconds
       MeasurementOperator::vis_params set_cell_size(const MeasurementOperator::vis_params& uv_vis, t_real cell_size_u = 0, t_real cell_size_v = 0);
+      //! Apply weights to visiblities
+      Vector<t_complex> apply_weights(const Vector<t_complex> visiblities, const Vector<t_complex> weights);
       //! scales the visibilities to units of pixels
       MeasurementOperator::vis_params uv_scale(const MeasurementOperator::vis_params& uv_vis, const t_int& ftsizeu, const t_int& ftsizev);
       //! Puts in conjugate visibilities

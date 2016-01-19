@@ -19,6 +19,7 @@ namespace purify {
     Vector<t_real> utemp(row);
     Vector<t_real> vtemp(row);
     Vector<t_complex> vistemp(row);
+    Vector<t_complex> weightstemp(row);
     std::ifstream vis_file(vis_name);
 
     // reads in vis file
@@ -40,12 +41,15 @@ namespace purify {
       std::getline(ss, entry, ' ');
       imag = std::stod(entry);
       vistemp(row) = t_complex(real, imag);
+      std::getline(ss, entry, ' ');
+      weightstemp(row) = 1/(std::stod(entry) * std::stod(entry));
       ++row;
     }
     MeasurementOperator::vis_params uv_vis;
     uv_vis.u = utemp;
     uv_vis.v = -vtemp; // found that a reflection is needed for the orientation of the gridded image to be correct
     uv_vis.vis = vistemp;
+    uv_vis.weights = weightstemp;
     return uv_vis;
   }
 
@@ -69,13 +73,14 @@ namespace purify {
         Vector<t_real> v_dist = uv_vis.v.array() * uv_vis.v.array();
         t_real max_v = std::sqrt(v_dist.maxCoeff());
         cell_size_v = (180 * 3600) / max_v / purify_pi / 3  * 1.02; //Calculate cell size if not given one
+        std::cout << "PSF has a FWHM of " << cell_size_u * 3 << " x " << cell_size_v * 3 << " arcseconds" << '\n';
       }
       if (cell_size_v == 0)
       {
         cell_size_v = cell_size_u;
       }
 
-      std::cout << "PSF has a FWHM of " << cell_size_u * 3 << " x " << cell_size_v * 3 << " arcseconds" << '\n';
+      
       std::cout << "Using a pixel size of " << cell_size_u << " x " << cell_size_v << " arcseconds" << '\n';
 
       t_real scale_factor_u = 180 * 3600 / cell_size_u / purify_pi;
@@ -83,7 +88,18 @@ namespace purify {
       scaled_vis.u = uv_vis.u / scale_factor_u * 2 * purify_pi;
       scaled_vis.v = uv_vis.v / scale_factor_v * 2 * purify_pi;
       scaled_vis.vis = uv_vis.vis;
+      scaled_vis.weights = uv_vis.weights;
       return scaled_vis;
+  }
+
+  Vector<t_complex> MeasurementOperator::apply_weights(const Vector<t_complex> visiblities, const Vector<t_complex> weights)
+  {
+    /*
+      Applies weights to visiblities, assuming they are 1/sigma^2.
+    */
+    Vector<t_complex> weighted_vis;
+    weighted_vis = (visiblities.array() * weights.array()).matrix();
+    return weighted_vis;
   }
 
   MeasurementOperator::vis_params MeasurementOperator::uv_scale(const MeasurementOperator::vis_params& uv_vis, const t_int& ftsizeu, const t_int& ftsizev)
@@ -95,7 +111,7 @@ namespace purify {
       scaled_vis.u = uv_vis.u / (2 * purify_pi) * ftsizeu;
       scaled_vis.v = uv_vis.v / (2 * purify_pi) * ftsizev;
       scaled_vis.vis = uv_vis.vis;
-
+      scaled_vis.weights = uv_vis.weights;
       return scaled_vis;
   }
 
@@ -110,22 +126,26 @@ namespace purify {
     Vector<t_real> utemp(2 * total);
     Vector<t_real> vtemp(2 * total);
     Vector<t_complex> vistemp(2 * total);
+    Vector<t_complex> weightstemp(2 * total);
     MeasurementOperator::vis_params conj_vis;
     for (t_int i = 0; i < uv_vis.u.size(); ++i)
     {
       utemp(i) = uv_vis.u(i);
       vtemp(i) = uv_vis.v(i);
       vistemp(i) = uv_vis.vis(i);
+      weightstemp(i) = uv_vis.weights(i);
     }
     for (t_int i = total; i < 2 * total; ++i)
     {
       utemp(i) = -uv_vis.u(i - total);
       vtemp(i) = -uv_vis.v(i - total);
       vistemp(i) = std::conj(uv_vis.vis(i - total));
+      weightstemp(i) = uv_vis.weights(i - total);
     }
     conj_vis.u = utemp;
     conj_vis.v = vtemp;
     conj_vis.vis = vistemp;
+    conj_vis.weights = weightstemp;
     return conj_vis;
   }
 
@@ -651,7 +671,7 @@ namespace purify {
 
       t_real alpha = 2.34 * J; // value said to be optimal in Fessler et. al. 2003
       t_complex eta = std::sqrt(static_cast<t_complex>((purify_pi * x * J)*(purify_pi * x * J) - alpha * alpha));
-      return std::real(std::sin(eta)/eta);
+      return std::real(std::sin(eta) / eta);
   }
 
   t_real MeasurementOperator::gaussian(const t_real& x, const t_int& J)
