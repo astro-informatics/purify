@@ -2,8 +2,14 @@
 
 namespace purify {
 
+  namespace {
+      const std::array<t_real, 6> p1 = {8.203343e-2, -3.644705e-1, 6.278660e-1, -5.335581e-1, 2.312756e-1, 2*0.0};
+      const std::array<t_real, 6> p2 = {4.028559e-3, -3.697768e-2, 1.021332e-1, -1.201436e-1, 6.412774e-2, 2*0.0};
+      const std::array<t_real, 3> q1 = {1., 8.212018e-1, 2.078043e-1};
+      const std::array<t_real, 3> q2 = {1., 9.599102e-1, 2.918724e-1};
+  }
 
-  MeasurementOperator::vis_params MeasurementOperator::read_visibility(const std::string& vis_name)
+  measurement_operator::vis_params measurement_operator::read_visibility(const std::string& vis_name)
   {
     /*
       Reads an csv file with u, v, visibilities and returns the vectors.
@@ -45,7 +51,7 @@ namespace purify {
       weightstemp(row) = 1/(std::stod(entry) * std::stod(entry));
       ++row;
     }
-    MeasurementOperator::vis_params uv_vis;
+    measurement_operator::vis_params uv_vis;
     uv_vis.u = utemp;
     uv_vis.v = -vtemp; // found that a reflection is needed for the orientation of the gridded image to be correct
     uv_vis.vis = vistemp;
@@ -53,7 +59,7 @@ namespace purify {
     return uv_vis;
   }
 
-  MeasurementOperator::vis_params MeasurementOperator::set_cell_size(const MeasurementOperator::vis_params& uv_vis, t_real cell_size_u, t_real cell_size_v)
+  measurement_operator::vis_params measurement_operator::set_cell_size(const measurement_operator::vis_params& uv_vis, t_real cell_size_u, t_real cell_size_v)
   {
       /*
         Converts the units of visibilities to units of 2 * pi, while scaling for the size of a pixel (cell_size)
@@ -62,7 +68,7 @@ namespace purify {
         cell_size:: size of a pixel in arcseconds
       */
 
-      MeasurementOperator::vis_params scaled_vis;
+      measurement_operator::vis_params scaled_vis;
 
       if (cell_size_u == 0 and cell_size_v == 0)
       {
@@ -92,7 +98,7 @@ namespace purify {
       return scaled_vis;
   }
 
-  Vector<t_complex> MeasurementOperator::apply_weights(const Vector<t_complex> visiblities, const Vector<t_complex> weights)
+  Vector<t_complex> measurement_operator::apply_weights(const Vector<t_complex> visiblities, const Vector<t_complex> weights)
   {
     /*
       Applies weights to visiblities, assuming they are 1/sigma^2.
@@ -102,12 +108,12 @@ namespace purify {
     return weighted_vis;
   }
 
-  MeasurementOperator::vis_params MeasurementOperator::uv_scale(const MeasurementOperator::vis_params& uv_vis, const t_int& ftsizeu, const t_int& ftsizev)
+  measurement_operator::vis_params measurement_operator::uv_scale(const measurement_operator::vis_params& uv_vis, const t_int& ftsizeu, const t_int& ftsizev)
   {
     /*
       scales the uv coordinates from being in units of 2 * pi to units of pixels.
     */
-      MeasurementOperator::vis_params scaled_vis;
+      measurement_operator::vis_params scaled_vis;
       scaled_vis.u = uv_vis.u / (2 * purify_pi) * ftsizeu;
       scaled_vis.v = uv_vis.v / (2 * purify_pi) * ftsizev;
       scaled_vis.vis = uv_vis.vis;
@@ -115,7 +121,7 @@ namespace purify {
       return scaled_vis;
   }
 
-  MeasurementOperator::vis_params MeasurementOperator::uv_symmetry(const MeasurementOperator::vis_params& uv_vis)
+  measurement_operator::vis_params measurement_operator::uv_symmetry(const measurement_operator::vis_params& uv_vis)
   {
     /*
       Adds in reflection of the fourier plane using the condjugate symmetry for a real image.
@@ -127,7 +133,7 @@ namespace purify {
     Vector<t_real> vtemp(2 * total);
     Vector<t_complex> vistemp(2 * total);
     Vector<t_complex> weightstemp(2 * total);
-    MeasurementOperator::vis_params conj_vis;
+    measurement_operator::vis_params conj_vis;
     for (t_int i = 0; i < uv_vis.u.size(); ++i)
     {
       utemp(i) = uv_vis.u(i);
@@ -149,7 +155,7 @@ namespace purify {
     return conj_vis;
   }
 
-  Vector<t_complex> MeasurementOperator::fftshift_1d(const Vector<t_complex> input) 
+  Vector<t_complex> measurement_operator::fftshift_1d(const Vector<t_complex> input) 
   {
     /*
       Performs a 1D fftshift on a vector and returns the shifted vector
@@ -172,7 +178,7 @@ namespace purify {
     return output;
   }
 
-  Matrix<t_complex> MeasurementOperator::fftshift_2d(Matrix<t_complex> input) 
+  Matrix<t_complex> measurement_operator::fftshift_2d(Matrix<t_complex> input) 
   {
     /*
       Performs a 1D fftshift on a vector and returns the shifted vector
@@ -182,15 +188,15 @@ namespace purify {
       t_int rows = input.rows();
       t_int cols = input.cols();
       for (t_int i = 0; i < cols; ++i)
-        input.col(i) = MeasurementOperator::fftshift_1d(input.col(i));
+        input.col(i) = measurement_operator::fftshift_1d(input.col(i));
 
       for (t_int i = 0; i < rows; ++i)
-        input.row(i) = MeasurementOperator::fftshift_1d(input.row(i));
+        input.row(i) = measurement_operator::fftshift_1d(input.row(i));
 
       return input;
   }
 
-  Matrix<t_complex> MeasurementOperator::ifftshift_2d(Matrix<t_complex> input) 
+  Matrix<t_complex> measurement_operator::ifftshift_2d(Matrix<t_complex> input) 
   {
     /*
       Performs a 1D fftshift on a vector and returns the shifted vector
@@ -200,15 +206,15 @@ namespace purify {
       t_int rows = input.rows();
       t_int cols = input.cols();
       for (t_int i = 0; i < cols; ++i)
-        input.col(i) = MeasurementOperator::ifftshift_1d(input.col(i));
+        input.col(i) = measurement_operator::ifftshift_1d(input.col(i));
 
       for (t_int i = 0; i < rows; ++i)
-        input.row(i) = MeasurementOperator::ifftshift_1d(input.row(i));
+        input.row(i) = measurement_operator::ifftshift_1d(input.row(i));
 
       return input;
   }
 
-  Vector<t_complex> MeasurementOperator::ifftshift_1d(Vector<t_complex> input) 
+  Vector<t_complex> measurement_operator::ifftshift_1d(Vector<t_complex> input) 
   {
     /*
       Performs a 1D ifftshift on a vector and returns the shifted vector
@@ -231,7 +237,7 @@ namespace purify {
     return output;
   }
 
-  Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex>& eigen_image, const MeasurementOperator::operator_params st)
+  Vector<t_complex> measurement_operator::degrid(const Image<t_complex>& eigen_image, const measurement_operator::operator_params st)
   {
     /*
       An operator that degrids an image and returns a vector of visibilities.
@@ -260,7 +266,7 @@ namespace purify {
         }
       }
       // create fftgrid
-      ft_vector = MeasurementOperator::fft2d(MeasurementOperator::fftshift_2d(padded_image));
+      ft_vector = measurement_operator::fft2d(measurement_operator::fftshift_2d(padded_image));
       // turn into vector
       ft_vector.resize(st.ftsizeu*st.ftsizev, 1);
       // get visibilities
@@ -269,7 +275,7 @@ namespace purify {
       
   }
 
-  Image<t_complex> MeasurementOperator::grid(const Vector<t_complex>& visibilities, const MeasurementOperator::operator_params st)
+  Image<t_complex> measurement_operator::grid(const Vector<t_complex>& visibilities, const measurement_operator::operator_params st)
   {
     /*
       An operator that degrids an image and returns a vector of visibilities.
@@ -279,7 +285,7 @@ namespace purify {
     */
       Matrix<t_complex> ft_vector = st.G.adjoint() * visibilities;
       ft_vector.resize(st.ftsizeu, st.ftsizev);
-      Matrix<t_complex> padded_image = MeasurementOperator::ifftshift_2d(MeasurementOperator::ifft2d(ft_vector));
+      Matrix<t_complex> padded_image = measurement_operator::ifftshift_2d(measurement_operator::ifft2d(ft_vector));
       Image<t_complex> eigen_image(st.imsizex, st.imsizey);
       t_int x_start = floor(st.ftsizeu * 0.5 - st.imsizex * 0.5);
       t_int y_start = floor(st.ftsizev * 0.5 - st.imsizey * 0.5);
@@ -296,7 +302,7 @@ namespace purify {
       
   }
 
-  Matrix<t_complex> MeasurementOperator::fft2d(const Matrix<t_complex>& input)
+  Matrix<t_complex> measurement_operator::fft2d(const Matrix<t_complex>& input)
   {
     /*
       Returns FFT of a 2D matrix.
@@ -323,7 +329,7 @@ namespace purify {
     return output;
   }
 
-  Matrix<t_complex> MeasurementOperator::ifft2d(const Matrix<t_complex>& input)
+  Matrix<t_complex> measurement_operator::ifft2d(const Matrix<t_complex>& input)
   {
     /*
       Returns FFT of a 2D matrix.
@@ -350,7 +356,7 @@ namespace purify {
     return output;
   }
 
-  t_int MeasurementOperator::sub2ind(const t_int& row, const t_int& col, const t_int& rows, const t_int& cols) 
+  t_int measurement_operator::sub2ind(const t_int& row, const t_int& col, const t_int& rows, const t_int& cols) 
   {
     /*
       Converts (row, column) of a matrix to a single index. This does the same as the matlab funciton sub2ind, converts subscript to index.
@@ -363,7 +369,7 @@ namespace purify {
     return row * cols + col;
   }
 
-  void MeasurementOperator::ind2sub(const t_int sub, const t_int cols, const t_int rows, t_int* row, t_int* col) 
+  void measurement_operator::ind2sub(const t_int sub, const t_int cols, const t_int rows, t_int* row, t_int* col) 
   {
     /*
       Converts index of a matrix to (row, column). This does the same as the matlab funciton sub2ind, converts subscript to index.
@@ -379,7 +385,7 @@ namespace purify {
     *row = (sub - *col) / cols;
   }
 
-  t_int MeasurementOperator::mod(const t_real& x, const t_real& y) 
+  t_int measurement_operator::mod(const t_real& x, const t_real& y) 
   {
     /*
       returns x % y, and warps circularly around y for negative values.
@@ -390,7 +396,7 @@ namespace purify {
       return static_cast<t_int>(r);
   }
 
-  Vector<t_real> MeasurementOperator::omega_to_k(const Vector<t_real>& omega) {
+  Vector<t_real> measurement_operator::omega_to_k(const Vector<t_real>& omega) {
     /*
       Maps fourier coordinates (u or v) to integer grid coordinates.
 
@@ -399,7 +405,7 @@ namespace purify {
     return omega.unaryExpr(std::ptr_fun<double,double>(std::floor));     
   }
 
-  void MeasurementOperator::writefits2d(Image<t_real> eigen_image, const std::string& fits_name, const bool& overwrite, const bool& flip) 
+  void measurement_operator::writefits2d(Image<t_real> eigen_image, const std::string& fits_name, const bool& overwrite, const bool& flip) 
   {
     /*
       Writes an image to a fits file.
@@ -429,7 +435,7 @@ namespace purify {
     imageExt->write(fpixel, naxes[0]*naxes[1], image);
   }
   
-  Image<t_complex> MeasurementOperator::readfits2d(const std::string& fits_name)
+  Image<t_complex> measurement_operator::readfits2d(const std::string& fits_name)
   {
     /*
       Reads in an image from a fits file and returns the image.
@@ -449,14 +455,14 @@ namespace purify {
     {
       for (t_int j = 0; j < ax2; ++j)
       {
-        index = MeasurementOperator::sub2ind(j, i, ax2, ax1);
+        index = measurement_operator::sub2ind(j, i, ax2, ax1);
         eigen_image(i, j) = contents[index];
       }
     }
     return eigen_image;
   }
 
-  Sparse<t_real> MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev) 
+  Sparse<t_real> measurement_operator::init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev) 
   {
     /* 
       Given u and v coordinates, creates a gridding interpolation matrix that maps between visibilities and the fourier transform grid.
@@ -478,19 +484,19 @@ namespace purify {
   t_int p;
   t_int index;
   Vector<t_real> ones = u * 0; ones.setOnes();
-  Vector<t_real> k_u = MeasurementOperator::omega_to_k(u - ones * Ju * 0.5);
-  Vector<t_real> k_v = MeasurementOperator::omega_to_k(v - ones * Jv * 0.5);
+  Vector<t_real> k_u = measurement_operator::omega_to_k(u - ones * Ju * 0.5);
+  Vector<t_real> k_v = measurement_operator::omega_to_k(v - ones * Jv * 0.5);
   std::vector<t_tripletList> entries;
   entries.reserve(rows * Ju * Jv);
   for (t_int m = 0; m < rows; ++m)
     {
       for (t_int ju = 1; ju <= Ju; ++ju)
        {
-         q = MeasurementOperator::mod(k_u(m) + ju, ftsizeu);
+         q = measurement_operator::mod(k_u(m) + ju, ftsizeu);
         for (t_int jv = 1; jv <= Jv; ++jv)
           {
-            p = MeasurementOperator::mod(k_v(m) + jv, ftsizev);
-            index = MeasurementOperator::sub2ind(p, q, ftsizev, ftsizeu);
+            p = measurement_operator::mod(k_v(m) + jv, ftsizev);
+            index = measurement_operator::sub2ind(p, q, ftsizev, ftsizeu);
             entries.push_back(t_tripletList(m, index, kernelu(u(m)-(k_u(m)+ju)) * kernelv(v(m)-(k_v(m)+jv))));
           }
         }
@@ -500,7 +506,7 @@ namespace purify {
     return interpolation_matrix; 
   }
 
-  Image<t_real> MeasurementOperator::init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv, const t_int ftsizeu, const t_int ftsizev)
+  Image<t_real> measurement_operator::init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv, const t_int ftsizeu, const t_int ftsizev)
   {
     /*
       Given the fourier transform of a gridding kernel, creates the scaling image for gridding correction.
@@ -518,7 +524,7 @@ namespace purify {
 
   }
 
-  Image<t_real> MeasurementOperator::init_correction2d_fft(const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev, const t_int Ju, const t_int Jv)
+  Image<t_real> measurement_operator::init_correction2d_fft(const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev, const t_int Ju, const t_int Jv)
   {
     /*
       Given the gridding kernel, creates the scaling image for gridding correction using an fft.
@@ -527,19 +533,19 @@ namespace purify {
     Matrix<t_complex> K= Matrix<t_complex>::Zero(ftsizeu, ftsizev);
     for (int i = 0; i < Ju; ++i)
     {
-      t_int n = MeasurementOperator::mod(i - Ju/2, ftsizeu);
+      t_int n = measurement_operator::mod(i - Ju/2, ftsizeu);
       for (int j = 0; j < Jv; ++j)
       {
-        t_int m = MeasurementOperator::mod(j - Jv/2, ftsizev);
+        t_int m = measurement_operator::mod(j - Jv/2, ftsizev);
         K(n, m) = kernelu(i - Ju/2) * kernelv(j - Jv/2);
       }
     }
-    Image<t_real> S = MeasurementOperator::fftshift_2d(MeasurementOperator::ifft2d(K)).array().real();
+    Image<t_real> S = measurement_operator::fftshift_2d(measurement_operator::ifft2d(K)).array().real();
     return 1/S;
 
   }  
 
-  MeasurementOperator::operator_params MeasurementOperator::init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, bool fft_grid_correction)
+  measurement_operator::operator_params measurement_operator::init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, bool fft_grid_correction)
   {
     /*
       Generates tools/operators needed for gridding and degridding.
@@ -558,7 +564,7 @@ namespace purify {
     std::cout << "Constructing Gridding Operator" << '\n';
 
 
-    MeasurementOperator::operator_params st;
+    measurement_operator::operator_params st;
     st.imsizex = imsizex;
     st.imsizey = imsizey;
     st.ftsizeu = floor(oversample_factor * imsizex);
@@ -575,9 +581,9 @@ namespace purify {
 
       t_real kb_interp_alpha = purify_pi * std::sqrt(Ju * Ju/(oversample_factor * oversample_factor) * (oversample_factor - 0.5) * (oversample_factor - 0.5) - 0.8);
       t_int total_samples = 2e5 * Ju;
-      auto kb_general = [&] (t_real x) { return MeasurementOperator::kaiser_bessel_general(x, Ju, kb_interp_alpha); };
-      Vector<t_real> samples = MeasurementOperator::kernel_samples(total_samples, kb_general, Ju);
-      auto kb_interp = [&] (t_real x) { return MeasurementOperator::kernel_linear_interp(samples, x, Ju); };
+      auto kb_general = [&] (t_real x) { return measurement_operator::kaiser_bessel_general(x, Ju, kb_interp_alpha); };
+      Vector<t_real> samples = measurement_operator::kernel_samples(total_samples, kb_general, Ju);
+      auto kb_interp = [&] (t_real x) { return measurement_operator::kernel_linear_interp(samples, x, Ju); };
       kernelu = kb_interp;
       kernelv = kb_interp;
       if (fft_grid_correction == false)
@@ -592,10 +598,10 @@ namespace purify {
     }
     if (kernel_name == "kb")
     {
-      auto kbu = [&] (t_real x) { return MeasurementOperator::kaiser_bessel(x, Ju); };
-      auto kbv = [&] (t_real x) { return MeasurementOperator::kaiser_bessel(x, Jv); };
-      auto ftkbu = [&] (t_real x) { return MeasurementOperator::ft_kaiser_bessel(x/st.ftsizeu - 0.5, Ju); };
-      auto ftkbv = [&] (t_real x) { return MeasurementOperator::ft_kaiser_bessel(x/st.ftsizev - 0.5, Jv); };
+      auto kbu = [&] (t_real x) { return measurement_operator::kaiser_bessel(x, Ju); };
+      auto kbv = [&] (t_real x) { return measurement_operator::kaiser_bessel(x, Jv); };
+      auto ftkbu = [&] (t_real x) { return measurement_operator::ft_kaiser_bessel(x/st.ftsizeu - 0.5, Ju); };
+      auto ftkbv = [&] (t_real x) { return measurement_operator::ft_kaiser_bessel(x/st.ftsizev - 0.5, Jv); };
       kernelu = kbu;
       kernelv = kbv;
       ftkernelu = ftkbu;
@@ -603,10 +609,10 @@ namespace purify {
     }
     if (kernel_name == "pswf")
     {
-      auto pswfu = [&] (t_real x) { return MeasurementOperator::pswf(x, Ju); };
-      auto pswfv = [&] (t_real x) { return MeasurementOperator::pswf(x, Jv); };
-      auto ftpswfu = [&] (t_real x) { return MeasurementOperator::ft_pswf(x/st.ftsizeu - 0.5, Ju); };
-      auto ftpswfv = [&] (t_real x) { return MeasurementOperator::ft_pswf(x/st.ftsizev - 0.5, Jv); };
+      auto pswfu = [&] (t_real x) { return measurement_operator::pswf(x, Ju); };
+      auto pswfv = [&] (t_real x) { return measurement_operator::pswf(x, Jv); };
+      auto ftpswfu = [&] (t_real x) { return measurement_operator::ft_pswf(x/st.ftsizeu - 0.5, Ju); };
+      auto ftpswfv = [&] (t_real x) { return measurement_operator::ft_pswf(x/st.ftsizev - 0.5, Jv); };
       kernelu = pswfu;
       kernelv = pswfv;
       ftkernelu = ftpswfu;
@@ -614,10 +620,10 @@ namespace purify {
     }
     if (kernel_name == "gauss")
     {
-      auto gaussu = [&] (t_real x) { return MeasurementOperator::gaussian(x, Ju); };
-      auto gaussv = [&] (t_real x) { return MeasurementOperator::gaussian(x, Jv); };
-      auto ftgaussu = [&] (t_real x) { return MeasurementOperator::ft_gaussian(x/st.ftsizeu - 0.5, Ju); };
-      auto ftgaussv = [&] (t_real x) { return MeasurementOperator::ft_gaussian(x/st.ftsizev - 0.5, Jv); };      
+      auto gaussu = [&] (t_real x) { return measurement_operator::gaussian(x, Ju); };
+      auto gaussv = [&] (t_real x) { return measurement_operator::gaussian(x, Jv); };
+      auto ftgaussu = [&] (t_real x) { return measurement_operator::ft_gaussian(x/st.ftsizeu - 0.5, Ju); };
+      auto ftgaussv = [&] (t_real x) { return measurement_operator::ft_gaussian(x/st.ftsizev - 0.5, Jv); };      
       kernelu = gaussu;
       kernelv = gaussv;
       ftkernelu = ftgaussu;
@@ -630,21 +636,21 @@ namespace purify {
     st.S = Image<t_real>::Zero(st.ftsizev, st.ftsizeu);
     if ( fft_grid_correction == true )
     {
-      st.S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, st.ftsizeu, st.ftsizev, Ju, Jv); // Does gridding correction with FFT
+      st.S = measurement_operator::measurement_operator::init_correction2d_fft(kernelu, kernelv, st.ftsizeu, st.ftsizev, Ju, Jv); // Does gridding correction with FFT
     }
     if ( fft_grid_correction == false )
     {
-      st.S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv, st.ftsizeu, st.ftsizev); // Does gridding correction using analytic formula
+      st.S = measurement_operator::measurement_operator::init_correction2d(ftkernelu, ftkernelv, st.ftsizeu, st.ftsizev); // Does gridding correction using analytic formula
     }
     
-    st.G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv, st.ftsizeu, st.ftsizev);
+    st.G = measurement_operator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv, st.ftsizeu, st.ftsizev);
     std::cout << "Gridding Operator Constructed" << '\n';
     std::cout << "------" << '\n';
     return st;
   }
 
 
-  t_real MeasurementOperator::kaiser_bessel(const t_real& x, const t_int& J)
+  t_real measurement_operator::kaiser_bessel(const t_real& x, const t_int& J)
   {
       /*
         kaiser bessel gridding kernel
@@ -654,7 +660,7 @@ namespace purify {
       return boost::math::cyl_bessel_i(0, std::real(alpha * std::sqrt(1 - a * a))) / boost::math::cyl_bessel_i(0, alpha);
   }
 
-  t_real MeasurementOperator::kaiser_bessel_general(const t_real& x, const t_int& J, const t_real& alpha)
+  t_real measurement_operator::kaiser_bessel_general(const t_real& x, const t_int& J, const t_real& alpha)
   {
       /*
         kaiser bessel gridding kernel
@@ -663,7 +669,7 @@ namespace purify {
       return boost::math::cyl_bessel_i(0, std::real(alpha * std::sqrt(1 - a * a))) / boost::math::cyl_bessel_i(0, alpha);
   }
 
-  t_real MeasurementOperator::ft_kaiser_bessel(const t_real& x, const t_int& J)
+  t_real measurement_operator::ft_kaiser_bessel(const t_real& x, const t_int& J)
   {
       /*
         Fourier transform of kaiser bessel gridding kernel
@@ -674,7 +680,7 @@ namespace purify {
       return std::real(std::sin(eta) / eta);
   }
 
-  t_real MeasurementOperator::gaussian(const t_real& x, const t_int& J)
+  t_real measurement_operator::gaussian(const t_real& x, const t_int& J)
   {
     /*
       Guassian gridding kernel
@@ -687,7 +693,7 @@ namespace purify {
       return std::exp(-a * a * 0.5);
   }
 
-  t_real MeasurementOperator::ft_gaussian(const t_real& x, const t_int& J)
+  t_real measurement_operator::ft_gaussian(const t_real& x, const t_int& J)
   {
     /*
       Fourier transform of guassian gridding kernel
@@ -701,7 +707,7 @@ namespace purify {
   }
 
 
-  t_real MeasurementOperator::calc_for_pswf(const t_real& x, const t_int& J, const t_real& alpha)
+  t_real measurement_operator::calc_for_pswf(const t_real& x, const t_int& J, const t_real& alpha)
   {
     /*
       Calculates Horner's Rule the standard PSWF for radio astronomy, with a support of J = 6 and alpha = 1.
@@ -769,7 +775,7 @@ namespace purify {
       return numerator / denominator;
   }
 
-  t_real MeasurementOperator::pswf(const t_real& x, const t_int& J)
+  t_real measurement_operator::pswf(const t_real& x, const t_int& J)
   {
     /*
       Calculates the standard PSWF for radio astronomy, with a support of J = 6 and alpha = 1.
@@ -784,10 +790,10 @@ namespace purify {
     */
       const t_real eta0 = 2 * x / J;
       const t_real alpha = 1;
-      return MeasurementOperator::calc_for_pswf(eta0, J, alpha) * std::pow(1 - eta0 * eta0, alpha);
+      return measurement_operator::calc_for_pswf(eta0, J, alpha) * std::pow(1 - eta0 * eta0, alpha);
   }
 
-  t_real MeasurementOperator::ft_pswf(const t_real& x, const t_int& J)
+  t_real measurement_operator::ft_pswf(const t_real& x, const t_int& J)
   {
     /*
       Calculates the fourier transform of the standard PSWF for radio astronomy, with a support of J = 6 and alpha = 1.
@@ -805,11 +811,11 @@ namespace purify {
       const t_real alpha = 1;
       const t_real eta0 = 2 * x;
 
-      return MeasurementOperator::calc_for_pswf(eta0, J, alpha);
+      return measurement_operator::calc_for_pswf(eta0, J, alpha);
 
   }
 
-  Vector<t_real> MeasurementOperator::kernel_samples(const t_int& total_samples, const std::function<t_real(t_real)> kernelu, const t_int& J)
+  Vector<t_real> measurement_operator::kernel_samples(const t_int& total_samples, const std::function<t_real(t_real)> kernelu, const t_int& J)
   {
     /*
       Pre-calculates samples of a kernel, that can be used with linear interpolation (see Rapid gridding reconstruction with a minimal oversampling ratio, Beatty et. al. 2005)
@@ -822,7 +828,7 @@ namespace purify {
       return samples;
   }
 
-  t_real MeasurementOperator::kernel_linear_interp(const Vector<t_real>& samples, const t_real& x, const t_int& J)
+  t_real measurement_operator::kernel_linear_interp(const Vector<t_real>& samples, const t_real& x, const t_int& J)
   {
     /*
       Calculates kernel using linear interpolation between pre-calculated samples. (see Rapid gridding reconstruction with a minimal oversampling ratio, Beatty et. al. 2005)

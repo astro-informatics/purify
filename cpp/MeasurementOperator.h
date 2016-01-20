@@ -10,12 +10,13 @@
 #include <stdio.h>
 #include <algorithm>
 #include <boost/math/special_functions/bessel.hpp>
+#include <array>
 
 
 namespace purify {
 
   //! This does something
-  class MeasurementOperator {
+  class measurement_operator {
     public:
       struct operator_params {
         Sparse<t_real> G;
@@ -32,15 +33,15 @@ namespace purify {
         Vector<t_complex> weights; // weights for visibilities
       };
       //! Reads in visibility file
-      MeasurementOperator::vis_params read_visibility(const std::string& vis_name);
+      measurement_operator::vis_params read_visibility(const std::string& vis_name);
       //! Scales visibilities to a given pixel size in arcseconds
-      MeasurementOperator::vis_params set_cell_size(const MeasurementOperator::vis_params& uv_vis, t_real cell_size_u = 0, t_real cell_size_v = 0);
+      measurement_operator::vis_params set_cell_size(const measurement_operator::vis_params& uv_vis, t_real cell_size_u = 0, t_real cell_size_v = 0);
       //! Apply weights to visiblities
       Vector<t_complex> apply_weights(const Vector<t_complex> visiblities, const Vector<t_complex> weights);
       //! scales the visibilities to units of pixels
-      MeasurementOperator::vis_params uv_scale(const MeasurementOperator::vis_params& uv_vis, const t_int& ftsizeu, const t_int& ftsizev);
+      measurement_operator::vis_params uv_scale(const measurement_operator::vis_params& uv_vis, const t_int& ftsizeu, const t_int& ftsizev);
       //! Puts in conjugate visibilities
-      MeasurementOperator::vis_params uv_symmetry(const MeasurementOperator::vis_params& uv_vis);
+      measurement_operator::vis_params uv_symmetry(const measurement_operator::vis_params& uv_vis);
       //! Performs fftshift on 1d vector
       Vector<t_complex> fftshift_1d(Vector<t_complex> input);
       //! Performs fftshift on 2d matrix
@@ -50,9 +51,9 @@ namespace purify {
       //! Performs ifftshift on 1d vector
       Vector<t_complex> ifftshift_1d(Vector<t_complex> input);
       //! Degridding operator that degrids image to visibilities
-      Vector<t_complex> degrid(const Image<t_complex>& eigen_image, const MeasurementOperator::operator_params st);
+      Vector<t_complex> degrid(const Image<t_complex>& eigen_image, const measurement_operator::operator_params st);
       //! Gridding operator that grids image from visibilities
-      Image<t_complex> grid(const Vector<t_complex>& visibilities, const MeasurementOperator::operator_params st);
+      Image<t_complex> grid(const Vector<t_complex>& visibilities, const measurement_operator::operator_params st);
       //! Uses Eigen's 1D FFT to perform 2D FFT
       Matrix<t_complex> fft2d(const Matrix<t_complex>& input);
       //! Uses Eigen's 1D IFFT to perform 2D IFFT
@@ -76,7 +77,7 @@ namespace purify {
       //! Generates scaling factors for gridding correction
       Image<t_real> init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv, const t_int ftsizeu, const t_int ftsizev);
       //! Generate gridding parameters, such as interpolation matrix
-      MeasurementOperator::operator_params init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, bool fft_grid_correction = false);
+      measurement_operator::operator_params init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, bool fft_grid_correction = false);
       //! Kaiser-Bessel kernel
       t_real kaiser_bessel(const t_real& x, const t_int& J);
       //! More general Kaiser-Bessel kernel
@@ -101,10 +102,7 @@ namespace purify {
       Vector<> something_;
     private:
       //polynomial coefficients for prolate spheriodal wave function rational approximation
-      t_real p1[6] = {8.203343e-2, -3.644705e-1, 6.278660e-1, -5.335581e-1, 2.312756e-1, 2*0.0};
-      t_real p2[6] = {4.028559e-3, -3.697768e-2, 1.021332e-1, -1.201436e-1, 6.412774e-2, 2*0.0};
-      t_real q1[3] = {1., 8.212018e-1, 2.078043e-1};
-      t_real q2[3] = {1., 9.599102e-1, 2.918724e-1};
+
   };
 }
 
