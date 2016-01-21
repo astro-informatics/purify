@@ -1,7 +1,14 @@
 #include "MeasurementOperator.h"
+#include "FFTOperator.h"
 
 namespace purify {
-
+  namespace {
+    //polynomial coefficients for prolate spheriodal wave function rational approximation
+    const std::array<t_real, 6> p1 = {8.203343e-2, -3.644705e-1, 6.278660e-1, -5.335581e-1, 2.312756e-1, 2*0.0};
+    const std::array<t_real, 6> p2 = {4.028559e-3, -3.697768e-2, 1.021332e-1, -1.201436e-1, 6.412774e-2, 2*0.0};
+    const std::array<t_real, 3> q1 = {1., 8.212018e-1, 2.078043e-1};
+    const std::array<t_real, 3> q2 = {1., 9.599102e-1, 2.918724e-1};
+  }
 
   MeasurementOperator::vis_params MeasurementOperator::read_visibility(const std::string& vis_name)
   {
