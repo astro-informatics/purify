@@ -1,11 +1,11 @@
 
 #include "MeasurementOperator.h"
-
+#include "utilities.h"
 using namespace purify;  
 
 int main( int nargs, char const** args ){
   MeasurementOperator op;
-  MeasurementOperator::vis_params uv_vis;
+  utilities::vis_params uv_vis;
   t_real max;
   t_real max_diff;
   t_real over_sample;
@@ -20,12 +20,12 @@ int main( int nargs, char const** args ){
   cellsize = 0.3;
   over_sample = 2;
   t_int J = 4;
-  uv_vis = op.read_visibility(vis_file); // visibility data being read in
+  uv_vis = utilities::read_visibility(vis_file); // visibility data being read in
   t_int width = 1024;
   t_int height = 1024;
-  uv_vis = op.set_cell_size(uv_vis, cellsize); // scale uv coordinates to correct pixel size and to units of 2pi
-  uv_vis = op.uv_scale(uv_vis, floor(width * over_sample), floor(height * over_sample)); // scale uv coordinates to units of Fourier grid size
-  uv_vis = op.uv_symmetry(uv_vis); // Enforce condjugate symmetry by reflecting measurements in uv coordinates
+  uv_vis = utilities::set_cell_size(uv_vis, cellsize); // scale uv coordinates to correct pixel size and to units of 2pi
+  uv_vis = utilities::uv_scale(uv_vis, floor(width * over_sample), floor(height * over_sample)); // scale uv coordinates to units of Fourier grid size
+  uv_vis = utilities::uv_symmetry(uv_vis); // Enforce condjugate symmetry by reflecting measurements in uv coordinates
 
   kernel = "kb";
   st = op.init_nufft2d(uv_vis.u, uv_vis.v, J, J, kernel, width, height, over_sample); // Generating gridding matrix
@@ -35,11 +35,11 @@ int main( int nargs, char const** args ){
   psf = op.grid(point_source, st);
   max = psf.real().maxCoeff();
   psf = psf / max;
-  op.writefits2d(psf.real(), "kb_psf.fits", true, false);
+  utilities::writefits2d(psf.real(), "kb_psf.fits", true, false);
 
   Image<t_real> kb_img = op.grid(uv_vis.vis, st).real();
   max = kb_img.maxCoeff();
   kb_img = kb_img / max;
-  op.writefits2d(kb_img.real(), "grid_image_real_kb_4.fits", true, false);
-  op.writefits2d(st.S.real(), "scale_kb_4.fits", true, false);
+  utilities::writefits2d(kb_img.real(), "grid_image_real_kb_4.fits", true, false);
+  utilities::writefits2d(st.S.real(), "scale_kb_4.fits", true, false);
 }
