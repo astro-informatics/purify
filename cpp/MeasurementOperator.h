@@ -2,15 +2,13 @@
 #define PURIFY_MEASUREMENT_OPERATOR_H
 
 #include "types.h"
+#include "utilities.h"
 
-#include <CCfits>
 #include <string>
-#include <fstream>
 #include <iostream>
-#include <stdio.h>
-#include <algorithm>
 #include <boost/math/special_functions/bessel.hpp>
 #include <array>
+
 
 
 namespace purify {
@@ -68,16 +66,6 @@ namespace purify {
 
       //Stuff that needs to be moved from measurement operator!
 
-      //! Reads in visibility file
-      MeasurementOperator::vis_params read_visibility(const std::string& vis_name);
-      //! Scales visibilities to a given pixel size in arcseconds
-      MeasurementOperator::vis_params set_cell_size(const MeasurementOperator::vis_params& uv_vis, t_real cell_size_u = 0, t_real cell_size_v = 0);
-      //! Apply weights to visiblities
-      Vector<t_complex> apply_weights(const Vector<t_complex> visiblities, const Vector<t_complex> weights);
-      //! scales the visibilities to units of pixels
-      MeasurementOperator::vis_params uv_scale(const MeasurementOperator::vis_params& uv_vis, const t_int& ftsizeu, const t_int& ftsizev);
-      //! Puts in conjugate visibilities
-      MeasurementOperator::vis_params uv_symmetry(const MeasurementOperator::vis_params& uv_vis);
       //! Performs fftshift on 1d vector
       Vector<t_complex> fftshift_1d(Vector<t_complex> input);
       //! Performs fftshift on 2d matrix
@@ -92,18 +80,13 @@ namespace purify {
       Matrix<t_complex> fft2d(const Matrix<t_complex>& input);
       //! Uses Eigen's 1D IFFT to perform 2D IFFT
       Matrix<t_complex> ifft2d(const Matrix<t_complex>& input);
-      //! Converts from subscript to index for matrix.
-      t_int sub2ind(const t_int& row, const t_int& col, const t_int& rows, const t_int& cols);
-      //! Converts from index to subscript for matrix.
-      void ind2sub(const t_int sub, const t_int cols, const t_int rows, t_int* row, t_int* col);
+
+
       //! Mod function modified to wrap circularly for negative numbers
       t_int mod(const t_real& x, const t_real& y);
       //! Match coordinates to grid
       Vector<t_real> omega_to_k(const Vector<t_real>& omega);
-      //! Write image to fits file
-      void writefits2d(Image<t_real> image, const std::string& fits_name, const bool& overwrite, const bool& flip);
-      //! Read image from fits file
-      Image<t_complex> readfits2d(const std::string& fits_name);
+
       //! Generates interpolation matrix from kernels
       Sparse<t_real> init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev);
       //! Generates scaling factors for gridding correction using an fft
@@ -112,6 +95,7 @@ namespace purify {
       Image<t_real> init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv, const t_int ftsizeu, const t_int ftsizev);
       //! Generate gridding parameters, such as interpolation matrix
       MeasurementOperator::operator_params init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, bool fft_grid_correction = false);
+      
       //! Kaiser-Bessel kernel
       t_real kaiser_bessel(const t_real& x, const t_int& J);
       //! More general Kaiser-Bessel kernel
@@ -132,8 +116,6 @@ namespace purify {
       Vector<t_real> kernel_samples(const t_int& total_samples, const std::function<t_real(t_real)> kernelu, const t_int& J);
       //! linearly interpolates from samples of kernel
       t_real kernel_linear_interp(const Vector<t_real>& samples, const t_real& x, const t_int& J);
-
-
 
   };
 }
