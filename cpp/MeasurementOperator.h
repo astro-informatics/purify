@@ -26,7 +26,9 @@ namespace purify {
         t_int ftsizev;
       };
 
+      //parameters needed for gridding and degridding function
       const params operator_params;
+      
       
       MeasurementOperator(const Vector<t_real>& u, const Vector<t_real>& v, const t_int & Ju, const t_int & Jv, const std::string & kernel_name, const t_int & imsizex, const t_int & imsizey, const t_real & oversample_factor, const bool & fft_grid_correction = false)
       //  : u_{u}, v_{v}, oversample_factor_{oversample_factor}, imsizex_{imsizex}, imsizey_{imsizey};
@@ -62,24 +64,9 @@ namespace purify {
       //! Gridding operator that grids image from visibilities
       Image<t_complex> grid(const Vector<t_complex>& visibilities);
 
-      //Stuff that needs to be moved from measurement operator!
-
-      //! Performs fftshift on 1d vector
-      Vector<t_complex> fftshift_1d(Vector<t_complex> input);
-      //! Performs fftshift on 2d matrix
-      Matrix<t_complex> fftshift_2d(Matrix<t_complex> input);
-      //! Performs fftshift on 2d matrix
-      Matrix<t_complex> ifftshift_2d(Matrix<t_complex> input);
-      //! Performs ifftshift on 1d vector
-      Vector<t_complex> ifftshift_1d(Vector<t_complex> input);
-
-
-      //! Uses Eigen's 1D FFT to perform 2D FFT
-      Matrix<t_complex> fft2d(const Matrix<t_complex>& input);
-      //! Uses Eigen's 1D IFFT to perform 2D IFFT
-      Matrix<t_complex> ifft2d(const Matrix<t_complex>& input);
-
-      //! Match coordinates to grid
+    private:
+      Fft2d fftop;
+      //! Match uv coordinates to grid
       Vector<t_real> omega_to_k(const Vector<t_real>& omega);
 
       //! Generates interpolation matrix from kernels
@@ -90,7 +77,7 @@ namespace purify {
       Image<t_real> init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv, const t_int ftsizeu, const t_int ftsizev);
       //! Generate gridding parameters, such as interpolation matrix
       MeasurementOperator::params init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, bool fft_grid_correction = false);
-      
+    public:
       //! Kaiser-Bessel kernel
       t_real kaiser_bessel(const t_real& x, const t_int& J);
       //! More general Kaiser-Bessel kernel

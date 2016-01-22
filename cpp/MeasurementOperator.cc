@@ -11,89 +11,6 @@ namespace purify {
   }
 
 
-
-  Vector<t_complex> MeasurementOperator::fftshift_1d(const Vector<t_complex> input) 
-  {
-    /*
-      Performs a 1D fftshift on a vector and returns the shifted vector
-
-      input:: vector to perform fftshift on.
-    */
-  
-    t_int input_size = input.size();
-    Vector<t_complex> output(input_size);
-    t_int NF = std::floor(input_size/2.0);
-    t_int NC = std::ceil(input_size/2.0);
-
-    
-    for (t_int i=0; i<NF; i++)
-      output(i)=input(i + NC);
-    
-    for (t_int i=NF; i<input_size; i++)
-      output(i)=input(i - NF);
-
-    return output;
-  }
-
-  Matrix<t_complex> MeasurementOperator::fftshift_2d(Matrix<t_complex> input) 
-  {
-    /*
-      Performs a 1D fftshift on a vector and returns the shifted vector
-
-      input:: vector to perform fftshift on.
-    */
-      t_int rows = input.rows();
-      t_int cols = input.cols();
-      for (t_int i = 0; i < cols; ++i)
-        input.col(i) = MeasurementOperator::fftshift_1d(input.col(i));
-
-      for (t_int i = 0; i < rows; ++i)
-        input.row(i) = MeasurementOperator::fftshift_1d(input.row(i));
-
-      return input;
-  }
-
-  Matrix<t_complex> MeasurementOperator::ifftshift_2d(Matrix<t_complex> input) 
-  {
-    /*
-      Performs a 1D fftshift on a vector and returns the shifted vector
-
-      input:: vector to perform fftshift on.
-    */
-      t_int rows = input.rows();
-      t_int cols = input.cols();
-      for (t_int i = 0; i < cols; ++i)
-        input.col(i) = MeasurementOperator::ifftshift_1d(input.col(i));
-
-      for (t_int i = 0; i < rows; ++i)
-        input.row(i) = MeasurementOperator::ifftshift_1d(input.row(i));
-
-      return input;
-  }
-
-  Vector<t_complex> MeasurementOperator::ifftshift_1d(Vector<t_complex> input) 
-  {
-    /*
-      Performs a 1D ifftshift on a vector and returns the shifted vector
-
-      input:: vector to perform ifftshift on.
-    */
-  
-    t_int input_size = input.size();
-    Vector<t_complex> output(input_size);
-    t_int NF = std::floor(input_size/2.0);
-    t_int NC = std::ceil(input_size/2.0);
-
-    
-    for (t_int i=0; i<NC; i++)
-      output(i)=input(i + NF);
-    
-    for (t_int i=NC; i<input_size; i++)
-      output(i)=input(i - NC);
-
-    return output;
-  }
-
   Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex>& eigen_image)
   {
     /*
@@ -123,7 +40,7 @@ namespace purify {
         }
       }
       // create fftgrid
-      ft_vector = MeasurementOperator::fft2d(MeasurementOperator::fftshift_2d(padded_image));
+      ft_vector = fftop.forward(fftop.shift(padded_image));
       // turn into vector
       ft_vector.resize(operator_params.ftsizeu*operator_params.ftsizev, 1);
       // get visibilities
@@ -142,7 +59,7 @@ namespace purify {
     */
       Matrix<t_complex> ft_vector = operator_params.G.adjoint() * visibilities;
       ft_vector.resize(operator_params.ftsizeu, operator_params.ftsizev);
-      Matrix<t_complex> padded_image = MeasurementOperator::ifftshift_2d(MeasurementOperator::ifft2d(ft_vector));
+      Matrix<t_complex> padded_image = fftop.ishift(fftop.inverse(ft_vector));
       Image<t_complex> eigen_image(operator_params.imsizex, operator_params.imsizey);
       t_int x_start = floor(operator_params.ftsizeu * 0.5 - operator_params.imsizex * 0.5);
       t_int y_start = floor(operator_params.ftsizev * 0.5 - operator_params.imsizey * 0.5);
@@ -158,61 +75,6 @@ namespace purify {
       return eigen_image;
       
   }
-
-  Matrix<t_complex> MeasurementOperator::fft2d(const Matrix<t_complex>& input)
-  {
-    /*
-      Returns FFT of a 2D matrix.
-
-      input:: complex valued image
-    */
-    Eigen::FFT<t_real> fft;
-    t_int dim_x = input.rows();
-    t_int dim_y = input.cols();
-    Matrix<t_complex> output(dim_x, dim_y);
-    for (t_int k = 0; k < dim_x; k++) {
-      Vector<t_complex> tmpOut(dim_y);
-      Vector<t_complex> tmpIn = input.row(k);
-      fft.fwd(tmpOut, tmpIn);
-      output.row(k) = tmpOut;
-    }
-
-    for (t_int k = 0; k < dim_y; k++) {
-      Vector<t_complex> tmpOut(dim_x);
-      Vector<t_complex> tmpIn = output.col(k);
-      fft.fwd(tmpOut, tmpIn);
-      output.col(k) = tmpOut;
-    }
-    return output;
-  }
-
-  Matrix<t_complex> MeasurementOperator::ifft2d(const Matrix<t_complex>& input)
-  {
-    /*
-      Returns FFT of a 2D matrix.
-
-      input:: complex valued image
-    */
-    Eigen::FFT<t_real> fft;
-    t_int dim_x = input.rows();
-    t_int dim_y = input.cols();
-    Matrix<t_complex> output(dim_x, dim_y);
-    for (t_int k = 0; k < dim_x; k++) {
-      Vector<t_complex> tmpOut(dim_y);
-      Vector<t_complex> tmpIn = input.row(k);
-      fft.inv(tmpOut, tmpIn);
-      output.row(k) = tmpOut;
-    }
-
-    for (t_int k = 0; k < dim_y; k++) {
-      Vector<t_complex> tmpOut(dim_x);
-      Vector<t_complex> tmpIn = output.col(k);
-      fft.inv(tmpOut, tmpIn);
-      output.col(k) = tmpOut;
-    }
-    return output;
-  }
-
 
 
 
@@ -305,7 +167,7 @@ namespace purify {
         K(n, m) = kernelu(i - Ju/2) * kernelv(j - Jv/2);
       }
     }
-    Image<t_real> S = MeasurementOperator::fftshift_2d(MeasurementOperator::ifft2d(K)).array().real();
+    Image<t_real> S = fftop.shift(fftop.inverse(K)).array().real();
     return 1/S;
 
   }  
