@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "utilities.h"
+#include "FFTOperator.h"
 
 #include <string>
 #include <iostream>
@@ -16,7 +17,7 @@ namespace purify {
   //! This does something
   class MeasurementOperator {
    public:
-      struct operator_params {
+      struct params {
         Sparse<t_real> G;
         Image<t_real> S;
         t_int imsizex;
@@ -24,15 +25,12 @@ namespace purify {
         t_int ftsizeu;
         t_int ftsizev;
       };
-      struct vis_params {
-        Vector<t_real> u; // u coordinates
-        Vector<t_real> v; // v coordinates
-        Vector<t_complex> vis; // complex visiblities
-        Vector<t_complex> weights; // weights for visibilities
-      };
 
-    //MeasurementOperator(const Vector<t_real>& u, const Vector<t_real>& v, const t_int & Ju, const t_int & Jv, const std::string & kernel_name, const t_int & imsizex, const t_int & imsizey, const t_real & oversample_factor, const bool & fft_grid_correction_ = false);
-    //  : u_{u}, v_{v}, oversample_factor_{oversample_factor}, imsizex_{imsizex}, imsizey_{imsizey};
+      const params operator_params;
+      
+      MeasurementOperator(const Vector<t_real>& u, const Vector<t_real>& v, const t_int & Ju, const t_int & Jv, const std::string & kernel_name, const t_int & imsizex, const t_int & imsizey, const t_real & oversample_factor, const bool & fft_grid_correction = false)
+      //  : u_{u}, v_{v}, oversample_factor_{oversample_factor}, imsizex_{imsizex}, imsizey_{imsizey};
+      : operator_params(MeasurementOperator::init_nufft2d(u, v, Ju, Jv, kernel_name, imsizex, imsizey, oversample_factor, fft_grid_correction)) {};
 
 #   define SOPT_MACRO(NAME, TYPE)                                                          \
         TYPE const& NAME() const { return NAME ## _; }                                     \
@@ -60,9 +58,9 @@ namespace purify {
 
 
       //! Degridding operator that degrids image to visibilities
-      Vector<t_complex> degrid(const Image<t_complex>& eigen_image, const MeasurementOperator::operator_params st);
+      Vector<t_complex> degrid(const Image<t_complex>& eigen_image);
       //! Gridding operator that grids image from visibilities
-      Image<t_complex> grid(const Vector<t_complex>& visibilities, const MeasurementOperator::operator_params st);
+      Image<t_complex> grid(const Vector<t_complex>& visibilities);
 
       //Stuff that needs to be moved from measurement operator!
 
@@ -81,9 +79,6 @@ namespace purify {
       //! Uses Eigen's 1D IFFT to perform 2D IFFT
       Matrix<t_complex> ifft2d(const Matrix<t_complex>& input);
 
-
-      //! Mod function modified to wrap circularly for negative numbers
-      t_int mod(const t_real& x, const t_real& y);
       //! Match coordinates to grid
       Vector<t_real> omega_to_k(const Vector<t_real>& omega);
 
@@ -94,7 +89,7 @@ namespace purify {
       //! Generates scaling factors for gridding correction
       Image<t_real> init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv, const t_int ftsizeu, const t_int ftsizev);
       //! Generate gridding parameters, such as interpolation matrix
-      MeasurementOperator::operator_params init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, bool fft_grid_correction = false);
+      MeasurementOperator::params init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, bool fft_grid_correction = false);
       
       //! Kaiser-Bessel kernel
       t_real kaiser_bessel(const t_real& x, const t_int& J);

@@ -94,7 +94,7 @@ namespace purify {
     return output;
   }
 
-  Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex>& eigen_image, const MeasurementOperator::operator_params st)
+  Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex>& eigen_image)
   {
     /*
       An operator that degrids an image and returns a vector of visibilities.
@@ -102,21 +102,21 @@ namespace purify {
       eigen_image:: input image to be degridded
       st:: gridding parameters
     */
-      Matrix<t_complex> padded_image(st.ftsizeu, st.ftsizev);
-      Matrix<t_complex> ft_vector(st.ftsizeu, st.ftsizev);
-      t_int x_start = floor(st.ftsizeu * 0.5 - st.imsizex * 0.5);
-      t_int y_start = floor(st.ftsizev * 0.5 - st.imsizey * 0.5);
-      t_int x_end = floor(st.ftsizeu * 0.5 + st.imsizex * 0.5);
-      t_int y_end = floor(st.ftsizev * 0.5 + st.imsizey * 0.5);
+      Matrix<t_complex> padded_image(operator_params.ftsizeu, operator_params.ftsizev);
+      Matrix<t_complex> ft_vector(operator_params.ftsizeu, operator_params.ftsizev);
+      t_int x_start = floor(operator_params.ftsizeu * 0.5 - operator_params.imsizex * 0.5);
+      t_int y_start = floor(operator_params.ftsizev * 0.5 - operator_params.imsizey * 0.5);
+      t_int x_end = floor(operator_params.ftsizeu * 0.5 + operator_params.imsizex * 0.5);
+      t_int y_end = floor(operator_params.ftsizev * 0.5 + operator_params.imsizey * 0.5);
 
       // zero padding and gridding correction
-      for (t_int i = 0; i < st.ftsizeu; ++i)
+      for (t_int i = 0; i < operator_params.ftsizeu; ++i)
       {
-        for (t_int j = 0; j < st.ftsizev; ++j)
+        for (t_int j = 0; j < operator_params.ftsizev; ++j)
         {
           if ( (i >= x_start) and (i < x_end) and (j >= y_start) and (j < y_end))
           {
-            padded_image(j, i) = st.S(j, i) * eigen_image(j - y_start, i - x_start);
+            padded_image(j, i) = operator_params.S(j, i) * eigen_image(j - y_start, i - x_start);
           }else{
             padded_image(j, i) = 0;
           }
@@ -125,14 +125,14 @@ namespace purify {
       // create fftgrid
       ft_vector = MeasurementOperator::fft2d(MeasurementOperator::fftshift_2d(padded_image));
       // turn into vector
-      ft_vector.resize(st.ftsizeu*st.ftsizev, 1);
+      ft_vector.resize(operator_params.ftsizeu*operator_params.ftsizev, 1);
       // get visibilities
-      Vector<t_complex> visibilities = st.G * ft_vector;
+      Vector<t_complex> visibilities = operator_params.G * ft_vector;
       return visibilities;
       
   }
 
-  Image<t_complex> MeasurementOperator::grid(const Vector<t_complex>& visibilities, const MeasurementOperator::operator_params st)
+  Image<t_complex> MeasurementOperator::grid(const Vector<t_complex>& visibilities)
   {
     /*
       An operator that degrids an image and returns a vector of visibilities.
@@ -140,19 +140,19 @@ namespace purify {
       visibilities:: input visibilities to be gridded
       st:: gridding parameters
     */
-      Matrix<t_complex> ft_vector = st.G.adjoint() * visibilities;
-      ft_vector.resize(st.ftsizeu, st.ftsizev);
+      Matrix<t_complex> ft_vector = operator_params.G.adjoint() * visibilities;
+      ft_vector.resize(operator_params.ftsizeu, operator_params.ftsizev);
       Matrix<t_complex> padded_image = MeasurementOperator::ifftshift_2d(MeasurementOperator::ifft2d(ft_vector));
-      Image<t_complex> eigen_image(st.imsizex, st.imsizey);
-      t_int x_start = floor(st.ftsizeu * 0.5 - st.imsizex * 0.5);
-      t_int y_start = floor(st.ftsizev * 0.5 - st.imsizey * 0.5);
-      t_int x_end = floor(st.ftsizeu * 0.5 + st.imsizex * 0.5);
-      t_int y_end = floor(st.ftsizev * 0.5 + st.imsizey * 0.5);
-      for (t_int i = 0; i < st.imsizex; ++i)
+      Image<t_complex> eigen_image(operator_params.imsizex, operator_params.imsizey);
+      t_int x_start = floor(operator_params.ftsizeu * 0.5 - operator_params.imsizex * 0.5);
+      t_int y_start = floor(operator_params.ftsizev * 0.5 - operator_params.imsizey * 0.5);
+      t_int x_end = floor(operator_params.ftsizeu * 0.5 + operator_params.imsizex * 0.5);
+      t_int y_end = floor(operator_params.ftsizev * 0.5 + operator_params.imsizey * 0.5);
+      for (t_int i = 0; i < operator_params.imsizex; ++i)
       {
-        for (t_int j = 0; j < st.imsizey; ++j)
+        for (t_int j = 0; j < operator_params.imsizey; ++j)
         {
-            eigen_image(j, i) = st.S(j + y_start, i + x_start) * padded_image(j + y_start, i + x_start);
+            eigen_image(j, i) = operator_params.S(j + y_start, i + x_start) * padded_image(j + y_start, i + x_start);
         }
       }
       return eigen_image;
@@ -310,7 +310,7 @@ namespace purify {
 
   }  
 
-  MeasurementOperator::operator_params MeasurementOperator::init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, bool fft_grid_correction)
+  MeasurementOperator::params MeasurementOperator::init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, bool fft_grid_correction)
   {
     /*
       Generates tools/operators needed for gridding and degridding.
@@ -329,7 +329,7 @@ namespace purify {
     std::cout << "Constructing Gridding Operator" << '\n';
 
 
-    MeasurementOperator::operator_params st;
+    MeasurementOperator::params st;
     st.imsizex = imsizex;
     st.imsizey = imsizey;
     st.ftsizeu = floor(oversample_factor * imsizex);
