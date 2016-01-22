@@ -7,6 +7,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <stdio.h>
 
 
 namespace purify {
@@ -34,8 +35,6 @@ namespace purify {
       void ind2sub(const t_int sub, const t_int cols, const t_int rows, t_int* row, t_int* col);
       //! Mod function modified to wrap circularly for negative numbers
       t_int mod(const t_real& x, const t_real& y);
-      //! Match coordinates to grid
-      Vector<t_real> omega_to_k(const Vector<t_real>& omega);
       //! Write image to fits file
       void writefits2d(Image<t_real> image, const std::string& fits_name, const bool& overwrite, const bool& flip);
       //! Read image from fits file
