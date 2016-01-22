@@ -2,8 +2,7 @@
 #include "FFTOperator.h"
 
 namespace purify {
-
-  Vector<t_complex> fftshift_1d(const Vector<t_complex> input) 
+  Vector<t_complex> Fft2d::fftshift_1d(const Vector<t_complex> input)
   {
     /*
       Performs a 1D fftshift on a vector and returns the shifted vector
@@ -26,7 +25,7 @@ namespace purify {
     return output;
   }
 
-  Vector<t_complex> ifftshift_1d(Vector<t_complex> input) 
+  Vector<t_complex> Fft2d::ifftshift_1d(const Vector<t_complex> input)
   {
     /*
       Performs a 1D ifftshift on a vector and returns the shifted vector
@@ -49,7 +48,7 @@ namespace purify {
     return output;
   }
 
- Matrix<t_complex> Fft2d::direct(const Matrix<t_complex>& input)
+ Matrix<t_complex> Fft2d::forward(const Matrix<t_complex>& input)
   {
     /*
       Returns FFT of a 2D matrix.
@@ -76,10 +75,10 @@ namespace purify {
     return output;
   }
 
-  Matrix<t_complex> Fft2d::indirect(const Matrix<t_complex>& input)
+  Matrix<t_complex> Fft2d::inverse(const Matrix<t_complex>& input)
   {
     /*
-      Returns FFT of a 2D matrix.
+      Returns IFFT of a 2D matrix.
 
       input:: complex valued image
     */
@@ -103,8 +102,7 @@ namespace purify {
     return output;
   }
 
-
-  Matrix<t_complex> Fft2d::shift(Matrix<t_complex> input) 
+  Matrix<t_complex> Fft2d::shift(Matrix<t_complex> input)
   {
     /*
       Performs a 1D fftshift on a vector and returns the shifted vector
@@ -122,7 +120,7 @@ namespace purify {
       return input;
   }
 
-  Matrix<t_complex> Fft2d::ishift(Matrix<t_complex> input) 
+  Matrix<t_complex> Fft2d::ishift(Matrix<t_complex> input)
   {
     /*
       Performs a 1D fftshift on a vector and returns the shifted vector

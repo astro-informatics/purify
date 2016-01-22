@@ -18,15 +18,22 @@ namespace purify {
 
   //! This does something
   class Fft2d {
+  private:
+
+      //! Performs fftshift on vector
+      Vector<t_complex> fftshift_1d(const Vector<t_complex> input);
+      //! Performs ifftshift on vector
+      Vector<t_complex> ifftshift_1d(const Vector<t_complex> input);
+
   public:
-      Matrix<t_complex> shift(Matrix<t_complex> input);
       //! Performs fftshift on 2d matrix
+      Matrix<t_complex> shift(Matrix<t_complex> input);
+      //! Performs ifftshift on 2d matrix
       Matrix<t_complex> ishift(Matrix<t_complex> input);
-      //! Performs ifftshift on 1d vector
-      Matrix<t_complex> direct(const Matrix<t_complex>& input);
+      //! Uses Eigen's 1D FFT to perform 2D FFT
+      Matrix<t_complex> forward(const Matrix<t_complex>& input);
       //! Uses Eigen's 1D IFFT to perform 2D IFFT
-      Matrix<t_complex> indirect(const Matrix<t_complex>& input);
-      //! Converts from subscript to index for matrix.
+      Matrix<t_complex> inverse(const Matrix<t_complex>& input);
    };
 }
 
