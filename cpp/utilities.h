@@ -3,7 +3,6 @@
 
 #include "types.h"
 
-#include <CCfits>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -35,10 +34,6 @@ namespace purify {
       void ind2sub(const t_int sub, const t_int cols, const t_int rows, t_int* row, t_int* col);
       //! Mod function modified to wrap circularly for negative numbers
       t_int mod(const t_real& x, const t_real& y);
-      //! Write image to fits file
-      void writefits2d(Image<t_real> image, const std::string& fits_name, const bool& overwrite, const bool& flip);
-      //! Read image from fits file
-      Image<t_complex> readfits2d(const std::string& fits_name);
 
  }
 }
