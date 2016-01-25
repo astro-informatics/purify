@@ -1,6 +1,8 @@
 
 #include "MeasurementOperator.h"
 #include "utilities.h"
+#include "pfitsio.h"
+
 using namespace purify;  
 
 int main( int nargs, char const** args ){
@@ -29,16 +31,16 @@ int main( int nargs, char const** args ){
   kernel = "kb";
   MeasurementOperator op(uv_vis.u, uv_vis.v, J, J, kernel, width, height, over_sample); // Generating gridding matrix
  
-  Vector<t_complex> point_source = uv_vis.vis * 0; point_source.setOnes();  // Creating model visibilities for point source
-  Image<t_complex> psf;
-  psf = op.grid(point_source);
-  max = psf.real().maxCoeff();
-  psf = psf / max;
-  utilities::writefits2d(psf.real(), "kb_psf.fits", true, false);
+  //Vector<t_complex> point_source = uv_vis.vis * 0; point_source.setOnes();  // Creating model visibilities for point source
+  //Image<t_complex> psf;
+  //psf = op.grid(point_source);
+  //max = psf.real().maxCoeff();
+  //psf = psf / max;
+  //pfitsio::write2d(psf.real(), "kb_psf.fits", true, false);
 
   Image<t_real> kb_img = op.grid(uv_vis.vis).real();
-  max = kb_img.maxCoeff();
-  kb_img = kb_img / max;
-  utilities::writefits2d(kb_img.real(), "grid_image_real_kb_4.fits", true, false);
-  utilities::writefits2d(op.operator_params.S.real(), "scale_kb_4.fits", true, false);
+  //max = kb_img.maxCoeff();
+  //kb_img = kb_img / max;
+  //pfitsio::write2d(kb_img.real(), "grid_image_real_kb_4.fits", true, false);
+  //pfitsio::write2d(op.operator_params.S.real(), "scale_kb_4.fits", true, false);
 }
