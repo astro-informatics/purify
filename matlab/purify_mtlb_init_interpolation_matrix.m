@@ -38,7 +38,7 @@ if parallel_type == 1
             cols = sub2ind([FTu, FTv], i, j); % Columns for each value of (u+ju, v+jv) at each visibility
             index = sub2ind([M,FTu*FTv], 1:M, cols'); % Convert the columns into an index for sparse matrix
             temp_index{ju, jv} = index;
-            temp_interp{ju, jv} =+ kernelu(U-um,ju).*kernelv(V-vm,jv);
+            temp_interp{ju, jv} =+ exp(-2*pi*1i*((um(m)+ju)*0.5 + (vm(m)+jv)*0.5))*kernelu(U-um,ju).*kernelv(V-vm,jv);
         end
     end
     %Storing temp variables into sparse matrix structure.
@@ -66,19 +66,12 @@ if parallel_type == 2
                 cols = sub2ind([FTu, FTv], i, j); % Columns for each value of (u+ju, v+jv) at each visibility
                 index = sub2ind([M,FTu*FTv], m, cols'); % Convert the columns into an index for sparse matrix
                 temp_index(ju, jv, m) = index;
-                temp_interp(ju, jv, m) = kernelu(U(m)-um(m),ju).*kernelv(V(m)-vm(m),jv);
+                temp_interp(ju, jv, m) = exp(-2*pi*1i*((um(m)+ju)*0.5 + (vm(m)+jv)*0.5))*kernelu(U(m)-um(m),ju).*kernelv(V(m)-vm(m),jv);
             end
         end
     end
     %Storing temp variables into sparse matrix structure.
     fprintf('Finished generating interpolation matrix\n')
-%     parfor ju = 1:Ju
-%         for jv = 1:Jv
-%             for m = 1:M
-%                 interpolation_matrix(temp_index{ju, jv, m}) = temp_interp{ju, jv, m};
-%             end
-%         end
-%     end
     [I, J] = ind2sub([M,FTu*FTv], reshape(temp_index,Ju*Jv*M,1));
     clear temp_index;
     fprintf('Storing interpolation matrix\n')
