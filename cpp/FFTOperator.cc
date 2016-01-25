@@ -102,40 +102,42 @@ namespace purify {
     return output;
   }
 
-  Matrix<t_complex> Fft2d::shift(Matrix<t_complex> input)
+  Matrix<t_complex> Fft2d::shift(const Matrix<t_complex> & input)
   {
     /*
       Performs a 1D fftshift on a vector and returns the shifted vector
 
       input:: vector to perform fftshift on.
     */
+      Matrix<t_complex> output  = input;
       t_int rows = input.rows();
       t_int cols = input.cols();
       for (t_int i = 0; i < cols; ++i)
-        input.col(i) = fftshift_1d(input.col(i));
+        output.col(i) = fftshift_1d(input.col(i));
 
       for (t_int i = 0; i < rows; ++i)
-        input.row(i) = fftshift_1d(input.row(i));
+        output.row(i) = fftshift_1d(input.row(i));
 
-      return input;
+      return output;
   }
 
-  Matrix<t_complex> Fft2d::ishift(Matrix<t_complex> input)
+  Matrix<t_complex> Fft2d::ishift(const Matrix<t_complex> & input)
   {
     /*
       Performs a 1D fftshift on a vector and returns the shifted vector
 
       input:: vector to perform fftshift on.
     */
+      Matrix<t_complex> output  = input;
       t_int rows = input.rows();
       t_int cols = input.cols();
       for (t_int i = 0; i < cols; ++i)
-        input.col(i) = ifftshift_1d(input.col(i));
+        output.col(i) = ifftshift_1d(input.col(i));
 
       for (t_int i = 0; i < rows; ++i)
-        input.row(i) = ifftshift_1d(input.row(i));
+        output.row(i) = ifftshift_1d(input.row(i));
 
-      return input;
+      return output;
   }
 
 
