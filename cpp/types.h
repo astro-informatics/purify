@@ -4,7 +4,6 @@
 #include <complex>
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-#include <unsupported/Eigen/FFT>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -23,10 +22,10 @@ namespace purify {
   typedef size_t t_uint;
   //! Root of the type hierarchy for real numbers
   typedef double t_real;
-  //! Root of the type hierarchy for triplet lists
-  typedef Eigen::Triplet<t_real> t_tripletList;
   //! Root of the type hierarchy for (real) complex numbers
   typedef std::complex<t_real> t_complex;
+  //! Root of the type hierarchy for triplet lists
+  typedef Eigen::Triplet<t_complex> t_tripletList;
 
   //! \brief A vector of a given type
   //! \details Operates as mathematical vector.

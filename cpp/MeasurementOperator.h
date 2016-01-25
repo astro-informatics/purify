@@ -18,7 +18,7 @@ namespace purify {
   class MeasurementOperator {
    public:
       struct params {
-        Sparse<t_real> G;
+        Sparse<t_complex> G;
         Image<t_real> S;
         t_int imsizex;
         t_int imsizey;
@@ -64,13 +64,13 @@ namespace purify {
       //! Gridding operator that grids image from visibilities
       Image<t_complex> grid(const Vector<t_complex>& visibilities);
 
-    private:
+    protected:
       Fft2d fftop;
       //! Match uv coordinates to grid
       Vector<t_real> omega_to_k(const Vector<t_real>& omega);
 
       //! Generates interpolation matrix from kernels
-      Sparse<t_real> init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev);
+      Sparse<t_complex> init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev);
       //! Generates scaling factors for gridding correction using an fft
       Image<t_real> init_correction2d_fft(const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev, const t_int Ju, const t_int Jv);
       //! Generates scaling factors for gridding correction

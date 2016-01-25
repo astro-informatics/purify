@@ -40,9 +40,10 @@ namespace purify {
         }
       }
       // create fftgrid
-      ft_vector = fftop.forward(fftop.shift(padded_image));
+      //ft_vector = fftop.forward(fftop.shift(padded_image)); 
+      ft_vector = fftop.forward(padded_image); // the fftshift is not needed because of the phase shift in the gridding kernel
       // turn into vector
-      ft_vector.resize(operator_params.ftsizeu*operator_params.ftsizev, 1);
+      ft_vector.resize(operator_params.ftsizeu*operator_params.ftsizev, 1); // using conservativeResize does not work, it grables the image. Also, not sure it is what we want.
       // get visibilities
       Vector<t_complex> visibilities = operator_params.G * ft_vector;
       return visibilities;
@@ -58,8 +59,10 @@ namespace purify {
       st:: gridding parameters
     */
       Matrix<t_complex> ft_vector = operator_params.G.adjoint() * visibilities;
-      ft_vector.resize(operator_params.ftsizeu, operator_params.ftsizev);
-      Matrix<t_complex> padded_image = fftop.ishift(fftop.inverse(ft_vector));
+      ft_vector.resize(operator_params.ftsizeu, operator_params.ftsizev); // using conservativeResize does not work, it grables the image. Also, not sure it is what we want.
+      
+      //Matrix<t_complex> padded_image = fftop.ishift(fftop.inverse(ft_vector));
+      Matrix<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
       Image<t_complex> eigen_image(operator_params.imsizex, operator_params.imsizey);
       t_int x_start = floor(operator_params.ftsizeu * 0.5 - operator_params.imsizex * 0.5);
       t_int y_start = floor(operator_params.ftsizev * 0.5 - operator_params.imsizey * 0.5);
@@ -89,7 +92,7 @@ namespace purify {
 
 
 
-  Sparse<t_real> MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev) 
+  Sparse<t_complex> MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev) 
   {
     /* 
       Given u and v coordinates, creates a gridding interpolation matrix that maps between visibilities and the fourier transform grid.
@@ -107,6 +110,8 @@ namespace purify {
   // Need to write exception for u.size() != v.size()
   t_real rows = u.size();
   t_real cols = ftsizeu * ftsizev;
+  t_real x0 = 0.5;
+  t_real y0 = 0.5;
   t_int q;
   t_int p;
   t_int index;
@@ -124,11 +129,12 @@ namespace purify {
           {
             p = utilities::mod(k_v(m) + jv, ftsizev);
             index = utilities::sub2ind(p, q, ftsizev, ftsizeu);
-            entries.push_back(t_tripletList(m, index, kernelu(u(m)-(k_u(m)+ju)) * kernelv(v(m)-(k_v(m)+jv))));
+            const t_complex I(0, 1);
+            entries.push_back(t_tripletList(m, index, std::exp(-2 * purify_pi * I *((k_u(m) + ju) * 0.5+ (k_v(m) + jv) * 0.5 )) * kernelu(u(m)-(k_u(m)+ju)) * kernelv(v(m)-(k_v(m)+jv))));
           }
         }
       }    
-    Sparse<t_real> interpolation_matrix(rows, cols);
+    Sparse<t_complex> interpolation_matrix(rows, cols);
     interpolation_matrix.setFromTriplets(entries.begin(), entries.end());
     return interpolation_matrix; 
   }
