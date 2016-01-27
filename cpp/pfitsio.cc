@@ -3,8 +3,13 @@
 namespace purify {
 	namespace pfitsio {
 
-	  void write2d(Image<t_real> eigen_image, const std::string& fits_name, const bool& overwrite, const bool& flip) 
+	  void write2d(const Image<t_real>& eigen_image, const std::string& fits_name, const bool& overwrite, const bool& flip) 
 	  {
+	    if (flip == true)
+	    {
+	      write2d(eigen_image.rowwise().reverse(), fits_name, overwrite, false);
+	      return;
+	    }
 	    /*
 	      Writes an image to a fits file.
 
@@ -12,24 +17,14 @@ namespace purify {
 	      fits_name:: string contating the file name of the fits file.
 	    */
 	    if (overwrite == true) {remove(fits_name.c_str());};
-	    std::auto_ptr<CCfits::FITS> pFits(0);
 	    long naxes[2] = {static_cast<long>(eigen_image.rows()), static_cast<long>(eigen_image.cols())};
-	    pFits.reset(new CCfits::FITS(fits_name, FLOAT_IMG, 2, naxes));
+	    std::unique_ptr<CCfits::FITS> pFits(new CCfits::FITS(fits_name, FLOAT_IMG, 2, naxes));
 	    long fpixel (1);
-	    std::vector<long> extAx; 
-	    extAx.push_back(naxes[0]);
-	    extAx.push_back(naxes[1]);
+	    std::vector<long> extAx = {eigen_image.rows(), eigen_image.cols()};
 	    CCfits::ExtHDU* imageExt = pFits->addImage(fits_name, FLOAT_IMG, extAx);
-	    if (flip == true)
-	    {
-	      eigen_image = eigen_image.rowwise().reverse().eval();
-	    }
-	    eigen_image.resize(naxes[0]*naxes[1], 1);
+	    
 	    std::valarray<double> image(naxes[0]*naxes[1]);
-	    for (int i = 0; i < static_cast<int>(naxes[0]*naxes[1]); ++i)
-	    {
-	      image[i] = static_cast<float>(eigen_image(i));
-	    }
+	    std::copy(eigen_image.data(), eigen_image.data() + eigen_image.size(), &image[0]);
 	    imageExt->write(fpixel, naxes[0]*naxes[1], image);
 	  }
 	  
@@ -48,15 +43,7 @@ namespace purify {
 	    t_int ax1(image.axis(0));
 	    t_int ax2(image.axis(1));
 	    Image<t_complex> eigen_image(ax1, ax2);
-	    t_int index;
-	    for (t_int i = 0; i < ax1; ++i)
-	    {
-	      for (t_int j = 0; j < ax2; ++j)
-	      {
-	        index = utilities::sub2ind(j, i, ax2, ax1);
-	        eigen_image(i, j) = contents[index];
-	      }
-	    }
+	    std::copy(&contents[0], &contents[0] + eigen_image.size(), eigen_image.data());
 	    return eigen_image;
 	  }
 	}
