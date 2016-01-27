@@ -21,16 +21,17 @@ V = [V;-V]/m*2*pi;
 vis = [vis; conj(vis)];
 
 st = purify_mtlb_init_nufft([U, V], imsize, oversample_rate, kernel_type, [Ju, Jv]);
-fftdata = st.gridding_matrix' * vis;
-fftdata = transpose(reshape(fftdata, FTsize(1), FTsize(2)));
 
-im = ifftshift(ifft2(fftdata))*sqrt(FTsize(1)*FTsize(2));
-im_deconv = im.*st.gridding_correction;
+At = @(y) purify_mtlb_grid(y,st);
 
-c = (FTsize + mod(FTsize,2))/2 - (imsize+mod(imsize,2))/2+1;
+im_deconv = At(vis);
 
-im = im(c(1):c(1)+imsize(1)-1, c(2):c(2)+imsize(2)-1);
-im_deconv = im_deconv(c(1):c(1)+imsize(1)-1, c(2):c(2)+imsize(2)-1);
+st.gridding_correction = 1 + 0*st.gridding_correction;
+
+At = @(y) purify_mtlb_grid(y,st);
+
+im = At(vis);
+
 figure
 realim_deconv = real(im_deconv);
 image(realim_deconv/max(max(realim_deconv))*100);
@@ -38,12 +39,13 @@ image(realim_deconv/max(max(realim_deconv))*100);
 figure
 realim = real(im);
 image(realim/max(max(realim))*100);
+
 %figure
 %imagim = imag(im);
 %image(imagim);
 realname = sprintf('at166BtestReal_deconvJ%d%s%d.fits',Ju, kernel_type, oversample_rate);
-fitswrite(flipud(realim_deconv/max(max(realim_deconv))), realname)
+fitswrite(rot90(realim_deconv/max(max(realim_deconv)), 3), realname)
 realname = sprintf('at166BtestRealJ%d%s%d.fits',Ju, kernel_type, oversample_rate);
-fitswrite(flipud(realim/max(max(realim))), realname)
+fitswrite(rot90(realim/max(max(realim)), 3), realname)
 %imagname = sprintf('at166BtestImagJ%d%s.fits',Ju, kernel_type);
 %fitswrite(imagim, imagname)
