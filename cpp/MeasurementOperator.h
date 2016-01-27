@@ -17,23 +17,17 @@ namespace purify {
   //! This does something
   class MeasurementOperator {
    public:
-      struct params {
-        Sparse<t_complex> G;
+       Sparse<t_complex> G;
         Image<t_real> S;
-        t_int imsizex;
-        t_int imsizey;
-        t_int ftsizeu;
-        t_int ftsizev;
-      };
-
-      //parameters needed for gridding and degridding function
-      const params operator_params;
+        const t_int imsizex;
+        const t_int imsizey;
+        const t_int ftsizeu;
+        const t_int ftsizev;
       
       
-      MeasurementOperator(const Vector<t_real>& u, const Vector<t_real>& v, const t_int & Ju, const t_int & Jv, const std::string & kernel_name, const t_int & imsizex, const t_int & imsizey, const t_real & oversample_factor, const bool & fft_grid_correction = false)
-      //  : u_{u}, v_{v}, oversample_factor_{oversample_factor}, imsizex_{imsizex}, imsizey_{imsizey};
-      : operator_params(MeasurementOperator::init_nufft2d(u, v, Ju, Jv, kernel_name, imsizex, imsizey, oversample_factor, fft_grid_correction)) {};
-
+      
+      MeasurementOperator(const Vector<t_real>& u, const Vector<t_real>& v, const t_int & Ju, const t_int & Jv, const std::string & kernel_name, const t_int & imsizex, const t_int & imsizey, const t_real & oversample_factor, bool fft_grid_correction = false);
+     
 #   define SOPT_MACRO(NAME, TYPE)                                                          \
         TYPE const& NAME() const { return NAME ## _; }                                     \
         MeasurementOperator & NAME(TYPE const &NAME) { NAME ## _ = NAME; return *this; }  \
@@ -70,13 +64,11 @@ namespace purify {
       Vector<t_real> omega_to_k(const Vector<t_real>& omega);
 
       //! Generates interpolation matrix from kernels
-      Sparse<t_complex> init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev);
+      Sparse<t_complex> init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv);
       //! Generates scaling factors for gridding correction using an fft
-      Image<t_real> init_correction2d_fft(const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev, const t_int Ju, const t_int Jv);
+      Image<t_real> init_correction2d_fft(const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int Ju, const t_int Jv);
       //! Generates scaling factors for gridding correction
-      Image<t_real> init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv, const t_int ftsizeu, const t_int ftsizev);
-      //! Generate gridding parameters, such as interpolation matrix
-      MeasurementOperator::params init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, bool fft_grid_correction = false);
+      Image<t_real> init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv);
     public:
       //! Kaiser-Bessel kernel
       t_real kaiser_bessel(const t_real& x, const t_int& J);
@@ -88,7 +80,13 @@ namespace purify {
       t_real gaussian(const t_real& x, const t_int& J);
       //! Fourier transform of Gaussian kernel
       t_real ft_gaussian(const t_real& x, const t_int& J);
-      //! Performs calculations for PSWF and its Fourier Transform
+      //! \brief Calculates Horner's Rule the standard PSWF for radio astronomy, with a support of J = 6 and alpha = 1.
+      //! \param[in] eta0: value to evaluate
+      //! \param[in] J: support size of gridding kernel
+      //! \param[in] alpha: type of special PSWF to calculate
+      //! \details The tailored prolate spheroidal wave functions for gridding radio astronomy.
+      //! Details are explained in Optimal Gridding of Visibility Data in Radio
+      //! Astronomy, F. R. Schwab 1983.
       t_real calc_for_pswf(const t_real& x, const t_int& J, const t_real& alpha);
       //! PSWF kernel
       t_real pswf(const t_real& x, const t_int& J);

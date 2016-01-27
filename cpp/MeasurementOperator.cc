@@ -2,15 +2,6 @@
 #include "FFTOperator.h"
 
 namespace purify {
-  namespace {
-    //polynomial coefficients for prolate spheriodal wave function rational approximation
-    const std::array<t_real, 6> p1 = {8.203343e-2, -3.644705e-1, 6.278660e-1, -5.335581e-1, 2.312756e-1, 2*0.0};
-    const std::array<t_real, 6> p2 = {4.028559e-3, -3.697768e-2, 1.021332e-1, -1.201436e-1, 6.412774e-2, 2*0.0};
-    const std::array<t_real, 3> q1 = {1., 8.212018e-1, 2.078043e-1};
-    const std::array<t_real, 3> q2 = {1., 9.599102e-1, 2.918724e-1};
-  }
-
-
   Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex>& eigen_image)
   {
     /*
@@ -19,23 +10,23 @@ namespace purify {
       eigen_image:: input image to be degridded
       st:: gridding parameters
     */
-      Matrix<t_complex> padded_image = Matrix<t_complex>::Zero(operator_params.ftsizeu, operator_params.ftsizev);
-      Matrix<t_complex> ft_vector(operator_params.ftsizeu, operator_params.ftsizev);
-      t_int x_start = floor(operator_params.ftsizeu * 0.5 - operator_params.imsizex * 0.5);
-      t_int y_start = floor(operator_params.ftsizev * 0.5 - operator_params.imsizey * 0.5);
+      Matrix<t_complex> padded_image = Matrix<t_complex>::Zero(ftsizeu, ftsizev);
+      Matrix<t_complex> ft_vector(ftsizeu, ftsizev);
+      t_int x_start = floor(ftsizeu * 0.5 - imsizex * 0.5);
+      t_int y_start = floor(ftsizev * 0.5 - imsizey * 0.5);
 
       // zero padding and gridding correction
-      padded_image.block(y_start, x_start, operator_params.imsizey, operator_params.imsizex)
-          = operator_params.S.block(y_start, x_start, operator_params.imsizey, operator_params.imsizex) * eigen_image;
+      padded_image.block(y_start, x_start, imsizey, imsizex)
+          = S.block(y_start, x_start, imsizey, imsizex) * eigen_image;
       
 
       // create fftgrid
       //ft_vector = fftop.forward(fftop.shift(padded_image)); 
       ft_vector = fftop.forward(padded_image); // the fftshift is not needed because of the phase shift in the gridding kernel
       // turn into vector
-      ft_vector.resize(operator_params.ftsizeu*operator_params.ftsizev, 1); // using conservativeResize does not work, it grables the image. Also, not sure it is what we want.
+      ft_vector.resize(ftsizeu*ftsizev, 1); // using conservativeResize does not work, it grables the image. Also, not sure it is what we want.
       // get visibilities
-      return operator_params.G * ft_vector;
+      return G * ft_vector;
       
   }
 
@@ -47,15 +38,15 @@ namespace purify {
       visibilities:: input visibilities to be gridded
       st:: gridding parameters
     */
-      Matrix<t_complex> ft_vector = operator_params.G.adjoint() * visibilities;
-      ft_vector.resize(operator_params.ftsizeu, operator_params.ftsizev); // using conservativeResize does not work, it grables the image. Also, not sure it is what we want.
+      Matrix<t_complex> ft_vector = G.adjoint() * visibilities;
+      ft_vector.resize(ftsizeu, ftsizev); // using conservativeResize does not work, it grables the image. Also, not sure it is what we want.
       
       //Matrix<t_complex> padded_image = fftop.ishift(fftop.inverse(ft_vector));
       Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
-      t_int x_start = floor(operator_params.ftsizeu * 0.5 - operator_params.imsizex * 0.5);
-      t_int y_start = floor(operator_params.ftsizev * 0.5 - operator_params.imsizey * 0.5);
-      return operator_params.S.block(y_start, x_start, operator_params.imsizey, operator_params.imsizex) 
-         * padded_image.block(y_start, x_start, operator_params.imsizey, operator_params.imsizex);
+      t_int x_start = floor(ftsizeu * 0.5 - imsizex * 0.5);
+      t_int y_start = floor(ftsizev * 0.5 - imsizey * 0.5);
+      return S.block(y_start, x_start, imsizey, imsizex) 
+         * padded_image.block(y_start, x_start, imsizey, imsizex);
   }
 
 
@@ -71,7 +62,7 @@ namespace purify {
 
 
 
-  Sparse<t_complex> MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev) 
+  Sparse<t_complex> MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv) 
   {
     /* 
       Given u and v coordinates, creates a gridding interpolation matrix that maps between visibilities and the fourier transform grid.
@@ -116,7 +107,7 @@ namespace purify {
     return interpolation_matrix; 
   }
 
-  Image<t_real> MeasurementOperator::init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv, const t_int ftsizeu, const t_int ftsizev)
+  Image<t_real> MeasurementOperator::init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv)
   {
     /*
       Given the fourier transform of a gridding kernel, creates the scaling image for gridding correction.
@@ -127,7 +118,7 @@ namespace purify {
     return (1e0 / range.head(ftsizeu).unaryExpr(ftkernelu)).matrix() * (1e0 / range.head(ftsizev).unaryExpr(ftkernelv)).matrix().transpose();
   }
 
-  Image<t_real> MeasurementOperator::init_correction2d_fft(const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev, const t_int Ju, const t_int Jv)
+  Image<t_real> MeasurementOperator::init_correction2d_fft(const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int Ju, const t_int Jv)
   {
     /*
       Given the gridding kernel, creates the scaling image for gridding correction using an fft.
@@ -148,7 +139,9 @@ namespace purify {
 
   }  
 
-  MeasurementOperator::params MeasurementOperator::init_nufft2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::string kernel_name, const t_int imsizex, const t_int imsizey, const t_real oversample_factor, bool fft_grid_correction)
+  MeasurementOperator::MeasurementOperator(const Vector<t_real>& u, const Vector<t_real>& v, const t_int &Ju, const t_int &Jv, const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, bool fft_grid_correction)
+      : imsizex(imsizex), imsizey(imsizey), ftsizeu(floor(oversample_factor * imsizex)), ftsizev(floor(oversample_factor * imsizey))
+    
   {
     /*
       Generates tools/operators needed for gridding and degridding.
@@ -167,11 +160,6 @@ namespace purify {
     std::cout << "Constructing Gridding Operator" << '\n';
 
 
-    MeasurementOperator::params st;
-    st.imsizex = imsizex;
-    st.imsizey = imsizey;
-    st.ftsizeu = floor(oversample_factor * imsizex);
-    st.ftsizev = floor(oversample_factor * imsizey);
     std::function<t_real(t_real)>  kernelu;
     std::function<t_real(t_real)> kernelv;
     std::function<t_real(t_real)> ftkernelu;
@@ -200,8 +188,8 @@ namespace purify {
     {
       auto kbu = [&] (t_real x) { return MeasurementOperator::kaiser_bessel(x, Ju); };
       auto kbv = [&] (t_real x) { return MeasurementOperator::kaiser_bessel(x, Jv); };
-      auto ftkbu = [&] (t_real x) { return MeasurementOperator::ft_kaiser_bessel(x/st.ftsizeu - 0.5, Ju); };
-      auto ftkbv = [&] (t_real x) { return MeasurementOperator::ft_kaiser_bessel(x/st.ftsizev - 0.5, Jv); };
+      auto ftkbu = [&] (t_real x) { return MeasurementOperator::ft_kaiser_bessel(x/ftsizeu - 0.5, Ju); };
+      auto ftkbv = [&] (t_real x) { return MeasurementOperator::ft_kaiser_bessel(x/ftsizev - 0.5, Jv); };
       kernelu = kbu;
       kernelv = kbv;
       ftkernelu = ftkbu;
@@ -211,8 +199,8 @@ namespace purify {
     {
       auto pswfu = [&] (t_real x) { return MeasurementOperator::pswf(x, Ju); };
       auto pswfv = [&] (t_real x) { return MeasurementOperator::pswf(x, Jv); };
-      auto ftpswfu = [&] (t_real x) { return MeasurementOperator::ft_pswf(x/st.ftsizeu - 0.5, Ju); };
-      auto ftpswfv = [&] (t_real x) { return MeasurementOperator::ft_pswf(x/st.ftsizev - 0.5, Jv); };
+      auto ftpswfu = [&] (t_real x) { return MeasurementOperator::ft_pswf(x/ftsizeu - 0.5, Ju); };
+      auto ftpswfv = [&] (t_real x) { return MeasurementOperator::ft_pswf(x/ftsizev - 0.5, Jv); };
       kernelu = pswfu;
       kernelv = pswfv;
       ftkernelu = ftpswfu;
@@ -222,8 +210,8 @@ namespace purify {
     {
       auto gaussu = [&] (t_real x) { return MeasurementOperator::gaussian(x, Ju); };
       auto gaussv = [&] (t_real x) { return MeasurementOperator::gaussian(x, Jv); };
-      auto ftgaussu = [&] (t_real x) { return MeasurementOperator::ft_gaussian(x/st.ftsizeu - 0.5, Ju); };
-      auto ftgaussv = [&] (t_real x) { return MeasurementOperator::ft_gaussian(x/st.ftsizev - 0.5, Jv); };      
+      auto ftgaussu = [&] (t_real x) { return MeasurementOperator::ft_gaussian(x/ftsizeu - 0.5, Ju); };
+      auto ftgaussv = [&] (t_real x) { return MeasurementOperator::ft_gaussian(x/ftsizev - 0.5, Jv); };      
       kernelu = gaussu;
       kernelv = gaussv;
       ftkernelu = ftgaussu;
@@ -233,20 +221,19 @@ namespace purify {
     std::cout << "Support of Kernel " << kernel_name << '\n';
     std::cout << "Ju: " << Ju << '\n';
     std::cout << "Jv: " << Jv << '\n';
-    st.S = Image<t_real>::Zero(st.ftsizev, st.ftsizeu);
+    S = Image<t_real>::Zero(ftsizev, ftsizeu);
     if ( fft_grid_correction == true )
     {
-      st.S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, st.ftsizeu, st.ftsizev, Ju, Jv); // Does gridding correction with FFT
+      S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, Ju, Jv); // Does gridding correction with FFT
     }
     if ( fft_grid_correction == false )
     {
-      st.S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv, st.ftsizeu, st.ftsizev); // Does gridding correction using analytic formula
+      S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv); // Does gridding correction using analytic formula
     }
     
-    st.G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv, st.ftsizeu, st.ftsizev);
+    G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv);
     std::cout << "Gridding Operator Constructed" << '\n';
     std::cout << "------" << '\n';
-    return st;
   }
 
 
@@ -307,20 +294,14 @@ namespace purify {
   }
 
 
-  t_real MeasurementOperator::calc_for_pswf(const t_real& x, const t_int& J, const t_real& alpha)
+  t_real MeasurementOperator::calc_for_pswf(const t_real& eta0, const t_int& J, const t_real& alpha)
   {
-    /*
-      Calculates Horner's Rule the standard PSWF for radio astronomy, with a support of J = 6 and alpha = 1.
-      
-      x:: value to evaluate
-      J:: support size of gridding kernel
-      alpha:: type of special PSWF to calculate
+    //polynomial coefficients for prolate spheriodal wave function rational approximation
+    const std::array<t_real, 6> p1 = {8.203343e-2, -3.644705e-1, 6.278660e-1, -5.335581e-1, 2.312756e-1, 2*0.0};
+    const std::array<t_real, 6> p2 = {4.028559e-3, -3.697768e-2, 1.021332e-1, -1.201436e-1, 6.412774e-2, 2*0.0};
+    const std::array<t_real, 3> q1 = {1., 8.212018e-1, 2.078043e-1};
+    const std::array<t_real, 3> q2 = {1., 9.599102e-1, 2.918724e-1};
 
-      The tailored prolate spheroidal wave functions for gridding radio astronomy.
-      Details are explained in Optimal Gridding of Visibility Data in Radio
-      Astronomy, F. R. Schwab 1983.
-
-    */
 
       if (J != 6 or alpha != 1)
       {
@@ -328,51 +309,30 @@ namespace purify {
       }
       //Calculating numerator and denominator using Horner's rule.
       // PSWF = numerator / denominator
-      t_real eta0 = x;
-      t_real numerator = 0;
-      t_real denominator = 1;
 
-      t_int p_size = 0;
-      t_int q_size = 0;
+      auto fraction = [](t_real eta, std::array<t_real, 6> const&p, std::array<t_real, 3> const &q) {
+        auto const p_size = sizeof(p) / sizeof(p[0]) - 1;
+        auto const q_size = sizeof(q) / sizeof(q[0]) - 1;
+
+        auto numerator = p[p_size];
+        for (t_int i = 1; i <= p_size; ++i)
+        {
+          numerator = eta * numerator + p[p_size - i];
+        }
+
+        auto denominator = q[q_size];
+        for (t_int i = 1; i <= q_size; ++i)
+        {
+          denominator = eta * denominator + q[q_size - i];
+        }
+        return numerator / denominator;
+      };
       if (0 <= std::abs(eta0) and std::abs(eta0) <= 0.75)
-      {
-        t_real eta = eta0 * eta0 - 0.75 * 0.75;
-        p_size = sizeof(p1) / sizeof(p1[0]) - 1;
-        q_size = sizeof(q1) / sizeof(q1[0]) - 1;
-
-        numerator = p1[p_size];
-        for (t_int i = 1; i <= p_size; ++i)
-        {
-          numerator = eta * numerator + p1[p_size - i];
-        }
-
-        denominator = q1[q_size];
-        for (t_int i = 1; i <= q_size; ++i)
-        {
-          denominator = eta * denominator + q1[q_size - i];
-        }
-
-      }
+        return fraction(eta0 * eta0 - 0.75 * 0.75, p1, q1);
       if (0.75 < std::abs(eta0) and std::abs(eta0) <= 1)
-      {
-        t_real eta = eta0 * eta0 - 1 * 1;
-        p_size = sizeof(p2) / sizeof(p2[0]) - 1;
-        q_size = sizeof(q2) / sizeof(q2[0]) - 1;
-      
-        numerator = p2[p_size];
-
-        for (t_int i = 1; i <= p_size; ++i)
-        {
-          numerator = eta * numerator + p2[p_size - i];
-        }
-
-        denominator = q2[q_size];
-        for (t_int i = 1; i <= q_size; ++i)
-        {
-          denominator = eta * denominator + q2[q_size - i];
-        }
-      }
-      return numerator / denominator;
+        return fraction(eta0 * eta0 - 1 * 1, p2, q2);
+  
+      return 0;
   }
 
   t_real MeasurementOperator::pswf(const t_real& x, const t_int& J)

@@ -42,5 +42,5 @@ int main( int nargs, char const** args ){
   //max = kb_img.maxCoeff();
   //kb_img = kb_img / max;
   //pfitsio::write2d(kb_img.real(), "grid_image_real_kb_4.fits", true, false);
-  //pfitsio::write2d(op.operator_params.S.real(), "scale_kb_4.fits", true, false);
+  //pfitsio::write2d(op.S.real(), "scale_kb_4.fits", true, false);
 }
