@@ -19,34 +19,23 @@ namespace purify {
       eigen_image:: input image to be degridded
       st:: gridding parameters
     */
-      Matrix<t_complex> padded_image(operator_params.ftsizeu, operator_params.ftsizev);
+      Matrix<t_complex> padded_image = Matrix<t_complex>::Zero(operator_params.ftsizeu, operator_params.ftsizev);
       Matrix<t_complex> ft_vector(operator_params.ftsizeu, operator_params.ftsizev);
       t_int x_start = floor(operator_params.ftsizeu * 0.5 - operator_params.imsizex * 0.5);
       t_int y_start = floor(operator_params.ftsizev * 0.5 - operator_params.imsizey * 0.5);
-      t_int x_end = floor(operator_params.ftsizeu * 0.5 + operator_params.imsizex * 0.5);
-      t_int y_end = floor(operator_params.ftsizev * 0.5 + operator_params.imsizey * 0.5);
 
       // zero padding and gridding correction
-      for (t_int i = 0; i < operator_params.ftsizeu; ++i)
-      {
-        for (t_int j = 0; j < operator_params.ftsizev; ++j)
-        {
-          if ( (i >= x_start) and (i < x_end) and (j >= y_start) and (j < y_end))
-          {
-            padded_image(j, i) = operator_params.S(j, i) * eigen_image(j - y_start, i - x_start);
-          }else{
-            padded_image(j, i) = 0;
-          }
-        }
-      }
+      padded_image.block(y_start, x_start, operator_params.imsizey, operator_params.imsizex)
+          = operator_params.S.block(y_start, x_start, operator_params.imsizey, operator_params.imsizex) * eigen_image;
+      
+
       // create fftgrid
       //ft_vector = fftop.forward(fftop.shift(padded_image)); 
       ft_vector = fftop.forward(padded_image); // the fftshift is not needed because of the phase shift in the gridding kernel
       // turn into vector
       ft_vector.resize(operator_params.ftsizeu*operator_params.ftsizev, 1); // using conservativeResize does not work, it grables the image. Also, not sure it is what we want.
       // get visibilities
-      Vector<t_complex> visibilities = operator_params.G * ft_vector;
-      return visibilities;
+      return operator_params.G * ft_vector;
       
   }
 
@@ -62,21 +51,11 @@ namespace purify {
       ft_vector.resize(operator_params.ftsizeu, operator_params.ftsizev); // using conservativeResize does not work, it grables the image. Also, not sure it is what we want.
       
       //Matrix<t_complex> padded_image = fftop.ishift(fftop.inverse(ft_vector));
-      Matrix<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
-      Image<t_complex> eigen_image(operator_params.imsizex, operator_params.imsizey);
+      Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
       t_int x_start = floor(operator_params.ftsizeu * 0.5 - operator_params.imsizex * 0.5);
       t_int y_start = floor(operator_params.ftsizev * 0.5 - operator_params.imsizey * 0.5);
-      t_int x_end = floor(operator_params.ftsizeu * 0.5 + operator_params.imsizex * 0.5);
-      t_int y_end = floor(operator_params.ftsizev * 0.5 + operator_params.imsizey * 0.5);
-      for (t_int i = 0; i < operator_params.imsizex; ++i)
-      {
-        for (t_int j = 0; j < operator_params.imsizey; ++j)
-        {
-            eigen_image(j, i) = operator_params.S(j + y_start, i + x_start) * padded_image(j + y_start, i + x_start);
-        }
-      }
-      return eigen_image;
-      
+      return operator_params.S.block(y_start, x_start, operator_params.imsizey, operator_params.imsizex) 
+         * padded_image.block(y_start, x_start, operator_params.imsizey, operator_params.imsizex);
   }
 
 
@@ -110,8 +89,6 @@ namespace purify {
   // Need to write exception for u.size() != v.size()
   t_real rows = u.size();
   t_real cols = ftsizeu * ftsizev;
-  t_real x0 = 0.5;
-  t_real y0 = 0.5;
   t_int q;
   t_int p;
   t_int index;
@@ -130,7 +107,7 @@ namespace purify {
             p = utilities::mod(k_v(m) + jv, ftsizev);
             index = utilities::sub2ind(p, q, ftsizev, ftsizeu);
             const t_complex I(0, 1);
-            entries.push_back(t_tripletList(m, index, std::exp(-2 * purify_pi * I *((k_u(m) + ju) * 0.5+ (k_v(m) + jv) * 0.5 )) * kernelu(u(m)-(k_u(m)+ju)) * kernelv(v(m)-(k_v(m)+jv))));
+            entries.emplace_back(m, index, std::exp(-2 * purify_pi * I *((k_u(m) + ju) * 0.5+ (k_v(m) + jv) * 0.5 )) * kernelu(u(m)-(k_u(m)+ju)) * kernelv(v(m)-(k_v(m)+jv)));
           }
         }
       }    
@@ -145,16 +122,9 @@ namespace purify {
       Given the fourier transform of a gridding kernel, creates the scaling image for gridding correction.
 
     */
-    Image<t_real> S(ftsizeu, ftsizev);
-    for (int i = 0; i < ftsizeu; ++i)
-    {
-      for (int j = 0; j < ftsizev; ++j)
-      {
-        S(j ,i) = 1/(ftkernelu(i) * ftkernelv(j));
-      }
-    }
-    return S;
-
+    Array<t_real> range;
+    range.setLinSpaced(std::max(ftsizeu, ftsizev), 0, std::max(ftsizeu, ftsizev));
+    return (1e0 / range.head(ftsizeu).unaryExpr(ftkernelu)).matrix() * (1e0 / range.head(ftsizev).unaryExpr(ftkernelv)).matrix().transpose();
   }
 
   Image<t_real> MeasurementOperator::init_correction2d_fft(const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int ftsizeu, const t_int ftsizev, const t_int Ju, const t_int Jv)
@@ -173,7 +143,7 @@ namespace purify {
         K(n, m) = kernelu(i - Ju/2) * kernelv(j - Jv/2);
       }
     }
-    Image<t_real> S = fftop.shift(fftop.inverse(K)).array().real();
+    Image<t_real> S = fftop.shift(fftop.inverse(K)).array().real(); // probably really slow!
     return 1/S;
 
   }  
@@ -219,10 +189,7 @@ namespace purify {
       auto kb_interp = [&] (t_real x) { return MeasurementOperator::kernel_linear_interp(samples, x, Ju); };
       kernelu = kb_interp;
       kernelv = kb_interp;
-      if (fft_grid_correction == false)
-      {
-        fft_grid_correction = true;
-      }
+      fft_grid_correction = true;
     }
 
     if ((kernel_name == "pswf") and (Ju != 6 or Jv != 6))
