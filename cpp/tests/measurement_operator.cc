@@ -320,7 +320,7 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     max = kb_vis.cwiseAbs().maxCoeff();
     kb_vis = kb_vis / max;
     max_diff = 0;
-
+    
     for (int i = 0; i < psf_vis.size(); ++i)
     {
       if (std::abs(std::abs(psf_vis(i)) - 1) > max_diff)
