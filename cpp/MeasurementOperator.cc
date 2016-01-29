@@ -17,7 +17,7 @@ namespace purify {
 
       // zero padding and gridding correction
       padded_image.block(y_start, x_start, imsizey, imsizex)
-          = S.block(y_start, x_start, imsizey, imsizex) * eigen_image;
+          = S * eigen_image;
       
 
       // create fftgrid
@@ -40,13 +40,11 @@ namespace purify {
     */
       Matrix<t_complex> ft_vector = G.adjoint() * visibilities;
       ft_vector.resize(ftsizeu, ftsizev); // using conservativeResize does not work, it grables the image. Also, not sure it is what we want.
-      
       //Matrix<t_complex> padded_image = fftop.ishift(fftop.inverse(ft_vector));
       Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
       t_int x_start = floor(ftsizeu * 0.5 - imsizex * 0.5);
       t_int y_start = floor(ftsizev * 0.5 - imsizey * 0.5);
-      return S.block(y_start, x_start, imsizey, imsizex) 
-         * padded_image.block(y_start, x_start, imsizey, imsizex);
+      return S * padded_image.block(y_start, x_start, imsizey, imsizex);
   }
 
 
@@ -113,9 +111,11 @@ namespace purify {
       Given the fourier transform of a gridding kernel, creates the scaling image for gridding correction.
 
     */
+    t_int x_start = floor(ftsizeu * 0.5 - imsizex * 0.5);
+    t_int y_start = floor(ftsizev * 0.5 - imsizey * 0.5);
     Array<t_real> range;
-    range.setLinSpaced(std::max(ftsizeu, ftsizev), 0, std::max(ftsizeu, ftsizev));
-    return (1e0 / range.head(ftsizeu).unaryExpr(ftkernelu)).matrix() * (1e0 / range.head(ftsizev).unaryExpr(ftkernelv)).matrix().transpose();
+    range.setLinSpaced(std::max(ftsizeu, ftsizev), 0, std::max(ftsizeu, ftsizev) - 1);
+    return (1e0 / range.segment(x_start, imsizex).unaryExpr(ftkernelu)).matrix() * (1e0 / range.segment(y_start, imsizey).unaryExpr(ftkernelv)).matrix().transpose();
   }
 
   Image<t_real> MeasurementOperator::init_correction2d_fft(const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int Ju, const t_int Jv)
@@ -131,10 +131,13 @@ namespace purify {
       for (int j = 0; j < Jv; ++j)
       {
         t_int m = utilities::mod(j - Jv/2, ftsizev);
-        K(n, m) = kernelu(i - Ju/2) * kernelv(j - Jv/2);
+        const t_complex I(0, 1);
+        K(n, m) = kernelu(i - Ju/2) * kernelv(j - Jv/2) * std::exp(-2 * purify_pi * I * ((i - Ju/2)  * 0.5 + (j - Jv/2) * 0.5 ));
       }
     }
-    Image<t_real> S = fftop.shift(fftop.inverse(K)).array().real(); // probably really slow!
+    t_int x_start = floor(ftsizeu * 0.5 - imsizex * 0.5);
+    t_int y_start = floor(ftsizev * 0.5 - imsizey * 0.5);
+    Image<t_real> S = fftop.inverse(K).array().real().block(y_start, x_start, imsizey, imsizex); // probably really slow!
     return 1/S;
 
   }  
@@ -221,7 +224,7 @@ namespace purify {
     std::cout << "Support of Kernel " << kernel_name << '\n';
     std::cout << "Ju: " << Ju << '\n';
     std::cout << "Jv: " << Jv << '\n';
-    S = Image<t_real>::Zero(ftsizev, ftsizeu);
+    S = Image<t_real>::Zero(imsizey, imsizex);
     if ( fft_grid_correction == true )
     {
       S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, Ju, Jv); // Does gridding correction with FFT

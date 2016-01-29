@@ -59,7 +59,7 @@ namespace purify {
       Image<t_complex> grid(const Vector<t_complex>& visibilities);
 
     protected:
-      Fft2d fftop;
+      FFTOperator fftop;
       //! Match uv coordinates to grid
       Vector<t_real> omega_to_k(const Vector<t_real>& omega);
 
