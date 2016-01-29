@@ -1,7 +1,10 @@
 if(EIGEN3_INCLUDE_DIR)
   include_directories(${EIGEN3_INCLUDE_DIR})
 endif()
+include_directories(${FFTW3_INCLUDE_DIR})
 add_library(cppurify MeasurementOperator.cc FFTOperator.cc utilities.cc pfitsio.cc)
+target_link_libraries(cppurify ${FFTW3_DOUBLE_LIBRARY})
+
 add_dependencies(cppurify lookup_dependencies)
 
 add_subdirectory(example)

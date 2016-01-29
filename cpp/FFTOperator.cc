@@ -140,6 +140,21 @@ namespace purify {
       return output;
   }
 
+  Matrix<t_complex> FFTOperator::forward(const Matrix<t_complex>& input)
+  {
+    Matrix<t_complex> dest;
+    dest.resizeLike(input);
+    impl().fwd2(dest.data(), input.data(), input.rows(), input.cols());
+    return dest;
+  }
+  Matrix<t_complex> FFTOperator::inverse(const Matrix<t_complex>& input)
+  {
+    Matrix<t_complex> dest;
+    dest.resizeLike(input);
+    impl().inv2(dest.data(), input.data(), input.rows(), input.cols()) ;
+    return dest / (input.cols() * input.rows());
+  }
+
 
 
 }

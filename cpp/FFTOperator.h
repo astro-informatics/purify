@@ -4,6 +4,8 @@
 
 #include "types.h"
 
+#include <fftw3.h>
+#include <unsupported/Eigen/src/FFT/ei_fftw_impl.h>
 #include <unsupported/Eigen/FFT>
 
 
@@ -28,6 +30,15 @@ namespace purify {
       //! Performs ifftshift on 2d matrix
       Matrix<t_complex> ishift(const Matrix<t_complex>& input);
    };
+
+  class FFTOperator : protected Eigen::FFT<t_real, Eigen::internal::fftw_impl<t_real>>
+  {
+  public:
+    //! Uses Eigen's 1D FFT to perform 2D FFT
+    Matrix<t_complex> forward(const Matrix<t_complex>& input);
+    //! Uses Eigen's 1D IFFT to perform 2D IFFT
+    Matrix<t_complex> inverse(const Matrix<t_complex>& input);
+  };
 }
 
 #endif
