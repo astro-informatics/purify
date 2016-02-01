@@ -21,11 +21,10 @@ namespace purify {
 	    std::unique_ptr<CCfits::FITS> pFits(new CCfits::FITS(fits_name, FLOAT_IMG, 2, naxes));
 	    long fpixel (1);
 	    std::vector<long> extAx = {eigen_image.rows(), eigen_image.cols()};
-	    CCfits::ExtHDU* imageExt = pFits->addImage(fits_name, FLOAT_IMG, extAx);
 	    
 	    std::valarray<double> image(naxes[0]*naxes[1]);
 	    std::copy(eigen_image.data(), eigen_image.data() + eigen_image.size(), &image[0]);
-	    imageExt->write(fpixel, naxes[0]*naxes[1], image);
+	    pFits->pHDU().write ( fpixel, naxes[0]*naxes[1], image);
 	  }
 	  
 	  Image<t_complex> read2d(const std::string& fits_name)
