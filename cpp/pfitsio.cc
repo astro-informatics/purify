@@ -1,3 +1,4 @@
+#include <CCfits/CCfits>
 #include "pfitsio.h"
 
 namespace purify {

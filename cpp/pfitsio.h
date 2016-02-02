@@ -3,7 +3,6 @@
 
 #include "types.h"
 
-#include <CCfits>
 #include "utilities.h"
 
 
