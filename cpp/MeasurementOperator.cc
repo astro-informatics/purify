@@ -21,10 +21,9 @@ namespace purify {
       
 
       // create fftgrid
-      //ft_vector = fftop.forward(fftop.shift(padded_image)); 
       ft_vector = fftop.forward(padded_image); // the fftshift is not needed because of the phase shift in the gridding kernel
       // turn into vector
-      ft_vector.resize(ftsizeu*ftsizev, 1); // using conservativeResize does not work, it grables the image. Also, not sure it is what we want.
+      ft_vector.resize(ftsizeu*ftsizev, 1); // using conservativeResize does not work, it grables the image. Also, it is not what we want.
       // get visibilities
       return G * ft_vector;
       
@@ -39,8 +38,7 @@ namespace purify {
       st:: gridding parameters
     */
       Matrix<t_complex> ft_vector = G.adjoint() * visibilities;
-      ft_vector.resize(ftsizeu, ftsizev); // using conservativeResize does not work, it grables the image. Also, not sure it is what we want.
-      //Matrix<t_complex> padded_image = fftop.ishift(fftop.inverse(ft_vector));
+      ft_vector.resize(ftsizeu, ftsizev); // using conservativeResize does not work, it grables the image. Also, it is not what we want.
       Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
       t_int x_start = floor(ftsizeu * 0.5 - imsizex * 0.5);
       t_int y_start = floor(ftsizev * 0.5 - imsizey * 0.5);
@@ -60,7 +58,8 @@ namespace purify {
 
 
 
-  Sparse<t_complex> MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv) 
+  Sparse<t_complex> MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, 
+          const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv) 
   {
     /* 
       Given u and v coordinates, creates a gridding interpolation matrix that maps between visibilities and the fourier transform grid.
@@ -142,7 +141,8 @@ namespace purify {
 
   }  
 
-  MeasurementOperator::MeasurementOperator(const Vector<t_real>& u, const Vector<t_real>& v, const t_int &Ju, const t_int &Jv, const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, bool fft_grid_correction)
+  MeasurementOperator::MeasurementOperator(const Vector<t_real>& u, const Vector<t_real>& v, const t_int &Ju, const t_int &Jv, 
+      const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, bool fft_grid_correction)
       : imsizex(imsizex), imsizey(imsizey), ftsizeu(floor(oversample_factor * imsizex)), ftsizev(floor(oversample_factor * imsizey))
     
   {

@@ -39,8 +39,8 @@ int main( int nargs, char const** args ){
   //pfitsio::write2d(psf.real(), "kb_psf.fits", true, false);
 
   Image<t_real> kb_img = op.grid(uv_vis.vis).real();
-  //max = kb_img.maxCoeff();
-  //kb_img = kb_img / max;
-  //pfitsio::write2d(kb_img.real(), "grid_image_real_kb_4.fits", true, false);
+  max = kb_img.maxCoeff();
+  kb_img = kb_img / max;
+  pfitsio::write2d(kb_img.real(), "grid_image_real_kb_4.fits", true, false);
   //pfitsio::write2d(op.S.real(), "scale_kb_4.fits", true, false);
 }
