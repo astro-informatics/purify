@@ -7,15 +7,17 @@ set(TEST_SOURCE purify_test.c)
 set(ABOUT_SOURCE purify_about.c)
 
 # Adds include directories
+if(BLAS_INCLUDE_DIR)
+  include_directories(${BLAS_INCLUDE_DIR})
+endif()
+if(Sopt_INCLUDE_DIRS)
+  include_directories(${Sopt_INCLUDE_DIRS})
+endif()
 include_directories(
   ${FFTW3_INCLUDE_DIR}
   ${CFitsIO_INCLUDE_DIR}
   ${TIFF_INCLUDE_DIR}
-  ${Sopt_INCLUDE_DIRS}
 )
-if(BLAS_INCLUDE_DIR)
-  include_directories(${BLAS_INCLUDE_DIR})
-endif()
 
 # Target libraries for the different executables
 set(TARGET_LIBRARIES

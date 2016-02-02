@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-#include <CCfits>
+#include <CCfits/CCfits>
 #include <string>
 #include <fstream>
 #include <iostream>

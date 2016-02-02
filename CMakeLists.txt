@@ -83,7 +83,3 @@ if(LINK_TO_ABSOLUTE_PYTHON_PATH AND APPLE)
         "${PROJECT_BINARY_DIR}/post_install/build" # Build dir
     )
 endif()
-
-# include boost
-find_package( Boost 1.55.0)
-include_directories(${Boost_INCLUDE_DIRS})
