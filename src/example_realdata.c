@@ -5,6 +5,7 @@
  * Coverage: VLA simulation with M=140918 visibilities.
  *
  */
+#include "purify_config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,14 +17,8 @@
 #include <time.h> 
 #ifdef _OPENMP 
   #include <omp.h>
-#endif 
-#ifdef __APPLE__
-  #include <Accelerate/Accelerate.h>
-#elif __unix__
-  #include <cblas.h>
-#else
-  #include <cblas.h>
-#endif 
+#endif
+#include PURIFY_BLAS_H
 #include "purify_visibility.h"
 #include "purify_sparsemat.h"
 #include "purify_image.h"

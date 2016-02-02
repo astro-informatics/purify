@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(Purify C)
+project(Purify C CXX)
 
 # Location of extra cmake includes for the project
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_files)
@@ -16,6 +16,7 @@ get_gitref()
 # Add C99 flag, since code uses inline
 # yeah, yeah it is GNU C, and others since for ever, but it was not part of the standard.
 include(AddC99Flags)
+include(AddCPP11Flags)
 
 option(tests          "Enable testing"                                  on)
 option(openmp         "Enable OpenMP"                                   off)
@@ -53,6 +54,7 @@ endif()
 
 if(tests)  # Adds ctest
     enable_testing()
+    include(AddCatchTest)
 endif()
 
 include_directories(
@@ -64,6 +66,7 @@ add_subdirectory(src)
 add_subdirectory(include)
 add_subdirectory(python)
 add_subdirectory(doc)
+add_subdirectory(cpp)
 
 if(LINK_TO_ABSOLUTE_PYTHON_PATH AND APPLE)
     configure_file(
