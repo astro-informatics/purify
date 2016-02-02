@@ -5,6 +5,7 @@
 #include "utilities.h"
 #include "FFTOperator.h"
 
+#include <CCfits/CCfits>
 #include <string>
 #include <iostream>
 #include <boost/math/special_functions/bessel.hpp>

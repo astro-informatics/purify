@@ -30,7 +30,7 @@ def test_deconvolution_kernel():
     assert_allclose(expected, kernels.deconvolution)
 
     shifts = exp(-1j * (
-        visibility['u'] * dims[0] * 0.5 + visibility['v'] * dims[1] * 0.5
+        visibility['u'] * dims[0] + visibility['v'] * dims[1]
     ))
     assert_allclose(shifts, kernels.shifts)
 
@@ -43,7 +43,7 @@ def visibility_image_operator():
 
     visibility_path = join(dirname(path), "data", "images",
                            "Coverages", "cont_sim4.vis")
-    visibility = read_visibility(visibility_path)
+    visibility = read_visibility(visibility_path, visflag="vis dummy")
 
     image_path = join(dirname(path), "data", "images", "M31.fits")
     image = Image(image_path)
@@ -67,26 +67,28 @@ def test_harden_forward_sensing_operator():
     _, image, sensing_op = visibility_image_operator()
 
     actual = sensing_op.forward(image.pixels)
-    expected = [ -7.477447730559e-04 -1.643830300229e-04j,
-         2.007158768045e-03 -4.642156936703e-03j,
-        -2.174973032357e-02 +1.517973591831e-01j,
-         1.163383706430e-03 +6.217717973737e-04j,
-        -3.155582694953e-05 -1.757819582375e-04j,
-        -5.556203800694e-03 +3.906914487911e-03j,
-         4.446615519891e-04 +4.502868790349e-04j,
-        -9.200048845186e-05 -5.950672269261e-05j,
-         1.332859869049e-04 +3.411182895605e-03j,
-        -3.042196522958e-02 +4.533805977039e-03j,
-         4.747003134771e-04 -2.077543235753e-03j,
-         8.678943808728e-04 -9.316061726497e-04j,
-         1.703778883336e-03 +1.763662654315e-03j,
-         2.588574384455e-03 -2.966714525229e-03j]
+    expected = [
+        -6.4388687930523332e-04 +4.1419043066021288e-04j,
+         3.2729514204322676e-03 -3.8556577058402363e-03j,
+         2.8575643591792536e-02 -1.5066161295241681e-01j,
+        -1.6945073530706846e-04 -1.3081851033781603e-03j,
+         1.1621622462300284e-04 +1.3560551681502390e-04j,
+         4.6614088119248560e-03 +4.9403086319390046e-03j,
+         6.2802376107770532e-04 -7.7899452951990796e-05j,
+         8.9859172806220012e-05 -6.2693452477723723e-05j,
+        -1.6480464037809442e-03 +2.9896282298232536e-03j,
+        -1.9034744504398318e-02 +2.4160502203379609e-02j,
+        -2.1053750306471767e-03 -3.3003373216459103e-04j,
+        -2.8168072072046814e-04 -1.2416870333719250e-03j,
+         2.3098073544246273e-03 -8.2350375042945312e-04j,
+         3.9372709474043794e-03 -3.1471870027482496e-06j
+    ]
     assert_allclose(actual[::1000], expected)
 
     relative = lambda x, y: abs(x - y) / (abs(x) + abs(y))
-    assert relative(mean(actual), 0.000219813613111-0.000147254689191j) < 1e-8
-    assert relative(max(actual), 1.98141879458-0.136758307021j) < 1e-8
-    assert relative(min(actual), -1.34576924606-0.683325812801j) < 1e-8
+    assert relative(mean(actual), 0.000325143128268-0.00108280079546j) < 1e-8
+    assert relative(max(actual), 1.95589088843+0.345273958792j) < 1e-8
+    assert relative(min(actual), -0.700393160833-0.151467127051j) < 1e-8
 
 
 def test_harden_adjoint_sensing_operator():
