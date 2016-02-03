@@ -3,6 +3,8 @@
 #include "utilities.h"
 #include "pfitsio.h"
 #include "directories.h"
+#include <iomanip>
+
 using namespace purify;
 using namespace purify::notinstalled;
 
@@ -125,13 +127,13 @@ TEST_CASE("Measurement Operator [Kernel Gridding Correction]", "[Gridding_Correc
     {
       
       t_real pswf_difference  = std::abs(op.ft_pswf(x_values[i], 6) - pswf_values[i]);
-      CHECK( pswf_difference  < 1e-10 ); //Test that pswf is the same as matlab calculations
+      CHECK( pswf_difference  < 1e-13 ); //Test that pswf is the same as matlab calculations
       
       t_real kb_difference = std::abs(op.ft_kaiser_bessel(x_values[i], 6) - kb_values[i]);
-      CHECK( kb_difference < 1e-2 ); //Test that kaiser_bessel is the same as matlab calculations
+      CHECK( kb_difference < 1e-13 ); //Test that kaiser_bessel is the same as matlab calculations
       
       t_real gauss_difference = std::abs(op.ft_gaussian(x_values[i], 6) - gauss_values[i]);
-      CHECK( gauss_difference < 1e-10 ); //Test that gaussian is the same as matlab calculations
+      CHECK( gauss_difference < 1e-13 ); //Test that gaussian is the same as matlab calculations
     }
 }
 

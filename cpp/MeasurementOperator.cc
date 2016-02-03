@@ -267,7 +267,10 @@ namespace purify {
 
       t_real alpha = 2.34 * J; // value said to be optimal in Fessler et. al. 2003
       t_complex eta = std::sqrt(static_cast<t_complex>((purify_pi * x * J)*(purify_pi * x * J) - alpha * alpha));
-      return std::real(std::sin(eta) / eta);
+      t_real normalisation = 38828.11016883
+      ; //Factor that keeps it consistent with fessler formula
+
+      return std::real(std::sin(eta) / eta) / normalisation; //simple way of doing the calculation, the boost bessel funtions do not support complex valued arguments
   }
 
   t_real MeasurementOperator::gaussian(const t_real& x, const t_int& J)
