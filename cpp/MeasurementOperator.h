@@ -18,8 +18,9 @@ namespace purify {
   //! This does something
   class MeasurementOperator {
    public:
-       Sparse<t_complex> G;
+        Sparse<t_complex> G;
         Image<t_real> S;
+        Array<t_complex> W;
         const t_int imsizex;
         const t_int imsizey;
         const t_int ftsizeu;
@@ -27,7 +28,7 @@ namespace purify {
       
       
       
-      MeasurementOperator(const Vector<t_real>& u, const Vector<t_real>& v, const t_int & Ju, const t_int & Jv, const std::string & kernel_name, const t_int & imsizex, const t_int & imsizey, const t_real & oversample_factor, bool fft_grid_correction = false);
+      MeasurementOperator(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const t_int & Ju, const t_int & Jv, const std::string & kernel_name, const t_int & imsizex, const t_int & imsizey, const t_real & oversample_factor, const std::string& weighting_type = "none", bool fft_grid_correction = false);
      
 #   define SOPT_MACRO(NAME, TYPE)                                                          \
         TYPE const& NAME() const { return NAME ## _; }                                     \
@@ -70,6 +71,8 @@ namespace purify {
       Image<t_real> init_correction2d_fft(const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int Ju, const t_int Jv);
       //! Generates scaling factors for gridding correction
       Image<t_real> init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv);
+      //! Generates and calculates weights
+      Array<t_complex> init_weights(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const std::string& weighting_type = "none");
     public:
       //! Kaiser-Bessel kernel
       t_real kaiser_bessel(const t_real& x, const t_int& J);

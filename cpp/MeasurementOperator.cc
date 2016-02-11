@@ -25,7 +25,7 @@ namespace purify {
       // turn into vector
       ft_vector.resize(ftsizeu*ftsizev, 1); // using conservativeResize does not work, it grables the image. Also, it is not what we want.
       // get visibilities
-      return G * ft_vector;
+      return (G * ft_vector).array()/W;
       
   }
 
@@ -37,7 +37,7 @@ namespace purify {
       visibilities:: input visibilities to be gridded
       st:: gridding parameters
     */
-      Matrix<t_complex> ft_vector = G.adjoint() * visibilities;
+      Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W).matrix();
       ft_vector.resize(ftsizeu, ftsizev); // using conservativeResize does not work, it grables the image. Also, it is not what we want.
       Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
       t_int x_start = floor(ftsizeu * 0.5 - imsizex * 0.5);
@@ -55,7 +55,6 @@ namespace purify {
     */
     return omega.unaryExpr(std::ptr_fun<double,double>(std::floor));     
   }
-
 
 
   Sparse<t_complex> MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, 
@@ -97,11 +96,14 @@ namespace purify {
             const t_complex I(0, 1);
             entries.emplace_back(m, index, std::exp(-2 * purify_pi * I *((k_u(m) + ju) * 0.5+ (k_v(m) + jv) * 0.5 )) * kernelu(u(m)-(k_u(m)+ju)) * kernelv(v(m)-(k_v(m)+jv)));
           }
-        }
-      }    
-    Sparse<t_complex> interpolation_matrix(rows, cols);
-    interpolation_matrix.setFromTriplets(entries.begin(), entries.end());
-    return interpolation_matrix; 
+      }
+    }
+
+  //    
+  Sparse<t_complex> interpolation_matrix(rows, cols);
+  interpolation_matrix.setFromTriplets(entries.begin(), entries.end());
+
+  return interpolation_matrix; 
   }
 
   Image<t_real> MeasurementOperator::init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv)
@@ -141,8 +143,32 @@ namespace purify {
 
   }  
 
-  MeasurementOperator::MeasurementOperator(const Vector<t_real>& u, const Vector<t_real>& v, const t_int &Ju, const t_int &Jv, 
-      const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, bool fft_grid_correction)
+  Array<t_complex> MeasurementOperator::init_weights(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const std::string& weighting_type)
+  {
+    Vector<t_complex> out_weights(weights.size());
+
+    if (weighting_type == "none")
+    {
+      out_weights = weights.array()*0 + 1;
+    } else if (weighting_type == "natural")
+    {
+      out_weights = weights;
+    } else {
+      Matrix<t_complex> gridded_weights = G.adjoint() * weights;
+      gridded_weights.resize(ftsizev, ftsizeu);
+      
+      for (t_int i = 0; i < weights.size(); ++i)
+      {
+        t_int q = utilities::mod(floor(u(i)), ftsizeu);
+        t_int p = utilities::mod(floor(v(i)), ftsizev);
+        out_weights(i) = weights(i) / gridded_weights(q, p);
+      }
+    }
+    return out_weights.array();
+  }
+
+  MeasurementOperator::MeasurementOperator(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const t_int &Ju, const t_int &Jv,
+      const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, const std::string& weighting_type, bool fft_grid_correction)
       : imsizex(imsizex), imsizey(imsizey), ftsizeu(floor(oversample_factor * imsizex)), ftsizev(floor(oversample_factor * imsizey))
     
   {
@@ -163,11 +189,17 @@ namespace purify {
     std::cout << "Constructing Gridding Operator" << '\n';
 
 
-    std::function<t_real(t_real)>  kernelu;
+    std::function<t_real(t_real)> kernelu;
     std::function<t_real(t_real)> kernelv;
     std::function<t_real(t_real)> ftkernelu;
     std::function<t_real(t_real)> ftkernelv;
 
+    std::cout << "Kernel Name: " << kernel_name << '\n';
+    std::cout << "Number of visibilities: " << u.size() <<'\n';
+    std::cout << "Ju: " << Ju << '\n';
+    std::cout << "Jv: " << Jv << '\n';
+
+    S = Image<t_real>::Zero(imsizey, imsizex);
 
     //samples for kb_interp
     if (kernel_name == "kb_interp")
@@ -180,7 +212,14 @@ namespace purify {
       auto kb_interp = [&] (t_real x) { return MeasurementOperator::kernel_linear_interp(samples, x, Ju); };
       kernelu = kb_interp;
       kernelv = kb_interp;
-      fft_grid_correction = true;
+      //Since kb_interp needs the pre-samples, all calculations need to be done within scope of this if statement. Otherwise massif gets a segfault.
+      S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, Ju, Jv);
+      G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv);
+      std::cout << "Calculating weights" << '\n';
+      W = MeasurementOperator::init_weights(u, v, weights, weighting_type);
+      std::cout << "Gridding Operator Constructed" << '\n';
+      std::cout << "------" << '\n';
+      return;
     }
 
     if ((kernel_name == "pswf") and (Ju != 6 or Jv != 6))
@@ -220,11 +259,7 @@ namespace purify {
       ftkernelu = ftgaussu;
       ftkernelv = ftgaussv;
     }
-
-    std::cout << "Support of Kernel " << kernel_name << '\n';
-    std::cout << "Ju: " << Ju << '\n';
-    std::cout << "Jv: " << Jv << '\n';
-    S = Image<t_real>::Zero(imsizey, imsizex);
+    
     if ( fft_grid_correction == true )
     {
       S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, Ju, Jv); // Does gridding correction with FFT
@@ -235,9 +270,12 @@ namespace purify {
     }
     
     G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv);
+    std::cout << "Calculating weights" << '\n';
+    W = MeasurementOperator::init_weights(u, v, weights);
     std::cout << "Gridding Operator Constructed" << '\n';
     std::cout << "------" << '\n';
   }
+
 
 
   t_real MeasurementOperator::kaiser_bessel(const t_real& x, const t_int& J)
@@ -401,10 +439,11 @@ namespace purify {
     t_int total_samples = samples.size();
 
     t_real i_effective = (x + J/2) * total_samples / J;
+
     t_real i_0 = floor(i_effective);
     t_real i_1 = ceil(i_effective);
     //case where i_effective is a sample point
-    if (i_0 == i_1)
+    if ( std::abs(i_0 - i_1) > 0 )
     {
       return samples(i_0);
     }
