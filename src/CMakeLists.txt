@@ -21,7 +21,7 @@ include_directories(SYSTEM
 
 # Target libraries for the different executables
 set(TARGET_LIBRARIES
-     ${Sopt_LIBRARIES}
+     ${Sopt_C_LIBRARY}
      ${FFTW3_DOUBLE_LIBRARY}
      ${CFitsIO_LIBRARY}
      ${TIFF_LIBRARY}
