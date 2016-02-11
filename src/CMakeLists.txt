@@ -8,12 +8,12 @@ set(ABOUT_SOURCE purify_about.c)
 
 # Adds include directories
 if(BLAS_INCLUDE_DIR)
-  include_directories(${BLAS_INCLUDE_DIR})
+  include_directories(SYSTEM ${BLAS_INCLUDE_DIR})
 endif()
 if(Sopt_INCLUDE_DIRS)
-  include_directories(${Sopt_INCLUDE_DIRS})
+  include_directories(SYSTEM ${Sopt_INCLUDE_DIRS})
 endif()
-include_directories(
+include_directories(SYSTEM
   ${FFTW3_INCLUDE_DIR}
   ${CFitsIO_INCLUDE_DIR}
   ${TIFF_INCLUDE_DIR}
