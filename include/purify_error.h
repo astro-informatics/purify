@@ -4,12 +4,16 @@
 
 #ifndef PURIFY_ERROR
 #define PURIFY_ERROR
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "purify_config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-inline void PURIFY_ERROR_GENERIC(char *comment) {
+inline void PURIFY_ERROR_GENERIC(char const *comment) {
   printf("ERROR: %s.\n", comment);					
   printf("ERROR: %s <%s> %s %s %s %d.\n",				
 	 "Occurred in function",					
