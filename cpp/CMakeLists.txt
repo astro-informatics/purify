@@ -16,6 +16,10 @@ add_library(cppurify MeasurementOperator.cc FFTOperator.cc utilities.cc pfitsio.
 target_link_libraries(cppurify ${FFTW3_DOUBLE_LIBRARY} ${CCFits_LIBRARY} ${CFitsIO_LIBRARY})
 add_dependencies(cppurify lookup_dependencies)
 
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/include/purify/")
+configure_file(tests/directories.in.h "${PROJECT_BINARY_DIR}/include/purify/directories.h")
+include_directories("${PROJECT_BINARY_DIR}/include/purify/")
+
 add_subdirectory(example)
 if(tests)
   add_subdirectory(tests)
