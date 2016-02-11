@@ -8,9 +8,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "purify_config.h"
 
-#include <complex.h>
+#include "purify_config.h"
+#include "purify_types.h"
+
 #include "purify_error.h"
 #include "purify_sparsemat.h"
 #include "purify_image.h"
@@ -28,9 +29,9 @@ typedef struct {
   /*! Fourier w coordinates of visibility. */
   double *w;
   /*! Noise standard deviation of each visibility measurement. */
-  complex double *noise_std;
+  purify_complex_double *noise_std;
   /*! Measured visibility value. */
-  complex double *y;
+  purify_complex_double *y;
 } purify_visibility;
 
 
