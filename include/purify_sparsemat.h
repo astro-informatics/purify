@@ -1,9 +1,13 @@
 
 #ifndef PURIFY_SPARSEMAT
 #define PURIFY_SPARSEMAT
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "purify_config.h"
 
 #include <complex.h>
+#include "purify_sparsemat.h"
 
 
 /*!  
@@ -82,4 +86,7 @@ void purify_sparsemat_adj_complexrsc(complex double *y, complex double *x,
           purify_sparsemat_row *A, complex double *d);
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif

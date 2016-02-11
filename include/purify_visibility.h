@@ -5,6 +5,9 @@
 
 #ifndef PURIFY_VISIBILITY
 #define PURIFY_VISIBILITY
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "purify_config.h"
 
 #include <complex.h>
@@ -128,4 +131,7 @@ int purify_visibility_vdsmask(purify_sparsemat *mask,
 			      int maxiter_pdf, int maxiter_nmeas, 
 			      int seed);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -24,4 +24,7 @@ inline void PURIFY_ERROR_MEM_ALLOC_CHECK(void *pointer) {
     PURIFY_ERROR_GENERIC("Memory allocation failed");
 }
 
+#ifdef __cplusplus
+}
+#endif
 #endif

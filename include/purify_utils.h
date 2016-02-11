@@ -1,6 +1,9 @@
 
 #ifndef PURIFY_UTILS
 #define PURIFY_UTILS
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "purify_config.h"
 
 void purify_utils_fftshift_1d(double *out, double *in, int n);
@@ -11,4 +14,7 @@ double purify_utils_maxarray(double *a, int num_elements);
 
 int purify_utils_absearch(double *x, int nx, double key);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

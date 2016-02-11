@@ -4,6 +4,9 @@
 
 #ifndef PURIFY_TYPES
 #define PURIFY_TYPES
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "purify_config.h"
 
 #define PURIFY_STRLEN 256
@@ -16,4 +19,7 @@
 #define purify_min(a,b) (a<b?a:b)
 #define purify_max(a,b) (a<b?b:a) 
 
+#ifdef __cplusplus
+}
+#endif
 #endif

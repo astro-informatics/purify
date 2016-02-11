@@ -1,6 +1,9 @@
 
 #ifndef PURIFY_IMAGE
 #define PURIFY_IMAGE
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "purify_config.h"
 #include "purify_error.h"
 
@@ -65,4 +68,7 @@ int purify_image_writefile(purify_image *img,
 			   const char *filename,
 			   purify_image_filetype filetype);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
