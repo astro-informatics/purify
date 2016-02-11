@@ -66,6 +66,10 @@ UseTab:          Never
 IncludeCategories:
   - Regex:           '^(<|")(sopt|purify)/config.h(>|")$'
     Priority:        2
+  - Regex:           '^(<|")purify_config.h(>|")$'
+    Priority:        2
+  - Regex:           '^(<|")purify_types.h(>|")$'
+    Priority:        2
   - Regex:           '^(<|")sopt/wavelets/'
     Priority:        10
   - Regex:           '^(<|")sopt/'
