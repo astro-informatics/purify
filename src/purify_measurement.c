@@ -119,8 +119,7 @@ void purify_measurement_fft_real(void *out, void *in,
  *
  * \authors <a href="http://www.jasonmcewen.org">Jason McEwen</a>
  */
-void purify_measurement_fft_complex(void *out, void *in, 
-				    void **data) {
+void purify_measurement_fft_complex(void *out, void *in, void **data) {
 
   fftw_plan *plan;
 
@@ -240,8 +239,8 @@ void purify_measurement_opfwd(void *out, void *in, void **data) {
  */
 void purify_measurement_init_cft(purify_sparsemat_row *mat, 
                                  double *deconv, complex double *shifts, 
-                                 double *u, double *v, 
-                                 purify_measurement_cparam *param) {
+                                 double const *u, double const *v, 
+                                 purify_measurement_cparam const *param) {
 
   int i, j, k, l;
   int nx2, ny2;

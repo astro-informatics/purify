@@ -51,8 +51,8 @@ void purify_measurement_opfwd(void *out,
 
 void purify_measurement_init_cft(purify_sparsemat_row *mat, 
                                  double *deconv, purify_complex_double *shifts,
-                                 double *u, double *v, 
-                                 purify_measurement_cparam *param);
+                                 double const *u, double const *v, 
+                                 purify_measurement_cparam const *param);
 
 void purify_measurement_cftfwd(void *out, void *in, void **data);
 
