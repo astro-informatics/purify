@@ -141,6 +141,32 @@ TEST_CASE("Measurement Operator [Kernel Gridding Correction]", "[Gridding_Correc
     }
 }
 
+TEST_CASE("Measurement Operator [Check FT Grid]", "[Check FT Grid]"){
+  utilities::vis_params uv_vis;
+  t_real max;
+  t_real max_diff;
+  t_int over_sample;
+  t_real cellsize;
+  std::string kernel;
+  
+
+  //Gridding example
+  over_sample = 2;
+  t_int J = 6;
+  uv_vis = utilities::read_visibility(vla_filename("at166B.3C129.c0.vis")); // visibility data being read in
+  cellsize = 0.3;
+  uv_vis = utilities::set_cell_size(uv_vis, cellsize, cellsize); // scale uv coordinates to correct pixel size and to units of 2pi
+  uv_vis = utilities::uv_scale(uv_vis, 1024 * over_sample, 1024 * over_sample); // scale uv coordinates to units of Fourier grid size
+  uv_vis = utilities::uv_symmetry(uv_vis); // Enforce condjugate symmetry by reflecting measurements in uv coordinates
+  kernel = "kb";
+  MeasurementOperator op(uv_vis.u, uv_vis.v, uv_vis.weights, J, J, kernel, 1024, 1024, over_sample); // Generating gridding matrix 
+  Matrix<t_complex> ftgrid_test = op.G.adjoint() * uv_vis.vis;  
+  ftgrid_test.resize(1024 * over_sample, 1024 * over_sample); 
+  Image<t_complex> ftgrid_real = pfitsio::read2d(gridding_filename("at166BtestJ6pswf.fits"));
+  Image<t_complex> ftgrid_imag = pfitsio::read2d(gridding_filename("at166BtestJ6pswf.fits"));
+  Matrix<t_complex> ftgrid = ftgrid_real + 1i * ftgrid_imag;
+}
+
 TEST_CASE("Measurement Operator [Gridding]", "[Gridding]") {
 
   /*
