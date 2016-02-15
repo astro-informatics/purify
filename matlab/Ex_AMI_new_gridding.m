@@ -2,14 +2,13 @@ clc
 clear;
 
 %%
-addpath src/
-addpath data/
+addpath ../data/
 addpath ../../sopt/matlab
 addpath ../../sopt/matlab/prox_operators
 addpath ../../sopt/matlab/misc
 
 %stringname='ppdisk672_GHz_50pc';
-stringname='cluster';
+%stringname='cluster';
 %stringname='g41.1-0.3.b';
 %stringname='HCO+_4-3_60';
 %stringname='3c288';
@@ -17,7 +16,7 @@ stringname='cluster';
 %stringname='CYGCBEST';
 %stringname='M87ABABCPCONV6';
 %stringname='M51HA'; 
-%stringname='M31';
+stringname='M31';
 %stringname='eta-carinae_ref-img';
 
 stringname1=[stringname '.fits'];
@@ -58,8 +57,8 @@ clear Data
 %% Compute nufft parameters
 
     
-Kx = 4;
-Ky = 4;
+Kx = 6;
+Ky = 6;
 Fa = 2;
 % %tau1 = (Fa/Nx1)*2*pi;
 % %tau2 = (Fa/Ny1)*2*pi;
