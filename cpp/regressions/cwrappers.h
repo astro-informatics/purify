@@ -7,6 +7,9 @@
 #include <fftw3.h>
 #include <memory>
 #include <random>
+#include "sopt/linear_transform.h"
+#include "sopt/real_type.h"
+#include "sopt/types.h"
 #include "directories.h"
 #include "pfitsio.h"
 #include "types.h"
@@ -64,13 +67,13 @@ public:
 
   //! State array to pass on to C function
   std::array<void *, 6> forward_data() const {
-    return {(void *)&params,       (void *)deconv.data(),      (void *)&gmat,
-            (void *)&forward_plan, (void *)fft_forward.data(), (void *)shifts.data()};
+    return {{(void *)&params, (void *)deconv.data(), (void *)&gmat, (void *)&forward_plan,
+             (void *)fft_forward.data(), (void *)shifts.data()}};
   }
   //! State array to pass on to C function
   std::array<void *, 6> inverse_data() const {
-    return {(void *)&params,       (void *)deconv.data(),      (void *)&gmat,
-            (void *)&inverse_plan, (void *)fft_inverse.data(), (void *)shifts.data()};
+    return {{(void *)&params, (void *)deconv.data(), (void *)&gmat, (void *)&inverse_plan,
+             (void *)fft_inverse.data(), (void *)shifts.data()}};
   }
 
   //! Transforms to a linear-transform operator
@@ -81,14 +84,14 @@ public:
                                 const_cast<void *>(reinterpret_cast<void const *>(input.data())),
                                 data.data());
     };
-    std::array<int, 3> const direct_size{0, 1, static_cast<int>(visibilities.vis.size())};
+    std::array<int, 3> const direct_size{{0, 1, static_cast<int>(visibilities.vis.size())}};
     auto adjoint = [this](Vector<t_complex> &out, Vector<t_complex> const &input) {
       auto data = inverse_data();
       purify_measurement_cftadj(out.data(),
                                 const_cast<void *>(reinterpret_cast<void const *>(input.data())),
                                 data.data());
     };
-    std::array<int, 3> const adjoint_size{0, 1, static_cast<int>(params.nx1 * params.ny1)};
+    std::array<int, 3> const adjoint_size{{0, 1, static_cast<int>(params.nx1 * params.ny1)}};
     return sopt::linear_transform<Vector<t_complex>>(direct, direct_size, adjoint, adjoint_size);
   };
 
