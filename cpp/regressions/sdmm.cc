@@ -9,7 +9,6 @@
 
 #include "sopt/relative_variation.h"
 #include "sopt/sdmm.h"
-#include "sopt/utility.h"
 #include "sopt/wavelets.h"
 #include "sopt/wavelets/sara.h"
 #include "cdata.h"
