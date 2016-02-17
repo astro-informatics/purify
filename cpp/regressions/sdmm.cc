@@ -73,8 +73,6 @@ TEST_CASE("Compare SDMMS", "") {
   // Create C bindings for C++ operators
   CData<Scalar> const psi_data{static_cast<std::ptrdiff_t>(M31.size() * sara.size()), M31.size(),
                                psi, 0, 0};
-  CData<Scalar> const measurement_data{measurements.cols(), measurements.rows(),
-                                       measurements.linear_transform(), 0, 0};
 
   // Try increasing number of iterations and check output of c and c++ algorithms are the same
   for(t_uint i : {1, 2, 5}) {
@@ -89,11 +87,12 @@ TEST_CASE("Compare SDMMS", "") {
 
       t_Vector c = t_Vector::Zero(M31.size());
       Vector<Real> l1_weights = Vector<Real>::Ones(M31.size() * sara.size());
-      sopt_l1_sdmm((void *)c.data(), c.size(), &direct_transform<Scalar>,
-                   (void **)&measurement_data, &adjoint_transform<Scalar>,
-                   (void **)&measurement_data, &direct_transform<Scalar>, (void **)&psi_data,
-                   &adjoint_transform<Scalar>, (void **)&psi_data, c.size() * sara.size(),
-                   (void *)y.data(), y.size(), l1_weights.data(), c_params);
+      auto forward_data = measurements.forward_data();
+      auto inverse_data = measurements.inverse_data();
+      sopt_l1_sdmm((void *)c.data(), c.size(), &purify_measurement_cftfwd, forward_data.data(),
+                   &purify_measurement_cftadj, inverse_data.data(), &direct_transform<Scalar>,
+                   (void **)&psi_data, &adjoint_transform<Scalar>, (void **)&psi_data,
+                   c.size() * sara.size(), (void *)y.data(), y.size(), l1_weights.data(), c_params);
 
       CHECK(cpp.isApprox(c, 1e-8));
     }
