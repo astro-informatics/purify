@@ -74,6 +74,8 @@ IncludeCategories:
     Priority:        10
   - Regex:           '^(<|")sopt/'
     Priority:        9
+  - Regex:           '^(<|")sopt_'
+    Priority:        50
   - Regex:           '^(<|")tests/directories.h'
     Priority:        20
   - Regex:           '^(<.*/.*>)'
