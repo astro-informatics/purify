@@ -40,7 +40,6 @@ sopt::algorithm::SDMM<Scalar> create_sdmm(purify::CMeasurementOperator const &me
 TEST_CASE("Compare SDMMS", "") {
   using namespace purify;
   using namespace purify::notinstalled;
-  sopt::logging::initialize();
 
   auto const M31 = pfitsio::read2d(image_filename("M31.fits"));
   purify::CMeasurementOperator const measurements(image_filename("Coverages/cont_sim4.vis"),
@@ -57,7 +56,7 @@ TEST_CASE("Compare SDMMS", "") {
         / std::sqrt(static_cast<t_real>(y0.size()) / static_cast<t_real>(M31.size()));
 
   sopt_l1_sdmmparam params = {
-      2,                                                                        // verbosity
+      0,                                                                        // verbosity
       50,                                                                       // max iter
       (measurements.linear_transform().adjoint() * y).real().maxCoeff() * 1e-3, // gamma
       0.01,                                                                     // relative change
@@ -85,7 +84,8 @@ TEST_CASE("Compare SDMMS", "") {
       c_params.cg_tol *= 0.5;
       auto sdmm = ::create_sdmm(measurements, psi, y, c_params);
       t_Vector cpp(M31.size());
-      sdmm(cpp, t_Vector::Zero(M31.size()));
+      auto const result = sdmm(cpp, t_Vector::Zero(M31.size()));
+      CHECK(result.niters == i);
 
       t_Vector c = t_Vector::Zero(M31.size());
       Vector<Real> l1_weights = Vector<Real>::Ones(M31.size() * sara.size());
