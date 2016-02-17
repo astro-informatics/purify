@@ -141,7 +141,7 @@ TEST_CASE("Measurement Operator [Kernel Gridding Correction]", "[Gridding_Correc
     }
 }
 
-TEST_CASE("Measurement Operator [Check FT Grid]", "[Check FT Grid]"){
+TEST_CASE("Measurement Operator [Check FT Grid]", "[Check_Grid]"){
   utilities::vis_params uv_vis;
   t_real max;
   t_real max_diff;
@@ -162,9 +162,22 @@ TEST_CASE("Measurement Operator [Check FT Grid]", "[Check FT Grid]"){
   MeasurementOperator op(uv_vis.u, uv_vis.v, uv_vis.weights, J, J, kernel, 1024, 1024, over_sample); // Generating gridding matrix 
   Matrix<t_complex> ftgrid_test = op.G.adjoint() * uv_vis.vis;  
   ftgrid_test.resize(1024 * over_sample, 1024 * over_sample); 
-  Image<t_complex> ftgrid_real = pfitsio::read2d(gridding_filename("at166BtestJ6pswf.fits"));
-  Image<t_complex> ftgrid_imag = pfitsio::read2d(gridding_filename("at166BtestJ6pswf.fits"));
-  Matrix<t_complex> ftgrid = ftgrid_real + 1i * ftgrid_imag;
+  t_complex I(0, 1);
+  Image<t_complex> ftgrid_real = pfitsio::read2d(gridding_filename("real_grid.fits"));
+  Image<t_complex> ftgrid_imag = pfitsio::read2d(gridding_filename("imag_grid.fits"));
+  
+  Matrix<t_complex> ftgrid = ftgrid_real - I * ftgrid_imag;
+  std::cout << ftgrid(0, 83) << " " << ftgrid(2047, 83) << " " << ftgrid_test(0, 83) << " " << ftgrid_test(2047, 83) << '\n';
+  for (t_int i = 1; i < 1024 * over_sample - 1; ++i)
+  {
+    for (t_int j = 1; j < 1024 * over_sample - 1; ++j)
+    {
+      CHECK(std::abs( ftgrid_test(i, j) - ftgrid(i, j) ) < 1e-8); // This shift suggests it is how matlab writes fits files.
+    }
+  }
+  pfitsio::write2d(ftgrid_test.real(), "real_grid.fits", true, false);
+  pfitsio::write2d(ftgrid_test.imag(), "imag_grid.fits", true, false);
+  pfitsio::write2d(ftgrid_test.array().abs(), "abs_grid.fits", true, false);
 }
 
 TEST_CASE("Measurement Operator [Gridding]", "[Gridding]") {
@@ -236,6 +249,8 @@ TEST_CASE("Measurement Operator [Gridding]", "[Gridding]") {
       }
     }
     std::cout << "Percentage max difference in Kaiser Bessel gridding: " << max_diff * 100 << "%" << '\n';
+    std::cout << kb_img(0, 0) << " " << kb_img(0, 1023) << " " << kb_test_image(0, 0) << " " << kb_test_image(0, 1023) << '\n';
+    std::cout << kb_img(0, 0) << " " << kb_img(1023, 0) << " " << kb_test_image(0, 0) << " " << kb_test_image(1023, 0) << '\n';
   }
   SECTION("Prolate Spheroidal Wave Functon Gridding") {
     kernel = "pswf";
@@ -333,13 +348,14 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     uv_vis = utilities::uv_scale(uv_vis, img.cols() * over_sample, img.rows() * over_sample);
     MeasurementOperator op(uv_vis.u, -uv_vis.v, uv_vis.weights, J, J, kernel, img.cols(), img.rows(), over_sample); // Calculates gridding matrix
 
-    point = Image<t_complex>::Zero(img.cols(), img.rows()); point(floor(img.cols()/2), floor(img.rows()/2)) = 1; // Creating model of point source in image
+    point = Image<t_complex>::Zero(img.cols(), img.rows()); point(floor(img.cols()/2) - 1, floor(img.rows()/2) - 1) = 1; // Creating model of point source in image
     psf_vis = op.degrid(point); // Creating visibilities from model
     max = psf_vis.cwiseAbs().maxCoeff();
     psf_vis = psf_vis / max; // normalized visibilities
     psf = op.grid(psf_vis); // gridding model visibilities into image
     max = psf.real().maxCoeff();
     psf = psf / max;
+    pfitsio::write2d(point.real(), output_filename("point.fits"), true, false);
     pfitsio::write2d(psf.real(), output_filename("kb_psf_M31_degridding.fits"), true, false); // saving image of degridded point source
 
 
@@ -380,7 +396,7 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     uv_vis = utilities::uv_scale(uv_vis, img.cols() * over_sample, img.rows() * over_sample);
     MeasurementOperator op(uv_vis.u, -uv_vis.v, uv_vis.weights, J, J, kernel, img.cols(), img.rows(), over_sample); // Calculates gridding matrix
 
-    point = Image<t_complex>::Zero(img.cols(), img.rows()); point(floor(img.cols()/2), floor(img.rows()/2)) = 1; // Creating model of point source in image
+    point = Image<t_complex>::Zero(img.cols(), img.rows()); point(floor(img.cols()/2) - 1, floor(img.rows()/2) - 1) = 1; // Creating model of point source in image
     psf_vis = op.degrid(point); // Creating visibilities from model
     max = psf_vis.cwiseAbs().maxCoeff();
     psf_vis = psf_vis / max; // normalized visibilities
