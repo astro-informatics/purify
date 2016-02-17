@@ -1,6 +1,11 @@
 clear
-addpath data/
-addpath src/
+addpath ../data/
+
+%Linking Sopt
+addpath ../../sopt/matlab/test_images/
+addpath ../../sopt/matlab/misc/
+addpath ../../sopt/matlab/prox_operators/
+addpath ../../sopt/matlab
 
 stringname='M31.fits';
 
@@ -97,7 +102,7 @@ param1.verbose_L1 = 0;
      
 %Solve BPDN
 tstart = tic;
-[sol, z] = admm_bpcon(y, epsilon, A, At, Psi, Psit, param1);
+[sol, z] = sopt_admm_bpcon(y, epsilon, A, At, Psi, Psit, param1);
 tend = toc(tstart)
 
 error = im - sol;
