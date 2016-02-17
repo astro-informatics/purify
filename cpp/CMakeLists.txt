@@ -21,6 +21,7 @@ configure_file(tests/directories.in.h "${PROJECT_BINARY_DIR}/include/purify/dire
 include_directories("${PROJECT_BINARY_DIR}/include/purify/")
 
 add_subdirectory(example)
+add_subdirectory(regressions)
 if(tests)
   add_subdirectory(tests)
 endif()
