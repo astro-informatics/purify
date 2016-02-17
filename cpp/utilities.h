@@ -33,8 +33,7 @@ namespace purify {
       //! Converts from index to subscript for matrix.
       void ind2sub(const t_int sub, const t_int cols, const t_int rows, t_int* row, t_int* col);
       //! Mod function modified to wrap circularly for negative numbers
-      t_int mod(const t_real& x, const t_real& y);
-
+      t_real mod(const t_real& x, const t_real& y);
  }
 }
 

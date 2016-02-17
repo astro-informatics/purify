@@ -112,6 +112,11 @@ namespace purify {
 	      scaled_vis.v = uv_vis.v / (2 * purify_pi) * ftsizev;
 	      scaled_vis.vis = uv_vis.vis;
 	      scaled_vis.weights = uv_vis.weights;
+	      for (t_int i = 0; i < uv_vis.u.size(); ++i)
+	      {
+	      	scaled_vis.u(i) = utilities::mod(scaled_vis.u(i), ftsizeu);
+	      	scaled_vis.v(i) = utilities::mod(scaled_vis.v(i), ftsizev);
+	      }
 	      return scaled_vis;
 	  }
 
@@ -152,7 +157,8 @@ namespace purify {
 	  t_int sub2ind(const t_int& row, const t_int& col, const t_int& rows, const t_int& cols) 
 	  {
 	    /*
-	      Converts (row, column) of a matrix to a single index. This does the same as the matlab funciton sub2ind, converts subscript to index.
+	      Converts (row, column) of a matrix to a single index. This does the same as the matlab funciton sub2ind, converts subscript to index. 
+	      Though order of cols and rows is probably transposed.
 
 	      row:: row of matrix (y)
 	      col:: column of matrix (x)
@@ -178,7 +184,7 @@ namespace purify {
 	    *row = (sub - *col) / cols;
 	  }
 
-	  t_int mod(const t_real& x, const t_real& y) 
+	  t_real mod(const t_real& x, const t_real& y) 
 	  {
 	    /*
 	      returns x % y, and warps circularly around y for negative values.
@@ -186,7 +192,7 @@ namespace purify {
 	      t_real r = std::fmod(x, y);
 	      if (r < 0)
 	        r = y + r;
-	      return static_cast<t_int>(r);
+	      return r;
 	  }
 	}
 }
