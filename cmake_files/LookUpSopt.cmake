@@ -45,3 +45,10 @@ ExternalProject_Add(
     LOG_BUILD ON
 )
 add_recursive_cmake_step(Sopt DEPENDEES install)
+
+foreach(dep Eigen3 spdlog)
+  lookup_package(${dep})
+  if(TARGET ${dep})
+    add_dependencies(Sopt ${dep})
+  endif()
+endforeach()
