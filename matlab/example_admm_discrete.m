@@ -100,7 +100,7 @@ param1.pos_L1 = 1;
 param1.nu_L1 = 1;
 param1.verbose_L1 = 0;
      
-%Solve BPDN
+% Solve BPDN
 tstart = tic;
 [sol, z] = sopt_admm_bpcon(y, epsilon, A, At, Psi, Psit, param1);
 tend = toc(tstart)
@@ -109,5 +109,12 @@ error = im - sol;
 SNR = 20*log10(norm(im(:))/norm(error(:)))
 residual = At(y - A(sol));
 DR = max(sol(:))/(norm(residual(:))/sqrt(N))
+
+% show result
+figure, imagesc(im), colorbar, axis image, title('Given image');
+figure, imagesc(sol), colorbar, axis image, title('Result of ADMM');
+figure, imagesc(log10(im + 1e-4)), colorbar, axis image, title('Log of Given image');
+figure, imagesc(log10(sol + 1e-4)), colorbar, axis image, title('Log of result of ADMM');
+
 
 
