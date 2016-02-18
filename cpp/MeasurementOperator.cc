@@ -115,7 +115,7 @@ namespace purify {
     t_int x_start = floor(ftsizeu * 0.5 - imsizex * 0.5);
     t_int y_start = floor(ftsizev * 0.5 - imsizey * 0.5);
     Array<t_real> range;
-    range.setLinSpaced(std::max(ftsizeu, ftsizev), 0, std::max(ftsizeu, ftsizev) - 1);
+    range.setLinSpaced(std::max(ftsizeu, ftsizev), 0.5, std::max(ftsizeu, ftsizev) - 0.5);
     return (1e0 / range.segment(x_start, imsizex).unaryExpr(ftkernelu)).matrix() * (1e0 / range.segment(y_start, imsizey).unaryExpr(ftkernelv)).matrix().transpose();
   }
 
