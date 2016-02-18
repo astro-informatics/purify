@@ -8,7 +8,7 @@ function st = purify_mtlb_init_nufft(UV, imsize, oversample_rate, kernelname, J)
 Ju = J(1);
 Jv = J(2);
 FTsize = imsize*oversample_rate;
-[X,Y] = meshgrid(1:FTsize(1),1:FTsize(2));
+[X,Y] = meshgrid(0.5:FTsize(1)-0.5,0.5:FTsize(2)-0.5);
 st.Nx1 = imsize(1);
 st.Ny1 = imsize(2);
 st.Nx2 = FTsize(1);
@@ -87,5 +87,8 @@ switch kernelname
         kernelv = @ (v, j) 1;
         st.gridding_correction = ones(FTsize);
 end
+xo = floor(st.Nx2/2) - floor(st.Nx1/2);
+yo = floor(st.Ny2/2) - floor(st.Ny1/2);
+st.gridding_correction = st.gridding_correction(yo+1:yo+st.Ny1,xo+1:xo+st.Nx1);
 st.gridding_matrix = purify_mtlb_init_interpolation_matrix(UV, kernelu, kernelv, FTsize, Ju, Jv, parallel_type);
 end

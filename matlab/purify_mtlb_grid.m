@@ -12,10 +12,10 @@ grid_vis=st.gridding_matrix'*vis;
 grid=reshape(grid_vis,Ny2,Nx2);
 
 %Quadrant swap and FFT
-im = ifft2(grid)*sqrt(Nx2*Ny2).*st.gridding_correction;
+im = ifft2(grid)*sqrt(Nx2*Ny2);
 
 %Cropping
 %Find image first point (centered image)
 xo = floor(Nx2/2) - floor(Nx1/2);
 yo = floor(Ny2/2) - floor(Ny1/2);
-im_est = im(yo+1:yo+Ny1,xo+1:xo+Nx1);
+im_est = im(yo+1:yo+Ny1,xo+1:xo+Nx1).*st.gridding_correction;
