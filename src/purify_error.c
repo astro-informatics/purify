@@ -11,7 +11,7 @@
  *
  * \authors <a href="http://www.jasonmcewen.org">Jason McEwen</a>
  */
-extern inline void PURIFY_ERROR_GENERIC(char *comment);
+extern inline void PURIFY_ERROR_GENERIC(char const *comment);
 
 /*!
  * Test whether memory allocation was successful (i.e. check allocated

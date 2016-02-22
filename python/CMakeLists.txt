@@ -13,7 +13,7 @@ add_to_python_path(${CMAKE_CURRENT_BINARY_DIR})
 
 add_definitions("-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION")
 
-include_directories(
+include_directories(SYSTEM
     ${PYTHON_INCLUDE_DIR}
     ${NUMPY_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}

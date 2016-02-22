@@ -1,7 +1,11 @@
 
 #ifndef PURIFY_MEASUREMENT
 #define PURIFY_MEASUREMENT
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "purify_config.h"
+#include "purify_sparsemat.h"
 
 /*!  
  * Structure storing parametrs for the interpolation operator.
@@ -46,9 +50,9 @@ void purify_measurement_opfwd(void *out,
 			      void **data);
 
 void purify_measurement_init_cft(purify_sparsemat_row *mat, 
-                                 double *deconv, complex double *shifts,
-                                 double *u, double *v, 
-                                 purify_measurement_cparam *param);
+                                 double *deconv, purify_complex_double *shifts,
+                                 double const *u, double const *v, 
+                                 purify_measurement_cparam const *param);
 
 void purify_measurement_cftfwd(void *out, void *in, void **data);
 
@@ -63,4 +67,7 @@ void purify_measurement_symcftfwd(void *out, void *in, void **data);
 
 void purify_measurement_symcftadj(void *out, void *in, void **data);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

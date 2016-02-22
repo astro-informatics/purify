@@ -5,9 +5,13 @@
 
 #ifndef PURIFY_VISIBILITY
 #define PURIFY_VISIBILITY
-#include "purify_config.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include <complex.h>
+#include "purify_config.h"
+#include "purify_types.h"
+
 #include "purify_error.h"
 #include "purify_sparsemat.h"
 #include "purify_image.h"
@@ -25,9 +29,9 @@ typedef struct {
   /*! Fourier w coordinates of visibility. */
   double *w;
   /*! Noise standard deviation of each visibility measurement. */
-  complex double *noise_std;
+  purify_complex_double *noise_std;
   /*! Measured visibility value. */
-  complex double *y;
+  purify_complex_double *y;
 } purify_visibility;
 
 
@@ -128,4 +132,7 @@ int purify_visibility_vdsmask(purify_sparsemat *mask,
 			      int maxiter_pdf, int maxiter_nmeas, 
 			      int seed);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

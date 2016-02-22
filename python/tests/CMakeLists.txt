@@ -5,6 +5,6 @@ if(tests AND python)
         DEPENDS copy
         FAKE_INIT
         PREFIX purify
-        LIBRARIES libpurify ${Sopt_LIBRARIES}
+        LIBRARIES libpurify ${Sopt_C_LIBRARY}
     )
 endif()

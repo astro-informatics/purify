@@ -4,12 +4,15 @@
 
 #ifndef PURIFY_ERROR
 #define PURIFY_ERROR
-#include "purify_config.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+#include "purify_config.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-inline void PURIFY_ERROR_GENERIC(char *comment) {
+inline void PURIFY_ERROR_GENERIC(char const *comment) {
   printf("ERROR: %s.\n", comment);					
   printf("ERROR: %s <%s> %s %s %s %d.\n",				
 	 "Occurred in function",					
@@ -24,4 +27,7 @@ inline void PURIFY_ERROR_MEM_ALLOC_CHECK(void *pointer) {
     PURIFY_ERROR_GENERIC("Memory allocation failed");
 }
 
+#ifdef __cplusplus
+}
+#endif
 #endif
