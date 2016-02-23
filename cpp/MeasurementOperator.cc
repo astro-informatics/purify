@@ -25,7 +25,7 @@ namespace purify {
       // turn into vector
       ft_vector.resize(ftsizeu*ftsizev, 1); // using conservativeResize does not work, it grables the image. Also, it is not what we want.
       // get visibilities
-      return (G * ft_vector).array()/W;
+      return (G * ft_vector).array()/W/norm;
       
   }
 
@@ -42,7 +42,7 @@ namespace purify {
       Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
       t_int x_start = floor(ftsizeu * 0.5 - imsizex * 0.5);
       t_int y_start = floor(ftsizev * 0.5 - imsizey * 0.5);
-      return S * padded_image.block(y_start, x_start, imsizey, imsizex);
+      return S * padded_image.block(y_start, x_start, imsizey, imsizex)/norm;
   }
 
 
@@ -181,6 +181,24 @@ namespace purify {
     return out_weights.array();
   }
 
+  t_real MeasurementOperator::power_method(const t_int niters){
+    /*
+     attempt at coding the power method, returns the largest eigen value of a linear operator
+    */
+     t_real estimate_eigen_value = 1;
+     Image<t_complex> estimate_eigen_vector = Image<t_complex>::Random(imsizey, imsizex);
+     std::cout << "Starting power method " << '\n';
+     std::cout << "Iteration: " << 0 << ", norm = " << estimate_eigen_value << '\n';
+     for (t_int i = 0; i < niters; ++i)
+     {
+      auto new_estimate_eigen_vector = MeasurementOperator::grid(MeasurementOperator::degrid(estimate_eigen_vector));
+      estimate_eigen_value = new_estimate_eigen_vector.matrix().norm();
+      estimate_eigen_vector = new_estimate_eigen_vector/estimate_eigen_value;
+      std::cout << "Iteration: " << i + 1 << ", norm = " << estimate_eigen_value << '\n';
+     }
+     return estimate_eigen_value;
+  }
+
   MeasurementOperator::MeasurementOperator(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const t_int &Ju, const t_int &Jv,
       const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, const std::string& weighting_type, const t_real& R, bool fft_grid_correction)
       : imsizex(imsizex), imsizey(imsizey), ftsizeu(floor(oversample_factor * imsizex)), ftsizev(floor(oversample_factor * imsizey))
@@ -220,17 +238,23 @@ namespace purify {
     {
 
       t_real kb_interp_alpha = purify_pi * std::sqrt(Ju * Ju/(oversample_factor * oversample_factor) * (oversample_factor - 0.5) * (oversample_factor - 0.5) - 0.8);
-      t_int total_samples = 2e5 * Ju;
+      t_int total_samples = 2e6 * Ju;
       auto kb_general = [&] (t_real x) { return MeasurementOperator::kaiser_bessel_general(x, Ju, kb_interp_alpha); };
       Vector<t_real> samples = MeasurementOperator::kernel_samples(total_samples, kb_general, Ju);
       auto kb_interp = [&] (t_real x) { return MeasurementOperator::kernel_linear_interp(samples, x, Ju); };
       kernelu = kb_interp;
       kernelv = kb_interp;
       //Since kb_interp needs the pre-samples, all calculations need to be done within scope of this if statement. Otherwise massif gets a segfault.
-      S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, Ju, Jv);
+      //S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, Ju, Jv);
+      auto ftkb = [&] (t_real x) { return MeasurementOperator::ft_kaiser_bessel_general(x/ftsizeu - 0.5, Ju, kb_interp_alpha); };
+      ftkernelu = ftkb;
+      ftkernelv = ftkb;
+      S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv); // Does gridding correction using analytic formula
+
       G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv);
       std::cout << "Calculating weights" << '\n';
-      W = MeasurementOperator::init_weights(u, v, weights, weighting_type);
+      W = MeasurementOperator::init_weights(u, v, weights, weighting_type, R);
+      norm = std::sqrt(MeasurementOperator::power_method(20));
       std::cout << "Gridding Operator Constructed" << '\n';
       std::cout << "------" << '\n';
       return;
@@ -286,11 +310,11 @@ namespace purify {
     G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv);
     std::cout << "Calculating weights" << '\n';
     W = MeasurementOperator::init_weights(u, v, weights, weighting_type, R);
+    norm = std::sqrt(MeasurementOperator::power_method(20));
+    std::cout << "Found a norm of " << norm << '\n';
     std::cout << "Gridding Operator Constructed" << '\n';
     std::cout << "------" << '\n';
   }
-
-
 
   t_real MeasurementOperator::kaiser_bessel(const t_real& x, const t_int& J)
   {
@@ -309,6 +333,18 @@ namespace purify {
       */
       t_real a = 2 * x / J;
       return boost::math::cyl_bessel_i(0, std::real(alpha * std::sqrt(1 - a * a))) / boost::math::cyl_bessel_i(0, alpha);
+  }
+
+  t_real MeasurementOperator::ft_kaiser_bessel_general(const t_real& x, const t_int& J, const t_real& alpha)
+  {
+      /*
+        Fourier transform of kaiser bessel gridding kernel
+      */
+      
+      t_complex eta = std::sqrt(static_cast<t_complex>((purify_pi * x * J)*(purify_pi * x * J) - alpha * alpha));
+      t_real normalisation = 38828.11016883; //Factor that keeps it consistent with fessler formula
+
+      return std::real(std::sin(eta) / eta) / normalisation; //simple way of doing the calculation, the boost bessel funtions do not support complex valued arguments
   }
 
   t_real MeasurementOperator::ft_kaiser_bessel(const t_real& x, const t_int& J)
@@ -457,7 +493,7 @@ namespace purify {
     t_real i_0 = floor(i_effective);
     t_real i_1 = ceil(i_effective);
     //case where i_effective is a sample point
-    if ( std::abs(i_0 - i_1) > 0 )
+    if ( std::abs(i_0 - i_1) == 0 )
     {
       return samples(i_0);
     }

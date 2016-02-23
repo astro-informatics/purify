@@ -21,11 +21,11 @@ namespace purify {
         Sparse<t_complex> G;
         Image<t_real> S;
         Array<t_complex> W;
+        t_real norm = 1;
         const t_int imsizex;
         const t_int imsizey;
         const t_int ftsizeu;
         const t_int ftsizev;
-      
       
       
       MeasurementOperator(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const t_int & Ju, const t_int & Jv, const std::string & kernel_name, const t_int & imsizex, const t_int & imsizey, const t_real & oversample_factor, const std::string& weighting_type = "none", const t_real& R = 0, bool fft_grid_correction = false);
@@ -73,11 +73,15 @@ namespace purify {
       Image<t_real> init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv);
       //! Generates and calculates weights
       Array<t_complex> init_weights(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const std::string& weighting_type = "none", const t_real& R = 0);
+      //! Estiamtes norm of operator
+      t_real power_method(const t_int niters);
     public:
       //! Kaiser-Bessel kernel
       t_real kaiser_bessel(const t_real& x, const t_int& J);
       //! More general Kaiser-Bessel kernel
       t_real kaiser_bessel_general(const t_real& x, const t_int& J, const t_real& alpha);
+      //!  Fourier transform of more general Kaiser-Bessel kernel
+      t_real ft_kaiser_bessel_general(const t_real& x, const t_int& J, const t_real& alpha);
       //! Fourier transform of kaiser bessel kernel
       t_real ft_kaiser_bessel(const t_real& x, const t_int& J);
       //! Gaussian kernel
