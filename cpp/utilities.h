@@ -34,6 +34,10 @@ namespace purify {
       void ind2sub(const t_int sub, const t_int cols, const t_int rows, t_int* row, t_int* col);
       //! Mod function modified to wrap circularly for negative numbers
       t_real mod(const t_real& x, const t_real& y);
+      //! Calculate mean of vector
+      t_complex mean(const Vector<t_complex> x);
+      //! Calculate variance of vector
+      t_real variance(const Vector<t_complex> x);
  }
 }
 

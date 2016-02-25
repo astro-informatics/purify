@@ -194,5 +194,18 @@ namespace purify {
 	        r = y + r;
 	      return r;
 	  }
+
+	  t_complex mean(const Vector<t_complex> x){
+	  	// Calculate mean of vector x
+	  	return x.sum()/static_cast<t_real>(x.size());
+	  }
+
+	  t_real variance(const Vector<t_complex> x){
+	  	//calculate variance of vector x
+	  	t_complex mu = mean(x);
+	  	Vector<t_complex> q = (x.array() - mu).matrix();
+	  	auto var = (q.adjoint() * q).real()(0)/(q.size() - 1);
+	  	return var;
+	  }
 	}
 }
