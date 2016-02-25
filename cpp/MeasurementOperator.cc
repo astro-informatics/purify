@@ -177,6 +177,7 @@ namespace purify {
           out_weights(i) = 1. /(1. + robust_scale * weights(i));
         }
       }
+      out_weights = out_weights/out_weights.sum();
     }
     return out_weights.array();
   }
@@ -233,6 +234,8 @@ namespace purify {
 
     S = Image<t_real>::Zero(imsizey, imsizex);
 
+    const t_int norm_iterations = 20; // number of iterations for power method
+
     //samples for kb_interp
     if (kernel_name == "kb_interp")
     {
@@ -254,7 +257,7 @@ namespace purify {
       G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv);
       std::cout << "Calculating weights" << '\n';
       W = MeasurementOperator::init_weights(u, v, weights, weighting_type, R);
-      norm = std::sqrt(MeasurementOperator::power_method(20));
+      norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
       std::cout << "Gridding Operator Constructed" << '\n';
       std::cout << "------" << '\n';
       return;
@@ -310,7 +313,7 @@ namespace purify {
     G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv);
     std::cout << "Calculating weights" << '\n';
     W = MeasurementOperator::init_weights(u, v, weights, weighting_type, R);
-    norm = std::sqrt(MeasurementOperator::power_method(20));
+    norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
     std::cout << "Found a norm of " << norm << '\n';
     std::cout << "Gridding Operator Constructed" << '\n';
     std::cout << "------" << '\n';
