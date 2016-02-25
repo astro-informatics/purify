@@ -20,14 +20,16 @@ int main(int, char **) {
   std::string const fitsfile = image_filename("M31.fits");
   std::string const visfile = image_filename("Coverages/cont_sim4.vis");
   std::string const outfile = output_filename("M31.tiff");
+  std::string const outfile_fits = output_filename("M31_solution.fits");
   std::string const dirty_image = output_filename("M31_dirty.tiff");
+  std::string const dirty_image_fits = output_filename("M31_dirty.fits");
 
-  t_real const over_sample = 1.375;
+  t_real const over_sample = 2;
   auto const M31 = pfitsio::read2d(fitsfile);
   auto uv_data = utilities::read_visibilities(visfile, PURIFY_VISIBILITY_FILETYPE_PROFILE_VIS);
   uv_data = utilities::uv_scale(uv_data, floor(M31.cols() * over_sample), floor(M31.rows() * over_sample)); // scale uv coordinates to units of Fourier grid size
   uv_data = utilities::uv_symmetry(uv_data); // Enforce condjugate symmetry by reflecting measurements in uv coordinates
-  MeasurementOperator measurements(uv_data.v, uv_data.u, uv_data.weights, 4, 4, "kb_interp", M31.cols(), M31.rows(), over_sample);
+  MeasurementOperator measurements(uv_data.v, uv_data.u, uv_data.weights, 4, 4, "kb", M31.cols(), M31.rows(), over_sample);
 
  
   auto direct = [&measurements, &M31](Vector<t_complex> &out, Vector<t_complex> const &x) {
@@ -52,7 +54,11 @@ int main(int, char **) {
       = (measurements_transform * Vector<t_complex>::Map(M31.data(), M31.size()));
   auto const input = dirty(y0, mersenne, 30e0);
   Vector<> dimage = (measurements_transform.adjoint() * input).real();
+  t_real max_val = dimage.array().abs().maxCoeff();
+  dimage = dimage / max_val;
+  Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   sopt::utilities::write_tiff(Image<t_real>::Map(dimage.data(), M31.rows(), M31.cols()), dirty_image);
+  pfitsio::write2d(Image<t_real>::Map(dimage.data(), M31.rows(), M31.cols()), dirty_image_fits);
 
   auto const epsilon
       = std::sqrt(y0.size() + 2 * std::sqrt(y0.size())) * sigma(y0, 30e0)
@@ -68,9 +74,12 @@ int main(int, char **) {
                     measurements_transform)
             .append(sopt::proximal::l1_norm<t_complex>, Psi.adjoint(), Psi)
             .append(sopt::proximal::positive_quadrant<t_complex>);
-  auto const result = sdmm(Vector<t_complex>::Zero(M31.size()));
+  auto const result = sdmm(initial_estimate);
   assert(result.out.size() == M31.size());
   Image<t_real> image = Image<t_complex>::Map(result.out.data(), M31.rows(), M31.cols()).real();
+  t_real max_val_final = image.array().abs().maxCoeff();
+  image = image / max_val;
   sopt::utilities::write_tiff(image, outfile);
+  pfitsio::write2d(image, outfile_fits);
   return 0;
 }
