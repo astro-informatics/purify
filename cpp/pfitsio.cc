@@ -25,6 +25,7 @@ namespace purify {
 	    
 	    std::valarray<double> image(naxes[0]*naxes[1]);
 	    std::copy(eigen_image.data(), eigen_image.data() + eigen_image.size(), &image[0]);
+	    pFits->pHDU().addKey("AUTHOR", "Purify", "");
 	    pFits->pHDU().write ( fpixel, naxes[0]*naxes[1], image);
 	  }
 	  
