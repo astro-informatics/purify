@@ -25,7 +25,7 @@ namespace purify {
       // turn into vector
       ft_vector.resize(ftsizeu*ftsizev, 1); // using conservativeResize does not work, it grables the image. Also, it is not what we want.
       // get visibilities
-      return (G * ft_vector).array()/W/norm;
+      return (G * ft_vector).array() * W/norm;
       
   }
 
@@ -143,7 +143,7 @@ namespace purify {
 
   }  
 
-  Array<t_complex> MeasurementOperator::init_weights(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const std::string& weighting_type, const t_real& R)
+  Array<t_complex> MeasurementOperator::init_weights(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const t_real & oversample_factor, const std::string& weighting_type, const t_real& R)
   {
     Vector<t_complex> out_weights(weights.size());
     t_complex mean_weights = weights.sum();
@@ -155,7 +155,7 @@ namespace purify {
       out_weights = weights / mean_weights;
     } else {
       auto step_function = [&] (t_real x) { return 1; };
-      t_real scale = 2; //scale for fov
+      t_real scale = 1./oversample_factor; //scale for fov
       Matrix<t_complex> gridded_weights = Matrix<t_complex>::Zero(ftsizev, ftsizeu);
       for (t_int i = 0; i < weights.size(); ++i)
       {
@@ -164,8 +164,8 @@ namespace purify {
         gridded_weights(p, q) += weights(i);
       }
       t_complex mean_gridded_weights = (gridded_weights.array() * gridded_weights.array()).sum();
-
       t_complex robust_scale = mean_weights/mean_gridded_weights * 12.5 * std::pow(10, -2 * R); // Need to check formula
+      
       for (t_int i = 0; i < weights.size(); ++i)
       {
         t_int q = utilities::mod(floor(u(i) * scale), ftsizeu);
@@ -173,8 +173,7 @@ namespace purify {
         if (weighting_type == "uniform")
           out_weights(i) = weights(i) / gridded_weights(p, q);
         if (weighting_type == "robust"){
-          
-          out_weights(i) = 1. /(1. + robust_scale * weights(i));
+          out_weights(i) = weights(i) /(1. + robust_scale * gridded_weights(p, q));
         }
       }
       out_weights = out_weights/out_weights.sum();
@@ -256,7 +255,7 @@ namespace purify {
 
       G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv);
       std::cout << "Calculating weights" << '\n';
-      W = MeasurementOperator::init_weights(u, v, weights, weighting_type, R);
+      W = MeasurementOperator::init_weights(u, v, weights, oversample_factor, weighting_type, R);
       norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
       std::cout << "Gridding Operator Constructed" << '\n';
       std::cout << "------" << '\n';
@@ -312,7 +311,7 @@ namespace purify {
     
     G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv);
     std::cout << "Calculating weights" << '\n';
-    W = MeasurementOperator::init_weights(u, v, weights, weighting_type, R);
+    W = MeasurementOperator::init_weights(u, v, weights, oversample_factor, weighting_type, R);
     norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
     std::cout << "Found a norm of " << norm << '\n';
     std::cout << "Gridding Operator Constructed" << '\n';

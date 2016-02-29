@@ -72,7 +72,7 @@ namespace purify {
       //! Generates scaling factors for gridding correction
       Image<t_real> init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv);
       //! Generates and calculates weights
-      Array<t_complex> init_weights(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const std::string& weighting_type = "none", const t_real& R = 0);
+      Array<t_complex> init_weights(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const t_real & oversample_factor, const std::string& weighting_type, const t_real& R);
       //! Estiamtes norm of operator
       t_real power_method(const t_int niters);
     public:
