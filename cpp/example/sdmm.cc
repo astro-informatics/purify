@@ -78,7 +78,7 @@ int main(int, char **) {
   assert(result.out.size() == M31.size());
   Image<t_real> image = Image<t_complex>::Map(result.out.data(), M31.rows(), M31.cols()).real();
   t_real max_val_final = image.array().abs().maxCoeff();
-  image = image / max_val;
+  image = image / max_val_final;
   sopt::utilities::write_tiff(image, outfile);
   pfitsio::write2d(image, outfile_fits);
   return 0;
