@@ -86,12 +86,12 @@ int main(int, char **) {
                          .nu(1e0)
                          .Psi(Psi)
                          .Phi(measurements_transform);
-  // auto const result = padmm(initial_estimate);
-  // assert(result.x.size() == M31.size());
-  // Image<t_real> image = Image<t_complex>::Map(result.x.data(), M31.rows(), M31.cols()).real();
-  // t_real max_val_final = image.array().abs().maxCoeff();
-  // image = image / max_val;
-  // sopt::utilities::write_tiff(image, outfile);
-  // pfitsio::write2d(image, outfile_fits);
+   auto const result = padmm(initial_estimate);
+   assert(result.x.size() == M31.size());
+   Image<t_real> final_image = Image<t_complex>::Map(result.x.data(), M31.rows(), M31.cols()).real();
+   t_real max_val_final = final_image.array().abs().maxCoeff();
+   final_image = final_image / max_val_final;
+   sopt::utilities::write_tiff(final_image, outfile);
+   pfitsio::write2d(final_image, outfile_fits);
   return 0;
 }
