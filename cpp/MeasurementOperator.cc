@@ -199,8 +199,130 @@ namespace purify {
      return estimate_eigen_value;
   }
 
-  MeasurementOperator::MeasurementOperator(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const t_int &Ju, const t_int &Jv,
-      const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, const std::string& weighting_type, const t_real& R, bool fft_grid_correction)
+  Image<t_complex> MeasurementOperator::sparsify_chirp(const Image<t_complex>& row, const t_real& energy){
+    /*
+      Takes in fourier transform of chirp, and returns sparsified version
+      w_prog:: input fourier transform of chirp
+      energy:: how much energy to keep after sparsifying 
+    */
+      //there is probably a way to get eigen to do this without a loop
+      t_real tau = 0.5;
+      t_int niters = 10;
+      Image<t_real> abs_row = row.coeff.cwiseAbs();
+      t_real min_energy = 0;
+      t_real max_energy = 1;
+      //calculating threshold
+      for (t_int i = 0; i < niters; ++i)
+      {
+        t_real energy_sum = 0;
+        for (t_int i = 0; i < abs_row.size(); ++i)
+        {
+
+          if (abs_row(i) * abs_row(i) > tau)
+          {
+            energy_sum = energy_sum + abs_row(i) * abs_row(i);
+          }
+        }
+
+        if (energy_sum > energy)
+        {
+          tau = (max_energy - tau) * 0.5 + tau;
+        }else{
+          tau = (tau - min_energy) * 0.5 + min_energy;
+        }
+      }
+  }
+
+  Image<t_complex> MeasurementOperator::generate_chirp(const t_real w_term, const t_real cellx, const t_real celly, const t_int x_size, const t_int y_size){
+    /*
+      return chirp image fourier transform for w component
+
+      w:: w-term in units of lambda
+      celly:: size of y pixel in arcseconds
+      cellx:: size of x pixel in arcseconds
+      x_size:: number of pixels along x-axis
+      y_size:: number of pixels along y-axis
+
+    */
+
+    const t_real max_fov = 180. * 60 * 60; //maximum field of view for a hemisphere
+
+    const t_real delt_x = cellx / max_fov;
+    const t_real delt_y = celly / max_fov;
+
+    Image<t_complex> chirp(y_size, x_size);
+    t_complex I(0, 1);
+    for (t_int l = 0; l < x_size; ++l)
+    {
+      for (t_int m = 0; m < y_size; ++m)
+      {
+        t_real x = (l + 0.5 - x_size * 0.5) * delt_x;
+        t_real y = (m + 0.5 - y_size * 0.5) * delt_y;
+        chirp(m, l) = std::exp(- 2 * purify_pi * I * w_term * (std::sqrt(1 - x*x - y*y) - 1)) * std::exp(- 2 * purify_pi * I * (l * 0.5 + m * 0.5));
+      }
+    }
+    return chirp;
+  }
+
+  Sparse<t_complex> MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_real>& w, const t_int Ju, 
+          const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv) {
+      /* 
+        Given u and v coordinates, creates a gridding interpolation matrix that maps between visibilities and the fourier transform grid.
+
+        u:: fourier coordinates of visibilities for u axis
+        v:: fourier coordinates of visibilities for v axis
+        Ju:: support of kernel for u axis
+        Jv:: support of kernel for v axis
+        kernelu:: lambda function for kernel on u axis
+        kernelv:: lambda function for kernel on v axis
+        ftsizeu:: size of grid along u axis
+        ftsizev:: size of grid along v axis
+      */
+
+    // Need to write exception for u.size() != v.size()
+    t_real rows = u.size();
+    t_real cols = ftsizeu * ftsizev;
+    t_int q;
+    t_int p;
+    t_int index;
+    Vector<t_real> ones = u * 0; ones.setOnes();
+    Vector<t_real> k_u = MeasurementOperator::omega_to_k(u - ones * Ju * 0.5);
+    Vector<t_real> k_v = MeasurementOperator::omega_to_k(v - ones * Jv * 0.5);
+    std::vector<t_tripletList> entries;
+    entries.reserve(rows * Ju * Jv);
+    for (t_int m = 0; m < rows; ++m)
+      {
+        Image<t_complex> kernel_image(Jv, Ju);
+        for (t_int ju = 1; ju <= Ju; ++ju)
+         {
+           q = utilities::mod(k_u(m) + ju, ftsizeu);
+          for (t_int jv = 1; jv <= Jv; ++jv)
+            {
+              p = utilities::mod(k_v(m) + jv, ftsizev);
+              index = utilities::sub2ind(p, q, ftsizev, ftsizeu);
+              const t_complex I(0, 1);
+              //Calculating image of convolution kernel
+              kernel_image(jv, ju) = std::exp(-2 * purify_pi * I *((k_u(m) + ju) * 0.5+ (k_v(m) + jv) * 0.5 )) * kernelu(u(m)-(k_u(m)+ju)) * kernelv(v(m)-(k_v(m)+jv));
+            }
+        }
+        //Calcluating chirp term
+        Image<t_complex> chirp = MeasurementOperator::generate_chirp(w(m), cellx, celly, x_size, y_size);
+        Image<t_complex> w_proj = fftop.inverse(chirp);
+        //Convolution of kernel and chirp
+        Matrix<t_complex> interp_row = utilities::convolution_operator(kernel_image, w_proj);
+        //Caclulating row
+        interp_row.resize(interp_row.size(), 1);
+      }
+
+    //    
+    Sparse<t_complex> interpolation_matrix(rows, cols);
+    interpolation_matrix.setFromTriplets(entries.begin(), entries.end());
+
+    return interpolation_matrix; 
+  }
+
+  MeasurementOperator::MeasurementOperator(const utilities::vis_params& uv_vis, const t_int &Ju, const t_int &Jv,
+      const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, const std::string& weighting_type, const t_real& R, bool use_w_term, bool fft_grid_correction)
       : imsizex(imsizex), imsizey(imsizey), ftsizeu(floor(oversample_factor * imsizex)), ftsizev(floor(oversample_factor * imsizey))
     
   {
