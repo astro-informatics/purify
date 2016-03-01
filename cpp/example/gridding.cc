@@ -29,7 +29,7 @@ int main( int nargs, char const** args ){
   uv_vis = utilities::uv_symmetry(uv_vis); // Enforce condjugate symmetry by reflecting measurements in uv coordinates
 
   kernel = "kb";
-  MeasurementOperator op(uv_vis.u, uv_vis.v, uv_vis.weights, J, J, kernel, width, height, over_sample, "uniform", 0); // Generating gridding matrix
+  MeasurementOperator op(uv_vis, J, J, kernel, width, height, over_sample, "uniform", 0); // Generating gridding matrix
   //Vector<t_complex> point_source = uv_vis.vis * 0; point_source.setOnes();  // Creating model visibilities for point source
   //Image<t_complex> psf;
   //psf = op.grid(point_source);

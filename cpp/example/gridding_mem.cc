@@ -33,7 +33,7 @@ int main( int nargs, char const** args ){
   uv_vis.vis = uv_vis.u.array()*static_cast<t_complex>(0) + 1.;
 
 
-  MeasurementOperator op(uv_vis.u, uv_vis.v, uv_vis.weights, J, J, kernel, width, height, over_sample); // Generating gridding matrix
+  MeasurementOperator op(uv_vis, J, J, kernel, width, height, over_sample); // Generating gridding matrix
  
   //Vector<t_complex> point_source = uv_vis.vis * 0; point_source.setOnes();  // Creating model visibilities for point source
   //Image<t_complex> psf;

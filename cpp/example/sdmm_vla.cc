@@ -31,7 +31,7 @@ int main(int, char **) {
   uv_data = utilities::set_cell_size(uv_data, cellsize); // scale uv coordinates to correct pixel size and to units of 2pi
   uv_data = utilities::uv_scale(uv_data, floor(width * over_sample), floor(height * over_sample)); // scale uv coordinates to units of Fourier grid size
   uv_data = utilities::uv_symmetry(uv_data); // Enforce conjugate symmetry by reflecting measurements in uv coordinates
-  MeasurementOperator measurements(uv_data.v, uv_data.u, uv_data.weights, 4, 4, "kb_interp", width, height, over_sample, "natural");
+  MeasurementOperator measurements(uv_data, 4, 4, "kb_interp", width, height, over_sample, "natural");
 
  
   auto direct = [&measurements, &width, &height](Vector<t_complex> &out, Vector<t_complex> const &x) {

@@ -32,7 +32,7 @@ int main(int, char **) {
       floor(M31.rows() * over_sample)); // scale uv coordinates to units of Fourier grid size
   uv_data = utilities::uv_symmetry(
       uv_data); // Enforce condjugate symmetry by reflecting measurements in uv coordinates
-  MeasurementOperator measurements(uv_data.v, uv_data.u, uv_data.weights, 4, 4, "kb", M31.cols(),
+  MeasurementOperator measurements(uv_data, 4, 4, "kb", M31.cols(),
                                    M31.rows(), over_sample);
 
   auto direct = [&measurements, &M31](Vector<t_complex> &out, Vector<t_complex> const &x) {
