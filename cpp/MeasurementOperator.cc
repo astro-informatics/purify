@@ -349,7 +349,7 @@ namespace purify {
     std::function<t_real(t_real)> ftkernelv;
 
     std::cout << "Kernel Name: " << kernel_name << '\n';
-    std::cout << "Number of visibilities: " << u.size() <<'\n';
+    std::cout << "Number of visibilities: " << uv_vis.u.size() <<'\n';
     std::cout << "Ju: " << Ju << '\n';
     std::cout << "Jv: " << Jv << '\n';
 
@@ -374,10 +374,16 @@ namespace purify {
       ftkernelu = ftkb;
       ftkernelv = ftkb;
       S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv); // Does gridding correction using analytic formula
+      if (use_w_term)
+      {
+        G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, uv_vis.w, Ju, Jv, kernelu, kernelv);
+      }else{
+        G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
+      }
+      
 
-      G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv);
       std::cout << "Calculating weights" << '\n';
-      W = MeasurementOperator::init_weights(u, v, weights, oversample_factor, weighting_type, R);
+      W = MeasurementOperator::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R);
       norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
       std::cout << "Gridding Operator Constructed" << '\n';
       std::cout << "------" << '\n';
@@ -430,10 +436,14 @@ namespace purify {
     {
       S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv); // Does gridding correction using analytic formula
     }
-    
-    G = MeasurementOperator::init_interpolation_matrix2d(u, v, Ju, Jv, kernelu, kernelv);
+    if (use_w_term)
+    {
+      G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, uv_vis.w, Ju, Jv, kernelu, kernelv);
+    }else{
+      G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
+    } 
     std::cout << "Calculating weights" << '\n';
-    W = MeasurementOperator::init_weights(u, v, weights, oversample_factor, weighting_type, R);
+    W = MeasurementOperator::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R);
     norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
     std::cout << "Found a norm of " << norm << '\n';
     std::cout << "Gridding Operator Constructed" << '\n';
