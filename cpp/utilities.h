@@ -15,6 +15,7 @@ namespace purify {
       struct vis_params {
         Vector<t_real> u; // u coordinates
         Vector<t_real> v; // v coordinates
+        Vector<t_real> w;
         Vector<t_complex> vis; // complex visiblities
         Vector<t_complex> weights; // weights for visibilities
       };
@@ -38,6 +39,8 @@ namespace purify {
       t_complex mean(const Vector<t_complex> x);
       //! Calculate variance of vector
       t_real variance(const Vector<t_complex> x);
+      //! Calculates the convolution between two images
+      Image<t_complex> convolution_operator(const Image<t_complex>& a, const Image<t_complex>& b);
  }
 }
 

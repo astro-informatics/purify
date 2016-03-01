@@ -207,5 +207,34 @@ namespace purify {
 	  	auto var = (q.adjoint() * q).real()(0)/(q.size() - 1);
 	  	return var;
 	  }
+
+  Image<t_complex> convolution_operator(const Image<t_complex>& a, const Image<t_complex>& b){
+    /*
+    returns the convolution of vector a with vector b
+    a:: vector a, which is shifted
+    b:: vector b, which is fixed
+    */
+
+    //size of a image
+    t_int a_y = a.rows();
+    t_int a_x = a.cols();
+    //size of b image
+    t_int b_y = b.rows();
+    t_int b_x = b.cols();    
+
+    Image<t_complex> output = Image<t_complex>::Zero(a_y + b_y, a_x + b_x);
+
+
+
+    for (t_int l = 0; l < b.cols(); ++l)
+    {
+      for (int k = 0; k < b.rows(); ++k)
+      {
+        output(k, l) = (a * b.block(k, l, a_y, a_x)).sum();
+      }
+    }
+
+    return output;
+  }
 	}
 }
