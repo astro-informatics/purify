@@ -210,7 +210,7 @@ namespace purify {
 
   Image<t_complex> convolution_operator(const Image<t_complex>& a, const Image<t_complex>& b){
     /*
-    returns the convolution of vector a with vector b
+    returns the convolution of images a with images b
     a:: vector a, which is shifted
     b:: vector b, which is fixed
     */
@@ -235,6 +235,65 @@ namespace purify {
     }
 
     return output;
+  }
+
+    Matrix<t_complex> re_sample_ft_grid(const Matrix<t_complex>& input, const t_real& re_sample_ratio){
+    /*
+      up samples image using by zero padding the fft
+      
+      input:: fft to be upsampled, with zero frequency at (0,0) of the matrix.
+
+    */
+
+
+      //sets up dimensions for old image
+      t_int old_x = input.cols();
+      t_int old_y = input.rows();
+
+      t_int old_x_centre_floor = floor(input.cols() * 0.5);
+      t_int old_y_centre_floor = floor(input.rows() * 0.5);
+      //need ceilling in case image is of odd dimension
+      t_int old_x_centre_ceil = ceil(input.cols() * 0.5);
+      t_int old_y_centre_ceil = ceil(input.rows() * 0.5);
+
+      //sets up dimensions for new image
+      t_int new_x = floor(input.cols() * re_sample_ratio);
+      t_int new_y = floor(input.rows() * re_sample_ratio);
+
+      t_int new_x_centre_floor = floor(new_x * 0.5);
+      t_int new_y_centre_floor = floor(new_y * 0.5);
+      //need ceilling in case image is of odd dimension
+      t_int new_x_centre_ceil = ceil(new_x * 0.5);
+      t_int new_y_centre_ceil = ceil(new_y * 0.5);
+
+      Matrix<t_complex> output = Matrix<t_complex>::Zero(new_y, new_x);
+
+      t_int box_dim_x;
+      t_int box_dim_y;
+
+
+      //now have to move each quadrant into new grid
+      box_dim_x = std::min(old_x_centre_floor, new_x_centre_floor);
+      box_dim_y = std::min(old_y_centre_floor, new_y_centre_floor);   
+      //(0, 0)
+      output.block(0, 0, box_dim_y, box_dim_x) = input.block(0, 0, box_dim_y, box_dim_x);
+
+      box_dim_x = std::min(old_x_centre_floor, new_x_centre_floor);
+      box_dim_y = std::min(old_y_centre_ceil, new_y_centre_ceil);   
+      //(0, y0)
+      output.block(new_y - box_dim_y, 0, box_dim_y, box_dim_x) = input.block(old_y - box_dim_y, 0, box_dim_y, box_dim_x);
+
+      box_dim_x = std::min(old_x_centre_ceil, new_x_centre_ceil);
+      box_dim_y = std::min(old_y_centre_floor, new_y_centre_floor);   
+      //(x0, 0)
+      output.block(0, new_x - box_dim_x, box_dim_y, box_dim_x) = input.block(0, old_y - box_dim_x, box_dim_y, box_dim_x);
+
+      box_dim_x = std::min(old_x_centre_ceil, new_x_centre_ceil);
+      box_dim_y = std::min(old_y_centre_ceil, new_y_centre_ceil);  
+      //(x0, y0)
+      output.block(new_y - box_dim_y, new_x - box_dim_x, box_dim_y, box_dim_x) = input.block(old_y - box_dim_y, old_y - box_dim_x, box_dim_y, box_dim_x);
+
+      return output;
   }
 	}
 }
