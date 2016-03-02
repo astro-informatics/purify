@@ -356,5 +356,36 @@ namespace purify {
       std::cout << final_energy / abs_row_total_energy << '\n';
       return output_row;
   }
+
+  Image<t_complex> generate_chirp(const t_real w_term, const t_real cellx, const t_real celly, const t_int x_size, const t_int y_size){
+    /*
+      return chirp image fourier transform for w component
+
+      w:: w-term in units of lambda
+      celly:: size of y pixel in arcseconds
+      cellx:: size of x pixel in arcseconds
+      x_size:: number of pixels along x-axis
+      y_size:: number of pixels along y-axis
+
+    */
+
+    const t_real max_fov = 180. * 60 * 60; //maximum field of view for a hemisphere
+
+    const t_real delt_x = cellx / max_fov;
+    const t_real delt_y = celly / max_fov;
+
+    Image<t_complex> chirp(y_size, x_size);
+    t_complex I(0, 1);
+    for (t_int l = 0; l < x_size; ++l)
+    {
+      for (t_int m = 0; m < y_size; ++m)
+      {
+        t_real x = (l + 0.5 - x_size * 0.5) * delt_x;
+        t_real y = (m + 0.5 - y_size * 0.5) * delt_y;
+        chirp(m, l) = std::exp(- 2 * purify_pi * I * w_term * (std::sqrt(1 - x*x - y*y) - 1)) * std::exp(- 2 * purify_pi * I * (l * 0.5 + m * 0.5));
+      }
+    }
+    return chirp;
+  }
 	}
 }

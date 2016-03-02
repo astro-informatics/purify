@@ -64,7 +64,6 @@ namespace purify {
       FFTOperator fftop;
       //! Match uv coordinates to grid
       Vector<t_real> omega_to_k(const Vector<t_real>& omega);
-
       //! Generates interpolation matrix from kernels without using w-component
       Sparse<t_complex> init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv);
       //! Generates interpolation matrix from kernels with using w-coponent
@@ -73,12 +72,11 @@ namespace purify {
       Image<t_real> init_correction2d_fft(const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int Ju, const t_int Jv);
       //! Generates scaling factors for gridding correction
       Image<t_real> init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv);
-      //! Generates chirp for w-projection
-      Image<t_complex> generate_chirp(const t_real w_term, const t_real cellx, const t_real celly, const t_int x_size, const t_int y_size);
       //! Generates and calculates weights
       Array<t_complex> init_weights(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const t_real & oversample_factor, const std::string& weighting_type, const t_real& R);
       //! Estiamtes norm of operator
       t_real power_method(const t_int niters);
+
     public:
       //! Kaiser-Bessel kernel
       t_real kaiser_bessel(const t_real& x, const t_int& J);

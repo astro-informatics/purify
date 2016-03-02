@@ -45,6 +45,8 @@ namespace purify {
       Matrix<t_complex> re_sample_ft_grid(const Matrix<t_complex>& input, const t_real& re_sample_factor);
       //! Sparsifies chirp
       Image<t_complex> sparsify_chirp(const Image<t_complex>& row, const t_real& energy);
+      //! Generates image of chirp for w component
+      Image<t_complex> generate_chirp(const t_real w_term, const t_real cellx, const t_real celly, const t_int x_size, const t_int y_size);
  }
 }
 
