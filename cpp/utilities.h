@@ -43,6 +43,8 @@ namespace purify {
       Image<t_complex> convolution_operator(const Image<t_complex>& a, const Image<t_complex>& b);
       //! zero pads ft grid for image up sampling and downsampling
       Matrix<t_complex> re_sample_ft_grid(const Matrix<t_complex>& input, const t_real& re_sample_factor);
+      //! Sparsifies chirp
+      Image<t_complex> sparsify_chirp(const Image<t_complex>& row, const t_real& energy);
  }
 }
 

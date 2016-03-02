@@ -295,5 +295,66 @@ namespace purify {
 
       return output;
   }
+  Image<t_complex> sparsify_chirp(const Image<t_complex>& row, const t_real& energy_fraction){
+    /*
+      Takes in fourier transform of chirp, and returns sparsified version
+      w_prog:: input fourier transform of chirp
+      energy_fraction:: how much energy to keep after sparsifying 
+    */
+      //there is probably a way to get eigen to do this without a loop
+      t_real tau = 0.5;
+      t_real old_tau = -1;
+      t_int niters = 100;
+      Image<t_real> abs_row = row.cwiseAbs();
+      t_real abs_row_max = abs_row.maxCoeff();
+      t_real abs_row_total_energy = (abs_row * abs_row).sum();
+
+      t_real min_tau = 0;
+      t_real max_tau = 1;
+      //calculating threshold
+      for (t_int i = 0; i < niters; ++i)
+      {
+        t_real energy_sum = 0;
+        for (t_int i = 0; i < abs_row.size(); ++i)
+        {
+          if (abs_row(i)/abs_row_max > tau)
+          {
+            energy_sum = energy_sum + abs_row(i) * abs_row(i) / abs_row_total_energy;
+          }
+        }
+
+        old_tau = tau;
+        if (energy_sum >= energy_fraction)
+        {
+          min_tau = tau;
+        }else{
+          max_tau = tau;
+        }
+        tau = (max_tau - min_tau) * 0.5 + min_tau;
+        std::cout << energy_sum << '\n';
+        if (std::abs(tau - old_tau)/tau < 1e-6 and energy_sum > energy_fraction)
+        {
+        	tau = old_tau;
+        	break;
+        }
+        
+
+      }
+
+      Image<t_complex> output_row = Image<t_complex>::Zero(row.rows(), row.cols());
+      t_real final_energy = 0;
+      //performing clipping
+      for (t_int i = 0; i < abs_row.size(); ++i)
+      {
+        if (abs_row(i)/abs_row_max > tau)
+        {
+          output_row(i) = row(i);
+          final_energy = final_energy + abs_row(i) * abs_row(i);
+        }
+      }
+      std::cout << "Final energy:" << '\n';
+      std::cout << final_energy / abs_row_total_energy << '\n';
+      return output_row;
+  }
 	}
 }
