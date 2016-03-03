@@ -387,5 +387,114 @@ namespace purify {
     }
     return chirp;
   }
+
+	Sparse<t_complex> convolution(const Sparse<t_complex> & Grid, const Image<t_complex>& Chirp, const t_int& Nx, const t_int& Ny, const t_int& Nvis){
+
+		t_int Npix=Nx*Ny;
+		t_int zerofreq=Nx*Ny/2;
+		Sparse<t_complex> newG(Nvis, Npix);
+		Image<t_complex> Gtemp_mat(Nx, Ny);
+
+		typedef Eigen::Triplet<t_complex> T;
+		std::vector<T> tripletList;
+		tripletList.reserve(Nvis*Npix);
+
+		for(int m=0; m<Nvis; m++){//chirp->M
+
+			if(m%100==0) std::cout<<"In vis = "<<m<<std::endl;
+
+			//loop over every pixel
+
+			for(int i=0; i<Nx; i++){//nx
+				for(int j=0; j<Ny; j++){ //ny
+					t_complex  Gtemp0 (0.0,0.0);
+					t_complex  chirptemp (0.0,0.0);
+
+					//only loop over the non-zero gmat elements
+					for (Eigen::SparseMatrix<t_complex>::InnerIterator pix(Grid,m); pix; ++pix){
+					//for(int pix=from; pix<to; pix++ ){
+
+						//express the column index as two-dimensional indices in image plane
+						t_int ii, jj, i_fftshift, j_fftshift;
+
+						jj=pix.row()% Ny; 
+						ii= (pix.row() - jj)/Ny;
+
+						if(ii<Nx/2) i_fftshift=ii+Nx/2;
+						if(ii>=Nx/2) i_fftshift=ii-Nx/2;
+						if(jj<Ny/2) j_fftshift=jj+Ny/2;
+						if(jj>=Ny/2) j_fftshift=jj-Ny/2;
+						
+						t_int oldpixi, oldpixj;
+						
+						//translate the chirp matrix for m to center on the pixel (i,j)
+						//store old pixel indices of Chirp 
+						oldpixi=Nx/2-i+i_fftshift;
+						oldpixj=Ny/2-j+j_fftshift;
+
+						//index of the chirp which translates to (ii,jj)
+						t_int chirppixindex= oldpixi*Ny+oldpixj;
+
+						chirptemp=Chirp(m,chirppixindex);
+
+						//only add if within the overlap between chirp and Gmat
+						//no circular convolution
+
+						if(oldpixi>=0 && oldpixi<Nx){
+							if(oldpixj>=0 && oldpixj<Ny){
+								
+								Gtemp0=Gtemp0 + ( pix.value() * chirptemp );
+
+							}
+						}		
+					}
+					Gtemp_mat(i,j)=Gtemp0;		
+				}
+			}
+
+			for(int i=0; i<Nx; i++){
+				for(int j=0; j<Ny; j++){
+					int ii, jj;
+					if(i>=Nx/2) ii=i-Nx/2;
+					if(i<Nx/2) ii=i+Nx/2;
+					if(j>=Ny/2) jj=j-Ny/2;
+					if(j<Ny/2) jj=j+Ny/2;
+	
+					if(abs(Gtemp_mat(i, j))!=0.0){
+						tripletList.push_back(T(m,ii*Ny+jj,Gtemp_mat(i, j)));
+					}
+				} 
+			}
+
+		}
+
+
+	newG.setFromTriplets(tripletList.begin(), tripletList.end());
+	return newG;	
+
+	}
+    t_real upsample_ratio(const utilities::vis_params& uv_vis, const t_int  ncols, const  t_int nrows, const t_real FoV){
+        /*
+         returns the upsampling (in Fourier domain) ratio
+         */
+        Vector<t_real> u = uv_vis.u.cwiseAbs();
+        Vector<t_real> v = uv_vis.v.cwiseAbs();
+        Vector<t_real> w = uv_vis.w.cwiseAbs();
+        Vector<t_real> um;
+        um << u.maxCoeff(), v.maxCoeff();
+        t_real bandwidth = 2 * um.maxCoeff() ;
+        
+        Vector<t_real> bandwidth_vx= 2 * ( u + w * FoV * 0.5);
+        Vector<t_real> bandwidth_vy= 2 * ( v + w * FoV * 0.5);
+        
+        t_real bx = bandwidth_vy.maxCoeff();
+        t_real by = bandwidth_vx.maxCoeff();
+        Vector<t_real> um_up;
+        um_up << bx, by;
+        t_real bandwidth_up = 2 * um_up.maxCoeff() ;
+        t_real ratio = bandwidth_up / bandwidth;
+        std::cout << "bandwidth" << ratio;
+        return ratio;
+    }
 	}
 }
