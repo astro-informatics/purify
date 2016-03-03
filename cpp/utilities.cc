@@ -302,6 +302,8 @@ namespace purify {
       energy_fraction:: how much energy to keep after sparsifying 
     */
       //there is probably a way to get eigen to do this without a loop
+      if ( energy_fraction == 1) 
+      	return row;
       t_real tau = 0.5;
       t_real old_tau = -1;
       t_int niters = 100;
@@ -357,7 +359,7 @@ namespace purify {
       return output_row;
   }
 
-  Image<t_complex> generate_chirp(const t_real w_term, const t_real cellx, const t_real celly, const t_int x_size, const t_int y_size){
+  Image<t_complex> generate_chirp(const t_real w_term, const t_real cell_x, const t_real cell_y, const t_int x_size, const t_int y_size){
     /*
       return chirp image fourier transform for w component
 
@@ -368,11 +370,14 @@ namespace purify {
       y_size:: number of pixels along y-axis
 
     */
+    const t_real theta_FoV_L = cell_x * x_size;
+    const t_real theta_FoV_M = cell_y * y_size;
 
-    const t_real max_fov = 180. * 60 * 60; //maximum field of view for a hemisphere
+    const t_real L = 2 * std::sin(purify_pi / 180.* theta_FoV_L / (60. * 60.) * 0.5);
+    const t_real M = 2 * std::sin(purify_pi / 180.* theta_FoV_M / (60. * 60.) * 0.5);
 
-    const t_real delt_x = cellx / max_fov;
-    const t_real delt_y = celly / max_fov;
+    const t_real delt_x = L / x_size;
+    const t_real delt_y = M / y_size;
 
     Image<t_complex> chirp(y_size, x_size);
     t_complex I(0, 1);
@@ -382,115 +387,130 @@ namespace purify {
       {
         t_real x = (l + 0.5 - x_size * 0.5) * delt_x;
         t_real y = (m + 0.5 - y_size * 0.5) * delt_y;
+
         chirp(m, l) = std::exp(- 2 * purify_pi * I * w_term * (std::sqrt(1 - x*x - y*y) - 1)) * std::exp(- 2 * purify_pi * I * (l * 0.5 + m * 0.5));
       }
     }
-    return chirp;
+    return chirp/chirp.size();
   }
 
-	Sparse<t_complex> convolution(const Sparse<t_complex> & Grid, const Image<t_complex>& Chirp, const t_int& Nx, const t_int& Ny, const t_int& Nvis){
+Sparse<t_complex> convolution(const Sparse<t_complex> & Grid, const Image<t_complex>& Chirp, const t_int& Nx, const t_int& Ny, const t_int& Nvis){
 
-		t_int Npix=Nx*Ny;
-		t_int zerofreq=Nx*Ny/2;
-		Sparse<t_complex> newG(Nvis, Npix);
-		Image<t_complex> Gtemp_mat(Nx, Ny);
+        std::cout<<"Convolving Gridding matrix with Chirp"<<std::endl;
+        std::cout<<"Nx = "<<Nx<<" Ny = "<<Ny<<std::endl;
+        std::cout<<Chirp.rows()<<" "<<Chirp.cols()<<std::endl;
+        t_int Npix=Nx*Ny;
+        Sparse<t_complex> newG(Nvis, Npix);
+        Image<t_complex> Gtemp_mat(Nx, Ny);
 
-		typedef Eigen::Triplet<t_complex> T;
-		std::vector<T> tripletList;
-		tripletList.reserve(Nvis*Npix);
+        typedef Eigen::Triplet<t_complex> T;
+        std::vector<T> tripletList;
 
-		for(int m=0; m<Nvis; m++){//chirp->M
+        tripletList.reserve(Nvis*Npix);
 
-			if(m%100==0) std::cout<<"In vis = "<<m<<std::endl;
+        for(int m=0; m<Nvis; m++){//chirp->M
 
-			//loop over every pixel
+            if(m%100==0)    std::cout<<"In vis = "<<m<<std::endl;
 
-			for(int i=0; i<Nx; i++){//nx
-				for(int j=0; j<Ny; j++){ //ny
-					t_complex  Gtemp0 (0.0,0.0);
-					t_complex  chirptemp (0.0,0.0);
+            //loop over every pixel
 
-					//only loop over the non-zero gmat elements
-					for (Eigen::SparseMatrix<t_complex>::InnerIterator pix(Grid,m); pix; ++pix){
-					//for(int pix=from; pix<to; pix++ ){
+            for(int i=0; i<Nx; i++){//nx
+                for(int j=0; j<Ny; j++){ //ny
+                    t_complex  Gtemp0 (0.0,0.0);
+                    t_complex  chirptemp (0.0,0.0);
 
-						//express the column index as two-dimensional indices in image plane
-						t_int ii, jj, i_fftshift, j_fftshift;
+                    //only loop over the non-zero gmat elements
+                    for (Eigen::SparseMatrix<t_complex>::InnerIterator pix(Grid,m); pix; ++pix){
+                    //for(int pix=from; pix<to; pix++ ){
+                        //std::cout<<i<<" "<<j<<"  "<<pix.row()<<"  "<<pix.col()<<"  " <<pix.index()<<std::endl;
+                        //express the column index as two-dimensional indices in image plane
+                        t_int ii, jj, i_fftshift, j_fftshift;
 
-						jj=pix.row()% Ny; 
-						ii= (pix.row() - jj)/Ny;
+                        jj=pix.row()% Ny; 
+                        ii= (pix.row() - jj)/Ny;
 
-						if(ii<Nx/2) i_fftshift=ii+Nx/2;
-						if(ii>=Nx/2) i_fftshift=ii-Nx/2;
-						if(jj<Ny/2) j_fftshift=jj+Ny/2;
-						if(jj>=Ny/2) j_fftshift=jj-Ny/2;
-						
-						t_int oldpixi, oldpixj;
-						
-						//translate the chirp matrix for m to center on the pixel (i,j)
-						//store old pixel indices of Chirp 
-						oldpixi=Nx/2-i+i_fftshift;
-						oldpixj=Ny/2-j+j_fftshift;
+                        if(ii<Nx/2) i_fftshift=ii+Nx/2;
+                        if(ii>=Nx/2) i_fftshift=ii-Nx/2;
+                        if(jj<Ny/2) j_fftshift=jj+Ny/2;
+                        if(jj>=Ny/2) j_fftshift=jj-Ny/2;
+                        
 
-						//index of the chirp which translates to (ii,jj)
-						t_int chirppixindex= oldpixi*Ny+oldpixj;
-
-						chirptemp=Chirp(m,chirppixindex);
-
-						//only add if within the overlap between chirp and Gmat
-						//no circular convolution
-
-						if(oldpixi>=0 && oldpixi<Nx){
-							if(oldpixj>=0 && oldpixj<Ny){
-								
-								Gtemp0=Gtemp0 + ( pix.value() * chirptemp );
-
-							}
-						}		
-					}
-					Gtemp_mat(i,j)=Gtemp0;		
-				}
-			}
-
-			for(int i=0; i<Nx; i++){
-				for(int j=0; j<Ny; j++){
-					int ii, jj;
-					if(i>=Nx/2) ii=i-Nx/2;
-					if(i<Nx/2) ii=i+Nx/2;
-					if(j>=Ny/2) jj=j-Ny/2;
-					if(j<Ny/2) jj=j+Ny/2;
-	
-					if(abs(Gtemp_mat(i, j))!=0.0){
-						tripletList.push_back(T(m,ii*Ny+jj,Gtemp_mat(i, j)));
-					}
-				} 
-			}
-
-		}
+                        t_int oldpixi, oldpixj;
+                        
+                        //translate the chirp matrix for m to center on the pixel (i,j)
+                        //store old pixel indices of Chirp 
+                        oldpixi=Nx/2-i+i_fftshift;
+                        oldpixj=Ny/2-j+j_fftshift;
+                        //std::cout<<oldpixi<<" "<<oldpixj<<std::endl;
+                        //index of the chirp which translates to (ii,jj)
+                        t_int chirppixindex= oldpixi*Ny+oldpixj;
 
 
-	newG.setFromTriplets(tripletList.begin(), tripletList.end());
-	return newG;	
+                
+                        
+                        //only add if within the overlap between chirp and Gmat
+                        //no circular convolution
 
-	}
-    t_real upsample_ratio(const utilities::vis_params& uv_vis, const t_int  ncols, const  t_int nrows, const t_real FoV){
+                        if(oldpixi>=0 && oldpixi<Nx){
+                            if(oldpixj>=0 && oldpixj<Ny){
+						        chirptemp=Chirp(m, chirppixindex);
+                                Gtemp0=Gtemp0 + ( pix.value() * chirptemp );
+
+                            }
+                        }        
+                    }
+                    Gtemp_mat(i,j)=Gtemp0;        
+                }
+            }
+            if(m%100==0) std::cout<<"After loop in vis = "<<m<<std::endl;
+
+            for(int i=0; i<Nx; i++){
+                for(int j=0; j<Ny; j++){
+                    int ii, jj;
+                    if(i>=Nx/2) ii=i-Nx/2;
+                    if(i<Nx/2) ii=i+Nx/2;
+                    if(j>=Ny/2) jj=j-Ny/2;
+                    if(j<Ny/2) jj=j+Ny/2;
+    
+                    if(abs(Gtemp_mat(i, j))!=0.0){
+                        tripletList.push_back(T(m,ii*Ny+jj,Gtemp_mat(i, j)));
+                    }
+                } 
+            }
+
+        }
+
+
+    newG.setFromTriplets(tripletList.begin(), tripletList.end());
+
+    
+    if(newG.isApprox(Grid, 1e-13)){ 
+        std::cout<<"Convolution works"<<std::endl;
+    }else std::cout<<"Convolution does not work"<<std::endl;
+    
+    return newG;    
+
+    }
+    t_real upsample_ratio(const utilities::vis_params& uv_vis, const t_real& field_of_view_x, const t_real& field_of_view_y){
         /*
          returns the upsampling (in Fourier domain) ratio
          */
-        Vector<t_real> u = uv_vis.u.cwiseAbs();
-        Vector<t_real> v = uv_vis.v.cwiseAbs();
-        Vector<t_real> w = uv_vis.w.cwiseAbs();
-        Vector<t_real> um;
-        um << u.maxCoeff(), v.maxCoeff();
+        const Vector<t_real> & u = uv_vis.u.cwiseAbs();
+        const Vector<t_real> & v = uv_vis.v.cwiseAbs();
+        const Vector<t_real> & w = uv_vis.w.cwiseAbs();
+        Vector<t_real> um(2);
+        t_real umax = u.maxCoeff();
+        t_real vmax = v.maxCoeff();
+        um(0) = umax; um(1) = vmax;
         t_real bandwidth = 2 * um.maxCoeff() ;
         
-        Vector<t_real> bandwidth_vx= 2 * ( u + w * FoV * 0.5);
-        Vector<t_real> bandwidth_vy= 2 * ( v + w * FoV * 0.5);
+        Vector<t_real> bandwidth_vx= 2 * ( u + w * field_of_view_x * 0.5);
+        Vector<t_real> bandwidth_vy= 2 * ( v + w * field_of_view_y * 0.5);
         
         t_real bx = bandwidth_vy.maxCoeff();
         t_real by = bandwidth_vx.maxCoeff();
-        Vector<t_real> um_up;
-        um_up << bx, by;
+        Vector<t_real> um_up(2);
+        um_up(0) = bx; um_up(1) = by;
         t_real bandwidth_up = 2 * um_up.maxCoeff() ;
         t_real ratio = bandwidth_up / bandwidth;
         std::cout << "bandwidth" << ratio;

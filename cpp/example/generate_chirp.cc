@@ -11,9 +11,9 @@ using namespace purify::notinstalled;
 
 int main( int nargs, char const** args ){
 
-	const t_real w = 100;
-	const t_real cellx = 500;
-	const t_real celly = 500;
+	const t_real w = 100000;
+	const t_real cellx = 5.;
+	const t_real celly = 5.;
 	const t_int x_size = 1024;
 	const t_int y_size = 1024;
 	FFTOperator fftop;

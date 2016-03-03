@@ -23,6 +23,7 @@ namespace purify {
         Array<t_complex> W;
         Image<t_complex> C;
         t_real norm = 1;
+        const t_real oversample_factor;
         const bool use_w_term;
         const t_int imsizex;
         const t_int imsizey;
@@ -30,7 +31,7 @@ namespace purify {
         const t_int ftsizev;
       
       
-      MeasurementOperator(const utilities::vis_params& uv_vis, const t_int & Ju, const t_int & Jv, const std::string & kernel_name, const t_int & imsizex, const t_int & imsizey, const t_real & oversample_factor, const std::string& weighting_type = "none", const t_real& R = 0, bool use_w_term = false, const t_real & field_of_view_x = 30., const t_real & field_of_view_y = 30., bool fft_grid_correction = false);
+      MeasurementOperator(const utilities::vis_params& uv_vis, const t_int & Ju, const t_int & Jv, const std::string & kernel_name, const t_int & imsizex, const t_int & imsizey, const t_real & oversample_factor, const std::string& weighting_type = "none", const t_real& R = 0, bool use_w_term = false, const t_real & cell_x = 1, const t_real & cell_y = 1, bool fft_grid_correction = false);
      
 #   define SOPT_MACRO(NAME, TYPE)                                                          \
         TYPE const& NAME() const { return NAME ## _; }                                     \
@@ -79,7 +80,7 @@ namespace purify {
       //! Estiamtes norm of operator
       t_real power_method(const t_int niters);
       //! Generates chirp matrix
-      Matrix<t_complex> create_chirp_matrix(const Vector<t_real> & w_components, const t_real & field_of_view_x, const t_real & field_of_view_y);
+      Matrix<t_complex> create_chirp_matrix(const Vector<t_real> & w_components, const t_real cell_x, const t_real cell_y);
 
     public:
       //! Kaiser-Bessel kernel

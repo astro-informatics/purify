@@ -200,93 +200,24 @@ namespace purify {
   }
 
 
-
-  Sparse<t_complex> MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_real>& w, const t_int Ju, 
-          const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv) {
-      /* 
-        Given u and v coordinates, creates a gridding interpolation matrix that maps between visibilities and the fourier transform grid.
-
-        u:: fourier coordinates of visibilities for u axis
-        v:: fourier coordinates of visibilities for v axis
-        Ju:: support of kernel for u axis
-        Jv:: support of kernel for v axis
-        kernelu:: lambda function for kernel on u axis
-        kernelv:: lambda function for kernel on v axis
-        ftsizeu:: size of grid along u axis
-        ftsizev:: size of grid along v axis
-      */
-
-    // Need to write exception for u.size() != v.size()
-    t_real rows = u.size();
-    t_real cols = ftsizeu * ftsizev;
-    t_int q;
-    t_int p;
-    t_int index;
-    Vector<t_real> ones = u * 0; ones.setOnes();
-    Vector<t_real> k_u = MeasurementOperator::omega_to_k(u - ones * Ju * 0.5);
-    Vector<t_real> k_v = MeasurementOperator::omega_to_k(v - ones * Jv * 0.5);
-    std::vector<t_tripletList> entries;
-    entries.reserve(rows * Ju * Jv);
-    for (t_int m = 0; m < rows; ++m)
-      {
-        Image<t_complex> kernel_image(Jv, Ju);
-        for (t_int ju = 1; ju <= Ju; ++ju)
-         {
-           q = utilities::mod(k_u(m) + ju, ftsizeu);
-          for (t_int jv = 1; jv <= Jv; ++jv)
-            {
-              p = utilities::mod(k_v(m) + jv, ftsizev);
-              index = utilities::sub2ind(p, q, ftsizev, ftsizeu);
-              const t_complex I(0, 1);
-              //Calculating image of convolution kernel
-              kernel_image(jv, ju) = std::exp(-2 * purify_pi * I *((k_u(m) + ju) * 0.5+ (k_v(m) + jv) * 0.5 )) * kernelu(u(m)-(k_u(m)+ju)) * kernelv(v(m)-(k_v(m)+jv));
-            }
-        }
-        //Calcluating chirp term
-        t_real cellx = 1;
-        t_real celly = 1;
-        t_int x_size = ftsizeu;
-        t_int y_size = ftsizev;
-        Image<t_complex> chirp = utilities::generate_chirp(w(m), cellx, celly, x_size, y_size);
-        Image<t_complex> w_proj = fftop.inverse(chirp);
-        //Convolution of kernel and chirp
-        Matrix<t_complex> interp_row = utilities::convolution_operator(kernel_image, w_proj);
-        //Caclulating row
-        interp_row.resize(interp_row.size(), 1);
-      }
-
-    //    
-    Sparse<t_complex> interpolation_matrix(rows, cols);
-    interpolation_matrix.setFromTriplets(entries.begin(), entries.end());
-
-    return interpolation_matrix; 
-  }
-
-  Matrix<t_complex> MeasurementOperator::create_chirp_matrix(const Vector<t_real> & w_components, const t_real & field_of_view_x, const t_real & field_of_view_y){
+  Matrix<t_complex> MeasurementOperator::create_chirp_matrix(const Vector<t_real> & w_components, const t_real cell_x, const t_real cell_y){
     const t_real energy_fraction = 0.9;
 
     const t_int total_rows = w_components.size();
     const t_int total_cols = ftsizeu * ftsizev;
     //std::vector<t_tripletList> entries;
     //entries.reserve(total_rows * total_cols);
-    const t_real celly = ftsizev / field_of_view_y;
-    const t_real cellx = ftsizeu / field_of_view_x;
-    const t_int x_size = floor(field_of_view_x / cellx);
-    const t_int y_size = floor(field_of_view_y / celly);
+
     Matrix<t_complex> chirp_matrix = Matrix<t_complex>::Zero(total_rows, total_cols);
-    std::cout << "Generating chirp matrix" << '\n';
+    std::cout << "Generating chirp matrix with " << total_rows << " x " << total_cols << '\n';
     for (t_int m = 0; m < total_rows; ++m)
     {
-      Image<t_complex> chirp_image = utilities::generate_chirp(w_components(m), cellx, celly, x_size, y_size);
-
-      t_int x_start = floor(ftsizeu * 0.5 - x_size * 0.5);
-      t_int y_start = floor(ftsizev * 0.5 - y_size * 0.5);
+      Image<t_complex> chirp_image = utilities::generate_chirp(w_components(m), cell_x, cell_y, ftsizeu, ftsizev);
       
-      Image<t_complex> padded_chirp = Image<t_complex>::Zero(ftsizev, ftsizeu);
-      // zero padding and gridding correction
-      padded_chirp.block(y_start, x_start, y_size, x_size) = chirp_image; 
-      Matrix<t_complex> row = fftop.inverse(padded_chirp);
-      row = utilities::sparsify_chirp(row, energy_fraction);
+      Matrix<t_complex> row = fftop.forward(chirp_image);
+      //row = utilities::sparsify_chirp(row, energy_fraction);
+
+      row.resize(1, total_cols);
       chirp_matrix.row(m) = row;
       //for (t_int j = 0; j < row.size(); ++j)
       //{
@@ -302,9 +233,9 @@ namespace purify {
     return chirp_matrix;
   }
 
-  MeasurementOperator::MeasurementOperator(const utilities::vis_params& uv_vis, const t_int &Ju, const t_int &Jv,
-      const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, const std::string& weighting_type, const t_real& R, bool use_w_term, const t_real & field_of_view_x, const t_real & field_of_view_y, bool fft_grid_correction)
-      : imsizex(imsizex), imsizey(imsizey), ftsizeu(floor(oversample_factor * imsizex)), ftsizev(floor(oversample_factor * imsizey)), use_w_term(use_w_term)
+  MeasurementOperator::MeasurementOperator(const utilities::vis_params& uv_vis_input, const t_int &Ju, const t_int &Jv,
+      const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, const std::string& weighting_type, const t_real& R, bool use_w_term, const t_real & cell_x, const t_real & cell_y, bool fft_grid_correction)
+      : imsizex(imsizex), imsizey(imsizey), ftsizeu(floor(oversample_factor * imsizex)), ftsizev(floor(oversample_factor * imsizey)), use_w_term(use_w_term), oversample_factor(oversample_factor)
     
   {
     /*
@@ -320,6 +251,10 @@ namespace purify {
       oversample_factor:: factor for oversampling the FFT grid
 
     */
+    utilities::vis_params uv_vis = utilities::set_cell_size(uv_vis_input, cell_x, cell_y);
+    uv_vis = utilities::uv_scale(uv_vis, ftsizeu, ftsizev);
+
+    //t_real new_upsample = utilities::upsample_ratio(uv_vis, ,);
     std::cout << "------" << '\n';
     std::cout << "Constructing Gridding Operator" << '\n';
 
@@ -358,7 +293,7 @@ namespace purify {
       G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
       if (use_w_term)
       {
-        C = MeasurementOperator::create_chirp_matrix(uv_vis.w, field_of_view_x, field_of_view_y);
+        C = MeasurementOperator::create_chirp_matrix(uv_vis.w, cell_x, cell_y);
       }
       
       std::cout << "Calculating weights" << '\n';
@@ -419,7 +354,8 @@ namespace purify {
     G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
     if (use_w_term)
     {
-      C = MeasurementOperator::create_chirp_matrix(uv_vis.w, field_of_view_x, field_of_view_y);
+      C = MeasurementOperator::create_chirp_matrix(uv_vis_input.w, cell_x, cell_y);
+      G = utilities::convolution(G, C, ftsizeu, ftsizev, uv_vis.w.size());
     }
     std::cout << "Calculating weights" << '\n';
     W = MeasurementOperator::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R);
