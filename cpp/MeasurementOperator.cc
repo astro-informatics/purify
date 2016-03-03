@@ -262,9 +262,49 @@ namespace purify {
     return interpolation_matrix; 
   }
 
+  Matrix<t_complex> MeasurementOperator::create_chirp_matrix(const Vector<t_real> & w_components, const t_real & field_of_view_x, const t_real & field_of_view_y){
+    const t_real energy_fraction = 0.9;
+
+    const t_int total_rows = w_components.size();
+    const t_int total_cols = ftsizeu * ftsizev;
+    //std::vector<t_tripletList> entries;
+    //entries.reserve(total_rows * total_cols);
+    const t_real celly = ftsizev / field_of_view_y;
+    const t_real cellx = ftsizeu / field_of_view_x;
+    const t_int x_size = floor(field_of_view_x / cellx);
+    const t_int y_size = floor(field_of_view_y / celly);
+    Matrix<t_complex> chirp_matrix = Matrix<t_complex>::Zero(total_rows, total_cols);
+    std::cout << "Generating chirp matrix" << '\n';
+    for (t_int m = 0; m < total_rows; ++m)
+    {
+      Image<t_complex> chirp_image = utilities::generate_chirp(w_components(m), cellx, celly, x_size, y_size);
+
+      t_int x_start = floor(ftsizeu * 0.5 - x_size * 0.5);
+      t_int y_start = floor(ftsizev * 0.5 - y_size * 0.5);
+      
+      Image<t_complex> padded_chirp = Image<t_complex>::Zero(ftsizev, ftsizeu);
+      // zero padding and gridding correction
+      padded_chirp.block(y_start, x_start, y_size, x_size) = chirp_image; 
+      Matrix<t_complex> row = fftop.inverse(padded_chirp);
+      row = utilities::sparsify_chirp(row, energy_fraction);
+      chirp_matrix.row(m) = row;
+      //for (t_int j = 0; j < row.size(); ++j)
+      //{
+        //if (std::abs(row(j)) == 0)
+        //{
+        //  entries.emplace_back(m, j, row(j));
+        //}
+      //}
+    }
+    //Sparse<t_complex> chirp_matrix(total_rows, total_cols);
+    //chirp_matrix.setFromTriplets(entries.begin(), entries.end());
+    
+    return chirp_matrix;
+  }
+
   MeasurementOperator::MeasurementOperator(const utilities::vis_params& uv_vis, const t_int &Ju, const t_int &Jv,
-      const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, const std::string& weighting_type, const t_real& R, bool use_w_term, bool fft_grid_correction)
-      : imsizex(imsizex), imsizey(imsizey), ftsizeu(floor(oversample_factor * imsizex)), ftsizev(floor(oversample_factor * imsizey))
+      const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, const std::string& weighting_type, const t_real& R, bool use_w_term, const t_real & field_of_view_x, const t_real & field_of_view_y, bool fft_grid_correction)
+      : imsizex(imsizex), imsizey(imsizey), ftsizeu(floor(oversample_factor * imsizex)), ftsizev(floor(oversample_factor * imsizey)), use_w_term(use_w_term)
     
   {
     /*
@@ -315,14 +355,12 @@ namespace purify {
       ftkernelu = ftkb;
       ftkernelv = ftkb;
       S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv); // Does gridding correction using analytic formula
+      G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
       if (use_w_term)
       {
-        G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, uv_vis.w, Ju, Jv, kernelu, kernelv);
-      }else{
-        G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
+        C = MeasurementOperator::create_chirp_matrix(uv_vis.w, field_of_view_x, field_of_view_y);
       }
       
-
       std::cout << "Calculating weights" << '\n';
       W = MeasurementOperator::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R);
       norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
@@ -377,12 +415,12 @@ namespace purify {
     {
       S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv); // Does gridding correction using analytic formula
     }
+
+    G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
     if (use_w_term)
     {
-      G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, uv_vis.w, Ju, Jv, kernelu, kernelv);
-    }else{
-      G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
-    } 
+      C = MeasurementOperator::create_chirp_matrix(uv_vis.w, field_of_view_x, field_of_view_y);
+    }
     std::cout << "Calculating weights" << '\n';
     W = MeasurementOperator::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R);
     norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
