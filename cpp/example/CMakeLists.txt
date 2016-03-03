@@ -8,3 +8,8 @@ add_example(gridding_mem LIBRARIES cppurify)
 add_example(sdmm LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY})
 add_example(sdmm_vla LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY})
 add_example(admm LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY})
+
+add_example(resample LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY})
+add_example(sparsify LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY})
+add_example(generate_chirp LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY})
+add_example(w_projection_example LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY})
