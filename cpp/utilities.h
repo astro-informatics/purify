@@ -42,7 +42,7 @@ namespace purify {
       //! Calculates the convolution between two images
       Image<t_complex> convolution_operator(const Image<t_complex>& a, const Image<t_complex>& b);
       //! Calculates upsample ratio for w-projection
-      t_real upsample_ratio(const utilities::vis_params& uv_vis, const t_real& field_of_view_x, const t_real& field_of_view_y);
+      t_real upsample_ratio(const utilities::vis_params& uv_vis, const t_real& cell_x, const t_real& cell_y, const t_int& x_size, const t_int& y_size);
       //! Calculates convolution between grid and chirp matrix
       Sparse<t_complex> convolution(const Sparse<t_complex> & Grid, const Image<t_complex>& Chirp, const t_int& Nx, const t_int& Ny, const t_int& Nvis);
       //! zero pads ft grid for image up sampling and downsampling
