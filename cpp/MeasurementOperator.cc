@@ -355,7 +355,7 @@ namespace purify {
     if (use_w_term)
     {
       C = MeasurementOperator::create_chirp_matrix(uv_vis_input.w, cell_x, cell_y);
-      G = utilities::convolution(G, C, ftsizeu, ftsizev, uv_vis.w.size());
+      G = utilities::convolution(G, C, ftsizeu, ftsizev, uv_vis_input.w.size());
     }
     std::cout << "Calculating weights" << '\n';
     W = MeasurementOperator::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R);

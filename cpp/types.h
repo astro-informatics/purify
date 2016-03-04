@@ -38,7 +38,7 @@ namespace purify {
   //! \brief A matrix of a given type
   //! \details Operates as mathematical sparse matrix.
   template<class T = t_real>
-    using Sparse = Eigen::SparseMatrix<T>;
+    using Sparse = Eigen::SparseMatrix<T, Eigen::ColMajor>;
   //! \brief A 1-dimensional list of elements of given type
   //! \details Operates coefficient-wise, not matrix-vector-wise
   template<class T = t_real>
