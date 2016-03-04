@@ -168,7 +168,7 @@ namespace purify {
 	    return row * cols + col;
 	  }
 
-	  void ind2sub(const t_int sub, const t_int cols, const t_int rows, t_int* row, t_int* col) 
+	  Vector<t_int> ind2sub(const t_int& sub, const t_int& cols, const t_int& rows) 
 	  {
 	    /*
 	      Converts index of a matrix to (row, column). This does the same as the matlab funciton sub2ind, converts subscript to index.
@@ -180,8 +180,10 @@ namespace purify {
 	      col:: output column of matrix
 
 	     */
-	    *col = sub % cols;
-	    *row = (sub - *col) / cols;
+	    Vector<t_int> row_col(2);
+	    row_col(1) = sub % cols;
+	   	row_col(0) = floor((sub - row_col(1)) / cols);
+	   	return row_col;
 	  }
 
 	  t_real mod(const t_real& x, const t_real& y) 
@@ -394,8 +396,9 @@ namespace purify {
     return chirp/chirp.size();
   }
 
-Sparse<t_complex> convolution(const Sparse<t_complex> & Grid, const Image<t_complex>& Chirp, const t_int& Nx, const t_int& Ny, const t_int& Nvis){
+Sparse<t_complex> convolution(const Sparse<t_complex> & input_gridding_matrix, const Image<t_complex>& Chirp, const t_int& Nx, const t_int& Ny, const t_int& Nvis){
 
+		const Sparse<t_complex> & Grid = input_gridding_matrix.transpose();
         std::cout<<"Convolving Gridding matrix with Chirp"<<std::endl;
         std::cout<<"Nx = "<<Nx<<" Ny = "<<Ny<<std::endl;
         std::cout<<Chirp.rows()<<" "<<Chirp.cols()<<std::endl;
@@ -405,15 +408,13 @@ Sparse<t_complex> convolution(const Sparse<t_complex> & Grid, const Image<t_comp
 
         typedef Eigen::Triplet<t_complex> T;
         std::vector<T> tripletList;
-
+        
         tripletList.reserve(Nvis*Npix);
-
         for(int m=0; m<Nvis; m++){//chirp->M
 
-            if(m%100==0)    std::cout<<"In vis = "<<m<<std::endl;
-
-            //loop over every pixel
-
+            //if(m%100==0)    std::cout<<"In vis = "<<m<<std::endl;
+        	std::cout << m << '\n';
+            //loop over every pixels
             for(int i=0; i<Nx; i++){//nx
                 for(int j=0; j<Ny; j++){ //ny
                     t_complex  Gtemp0 (0.0,0.0);
@@ -426,8 +427,13 @@ Sparse<t_complex> convolution(const Sparse<t_complex> & Grid, const Image<t_comp
                         //express the column index as two-dimensional indices in image plane
                         t_int ii, jj, i_fftshift, j_fftshift;
 
-                        jj=pix.row()% Ny; 
-                        ii= (pix.row() - jj)/Ny;
+                        Vector<t_int> image_row_col = ind2sub(pix.index(), Nx, Ny); 
+                        ii = image_row_col(0);
+                        jj = image_row_col(1);
+                        
+                        //std::cout << pix.index() << " " << ii << " " << jj << " " << Ny << " " << Nx << '\n';
+                        //jj= pix.index()% Ny; 
+                        //ii= (pix.index() - jj)/Ny;
 
                         if(ii<Nx/2) i_fftshift=ii+Nx/2;
                         if(ii>=Nx/2) i_fftshift=ii-Nx/2;
@@ -484,7 +490,7 @@ Sparse<t_complex> convolution(const Sparse<t_complex> & Grid, const Image<t_comp
     newG.setFromTriplets(tripletList.begin(), tripletList.end());
 
     
-    if(newG.isApprox(Grid, 1e-13)){ 
+    if(newG.isApprox(Grid, 1e-2)){ 
         std::cout<<"Convolution works"<<std::endl;
     }else std::cout<<"Convolution does not work"<<std::endl;
     

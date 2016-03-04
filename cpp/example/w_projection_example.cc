@@ -45,14 +45,15 @@ int main( int nargs, char const** args ){
   MeasurementOperator op(uv_vis, J, J, kernel, width, height, over_sample, "none", 0, use_w_term, cellsize, cellsize); // Create Measurement Operator
   auto chirp_matrix = op.C;
   auto first_row = chirp_matrix.row(18);
+  MeasurementOperator op0(uv_vis, J, J, kernel, width, height, over_sample, "none", 0, false, cellsize, cellsize); 
 //  first_row.resize(64, 64);
 //  pfitsio::write2d(first_row.real(), output_filename("first_row.fits"));
   for (t_int i = 0; i < chirp_matrix.rows(); ++i)
   {
     for (t_int j = 0; j < chirp_matrix.cols(); ++j)
     {
-      if (std::abs(chirp_matrix(i, j)) > 1e-4)
-        std::cout << std::abs(chirp_matrix(i, j)) << " " << i << " " << j << '\n';
+      if (std::abs(op0.G.coeffRef(i, j)) > 1e-4)
+        std::cout << std::abs(op0.G.coeffRef(i, j)) << " " << std::abs(op.G.coeffRef(i, j)) << " " << i << " " << j << '\n';
     }
   }
   
