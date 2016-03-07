@@ -111,6 +111,7 @@ namespace purify {
 	      t_real scale_factor_v = 180 * 3600 / cell_size_v / purify_pi;
 	      scaled_vis.u = uv_vis.u / scale_factor_u * 2 * purify_pi;
 	      scaled_vis.v = uv_vis.v / scale_factor_v * 2 * purify_pi;
+	      scaled_vis.w = uv_vis.w;
 	      scaled_vis.vis = uv_vis.vis;
 	      scaled_vis.weights = uv_vis.weights;
 	      return scaled_vis;
@@ -126,21 +127,22 @@ namespace purify {
 	    return weighted_vis;
 	  }
 
-	  utilities::vis_params uv_scale(const utilities::vis_params& uv_vis, const t_int& ftsizeu, const t_int& ftsizev)
+	  utilities::vis_params uv_scale(const utilities::vis_params& uv_vis, const t_int& sizex, const t_int& sizey)
 	  {
 	    /*
 	      scales the uv coordinates from being in units of 2 * pi to units of pixels.
 	    */
 	      utilities::vis_params scaled_vis;
-	      scaled_vis.u = uv_vis.u / (2 * purify_pi) * ftsizeu;
-	      scaled_vis.v = uv_vis.v / (2 * purify_pi) * ftsizev;
+	      scaled_vis.u = uv_vis.u / (2 * purify_pi) * sizex;
+	      scaled_vis.v = uv_vis.v / (2 * purify_pi) * sizey;
 	      scaled_vis.vis = uv_vis.vis;
 	      scaled_vis.weights = uv_vis.weights;
 	      for (t_int i = 0; i < uv_vis.u.size(); ++i)
 	      {
-	      	scaled_vis.u(i) = utilities::mod(scaled_vis.u(i), ftsizeu);
-	      	scaled_vis.v(i) = utilities::mod(scaled_vis.v(i), ftsizev);
+	      	scaled_vis.u(i) = utilities::mod(scaled_vis.u(i), sizex);
+	      	scaled_vis.v(i) = utilities::mod(scaled_vis.v(i), sizey);
 	      }
+	      scaled_vis.w = uv_vis.w;
 	      return scaled_vis;
 	  }
 
@@ -154,13 +156,15 @@ namespace purify {
 	    t_int total = uv_vis.u.size();
 	    Vector<t_real> utemp(2 * total);
 	    Vector<t_real> vtemp(2 * total);
+	    Vector<t_real> wtemp(2 * total);
 	    Vector<t_complex> vistemp(2 * total);
 	    Vector<t_complex> weightstemp(2 * total);
-	    utilities::vis_params conj_vis;
+	    
 	    for (t_int i = 0; i < uv_vis.u.size(); ++i)
 	    {
 	      utemp(i) = uv_vis.u(i);
 	      vtemp(i) = uv_vis.v(i);
+	      wtemp(i) = uv_vis.w(i);
 	      vistemp(i) = uv_vis.vis(i);
 	      weightstemp(i) = uv_vis.weights(i);
 	    }
@@ -168,11 +172,14 @@ namespace purify {
 	    {
 	      utemp(i) = -uv_vis.u(i - total);
 	      vtemp(i) = -uv_vis.v(i - total);
+	      wtemp(i) = uv_vis.w(i - total);
 	      vistemp(i) = std::conj(uv_vis.vis(i - total));
 	      weightstemp(i) = uv_vis.weights(i - total);
 	    }
+	    utilities::vis_params conj_vis;
 	    conj_vis.u = utemp;
 	    conj_vis.v = vtemp;
+	    conj_vis.w = wtemp;
 	    conj_vis.vis = vistemp;
 	    conj_vis.weights = weightstemp;
 	    return conj_vis;
@@ -270,7 +277,8 @@ namespace purify {
       input:: fft to be upsampled, with zero frequency at (0,0) of the matrix.
 
     */
-
+      if (re_sample_ratio == 1)
+      	return input;
 
       //sets up dimensions for old image
       t_int old_x = input.cols();
