@@ -7,7 +7,8 @@
 #include <fstream>
 #include <iostream>
 #include <stdio.h>
-
+#include <boost/random.hpp>
+#include <boost/random/normal_distribution.hpp>
 
 namespace purify {
 
@@ -19,6 +20,8 @@ namespace purify {
         Vector<t_complex> vis; // complex visiblities
         Vector<t_complex> weights; // weights for visibilities
       };
+      //! Generates a random visibility coverage
+      utilities::vis_params random_sample_density(const t_int& vis_num, const t_real& mean, const t_real& standard_deviation);
       //! Reads in visibility file
       utilities::vis_params read_visibility(const std::string& vis_name);
       //! Scales visibilities to a given pixel size in arcseconds

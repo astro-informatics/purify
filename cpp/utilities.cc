@@ -2,7 +2,31 @@
 
 namespace purify {
 	namespace utilities {
+	utilities::vis_params random_sample_density(const t_int& vis_num, const t_real& mean, const t_real& standard_deviation){
+		/*
+			Generates a random sampling density for visibility coverage
+			vis_num:: number of visibilities
+			mean:: mean of distribution
+			standard_deviation:: standard deviation of distirbution
+		*/
+			auto sample = [&mean, &standard_deviation] (t_real x) { 
+				static boost::mt19937 rng;
+				t_real output = 4 * standard_deviation;
+				static boost::normal_distribution<t_real> normal_dist(mean, standard_deviation);
+				while(output > 3 * standard_deviation){
+					output = normal_dist(rng);
+				}
+				return output;
+			 };
 
+			utilities::vis_params uv_vis;
+			uv_vis.u = Vector<t_real>::Zero(vis_num).unaryExpr(sample);
+			uv_vis.v = Vector<t_real>::Zero(vis_num).unaryExpr(sample);
+			uv_vis.w = Vector<t_real>::Zero(vis_num).unaryExpr(sample);
+			uv_vis.weights = Vector<t_complex>::Constant(vis_num, 1);
+			uv_vis.vis = Vector<t_complex>::Constant(vis_num, 1);
+			return uv_vis;
+	}
 	utilities::vis_params read_visibility(const std::string& vis_name)
 	  {
 	    /*
