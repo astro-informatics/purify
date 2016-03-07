@@ -10,10 +10,10 @@ namespace purify {
       eigen_image:: input image to be degridded
       st:: gridding parameters
     */
-      Matrix<t_complex> padded_image = Matrix<t_complex>::Zero(ftsizeu, ftsizev);
+      Matrix<t_complex> padded_image = Matrix<t_complex>::Zero(floor(imsizex * oversample_factor), floor(imsizey * oversample_factor));
       Matrix<t_complex> ft_vector(ftsizeu, ftsizev);
-      t_int x_start = floor(ftsizeu * 0.5 - imsizex * 0.5);
-      t_int y_start = floor(ftsizev * 0.5 - imsizey * 0.5);
+      t_int x_start = floor(floor(imsizex * oversample_factor) * 0.5 - imsizex * 0.5);
+      t_int y_start = floor(floor(imsizey * oversample_factor) * 0.5 - imsizey * 0.5);
 
       // zero padding and gridding correction
       padded_image.block(y_start, x_start, imsizey, imsizex)
@@ -21,7 +21,7 @@ namespace purify {
       
 
       // create fftgrid
-      ft_vector = fftop.forward(padded_image); // the fftshift is not needed because of the phase shift in the gridding kernel
+      ft_vector = utilities::re_sample_ft_grid(fftop.forward(padded_image),resample_factor); // the fftshift is not needed because of the phase shift in the gridding kernel
       // turn into vector
       ft_vector.resize(ftsizeu*ftsizev, 1); // using conservativeResize does not work, it grables the image. Also, it is not what we want.
       // get visibilities
@@ -39,9 +39,10 @@ namespace purify {
     */
       Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W).matrix();
       ft_vector.resize(ftsizeu, ftsizev); // using conservativeResize does not work, it grables the image. Also, it is not what we want.
+      ft_vector = utilities::re_sample_ft_grid(ft_vector, 1./resample_factor);
       Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
-      t_int x_start = floor(ftsizeu * 0.5 - imsizex * 0.5);
-      t_int y_start = floor(ftsizev * 0.5 - imsizey * 0.5);
+      t_int x_start = floor(floor(imsizex * oversample_factor) * 0.5 - imsizex * 0.5);
+      t_int y_start = floor(floor(imsizey * oversample_factor) * 0.5 - imsizey * 0.5);
       return S * padded_image.block(y_start, x_start, imsizey, imsizex)/norm;
   }
 
