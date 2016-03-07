@@ -187,14 +187,14 @@ namespace purify {
     */
      t_real estimate_eigen_value = 1;
      Image<t_complex> estimate_eigen_vector = Image<t_complex>::Random(imsizey, imsizex);
-     std::cout << "Starting power method " << '\n';
-     std::cout << "Iteration: " << 0 << ", norm = " << estimate_eigen_value << '\n';
+     //std::cout << "Starting power method " << '\n';
+     //std::cout << "Iteration: " << 0 << ", norm = " << estimate_eigen_value << '\n';
      for (t_int i = 0; i < niters; ++i)
      {
       auto new_estimate_eigen_vector = MeasurementOperator::grid(MeasurementOperator::degrid(estimate_eigen_vector));
       estimate_eigen_value = new_estimate_eigen_vector.matrix().norm();
       estimate_eigen_vector = new_estimate_eigen_vector/estimate_eigen_value;
-      std::cout << "Iteration: " << i + 1 << ", norm = " << estimate_eigen_value << '\n';
+      //std::cout << "Iteration: " << i + 1 << ", norm = " << estimate_eigen_value << '\n';
      }
      return estimate_eigen_value;
   }
@@ -251,23 +251,31 @@ namespace purify {
       oversample_factor:: factor for oversampling the FFT grid
 
     */
+    if (use_w_term){
+      resample_factor = utilities::upsample_ratio(uv_vis_input, cell_x, cell_y, ftsizeu, ftsizev);
+      ftsizeu = ftsizeu * resample_factor;
+      ftsizev = ftsizev * resample_factor;
+    }
+    
     utilities::vis_params uv_vis = utilities::set_cell_size(uv_vis_input, cell_x, cell_y);
-    uv_vis = utilities::uv_scale(uv_vis, ftsizeu, ftsizev);
+    uv_vis = utilities::uv_scale(uv_vis, floor(oversample_factor * imsizex), floor(oversample_factor * imsizey));
+    uv_vis = utilities::uv_symmetry(uv_vis);
 
     //t_real new_upsample = utilities::upsample_ratio(uv_vis, ,);
-    std::cout << "------" << '\n';
-    std::cout << "Constructing Gridding Operator" << '\n';
+    std::printf("------ \n");
+    std::printf("Constructing Gridding Operator \n");
 
-
+    std::printf("Oversampling Factor: %f \n", oversample_factor);
     std::function<t_real(t_real)> kernelu;
     std::function<t_real(t_real)> kernelv;
     std::function<t_real(t_real)> ftkernelu;
     std::function<t_real(t_real)> ftkernelv;
-
-    std::cout << "Kernel Name: " << kernel_name << '\n';
-    std::cout << "Number of visibilities: " << uv_vis.u.size() <<'\n';
-    std::cout << "Ju: " << Ju << '\n';
-    std::cout << "Jv: " << Jv << '\n';
+    if (use_w_term)
+      std::printf("Resampling Factor: %f \n", resample_factor);
+    std::printf("Kernel Name: %s \n", kernel_name.c_str());
+    std::printf("Number of visibilities: %ld \n", uv_vis.u.size());
+    std::printf("Ju: %d \n", Ju);
+    std::printf("Jv: %d \n", Jv);
 
     S = Image<t_real>::Zero(imsizey, imsizex);
 
@@ -278,7 +286,7 @@ namespace purify {
     {
 
       t_real kb_interp_alpha = purify_pi * std::sqrt(Ju * Ju/(oversample_factor * oversample_factor) * (oversample_factor - 0.5) * (oversample_factor - 0.5) - 0.8);
-      t_int total_samples = 2e6 * Ju;
+      const t_int total_samples = 2e6 * Ju;
       auto kb_general = [&] (t_real x) { return MeasurementOperator::kaiser_bessel_general(x, Ju, kb_interp_alpha); };
       Vector<t_real> samples = MeasurementOperator::kernel_samples(total_samples, kb_general, Ju);
       auto kb_interp = [&] (t_real x) { return MeasurementOperator::kernel_linear_interp(samples, x, Ju); };
@@ -294,13 +302,14 @@ namespace purify {
       if (use_w_term)
       {
         C = MeasurementOperator::create_chirp_matrix(uv_vis.w, cell_x, cell_y);
+        G = utilities::convolution(G, C, ftsizeu, ftsizev, uv_vis.w.size());
       }
       
-      std::cout << "Calculating weights" << '\n';
+      std::printf("Calculating weights \n");
       W = MeasurementOperator::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R);
       norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
-      std::cout << "Gridding Operator Constructed" << '\n';
-      std::cout << "------" << '\n';
+      std::printf("Gridding Operator Constructed \n");
+      std::printf("------ \n");
       return;
     }
 
@@ -354,15 +363,16 @@ namespace purify {
     G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
     if (use_w_term)
     {
-      C = MeasurementOperator::create_chirp_matrix(uv_vis_input.w, cell_x, cell_y);
-      G = utilities::convolution(G, C, ftsizeu, ftsizev, uv_vis_input.w.size());
+      C = MeasurementOperator::create_chirp_matrix(uv_vis.w, cell_x, cell_y);
+      G = utilities::convolution(G, C, ftsizeu, ftsizev, uv_vis.w.size());
     }
-    std::cout << "Calculating weights" << '\n';
+    std::printf("Calculating weights \n");
     W = MeasurementOperator::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R);
+    std::printf("Doing power method \n");
     norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
-    std::cout << "Found a norm of " << norm << '\n';
-    std::cout << "Gridding Operator Constructed" << '\n';
-    std::cout << "------" << '\n';
+    std::printf("Found a norm of %f \n", norm);
+    std::printf("Gridding Operator Constructed \n");
+    std::printf("------ \n");
   }
 
   t_real MeasurementOperator::kaiser_bessel(const t_real& x, const t_int& J)

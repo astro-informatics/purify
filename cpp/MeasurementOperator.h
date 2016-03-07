@@ -24,11 +24,12 @@ namespace purify {
         Image<t_complex> C;
         t_real norm = 1;
         const t_real oversample_factor;
+        t_real resample_factor = 1;
         const bool use_w_term;
         const t_int imsizex;
         const t_int imsizey;
-        const t_int ftsizeu;
-        const t_int ftsizev;
+        t_int ftsizeu;
+        t_int ftsizev;
       
       
       MeasurementOperator(const utilities::vis_params& uv_vis, const t_int & Ju, const t_int & Jv, const std::string & kernel_name, const t_int & imsizex, const t_int & imsizey, const t_real & oversample_factor, const std::string& weighting_type = "none", const t_real& R = 0, bool use_w_term = false, const t_real & cell_x = 1, const t_real & cell_y = 1, bool fft_grid_correction = false);
