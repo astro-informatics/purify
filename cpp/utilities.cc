@@ -443,7 +443,7 @@ Sparse<t_complex> convolution(const Sparse<t_complex> & input_gridding_matrix, c
         
         tripletList.reserve(Nvis*Npix);
         for(int m=0; m<Nvis; m++){//chirp->M
-        	std::cout << m << '\n';
+        	
             //loop over every pixels
             for(int i=0; i<Nx; i++){//nx
                 for(int j=0; j<Ny; j++){ //ny
@@ -486,7 +486,7 @@ Sparse<t_complex> convolution(const Sparse<t_complex> & input_gridding_matrix, c
                     Gtemp_mat(i,j)=Gtemp0;        
                 }
             }
-             std::cout<<"vis = "<<m<<std::endl;
+             //std::cout<<"vis = "<<m<<std::endl;
 
             for(int i=0; i<Nx; i++){
                 for(int j=0; j<Ny; j++){
@@ -497,7 +497,6 @@ Sparse<t_complex> convolution(const Sparse<t_complex> & input_gridding_matrix, c
                     if(j<Ny/2) jj=j+Ny/2;
     
                     if(abs(Gtemp_mat(i, j))> 1e-14){
-
                         tripletList.push_back(T(m,sub2ind(ii,jj,Nx,Ny),Gtemp_mat(i, j)));
                     }
                 } 
@@ -505,14 +504,14 @@ Sparse<t_complex> convolution(const Sparse<t_complex> & input_gridding_matrix, c
 
         }
 
-                                   std::cout<<"---- After convolution  ---- "<<std::endl;
+        std::cout<<"---- After convolution  ---- "<<std::endl;
 
     newG.setFromTriplets(tripletList.begin(), tripletList.end());
 
     
-    if(newG.isApprox(input_gridding_matrix, 1e-14)){ 
-        std::cout<<"Convolution works"<<std::endl;
-    }else std::cout<<"Convolution does not work"<<std::endl;
+    //if(newG.isApprox(input_gridding_matrix, 1e-14)){ 
+    //    std::cout<<"Convolution works"<<std::endl;
+    //}else std::cout<<"Convolution does not work"<<std::endl;
     
     return newG;    
 
