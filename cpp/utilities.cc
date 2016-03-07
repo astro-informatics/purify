@@ -527,21 +527,19 @@ Sparse<t_complex> convolution(const Sparse<t_complex> & input_gridding_matrix, c
 
     	const t_real L = 2 * std::sin(purify_pi / 180.* theta_FoV_L / (60. * 60.) * 0.5);
     	const t_real M = 2 * std::sin(purify_pi / 180.* theta_FoV_M / (60. * 60.) * 0.5);
-        
-        const Vector<t_real> & u = uv_vis.u.cwiseAbs();
-        const Vector<t_real> & v = uv_vis.v.cwiseAbs();
-        const Vector<t_real> & w = uv_vis.w.cwiseAbs();
-        Vector<t_real> uvdist = (u.array() * u.array() + v.array() * v.array()).sqrt();
-        
-        Vector<t_real> bandwidth_up_vector = 2 * ( uvdist + w * L * 0.5);
-        
-        t_real bandwidth_up = bandwidth_up_vector.maxCoeff();
 
-    	t_real bandwidth = 2 * uvdist.maxCoeff();
-    	 
-        t_real ratio = bandwidth_up / bandwidth;
-        std::cout << "L " << L;
-        std::cout << "M " << M;
+    	const t_real FoV = std::max(L, M);
+        
+        const Vector<t_real> & w = uv_vis.w.cwiseAbs();
+        const Vector<t_real> uv_dist = (uv_vis.u.array() * uv_vis.u.array() + uv_vis.v.array() * uv_vis.v.array()).sqrt();
+        
+        const Vector<t_real> bandwidth_up_vector = uv_dist + w * FoV * 0.5;
+        
+        const t_real bandwidth_up = bandwidth_up_vector.maxCoeff();
+
+    	const t_real bandwidth = uv_dist.maxCoeff();
+
+        const t_real ratio = bandwidth_up / bandwidth;
         return ratio;
     }
 	}
