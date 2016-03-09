@@ -11,6 +11,7 @@
 #include "regressions/cwrappers.h"
 #include "types.h"
 #include "MeasurementOperator.h"
+#include "utilities.h"
 
 int main(int, char **) {
   using namespace purify;
@@ -27,8 +28,7 @@ int main(int, char **) {
   t_real const over_sample = 2;
   auto const M31 = pfitsio::read2d(fitsfile);
   auto uv_data = utilities::read_visibilities(visfile, PURIFY_VISIBILITY_FILETYPE_PROFILE_VIS);
-  uv_data = utilities::uv_scale(uv_data, floor(M31.cols() * over_sample), floor(M31.rows() * over_sample)); // scale uv coordinates to units of Fourier grid size
-  uv_data = utilities::uv_symmetry(uv_data); // Enforce condjugate symmetry by reflecting measurements in uv coordinates
+  uv_data.units = "radians";
   MeasurementOperator measurements(uv_data, 4, 4, "kb", M31.cols(), M31.rows(), over_sample);
 
  

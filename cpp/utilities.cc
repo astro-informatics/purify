@@ -106,14 +106,26 @@ namespace purify {
 
 	      
 	      std::cout << "Using a pixel size of " << cell_size_u << " x " << cell_size_v << " arcseconds" << '\n';
-
-	      t_real scale_factor_u = 180 * 3600 / cell_size_u / purify_pi;
-	      t_real scale_factor_v = 180 * 3600 / cell_size_v / purify_pi;
+	      t_real scale_factor_u = 1;
+	      t_real scale_factor_v = 1;
+	      if (uv_vis.units == "lambda")
+	      {
+	      	scale_factor_u = 180 * 3600 / cell_size_u / purify_pi;
+	      	scale_factor_v = 180 * 3600 / cell_size_v / purify_pi;
+	      	scaled_vis.w = uv_vis.w;
+	      }
+	      if (uv_vis.units == "radians")
+	      {
+	      	scale_factor_u = 180 * 3600 / purify_pi;
+	      	scale_factor_v = 180 * 3600 / purify_pi;
+	      	scaled_vis.w = uv_vis.w;	      	
+	      }
 	      scaled_vis.u = uv_vis.u / scale_factor_u * 2 * purify_pi;
 	      scaled_vis.v = uv_vis.v / scale_factor_v * 2 * purify_pi;
-	      scaled_vis.w = uv_vis.w;
+	      
 	      scaled_vis.vis = uv_vis.vis;
 	      scaled_vis.weights = uv_vis.weights;
+	      scaled_vis.units = "radians";
 	      return scaled_vis;
 	  }
 
@@ -143,6 +155,7 @@ namespace purify {
 	      	scaled_vis.v(i) = utilities::mod(scaled_vis.v(i), sizey);
 	      }
 	      scaled_vis.w = uv_vis.w;
+	      scaled_vis.units = "pixels";
 	      return scaled_vis;
 	  }
 
@@ -182,6 +195,8 @@ namespace purify {
 	    conj_vis.w = wtemp;
 	    conj_vis.vis = vistemp;
 	    conj_vis.weights = weightstemp;
+	    conj_vis.units = uv_vis.units;
+
 	    return conj_vis;
 	  }
 	

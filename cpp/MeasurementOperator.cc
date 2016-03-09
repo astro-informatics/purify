@@ -252,14 +252,17 @@ namespace purify {
       oversample_factor:: factor for oversampling the FFT grid
 
     */
+    
     if (use_w_term){
       resample_factor = utilities::upsample_ratio(uv_vis_input, cell_x, cell_y, ftsizeu, ftsizev);
       ftsizeu = ftsizeu * resample_factor;
       ftsizev = ftsizev * resample_factor;
     }
-    
-    utilities::vis_params uv_vis = utilities::set_cell_size(uv_vis_input, cell_x, cell_y);
-    uv_vis = utilities::uv_scale(uv_vis, floor(oversample_factor * imsizex), floor(oversample_factor * imsizey));
+    utilities::vis_params uv_vis = uv_vis_input;
+    if (uv_vis.units == "lambda")
+      uv_vis = utilities::set_cell_size(uv_vis_input, cell_x, cell_y);
+    if (uv_vis.units == "radians")
+      uv_vis = utilities::uv_scale(uv_vis, floor(oversample_factor * imsizex), floor(oversample_factor * imsizey));
     uv_vis = utilities::uv_symmetry(uv_vis);
 
     //t_real new_upsample = utilities::upsample_ratio(uv_vis, ,);
