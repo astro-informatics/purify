@@ -457,7 +457,8 @@ Sparse<t_complex> convolution(const Sparse<t_complex> & input_gridding_matrix, c
         typedef Eigen::Triplet<t_complex> T;
         std::vector<T> tripletList;
         
-        tripletList.reserve(Nvis*Npix);
+        t_int sparsity = 0;
+        
         for(int m=0; m<Nvis; m++){//chirp->M
         	
             //loop over every pixels
@@ -499,11 +500,13 @@ Sparse<t_complex> convolution(const Sparse<t_complex> & input_gridding_matrix, c
                             }
                         }        
                     }
+                    if (std::abs(Gtemp0) < 1e-13)
+                    	sparsity++;
                     Gtemp_mat(i,j)=Gtemp0;        
                 }
             }
              //std::cout<<"vis = "<<m<<std::endl;
-
+            tripletList.reserve(sparsity);
             for(int i=0; i<Nx; i++){
                 for(int j=0; j<Ny; j++){
                     int ii, jj;
@@ -512,7 +515,7 @@ Sparse<t_complex> convolution(const Sparse<t_complex> & input_gridding_matrix, c
                     if(j>=Ny/2) jj=j-Ny/2;
                     if(j<Ny/2) jj=j+Ny/2;
     
-                    if(abs(Gtemp_mat(i, j))> 1e-14){
+                    if(abs(Gtemp_mat(i, j))> 1e-13){
                         tripletList.push_back(T(m,sub2ind(ii,jj,Nx,Ny),Gtemp_mat(i, j)));
                     }
                 } 
