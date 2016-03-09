@@ -28,6 +28,7 @@ vis_params read_visibilities(std::string const &filename, purify_visibility_file
   result.v = Vector<t_real>::Map(vis_test.v, vis_test.nmeas);
   result.vis = Vector<t_complex>::Map(vis_test.y, vis_test.nmeas);
   result.weights = Vector<t_complex>::Map(vis_test.noise_std, vis_test.nmeas);
+  result.w = result.u * 0;
   return result;
 }
 }

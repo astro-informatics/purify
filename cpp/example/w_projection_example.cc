@@ -25,6 +25,7 @@ int main( int nargs, char const** args ){
   std::string const dirty_image = output_filename("M31_w_component_dirty.tiff");
   std::string const dirty_image_fits = output_filename("M31_w_component_dirty.fits");  
 
+  sopt::logging::initialize();
 
   utilities::vis_params uv_vis;
   t_real over_sample;
@@ -33,19 +34,19 @@ int main( int nargs, char const** args ){
 
 
   //Gridding example
-  cellsize = 1./6000. * 180./ purify_pi / 3. * (60. * 60.);
+  cellsize = 1./2000. * 180./ purify_pi / 3. * (60. * 60.);
   t_real energy_fraction = 0.99;
   over_sample = 2;
   t_int J = 4;
 
-  t_int number_of_vis = 200;
+  t_int number_of_vis = 20;
   bool use_w_term = true;
   
   auto M31 = pfitsio::read2d(fitsfile);
   t_int height = M31.rows();
   t_int width = M31.cols();
   
-  uv_vis = utilities::random_sample_density(number_of_vis, 0, 6000. / 3);
+  uv_vis = utilities::random_sample_density(number_of_vis, 0, 2000. / 3);
   uv_vis.units = "lambda";
 
   const t_real theta_FoV_L = cellsize * width * over_sample;
