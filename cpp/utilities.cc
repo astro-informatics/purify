@@ -74,6 +74,7 @@ namespace purify {
 	    uv_vis.v = -vtemp; // found that a reflection is needed for the orientation of the gridded image to be correct
 	    uv_vis.vis = vistemp;
 	    uv_vis.weights = weightstemp;
+	    uv_vis.w = uv_vis.u * 0;
 	    return uv_vis;
 	  }
 
@@ -347,7 +348,7 @@ namespace purify {
   Image<t_complex> sparsify_chirp(const Image<t_complex>& row, const t_real& energy_fraction){
     /*
       Takes in fourier transform of chirp, and returns sparsified version
-      w_prog:: input fourier transform of chirp
+      row:: input fourier transform of chirp
       energy_fraction:: how much energy to keep after sparsifying 
     */
       //there is probably a way to get eigen to do this without a loop
@@ -382,7 +383,7 @@ namespace purify {
           max_tau = tau;
         }
         tau = (max_tau - min_tau) * 0.5 + min_tau;
-        std::cout << energy_sum << '\n';
+        //std::cout << energy_sum << '\n';
         if (std::abs(tau - old_tau)/tau < 1e-6 and energy_sum > energy_fraction)
         {
         	tau = old_tau;
@@ -403,8 +404,8 @@ namespace purify {
           final_energy = final_energy + abs_row(i) * abs_row(i);
         }
       }
-      std::cout << "Final energy:" << '\n';
-      std::cout << final_energy / abs_row_total_energy << '\n';
+      //std::cout << "Final energy:" << '\n';
+      //std::cout << final_energy / abs_row_total_energy << '\n';
       return output_row;
   }
 

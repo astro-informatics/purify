@@ -201,8 +201,7 @@ namespace purify {
   }
 
 
-  Matrix<t_complex> MeasurementOperator::create_chirp_matrix(const Vector<t_real> & w_components, const t_real cell_x, const t_real cell_y){
-    const t_real energy_fraction = 0.9;
+  Matrix<t_complex> MeasurementOperator::create_chirp_matrix(const Vector<t_real> & w_components, const t_real cell_x, const t_real cell_y, const t_real& energy_fraction){
 
     const t_int total_rows = w_components.size();
     const t_int total_cols = ftsizeu * ftsizev;
@@ -216,7 +215,7 @@ namespace purify {
       Image<t_complex> chirp_image = utilities::generate_chirp(w_components(m), cell_x, cell_y, ftsizeu, ftsizev);
       
       Matrix<t_complex> row = fftop.forward(chirp_image);
-      //row = utilities::sparsify_chirp(row, energy_fraction);
+      row = utilities::sparsify_chirp(row, energy_fraction);
 
       row.resize(1, total_cols);
       chirp_matrix.row(m) = row;
@@ -235,7 +234,7 @@ namespace purify {
   }
 
   MeasurementOperator::MeasurementOperator(const utilities::vis_params& uv_vis_input, const t_int &Ju, const t_int &Jv,
-      const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, const std::string& weighting_type, const t_real& R, bool use_w_term, const t_real & cell_x, const t_real & cell_y, bool fft_grid_correction)
+      const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, const std::string& weighting_type, const t_real& R, bool use_w_term, const t_real & cell_x, const t_real & cell_y, const t_real& energy_fraction, bool fft_grid_correction)
       : imsizex(imsizex), imsizey(imsizey), ftsizeu(floor(oversample_factor * imsizex)), ftsizev(floor(oversample_factor * imsizey)), use_w_term(use_w_term), oversample_factor(oversample_factor)
     
   {
@@ -305,12 +304,13 @@ namespace purify {
       G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
       if (use_w_term)
       {
-        C = MeasurementOperator::create_chirp_matrix(uv_vis.w, cell_x, cell_y);
+        C = MeasurementOperator::create_chirp_matrix(uv_vis.w, cell_x, cell_y, energy_fraction);
         G = utilities::convolution(G, C, ftsizeu, ftsizev, uv_vis.w.size());
       }
       
       std::printf("Calculating weights \n");
       W = MeasurementOperator::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R);
+      std::printf("Doing power method \n");
       norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
       std::printf("Gridding Operator Constructed \n");
       std::printf("------ \n");
@@ -367,7 +367,7 @@ namespace purify {
     G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
     if (use_w_term)
     {
-      C = MeasurementOperator::create_chirp_matrix(uv_vis.w, cell_x, cell_y);
+      C = MeasurementOperator::create_chirp_matrix(uv_vis.w, cell_x, cell_y, energy_fraction);
       G = utilities::convolution(G, C, ftsizeu, ftsizev, uv_vis.w.size());
     }
     std::printf("Calculating weights \n");
