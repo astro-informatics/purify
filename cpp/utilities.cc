@@ -535,6 +535,7 @@ Sparse<t_complex> convolution(const Sparse<t_complex> & input_gridding_matrix, c
     return newG;    
 
     }
+
     t_real upsample_ratio(const utilities::vis_params& uv_vis, const t_real& cell_x, const t_real& cell_y, const t_int& x_size, const t_int& y_size){
         /*
          returns the upsampling (in Fourier domain) ratio
@@ -559,6 +560,17 @@ Sparse<t_complex> convolution(const Sparse<t_complex> & input_gridding_matrix, c
 
         const t_real ratio = bandwidth_up / bandwidth;
         return ratio;
+    }
+
+    utilities::vis_params whiten_vis(const utilities::vis_params& uv_vis){
+    	/*
+			A function that whitens and returns the visibilities.
+			vis:: input visibilities
+			weights:: this expects weights that are the inverse of the complex variance, they are converted th RMS for whitenning.
+    	*/
+			auto output_uv_vis = uv_vis;
+    		output_uv_vis.vis = uv_vis.vis.array() * uv_vis.weights.array().cwiseAbs().sqrt();
+    		return output_uv_vis;
     }
 	}
 }

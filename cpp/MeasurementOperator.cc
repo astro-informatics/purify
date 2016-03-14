@@ -262,7 +262,7 @@ namespace purify {
       uv_vis = utilities::set_cell_size(uv_vis_input, cell_x, cell_y);
     if (uv_vis.units == "radians")
       uv_vis = utilities::uv_scale(uv_vis, floor(oversample_factor * imsizex), floor(oversample_factor * imsizey));
-    uv_vis = utilities::uv_symmetry(uv_vis);
+    
 
     //t_real new_upsample = utilities::upsample_ratio(uv_vis, ,);
     std::printf("------ \n");

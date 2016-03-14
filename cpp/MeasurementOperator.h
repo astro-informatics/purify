@@ -25,7 +25,7 @@ namespace purify {
         t_real norm = 1;
         const t_real oversample_factor;
         t_real resample_factor = 1;
-        const bool use_w_term;
+        const bool use_w_term = false;
         const t_int imsizex;
         const t_int imsizey;
         t_int ftsizeu;
