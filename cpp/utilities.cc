@@ -11,9 +11,10 @@ namespace purify {
 		*/
 			auto sample = [&mean, &standard_deviation] (t_real x) { 
 				static boost::mt19937 rng;
-				t_real output = 4 * standard_deviation;
+				t_real output = 4 * standard_deviation + mean;
 				static boost::normal_distribution<t_real> normal_dist(mean, standard_deviation);
-				while(output > 3 * standard_deviation){
+				//ensures that all sample points are within bounds
+				while(std::abs(output - mean) > 3 * standard_deviation){
 					output = normal_dist(rng);
 				}
 				return output;
@@ -601,6 +602,17 @@ Sparse<t_complex> convolution(const Sparse<t_complex> & input_gridding_matrix, c
 			auto output_uv_vis = uv_vis;
     		output_uv_vis.vis = uv_vis.vis.array() * uv_vis.weights.array().cwiseAbs().sqrt();
     		return output_uv_vis;
+    }
+    t_real calculate_l2_radius(const t_real & number_of_vis, const t_real & standard_deviation, const t_real & number_of_pixels){
+    	/*
+			Calculates the epsilon, the radius of the l2_ball in sopt
+			number_of_vis:: number of visibilities
+			standard_deviation:: RMS of the visibilities 
+			number_of_pixels:: number of pixels in the image
+    	*/
+
+    	return std::sqrt(number_of_vis + 2 * std::sqrt(number_of_vis)) * standard_deviation
+        / std::sqrt(number_of_vis) / number_of_pixels;
     }
 	}
 }
