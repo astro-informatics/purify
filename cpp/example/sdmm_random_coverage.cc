@@ -19,19 +19,21 @@ int main(int, char **) {
   sopt::logging::initialize();
 
   std::string const fitsfile = image_filename("M31.fits");
-  std::string const visfile = image_filename("Coverages/cont_sim4.vis");
   std::string const outfile = output_filename("M31.tiff");
   std::string const outfile_fits = output_filename("M31_solution.fits");
   std::string const dirty_image = output_filename("M31_dirty.tiff");
   std::string const dirty_image_fits = output_filename("M31_dirty.fits");
 
-  t_real const over_sample = 2;
+  t_int const number_of_vis = 1e4;
+  t_real const over_sample = 1.375;
   auto const M31 = pfitsio::read2d(fitsfile);
-  auto uv_data = utilities::read_visibilities(visfile, PURIFY_VISIBILITY_FILETYPE_PROFILE_VIS);
+  auto uv_data = utilities::random_sample_density(number_of_vis, 0, purify_pi / 3);
   uv_data.units = "radians";
-  MeasurementOperator measurements(uv_data, 4, 4, "kb", M31.cols(), M31.rows(), over_sample);
+  std::cout << "Number of measurements / number of pixels: " << number_of_vis *1. /M31.size() << '\n';
+  uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
+  MeasurementOperator measurements(uv_data, 4, 4, "kb_interp", M31.cols(), M31.rows(), over_sample);
 
- 
+  
   auto direct = [&measurements, &M31](Vector<t_complex> &out, Vector<t_complex> const &x) {
         assert(x.size() == M31.size());
         auto const image = Image<t_complex>::Map(x.data(), M31.rows(), M31.cols());
