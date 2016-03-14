@@ -56,6 +56,7 @@ int main( int nargs, char const** args ){
   const t_real M = 2 * std::sin(purify_pi / 180.* theta_FoV_M / (60. * 60.) * 0.5);
   const t_real FoV = std::max(L, M);
   uv_vis.w = Vector<t_real>::Constant(number_of_vis, 1)/FoV * (uv_vis.u.array() * uv_vis.u.array() + uv_vis.v.array() * uv_vis.v.array()).sqrt().maxCoeff();
+  uv_vis = utilities::uv_symmetry(uv_vis); //reflect uv measurements
 
   kernel = "kb";
   MeasurementOperator measurements(uv_vis, J, J, kernel, width, height, over_sample, "none", 0, use_w_term, cellsize, cellsize, energy_fraction); // Create Measurement Operator
