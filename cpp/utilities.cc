@@ -27,7 +27,7 @@ namespace purify {
 			uv_vis.vis = Vector<t_complex>::Constant(vis_num, 1);
 			return uv_vis;
 	}
-	utilities::vis_params read_visibility(const std::string& vis_name)
+	utilities::vis_params read_visibility(const std::string& vis_name, const bool w_term)
 	  {
 	    /*
 	      Reads an csv file with u, v, visibilities and returns the vectors.
@@ -40,10 +40,11 @@ namespace purify {
 	    //counts size of vis file
 	    while (std::getline(temp_file, line))
 	      ++row;
-	    Vector<t_real> utemp(row);
-	    Vector<t_real> vtemp(row);
-	    Vector<t_complex> vistemp(row);
-	    Vector<t_complex> weightstemp(row);
+	    Vector<t_real> utemp = Vector<t_real>::Zero(row);
+	    Vector<t_real> vtemp = Vector<t_real>::Zero(row);
+	    Vector<t_real> wtemp = Vector<t_real>::Zero(row);
+	    Vector<t_complex> vistemp = Vector<t_complex>::Zero(row);
+	    Vector<t_complex> weightstemp = Vector<t_complex>::Zero(row);
 	    std::ifstream vis_file(vis_name);
 
 	    // reads in vis file
@@ -60,6 +61,13 @@ namespace purify {
 	      utemp(row) = std::stod(entry);
 	      std::getline(ss, entry, ' ');
 	      vtemp(row) = std::stod(entry);
+	      
+	      if (w_term)
+	      {
+	      	std::getline(ss, entry, ' ');
+	      	wtemp(row) = std::stod(entry);
+	      }
+
 	      std::getline(ss, entry, ' ');
 	      real = std::stod(entry);
 	      std::getline(ss, entry, ' ');
@@ -72,10 +80,31 @@ namespace purify {
 	    utilities::vis_params uv_vis;
 	    uv_vis.u = utemp;
 	    uv_vis.v = -vtemp; // found that a reflection is needed for the orientation of the gridded image to be correct
+	    uv_vis.w = wtemp;
 	    uv_vis.vis = vistemp;
 	    uv_vis.weights = weightstemp;
-	    uv_vis.w = uv_vis.u * 0;
+		
+	    
 	    return uv_vis;
+	  }
+
+	  void write_visibility(const utilities::vis_params& uv_vis, const std::string & file_name, const bool w_term)
+	  {
+	  	/*
+			writes visibilities to output text file (currently ignores w-component)
+			uv_vis:: input uv data
+			file_name:: name of output text file
+	  	*/
+		std::ofstream out(file_name);
+		out.precision(13);
+		for (t_int i = 0; i < uv_vis.u.size(); ++i)
+		{
+			out << uv_vis.u(i) << " " << -uv_vis.v(i) << " ";
+			if (w_term)
+				out << uv_vis.w(i) << " ";
+			out << std::real(uv_vis.vis(i)) << " " << std::imag(uv_vis.vis(i)) << " " << 1./std::sqrt(std::real(uv_vis.weights(i))) << std::endl;
+		}
+		out.close();
 	  }
 
 	  utilities::vis_params set_cell_size(const utilities::vis_params& uv_vis, t_real cell_size_u, t_real cell_size_v)
@@ -565,6 +594,7 @@ Sparse<t_complex> convolution(const Sparse<t_complex> & input_gridding_matrix, c
     utilities::vis_params whiten_vis(const utilities::vis_params& uv_vis){
     	/*
 			A function that whitens and returns the visibilities.
+
 			vis:: input visibilities
 			weights:: this expects weights that are the inverse of the complex variance, they are converted th RMS for whitenning.
     	*/

@@ -24,7 +24,9 @@ namespace purify {
       //! Generates a random visibility coverage
       utilities::vis_params random_sample_density(const t_int& vis_num, const t_real& mean, const t_real& standard_deviation);
       //! Reads in visibility file
-      utilities::vis_params read_visibility(const std::string& vis_name);
+      utilities::vis_params read_visibility(const std::string& vis_name, const bool w_term = false);
+      //! Writes visibilities to txt
+      void write_visibility(const utilities::vis_params& uv_vis, const std::string & file_name, const bool w_term = false);
       //! Scales visibilities to a given pixel size in arcseconds
       utilities::vis_params set_cell_size(const utilities::vis_params& uv_vis, t_real cell_size_u = 0, t_real cell_size_v = 0);
       //! Apply weights to visiblities
@@ -57,6 +59,8 @@ namespace purify {
       Image<t_complex> generate_chirp(const t_real w_term, const t_real cellx, const t_real celly, const t_int x_size, const t_int y_size);
       //! A vector that whiten's the visibilities given the weights.
       utilities::vis_params whiten_vis(const utilities::vis_params& uv_vis);
+      //! A function that calculates the l2 ball radius for sopt
+      t_real calculate_l2_radius(const t_real & number_of_vis, const t_real & standard_deviation, const t_real & number_of_pixels);
  }
 }
 

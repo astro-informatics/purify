@@ -62,3 +62,27 @@ TEST_CASE("utilities [variance]", "[variance]"){
     std::cout << var << '\n';
     CHECK(std::abs(var - 50.1405284663126) < 1e-13);
 }
+
+TEST_CASE("utilities [read_write_vis]", "[read_write_vis]"){
+    //tests the read and write function for a visibility data set
+    std::string vis_file = vla_filename("at166B.3C129.c0.vis");
+    std::string out_file = output_filename("test_output.vis");
+    std::string out_w_file = output_filename("test_w_output.vis");
+    auto uv_data = utilities::read_visibility(vis_file);
+    utilities::write_visibility(uv_data, out_file);
+    auto new_uv_data = utilities::read_visibility(out_file);
+    CHECK(new_uv_data.u.isApprox(uv_data.u, 1e-13));
+    CHECK(new_uv_data.v.isApprox(uv_data.v, 1e-13));
+    CHECK(new_uv_data.vis.isApprox(uv_data.vis, 1e-13));
+    CHECK(new_uv_data.weights.isApprox(uv_data.weights, 1e-13));
+    t_int number_of_random_vis = 1e5;
+    const bool w_term = true;
+    auto random_uv_data = utilities::random_sample_density(number_of_random_vis, 0, purify_pi /3);
+    utilities::write_visibility(random_uv_data, out_w_file, w_term);
+    auto new_random_uv_data = utilities::read_visibility(out_w_file, w_term);
+    CHECK(new_random_uv_data.u.isApprox(random_uv_data.u, 1e-8));
+    CHECK(new_random_uv_data.v.isApprox(random_uv_data.v, 1e-8));
+    CHECK(new_random_uv_data.w.isApprox(random_uv_data.w, 1e-8));
+    CHECK(new_random_uv_data.vis.isApprox(random_uv_data.vis, 1e-8));
+    CHECK(new_random_uv_data.weights.isApprox(random_uv_data.weights, 1e-8));
+}
