@@ -233,6 +233,17 @@ namespace purify {
     return chirp_matrix;
   }
 
+  Image<t_complex> MeasurementOperator::covariance_calculation(const Image<t_complex> & vector){
+    /*
+      Calculates a new representation of the covariance matrix, using propogation of uncertainty A Sigma A^T
+
+      pixel:: determines the column to calculate for the covariance matrix.
+    */
+      Array<t_real> covariance = 1./(W.real());
+      return MeasurementOperator::grid(covariance * MeasurementOperator::degrid(vector).array());
+
+  }
+
   MeasurementOperator::MeasurementOperator(const utilities::vis_params& uv_vis_input, const t_int &Ju, const t_int &Jv,
       const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, const t_real & cell_x, const t_real & cell_y,
        const std::string& weighting_type, const t_real& R, bool use_w_term, const t_real& energy_fraction, bool fft_grid_correction)
