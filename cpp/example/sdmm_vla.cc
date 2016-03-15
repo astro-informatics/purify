@@ -23,15 +23,16 @@ int main(int, char **) {
   std::string const dirty_image = output_filename("vla_dirty.tiff");
   std::string const dirty_image_fits = output_filename("vla_dirty.fits");
 
-  t_real const over_sample = 1.375;
+  std::string const residual_fits = output_filename("vla_residual.fits");
+
+  t_real const over_sample = 2;
   auto uv_data = utilities::read_visibility(visfile);
+  uv_data.units = "lambda";
   t_real cellsize = 0.3;
   t_int width = 512;
   t_int height = 512;
-  uv_data = utilities::set_cell_size(uv_data, cellsize); // scale uv coordinates to correct pixel size and to units of 2pi
-  uv_data = utilities::uv_scale(uv_data, floor(width * over_sample), floor(height * over_sample)); // scale uv coordinates to units of Fourier grid size
-  uv_data = utilities::uv_symmetry(uv_data); // Enforce conjugate symmetry by reflecting measurements in uv coordinates
-  MeasurementOperator measurements(uv_data, 4, 4, "kb_interp", width, height, over_sample, "natural");
+  uv_data = utilities::whiten_vis(uv_data);
+  uv_data = utilities::uv_symmetry(uv_data);
   MeasurementOperator measurements(uv_data, 4, 4, "kb", width, height, over_sample, cellsize, cellsize, "none", 0);
 
  
@@ -49,9 +50,12 @@ int main(int, char **) {
     adjoint, {0, 1, static_cast<t_int>(width * height)}
   );
 
-  sopt::wavelets::SARA const sara{std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u), std::make_tuple("DB3", 3u), std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u), std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
-  auto const Psi = sopt::linear_transform<t_complex>(sara, height, width);
+  sopt::wavelets::SARA const sara{std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u), std::make_tuple("DB3", 3u), 
+        std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u), std::make_tuple("DB6", 3u), 
+        std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
+  auto const Psi = sopt::linear_transform<t_complex>(sara, height, width);
+  std::printf("Saving dirty map \n");
   Vector<t_complex> & input = uv_data.vis;
   Vector<> dimage = (measurements_transform.adjoint() * input).real();
   t_real max_val = dimage.array().abs().maxCoeff();
@@ -64,16 +68,16 @@ int main(int, char **) {
 
   t_real noise_variance = utilities::variance(uv_data.vis.array() * measurements.W)/2;
   t_real const noise_rms = std::sqrt(noise_variance);
-  std::cout << "Calculated RMS noise of "<< noise_rms * 1e3 << " mJy" << '\n';
+  std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
 
   input = uv_data.vis / max_val;
-  noise_variance = utilities::variance(input.array() * measurements.W)/2;
+  noise_variance = utilities::variance(input.array())/2;
   t_real epsilon = std::sqrt(2 * uv_data.vis.size() + 4 * std::sqrt(uv_data.vis.size()) * noise_variance); //Calculation of l_2 bound following SARA paper
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
   auto const sdmm
       = sopt::algorithm::SDMM<t_complex>()
-            .itermax(11)
+            .itermax(500)
             .gamma((measurements_transform.adjoint() * input).real().maxCoeff() * 1e-3) //l_1 bound
             .is_converged(sopt::RelativeVariation<t_complex>(1e-3))
             .conjugate_gradient(100, 1e-3)
@@ -83,10 +87,12 @@ int main(int, char **) {
             .append(sopt::proximal::positive_quadrant<t_complex>);
   auto const result = sdmm(initial_estimate);
   assert(result.out.size() == width * height);
-  Image<t_real> image = Image<t_complex>::Map(result.out.data(), height, width).real();
-  t_real max_val_final = image.array().abs().maxCoeff();
+  Image<t_complex> image = Image<t_complex>::Map(result.out.data(), measurements.imsizey, measurements.imsizex);
+  t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
-  sopt::utilities::write_tiff(image, outfile);
-  pfitsio::write2d(image, outfile_fits);
+  sopt::utilities::write_tiff(image.real(), outfile);
+  pfitsio::write2d(image.real(), outfile_fits);
+  Image<t_complex> residual = measurements.grid(input - measurements.degrid(image));
+  pfitsio::write2d(residual.real(), residual_fits);
   return 0;
 }

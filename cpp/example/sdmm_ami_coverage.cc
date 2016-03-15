@@ -27,14 +27,15 @@ int main(int, char **) {
   std::string const dirty_image = output_filename("M31_dirty.tiff");
   std::string const dirty_image_fits = output_filename("M31_dirty.fits");
 
-  t_real const over_sample = 1.375;
+  t_real const over_sample = 2;
   auto M31 = pfitsio::read2d(fitsfile);
   t_real const max = M31.array().abs().maxCoeff();
   M31 = M31 * 1. / max;
   auto uv_data = utilities::read_visibilities(visfile, PURIFY_VISIBILITY_FILETYPE_PROFILE_VIS);
   uv_data.units = "radians";
   uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
-  MeasurementOperator measurements(uv_data, 4, 4, "kb_interp", M31.cols(), M31.rows(), over_sample);
+  std::cout << "Number of measurements / number of pixels: " << uv_data.u.size() * 1./M31.size() << '\n';
+  MeasurementOperator measurements(uv_data, 4, 4, "kb", M31.cols(), M31.rows(), over_sample);
 
  
   auto direct = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {
@@ -59,35 +60,37 @@ int main(int, char **) {
   std::mt19937_64 mersenne;
   Vector<t_complex> const y0
       = (measurements_transform * Vector<t_complex>::Map(M31.data(), M31.size()));
-  auto const input = dirty(y0, mersenne, 30e0);
-  Vector<> dimage = (measurements_transform.adjoint() * input).real();
+  uv_data.vis = dirty(y0, mersenne, 30e0);
+  
+  Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
   t_real const max_val = dimage.array().abs().maxCoeff();
   dimage = dimage / max_val;
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   sopt::utilities::write_tiff(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image);
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image_fits);
 
-  auto const epsilon
-      = utilities::calculate_l2_radius(y0.size(), sigma(y0, 30e0), measurements.imsizex * measurements.imsizey);
-
+  uv_data = utilities::whiten_vis(uv_data);
+  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis);
+  std::printf("Using epsilon of %f \n", epsilon);
   std::cout << "Starting sopt!" << '\n';
   auto const sdmm
       = sopt::algorithm::SDMM<t_complex>()
             .itermax(500)
-            .gamma((measurements_transform.adjoint() * input).real().maxCoeff() * 1e-3)
+            .gamma((measurements_transform.adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
             .is_converged(sopt::RelativeVariation<t_complex>(1e-3))
             .conjugate_gradient(100, 1e-3)
-            .append(sopt::proximal::translate(sopt::proximal::L2Ball<t_complex>(epsilon), -input),
+            .append(sopt::proximal::translate(sopt::proximal::L2Ball<t_complex>(epsilon), -uv_data.vis),
                     measurements_transform)
             .append(sopt::proximal::l1_norm<t_complex>, Psi.adjoint(), Psi)
             .append(sopt::proximal::positive_quadrant<t_complex>);
   auto const result = sdmm(initial_estimate);
   assert(result.out.size() == M31.size());
-  Image<t_real> image = Image<t_complex>::Map(result.out.data(), measurements.imsizey, measurements.imsizex).real();
+  Image<t_complex> image = Image<t_complex>::Map(result.out.data(), measurements.imsizey, measurements.imsizex);
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
-  sopt::utilities::write_tiff(image, outfile);
-  pfitsio::write2d(image, outfile_fits);
-  pfitsio::write2d(M31.real() - image, residual_fits);
+  sopt::utilities::write_tiff(image.real(), outfile);
+  pfitsio::write2d(image.real(), outfile_fits);
+  Image<t_complex> residual = measurements.grid(y0 - measurements.degrid(image));
+  pfitsio::write2d(residual.real(), residual_fits);
   return 0;
 }
