@@ -45,6 +45,8 @@ namespace purify {
       t_complex mean(const Vector<t_complex> x);
       //! Calculate variance of vector
       t_real variance(const Vector<t_complex> x);
+      //! Calculates the standard deviation of a vector
+      t_real standard_deviation(const Vector<t_complex> x);
       //! Calculates the convolution between two images
       Image<t_complex> convolution_operator(const Image<t_complex>& a, const Image<t_complex>& b);
       //! Calculates upsample ratio for w-projection
@@ -60,7 +62,7 @@ namespace purify {
       //! A vector that whiten's the visibilities given the weights.
       utilities::vis_params whiten_vis(const utilities::vis_params& uv_vis);
       //! A function that calculates the l2 ball radius for sopt
-      t_real calculate_l2_radius(const t_real & number_of_vis, const t_real & standard_deviation, const t_real & number_of_pixels);
+      t_real calculate_l2_radius(const Vector<t_complex> & y);
  }
 }
 
