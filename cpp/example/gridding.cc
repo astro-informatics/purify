@@ -24,12 +24,10 @@ int main( int nargs, char const** args ){
   uv_vis = utilities::read_visibility(vis_file); // visibility data being read in
   t_int width = 1024;
   t_int height = 1024;
-  uv_vis = utilities::set_cell_size(uv_vis, cellsize); // scale uv coordinates to correct pixel size and to units of 2pi
-  uv_vis = utilities::uv_scale(uv_vis, floor(width * over_sample), floor(height * over_sample)); // scale uv coordinates to units of Fourier grid size
   uv_vis = utilities::uv_symmetry(uv_vis); // Enforce condjugate symmetry by reflecting measurements in uv coordinates
 
   kernel = "kb";
-  MeasurementOperator op(uv_vis, J, J, kernel, width, height, over_sample, "uniform", 0); // Generating gridding matrix
+  MeasurementOperator op(uv_vis, J, J, kernel, width, height, over_sample, cellsize, cellsize, "natural", 0); // Generating gridding matrix
   //Vector<t_complex> point_source = uv_vis.vis * 0; point_source.setOnes();  // Creating model visibilities for point source
   //Image<t_complex> psf;
   //psf = op.grid(point_source);

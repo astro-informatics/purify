@@ -32,6 +32,7 @@ int main(int, char **) {
   uv_data = utilities::uv_scale(uv_data, floor(width * over_sample), floor(height * over_sample)); // scale uv coordinates to units of Fourier grid size
   uv_data = utilities::uv_symmetry(uv_data); // Enforce conjugate symmetry by reflecting measurements in uv coordinates
   MeasurementOperator measurements(uv_data, 4, 4, "kb_interp", width, height, over_sample, "natural");
+  MeasurementOperator measurements(uv_data, 4, 4, "kb", width, height, over_sample, cellsize, cellsize, "none", 0);
 
  
   auto direct = [&measurements, &width, &height](Vector<t_complex> &out, Vector<t_complex> const &x) {
