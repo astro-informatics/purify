@@ -5,7 +5,7 @@ set(CCFits_SHA dd9a11d964590dd5f3fd5a3491b2c1ce)
 
 find_program(PATCH_EXECUTABLE patch)
 include(PassonVariables)
-passon_variables(CCFits
+passon_variables(CCfits
   FILENAME "${EXTERNAL_ROOT}/src/CCFitsVariables.cmake"
   PATTERNS
       "CMAKE_[^_]*_R?PATH" "CMAKE_C_.*"
@@ -22,7 +22,7 @@ else()
   set(cfitsio_include_dir "${EXTERNAL_ROOT}/include")
 endif()
 ExternalProject_Add(
-  CCFits
+  CCfits
     PREFIX ${EXTERNAL_ROOT}
     URL ${CCFits_URL}
     URL_MD5 ${CCFist_SHA}
@@ -38,8 +38,8 @@ ExternalProject_Add(
     LOG_BUILD ON
 )
 if(TARGET CFitsIO)
-  add_dependencies(CCFits CFitsIO)
+  add_dependencies(CCfits CFitsIO)
 endif()
-add_recursive_cmake_step(CCFits DEPENDEES install)
+add_recursive_cmake_step(CCfits DEPENDEES install)
 set(CCFits_INCLUDE_DIR "")
 set(CCFits_LIBRARY "")
