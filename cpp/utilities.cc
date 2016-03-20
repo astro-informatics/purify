@@ -604,13 +604,48 @@ namespace purify {
 	    		output_uv_vis.vis = uv_vis.vis.array() * uv_vis.weights.array().cwiseAbs().sqrt();
 	    		return output_uv_vis;
 	    }
-	    t_real calculate_l2_radius(const Vector<t_complex> & y){
+	    t_real calculate_l2_radius(const Vector<t_complex> & y, const t_real& sigma){
 	    	/*
 				Calculates the epsilon, the radius of the l2_ball in sopt
 				y:: vector for the l2 ball
 	    	*/
-
-	    	return std::sqrt(y.size() + 2 * std::sqrt(y.size())) * standard_deviation(y);
+			if (sigma == 0)
+			{
+				return std::sqrt(y.size() + 2 * std::sqrt(y.size())) * standard_deviation(y) / std::sqrt(2);
+			}
+	    	return std::sqrt(y.size() + 2 * std::sqrt(y.size())) * sigma;
 	    }
+	   	t_real SNR_to_standard_deviation(const Vector<t_complex>& y0, const t_real& SNR){
+	   		/*
+			Returns value of noise rms given a measurement vector and signal to noise ratio
+			y0:: complex valued vector before noise added
+			SNR:: signal to noise ratio
+
+			This calculation follows Carrillo et al. (2014), PURIFY a new approach to radio interferometric imaging
+	   		*/
+	    	return y0.stableNorm() / std::sqrt(y0.size()) * std::pow(10.0, -(SNR / 20.0));
+	    }
+
+		Vector<t_complex> add_noise(const Vector<t_complex>& y0, 
+				const t_complex& mean, const t_real& standard_deviation){
+			/*
+				Adds complex valued gaussian noise to vector
+				y0:: vector beore noise
+				mean:: complex valued mean of noise
+				standard_deviation:: rms of noise
+			*/
+			auto sample = [&mean, &standard_deviation] (t_complex x) { 
+				static boost::mt19937 rng_real;
+				static boost::mt19937 rng_imag;
+				static boost::normal_distribution<t_real> normal_dist_real(std::real(mean), standard_deviation / std::sqrt(2));
+				static boost::normal_distribution<t_real> normal_dist_imag(std::imag(mean), standard_deviation / std::sqrt(2));
+				t_complex I(0,1.);
+				return normal_dist_real(rng_real) + I * normal_dist_imag(rng_imag);
+			 };
+
+			auto noise = Vector<t_complex>::Zero(y0.size()).unaryExpr(sample);
+
+			return y0 + noise;
+		}	
 	}
 }

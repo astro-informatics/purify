@@ -60,7 +60,11 @@ int main(int, char **) {
   std::mt19937_64 mersenne;
   Vector<t_complex> const y0
       = (measurements_transform * Vector<t_complex>::Map(M31.data(), M31.size()));
-  uv_data.vis = dirty(y0, mersenne, 30e0);
+
+  //working out value of signal given SNR of 30
+  t_real sigma = utilities::SNR_to_standard_deviation(y0, 30.);
+  //adding noise to visibilities
+  uv_data.vis = utilities::add_noise(y0, 0., sigma);
   
   Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
   t_real const max_val = dimage.array().abs().maxCoeff();
@@ -69,8 +73,7 @@ int main(int, char **) {
   sopt::utilities::write_tiff(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image);
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image_fits);
 
-  uv_data = utilities::whiten_vis(uv_data);
-  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis);
+  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
   std::printf("Using epsilon of %f \n", epsilon);
   std::cout << "Starting sopt!" << '\n';
   auto const sdmm

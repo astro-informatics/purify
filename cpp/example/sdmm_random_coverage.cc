@@ -29,7 +29,7 @@ int main(int, char **) {
   std::string const output_vis_file = output_filename("M31_Random_coverage.vis");
 
   
-  t_real const over_sample = 1.375;
+  t_real const over_sample = 2;
   auto M31 = pfitsio::read2d(fitsfile);
   t_real const max = M31.array().abs().maxCoeff();
   M31 = M31 * 1. / max;
@@ -39,14 +39,14 @@ int main(int, char **) {
   t_real const sigma_m = purify_pi/3;
   t_real const rho = 2 - (boost::math::erf(purify_pi/(sigma_m * std::sqrt(2)))) * (boost::math::erf(purify_pi/(sigma_m * std::sqrt(2))));
   //t_int const number_of_vis = std::floor(p * rho * M31.size());
-  t_int const number_of_vis = 2e4;
+  t_int const number_of_vis = 1e4;
   //Generating random uv(w) coverage
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";
   utilities::write_visibility(uv_data, output_vis_file);
   std::cout << "Number of measurements / number of pixels: " << uv_data.u.size() * 1./M31.size() << '\n';
-  uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
-  MeasurementOperator measurements(uv_data, 4, 4, "kb_interp", M31.cols(), M31.rows(), over_sample);
+  //uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
+  MeasurementOperator measurements(uv_data, 4, 4, "kb", M31.cols(), M31.rows(), over_sample);
 
   
   auto direct = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {
@@ -66,12 +66,16 @@ int main(int, char **) {
   sopt::wavelets::SARA const sara{std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u), std::make_tuple("DB3", 3u), 
           std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u), std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), 
           std::make_tuple("DB8", 3u)};
+
   auto const Psi = sopt::linear_transform<t_complex>(sara, measurements.imsizey, measurements.imsizex);
 
   std::mt19937_64 mersenne;
   Vector<t_complex> const y0
       = (measurements_transform * Vector<t_complex>::Map(M31.data(), M31.size()));
-  uv_data.vis = dirty(y0, mersenne, 30e0);
+  //working out value of signal given SNR of 30
+  t_real sigma = utilities::SNR_to_standard_deviation(y0, 30.);
+  //adding noise to visibilities
+  uv_data.vis = utilities::add_noise(y0, 0., sigma);
   Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
   t_real const max_val = dimage.array().abs().maxCoeff();
   dimage = dimage / max_val;
@@ -79,7 +83,7 @@ int main(int, char **) {
   sopt::utilities::write_tiff(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image);
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image_fits);
 
-  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis);
+  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
   std::printf("Using epsilon of %f \n", epsilon);
   std::cout << "Starting sopt" << '\n';
   auto const sdmm
