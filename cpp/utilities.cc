@@ -10,13 +10,14 @@ namespace purify {
 			standard_deviation:: standard deviation of distirbution
 		*/
 			auto sample = [&mean, &standard_deviation] (t_real x) { 
-				static boost::mt19937 rng;
+				static std::mt19937 rng;
 				t_real output = 4 * standard_deviation + mean;
-				static boost::normal_distribution<t_real> normal_dist(mean, standard_deviation);
+				static std::normal_distribution<> normal_dist(mean, standard_deviation);
 				//ensures that all sample points are within bounds
 				while(std::abs(output - mean) > 3 * standard_deviation){
 					output = normal_dist(rng);
 				}
+				if (output != output) std::cout << output << '\n';
 				return output;
 			 };
 
@@ -635,10 +636,10 @@ namespace purify {
 				standard_deviation:: rms of noise
 			*/
 			auto sample = [&mean, &standard_deviation] (t_complex x) { 
-				static boost::mt19937 rng_real;
-				static boost::mt19937 rng_imag;
-				static boost::normal_distribution<t_real> normal_dist_real(std::real(mean), standard_deviation / std::sqrt(2));
-				static boost::normal_distribution<t_real> normal_dist_imag(std::imag(mean), standard_deviation / std::sqrt(2));
+				static std::mt19937 rng_real;
+				static std::mt19937 rng_imag;
+				static std::normal_distribution<t_real> normal_dist_real(std::real(mean), standard_deviation / std::sqrt(2));
+				static std::normal_distribution<t_real> normal_dist_imag(std::imag(mean), standard_deviation / std::sqrt(2));
 				t_complex I(0,1.);
 				return normal_dist_real(rng_real) + I * normal_dist_imag(rng_imag);
 			 };

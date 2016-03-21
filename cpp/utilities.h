@@ -7,8 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdio.h>
-#include <boost/random.hpp>
-#include <boost/random/normal_distribution.hpp>
+
 
 namespace purify {
 
