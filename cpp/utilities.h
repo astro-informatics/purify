@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdio.h>
+#include <random>
 
 
 namespace purify {
