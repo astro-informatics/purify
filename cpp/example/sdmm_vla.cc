@@ -61,6 +61,9 @@ int main(int, char **) {
   t_real max_val = dimage.array().abs().maxCoeff();
   dimage = dimage / max_val;
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
+  if (utilities::file_exists(outfile_fits))
+    initial_estimate = pfitsio::read2d(outfile_fits);
+  
 
   sopt::utilities::write_tiff(Image<t_real>::Map(dimage.data(), height, width), dirty_image);
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), height, width), dirty_image_fits);

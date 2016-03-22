@@ -86,3 +86,11 @@ TEST_CASE("utilities [read_write_vis]", "[read_write_vis]"){
     CHECK(new_random_uv_data.vis.isApprox(random_uv_data.vis, 1e-8));
     CHECK(new_random_uv_data.weights.isApprox(random_uv_data.weights, 1e-8));
 }
+TEST_CASE("utilities [file exists]", "[file exists]"){
+    std::string vis_file = vla_filename("at166B.3C129.c0.vis");
+    //File should exist
+    CHECK(utilities::file_exists(vis_file));
+    //File should not exist
+    CHECK(not utilities::file_exists("adfadsf"));
+
+}
