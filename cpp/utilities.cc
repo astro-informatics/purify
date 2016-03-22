@@ -647,6 +647,17 @@ namespace purify {
 			auto noise = Vector<t_complex>::Zero(y0.size()).unaryExpr(sample);
 
 			return y0 + noise;
+		}
+		
+		bool file_exists(const std::string& name) {
+			/*
+				Checks if a file exists
+				name:: path of file checked for existance.
+
+				returns true if exists and false if not exists
+			*/
+  			struct stat buffer;   
+  			return (stat (name.c_str(), &buffer) == 0); 
 		}	
 	}
 }

@@ -8,6 +8,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <random>
+#include <sys/stat.h>
 
 
 namespace purify {
@@ -67,6 +68,8 @@ namespace purify {
       t_real SNR_to_standard_deviation(const Vector<t_complex>& y0, const t_real& SNR = 30.);
       //! Add guassian noise to vector
       Vector<t_complex> add_noise(const Vector<t_complex>& y, const t_complex& mean, const t_real& standard_deviation);
+      //! Test to see if file exists
+      bool file_exists(const std::string& name);
  }
 }
 
