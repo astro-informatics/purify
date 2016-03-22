@@ -25,7 +25,7 @@ int main(int, char **) {
 
   std::string const residual_fits = output_filename("vla_residual.fits");
 
-  t_real const over_sample = 2;
+  t_real const over_sample = 1.375;
   auto uv_data = utilities::read_visibility(visfile);
   uv_data.units = "lambda";
   t_real cellsize = 0.3;
@@ -33,7 +33,7 @@ int main(int, char **) {
   t_int height = 512;
   uv_data = utilities::whiten_vis(uv_data);
   uv_data = utilities::uv_symmetry(uv_data);
-  MeasurementOperator measurements(uv_data, 4, 4, "kb", width, height, over_sample, cellsize, cellsize, "none", 0);
+  MeasurementOperator measurements(uv_data, 4, 4, "kb_interp", width, height, over_sample, cellsize, cellsize, "natural", 0);
 
  
   auto direct = [&measurements, &width, &height](Vector<t_complex> &out, Vector<t_complex> const &x) {
@@ -69,10 +69,8 @@ int main(int, char **) {
   t_real noise_variance = utilities::variance(uv_data.vis.array() * measurements.W)/2;
   t_real const noise_rms = std::sqrt(noise_variance);
   std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
-
-  input = uv_data.vis / max_val;
-  noise_variance = utilities::variance(input.array())/2;
-  t_real epsilon = std::sqrt(2 * uv_data.vis.size() + 4 * std::sqrt(uv_data.vis.size()) * noise_variance); //Calculation of l_2 bound following SARA paper
+  
+  t_real epsilon = utilities::calculate_l2_radius(uv_data.vis, 1.); //Calculation of l_2 bound following SARA paper
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
   auto const sdmm
@@ -81,7 +79,7 @@ int main(int, char **) {
             .gamma((measurements_transform.adjoint() * input).real().maxCoeff() * 1e-3) //l_1 bound
             .is_converged(sopt::RelativeVariation<t_complex>(1e-3))
             .conjugate_gradient(100, 1e-3)
-            .append(sopt::proximal::translate(sopt::proximal::L2Ball<t_complex>(epsilon), -input),
+            .append(sopt::proximal::translate(sopt::proximal::L2Ball<t_complex>(epsilon), -uv_data.vis),
                     measurements_transform)
             .append(sopt::proximal::l1_norm<t_complex>, Psi.adjoint(), Psi)
             .append(sopt::proximal::positive_quadrant<t_complex>);
