@@ -25,6 +25,7 @@ int main(int, char **) {
 
   std::string const residual_fits = output_filename("vla_residual.fits");
 
+  t_int const niters = 1e5;
   t_real const over_sample = 1.375;
   auto uv_data = utilities::read_visibility(visfile);
   uv_data.units = "lambda";
@@ -78,7 +79,7 @@ int main(int, char **) {
   std::cout << "Epsilon = " << epsilon << '\n';
   auto const sdmm
       = sopt::algorithm::SDMM<t_complex>()
-            .itermax(500)
+            .itermax(niters)
             .gamma((measurements_transform.adjoint() * input).real().maxCoeff() * 1e-3) //l_1 bound
             .is_converged(sopt::RelativeVariation<t_complex>(1e-3))
             .conjugate_gradient(100, 1e-3)
