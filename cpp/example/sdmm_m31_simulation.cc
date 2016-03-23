@@ -52,9 +52,9 @@ int main( int nargs, char const** args ) {
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";
 
-  std::cout << "Number of measurements / number of pixels: " << uv_data.u.size() * 1./M31.size() << '\n';
+  std::cout << "Number of measurements: " << uv_data.u.size() << '\n';
   //uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
-  MeasurementOperator measurements(uv_data, 4, 4, kernel, M31.cols(), M31.rows(), over_sample);
+  MeasurementOperator measurements(uv_data, 6, 6, kernel, M31.cols(), M31.rows(), over_sample);
 
   
   auto direct = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {
@@ -77,7 +77,6 @@ int main( int nargs, char const** args ) {
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, measurements.imsizey, measurements.imsizex);
 
-  std::mt19937_64 mersenne;
   Vector<t_complex> const y0
       = (measurements_transform * Vector<t_complex>::Map(M31.data(), M31.size()));
   //working out value of signal given SNR of 30
