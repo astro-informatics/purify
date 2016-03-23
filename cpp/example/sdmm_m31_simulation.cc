@@ -34,9 +34,9 @@ int main( int nargs, char const** args ) {
   t_real const m_over_n = std::stod(static_cast<std::string>(args[3]));
   std::string const test_number = static_cast<std::string>(args[4]);
 
-  std::string const outfile_fits = output_filename("M31_solution" + test_number + ".fits");
-  std::string const residual_fits = output_filename("M31_residual" + test_number + ".fits");
-  std::string const dirty_image_fits = output_filename("M31_dirty" + test_number + ".fits");
+  std::string const outfile_fits = output_filename("M31_solution_"+ kernel + "_" + test_number + ".fits");
+  std::string const residual_fits = output_filename("M31_residual_"+ kernel + "_" + test_number + ".fits");
+  std::string const dirty_image_fits = output_filename("M31_dirty_"+ kernel + "_" + test_number + ".fits");
 
   auto M31 = pfitsio::read2d(fitsfile);
   t_real const max = M31.array().abs().maxCoeff();
