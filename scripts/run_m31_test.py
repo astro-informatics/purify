@@ -11,7 +11,7 @@ def run_test(kernel, oversample, M_N_ratio, i):
 
 def kb(x): run_test("kb", 2, 0.3, x)
 def kb_interp(x): run_test("kb_interp", 1.375, 0.3, x)
-def gauss(x): run_test("gauss", 1.375, 0.3, x)
+def gauss(x): run_test("gauss", 2, 0.3, x)
 
 if __name__ == '__main__':
 	# kaiser-bessel test
