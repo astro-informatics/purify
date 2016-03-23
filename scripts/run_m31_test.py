@@ -1,10 +1,9 @@
 #!/usr/bin/python
 
-import os
-import matplotlib.pyplot as plt 
+import os 
 import numpy as np 
-from multiprocessing import Pool
-
+import multiprocessing
+import time
 
 def run_test(kernel, oversample, M_N_ratio, i):
 	print os.getcwd()
@@ -15,7 +14,20 @@ def kb_interp(x): run_test("kb_interp", 1.375, 0.3, x)
 def gauss(x): run_test("gauss", 1.375, 0.3, x)
 
 if __name__ == '__main__':
-    p = Pool(4)
-    p.map(kb, range(1, 48))
+	# kaiser-bessel test
+    for i in range(1, multiprocessing.cpu_count() + 1):
+       time.sleep(0.5)
+       p = multiprocessing.Process(target=kb, args = (i,))
+       p.start()
+    # kaiser-bessel with linear interpolation and minimal oversampling test
+    for i in range(1, multiprocessing.cpu_count() + 1):
+       time.sleep(0.5)
+       p = multiprocessing.Process(target=kb_interp, args = (i,))
+       p.start()
+    # gaussian test
+    for i in range(1, multiprocessing.cpu_count() + 1):
+       time.sleep(0.5)
+       p = multiprocessing.Process(target=gauss, args = (i,))
+       p.start()
 
 
