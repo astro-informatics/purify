@@ -10,7 +10,8 @@ namespace purify {
 			standard_deviation:: standard deviation of distirbution
 		*/
 			auto sample = [&mean, &standard_deviation] (t_real x) { 
-				static std::mt19937 rng;
+				std::random_device rd;
+				std::mt19937_64 rng(rd());
 				t_real output = 4 * standard_deviation + mean;
 				static std::normal_distribution<> normal_dist(mean, standard_deviation);
 				//ensures that all sample points are within bounds
@@ -636,8 +637,10 @@ namespace purify {
 				standard_deviation:: rms of noise
 			*/
 			auto sample = [&mean, &standard_deviation] (t_complex x) { 
-				static std::mt19937 rng_real;
-				static std::mt19937 rng_imag;
+				std::random_device rd_real;
+				std::random_device rd_imag;
+				std::mt19937_64 rng_real(rd_real());
+				std::mt19937_64 rng_imag(rd_imag());
 				static std::normal_distribution<t_real> normal_dist_real(std::real(mean), standard_deviation / std::sqrt(2));
 				static std::normal_distribution<t_real> normal_dist_imag(std::imag(mean), standard_deviation / std::sqrt(2));
 				t_complex I(0,1.);
