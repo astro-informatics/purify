@@ -15,7 +15,7 @@
 #include <boost/math/special_functions/erf.hpp>
 
 int main( int nargs, char const** args ) {
-  if (nargs != 5 )
+  if (nargs != 6 )
   {
     std::cout << " Wrong number of arguments! " << '\n';
     return 1;
@@ -31,8 +31,10 @@ int main( int nargs, char const** args ) {
 
   std::string const kernel = args[1];
   t_real const over_sample = std::stod(static_cast<std::string>(args[2]));
-  t_real const m_over_n = std::stod(static_cast<std::string>(args[3]));
-  std::string const test_number = static_cast<std::string>(args[4]);
+  t_int const J = static_cast<t_int>(std::stod(static_cast<std::string>(args[3])));
+  t_real const m_over_n = std::stod(static_cast<std::string>(args[4]));
+  std::string const test_number = static_cast<std::string>(args[5]);
+
 
   std::string const outfile_fits = output_filename("M31_solution_"+ kernel + "_" + test_number + ".fits");
   std::string const residual_fits = output_filename("M31_residual_"+ kernel + "_" + test_number + ".fits");
@@ -54,7 +56,7 @@ int main( int nargs, char const** args ) {
 
   std::cout << "Number of measurements: " << uv_data.u.size() << '\n';
   //uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
-  MeasurementOperator measurements(uv_data, 6, 6, kernel, M31.cols(), M31.rows(), over_sample);
+  MeasurementOperator measurements(uv_data, J, J, kernel, M31.cols(), M31.rows(), over_sample);
 
   
   auto direct = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {
