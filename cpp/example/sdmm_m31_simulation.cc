@@ -89,7 +89,7 @@ int main( int nargs, char const** args ) {
   t_real const max_val = dimage.array().abs().maxCoeff();
   dimage = dimage / max_val;
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
-  pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image_fits);
+  //pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
   std::printf("Using epsilon of %f \n", epsilon);
