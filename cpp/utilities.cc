@@ -28,6 +28,7 @@ namespace purify {
 			uv_vis.w = Vector<t_real>::Zero(vis_num).unaryExpr(sample);
 			uv_vis.weights = Vector<t_complex>::Constant(vis_num, 1);
 			uv_vis.vis = Vector<t_complex>::Constant(vis_num, 1);
+			uv_vis.phase_centre = 0;
 			return uv_vis;
 	}
 	utilities::vis_params read_visibility(const std::string& vis_name, const bool w_term)
@@ -159,6 +160,7 @@ namespace purify {
 	      scaled_vis.vis = uv_vis.vis;
 	      scaled_vis.weights = uv_vis.weights;
 	      scaled_vis.units = "radians";
+	      scaled_vis.phase_centre = uv_vis.phase_centre;
 	      return scaled_vis;
 	  }
 
@@ -189,6 +191,7 @@ namespace purify {
 	      }
 	      scaled_vis.w = uv_vis.w;
 	      scaled_vis.units = "pixels";
+	      scaled_vis.phase_centre = uv_vis.phase_centre;
 	      return scaled_vis;
 	  }
 
@@ -229,6 +232,7 @@ namespace purify {
 	    conj_vis.vis = vistemp;
 	    conj_vis.weights = weightstemp;
 	    conj_vis.units = uv_vis.units;
+	    conj_vis.phase_centre = uv_vis.phase_centre;
 
 	    return conj_vis;
 	  }
@@ -389,7 +393,7 @@ namespace purify {
 	      energy_fraction:: how much energy to keep after sparsifying 
 	    */
 	      //there is probably a way to get eigen to do this without a loop
-	      if ( energy_fraction == 1) 
+	      if (energy_fraction == 1) 
 	      	return row;
 	      t_real tau = 0.5;
 	      t_real old_tau = -1;
@@ -613,7 +617,7 @@ namespace purify {
 	    	*/
 			if (sigma == 0)
 			{
-				return std::sqrt(y.size() + 2 * std::sqrt(y.size())) * standard_deviation(y) / std::sqrt(2);
+				return std::sqrt(y.size() + 2 * std::sqrt(y.size())) * standard_deviation(y);
 			}
 	    	return std::sqrt(y.size() + 2 * std::sqrt(y.size())) * sigma;
 	    }

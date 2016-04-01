@@ -21,6 +21,7 @@ namespace purify {
         Vector<t_complex> vis; // complex visiblities
         Vector<t_complex> weights; // weights for visibilities
         std::string units = "lambda";
+        t_real phase_centre = 0.;
       };
       //! Generates a random visibility coverage
       utilities::vis_params random_sample_density(const t_int& vis_num, const t_real& mean, const t_real& standard_deviation);
