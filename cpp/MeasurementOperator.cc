@@ -311,7 +311,7 @@ namespace purify {
       auto ftkb = [&] (t_real x) { return kernels::ft_kaiser_bessel_general(x/ftsizeu - 0.5, Ju, kb_interp_alpha); };
       ftkernelu = ftkb;
       ftkernelv = ftkb;
-      S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv); // Does gridding correction using analytic formula
+      S = MeasurementOperator::init_correction2d(ftkernelu, ftkernelv); // Does gridding correction using analytic formula
       G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
       if (use_w_term)
       {
@@ -368,11 +368,11 @@ namespace purify {
     
     if ( fft_grid_correction == true )
     {
-      S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, Ju, Jv); // Does gridding correction with FFT
+      S = MeasurementOperator::init_correction2d_fft(kernelu, kernelv, Ju, Jv); // Does gridding correction with FFT
     }
     if ( fft_grid_correction == false )
     {
-      S = MeasurementOperator::MeasurementOperator::init_correction2d(ftkernelu, ftkernelv); // Does gridding correction using analytic formula
+      S = MeasurementOperator::init_correction2d(ftkernelu, ftkernelv); // Does gridding correction using analytic formula
     }
 
     G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
