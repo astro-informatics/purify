@@ -23,6 +23,12 @@ namespace purify {
         std::string units = "lambda";
         t_real phase_centre = 0.;
       };
+      struct rm_params {
+        Vector<t_real> frequency; // u coordinates
+        Vector<t_complex> linear_polarisation; // complex linear polarisation
+        Vector<t_complex> weights; // weights for visibilities
+        std::string units = "Mhz";
+      };
       //! Generates a random visibility coverage
       utilities::vis_params random_sample_density(const t_int& vis_num, const t_real& mean, const t_real& standard_deviation);
       //! Reads in visibility file

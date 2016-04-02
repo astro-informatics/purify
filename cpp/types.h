@@ -11,6 +11,7 @@
 
 
 # define purify_pi           3.14159265358979323846
+# define purify_c            299792458.0
 
 namespace purify {
 
