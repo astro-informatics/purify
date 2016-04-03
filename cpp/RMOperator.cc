@@ -207,7 +207,7 @@ namespace purify {
   	  rm_vis.units = "wavelength_squared";
 	}
     if (rm_vis.units == "wavelength_squared"){
-      rm_vis.frequency = rm_vis.frequency * cell_size;
+      rm_vis.frequency = rm_vis.frequency * cell_size; 
       rm_vis.units = "radians";
     }
     if (rm_vis.units == "radians")

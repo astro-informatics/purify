@@ -5,6 +5,9 @@ include_directories("${PROJECT_SOURCE_DIR}/cpp")
 
 add_example(gridding LIBRARIES cppurify)
 add_example(gridding_mem LIBRARIES cppurify NOTEST)
+add_example(rm_gridding_example LIBRARIES cppurify NOTEST)
+
+add_example(sdmm_rm_simulation LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY})
 add_example(sdmm_ami_coverage LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY} NOTEST)
 add_example(sdmm_random_coverage LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY} NOTEST)
 add_example(sdmm_vla LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY} NOTEST)

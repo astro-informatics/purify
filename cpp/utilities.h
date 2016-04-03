@@ -27,7 +27,7 @@ namespace purify {
         Vector<t_real> frequency; // u coordinates
         Vector<t_complex> linear_polarisation; // complex linear polarisation
         Vector<t_complex> weights; // weights for visibilities
-        std::string units = "Mhz";
+        std::string units = "MHz";
       };
       //! Generates a random visibility coverage
       utilities::vis_params random_sample_density(const t_int& vis_num, const t_real& mean, const t_real& standard_deviation);
