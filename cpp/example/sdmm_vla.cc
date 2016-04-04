@@ -63,6 +63,7 @@ int main(int, char **) {
   dimage = dimage / max_val;
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   if (utilities::file_exists(outfile_fits))
+    std::printf("Using previous run.");
     initial_estimate = pfitsio::read2d(outfile_fits);
   
 
