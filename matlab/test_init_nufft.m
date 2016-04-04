@@ -12,7 +12,7 @@ stringname = '../data/vla/at166B.3C129.c0.vis';
 
 Y = importdata(stringname);
 U = Y(:,1);
-V = Y(:,2);
+V = -Y(:,2);
 vis = Y(:,3)+1j*Y(:,4);
 %m = sqrt(max(max(U.^2+V.^2)))/3;
 m = 180*3600/cellsize/pi;
@@ -20,7 +20,7 @@ U = [U;-U]/m*2*pi;
 V = [V;-V]/m*2*pi;
 vis = [vis; conj(vis)];
 
-st = purify_mtlb_init_nufft([U, V], imsize, oversample_rate, kernel_type, [Ju, Jv]);
+st = purify_mtlb_init_nufft([V, U], imsize, oversample_rate, kernel_type, [Ju, Jv]);
 
 At = @(y) purify_mtlb_grid(y,st);
 
@@ -44,8 +44,8 @@ image(realim/max(max(realim))*100);
 %imagim = imag(im);
 %image(imagim);
 realname = sprintf('at166BtestReal_deconvJ%d%s%d.fits',Ju, kernel_type, oversample_rate);
-fitswrite(rot90(realim_deconv/max(max(realim_deconv)), 3), realname)
+fitswrite(realim_deconv/max(max(realim_deconv)), realname)
 realname = sprintf('at166BtestRealJ%d%s%d.fits',Ju, kernel_type, oversample_rate);
-fitswrite(rot90(realim/max(max(realim)), 3), realname)
+fitswrite(realim/max(max(realim)), realname)
 %imagname = sprintf('at166BtestImagJ%d%s.fits',Ju, kernel_type);
 %fitswrite(imagim, imagname)
