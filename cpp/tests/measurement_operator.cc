@@ -295,6 +295,7 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     img = pfitsio::read2d(image_filename("M31.fits"));
     uv_vis = utilities::uv_scale(uv_vis, img.cols() * over_sample, img.rows() * over_sample);
     uv_vis.v = - uv_vis.v;
+    uv_vis.units = "pixels";
     MeasurementOperator op(uv_vis, J, J, kernel, img.cols(), img.rows(), over_sample, cellsize, cellsize); // Calculates gridding matrix
 
     point = Image<t_complex>::Zero(img.cols(), img.rows()); point(floor(img.cols()/2) - 1, floor(img.rows()/2) - 1) = 1; // Creating model of point source in image
@@ -341,9 +342,10 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     over_sample = 2;
     t_int J = 6;
     uv_vis = utilities::read_visibility("../data/expected/degridding/M31_J6kb.vis");
-    img = pfitsio::read2d("../data/images/M31.fits");
+    img = pfitsio::read2d(image_filename("M31.fits"));
     uv_vis = utilities::uv_scale(uv_vis, img.cols() * over_sample, img.rows() * over_sample);
     uv_vis.v = - uv_vis.v;
+    uv_vis.units = "pixels";
     MeasurementOperator op(uv_vis, J, J, kernel, img.cols(), img.rows(), over_sample, cellsize, cellsize); // Calculates gridding matrix
 
     point = Image<t_complex>::Zero(img.cols(), img.rows()); point(floor(img.cols()/2) - 1, floor(img.rows()/2) - 1) = 1; // Creating model of point source in image
@@ -392,9 +394,10 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     img = pfitsio::read2d(image_filename("M31.fits"));
     uv_vis = utilities::uv_scale(uv_vis, img.cols() * over_sample, img.rows() * over_sample);
     uv_vis.v = - uv_vis.v;
+    uv_vis.units = "pixels";
     MeasurementOperator op(uv_vis, J, J, kernel, img.cols(), img.rows(), over_sample, cellsize, cellsize); // Calculates gridding matrix
 
-    point = Image<t_complex>::Zero(img.cols(), img.rows()); point(floor(img.cols()/2), floor(img.rows()/2)) = 1; // Creating model of point source in image
+    point = Image<t_complex>::Zero(img.cols(), img.rows()); point(floor(img.cols()/2) - 1, floor(img.rows()/2) - 1) = 1; // Creating model of point source in image
     psf_vis = op.degrid(point); // Creating visibilities from model
     max = psf_vis.cwiseAbs().maxCoeff();
     psf_vis = psf_vis / max; // normalized visibilities
