@@ -110,8 +110,9 @@ int main( int nargs, char const** args ) {
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
 
-  pfitsio::write2d(image.real(), outfile_fits);
-  Image<t_complex> residual = measurements.grid(y0 - measurements.degrid(image));
-  pfitsio::write2d(residual.real(), residual_fits);
+  Image<t_real> solution = measurements.degrid(image).array().abs();
+  pfitsio::write2d(solution, outfile_fits);
+  Image<t_real> residual = (y0 - measurements.degrid(image)).array().abs();
+  pfitsio::write2d(residual, residual_fits);
   return 0;
 }
