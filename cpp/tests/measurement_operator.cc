@@ -334,14 +334,14 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     psf = op.grid(psf_vis);
     max = psf.real().maxCoeff();
     psf = psf / max;
-    pfitsio::write2d(psf.real(), "kb_psf_M31_gridding.fits", true, false); // saving image of degridded point source
+    pfitsio::write2d(psf.real(), output_filename("kb_psf_M31_gridding.fits"), true, false); // saving image of degridded point source
   }
 
   SECTION("Prolate Spheroidal Wave Functon Degridding") {
     kernel = "pswf";
     over_sample = 2;
     t_int J = 6;
-    uv_vis = utilities::read_visibility("../data/expected/degridding/M31_J6kb.vis");
+    uv_vis = utilities::read_visibility(degridding_filename("M31_J6kb.vis"));
     img = pfitsio::read2d(image_filename("M31.fits"));
     uv_vis = utilities::uv_scale(uv_vis, img.cols() * over_sample, img.rows() * over_sample);
     uv_vis.v = - uv_vis.v;
