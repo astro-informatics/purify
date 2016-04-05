@@ -81,6 +81,6 @@ int main( int nargs, char const** args ){
                     measurements_transform)
             .append(sopt::proximal::l1_norm<t_complex>, Psi.adjoint(), Psi);
             //.append(sopt::proximal::positive_quadrant<t_complex>);
-  auto const result = sdmm(initial_estimate);
+  //auto const result = sdmm(initial_estimate);
 
 }
