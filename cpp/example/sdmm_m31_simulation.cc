@@ -32,29 +32,17 @@ int main( int nargs, char const** args ) {
   std::string const kernel = args[1];
   t_real const over_sample = std::stod(static_cast<std::string>(args[2]));
   t_int const J = static_cast<t_int>(std::stod(static_cast<std::string>(args[3])));
-  t_real const m_over_n = std::stod(static_cast<std::string>(args[4]));
-  std::string const test_number = static_cast<std::string>(args[5]);
+  std::string const test_number = static_cast<std::string>(args[4]);
 
 
-  std::string const outfile_fits = output_filename("M31_solution_"+ kernel + "_" + test_number + ".fits");
-  std::string const residual_fits = output_filename("M31_residual_"+ kernel + "_" + test_number + ".fits");
-  std::string const dirty_image_fits = output_filename("M31_dirty_"+ kernel + "_" + test_number + ".fits");
+  std::string const outfile_fits = output_filename("M31_solution_" + kernel + "_" + test_number + ".fits");
+  std::string const residual_fits = output_filename("M31_residual_" + kernel + "_" + test_number + ".fits");
+  std::string const dirty_image_fits = output_filename("M31_dirty_" + kernel + "_" + test_number + ".fits");
+  std::string const vis_file = output_filename("M31_vis_" + kernel + "_" + test_number + ".vis");
 
-  auto M31 = pfitsio::read2d(fitsfile);
-  t_real const max = M31.array().abs().maxCoeff();
-  M31 = M31 * 1. / max;
-  pfitsio::write2d(M31.real(), inputfile);
-  //Following same formula in matlab example
-  t_real const p = 0.15;
-  t_real const sigma_m = purify_pi/3;
-  t_real const rho = 2 - (boost::math::erf(purify_pi/(sigma_m * std::sqrt(2)))) * (boost::math::erf(purify_pi/(sigma_m * std::sqrt(2))));
-  //t_int const number_of_vis = std::floor(p * rho * M31.size());
-  t_int const number_of_vis = std::floor(m_over_n * M31.size());
-  //Generating random uv(w) coverage
-  auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
+  auto uv_data = utilities::read_visibility(vis_file);
   uv_data.units = "radians";
-
-  std::cout << "Number of measurements: " << uv_data.u.size() << '\n';
+  auto M31 = pfitsio::read2d(fitsfile);
   //uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
   MeasurementOperator measurements(uv_data, J, J, kernel, M31.cols(), M31.rows(), over_sample);
 

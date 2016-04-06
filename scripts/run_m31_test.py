@@ -27,9 +27,10 @@ if kernel == "kb_interp":
   oversample = 1.375
 
 def run_test(i):
-	print os.getcwd()
-	os.system("../build/cpp/example/sdmm_m31_simulation " + kernel + " " 
-      + str(oversample) + " " +str(J) + " " + str(M_N_ratio) + " " + str(i))
+  print os.getcwd()
+  os.system("../build/cpp/example/generate_vis_data " + str(M_N_ratio) + " " + str(i)) 
+  os.system("../build/cpp/example/sdmm_m31_simulation " + kernel + " " 
+      + str(oversample) + " " +str(J) + " " + str(i))
 
 if __name__ == '__main__':
 	# kernels test
