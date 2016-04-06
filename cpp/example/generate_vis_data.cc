@@ -17,7 +17,7 @@ int main( int nargs, char const** args ) {
   
 
   std::string const kernel = "kb";
-  t_real const over_sample = 5;
+  t_real const over_sample = 5.;
   t_int const J = 24;
   t_real const m_over_n = std::stod(static_cast<std::string>(args[1]));
   std::string const test_number = static_cast<std::string>(args[2]);
@@ -41,7 +41,7 @@ int main( int nargs, char const** args ) {
   std::cout << "Number of measurements: " << uv_data.u.size() << '\n';
   //uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
   MeasurementOperator measurements(uv_data, J, J, kernel, M31.cols(), M31.rows(), over_sample);
-
+  uv_data.vis = measurements.degrid(M31);
   utilities::write_visibility(uv_data, vis_file);
 
 }

@@ -15,7 +15,7 @@
 #include <boost/math/special_functions/erf.hpp>
 
 int main( int nargs, char const** args ) {
-  if (nargs != 6 )
+  if (nargs != 5 )
   {
     std::cout << " Wrong number of arguments! " << '\n';
     return 1;
@@ -38,7 +38,7 @@ int main( int nargs, char const** args ) {
   std::string const outfile_fits = output_filename("M31_solution_" + kernel + "_" + test_number + ".fits");
   std::string const residual_fits = output_filename("M31_residual_" + kernel + "_" + test_number + ".fits");
   std::string const dirty_image_fits = output_filename("M31_dirty_" + kernel + "_" + test_number + ".fits");
-  std::string const vis_file = output_filename("M31_vis_" + kernel + "_" + test_number + ".vis");
+  std::string const vis_file = output_filename("M31_vis_" + test_number + ".vis");
 
   auto uv_data = utilities::read_visibility(vis_file);
   uv_data.units = "radians";
