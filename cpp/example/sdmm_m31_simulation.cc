@@ -67,12 +67,11 @@ int main( int nargs, char const** args ) {
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, measurements.imsizey, measurements.imsizex);
 
-  Vector<t_complex> const y0
-      = (measurements_transform * Vector<t_complex>::Map(M31.data(), M31.size()));
+
   //working out value of signal given SNR of 30
-  t_real sigma = utilities::SNR_to_standard_deviation(y0, 30.);
+  t_real sigma = utilities::SNR_to_standard_deviation(uv_data.vis, 30.);
   //adding noise to visibilities
-  uv_data.vis = utilities::add_noise(y0, 0., sigma);
+  uv_data.vis = utilities::add_noise(uv_data.vis, 0., sigma);
   Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
   t_real const max_val = dimage.array().abs().maxCoeff();
   dimage = dimage / max_val;
@@ -100,7 +99,7 @@ int main( int nargs, char const** args ) {
 
   Image<t_real> solution = measurements.degrid(image).array().abs();
   pfitsio::write2d(solution, outfile_fits);
-  Image<t_real> residual = (y0 - measurements.degrid(image)).array().abs();
+  Image<t_real> residual = (uv_data.vis - measurements.degrid(image)).array().abs();
   pfitsio::write2d(residual, residual_fits);
   return 0;
 }
