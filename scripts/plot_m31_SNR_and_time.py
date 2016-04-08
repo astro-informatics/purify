@@ -1,5 +1,6 @@
 import os 
 import multiprocessing
+import random
 import time
 import numpy as np 
 import pyfits
@@ -8,6 +9,7 @@ import subprocess
 import matplotlib.pyplot as plt
 
 def run_test((i, kernel, M_N_ratio)):
+	time.sleep(random.random())
 	J = 4
 	oversample = 2
 	if kernel == "pswf":
