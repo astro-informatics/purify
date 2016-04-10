@@ -72,6 +72,9 @@ int main( int nargs, char const** args ) {
   t_real sigma = utilities::SNR_to_standard_deviation(uv_data.vis, 30.);
   //adding noise to visibilities
   uv_data.vis = utilities::add_noise(uv_data.vis, 0., sigma);
+  auto uv_max = uv_data.vis.array().abs().maxCoeff();
+  uv_data.vis = uv_data.vis / uv_max;
+
   Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
   t_real const max_val = dimage.array().abs().maxCoeff();
   dimage = dimage / max_val;
@@ -99,7 +102,10 @@ int main( int nargs, char const** args ) {
 
   Image<t_real> solution = measurements.degrid(image).array().abs();
   pfitsio::write2d(solution, outfile_fits);
-  Image<t_real> residual = (uv_data.vis - measurements.degrid(image)).array().abs();
+  auto soln = measurements.degrid(image);
+  auto soln_max = soln.array().abs().maxCoeff();
+  soln = soln / soln_max;
+  Image<t_real> residual = (uv_data.vis - soln).array().abs();
   pfitsio::write2d(residual, residual_fits);
   return 0;
 }
