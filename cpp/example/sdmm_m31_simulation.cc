@@ -43,6 +43,8 @@ int main( int nargs, char const** args ) {
   auto uv_data = utilities::read_visibility(vis_file);
   uv_data.units = "radians";
   auto M31 = pfitsio::read2d(fitsfile);
+  auto M31_max = M31.array().abs().maxCoeff();
+  M31 = M31 / M31_max;
   //uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
   MeasurementOperator measurements(uv_data, J, J, kernel, M31.cols(), M31.rows(), over_sample);
 
@@ -72,8 +74,8 @@ int main( int nargs, char const** args ) {
   t_real sigma = utilities::SNR_to_standard_deviation(uv_data.vis, 30.);
   //adding noise to visibilities
   uv_data.vis = utilities::add_noise(uv_data.vis, 0., sigma);
-  auto uv_max = uv_data.vis.array().abs().maxCoeff();
-  uv_data.vis = uv_data.vis / uv_max;
+  
+  
 
   Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
   t_real const max_val = dimage.array().abs().maxCoeff();
@@ -100,12 +102,10 @@ int main( int nargs, char const** args ) {
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
 
-  Image<t_real> solution = measurements.degrid(image).array().abs();
+  Image<t_real> solution = M31.abs();
   pfitsio::write2d(solution, outfile_fits);
-  auto soln = measurements.degrid(image);
-  auto soln_max = soln.array().abs().maxCoeff();
-  soln = soln / soln_max;
-  Image<t_real> residual = (uv_data.vis - soln).array().abs();
+  auto soln = image;
+  Image<t_real> residual = (M31 - soln).array().abs();
   pfitsio::write2d(residual, residual_fits);
   return 0;
 }
