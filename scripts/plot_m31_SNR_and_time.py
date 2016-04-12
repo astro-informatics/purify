@@ -34,7 +34,7 @@ def run_test((i, kernel, M_N_ratio)):
 if __name__ == '__main__':
 	M_N_ratios = np.arange(1, 11) * 0.2
 	args = []
-	n_tests = 1
+	n_tests = 48
 	test_num = 0
 	for i in range(1, n_tests + 1):
 		for k in ["kb", "kb_interp", "pswf", "gauss"]:
