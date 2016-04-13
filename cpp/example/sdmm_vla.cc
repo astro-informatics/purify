@@ -20,7 +20,7 @@ int main(int, char **) {
   std::string const visfile = vla_filename("at166B.3C129.c0.vis");
   std::string const outfile = output_filename("vla.tiff");
   std::string const outfile_fits = output_filename("vla_solution.fits");
-  std::string const dirty_image = output_filename("vla_dirty.tiff");
+
   std::string const dirty_image_fits = output_filename("vla_dirty.fits");
 
   std::string const residual_fits = output_filename("vla_residual.fits");
@@ -32,9 +32,8 @@ int main(int, char **) {
   t_real cellsize = 0.3;
   t_int width = 512;
   t_int height = 512;
-  uv_data = utilities::whiten_vis(uv_data);
   uv_data = utilities::uv_symmetry(uv_data);
-  MeasurementOperator measurements(uv_data, 4, 4, "kb_interp", width, height, over_sample, cellsize, cellsize, "natural", 0);
+  MeasurementOperator measurements(uv_data, 4, 4, "kb_interp", width, height, over_sample, cellsize, cellsize, "whiten");
 
  
   auto direct = [&measurements, &width, &height](Vector<t_complex> &out, Vector<t_complex> const &x) {
@@ -64,10 +63,9 @@ int main(int, char **) {
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   if (utilities::file_exists(outfile_fits))
     std::printf("Using previous run.");
-    initial_estimate = pfitsio::read2d(outfile_fits);
+    //initial_estimate = pfitsio::read2d(outfile_fits);
   
 
-  sopt::utilities::write_tiff(Image<t_real>::Map(dimage.data(), height, width), dirty_image);
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), height, width), dirty_image_fits);
 
 
