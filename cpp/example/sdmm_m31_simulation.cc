@@ -111,9 +111,11 @@ int main( int nargs, char const** args ) {
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
 
-  auto residual = sky_model - image;
+  Vector<t_complex> original = Vector<t_complex>::Map(sky_model.data(), sky_model.size(), 1);
+  Image<t_complex> res = sky_model - image;
+  Vector<t_complex> residual = Vector<t_complex>::Map(res.data(), image.size(), 1);
 
-  auto snr = 20. * std::log10(sky_model.norm() / residual.norm()); // SNR of reconstruction
+  auto snr = 20. * std::log10(original.norm() / residual.norm()); // SNR of reconstruction
   auto total_time = (c_end-c_start) / CLOCKS_PER_SEC; // total time for solver to run in seconds
   //writing snr and time to a file
   std::ofstream out(results);
