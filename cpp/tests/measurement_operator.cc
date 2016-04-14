@@ -341,7 +341,7 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     kernel = "pswf";
     over_sample = 2;
     t_int J = 6;
-    uv_vis = utilities::read_visibility("../data/expected/degridding/M31_J6kb.vis");
+    uv_vis = utilities::read_visibility(degridding_filename("M31_J6kb.vis"));
     img = pfitsio::read2d(image_filename("M31.fits"));
     uv_vis = utilities::uv_scale(uv_vis, img.cols() * over_sample, img.rows() * over_sample);
     uv_vis.v = - uv_vis.v;
