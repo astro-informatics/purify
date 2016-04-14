@@ -13,9 +13,10 @@
 #include "MeasurementOperator.h"
 #include "utilities.h"
 #include <boost/math/special_functions/erf.hpp>
+#include <ctime>
 
 int main( int nargs, char const** args ) {
-  if (nargs != 5 )
+  if (nargs != 6 )
   {
     std::cout << " Wrong number of arguments! " << '\n';
     return 1;
@@ -26,29 +27,35 @@ int main( int nargs, char const** args ) {
   sopt::logging::initialize();
 
   std::string const fitsfile = image_filename("M31.fits");
-  std::string const inputfile = output_filename("M31_input.fits");
   
 
   std::string const kernel = args[1];
   t_real const over_sample = std::stod(static_cast<std::string>(args[2]));
   t_int const J = static_cast<t_int>(std::stod(static_cast<std::string>(args[3])));
-  std::string const test_number = static_cast<std::string>(args[4]);
-
-
-  std::string const outfile_fits = output_filename("M31_solution_" + kernel + "_" + test_number + ".fits");
-  std::string const residual_fits = output_filename("M31_residual_" + kernel + "_" + test_number + ".fits");
-  std::string const dirty_image_fits = output_filename("M31_dirty_" + kernel + "_" + test_number + ".fits");
-  std::string const vis_file = output_filename("M31_vis_" + test_number + ".vis");
-
-  auto uv_data = utilities::read_visibility(vis_file);
-  uv_data.units = "radians";
-  auto M31 = pfitsio::read2d(fitsfile);
-  auto M31_max = M31.array().abs().maxCoeff();
-  M31 = M31 / M31_max;
-  //uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
-  MeasurementOperator measurements(uv_data, J, J, kernel, M31.cols(), M31.rows(), over_sample);
-
+  t_real const m_over_n = std::stod(static_cast<std::string>(args[4]));
+  std::string const test_number = static_cast<std::string>(args[5]);
   
+
+
+
+  std::string const dirty_image_fits = output_filename("M31_dirty_" + kernel + "_" + test_number + ".fits");
+  std::string const results = output_filename("M31_results_" + kernel + "_" + test_number + ".txt");
+
+  auto sky_model = pfitsio::read2d(fitsfile);
+  auto sky_model_max = sky_model.array().abs().maxCoeff();
+  sky_model = sky_model / sky_model_max;
+  t_int const number_of_vis = std::floor(m_over_n * sky_model.size());
+  t_real const sigma_m = purify_pi/3;
+  
+  auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
+  uv_data.units = "radians";
+  std::cout << "Number of measurements: " << uv_data.u.size() << '\n';
+  MeasurementOperator simulate_measurements(uv_data, 4, 4, "kb", sky_model.cols(), sky_model.rows(), 5); // Generating simulated high quality visibilites
+  uv_data.vis = simulate_measurements.degrid(sky_model);
+
+  MeasurementOperator measurements(uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(), over_sample);
+
+  // putting measurement operator in a form that sopt can use
   auto direct = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {
         assert(x.size() == measurements.imsizex * measurements.imsizey);
         auto const image = Image<t_complex>::Map(x.data(), measurements.imsizey, measurements.imsizex);
@@ -70,11 +77,10 @@ int main( int nargs, char const** args ) {
   auto const Psi = sopt::linear_transform<t_complex>(sara, measurements.imsizey, measurements.imsizex);
 
 
-  //working out value of signal given SNR of 30
+  //working out value of sigma given SNR of 30
   t_real sigma = utilities::SNR_to_standard_deviation(uv_data.vis, 30.);
   //adding noise to visibilities
   uv_data.vis = utilities::add_noise(uv_data.vis, 0., sigma);
-  
   
 
   Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
@@ -96,16 +102,24 @@ int main( int nargs, char const** args ) {
                     measurements_transform)
             .append(sopt::proximal::l1_norm<t_complex>, Psi.adjoint(), Psi)
             .append(sopt::proximal::positive_quadrant<t_complex>);
+  //Timing reconstruction
+  std::clock_t c_start = std::clock();
   auto const result = sdmm(initial_estimate);
-  assert(result.out.size() == M31.size());
+  std::clock_t c_end = std::clock();
+
   Image<t_complex> image = Image<t_complex>::Map(result.out.data(), measurements.imsizey, measurements.imsizex);
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
 
-  Image<t_real> solution = M31.abs();
-  pfitsio::write2d(solution, outfile_fits);
-  auto soln = image;
-  Image<t_real> residual = (M31 - soln).array().abs();
-  pfitsio::write2d(residual, residual_fits);
+  auto residual = sky_model - image;
+
+  auto snr = 20. * std::log10(sky_model.norm() / residual.norm()); // SNR of reconstruction
+  auto total_time = (c_end-c_start) / CLOCKS_PER_SEC; // total time for solver to run in seconds
+  //writing snr and time to a file
+  std::ofstream out(results);
+  out.precision(13);
+  out << snr << " " << total_time;
+  out.close();
+
   return 0;
 }

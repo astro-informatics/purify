@@ -16,19 +16,16 @@ def run_test((i, kernel, M_N_ratio)):
   		J = 6
 	if kernel == "kb_interp":
   		oversample = 1.375
-  	os.system("../build/cpp/example/generate_vis_data " + str(M_N_ratio) + " " + str(i)) 
-  	start_time = time.time()
+
+  	
   	os.system("../build/cpp/example/sdmm_m31_simulation " + kernel + " " 
-      + str(oversample) + " " +str(J) + " " + str(i))
-  	end_time = time.time()
-  	residual = "../build/outputs/M31_residual_" + kernel + "_" + str(i) + ".fits"
-  	solution = "../build/outputs/M31_solution_" + kernel + "_" + str(i) + ".fits"
-  	r = np.linalg.norm(pyfits.open(residual)[0].data.flatten())
-	s = np.linalg.norm(pyfits.open(solution)[0].data.flatten())
-	SNR = 20 * np.log10(s / r)
-	os.system("rm " + residual)
-	os.system("rm " + solution)
-  	return [SNR, end_time - start_time]
+      + str(oversample) + " " +str(J) + " " +str(M_N_ratio) + " " + str(i))
+  	
+  	results_file = "../build/outputs/M31_results_" + kernel + "_" + test_number + ".txt"
+  	SNR, time = np.loadtxt(results_file, dtype = str, unpack= True)
+ 
+	os.system("rm " + results_file)
+  	return [SNR, time]
 
 
 if __name__ == '__main__':
@@ -122,7 +119,7 @@ if __name__ == '__main__':
 	plt.legend(["kb", "kb_interp", "gauss", "pswf"], loc = "upper left")
 	plt.xlabel("M/N")
 	plt.ylabel("SNR, db")
-	plt.xlim(0,2.2)
+	plt.xlim(0, 2.2)
 	plt.savefig("example_SNR_plot.png")
 	plt.clf()
 
@@ -133,6 +130,6 @@ if __name__ == '__main__':
 	plt.legend(["kb", "kb_interp", "gauss", "pswf"], loc = "upper left")
 	plt.xlabel("M/N")
 	plt.ylabel("Time, (seconds)")
-	plt.xlim(0,2.2)
+	plt.xlim(0, 2.2)
 	plt.savefig("example_Time_plot.png")
 	plt.clf()
