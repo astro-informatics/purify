@@ -21,11 +21,13 @@ def run_test((i, kernel, M_N_ratio)):
   	os.system("../build/cpp/example/sdmm_m31_simulation " + kernel + " " 
       + str(oversample) + " " +str(J) + " " +str(M_N_ratio) + " " + str(i))
   	
-  	results_file = "../build/outputs/M31_results_" + kernel + "_" + test_number + ".txt"
-  	SNR, time = np.loadtxt(results_file, dtype = str, unpack= True)
+  	results_file = "../build/outputs/M31_results_" + kernel + "_" + str(i) + ".txt"
+  	results = np.loadtxt(results_file, dtype = str)
+  	SNR = results[0]
+  	total_time = results[1]
  
 	os.system("rm " + results_file)
-  	return [SNR, time]
+  	return [SNR, total_time]
 
 
 if __name__ == '__main__':
