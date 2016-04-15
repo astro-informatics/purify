@@ -61,7 +61,7 @@ int main(int, char **) {
   Vector<> dimage = (measurements_transform.adjoint() * input).real();
   t_real max_val = dimage.array().abs().maxCoeff();
   dimage = dimage / max_val;
-  Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
+  Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(y0.size());
   sopt::utilities::write_tiff(Image<t_real>::Map(dimage.data(), M31.rows(), M31.cols()),
                               dirty_image);
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), M31.rows(), M31.cols()), dirty_image_fits);
