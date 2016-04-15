@@ -150,7 +150,10 @@ namespace purify {
     if (weighting_type == "none")
     {
       out_weights = weights.array() * 0 + 1;
-    } else if (weighting_type == "natural")
+    } else if (weighting_type == "whiten"){
+      out_weights = weights.array().sqrt();
+    }
+    else if (weighting_type == "natural")
     {
       out_weights = weights / mean_weights;
     } else {

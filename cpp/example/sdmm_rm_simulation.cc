@@ -13,6 +13,7 @@
 #include "RMOperator.h"
 #include "utilities.h"
 using namespace purify;  
+using namespace purify::notinstalled;
 
 int main( int nargs, char const** args ){
   
@@ -61,7 +62,7 @@ int main( int nargs, char const** args ){
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dirty.size());
 
   Image<t_real> dirty_image = dirty.array().abs();
-  pfitsio::write2d(dirty_image, "rm_kb_4.fits");
+  pfitsio::write2d(dirty_image, output_filename("rm_kb_4.fits"));
 
   sopt::wavelets::SARA const sara{std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u), std::make_tuple("DB3", 3u), 
           std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u), std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), 

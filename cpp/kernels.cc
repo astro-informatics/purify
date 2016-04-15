@@ -147,7 +147,6 @@ namespace purify {
         Astronomy, F. R. Schwab 1983.
 
       */
-        // Does not produce the correct scaling factor!!! Use the fft gridding correction method!
 
         const t_real alpha = 1;
         const t_real eta0 = 2 * x;

@@ -13,6 +13,7 @@
 #include "MeasurementOperator.h"
 #include "utilities.h"
 #include <boost/math/special_functions/erf.hpp>
+#include <ctime>
 
 int main( int nargs, char const** args ) {
   if (nargs != 6 )
@@ -26,7 +27,6 @@ int main( int nargs, char const** args ) {
   sopt::logging::initialize();
 
   std::string const fitsfile = image_filename("M31.fits");
-  std::string const inputfile = output_filename("M31_input.fits");
   
 
   std::string const kernel = args[1];
@@ -34,31 +34,28 @@ int main( int nargs, char const** args ) {
   t_int const J = static_cast<t_int>(std::stod(static_cast<std::string>(args[3])));
   t_real const m_over_n = std::stod(static_cast<std::string>(args[4]));
   std::string const test_number = static_cast<std::string>(args[5]);
+  
 
 
-  std::string const outfile_fits = output_filename("M31_solution_"+ kernel + "_" + test_number + ".fits");
-  std::string const residual_fits = output_filename("M31_residual_"+ kernel + "_" + test_number + ".fits");
-  std::string const dirty_image_fits = output_filename("M31_dirty_"+ kernel + "_" + test_number + ".fits");
 
-  auto M31 = pfitsio::read2d(fitsfile);
-  t_real const max = M31.array().abs().maxCoeff();
-  M31 = M31 * 1. / max;
-  pfitsio::write2d(M31.real(), inputfile);
-  //Following same formula in matlab example
-  t_real const p = 0.15;
+  std::string const dirty_image_fits = output_filename("M31_dirty_" + kernel + "_" + test_number + ".fits");
+  std::string const results = output_filename("M31_results_" + kernel + "_" + test_number + ".txt");
+
+  auto sky_model = pfitsio::read2d(fitsfile);
+  auto sky_model_max = sky_model.array().abs().maxCoeff();
+  sky_model = sky_model / sky_model_max;
+  t_int const number_of_vis = std::floor(m_over_n * sky_model.size());
   t_real const sigma_m = purify_pi/3;
-  t_real const rho = 2 - (boost::math::erf(purify_pi/(sigma_m * std::sqrt(2)))) * (boost::math::erf(purify_pi/(sigma_m * std::sqrt(2))));
-  //t_int const number_of_vis = std::floor(p * rho * M31.size());
-  t_int const number_of_vis = std::floor(m_over_n * M31.size());
-  //Generating random uv(w) coverage
+  
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";
-
   std::cout << "Number of measurements: " << uv_data.u.size() << '\n';
-  //uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
-  MeasurementOperator measurements(uv_data, J, J, kernel, M31.cols(), M31.rows(), over_sample);
+  MeasurementOperator simulate_measurements(uv_data, 4, 4, "kb", sky_model.cols(), sky_model.rows(), 5); // Generating simulated high quality visibilites
+  uv_data.vis = simulate_measurements.degrid(sky_model);
 
-  
+  MeasurementOperator measurements(uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(), over_sample);
+
+  // putting measurement operator in a form that sopt can use
   auto direct = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {
         assert(x.size() == measurements.imsizex * measurements.imsizey);
         auto const image = Image<t_complex>::Map(x.data(), measurements.imsizey, measurements.imsizex);
@@ -73,23 +70,24 @@ int main( int nargs, char const** args ) {
     adjoint, {0, 1, static_cast<t_int>(measurements.imsizex * measurements.imsizey)}
   );
 
-  sopt::wavelets::SARA const sara{std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u), std::make_tuple("DB3", 3u), 
+  sopt::wavelets::SARA const sara{std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u), std::make_tuple("DB3", 3u), 
           std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u), std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), 
           std::make_tuple("DB8", 3u)};
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, measurements.imsizey, measurements.imsizex);
 
-  Vector<t_complex> const y0
-      = (measurements_transform * Vector<t_complex>::Map(M31.data(), M31.size()));
-  //working out value of signal given SNR of 30
-  t_real sigma = utilities::SNR_to_standard_deviation(y0, 30.);
+
+  //working out value of sigma given SNR of 30
+  t_real sigma = utilities::SNR_to_standard_deviation(uv_data.vis, 30.);
   //adding noise to visibilities
-  uv_data.vis = utilities::add_noise(y0, 0., sigma);
+  uv_data.vis = utilities::add_noise(uv_data.vis, 0., sigma);
+  
+
   Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
   t_real const max_val = dimage.array().abs().maxCoeff();
   dimage = dimage / max_val;
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
-  //pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image_fits);
+  pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
   std::printf("Using epsilon of %f \n", epsilon);
@@ -104,15 +102,26 @@ int main( int nargs, char const** args ) {
                     measurements_transform)
             .append(sopt::proximal::l1_norm<t_complex>, Psi.adjoint(), Psi)
             .append(sopt::proximal::positive_quadrant<t_complex>);
+  //Timing reconstruction
+  std::clock_t c_start = std::clock();
   auto const result = sdmm(initial_estimate);
-  assert(result.out.size() == M31.size());
+  std::clock_t c_end = std::clock();
+
   Image<t_complex> image = Image<t_complex>::Map(result.out.data(), measurements.imsizey, measurements.imsizex);
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
 
-  Image<t_real> solution = measurements.degrid(image).array().abs();
-  pfitsio::write2d(solution, outfile_fits);
-  Image<t_real> residual = (y0 - measurements.degrid(image)).array().abs();
-  pfitsio::write2d(residual, residual_fits);
+  Vector<t_complex> original = Vector<t_complex>::Map(sky_model.data(), sky_model.size(), 1);
+  Image<t_complex> res = sky_model - image;
+  Vector<t_complex> residual = Vector<t_complex>::Map(res.data(), image.size(), 1);
+
+  auto snr = 20. * std::log10(original.norm() / residual.norm()); // SNR of reconstruction
+  auto total_time = (c_end-c_start) / CLOCKS_PER_SEC; // total time for solver to run in seconds
+  //writing snr and time to a file
+  std::ofstream out(results);
+  out.precision(13);
+  out << snr << " " << total_time;
+  out.close();
+
   return 0;
 }

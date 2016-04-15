@@ -334,7 +334,7 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     psf = op.grid(psf_vis);
     max = psf.real().maxCoeff();
     psf = psf / max;
-    pfitsio::write2d(psf.real(), "kb_psf_M31_gridding.fits", true, false); // saving image of degridded point source
+    pfitsio::write2d(psf.real(), output_filename("kb_psf_M31_gridding.fits"), true, false); // saving image of degridded point source
   }
 
   SECTION("Prolate Spheroidal Wave Functon Degridding") {
