@@ -1,6 +1,5 @@
 import os 
 import multiprocessing
-import random
 import time
 import numpy as np 
 import pyfits
@@ -8,8 +7,8 @@ import glob
 import subprocess
 import matplotlib.pyplot as plt
 
-def run_test((i, kernel, M_N_ratio)):
-	time.sleep(random.random())
+def run_test((i, kernel, M_N_ratio, start_time)):
+	time.sleep(start_time)
 	J = 4
 	oversample = 2
 	if kernel == "pswf":
@@ -35,11 +34,13 @@ if __name__ == '__main__':
 	args = []
 	n_tests = 5
 	test_num = 0
+	kernels = ["kb", "kb_interp", "pswf", "gauss"]
+	total_tests = n_tests * len(kernels) * len(M_N_ratios)
 	for i in range(1, n_tests + 1):
-		for k in ["kb", "kb_interp", "pswf", "gauss"]:
+		for k in kernels:
 			for m in M_N_ratios:
 				test_num = test_num + 1
-				args.append((test_num, k, m))
+				args.append((test_num, k, m, test_num * 1./ total_tests))
 	n_processors = multiprocessing.cpu_count();
 	p = multiprocessing.Pool(min(40, n_processors)) # Limiting the number of processes used to 40, otherwise it will cause problems with the user limit
 	results = p.map(run_test, args)
