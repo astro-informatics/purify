@@ -33,14 +33,15 @@ def run_test((i, kernel, M_N_ratio)):
 if __name__ == '__main__':
 	M_N_ratios = np.arange(1, 11) * 0.2
 	args = []
-	n_tests = 48
+	n_tests = 5
 	test_num = 0
 	for i in range(1, n_tests + 1):
 		for k in ["kb", "kb_interp", "pswf", "gauss"]:
 			for m in M_N_ratios:
 				test_num = test_num + 1
 				args.append((test_num, k, m))
-	p = multiprocessing.Pool(multiprocessing.cpu_count())
+	n_processors = multiprocessing.cpu_count();
+	p = multiprocessing.Pool(min(40, n_processors)) # Limiting the number of processes used to 40, otherwise it will cause problems with the user limit
 	results = p.map(run_test, args)
 	meankbSNR = []
 	meankb_interpSNR = []
