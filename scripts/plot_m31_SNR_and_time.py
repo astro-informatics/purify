@@ -26,7 +26,7 @@ def run_test((i, kernel, M_N_ratio, start_time)):
   	total_time = results[1]
  
 	os.system("rm " + results_file)
-  	return [SNR, total_time]
+  	return [float(SNR), float(total_time)]
 
 
 if __name__ == '__main__':
@@ -121,20 +121,20 @@ if __name__ == '__main__':
 	plt.errorbar(M_N_ratios, meankb_interpSNR, errorkb_interpSNR, c = "red", fmt='')
 	plt.errorbar(M_N_ratios, meangaussSNR, errorgaussSNR, c = "green", fmt='')
 	plt.errorbar(M_N_ratios, meanpswfSNR, errorpswfSNR, c = "black", fmt='')
-	plt.legend(["kb", "kb_interp", "gauss", "pswf"], loc = "upper left")
+	plt.legend(["Kaiser-Bessel", "Kaiser-Bessel Linear Interpolation", "Gaussian", "PSWF"], loc = "upper left")
 	plt.xlabel("M/N")
 	plt.ylabel("SNR, db")
 	plt.xlim(0, 2.2)
-	plt.savefig("example_SNR_plot.png")
+	plt.savefig("sdmm_SNR_plot.pdf")
 	plt.clf()
 
 	plt.errorbar(M_N_ratios, meankbTime, errorkbTime, fmt='')
 	plt.errorbar(M_N_ratios, meankb_interpTime, errorkb_interpTime, c = "red", fmt='')
 	plt.errorbar(M_N_ratios, meangaussTime, errorgaussTime, c = "green", fmt='')
 	plt.errorbar(M_N_ratios, meanpswfTime, errorpswfTime, c = "black", fmt='')
-	plt.legend(["kb", "kb_interp", "gauss", "pswf"], loc = "upper left")
+	plt.legend(["Kaiser-Bessel", "Kaiser-Bessel Linear Interpolation", "Gaussian", "PSWF"], loc = "upper left")
 	plt.xlabel("M/N")
 	plt.ylabel("Time, (seconds)")
 	plt.xlim(0, 2.2)
-	plt.savefig("example_Time_plot.png")
+	plt.savefig("sdmm_Time_plot.pdf")
 	plt.clf()
