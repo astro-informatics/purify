@@ -12,7 +12,7 @@ if(CCFits_INCLUDE_DIR)
 endif()
 include_directories(SYSTEM ${FFTW3_INCLUDE_DIR})
 
-add_library(cppurify MeasurementOperator.cc FFTOperator.cc utilities.cc pfitsio.cc kernels.cc RMOperator.cc)
+add_library(cppurify MeasurementOperator.cc FFTOperator.cc clean.cc utilities.cc pfitsio.cc kernels.cc RMOperator.cc)
 target_link_libraries(cppurify ${FFTW3_DOUBLE_LIBRARY} ${CCFits_LIBRARY} ${CFitsIO_LIBRARY})
 add_dependencies(cppurify lookup_dependencies)
 
