@@ -116,7 +116,13 @@ if __name__ == '__main__':
 		errorkb_interpTime.append(kb_interpTime.std())
 		errorgaussTime.append(gaussTime.std())
 		errorpswfTime.append(pswfTime.std())
-		
+	
+	tableSNR = np.array([M_N_ratios, meankbSNR, errorkbSNR, meankb_interpSNR, 
+		                                 errorkb_interpSNR, meangaussSNR, errorgaussSNR, meanpswfSNR, errorpswfSNR])
+	tableTime = np.array([M_N_ratios, meankbTime, errorkbTime, meankb_interpTime, 
+		                                 errorkb_interpTime, meangaussTime, errorgaussTime, meanpswfTime, errorpswfTime])
+	np.savetxt('SNRtable', tableSNR, delimiter=',')
+	np.savetxt('Timetable', tableTime, delimiter=',')
 	plt.errorbar(M_N_ratios, meankbSNR, errorkbSNR, fmt='')
 	plt.errorbar(M_N_ratios, meankb_interpSNR, errorkb_interpSNR, c = "red", fmt='')
 	plt.errorbar(M_N_ratios, meangaussSNR, errorgaussSNR, c = "green", fmt='')
