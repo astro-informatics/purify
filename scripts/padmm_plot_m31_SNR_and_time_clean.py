@@ -121,8 +121,8 @@ if __name__ == '__main__':
 		                                 errorkb_interpSNR, meangaussSNR, errorgaussSNR, meanpswfSNR, errorpswfSNR])
 	tableTime = np.array([M_N_ratios, meankbTime, errorkbTime, meankb_interpTime, 
 		                                 errorkb_interpTime, meangaussTime, errorgaussTime, meanpswfTime, errorpswfTime])
-	np.savetxt('clean_SNRtable', tableSNR, delimiter=',')
-	np.savetxt('clean_Timetable', tableTime, delimiter=',')
+	np.savetxt('padmm_clean_SNRtable', tableSNR, delimiter=',')
+	np.savetxt('padmm_clean_Timetable', tableTime, delimiter=',')
 	plt.errorbar(M_N_ratios, meankbSNR, errorkbSNR, fmt='')
 	plt.errorbar(M_N_ratios, meankb_interpSNR, errorkb_interpSNR, c = "red", fmt='')
 	plt.errorbar(M_N_ratios, meangaussSNR, errorgaussSNR, c = "green", fmt='')
@@ -131,7 +131,7 @@ if __name__ == '__main__':
 	plt.xlabel("M/N")
 	plt.ylabel("SNR, db")
 	plt.xlim(0, 2.2)
-	plt.savefig("clean_SNR_plot.pdf")
+	plt.savefig("padmm_clean_SNR_plot.pdf")
 	plt.clf()
 
 	plt.errorbar(M_N_ratios, meankbTime, errorkbTime, fmt='')
@@ -142,5 +142,5 @@ if __name__ == '__main__':
 	plt.xlabel("M/N")
 	plt.ylabel("Time, (seconds)")
 	plt.xlim(0, 2.2)
-	plt.savefig("clean_Time_plot.pdf")
+	plt.savefig("padmm_clean_Time_plot.pdf")
 	plt.clf()
