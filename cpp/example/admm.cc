@@ -68,14 +68,15 @@ int main(int, char **) {
   Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
   t_real const max_val = dimage.array().abs().maxCoeff();
   dimage = dimage / max_val;
-  Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(y0.size());
-  sopt::utilities::write_tiff(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image);
-  pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image_fits);
+  Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
+  sopt::utilities::write_tiff(Image<t_real>::Map(dimage.data(), M31.rows(), M31.cols()),
+                              dirty_image);
+  pfitsio::write2d(Image<t_real>::Map(dimage.data(), M31.rows(), M31.cols()), dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
   std::printf("Using epsilon of %f \n", epsilon);
   std::cout << "Starting sopt!" << '\n';
-  auto const padmm = sopt::algorithm::L1ProximalADMM<t_complex>()
+  auto const padmm = sopt::algorithm::L1ProximalADMM<t_complex>(uv_data.vis)
                          .itermax(500)
                          .gamma((measurements_transform.adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
                          .relative_variation(1e-3)
