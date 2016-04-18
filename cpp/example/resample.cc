@@ -16,8 +16,7 @@ int main( int nargs, char const** args ){
     FFTOperator fftop;
 
     auto ft_grid = fftop.forward(M31);
-    auto new_ft_grid = utilities::re_sample_ft_grid(ft_grid, 5.);
-    new_ft_grid = utilities::re_sample_ft_grid(new_ft_grid, 1./5);
+    auto new_ft_grid = utilities::re_sample_ft_grid(ft_grid, 4.);
     auto M31_resample = fftop.inverse(new_ft_grid).real();
-    pfitsio::write2d(M31_resample, output_filename("re_sample_m31.fits"));
+    pfitsio::write2d(M31_resample, output_filename("M31_resample_4.fits"));
 }
