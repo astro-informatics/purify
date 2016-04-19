@@ -123,23 +123,23 @@ if __name__ == '__main__':
 		                                 errorkb_interpTime, meangaussTime, errorgaussTime, meanpswfTime, errorpswfTime])
 	np.savetxt('padmm_SNRtable', tableSNR, delimiter=',')
 	np.savetxt('padmm_Timetable', tableTime, delimiter=',')
-	plt.figure(1)
-	plt.subplot(211)
+
+
 	plt.errorbar(M_N_ratios, meankbSNR, errorkbSNR, fmt='')
 	plt.errorbar(M_N_ratios, meankb_interpSNR, errorkb_interpSNR, c = "red", fmt='')
 	plt.errorbar(M_N_ratios, meangaussSNR, errorgaussSNR, c = "green", fmt='')
 	plt.errorbar(M_N_ratios, meanpswfSNR, errorpswfSNR, c = "black", fmt='')
-	plt.legend(["Kaiser-Bessel", "Kaiser-Bessel Linear Interpolation", "Gaussian", "PSWF"], loc = "upper left")
+	plt.legend(["Kaiser-Bessel (KB)", "KB Linear Interpolation", "Gaussian", "PSWF"])
 	plt.xlabel("M/N")
 	plt.ylabel("SNR, db")
 	plt.xlim(0, 2.2)
 	
-	plt.subplot(221)
+
 	plt.errorbar(M_N_ratios, meankbTime, errorkbTime, fmt='')
 	plt.errorbar(M_N_ratios, meankb_interpTime, errorkb_interpTime, c = "red", fmt='')
 	plt.errorbar(M_N_ratios, meangaussTime, errorgaussTime, c = "green", fmt='')
 	plt.errorbar(M_N_ratios, meanpswfTime, errorpswfTime, c = "black", fmt='')
-	plt.legend(["Kaiser-Bessel", "Kaiser-Bessel Linear Interpolation", "Gaussian", "PSWF"], loc = "upper left")
+	#plt.legend(["Kaiser-Bessel", "Kaiser-Bessel Linear Interpolation", "Gaussian", "PSWF"], loc = "upper left")
 	plt.xlabel("M/N")
 	plt.ylabel("Time, (seconds)")
 	plt.xlim(0, 2.2)
