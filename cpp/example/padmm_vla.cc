@@ -26,14 +26,14 @@ int main(int, char **) {
   std::string const residual_fits = output_filename("vla_residual.fits");
 
   t_int const niters = 1e5;
-  t_real const over_sample = 1.375;
+  t_real const over_sample = 2;
   auto uv_data = utilities::read_visibility(visfile);
   uv_data.units = "lambda";
   t_real cellsize = 0.3;
   t_int width = 512;
   t_int height = 512;
   uv_data = utilities::uv_symmetry(uv_data);
-  MeasurementOperator measurements(uv_data, 4, 4, "kb_interp", width, height, over_sample, cellsize, cellsize, "whiten");
+  MeasurementOperator measurements(uv_data, 4, 4, "kb", width, height, over_sample, cellsize, cellsize, "whiten");
 
  
   auto direct = [&measurements, &width, &height](Vector<t_complex> &out, Vector<t_complex> const &x) {
@@ -50,9 +50,9 @@ int main(int, char **) {
     adjoint, {0, 1, static_cast<t_int>(width * height)}
   );
 
-  sopt::wavelets::SARA const sara{std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u), std::make_tuple("DB3", 3u), 
-        std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u), std::make_tuple("DB6", 3u), 
-        std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
+  sopt::wavelets::SARA const sara{std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u), 
+        std::make_tuple("DB3", 3u),  std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u), 
+        std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, height, width);
   std::printf("Saving dirty map \n");
@@ -72,7 +72,7 @@ int main(int, char **) {
   t_real noise_variance = utilities::variance(uv_data.vis.array() * measurements.W)/2;
   t_real const noise_rms = std::sqrt(noise_variance);
   std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
-  
+  uv_data = utilities::whiten_vis(uv_data);
   t_real epsilon = utilities::calculate_l2_radius(uv_data.vis, 1.); //Calculation of l_2 bound following SARA paper
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
@@ -92,7 +92,7 @@ int main(int, char **) {
                          .nu(1e0)
                          .Psi(Psi)
                          .Phi(measurements_transform);
-   auto const result = padmm(initial_estimate);
+  auto const result = padmm(initial_estimate);
   assert(result.x.size() == width * height);
   Image<t_complex> image = Image<t_complex>::Map(result.x.data(), measurements.imsizey, measurements.imsizex);
   t_real const max_val_final = image.array().abs().maxCoeff();
