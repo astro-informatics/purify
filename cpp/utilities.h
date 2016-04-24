@@ -29,6 +29,7 @@ namespace purify {
         Vector<t_complex> weights; // weights for visibilities
         std::string units = "MHz";
       };
+
       //! Generates a random visibility coverage
       utilities::vis_params random_sample_density(const t_int& vis_num, const t_real& mean, const t_real& standard_deviation);
       //! Reads in visibility file
@@ -50,11 +51,25 @@ namespace purify {
       //! Mod function modified to wrap circularly for negative numbers
       t_real mod(const t_real& x, const t_real& y);
       //! Calculate mean of vector
-      t_complex mean(const Vector<t_complex> x);
+      template<class K>
+      typename K::Scalar mean(const K x){
+        // Calculate mean of vector x
+        return x.array().mean();
+      };
       //! Calculate variance of vector
-      t_real variance(const Vector<t_complex> x);
+      template<class K>
+      t_real variance(const K x){
+        //calculate variance of vector x
+        auto q = (x.array() - x.array().mean()).matrix();
+        t_real var = std::real((q.adjoint() * q)(0)/static_cast<t_real>(q.size() - 1));
+        return var;
+      };
       //! Calculates the standard deviation of a vector
-      t_real standard_deviation(const Vector<t_complex> x);
+      template<class K>
+      t_real standard_deviation(const K x){
+        //calculate standard deviation of vector x
+        return std::sqrt(variance(x));
+      };
       //! Calculates the convolution between two images
       Image<t_complex> convolution_operator(const Image<t_complex>& a, const Image<t_complex>& b);
       //! Calculates upsample ratio for w-projection

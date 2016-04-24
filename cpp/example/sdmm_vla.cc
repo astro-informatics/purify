@@ -68,8 +68,8 @@ int main(int, char **) {
 
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), height, width), dirty_image_fits);
 
-
-  t_real noise_variance = utilities::variance(uv_data.vis.array() * measurements.W)/2;
+  const Vector<t_complex> & weighted_data = (uv_data.vis.array() * measurements.W).matrix();
+  t_real noise_variance = utilities::variance(weighted_data)/2;
   t_real const noise_rms = std::sqrt(noise_variance);
   std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
   

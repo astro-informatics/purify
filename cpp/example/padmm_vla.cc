@@ -68,17 +68,20 @@ int main(int, char **) {
 
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), height, width), dirty_image_fits);
 
-
-  t_real noise_variance = utilities::variance(uv_data.vis.array() * measurements.W)/2;
+  const Vector<t_complex> weighted_data = (uv_data.vis.array() * measurements.W).matrix();
+  auto noise_variance = utilities::variance(weighted_data)/2;
   t_real const noise_rms = std::sqrt(noise_variance);
   std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
   uv_data = utilities::whiten_vis(uv_data);
   t_real epsilon = utilities::calculate_l2_radius(uv_data.vis, 1.); //Calculation of l_2 bound following SARA paper
+
+  auto purify_gamma = (measurements_transform.adjoint() * uv_data.vis).real().maxCoeff() * 1e-3;
+
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
   auto const padmm = sopt::algorithm::L1ProximalADMM<t_complex>(uv_data.vis)
                          .itermax(500)
-                         .gamma((measurements_transform.adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
+                         .gamma(purify_gamma)
                          .relative_variation(1e-3)
                          .l2ball_proximal_epsilon(epsilon)
                          .tight_frame(false)
