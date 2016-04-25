@@ -35,7 +35,7 @@ int main( int nargs, char const** args ){
 
   Image<t_complex> im = Matrix<t_complex>::Random(width, height);
   Vector<t_complex> vis = Vector<t_complex>::Random(number_of_vis);
-  t_real inner_loop = 100;
+  t_real inner_loop = 10000;
   t_complex const I(0, 1);
   std::cout.precision(20);
   for (t_int i = 0; i < number_of_tests; ++i)
