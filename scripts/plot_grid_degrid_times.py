@@ -67,7 +67,7 @@ if __name__ == '__main__':
 	degridgausstime_error = []	
 	for m in M_N_ratios:
 		for i in range(len(args)):
-			if m == args[i][2]:
+			if m == args[i][1]:
 				if args[i][1] == "kb":
 					gridkbtime.append(results[i][0])
 					gridkbtime_error.append(results[i][1])
