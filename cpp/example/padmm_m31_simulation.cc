@@ -78,7 +78,7 @@ int main( int nargs, char const** args ) {
 
 
   //working out value of sigma given SNR of 30
-  t_real sigma = utilities::SNR_to_standard_deviation(uv_data.vis, 30.);
+  t_real sigma = utilities::SNR_to_standard_deviation(uv_data.vis, 10.);
   //adding noise to visibilities
   uv_data.vis = utilities::add_noise(uv_data.vis, 0., sigma);
   

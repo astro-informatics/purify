@@ -73,7 +73,7 @@ int main(int, char **) {
   Vector<t_complex> const y0
       = (measurements_transform * Vector<t_complex>::Map(M31.data(), M31.size()));
   //working out value of signal given SNR of 30
-  t_real sigma = utilities::SNR_to_standard_deviation(y0, 30.);
+  t_real sigma = utilities::SNR_to_standard_deviation(y0, 10.);
   //adding noise to visibilities
   uv_data.vis = utilities::add_noise(y0, 0., sigma);
   Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
