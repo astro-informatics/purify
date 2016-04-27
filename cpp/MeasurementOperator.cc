@@ -380,7 +380,29 @@ namespace purify {
       ftkernelu = ftgaussu;
       ftkernelv = ftgaussv;
     }
-    
+    if (kernel_name == "box")
+    {
+      auto boxu = [&] (t_real x) { return kernels::pill_box(x, Ju); };
+      auto boxv = [&] (t_real x) { return kernels::pill_box(x, Jv); };
+      auto ftboxu = [&] (t_real x) { return kernels::ft_pill_box(x/ftsizeu - 0.5, Ju); };
+      auto ftboxv = [&] (t_real x) { return kernels::ft_pill_box(x/ftsizev - 0.5, Jv); };      
+      kernelu = boxu;
+      kernelv = boxv;
+      ftkernelu = ftboxu;
+      ftkernelv = ftboxv;
+    }
+    if (kernel_name == "gauss_alt")
+    {
+      const t_real sigma = 1; //In units of radians, Rafael uses sigma = 2 * pi / ftsizeu. However, this should be 1 in units of pixels.
+      auto gaussu = [&] (t_real x) { return kernels::gaussian_general(x, Ju, sigma); };
+      auto gaussv = [&] (t_real x) { return kernels::gaussian_general(x, Jv, sigma); };
+      auto ftgaussu = [&] (t_real x) { return kernels::ft_gaussian_general(x/ftsizeu - 0.5, Ju, sigma); };
+      auto ftgaussv = [&] (t_real x) { return kernels::ft_gaussian_general(x/ftsizev - 0.5, Jv, sigma); };      
+      kernelu = gaussu;
+      kernelv = gaussv;
+      ftkernelu = ftgaussu;
+      ftkernelv = ftgaussv;
+    }
     if ( fft_grid_correction == true )
     {
       S = MeasurementOperator::init_correction2d_fft(kernelu, kernelv, Ju, Jv); // Does gridding correction with FFT

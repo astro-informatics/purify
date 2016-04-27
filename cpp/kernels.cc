@@ -9,9 +9,8 @@ namespace purify {
         /*
           kaiser bessel gridding kernel
         */
-        t_real a = 2 * x / J;
-        t_real alpha = 2.34 * J;
-        return boost::math::cyl_bessel_i(0, std::real(alpha * std::sqrt(1 - a * a))) / boost::math::cyl_bessel_i(0, alpha);
+        t_real alpha = 2.34 * J; // value said to be optimal in Fessler et. al. 2003
+        return kaiser_bessel_general(x, J, alpha);
     }
 
     t_real kaiser_bessel_general(const t_real& x, const t_int& J, const t_real& alpha)
@@ -42,11 +41,8 @@ namespace purify {
         */
 
         t_real alpha = 2.34 * J; // value said to be optimal in Fessler et. al. 2003
-        t_complex eta = std::sqrt(static_cast<t_complex>((purify_pi * x * J)*(purify_pi * x * J) - alpha * alpha));
-        t_real normalisation = 38828.11016883; //Factor that keeps it consistent with fessler formula
-
-        return std::real(std::sin(eta) / eta) / normalisation; //simple way of doing the calculation, the boost bessel funtions do not support complex valued arguments
-    }
+        return ft_kaiser_bessel_general(x, J, alpha);
+      }
 
     t_real gaussian(const t_real& x, const t_int& J)
     {
@@ -57,8 +53,7 @@ namespace purify {
         J:: support size
       */
         t_real sigma = 0.31 * std::pow(J, 0.52); // Optimal sigma according to fessler et al.
-        t_real a = x / sigma;
-        return std::exp(-a * a * 0.5);
+        return gaussian_general(x, J, sigma);
     }
 
     t_real ft_gaussian(const t_real& x, const t_int& J)
@@ -70,8 +65,7 @@ namespace purify {
         J:: support size of gridding kernel
       */
         t_real sigma = 0.31 * std::pow(J, 0.52);
-        t_real a = x * sigma * purify_pi;
-        return std::sqrt(purify_pi / 2) / sigma * std::exp(-a * a * 2);
+        return ft_gaussian_general(x, J, sigma);
     }
 
 
@@ -201,6 +195,51 @@ namespace purify {
       }
       t_real output = y_0 + (y_1 - y_0)/(i_1 - i_0) * (i_effective - i_0);
       return output;
+    }
+    t_real pill_box(const t_real& x, const t_int& J){
+      /*
+        Gaussian gridding kernel
+
+        x:: value to evaluate
+        J:: support size
+      */
+        return 1./static_cast<t_real>(J);
+    }
+    t_real ft_pill_box(const t_real& x, const t_int& J){
+      /*
+        Gaussian gridding kernel
+
+        x:: value to evaluate
+        J:: support size
+      */
+        return boost::math::sinc_pi( J * x * purify_pi);
+    }
+    t_real gaussian_general(const t_real& x, const t_int& J, const t_real& sigma)
+    {
+      /*
+        Gaussian gridding kernel
+
+        x:: value to evaluate
+        J:: support size
+        sigma:: standard deviation of Gaussian kernel (in pixels)
+      */
+        
+        t_real a = x / sigma;
+        return std::exp(-a * a * 0.5);
+    }
+
+    t_real ft_gaussian_general(const t_real& x, const t_int& J, const t_real& sigma)
+    {
+      /*
+        Fourier transform of Gaussian gridding kernel
+
+        x:: value to evaluate
+        J:: support size of gridding kernel
+        sigma:: standard deviation of Gaussian kernel (in pixels)
+      */
+        
+        t_real a = x * sigma * purify_pi;
+        return std::sqrt(purify_pi / 2) / sigma * std::exp(-a * a * 2);
     }
 
  }

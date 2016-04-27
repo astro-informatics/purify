@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include <boost/math/special_functions/bessel.hpp>
+#include <boost/math/special_functions/sinc.hpp>
 #include <array>
 
 namespace purify {
@@ -37,7 +38,14 @@ namespace purify {
       Vector<t_real> kernel_samples(const t_int& total_samples, const std::function<t_real(t_real)> kernelu, const t_int& J);
       //! linearly interpolates from samples of kernel
       t_real kernel_linear_interp(const Vector<t_real>& samples, const t_real& x, const t_int& J);
-
+      //! Box car function for kernel
+      t_real pill_box(const t_real& x, const t_int& J);
+      //! Fourier transform of box car function, a Sinc function
+      t_real ft_pill_box(const t_real& x, const t_int& J);
+      //! Fourier transform of general Gaussian kernel
+      t_real gaussian_general(const t_real& x, const t_int& J, const t_real& sigma);
+      //! Fourier transform of general Gaussian kernel
+      t_real ft_gaussian_general(const t_real& x, const t_int& J, const t_real& sigma);
  }
 
 }
