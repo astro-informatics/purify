@@ -345,7 +345,7 @@ namespace purify {
 
     if ((kernel_name == "pswf") and (Ju != 6 or Jv != 6))
     {
-      std::cout << "Error: Only a support of 6 is implimented for PSWFs.";
+      std::cout << "Error: Only a support of 6 is implemented for PSWFs.";
     }
     if (kernel_name == "kb")
     {

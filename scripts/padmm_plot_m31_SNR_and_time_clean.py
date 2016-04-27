@@ -15,7 +15,8 @@ def run_test((i, kernel, M_N_ratio, start_time)):
   		J = 6
 	if kernel == "kb_interp":
   		oversample = 1.375
-
+  	if kernel == "box":
+  		J = 1
   	
   	os.system("../build/cpp/example/padmm_clean_m31_simulation " + kernel + " " 
       + str(oversample) + " " +str(J) + " " +str(M_N_ratio) + " " + str(i))
@@ -34,7 +35,7 @@ if __name__ == '__main__':
 	args = []
 	n_tests = 5
 	test_num = 0
-	kernels = ["kb", "kb_interp", "pswf", "gauss"]
+	kernels = ["kb", "kb_interp", "pswf", "gauss", "box", "gauss_alt"]
 	total_tests = n_tests * len(kernels) * len(M_N_ratios)
 	for i in range(1, n_tests + 1):
 		for k in kernels:
@@ -49,30 +50,41 @@ if __name__ == '__main__':
 	meankb_interpSNR = []
 	meangaussSNR = []
 	meanpswfSNR = []
+	meanboxSNR = []
+	meangauss_altSNR = []
 	errorkbSNR = []
 	errorkb_interpSNR = []
 	errorgaussSNR = []
 	errorpswfSNR = []
+	errorboxSNR = []
+	errorgauss_altSNR = []
 
 	meankbTime = []
 	meankb_interpTime = []
 	meangaussTime = []
 	meanpswfTime = []
+	meanboxTime = []
+	meangauss_altTime = []
 	errorkbTime = []
 	errorkb_interpTime = []
 	errorgaussTime = []
 	errorpswfTime = []
+	errorboxTime = []
+	errorgauss_altTime = []
 
 	for m in M_N_ratios:
 		kbSNR = []
 		kb_interpSNR = []
 		gaussSNR = []
 		pswfSNR = []
+		boxSNR = []
+		gauss_altSNR = []
 
 		kbTime = []
 		kb_interpTime = []
 		gaussTime = []
 		pswfTime = []
+		gauss_altTime =[]
 		for i in range(len(args)):
 			if m == args[i][2]:
 				if args[i][1] == "kb":
@@ -87,35 +99,53 @@ if __name__ == '__main__':
 				if args[i][1] == "pswf":
 					pswfSNR.append(results[i][0])
 					pswfTime.append(results[i][1])
+				if args[i][1] == "box":
+					boxSNR.append(results[i][0])
+					boxTime.append(results[i][1])
+				if args[i][1] == "gauss_alt":
+					gauss_altSNR.append(results[i][0])
+					gauss_altTime.append(results[i][1])
 		kbSNR = np.array(kbSNR)
 		kb_interpSNR = np.array(kb_interpSNR)
 		gaussSNR = np.array(gaussSNR)
 		pswfSNR = np.array(pswfSNR)
+		boxSNR = np.array(boxSNR)
+		gauss_altSNR = np.array(gauss_altSNR)
 		
 		meankbSNR.append(kbSNR.mean())
 		meankb_interpSNR.append(kb_interpSNR.mean())
 		meangaussSNR.append(gaussSNR.mean())
 		meanpswfSNR.append(pswfSNR.mean())
+		meanboxSNR.append(boxSNR.mean())
+		meangauss_altSNR.append(gauss_altSNR.mean())
 		
 		errorkbSNR.append(kbSNR.std())
 		errorkb_interpSNR.append(kb_interpSNR.std())
 		errorgaussSNR.append(gaussSNR.std())
 		errorpswfSNR.append(pswfSNR.std())
+		errorboxSNR.append(boxSNR.std())
+		errorgauss_altSNR.append(gauss_altSNR.std())
 
 		kbTime = np.array(kbTime)
 		kb_interpTime = np.array(kb_interpTime)
 		gaussTime = np.array(gaussTime)
 		pswfTime = np.array(pswfTime)
+		boxTime = np.array(boxTime)
+		gauss_altTime = np.array(gauss_altTime)
 		
 		meankbTime.append(kbTime.mean())
 		meankb_interpTime.append(kb_interpTime.mean())
 		meangaussTime.append(gaussTime.mean())
 		meanpswfTime.append(pswfTime.mean())
+		meanboxTime.append(boxTime.mean())
+		meangauss_altTime.append(gauss_altTime.mean())
 		
 		errorkbTime.append(kbTime.std())
 		errorkb_interpTime.append(kb_interpTime.std())
 		errorgaussTime.append(gaussTime.std())
 		errorpswfTime.append(pswfTime.std())
+		errorboxTime.append(boxTime.std())
+		errorgauss_altTime.append(gauss_altTime.std())
 	
 	tableSNR = np.array([M_N_ratios, meankbSNR, errorkbSNR, meankb_interpSNR, 
 		                                 errorkb_interpSNR, meangaussSNR, errorgaussSNR, meanpswfSNR, errorpswfSNR])
@@ -127,7 +157,9 @@ if __name__ == '__main__':
 	plt.errorbar(M_N_ratios, meankb_interpSNR, errorkb_interpSNR, c = "red", fmt='')
 	plt.errorbar(M_N_ratios, meangaussSNR, errorgaussSNR, c = "green", fmt='')
 	plt.errorbar(M_N_ratios, meanpswfSNR, errorpswfSNR, c = "black", fmt='')
-	plt.legend(["Kaiser-Bessel (KB)", "KB Linear Interpolation", "Gaussian", "PSWF"])
+	plt.errorbar(M_N_ratios, meanboxSNR, errorboxSNR, c = "black", fmt='')
+	plt.errorbar(M_N_ratios, meangauss_altSNR, errorgauss_altSNR, c = "black", fmt='')
+	plt.legend(["Kaiser-Bessel (KB)", "KB Linear Interpolation", "Gaussian", "PSWF", "Box", "Gaussian non-optimal"])
 	plt.xlabel("M/N")
 	plt.ylabel("SNR, db")
 	plt.xlim(0, 2.2)
@@ -138,7 +170,8 @@ if __name__ == '__main__':
 	plt.errorbar(M_N_ratios, meankb_interpTime, errorkb_interpTime, c = "red", fmt='')
 	plt.errorbar(M_N_ratios, meangaussTime, errorgaussTime, c = "green", fmt='')
 	plt.errorbar(M_N_ratios, meanpswfTime, errorpswfTime, c = "black", fmt='')
-	#plt.legend(["Kaiser-Bessel", "Kaiser-Bessel Linear Interpolation", "Gaussian", "PSWF"], loc = "upper left")
+	plt.errorbar(M_N_ratios, meanboxTime, errorboxTime, c = "black", fmt='')
+	plt.errorbar(M_N_ratios, meangauss_altTime, errorgauss_altTime, c = "black", fmt='')
 	plt.xlabel("M/N")
 	plt.ylabel("Time, (seconds)")
 	plt.xlim(0, 2.2)
