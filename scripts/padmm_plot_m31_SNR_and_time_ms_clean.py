@@ -85,6 +85,7 @@ if __name__ == '__main__':
 		kb_interpTime = []
 		gaussTime = []
 		pswfTime = []
+		boxTime = []
 		gauss_altTime =[]
 		for i in range(len(args)):
 			if m == args[i][2]:
