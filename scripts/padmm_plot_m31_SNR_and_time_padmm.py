@@ -36,7 +36,7 @@ if __name__ == '__main__':
 	args = []
 	n_tests = 5
 	test_num = 0
-	kernels = ["kb", "kb_interp", "pswf", "gauss"]
+	kernels = ["kb", "kb_interp", "pswf", "gauss", "box", "gauss_alt"]
 	total_tests = n_tests * len(kernels) * len(M_N_ratios)
 	for i in range(1, n_tests + 1):
 		for k in kernels:
@@ -158,8 +158,8 @@ if __name__ == '__main__':
 	plt.errorbar(M_N_ratios, meankb_interpSNR, errorkb_interpSNR, c = "red", fmt='')
 	plt.errorbar(M_N_ratios, meangaussSNR, errorgaussSNR, c = "green", fmt='')
 	plt.errorbar(M_N_ratios, meanpswfSNR, errorpswfSNR, c = "black", fmt='')
-	plt.errorbar(M_N_ratios, meanboxSNR, errorboxSNR, c = "black", fmt='')
-	plt.errorbar(M_N_ratios, meangauss_altSNR, errorgauss_altSNR, c = "black", fmt='')
+	plt.errorbar(M_N_ratios, meanboxSNR, errorboxSNR, c = "magenta", fmt='')
+	plt.errorbar(M_N_ratios, meangauss_altSNR, errorgauss_altSNR, c = "cyan", fmt='')
 	plt.legend(["Kaiser-Bessel (KB)", "KB Linear Interpolation", "Gaussian", "PSWF", "Box", "Gaussian non-optimal"])
 	plt.xlabel("M/N")
 	plt.ylabel("SNR, db")
@@ -171,8 +171,8 @@ if __name__ == '__main__':
 	plt.errorbar(M_N_ratios, meankb_interpTime, errorkb_interpTime, c = "red", fmt='')
 	plt.errorbar(M_N_ratios, meangaussTime, errorgaussTime, c = "green", fmt='')
 	plt.errorbar(M_N_ratios, meanpswfTime, errorpswfTime, c = "black", fmt='')
-	plt.errorbar(M_N_ratios, meanboxTime, errorboxTime, c = "black", fmt='')
-	plt.errorbar(M_N_ratios, meangauss_altTime, errorgauss_altTime, c = "black", fmt='')
+	plt.errorbar(M_N_ratios, meanboxTime, errorboxTime, c = "magenta", fmt='')
+	plt.errorbar(M_N_ratios, meangauss_altTime, errorgauss_altTime, c = "cyan", fmt='')
 	plt.xlabel("M/N")
 	plt.ylabel("Time, (seconds)")
 	plt.xlim(0, 2.2)
