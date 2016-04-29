@@ -122,7 +122,9 @@ namespace purify {
     if (weighting_type == "none")
     {
       out_weights = weights.array() * 0 + 1;
-    } else if (weighting_type == "natural")
+    }else if (weighting_type == "whiten"){
+      out_weights = weights.array().sqrt();
+    }else if (weighting_type == "natural")
     {
       out_weights = weights / mean_weights;
     } else {
@@ -237,9 +239,11 @@ namespace purify {
     //samples for kb_interp
     if (kernel_name == "kb_interp")
     {
-
-      t_real kb_interp_alpha = purify_pi * std::sqrt(Ju * Ju/(oversample_factor * oversample_factor) * (oversample_factor - 0.5) * (oversample_factor - 0.5) - 0.8);
-      const t_int total_samples = 2e6 * Ju;
+      //It is suggested you use Ju = 5 for this alpha
+      const t_real kb_interp_alpha = purify_pi * 
+                                    std::sqrt(Ju * Ju/(oversample_factor * oversample_factor) * (oversample_factor - 0.5) * (oversample_factor - 0.5) - 0.8); 
+      const t_int sample_density = 7280;
+      const t_int total_samples = sample_density * Ju;
       auto kb_general = [&] (t_real x) { return kernels::kaiser_bessel_general(x, Ju, kb_interp_alpha); };
       Vector<t_real> samples = kernels::kernel_samples(total_samples, kb_general, Ju);
       auto kb_interp = [&] (t_real x) { return kernels::kernel_linear_interp(samples, x, Ju); };
