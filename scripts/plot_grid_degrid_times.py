@@ -15,6 +15,8 @@ def run_test((i, kernel, number_of_samples, start_time)):
   		J = 6
 	if kernel == "kb_interp":
   		oversample = 1.375
+  	if kernel == "box":
+  		J = 1
 
   	
   	os.system("../build/cpp/example/time_gridding_degridding " + kernel + " " 
@@ -35,7 +37,7 @@ if __name__ == '__main__':
 	M_N_ratios = np.arange(1, 11)
 	args = []
 	test_num = 0
-	kernels = ["kb", "kb_interp", "pswf", "gauss"]
+	kernels = ["kb", "kb_interp", "pswf", "gauss", "box", "gauss_alt"]
 	total_tests = len(kernels) * len(M_N_ratios)
 	for k in kernels:
 		for m in M_N_ratios:
@@ -61,10 +63,15 @@ if __name__ == '__main__':
 	degridpswftime = []
 	degridpswftime_error = []
 
-	gridgausstime = []
-	gridgausstime_error = []
-	degridgausstime = []
-	degridgausstime_error = []	
+	gridboxtime = []
+	gridboxtime_error = []
+	degridboxtime = []
+	degridboxtime_error = []	
+
+	gridgauss_alttime = []
+	gridgauss_alttime_error = []
+	degridgauss_alttime = []
+	degridgauss_alttime_error = []
 	for m in M_N_ratios:
 		for i in range(len(args)):
 			if m == args[i][0]:
@@ -79,23 +86,34 @@ if __name__ == '__main__':
 					degridkb_interptime.append(results[i][2])
 					degridkb_interptime_error.append(results[i][3])
 				if args[i][1] == "gauss":
-					gridpswftime.append(results[i][0])
-					gridpswftime_error.append(results[i][1])
-					degridpswftime.append(results[i][2])
-					degridpswftime_error.append(results[i][3])
-				if args[i][1] == "pswf":
 					gridgausstime.append(results[i][0])
 					gridgausstime_error.append(results[i][1])
 					degridgausstime.append(results[i][2])
 					degridgausstime_error.append(results[i][3])
-	
+				if args[i][1] == "pswf":
+					gridpswftime.append(results[i][0])
+					gridpswftime_error.append(results[i][1])
+					degridpswftime.append(results[i][2])
+					degridpswftime_error.append(results[i][3])
+				if args[i][1] == "box":
+					gridboxtime.append(results[i][0])
+					gridboxtime_error.append(results[i][1])
+					degridboxtime.append(results[i][2])
+					degridboxtime_error.append(results[i][3])
+				if args[i][1] == "gauss":
+					gridgauss_alttime.append(results[i][0])
+					gridgauss_alttime_error.append(results[i][1])
+					degridgauss_alttime.append(results[i][2])
+					degridgauss_alttime_error.append(results[i][3])	
 
 
 	plt.errorbar(M_N_ratios/10. * 2, gridkbtime, gridkbtime_error, fmt='')
 	plt.errorbar(M_N_ratios/10. * 2, gridkb_interptime, gridkb_interptime_error, c = "red", fmt='')
-	plt.errorbar(M_N_ratios/10. * 2, gridpswftime, gridpswftime_error, c = "green", fmt='')
-	plt.errorbar(M_N_ratios/10. * 2, gridgausstime, gridgausstime_error, c = "black", fmt='')
-	plt.legend(["Kaiser-Bessel (KB)", "KB Linear Interpolation", "Gaussian", "PSWF"])
+	plt.errorbar(M_N_ratios/10. * 2, gridpswftime, gridpswftime_error, c = "black", fmt='')
+	plt.errorbar(M_N_ratios/10. * 2, gridgausstime, gridgausstime_error, c = "green", fmt='')
+	plt.errorbar(M_N_ratios/10. * 2, gridboxtime, gridboxtime_error, c = "magenta", fmt='')
+	plt.errorbar(M_N_ratios/10. * 2, gridgauss_alttime, gridgauss_alttime_error, c = "cyan", fmt='')
+	plt.legend(["Kaiser-Bessel (KB)", "KB Linear Interpolation", "Gaussian", "PSWF", "Box", "Gaussian non-optimal"])
 	plt.xlabel("M/N")
 	plt.ylabel("Time (seconds)")
 	plt.xlim(0, 2.2)
@@ -105,8 +123,9 @@ if __name__ == '__main__':
 
 	plt.errorbar(M_N_ratios/10. * 2, degridkbtime, degridkbtime_error, fmt='')
 	plt.errorbar(M_N_ratios/10. * 2, degridkb_interptime, degridkb_interptime_error, c = "red", fmt='')
-	plt.errorbar(M_N_ratios/10. * 2, degridpswftime, degridpswftime_error, c = "green", fmt='')
-	plt.errorbar(M_N_ratios/10. * 2, degridgausstime, degridgausstime_error, c = "black", fmt='')
+	plt.errorbar(M_N_ratios/10. * 2, degridpswftime, degridpswftime_error, c = "black", fmt='')
+	plt.errorbar(M_N_ratios/10. * 2, degridgausstime, degridgausstime_error, c = "green", fmt='')
+	plt.errorbar(M_N_ratios/10. * 2, degridboxtime, degridboxtime_error, c = "magenta", fmt='')
 	#plt.legend(["Kaiser-Bessel (KB)", "KB Linear Interpolation", "Gaussian", "PSWF"])
 	plt.xlabel("M/N")
 	plt.ylabel("Time (seconds)")
