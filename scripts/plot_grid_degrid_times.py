@@ -15,6 +15,7 @@ def run_test((i, kernel, number_of_samples, start_time)):
   		J = 6
 	if kernel == "kb_interp":
   		oversample = 1.375
+  		J = 5
   	if kernel == "box":
   		J = 1
 

@@ -15,6 +15,7 @@ def run_test((i, kernel, M_N_ratio, start_time)):
   		J = 6
 	if kernel == "kb_interp":
   		oversample = 1.375
+  		J = 5
 
   	
   	os.system("../build/cpp/example/sdmm_ms_clean_m31_simulation " + kernel + " " 
