@@ -22,7 +22,7 @@ namespace purify {
       // create fftgrid
       ft_vector = utilities::re_sample_ft_grid(fftop.forward(padded_image),resample_factor); // the fftshift is not needed because of the phase shift in the gridding kernel
       // turn into vector
-      ft_vector.resize(ftsizeu*ftsizev, 1); // using conservativeResize does not work, it grables the image. Also, it is not what we want.
+      ft_vector.resize(ftsizeu*ftsizev, 1); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
       // get visibilities
       return (G * ft_vector).array() * W/norm;
       
@@ -37,8 +37,9 @@ namespace purify {
       st:: gridding parameters
     */
       Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W).matrix();
-      ft_vector.resize(ftsizeu, ftsizev); // using conservativeResize does not work, it grables the image. Also, it is not what we want.
-      ft_vector = utilities::re_sample_ft_grid(ft_vector, 1./resample_factor);
+      ft_vector.resize(ftsizeu, ftsizev); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
+      if (resample_factor != 1)
+        ft_vector = utilities::re_sample_ft_grid(ft_vector, 1./resample_factor);
       Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
       t_int x_start = floor(floor(imsizex * oversample_factor) * 0.5 - imsizex * 0.5);
       t_int y_start = floor(floor(imsizey * oversample_factor) * 0.5 - imsizey * 0.5);
@@ -313,6 +314,7 @@ namespace purify {
     {
 
       t_real kb_interp_alpha = purify_pi * std::sqrt(Ju * Ju/(oversample_factor * oversample_factor) * (oversample_factor - 0.5) * (oversample_factor - 0.5) - 0.8);
+      const t_int sample_density = 7280;
       const t_int total_samples = 2e6 * Ju;
       auto kb_general = [&] (t_real x) { return kernels::kaiser_bessel_general(x, Ju, kb_interp_alpha); };
       Vector<t_real> samples = kernels::kernel_samples(total_samples, kb_general, Ju);
