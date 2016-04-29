@@ -92,7 +92,7 @@ int main( int nargs, char const** args ) {
   std::printf("Using epsilon of %f \n", epsilon);
   std::cout << "Starting sopt" << '\n';
   auto const padmm = sopt::algorithm::L1ProximalADMM<t_complex>(uv_data.vis)
-                         .itermax(500)
+                         .itermax(1000)
                          .gamma((measurements_transform.adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
                          .relative_variation(1e-3)
                          .l2ball_proximal_epsilon(epsilon)
@@ -102,7 +102,7 @@ int main( int nargs, char const** args ) {
                          .l1_proximal_itermax(50)
                          .l1_proximal_positivity_constraint(true)
                          .l1_proximal_real_constraint(true)
-                         .residual_convergence(epsilon * 1.001)
+                         .residual_convergence(epsilon)
                          .lagrange_update_scale(0.9)
                          .nu(1e0)
                          .Psi(Psi)
