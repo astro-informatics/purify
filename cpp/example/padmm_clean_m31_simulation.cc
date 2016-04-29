@@ -16,7 +16,7 @@
 #include <ctime>
 
 int main( int nargs, char const** args ) {
-  if (nargs != 6 )
+  if (nargs != 7 )
   {
     std::cout << " Wrong number of arguments! " << '\n';
     return 1;
@@ -34,6 +34,7 @@ int main( int nargs, char const** args ) {
   t_int const J = static_cast<t_int>(std::stod(static_cast<std::string>(args[3])));
   t_real const m_over_n = std::stod(static_cast<std::string>(args[4]));
   std::string const test_number = static_cast<std::string>(args[5]);
+  t_real const ISNR = std::stod(static_cast<std::string>(args[6]));
   
 
 
@@ -76,7 +77,7 @@ int main( int nargs, char const** args ) {
 
 
   //working out value of sigma given SNR of 30
-  t_real sigma = utilities::SNR_to_standard_deviation(uv_data.vis, 10.);
+  t_real sigma = utilities::SNR_to_standard_deviation(uv_data.vis, ISNR);
   //adding noise to visibilities
   uv_data.vis = utilities::add_noise(uv_data.vis, 0., sigma);
   

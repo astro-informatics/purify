@@ -7,7 +7,7 @@ import glob
 import subprocess
 import matplotlib.pyplot as plt
 
-def run_test((i, kernel, M_N_ratio, start_time)):
+def run_test((i, kernel, M_N_ratio, start_time, input_SNR)):
 	time.sleep(start_time)
 	J = 4
 	oversample = 2
@@ -18,9 +18,8 @@ def run_test((i, kernel, M_N_ratio, start_time)):
   	if kernel == "box":
   		J = 1
 
-  	
   	os.system("../build/cpp/example/padmm_m31_simulation " + kernel + " " 
-      + str(oversample) + " " +str(J) + " " +str(M_N_ratio) + " " + str(i))
+      + str(oversample) + " " +str(J) + " " +str(M_N_ratio) + " " + str(i) + " "+str(input_SNR))
   	
   	results_file = "../build/outputs/M31_results_" + kernel + "_" + str(i) + ".txt"
   	results = np.loadtxt(results_file, dtype = str)
@@ -34,7 +33,10 @@ def run_test((i, kernel, M_N_ratio, start_time)):
 if __name__ == '__main__':
 	M_N_ratios = np.arange(1, 11) * 0.2
 	args = []
+	
 	n_tests = 5
+	input_SNR = 100
+
 	test_num = 0
 	kernels = ["kb", "kb_interp", "pswf", "gauss", "box", "gauss_alt"]
 	total_tests = n_tests * len(kernels) * len(M_N_ratios)
@@ -42,7 +44,7 @@ if __name__ == '__main__':
 		for k in kernels:
 			for m in M_N_ratios:
 				test_num = test_num + 1
-				args.append((test_num, k, m, test_num * 1./ total_tests * 30.))
+				args.append((test_num, k, m, test_num * 1./ total_tests * 30., input_SNR))
 				print test_num
 	n_processors = multiprocessing.cpu_count() + 1
 	p = multiprocessing.Pool(min(n_processors, 41)) # Limiting the number of processes used to 40, otherwise it will cause problems with the user limit
