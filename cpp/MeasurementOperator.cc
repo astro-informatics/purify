@@ -315,7 +315,7 @@ namespace purify {
 
       t_real kb_interp_alpha = purify_pi * std::sqrt(Ju * Ju/(oversample_factor * oversample_factor) * (oversample_factor - 0.5) * (oversample_factor - 0.5) - 0.8);
       const t_int sample_density = 7280;
-      const t_int total_samples = 2e6 * Ju;
+      const t_int total_samples = sample_density * Ju;
       auto kb_general = [&] (t_real x) { return kernels::kaiser_bessel_general(x, Ju, kb_interp_alpha); };
       Vector<t_real> samples = kernels::kernel_samples(total_samples, kb_general, Ju);
       auto kb_interp = [&] (t_real x) { return kernels::kernel_linear_interp(samples, x, Ju); };
