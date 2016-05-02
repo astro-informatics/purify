@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 
 n_tests = 1
-input_SNR = 100
+input_SNR = 20
 
 def run_test_padmm((i, kernel, M_N_ratio, start_time, input_SNR)):
 	time.sleep(start_time)
@@ -87,7 +87,6 @@ def collect_data(args, results, M_N_ratios, kernel):
 	errortempTime = []
 	for m in M_N_ratios:
 		tempSNR = []
-
 		tempTime = []
 
 		for i in range(len(args)):
@@ -105,21 +104,21 @@ def collect_data(args, results, M_N_ratios, kernel):
 		errortempTime.append(tempTime.std())
 	return meantempSNR, errortempSNR, meantempTime, errortempTime
 
-def create_plots(args, results, M_N_ratios, name, kernels =[], legend = False):
-	for k in kernels:
-		meantempSNR, errortempSNR, meantempTime, errortempTime = collect_data(args, M_N_ratios, k)
-		plt.errorbar(M_N_ratios, meantempSNR, errortempSNR, fmt='')
-	if legend:
-		plt.legend(kernels)
+def create_plots(args, results, M_N_ratios, name, kernels, colours = [],legend = []):
+	for k in range(len(kernels)):
+		meantempSNR, errortempSNR, meantempTime, errortempTime = collect_data(args, results, M_N_ratios, kernels[k])
+		plt.errorbar(M_N_ratios, meantempSNR, errortempSNR, fmt='', c = colours[k])
+	if len(legend) > 0:
+		plt.legend(legend)
 	plt.xlabel("M/N")
 	plt.ylabel("SNR, db")
 	plt.xlim(0, 2.2)
 	plt.savefig(name + "_SNR_plot.pdf")
 	plt.clf()
 
-	for k in kernels:
-		meantempSNR, errortempSNR, meantempTime, errortempTime = collect_data(args, M_N_ratios, k)
-		plt.errorbar(M_N_ratios, meantempTime, errortempTime, fmt='')
+	for k in range(len(kernels)):
+		meantempSNR, errortempSNR, meantempTime, errortempTime = collect_data(args, results, M_N_ratios, kernels[k])
+		plt.errorbar(M_N_ratios, meantempTime, errortempTime, fmt='', c = colours[k])
 	plt.xlabel("M/N")
 	plt.ylabel("Time (seconds)")
 	plt.xlim(0, 2.2)
@@ -145,9 +144,10 @@ if __name__ == '__main__':
 	p = multiprocessing.Pool(min(n_processors, 41)) # Limiting the number of processes used to 40, otherwise it will cause problems with the user limit
 	
 	legend = ["Kaiser Bessel (KB)", "KB (Linear-interp, Min-oversample)", "PSWF", "Gaussian (Optimal)", "Box", "Gaussian (non-Optimal)", "KB (Min-oversample)"]
+	colours = ['blue', 'red', 'black', 'green', 'magenta', 'cyan', 'yellow']
 	results = p.map(run_test_padmm, args)
-	create_plots(args, results, M_N_ratios, "padmm", legend, True)
+	create_plots(args, results, M_N_ratios, "padmm", kernels, legend)
 	results = p.map(run_test_ms_clean, args)
-	create_plots(args, results, M_N_ratios, "ms_clean")
+	create_plots(args, results, M_N_ratios, "ms_clean", kernels)
 	results = p.map(run_test_clean, args)
-	create_plots(args, results, M_N_ratios, "clean")
+	create_plots(args, results, M_N_ratios, "clean", kernels)
