@@ -8,23 +8,28 @@ import subprocess
 import matplotlib.pyplot as plt
 
 
-n_tests = 1
-input_SNR = 20
+n_tests = 10
+input_SNR = 100
 
+def kernel_settings(kernel):
+        J = 4
+        oversample = 2
+        if kernel == "pswf":
+                J = 6
+        if kernel == "kb_interp":
+                oversample = 1.375
+                J = 5
+        if kernel == "box":
+                J = 1
+        if kernel == "kb_min":
+                oversample = 1.375
+                J = 5
+	return J, oversample
 def run_test_padmm((i, kernel, M_N_ratio, start_time, input_SNR)):
 	time.sleep(start_time)
-	J = 4
-	oversample = 2
-	if kernel == "pswf":
-  		J = 6
-	if kernel == "kb_interp":
-  		oversample = 1.375
-  		J = 5
-  	if kernel == "box":
-  		J = 1
-  	if kernel == "kb_min":
-  		oversample = 1.375
-  		J = 5
+
+	J, oversample = kernel_settings(kernel)
+
   	os.system("../build/cpp/example/padmm_m31_simulation " + kernel + " " 
       + str(oversample) + " " +str(J) + " " +str(M_N_ratio) + " " + str(i) + " "+str(input_SNR))
   	results_file = "../build/outputs/M31_results_" + kernel + "_" + str(i) + ".txt"
@@ -35,18 +40,9 @@ def run_test_padmm((i, kernel, M_N_ratio, start_time, input_SNR)):
   	return [float(SNR), float(total_time)]
 def run_test_ms_clean((i, kernel, M_N_ratio, start_time, input_SNR)):
 	time.sleep(start_time)
-	J = 4
-	oversample = 2
-	if kernel == "pswf":
-  		J = 6
-	if kernel == "kb_interp":
-  		oversample = 1.375
-  		J = 5
-  	if kernel == "box":
-  		J = 1
-  	if kernel == "kb_min":
-  		oversample = 1.375
-  		J = 5
+	
+	J, oversample = kernel_settings(kernel)
+	
   	os.system("../build/cpp/example/padmm_ms_clean_m31_simulation " + kernel + " " 
       + str(oversample) + " " +str(J) + " " +str(M_N_ratio) + " " + str(i) + " " + str(input_SNR))
   	results_file = "../build/outputs/M31_results_" + kernel + "_" + str(i) + ".txt"
@@ -58,18 +54,9 @@ def run_test_ms_clean((i, kernel, M_N_ratio, start_time, input_SNR)):
 
 def run_test_clean((i, kernel, M_N_ratio, start_time, input_SNR)):
 	time.sleep(start_time)
-	J = 4
-	oversample = 2
-	if kernel == "pswf":
-  		J = 6
-	if kernel == "kb_interp":
-  		oversample = 1.375
-  		J = 5
-  	if kernel == "box":
-  		J = 1
-  	if kernel == "kb_min":
-  		oversample = 1.375
-  		J = 5
+
+	J, oversample = kernel_settings(kernel)
+
   	os.system("../build/cpp/example/padmm_clean_m31_simulation " + kernel + " " 
       + str(oversample) + " " +str(J) + " " +str(M_N_ratio) + " " + str(i) + " " + str(input_SNR))
   	results_file = "../build/outputs/M31_results_" + kernel + "_" + str(i) + ".txt"
@@ -104,7 +91,7 @@ def collect_data(args, results, M_N_ratios, kernel):
 		errortempTime.append(tempTime.std())
 	return meantempSNR, errortempSNR, meantempTime, errortempTime
 
-def create_plots(args, results, M_N_ratios, name, kernels, colours = [],legend = []):
+def create_plots(args, results, M_N_ratios, name, kernels, colours,legend = []):
 	for k in range(len(kernels)):
 		meantempSNR, errortempSNR, meantempTime, errortempTime = collect_data(args, results, M_N_ratios, kernels[k])
 		plt.errorbar(M_N_ratios, meantempSNR, errortempSNR, fmt='', c = colours[k])
@@ -146,8 +133,8 @@ if __name__ == '__main__':
 	legend = ["Kaiser Bessel (KB)", "KB (Linear-interp, Min-oversample)", "PSWF", "Gaussian (Optimal)", "Box", "Gaussian (non-Optimal)", "KB (Min-oversample)"]
 	colours = ['blue', 'red', 'black', 'green', 'magenta', 'cyan', 'yellow']
 	results = p.map(run_test_padmm, args)
-	create_plots(args, results, M_N_ratios, "padmm", kernels, legend)
+	create_plots(args, results, M_N_ratios, "padmm", kernels, colours, legend)
 	results = p.map(run_test_ms_clean, args)
-	create_plots(args, results, M_N_ratios, "ms_clean", kernels)
+	create_plots(args, results, M_N_ratios, "ms_clean", kernels, colours)
 	results = p.map(run_test_clean, args)
-	create_plots(args, results, M_N_ratios, "clean", kernels)
+	create_plots(args, results, M_N_ratios, "clean", kernels, colours)
