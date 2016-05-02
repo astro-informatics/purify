@@ -18,6 +18,9 @@ def run_test((i, kernel, M_N_ratio, start_time, input_SNR)):
   		J = 5
   	if kernel == "box":
   		J = 1
+  	if kernel == "kb_min":
+  		oversample = 1.375
+  		J = 5
 
   	os.system("../build/cpp/example/padmm_ms_clean_m31_simulation " + kernel + " " 
       + str(oversample) + " " +str(J) + " " +str(M_N_ratio) + " " + str(i) + " " + str(input_SNR))

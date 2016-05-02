@@ -18,6 +18,9 @@ def run_test((i, kernel, M_N_ratio, start_time, input_SNR)):
   		J = 5
   	if kernel == "box":
   		J = 1
+  	if kernel == "kb_min":
+  		oversample = 1.375
+  		J = 5
 
   	os.system("../build/cpp/example/padmm_m31_simulation " + kernel + " " 
       + str(oversample) + " " +str(J) + " " +str(M_N_ratio) + " " + str(i) + " "+str(input_SNR))
@@ -39,7 +42,7 @@ if __name__ == '__main__':
 	input_SNR = 100
 
 	test_num = 0
-	kernels = ["kb", "kb_interp", "pswf", "gauss", "box", "gauss_alt"]
+	kernels = ["kb", "kb_interp", "pswf", "gauss", "box", "gauss_alt", "kb_min"]
 	total_tests = n_tests * len(kernels) * len(M_N_ratios)
 	for i in range(1, n_tests + 1):
 		for k in kernels:
