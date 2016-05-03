@@ -30,8 +30,8 @@ int main(int, char **) {
   auto uv_data = utilities::read_visibility(visfile);
   uv_data.units = "lambda";
   t_real cellsize = 0.3;
-  t_int width = 512;
-  t_int height = 512;
+  t_int width = 2048;
+  t_int height = 2048;
   uv_data = utilities::uv_symmetry(uv_data);
   MeasurementOperator measurements(uv_data, 4, 4, "kb", width, height, over_sample, cellsize, cellsize, "whiten");
 
@@ -54,9 +54,11 @@ int main(int, char **) {
         std::make_tuple("DB3", 3u),  std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u), 
         std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
+
   auto const Psi = sopt::linear_transform<t_complex>(sara, height, width);
   std::printf("Saving dirty map \n");
-  Vector<t_complex> & input = uv_data.vis;
+  const Vector<t_complex> weighted_data = (uv_data.vis.array() * measurements.W).matrix(); //whitening data
+  const Vector<t_complex> & input = weighted_data;
   Vector<> dimage = (measurements_transform.adjoint() * input).real();
   t_real max_val = dimage.array().abs().maxCoeff();
   dimage = dimage / max_val;
@@ -68,19 +70,18 @@ int main(int, char **) {
 
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), height, width), dirty_image_fits);
 
-  const Vector<t_complex> weighted_data = (uv_data.vis.array() * measurements.W).matrix();
-  auto noise_variance = utilities::variance(weighted_data)/2;
+ 
+  auto noise_variance = utilities::variance(input)/2;
   t_real const noise_rms = std::sqrt(noise_variance);
   std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
-  uv_data = utilities::whiten_vis(uv_data);
-  t_real epsilon = utilities::calculate_l2_radius(uv_data.vis, 1.); //Calculation of l_2 bound following SARA paper
+  t_real epsilon = utilities::calculate_l2_radius(input, 1.); //Calculation of l_2 bound following SARA paper
 
-  auto purify_gamma = (measurements_transform.adjoint() * uv_data.vis).real().maxCoeff() * 1e-3;
+  auto purify_gamma = (measurements_transform.adjoint() * input).real().maxCoeff() * 1e-3;
 
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
-  auto const padmm = sopt::algorithm::L1ProximalADMM<t_complex>(uv_data.vis)
-                         .itermax(500)
+  auto const padmm = sopt::algorithm::L1ProximalADMM<t_complex>(input)
+                         .itermax(10)
                          .gamma(purify_gamma)
                          .relative_variation(1e-3)
                          .l2ball_proximal_epsilon(epsilon)
