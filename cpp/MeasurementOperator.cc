@@ -20,7 +20,7 @@ namespace purify {
       
 
       // create fftgrid
-      ft_vector = utilities::re_sample_ft_grid(fftop.forward(padded_image),resample_factor); // the fftshift is not needed because of the phase shift in the gridding kernel
+      ft_vector = utilities::re_sample_ft_grid(fftop.forward(padded_image), resample_factor); // the fftshift is not needed because of the phase shift in the gridding kernel
       // turn into vector
       ft_vector.resize(ftsizeu*ftsizev, 1); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
       // get visibilities
@@ -36,14 +36,13 @@ namespace purify {
       visibilities:: input visibilities to be gridded
       st:: gridding parameters
     */
-      Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W).matrix();
+      Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W).matrix()/norm;
       ft_vector.resize(ftsizeu, ftsizev); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
-      if (resample_factor != 1)
-        ft_vector = utilities::re_sample_ft_grid(ft_vector, 1./resample_factor);
+      ft_vector = utilities::re_sample_ft_grid(ft_vector, 1./resample_factor);
       Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
       t_int x_start = floor(floor(imsizex * oversample_factor) * 0.5 - imsizex * 0.5);
       t_int y_start = floor(floor(imsizey * oversample_factor) * 0.5 - imsizey * 0.5);
-      return S * padded_image.block(y_start, x_start, imsizey, imsizex)/norm;
+      return S * padded_image.block(y_start, x_start, imsizey, imsizex);
   }
 
 
