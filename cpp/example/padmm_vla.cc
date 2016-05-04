@@ -32,8 +32,8 @@ int main(int, char **) {
   t_real cellsize = 0.3;
   t_int width = 2048;
   t_int height = 2048;
-  uv_data = utilities::uv_symmetry(uv_data);
-  MeasurementOperator measurements(uv_data, 4, 4, "kb", width, height, over_sample, cellsize, cellsize, "whiten");
+  //uv_data = utilities::uv_symmetry(uv_data);
+  MeasurementOperator measurements(uv_data, 4, 4, "kb", width, height, over_sample, cellsize, cellsize, "none");
 
  
   auto direct = [&measurements, &width, &height](Vector<t_complex> &out, Vector<t_complex> const &x) {
@@ -57,8 +57,8 @@ int main(int, char **) {
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, height, width);
   std::printf("Saving dirty map \n");
-  const Vector<t_complex> weighted_data = (uv_data.vis.array() * measurements.W).matrix(); //whitening data
-  const Vector<t_complex> & input = weighted_data;
+  //const Vector<t_complex> weighted_data = (uv_data.vis.array() * measurements.W).matrix(); //whitening data
+  const Vector<t_complex> & input = uv_data.vis;
   Vector<> dimage = (measurements_transform.adjoint() * input).real();
   t_real max_val = dimage.array().abs().maxCoeff();
   dimage = dimage / max_val;
@@ -74,28 +74,30 @@ int main(int, char **) {
   auto noise_variance = utilities::variance(input)/2;
   t_real const noise_rms = std::sqrt(noise_variance);
   std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
-  t_real epsilon = utilities::calculate_l2_radius(input, 1.); //Calculation of l_2 bound following SARA paper
+  t_real epsilon = utilities::calculate_l2_radius(input); //Calculation of l_2 bound following SARA paper
 
-  auto purify_gamma = (measurements_transform.adjoint() * input).real().maxCoeff() * 1e-3;
+  auto purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * input)).real().maxCoeff() * 1e-3;
 
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
+  std::cout << "Gamma = " << purify_gamma << '\n';
   auto const padmm = sopt::algorithm::L1ProximalADMM<t_complex>(input)
-                         .itermax(10)
-                         .gamma(purify_gamma)
-                         .relative_variation(1e-3)
-                         .l2ball_proximal_epsilon(epsilon)
-                         .tight_frame(false)
-                         .l1_proximal_tolerance(1e-2)
-                         .l1_proximal_nu(1)
-                         .l1_proximal_itermax(50)
-                         .l1_proximal_positivity_constraint(true)
-                         .l1_proximal_real_constraint(true)
-                         .residual_convergence(epsilon * 1.001)
-                         .lagrange_update_scale(0.9)
-                         .nu(1e0)
-                         .Psi(Psi)
-                         .Phi(measurements_transform);
+    .itermax(20)
+    .gamma(purify_gamma)
+    .relative_variation(1e-3)
+    .l2ball_proximal_epsilon(epsilon)
+    .l2ball_proximal_weights(uv_data.weights.array().real().sqrt())
+    .tight_frame(false)
+    .l1_proximal_tolerance(1e-3)
+    .l1_proximal_nu(1)
+    .l1_proximal_itermax(50)
+    .l1_proximal_positivity_constraint(true)
+    .l1_proximal_real_constraint(true)
+    .residual_convergence(epsilon * 1.001)
+    .lagrange_update_scale(0.9)
+    .nu(1e0)
+    .Psi(Psi)
+    .Phi(measurements_transform);
   auto const result = padmm(initial_estimate);
   assert(result.x.size() == width * height);
   Image<t_complex> image = Image<t_complex>::Map(result.x.data(), measurements.imsizey, measurements.imsizex);
