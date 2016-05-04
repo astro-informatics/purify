@@ -600,7 +600,7 @@ namespace purify {
 	    	*/
 			if (sigma == 0)
 			{
-				return std::sqrt(y.size() + 2 * std::sqrt(y.size())) * standard_deviation(y);
+				return std::sqrt(y.size() + 2 * std::sqrt(y.size()));
 			}
 	    	return std::sqrt(y.size() + 2 * std::sqrt(y.size())) * sigma;
 	    }
