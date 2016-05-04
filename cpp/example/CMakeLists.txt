@@ -33,3 +33,4 @@ add_example(padmm_ms_clean_m31_simulation LIBRARIES cppurify libpurify ${Sopt_CP
 add_example(padmm_ami_coverage LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY} NOTEST)
 add_example(padmm_random_coverage LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY} NOTEST)
 add_example(padmm_vla LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY} NOTEST)
+add_example(padmm_atca LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY} NOTEST)

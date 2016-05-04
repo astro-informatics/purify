@@ -18,6 +18,10 @@ inline std::string image_filename(std::string const &filename) {
 inline std::string vla_filename(std::string const &filename) {
   return data_filename("vla/" + filename);
 }
+//! Specific atca data
+inline std::string atca_filename(std::string const &filename) {
+  return data_filename("atca/" + filename);
+}
 //! Some gridding regression data
 inline std::string gridding_filename(std::string const &filename) {
   return data_filename("expected/gridding/" + filename);
