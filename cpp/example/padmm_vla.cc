@@ -26,12 +26,13 @@ int main(int, char **) {
   std::string const residual_fits = output_filename("vla_residual.fits");
 
   t_int const niters = 1e5;
+  t_real const beta = 1e-1;
   t_real const over_sample = 2;
   auto uv_data = utilities::read_visibility(visfile);
   uv_data.units = "lambda";
   t_real cellsize = 0.3;
-  t_int width = 2048;
-  t_int height = 2048;
+  t_int width = 512;
+  t_int height = 512;
   //uv_data = utilities::uv_symmetry(uv_data);
   MeasurementOperator measurements(uv_data, 4, 4, "kb", width, height, over_sample, cellsize, cellsize, "none");
 
@@ -76,13 +77,13 @@ int main(int, char **) {
   std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
   t_real epsilon = utilities::calculate_l2_radius(input); //Calculation of l_2 bound following SARA paper
 
-  auto purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * input)).real().maxCoeff() * 1e-3;
+  auto purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * (measurements.W * input.array()).matrix())).real().maxCoeff() * beta;
 
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
   std::cout << "Gamma = " << purify_gamma << '\n';
   auto const padmm = sopt::algorithm::L1ProximalADMM<t_complex>(input)
-    .itermax(20)
+    .itermax(200)
     .gamma(purify_gamma)
     .relative_variation(1e-3)
     .l2ball_proximal_epsilon(epsilon)
