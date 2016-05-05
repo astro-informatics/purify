@@ -31,8 +31,8 @@ int main(int, char **) {
   auto uv_data = utilities::read_visibility(visfile);
   uv_data.units = "lambda";
   t_real cellsize = 1;
-  t_int width = 1024;
-  t_int height = 1024;
+  t_int width = 2048;
+  t_int height = 2048;
   //uv_data = utilities::uv_symmetry(uv_data);
   MeasurementOperator measurements(uv_data, 4, 4, "kb", width, height, over_sample, cellsize, cellsize, "none");
 
@@ -92,7 +92,7 @@ int main(int, char **) {
     .l1_proximal_tolerance(1e-3)
     .l1_proximal_nu(1)
     .l1_proximal_itermax(50)
-    .l1_proximal_positivity_constraint(true)
+    .l1_proximal_positivity_constraint(false)
     .l1_proximal_real_constraint(true)
     .residual_convergence(epsilon * 0.1)
     .lagrange_update_scale(0.9)
