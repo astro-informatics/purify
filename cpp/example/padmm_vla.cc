@@ -77,7 +77,7 @@ int main(int, char **) {
   std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
   t_real epsilon = utilities::calculate_l2_radius(input); //Calculation of l_2 bound following SARA paper
 
-  auto purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * (measurements.W * input.array()).matrix())).real().maxCoeff() * beta;
+  auto purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * (uv_data.weights.array().real().sqrt() * input.array()).matrix())).real().maxCoeff() * beta;
 
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';

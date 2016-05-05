@@ -77,7 +77,7 @@ int main(int, char **) {
   std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
   t_real epsilon = utilities::calculate_l2_radius(input); //Calculation of l_2 bound following SARA paper
 
-  auto purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * (measurements.W * input.array()).matrix())).real().maxCoeff() * beta;
+  auto purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * (uv_data.weights.array().real().sqrt() * input.array()).matrix())).real().maxCoeff() * beta;
 
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
@@ -86,7 +86,7 @@ int main(int, char **) {
     .itermax(100)
     .gamma(purify_gamma)
     .relative_variation(1e-3)
-    .l2ball_proximal_epsilon(epsilon)
+    .l2ball_proximal_epsilon(epsilon * 0.1)
     .l2ball_proximal_weights(uv_data.weights.array().real().sqrt())
     .tight_frame(false)
     .l1_proximal_tolerance(1e-3)
@@ -94,7 +94,7 @@ int main(int, char **) {
     .l1_proximal_itermax(50)
     .l1_proximal_positivity_constraint(true)
     .l1_proximal_real_constraint(true)
-    .residual_convergence(epsilon * 1.001)
+    .residual_convergence(epsilon * 0.1)
     .lagrange_update_scale(0.9)
     .nu(1e0)
     .Psi(Psi)
