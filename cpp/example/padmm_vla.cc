@@ -75,7 +75,7 @@ int main(int, char **) {
   auto noise_variance = utilities::variance(input)/2;
   t_real const noise_rms = std::sqrt(noise_variance);
   std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
-  t_real epsilon = utilities::calculate_l2_radius(input); //Calculation of l_2 bound following SARA paper
+  t_real epsilon = utilities::calculate_l2_radius(input, noise_rms); //Calculation of l_2 bound following SARA paper
 
   auto purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * (uv_data.weights.array().real().sqrt() * input.array()).matrix())).real().maxCoeff() * beta;
 
@@ -94,7 +94,7 @@ int main(int, char **) {
     .l1_proximal_itermax(50)
     .l1_proximal_positivity_constraint(true)
     .l1_proximal_real_constraint(true)
-    .residual_convergence(epsilon * 1.001)
+    .residual_convergence(epsilon)
     .lagrange_update_scale(0.9)
     .nu(1e0)
     .Psi(Psi)
