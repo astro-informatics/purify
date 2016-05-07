@@ -48,8 +48,8 @@ ox = 2;
 oy = 2;
 
 %Number of neighbours for nufft
-Kx = 8;
-Ky = 8;
+Kx = 4;
+Ky = 4;
 
 %Initialize nufft parameters
 fprintf('Initializing the NUFFT operator\n\n');
@@ -74,7 +74,8 @@ sigma_noise = 10^(-input_snr/20)*norm(y0)/sqrt(M);
 noise = (randn(size(y0)) + 1i*randn(size(y0)))*sigma_noise/sqrt(2);
 y = y0 + noise;
 
-sigma_estimate = purify_mtlb_est_std_var(st.gridding_matrix'*y);
+sigma_estimate = purify_mtlb_est_std_var(st.gridding_matrix'*y * eval);
+
 
 
 epsilon = sqrt(M + 2*sqrt(M))*sigma_noise;
