@@ -4,8 +4,8 @@ function std_e = purify_mtlb_est_std_var(y)
 
 
 mask = y; % generate mask
-mask(abs(mask) > 0) = 1;
-mask(abs(mask) == 0) = 0;
+mask(abs(mask) > 1e-13) = 1;
+mask(abs(mask) < 1e-13) = 0;
 %%
 % set low-pass and high-pass filters
 w_l = [-0.0106, 0.0329, 0.0308, -0.1870, -0.0280, 0.6309, 0.7148, 0.2304];
