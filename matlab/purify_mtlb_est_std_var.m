@@ -1,7 +1,7 @@
 function std_e = purify_mtlb_est_std_var(y)
 %EST_STD_VAR Summary of this function goes here
 %   Detailed explanation goes here
-
+%   y is 2D data
 
 mask = y; % generate mask
 mask(abs(mask) > 1e-13) = 1;

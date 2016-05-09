@@ -83,7 +83,7 @@ for i = 1:60
     
     grid = st.gridding_matrix' * y; % Convolve sparse data onto a grid, the mask is determined by values that are zero
     
-    sigma_estimate = purify_mtlb_est_std_var(grid); %Calculating estimate standard deviation from data
+    sigma_estimate = purify_mtlb_est_std_var(reshape(grid,[512,512])); %Calculating estimate standard deviation from data
     
     err(i) = round((sigma_noise - std(y))/sigma_noise * 100, 3); % relative error as a percentage
     fprintf('Original: %e\n\nEstimate: %e\n\n', sigma_noise, sigma_estimate);
