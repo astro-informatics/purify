@@ -86,6 +86,7 @@ namespace purify {
   entries.reserve(rows * Ju * Jv);
   for (t_int m = 0; m < rows; ++m)
     {
+      // I should write this as a tensor product! It would reduce the number of calculations of kernelu and kernelv.
       for (t_int ju = 1; ju <= Ju; ++ju)
        {
          q = utilities::mod(k_u(m) + ju, ftsizeu);
@@ -195,22 +196,29 @@ namespace purify {
       return Image<t_real>::Zero(imsizey, imsizex) + 1.;
   }
 
-  t_real MeasurementOperator::power_method(const t_int niters){
+  t_real MeasurementOperator::power_method(const t_int & niters, const t_real & relative_difference){
     /*
      Attempt at coding the power method, returns the largest eigen value of a linear operator
+      niters:: max number of iterations
+      relative_difference:: percentage difference at which eigen value has converged
     */
      t_real estimate_eigen_value = 1;
+     t_real old_value = 0;
      Image<t_complex> estimate_eigen_vector = Image<t_complex>::Random(imsizey, imsizex);
-     //std::cout << "Starting power method " << '\n';
-     //std::cout << "Iteration: " << 0 << ", norm = " << estimate_eigen_value << '\n';
+     estimate_eigen_vector = estimate_eigen_vector / estimate_eigen_vector.matrix().norm();
+     std::cout << "Starting power method " << '\n';
+     std::cout << "Iteration: " << 0 << ", norm = " << estimate_eigen_value << '\n';
      for (t_int i = 0; i < niters; ++i)
      {
       auto new_estimate_eigen_vector = MeasurementOperator::grid(MeasurementOperator::degrid(estimate_eigen_vector));
       estimate_eigen_value = new_estimate_eigen_vector.matrix().norm();
       estimate_eigen_vector = new_estimate_eigen_vector/estimate_eigen_value;
-      //std::cout << "Iteration: " << i + 1 << ", norm = " << estimate_eigen_value << '\n';
+      std::cout << "Iteration: " << i + 1 << ", norm = " << estimate_eigen_value << '\n';
+      if (relative_difference > std::abs(old_value - estimate_eigen_value)/old_value)
+        break;
+      old_value = estimate_eigen_value;
      }
-     return estimate_eigen_value;
+     return old_value;
   }
 
 
