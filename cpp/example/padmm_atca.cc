@@ -31,12 +31,11 @@ int main(int, char **) {
   auto uv_data = utilities::read_visibility(visfile);
   uv_data.units = "lambda";
   t_real cellsize = 1;
-  t_int width = 2048;
-  t_int height = 2048;
+  t_int width = 512;
+  t_int height = 512;
   //uv_data = utilities::uv_symmetry(uv_data);
-  MeasurementOperator measurements(uv_data, 4, 4, "kb", width, height, over_sample, cellsize, cellsize, "none");
+  MeasurementOperator measurements(uv_data, 4, 4, "kb_min", width, height, over_sample, cellsize, cellsize, "none");
 
- 
   auto direct = [&measurements, &width, &height](Vector<t_complex> &out, Vector<t_complex> const &x) {
         assert(x.size() == width * height);
         auto const image = Image<t_complex>::Map(x.data(), height, width);
@@ -59,7 +58,7 @@ int main(int, char **) {
   auto const Psi = sopt::linear_transform<t_complex>(sara, height, width);
   std::printf("Saving dirty map \n");
   //const Vector<t_complex> weighted_data = (uv_data.vis.array() * measurements.W).matrix(); //whitening data
-  const Vector<t_complex> & input = uv_data.vis;
+  const Vector<t_complex> & input = uv_data.vis.array();
   Vector<> dimage = (measurements_transform.adjoint() * input).real();
   t_real max_val = dimage.array().abs().maxCoeff();
   dimage = dimage / max_val;
@@ -72,29 +71,28 @@ int main(int, char **) {
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), height, width), dirty_image_fits);
 
  
-  auto noise_variance = utilities::variance(input)/2;
-  t_real const noise_rms = std::sqrt(noise_variance);
+  t_real const noise_rms = 0.5630 * 0.5;
   std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
-  t_real epsilon = utilities::calculate_l2_radius(input); //Calculation of l_2 bound following SARA paper
-
-  auto purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * (uv_data.weights.array().real().sqrt() * input.array()).matrix())).real().maxCoeff() * beta;
+  t_real epsilon = utilities::calculate_l2_radius(input, noise_rms); //Calculation of l_2 bound following SARA paper
+  t_real epsilon_alt = std::sqrt(uv_data.vis.size()) * noise_rms;
+  auto purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * (uv_data.weights.array().real() * input.array()).matrix())).real().maxCoeff() * beta;
 
   std::cout << "Starting sopt!" << '\n';
-  std::cout << "Epsilon = " << epsilon << '\n';
+  std::cout << "Epsilon = " << epsilon - epsilon_alt << '\n';
   std::cout << "Gamma = " << purify_gamma << '\n';
   auto const padmm = sopt::algorithm::L1ProximalADMM<t_complex>(input)
-    .itermax(100)
+    .itermax(500)
     .gamma(purify_gamma)
     .relative_variation(1e-3)
-    .l2ball_proximal_epsilon(epsilon * 0.1)
-    .l2ball_proximal_weights(uv_data.weights.array().real().sqrt())
+    .l2ball_proximal_epsilon(epsilon)
+    .l2ball_proximal_weights(uv_data.weights.array().real())
     .tight_frame(false)
     .l1_proximal_tolerance(1e-3)
     .l1_proximal_nu(1)
     .l1_proximal_itermax(50)
     .l1_proximal_positivity_constraint(false)
     .l1_proximal_real_constraint(true)
-    .residual_convergence(epsilon * 0.1)
+    .residual_convergence(epsilon)
     .lagrange_update_scale(0.9)
     .nu(1e0)
     .Psi(Psi)
