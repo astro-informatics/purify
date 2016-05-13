@@ -25,6 +25,8 @@ int main(int, char **) {
 
   std::string const residual_fits = output_filename("vla_residual.fits");
 
+  std::string const restore_fits = output_filename("vla_restore.fits");
+
   t_int const niters = 1e5;
   t_real const beta = 1e-3;
   t_real const over_sample = 2;
@@ -104,8 +106,12 @@ int main(int, char **) {
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
   sopt::utilities::write_tiff(image.real(), outfile);
+
   pfitsio::write2d(image.real(), outfile_fits);
-  Image<t_complex> residual = measurements.grid(input - measurements.degrid(image));
+  image = Image<t_complex>::Map(result.x.data(), measurements.imsizey, measurements.imsizex);
+  Image<t_complex> residual = measurements.grid(uv_data.weights.array().real().sqrt() * (input - measurements.degrid(image)).array());
   pfitsio::write2d(residual.real(), residual_fits);
+  auto restore = image = image + residual;
+  pfitsio::write2d(restore.real(), restore_fits);
   return 0;
 }

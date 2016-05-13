@@ -86,7 +86,7 @@ namespace purify {
       //! Calculate Primary Beam
       Image<t_real> init_primary_beam(const std::string & primary_beam);
       //! Estiamtes norm of operator
-      t_real power_method(const t_int & niters, const t_real & relative_difference = 0.01);
+      t_real power_method(const t_int & niters, const t_real & relative_difference = 0.0001);
       //! Generates chirp matrix
       Matrix<t_complex> create_chirp_matrix(const Vector<t_real> & w_components, const t_real cell_x, const t_real cell_y, const t_real& energy_fraction = 1);
 
