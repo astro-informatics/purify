@@ -1,16 +1,16 @@
 clear
 %Linking Sopt
-addpath ../sopt/matlab/test_images/
-addpath ../sopt/matlab/misc/
-addpath ../sopt/matlab/prox_operators/
-addpath ../sopt/matlab
+addpath ../../sopt/matlab/test_images/
+addpath ../../sopt/matlab/misc/
+addpath ../../sopt/matlab/prox_operators/
+addpath ../../sopt/matlab
 %Linking Nufft
-addpath ../../Software/irt/nufft
-addpath ../../Software/irt/utilities
-addpath ../../Software/irt/systems
+addpath ../../../Software/irt/nufft
+addpath ../../../Software/irt/utilities
+addpath ../../../Software/irt/systems
 
 %% Load data
-stringname='real_data.vis';
+stringname='../data/vla/at166B.3C129.c0.vis';
 Y = importdata(stringname);
 
 %Measurement vector
@@ -20,6 +20,10 @@ y = Y(:,3) + 1i*Y(:,4);
 u = Y(:,1);
 v = Y(:,2);
 
+cellsize = 0.3;%size of pixel in arcseconds
+m = 180/pi*3600/cellsize;
+u = u/m*2*pi;
+v = v/m*2*pi;
 %Noise standard deviation vector
 sigma = Y(:,5);
 %Weighting vector
