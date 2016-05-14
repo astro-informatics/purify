@@ -1,9 +1,9 @@
 clear
 %Linking Sopt
-addpath ../sopt/matlab/test_images/
-addpath ../sopt/matlab/misc/
-addpath ../sopt/matlab/prox_operators/
-addpath ../sopt/matlab
+addpath ../../sopt/matlab/test_images/
+addpath ../../sopt/matlab/misc/
+addpath ../../sopt/matlab/prox_operators/
+addpath ../../sopt/matlab
 
 
 %% Load data
@@ -54,9 +54,11 @@ st = purify_mtlb_init_nufft([v u],[Ny Nx],ox,'kb',[Ky, Kx]);
 tend1=toc(tstart1);
 fprintf('Time for the initialization: %e\n\n', tend1);
 
-%Operator functions
-A = @(x) nufft(x, st);
-At = @(x) nufft_adj(x, st);
+%Define operators
+A = @(x) purify_mtlb_degrid(x,st);
+
+At = @(y) purify_mtlb_grid(y,st);
+
 
 %Maximum eigenvalue of operato A^TA
 eval = pow_method(A, At, [Ny,Nx], 1e-4, 100, 1);
