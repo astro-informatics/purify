@@ -1,53 +1,49 @@
 clear
 %Linking Sopt
-addpath ../../sopt/matlab/test_images/
-addpath ../../sopt/matlab/misc/
-addpath ../../sopt/matlab/prox_operators/
-addpath ../../sopt/matlab
+addpath ../sopt/matlab/test_images/
+addpath ../sopt/matlab/misc/
+addpath ../sopt/matlab/prox_operators/
+addpath ../sopt/matlab
+%Linking Nufft
+addpath ../../Software/irt/nufft
+addpath ../../Software/irt/utilities
+addpath ../../Software/irt/systems
+
+%% Load data
+stringname='../data/vla/at166B.3C129.c0.vis';
+Y = importdata(stringname);
+
+%Measurement vector
+y = Y(:,3) + 1i*Y(:,4);
+
+%u-v coverage
+u = Y(:,1);
+v = Y(:,2);
+
+%Noise standard deviation vector
+sigma = Y(:,5);
+%Weighting vector
+w = 1./sigma;
 
 
-stringname='M31.fits';
+clear Y
 
-data = fitsread(stringname);
-data=flipud(data);
-im=im2double(data);
-im(im<0)=0;
-[Nx,Ny]=size(im);
+M = length(y);
+
+%% Measurement operator initialization
+%Image dimensions
+Nx = 2048;
+Ny = 2048;
+
 N = Nx*Ny;
-
-%% Parameters
-input_snr = 40; % Noise level (on the measurements)
-
-%% Sampling pattern
-p = 1;
-sigma_m = pi/3;
-rho = 2-(erf(pi/(sigma_m*sqrt(2))))^2;
-num_meas1 = floor(p*rho*N);
-u1 = sigma_m*randn(num_meas1,1);
-v1 = sigma_m*randn(num_meas1,1);
-
-%Discard points outside (-pi,pi)x(-pi,pi)
-
-sf1=find((u1<pi)&(u1>-pi));
-sf2=find((v1<pi)&(v1>-pi));
-sf=intersect(sf1,sf2);
-
-v=v1(sf);
-u=u1(sf);
-M = length(u);
-
-clear v1 u1
-
-
-%% Measurement operator initialization 
 
 %Oversampling factors for nufft
 ox = 2;
 oy = 2;
 
 %Number of neighbours for nufft
-Kx = 4;
-Ky = 4;
+Kx = 8;
+Ky = 8;
 
 %Initialize nufft parameters
 fprintf('Initializing the NUFFT operator\n\n');
@@ -57,32 +53,25 @@ tend1=toc(tstart1);
 fprintf('Time for the initialization: %e\n\n', tend1);
 
 %Operator functions
-
-A = @(x) purify_mtlb_degrid(x, st);
-At = @(x) purify_mtlb_grid(x, st);
+A = @(x) nufft(x, st);
+At = @(x) nufft_adj(x, st);
 
 %Maximum eigenvalue of operato A^TA
 eval = pow_method(A, At, [Ny,Nx], 1e-4, 100, 1);
-
-y0 = A(im);
-    
-% Add Gaussian i.i.d. noise
-%sigma_noise = 10^(-input_snr/20)*norm(im(:))/sqrt(N);
-sigma_noise = 10^(-input_snr/20)*norm(y0)/sqrt(M);
-noise = (randn(size(y0)) + 1i*randn(size(y0)))*sigma_noise/sqrt(2);
-y = y0 + noise;
-
-epsilon = sqrt(M + 2*sqrt(M))*sigma_noise;
+grid = reshape(st.gridding_matrix' * y / eval, [Nx, Ny]);
+noise_est = purify_mtlb_est_std_var(grid);
+%Bounn for the L2 residual
+epsilon = sqrt(M + 2*sqrt(M)) * noise_est/sqrt(2);
 
 %Dirty image
 dirty = At(y);
 dirty1 = 2*real(dirty)/eval;
-%dirty1(dirty1<0) = 0;
+dirty1(dirty1<0) = 0;
 
 %% Sparsity operator definition
 
 %Wavelets parameters
-nlevel=4;
+nlevel=8;
 dwtmode('per');
 
 % Sparsity operator for SARA
@@ -122,49 +111,36 @@ Psi = @(x) (waverec2(x(1:ncoef1),S1,'db1')+...
     reshape(x(8*ncoef1+1:8*ncoef1+ncoef2), [Ny Nx]))/sqrt(9);
 
 
-% Parameters for BPDN
+%Parameters for BPDN
 param1.verbose = 1; % Print log or not
-param1.gamma = 1e-2; % Converge parameter
-param1.rel_obj = 1e-4; % Stopping criterion for the L1 problem
-param1.max_iter = 500; % Max. number of iterations for the L1 problem
+param1.gamma = 1e3; % Converge parameter
+param1.rel_obj = 1e-6; % Stopping criterion for the L1 problem
+param1.max_iter = 20; % Max. number of iterations for the L1 problem
 param1.nu = eval; % Bound on the norm of the operator A
 param1.tight_L1 = 0; % Indicate if Psit is a tight frame (1) or not (0)
 param1.max_iter_L1 = 100;
-param1.rel_obj_L1 = 1e-2;
+param1.rel_obj_L1 = 5e-2;
 param1.pos_L1 = 1;
 param1.nu_L1 = 1;
-param1.verbose_L1 = 0;
+param1.verbose_L1 = 2;
 param1.initsol = dirty1;
 %param1.initz = z;
      
 %Solve BPDN
 tstart = tic;
-[sol, z] = sopt_admm_bpcon(y, epsilon, A, At, Psi, Psit, param1);
+[sol, z] = sopt_mltb_admm_bpconw(y, epsilon, A, At, Psi, Psit, w, param1);
 tend = toc(tstart)
-
-error = im - sol;
-SNR = 20*log10(norm(im(:))/norm(error(:)))
 
 
 residual = At(y - A(sol));
 DR = eval*max(sol(:))/(norm(residual(:))/sqrt(N))
 
-% save('results/par_results_1.mat','sol','residual','tend','DR','param1',...
-%     'nlevel','SNR','z');
+%save('results/real_results_8.mat','sol','residual','tend','DR','param1','nlevel');
 
 soln = sol/max(sol(:));
-dirtyn = dirty1 - min(dirty1(:));
-dirtyn = dirtyn/max(dirtyn(:));
+dirtyn = dirty1/max(dirty1(:));
 
-figure, imagesc(log10(soln + 1e-4)), colorbar, axis image
-figure, imagesc(log10(dirtyn + 1e-4)), colorbar, axis image
+figure, imagesc(log10(soln(850:1250,800:1200) + 1e-4)), colorbar, axis image
+figure, imagesc(log10(dirtyn(850:1250,800:1200) + 1e-2)), colorbar, axis image
 
-figure, imagesc(real(residual)/eval), colorbar, axis image
-
-realname = sprintf('test_admm_new_gridding.fits');
-fitswrite(flipud(real(soln)), realname)
-realname = sprintf('test_admm_new_gridding_res.fits');
-fitswrite(flipud(real(residual)/eval), realname)
-realname = sprintf('test_admm_new_gridding_dirty.fits');
-fitswrite(flipud(real(dirtyn)), realname)
-
+figure, imagesc(real(residual(850:1250,800:1200))/eval), colorbar, axis image
