@@ -62,8 +62,7 @@ At = @(y) purify_mtlb_grid(y,st);
 
 %Maximum eigenvalue of operato A^TA
 eval = pow_method(A, At, [Ny,Nx], 1e-4, 100, 1);
-grid = reshape(st.gridding_matrix' * y / eval, [Nx, Ny]);
-noise_est = purify_mtlb_est_std_var(grid);
+noise_est = sqrt(2); % Due to the weights
 %Bounn for the L2 residual
 epsilon = sqrt(M + 2*sqrt(M)) * noise_est/sqrt(2);
 
