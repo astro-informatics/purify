@@ -93,7 +93,7 @@ int main(int, char **) {
                          .Psi(Psi)
                          .Phi(measurements_transform);
    auto const result = padmm(initial_estimate);
-  assert(result.out.size() == M31.size());
+  assert(result.x.size() == M31.size());
   Image<t_complex> image = Image<t_complex>::Map(result.x.data(), measurements.imsizey, measurements.imsizex);
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
