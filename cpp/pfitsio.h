@@ -10,7 +10,7 @@ namespace purify {
 
  namespace pfitsio {
       //! Write image to fits file
-      void write2d(const Image<t_real> & image, const std::string& fits_name, const bool& overwrite = true, const bool& flip = false);
+      void write2d(const Image<t_real> & image, const std::string& fits_name, const std::string& pix_units = "Jy/Beam", const bool& overwrite = true, const bool& flip = false);
       //! Read image from fits file
       Image<t_complex> read2d(const std::string& fits_name);
  }

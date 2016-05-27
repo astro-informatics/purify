@@ -4,11 +4,11 @@
 namespace purify {
 	namespace pfitsio {
 
-	  void write2d(const Image<t_real>& eigen_image, const std::string& fits_name, const bool& overwrite, const bool& flip) 
+	  void write2d(const Image<t_real>& eigen_image, const std::string& fits_name, const std::string& pix_units, const bool& overwrite, const bool& flip) 
 	  {
 	    if (flip == true)
 	    {
-	      write2d(eigen_image.rowwise().reverse(), fits_name, overwrite, false);
+	      write2d(eigen_image.rowwise().reverse(), fits_name, pix_units, overwrite, false);
 	      return;
 	    }
 	    /*
@@ -26,6 +26,7 @@ namespace purify {
 	    std::valarray<double> image(naxes[0]*naxes[1]);
 	    std::copy(eigen_image.data(), eigen_image.data() + eigen_image.size(), &image[0]);
 	    pFits->pHDU().addKey("AUTHOR", "Purify", "");
+	    pFits->pHDU().addKey("BUNIT", pix_units, "");
 	    pFits->pHDU().write ( fpixel, naxes[0]*naxes[1], image);
 	  }
 	  

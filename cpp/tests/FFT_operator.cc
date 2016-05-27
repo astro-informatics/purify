@@ -25,7 +25,7 @@ TEST_CASE("FFT Operator [FORWARD]", "[FORWARD]") {
       guassian(i, j) = std::exp(- (x(i) * x(i) + x(j) * x(j)) * 0.5/(sigma * sigma) -2. * I * purify_pi * 64. * (x(j) + x(i)));
     }
   }
-  //pfitsio::write2d(newFFT.forward(guassian).real(), "forward_guassian.fits", true, false);
+  //pfitsio::write2d(newFFT.forward(guassian).real(), "forward_guassian.fits");
 }
 
 TEST_CASE("FFT Operator [INVERSE]", "[INVERSE]") {
@@ -50,7 +50,7 @@ TEST_CASE("FFT Operator [INVERSE]", "[INVERSE]") {
       guassian(i, j) = std::exp(- (x(i) * x(i) + x(j) * x(j)) * 0.5/(sigma * sigma) -2. * I * purify_pi * 64. * (x(j) + x(i)));
     }
   }
-  //pfitsio::write2d(newFFT.inverse(guassian).real(), "inverse_guassian.fits", true, false);
+  //pfitsio::write2d(newFFT.inverse(guassian).real(), "inverse_guassian.fits");
 
 }
 
@@ -72,6 +72,6 @@ TEST_CASE("FFT Operator [BOTH]", "[BOTH]") {
       guassian(i, j) = std::exp(- (x(i) * x(i) + x(j) * x(j)) * 0.5/(sigma * sigma) );
     }
   }
-  pfitsio::write2d(newFFT.forward(newFFT.inverse(guassian)).real(), "guassian.fits", true, false);
+  pfitsio::write2d(newFFT.forward(newFFT.inverse(guassian)).real(), "guassian.fits");
 
 }

@@ -38,13 +38,13 @@ TEST_CASE("Measurement Operator [Kaiser Bessel Linear Interpolation]", "[KB_Inte
   psf = op.grid(point_source);
   max = psf.real().maxCoeff();
   psf = psf / max;
-  pfitsio::write2d(psf.real(), output_filename("kb_interp_psf.fits"), true, false);
+  pfitsio::write2d(psf.real(), output_filename("kb_interp_psf.fits"));
 
   Image<t_real> kb_img = op.grid(uv_vis.vis).real();
   max = kb_img.maxCoeff();
   kb_img = kb_img / max;
-  pfitsio::write2d(kb_img.real(), output_filename("grid_image_real_kb_interp_4.fits"), true, false);
-  pfitsio::write2d(op.S.real(), output_filename("scale_kb_interp_4.fits"), true, false);
+  pfitsio::write2d(kb_img.real(), output_filename("grid_image_real_kb_interp_4.fits"));
+  pfitsio::write2d(op.S.real(), output_filename("scale_kb_interp_4.fits"));
 
 }
 
@@ -77,13 +77,13 @@ TEST_CASE("Measurement Operator [Kaiser Bessel]", "[KB_Non-Interp]") {
   psf = op.grid(point_source);
   max = psf.real().maxCoeff();
   psf = psf / max;
-  pfitsio::write2d(psf.real(), output_filename("kb_psf.fits"), true, false);
+  pfitsio::write2d(psf.real(), output_filename("kb_psf.fits"));
 
   Image<t_real> kb_img = op.grid(uv_vis.vis).real();
   max = kb_img.maxCoeff();
   kb_img = kb_img / max;
-  pfitsio::write2d(kb_img.real(), output_filename("grid_image_real_kb_4.fits"), true, false);
-  pfitsio::write2d(op.S.real(), output_filename("scale_kb_4.fits"), true, false);
+  pfitsio::write2d(kb_img.real(), output_filename("grid_image_real_kb_4.fits"));
+  pfitsio::write2d(op.S.real(), output_filename("scale_kb_4.fits"));
 
 }
 
@@ -171,13 +171,13 @@ TEST_CASE("Measurement Operator [Gridding]", "[Gridding]") {
     psf = op.grid(point_source);
     max = psf.real().maxCoeff();
     psf = psf / max;
-    pfitsio::write2d(psf.real(), output_filename("kb_psf.fits"), true, false);
+    pfitsio::write2d(psf.real(), output_filename("kb_psf.fits"));
 
 
     Image<t_real> kb_img = op.grid(uv_vis.vis).real();
     max = kb_img.maxCoeff();
     kb_img = kb_img / max;
-    pfitsio::write2d(kb_img.real(), output_filename("grid_image_real_kb_6.fits"), true, false);
+    pfitsio::write2d(kb_img.real(), output_filename("grid_image_real_kb_6.fits"));
 
 
     Image<t_real> kb_test_image = pfitsio::read2d(gridding_filename("at166BtestJ6kb.fits")).real();
@@ -206,8 +206,8 @@ TEST_CASE("Measurement Operator [Gridding]", "[Gridding]") {
     Image<t_real> pswf_img = op.grid(uv_vis.vis).real();
     max = pswf_img.maxCoeff();
     pswf_img = pswf_img / max;
-    pfitsio::write2d(pswf_img.real(), output_filename("grid_image_real_pswf_6.fits"), true, false);
-    pfitsio::write2d(op.S.real(), output_filename("grid_scale_real_pswf_6.fits"), true, false);
+    pfitsio::write2d(pswf_img.real(), output_filename("grid_image_real_pswf_6.fits"));
+    pfitsio::write2d(op.S.real(), output_filename("grid_scale_real_pswf_6.fits"));
 
     Image<t_real> pswf_test_image = pfitsio::read2d(gridding_filename("at166BtestJ6pswf.fits")).real();
     Image<t_real> pswf_difference = pswf_img - pswf_test_image;
@@ -305,8 +305,8 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     psf = op.grid(psf_vis); // gridding model visibilities into image
     max = psf.real().maxCoeff();
     psf = psf / max;
-    pfitsio::write2d(point.real(), output_filename("point.fits"), true, false);
-    pfitsio::write2d(psf.real(), output_filename("kb_psf_M31_degridding.fits"), true, false); // saving image of degridded point source
+    pfitsio::write2d(point.real(), output_filename("point.fits"));
+    pfitsio::write2d(psf.real(), output_filename("kb_psf_M31_degridding.fits")); // saving image of degridded point source
 
 
     Vector<t_complex> kb_vis = op.degrid(img); // visibilities of degridded model
@@ -314,7 +314,7 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     max = kb_img.real().maxCoeff();
     kb_img = kb_img / max; // normalisation of degridded model
 
-    pfitsio::write2d(kb_img.real(), output_filename("kb_test.fits"), true, false);
+    pfitsio::write2d(kb_img.real(), output_filename("kb_test.fits"));
 
     max = kb_vis.cwiseAbs().maxCoeff();
     kb_vis = kb_vis / max;
@@ -334,7 +334,7 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     psf = op.grid(psf_vis);
     max = psf.real().maxCoeff();
     psf = psf / max;
-    pfitsio::write2d(psf.real(), output_filename("kb_psf_M31_gridding.fits"), true, false); // saving image of degridded point source
+    pfitsio::write2d(psf.real(), output_filename("kb_psf_M31_gridding.fits")); // saving image of degridded point source
   }
 
   SECTION("Prolate Spheroidal Wave Functon Degridding") {
@@ -355,7 +355,7 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     psf = op.grid(psf_vis); // gridding model visibilities into image
     max = psf.real().maxCoeff();
     psf = psf / max;
-    pfitsio::write2d(psf.real(), output_filename("pswf_psf_M31_degridding.fits"), true, false); // saving image of degridded point source
+    pfitsio::write2d(psf.real(), output_filename("pswf_psf_M31_degridding.fits")); // saving image of degridded point source
 
 
     Vector<t_complex> pswf_vis = op.degrid(img); // visibilities of degridded model
@@ -363,7 +363,7 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     max = pswf_img.real().maxCoeff();
     pswf_img = pswf_img / max; // normalisation of degridded model
 
-    pfitsio::write2d(pswf_img.real(), output_filename("pswf_test.fits"), true, false);
+    pfitsio::write2d(pswf_img.real(), output_filename("pswf_test.fits"));
 
     max = pswf_vis.cwiseAbs().maxCoeff();
     pswf_vis = pswf_vis / max;
@@ -383,7 +383,7 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     psf = op.grid(psf_vis);
     max = psf.real().maxCoeff();
     psf = psf / max;
-    pfitsio::write2d(psf.real(), output_filename("pswf_psf_M31_gridding.fits"), true, false); // saving image of degridded point source
+    pfitsio::write2d(psf.real(), output_filename("pswf_psf_M31_gridding.fits")); // saving image of degridded point source
   }
 
   SECTION("Gaussian Degridding") {
@@ -404,7 +404,7 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     psf = op.grid(psf_vis); // gridding model visibilities into image
     max = psf.real().maxCoeff();
     psf = psf / max;
-    pfitsio::write2d(psf.real(), output_filename("gauss_psf_M31_degridding.fits"), true, false); // saving image of degridded point source
+    pfitsio::write2d(psf.real(), output_filename("gauss_psf_M31_degridding.fits")); // saving image of degridded point source
 
 
     Vector<t_complex> gauss_vis = op.degrid(img); // visibilities of degridded model
@@ -412,7 +412,7 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     max = gauss_img.real().maxCoeff();
     gauss_img = gauss_img / max; // normalisation of degridded model
 
-    pfitsio::write2d(gauss_img.real(), output_filename("gauss_test.fits"), true, false);
+    pfitsio::write2d(gauss_img.real(), output_filename("gauss_test.fits"));
 
     max = gauss_vis.cwiseAbs().maxCoeff();
     gauss_vis = gauss_vis / max;
@@ -432,6 +432,6 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     psf = op.grid(psf_vis);
     max = psf.real().maxCoeff();
     psf = psf / max;
-    pfitsio::write2d(psf.real(), output_filename("gauss_psf_M31_gridding.fits"), true, false); // saving image of degridded point source
+    pfitsio::write2d(psf.real(), output_filename("gauss_psf_M31_gridding.fits")); // saving image of degridded point source
   }
 }
