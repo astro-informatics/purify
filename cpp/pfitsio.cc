@@ -1,21 +1,66 @@
-#include <CCfits/CCfits>
 #include "pfitsio.h"
 
 namespace purify {
 	namespace pfitsio {
+      //! Write image to fits file
+      void write2d_header(const Image<t_real> & eigen_image, const pfitsio::header_params& header, const bool& overwrite){
+ 	    /*
+	      Writes an image to a fits file.
 
-	  void write2d(const Image<t_real>& eigen_image, const std::string& fits_name, const std::string& pix_units, const bool& overwrite, const bool& flip) 
+	      image:: image data, a 2d Image.
+		  header:: structure containing header information
+		  overwrite:: if true, overwrites old fits file with same name
+
+	    */
+		
+	    if (overwrite == true) {remove(header.fits_name.c_str());};
+	    long naxes[4] = {static_cast<long>(eigen_image.rows()), static_cast<long>(eigen_image.cols()), 1, 1};
+	    std::unique_ptr<CCfits::FITS> pFits(new CCfits::FITS(header.fits_name, FLOAT_IMG, 4, naxes));
+	    long fpixel (1);
+	    std::vector<long> extAx = {eigen_image.rows(), eigen_image.cols()};
+	    
+	    std::valarray<double> image(naxes[0]*naxes[1]);
+	    std::copy(eigen_image.data(), eigen_image.data() + eigen_image.size(), &image[0]);
+	    //Writing to fits header
+	    pFits->pHDU().addKey("AUTHOR", "Purify", "");
+	    pFits->pHDU().addKey("BUNIT", header.pix_units, ""); // units
+	    pFits->pHDU().addKey("NAXIS", 4, ""); // number of axes
+	    pFits->pHDU().addKey("NAXIS1", static_cast<t_int>(eigen_image.cols()), "");
+	    pFits->pHDU().addKey("NAXIS2", static_cast<t_int>(eigen_image.rows()), "");
+	    pFits->pHDU().addKey("NAXIS3", 1, "");
+	    pFits->pHDU().addKey("NAXIS4", 1, "");
+	    pFits->pHDU().addKey("CRPIX1",  static_cast<t_int>(std::floor(eigen_image.cols()/2)), "");
+	    pFits->pHDU().addKey("CRPIX2",  static_cast<t_int>(std::floor(eigen_image.rows()/2)), "");
+	    pFits->pHDU().addKey("CRPIX3", 1, "");
+	    pFits->pHDU().addKey("CRPIX4", 1, "");
+	    pFits->pHDU().addKey("CRVAL1", header.ra , "");
+	    pFits->pHDU().addKey("CRVAL2", header.dec , "");
+	    pFits->pHDU().addKey("CRVAL3", header.mean_frequency * std::pow(10, 6) * 1., "");
+	    pFits->pHDU().addKey("CRVAL4", 1, "");
+	    pFits->pHDU().addKey("CTYPE1", "RA---NCP", "");
+	    pFits->pHDU().addKey("CTYPE2", "DEC---NCP", "");
+	    pFits->pHDU().addKey("CTYPE3", "FREQ-OBS", "");
+	    pFits->pHDU().addKey("CTYPE4", "STOKES", "");
+	    pFits->pHDU().addKey("CDELT1", -header.cell_x / 3600. , "");
+	    pFits->pHDU().addKey("CDELT2", header.cell_y / 3600. , "");
+	    pFits->pHDU().addKey("CDELT3", header.channel_width * std::pow(10, 6) * 1., "");
+	    pFits->pHDU().addKey("CDELT4", 1, "");
+	    pFits->pHDU().addKey("BTYPE", "intensity", "");
+	    pFits->pHDU().addKey("EPOCH", 2000, "");
+	    pFits->pHDU().write ( fpixel, naxes[0]*naxes[1], image);     	
+      }
+
+	  void write2d(const Image<t_real>& eigen_image, const std::string& fits_name, const std::string& pix_units, const bool& overwrite) 
 	  {
-	    if (flip == true)
-	    {
-	      write2d(eigen_image.rowwise().reverse(), fits_name, pix_units, overwrite, false);
-	      return;
-	    }
 	    /*
 	      Writes an image to a fits file.
 
 	      image:: image data, a 2d Image.
-	      fits_name:: string contating the file name of the fits file.
+	      fits_name:: string containing the file name of the fits file.
+	      pix_units:: units of flux
+	      ra:: centre pixel coordinate in ra
+	      dec:: centre pixel coordinate in dec
+
 	    */
 	    if (overwrite == true) {remove(fits_name.c_str());};
 	    long naxes[2] = {static_cast<long>(eigen_image.rows()), static_cast<long>(eigen_image.cols())};
