@@ -299,7 +299,7 @@ namespace purify {
 
     //t_real new_upsample = utilities::upsample_ratio(uv_vis, ,);
     std::printf("------ \n");
-    std::printf("Constructing Gridding Operator \n");
+    std::printf("Constructing Gridding Operator: G\n");
 
     std::printf("Oversampling Factor: %f \n", oversample_factor);
     std::function<t_real(t_real)> kernelu;
@@ -314,7 +314,7 @@ namespace purify {
     std::printf("Jv: %d \n", Jv);
 
     S = Image<t_real>::Zero(imsizey, imsizex);
-    const t_int norm_iterations = 20; // number of iterations for power method
+    const t_int norm_iterations = 100; // number of iterations for power method
 
     //samples for kb_interp
     if (kernel_name == "kb_interp")
@@ -341,13 +341,15 @@ namespace purify {
         G = utilities::convolution(G, C, ftsizeu, ftsizev, uv_vis.w.size());
       }
       
-      std::printf("Calculating weights \n");
+      std::printf("Calculating weights: W \n");
       W = MeasurementOperator::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R);
+      std::printf("Calculating the primary beam: A \n");
       auto A = MeasurementOperator::init_primary_beam(primary_beam);
       S = S * A;
-      std::printf("Doing power method \n");
+      std::printf("Doing power method: eta_{i+1}x_{i + 1} = Psi^T Psi x_i \n");
       norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
-      std::printf("Gridding Operator Constructed \n");
+      std::printf("Found a norm of eta = %f \n", norm);
+      std::printf("Gridding Operator Constructed: WGFSA \n");
       std::printf("------ \n");
       return;
     }
@@ -440,17 +442,17 @@ namespace purify {
       C = MeasurementOperator::create_chirp_matrix(uv_vis.w, cell_x, cell_y, energy_fraction);
       G = utilities::convolution(G, C, ftsizeu, ftsizev, uv_vis.w.size());
     }
-    std::printf("Calculating weights \n");
+    std::printf("Calculating weights: W \n");
     W = MeasurementOperator::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R);
 
     //It makes sense to included the primary beam at the same time the gridding correction is performed.
-    std::printf("Calculating the primary beam \n");
+    std::printf("Calculating the primary beam: A \n");
     auto A = MeasurementOperator::init_primary_beam(primary_beam);
     S = S * A;
-    std::printf("Doing power method \n");
+    std::printf("Doing power method: eta_{i+1}x_{i + 1} = Psi^T Psi x_i \n");
     norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
-    std::printf("Found a norm of %f \n", norm);
-    std::printf("Gridding Operator Constructed \n");
+    std::printf("Found a norm of eta = %f \n", norm);
+    std::printf("Gridding Operator Constructed: WGFSA \n");
     std::printf("------ \n");
   }
 
