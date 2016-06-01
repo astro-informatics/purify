@@ -11,15 +11,19 @@
 #include "regressions/cwrappers.h"
 #include "types.h"
 #include "MeasurementOperator.h"
+#ifdef ENABLE_OPENMP
 #include <omp.h>
+#endif
 
 int main(int, char **) {
   using namespace purify;
   using namespace purify::notinstalled;
   sopt::logging::initialize();
+# ifdef ENABLE_OPENMP
   //Eigen::setNbThreads(24);
   int nthreads = Eigen::nbThreads( );
   std::cout << "THREADS = " << nthreads <<std::endl; // returns '1'
+# endif
 
   std::string const visfile = vla_filename("at166B.3C129.c0.vis");
   std::string const outfile = output_filename("vla.tiff");
@@ -31,7 +35,6 @@ int main(int, char **) {
 
   std::string const restore_fits = output_filename("vla_restore.fits");
 
-  t_int const niters = 500;
   t_real const beta = 1e-3;
   t_real const over_sample = 2;
   auto uv_data = utilities::read_visibility(visfile);
@@ -61,8 +64,8 @@ int main(int, char **) {
         image = measurements.grid(x);
   };
   auto measurements_transform = sopt::linear_transform<Vector<t_complex>>(
-    direct, {0, 1, static_cast<t_int>(uv_data.vis.size())},
-    adjoint, {0, 1, static_cast<t_int>(width * height)}
+    direct, {{0, 1, static_cast<t_int>(uv_data.vis.size())}},
+    adjoint, {{0, 1, static_cast<t_int>(width * height)}}
   );
 
   sopt::wavelets::SARA const sara{std::make_tuple("Dirac", 8u), std::make_tuple("DB1", 8u), std::make_tuple("DB2", 8u), 
@@ -89,7 +92,6 @@ int main(int, char **) {
   t_real const noise_rms = 1; // of complex signal
   std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
   t_real epsilon = utilities::calculate_l2_radius(input, noise_rms); //Calculation of l_2 bound following SARA paper
-  t_real epsilon_alt = std::sqrt(uv_data.vis.size()) * noise_rms;
   auto purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * (uv_data.weights.array().real().sqrt() * input.array()).matrix())).real().maxCoeff() * beta;
 
   std::cout << "Starting sopt!" << '\n';
@@ -117,7 +119,6 @@ int main(int, char **) {
   auto const diagnostic = padmm(estimates);
   assert(diagnostic.x.size() == width * height);
   Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey, measurements.imsizex);
-  t_real const max_val_final = image.array().abs().maxCoeff();
   image = image;
   // header information
   header.pix_units = "JY/PIXEL";
