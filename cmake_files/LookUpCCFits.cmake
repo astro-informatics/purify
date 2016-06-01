@@ -22,10 +22,11 @@ else()
   set(cfitsio_include_dir "${EXTERNAL_ROOT}/include")
 endif()
 ExternalProject_Add(
-  CCfits
+    Lookup-CCFits
     PREFIX ${EXTERNAL_ROOT}
     URL ${CCFits_URL}
     URL_MD5 ${CCFist_SHA}
+    SOURCE_DIR ${EXTERNAL_ROOT}/src/CCfits
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND
     ./configure --prefix=${EXTERNAL_ROOT}
@@ -38,8 +39,8 @@ ExternalProject_Add(
     LOG_BUILD ON
 )
 if(TARGET CFitsIO)
-  add_dependencies(CCfits CFitsIO)
+  add_dependencies(Lookup-CCFits CFitsIO)
 endif()
-add_recursive_cmake_step(CCfits DEPENDEES install)
+add_recursive_cmake_step(Lookup-CCFits DEPENDEES install)
 set(CCFits_INCLUDE_DIR "")
 set(CCFits_LIBRARY "")

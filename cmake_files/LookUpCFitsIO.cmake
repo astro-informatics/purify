@@ -49,7 +49,7 @@ if(using_casa)
         message(FATAL_ERROR "Cannot find tar executable in path")
     endif()
     ExternalProject_Add(
-        CFitsIO
+        Lookup-CFitsIO
         PREFIX ${EXTERNAL_ROOT}
         URL ${CFitsIO_URL}
         BUILD_IN_SOURCE 1
@@ -62,7 +62,7 @@ if(using_casa)
     )
 else()
     ExternalProject_Add(
-        CFitsIO
+        Lookup-CFitsIO
         PREFIX ${EXTERNAL_ROOT}
         URL ${CFitsIO_URL}
         BUILD_IN_SOURCE 1
@@ -74,6 +74,6 @@ else()
         LOG_BUILD ON
     )
 endif()
-add_recursive_cmake_step(CFitsIO DEPENDEES install)
+add_recursive_cmake_step(Lookup-CFitsIO DEPENDEES install)
 set(CFitsIO_INCLUDE_DIR "")
 set(CFitsIO_LIBRARY "")
