@@ -2,6 +2,7 @@
 #define PURIFY_TYPES_H
 
 #include <complex>
+#include <Eigen/Dense>
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 #ifdef HAVE_CONFIG_H
