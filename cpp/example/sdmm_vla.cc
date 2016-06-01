@@ -25,7 +25,8 @@ int main(int, char **) {
 
   std::string const residual_fits = output_filename("vla_residual.fits");
 
-  t_int const niters = 1e5;
+  t_int const niters = 1e1;
+  t_real const beta = 1e-3;
   t_real const over_sample = 1.375;
   auto uv_data = utilities::read_visibility(visfile);
   uv_data.units = "lambda";
@@ -74,21 +75,23 @@ int main(int, char **) {
   std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
   
   t_real epsilon = utilities::calculate_l2_radius(uv_data.vis, 1.); //Calculation of l_2 bound following SARA paper
+  auto purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * (input.array()).matrix())).real().maxCoeff() * beta;
+
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
   auto const sdmm
       = sopt::algorithm::SDMM<t_complex>()
             .itermax(niters)
-            .gamma((measurements_transform.adjoint() * input).real().maxCoeff() * 1e-3) //l_1 bound
+            .gamma(purify_gamma) //l_1 bound
             .is_converged(sopt::RelativeVariation<t_complex>(1e-3))
             .conjugate_gradient(100, 1e-3)
             .append(sopt::proximal::translate(sopt::proximal::L2Ball<t_complex>(epsilon), -uv_data.vis),
                     measurements_transform)
             .append(sopt::proximal::l1_norm<t_complex>, Psi.adjoint(), Psi)
             .append(sopt::proximal::positive_quadrant<t_complex>);
-  auto const result = sdmm(initial_estimate);
-  assert(result.out.size() == width * height);
-  Image<t_complex> image = Image<t_complex>::Map(result.out.data(), measurements.imsizey, measurements.imsizex);
+  Vector<t_complex> result;
+  auto const diagonstic = sdmm(result);
+  Image<t_complex> image = Image<t_complex>::Map(result.data(), measurements.imsizey, measurements.imsizex);
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
   sopt::utilities::write_tiff(image.real(), outfile);

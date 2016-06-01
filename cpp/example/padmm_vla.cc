@@ -2,7 +2,7 @@
 #include <memory>
 #include <random>
 #include "sopt/relative_variation.h"
-#include <sopt/l1_padmm.h>
+#include <sopt/imaging_padmm.h>
 #include "sopt/utilities.h"
 #include "sopt/wavelets.h"
 #include "sopt/wavelets/sara.h"
@@ -11,11 +11,15 @@
 #include "regressions/cwrappers.h"
 #include "types.h"
 #include "MeasurementOperator.h"
+#include <omp.h>
 
 int main(int, char **) {
   using namespace purify;
   using namespace purify::notinstalled;
   sopt::logging::initialize();
+  //Eigen::setNbThreads(24);
+  int nthreads = Eigen::nbThreads( );
+  std::cout << "THREADS = " << nthreads <<std::endl; // returns '1'
 
   std::string const visfile = vla_filename("at166B.3C129.c0.vis");
   std::string const outfile = output_filename("vla.tiff");
@@ -27,7 +31,7 @@ int main(int, char **) {
 
   std::string const restore_fits = output_filename("vla_restore.fits");
 
-  t_int const niters = 1e5;
+  t_int const niters = 500;
   t_real const beta = 1e-3;
   t_real const over_sample = 2;
   auto uv_data = utilities::read_visibility(visfile);
@@ -36,6 +40,14 @@ int main(int, char **) {
   t_int width = 512;
   t_int height = 512;
   //uv_data = utilities::uv_symmetry(uv_data);
+  pfitsio::header_params header;
+  header.mean_frequency = 1400;
+  header.ra = 0;
+  header.dec = 0;
+  header.cell_x = cellsize;
+  header.cell_y = cellsize;
+
+
   MeasurementOperator measurements(uv_data, 4, 4, "kb", width, height, over_sample, cellsize, cellsize, "none");
 
  
@@ -53,9 +65,9 @@ int main(int, char **) {
     adjoint, {0, 1, static_cast<t_int>(width * height)}
   );
 
-  sopt::wavelets::SARA const sara{std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u), 
-        std::make_tuple("DB3", 3u),  std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u), 
-        std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
+  sopt::wavelets::SARA const sara{std::make_tuple("Dirac", 8u), std::make_tuple("DB1", 8u), std::make_tuple("DB2", 8u), 
+        std::make_tuple("DB3", 8u),  std::make_tuple("DB4", 8u), std::make_tuple("DB5", 8u), 
+        std::make_tuple("DB6", 8u), std::make_tuple("DB7", 8u), std::make_tuple("DB8", 8u)};
 
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, height, width);
@@ -70,11 +82,11 @@ int main(int, char **) {
     std::printf("Using previous run.");
     //initial_estimate = pfitsio::read2d(outfile_fits);
   
-
-  pfitsio::write2d(Image<t_real>::Map(dimage.data(), height, width), dirty_image_fits);
+  header.fits_name = dirty_image_fits;
+  pfitsio::write2d_header(Image<t_real>::Map(dimage.data(), height, width), header);
 
  
-  t_real const noise_rms = 1.2324; // of complex signal
+  t_real const noise_rms = 1; // of complex signal
   std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
   t_real epsilon = utilities::calculate_l2_radius(input, noise_rms); //Calculation of l_2 bound following SARA paper
   t_real epsilon_alt = std::sqrt(uv_data.vis.size()) * noise_rms;
@@ -83,7 +95,7 @@ int main(int, char **) {
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
   std::cout << "Gamma = " << purify_gamma << '\n';
-  auto const padmm = sopt::algorithm::L1ProximalADMM<t_complex>(input)
+  auto const padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(input)
     .itermax(500)
     .gamma(purify_gamma)
     .relative_variation(1e-3)
@@ -100,18 +112,23 @@ int main(int, char **) {
     .nu(1e0)
     .Psi(Psi)
     .Phi(measurements_transform);
-  auto const result = padmm(initial_estimate);
-  assert(result.x.size() == width * height);
-  Image<t_complex> image = Image<t_complex>::Map(result.x.data(), measurements.imsizey, measurements.imsizex);
+  
+   std::tuple<Vector<t_complex>, Vector<t_complex>> const estimates(initial_estimate, Vector<t_complex>::Zero(input.size()));  
+  auto const diagnostic = padmm(estimates);
+  assert(diagnostic.x.size() == width * height);
+  Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey, measurements.imsizex);
   t_real const max_val_final = image.array().abs().maxCoeff();
-  image = image / max_val_final;
-  sopt::utilities::write_tiff(image.real(), outfile);
+  image = image;
+  // header information
+  header.pix_units = "JY/PIXEL";
+  header.fits_name = outfile_fits;
 
-  pfitsio::write2d(image.real(), outfile_fits);
-  image = Image<t_complex>::Map(result.x.data(), measurements.imsizey, measurements.imsizex);
+
+  pfitsio::write2d_header(image.real(), header);
+  image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey, measurements.imsizex);
   Image<t_complex> residual = measurements.grid(uv_data.weights.array().real().sqrt() * (input - measurements.degrid(image)).array());
-  pfitsio::write2d(residual.real(), residual_fits);
-  auto restore = image = image + residual;
-  pfitsio::write2d(restore.real(), restore_fits);
+  header.pix_units = "JY/BEAM";
+  header.fits_name = residual_fits;
+  pfitsio::write2d_header(residual.real(), header);
   return 0;
 }

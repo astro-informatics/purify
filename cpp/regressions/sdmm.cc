@@ -116,8 +116,9 @@ TEST_CASE("Compare SDMMS", "") {
 
   auto check = [params, sdmm, sara, forward_data, inverse_data, y, l1_weights, M31,
                 sara_params](t_int niters) mutable {
-    auto const cpp = sdmm.itermax(niters)(t_Vector::Zero(M31.size()));
-    CHECK(cpp.niters == niters);
+    t_Vector cpp;
+    auto const diagnostic = sdmm.itermax(niters)(t_Vector::Zero(M31.size()));
+    CHECK(diagnostic.niters == niters);
 
     params.max_iter = niters;
     t_Vector c = t_Vector::Zero(M31.size());
@@ -127,7 +128,7 @@ TEST_CASE("Compare SDMMS", "") {
                  &sopt_sara_analysisop, data, c.size() * sara.size(), (void *)y.data(), y.size(),
                  l1_weights.data(), params);
 
-    CHECK(cpp.out.isApprox(c, 1e-8));
+    CHECK(cpp.isApprox(c, 1e-8));
   };
 
   SECTION("With 1 iteration") { check(1); }

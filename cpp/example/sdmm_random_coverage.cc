@@ -96,9 +96,9 @@ int main(int, char **) {
                     measurements_transform)
             .append(sopt::proximal::l1_norm<t_complex>, Psi.adjoint(), Psi)
             .append(sopt::proximal::positive_quadrant<t_complex>);
-  auto const result = sdmm(initial_estimate);
-  assert(result.out.size() == M31.size());
-  Image<t_complex> image = Image<t_complex>::Map(result.out.data(), measurements.imsizey, measurements.imsizex);
+  Vector<t_complex> result;
+  auto const diagonstic = sdmm(result);
+  Image<t_complex> image = Image<t_complex>::Map(result.data(), measurements.imsizey, measurements.imsizex);
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
   sopt::utilities::write_tiff(image.real(), outfile);

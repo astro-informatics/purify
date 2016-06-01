@@ -2,7 +2,7 @@
 #include <memory>
 #include <random>
 #include "sopt/relative_variation.h"
-#include <sopt/l1_padmm.h>
+#include <sopt/imaging_padmm.h>
 #include "sopt/utilities.h"
 #include "sopt/wavelets.h"
 #include "sopt/wavelets/sara.h"
@@ -91,7 +91,7 @@ int main( int nargs, char const** args ) {
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
   std::printf("Using epsilon of %f \n", epsilon);
   std::cout << "Starting sopt" << '\n';
-  auto const padmm = sopt::algorithm::L1ProximalADMM<t_complex>(uv_data.vis)
+  auto const padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
                          .itermax(1000)
                          .gamma((measurements_transform.adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
                          .relative_variation(1e-3)
@@ -108,11 +108,12 @@ int main( int nargs, char const** args ) {
                          .Psi(Psi)
                          .Phi(measurements_transform);
   //Timing reconstruction
+  
   std::clock_t c_start = std::clock();
-  auto const result = padmm(initial_estimate);
+  auto const diagnostic = padmm();
   std::clock_t c_end = std::clock();
 
-  Image<t_complex> image = Image<t_complex>::Map(result.x.data(), measurements.imsizey, measurements.imsizex);
+  Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey, measurements.imsizex);
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
 
