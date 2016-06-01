@@ -92,6 +92,8 @@ namespace purify {
       Vector<t_complex> add_noise(const Vector<t_complex>& y, const t_complex& mean, const t_real& standard_deviation);
       //! Test to see if file exists
       bool file_exists(const std::string& name);
+      //! Method to fit Gaussian to PSF
+      void fit_fwhm(const Image<t_real> & psf);
  }
 }
 

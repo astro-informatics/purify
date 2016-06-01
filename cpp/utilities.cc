@@ -648,6 +648,60 @@ namespace purify {
 			*/
   			struct stat buffer;   
   			return (stat (name.c_str(), &buffer) == 0); 
+		}
+
+		void fit_fwhm(const Image<t_real> & psf){
+			/*
+				Find FWHM of point spread function, using least squares.
+
+				psf:: point spread function, assumed to be normalised.
+
+				The method assumes that you have sampled at least 
+				3 pixels across the beam.
+			*/
+
+			
+			auto x0 = std::floor(psf.cols() * 0.5);
+			auto y0 = std::floor(psf.rows() * 0.5);
+			
+			//finding patch
+			t_real total = 0.;
+			Image<t_real> patch;
+			for (t_int i = 0; i < std::floor(std::min(psf.cols() * 0.5, psf.rows() * 0.5)); ++i)
+			{
+				auto temp = psf.block(std::floor(y0 - i * 0.5), i, std::floor(x0 - i * 0.5), i);
+				auto sum = temp.sum();
+				if (total >= sum)
+					patch = temp;
+					break;
+				total = sum;
+			}
+			//finding values for least squares
+
+			std::vector<t_tripletList> entries;
+			auto total_entries = 0;
+
+			for (t_int i = 0; i < patch.cols(); ++i)
+			{
+				for (t_int j = 0; j < patch.rows(); ++j)
+				{	
+					if(patch(j, i) >= 0.5)
+						entries.emplace_back(j, i, patch(i, j)); total_entries++;
+				}
+			}
+
+			Matrix<t_real> A = Matrix<t_real>::Zero(total_entries, 4);
+			Vector<t_real> b = Vector<t_real>::Zero(total_entries);
+			//putting values into a vector and matrix for least squares
+			for (t_int i = 0; i < total_entries; ++i)
+			{
+				A(i, 0) = static_cast<t_real>(entries.at(i).row() * entries.at(i).row()); // y^2
+				A(i, 1) = static_cast<t_real>(entries.at(i).col() * entries.at(i).col()); // x^2
+				A(i, 2) = static_cast<t_real>(entries.at(i).col() * entries.at(i).row()); // x*y
+				b(i) = std::real(entries.at(i).value());
+			}
+			const auto solution = static_cast<Vector<t_real>>(A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b));
+			std::cout << solution << '\n';
 		}	
 	}
 }
