@@ -106,26 +106,25 @@ int main(int, char **) {
                          .Psi(Psi)
                          .Phi(measurements_transform);
   
-  auto const posq = positive_quadrant(padmm);
-  typedef std::remove_const<decltype(posq)>::type t_PosQuadPADMM;
-  auto const min_delta = sigma * std::sqrt(y.size()) / std::sqrt(8 * image.size());
+  auto const posq = sopt::algorithm::positive_quadrant(padmm);
+  auto const min_delta = sigma * std::sqrt(y0.size()) / std::sqrt(8 * M31.size());
   // Sets weight after each padmm iteration.
   // In practice, this means replacing the proximal of the l1 objective function.
-  auto set_weights = [](t_PosQuadPADMM &padmm, Vector<t_complex> const &weights) {
-    padmm.algorithm().proximals(0) = [weights](Vector<t_complex> &out, t_real gamma, Vector<t_complex> const &x) {
-      out = sopt::soft_threshhold(x, gamma * weights);
-    };
+  auto set_weights = [](std::remove_const<decltype(posq)>::type &posq, Vector<t_real> const &weights) {
+    posq.algorithm().l1_proximal_weights(weights);
   };
-  auto call_PsiT
-      = [&Psi](t_PosQuadPADMM const &, Vector<t_complex> const &x) -> Vector<t_complex> { return Psi.adjoint() * x; };
+  auto call_PsiT = [](decltype(posq) const &posq, Vector<t_complex> const &x) -> Vector<t_complex> {
+    return posq.algorithm().Psi().adjoint() * x;
+  };
   auto const reweighted = sopt::algorithm::reweighted(posq, set_weights, call_PsiT)
                               .itermax(5)
                               .min_delta(min_delta)
-                              .is_converged(sopt::RelativeVariation<t_complex>(1e-3));  
+                              .is_converged(sopt::RelativeVariation<t_real>(1e-3));  
   auto const diagnostic = reweighted();
   assert(diagnostic.algo.x.data().size() == M31.size());
   Image<t_complex> image = Image<t_complex>::Map(diagnostic.algo.x.data(), measurements.imsizey, measurements.imsizex);
   t_real const max_val_final = image.array().abs().maxCoeff();
+
   image = image / max_val_final;
   sopt::utilities::write_tiff(image.real(), outfile);
   pfitsio::write2d(image.real(), outfile_fits);
