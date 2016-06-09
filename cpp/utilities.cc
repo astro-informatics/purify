@@ -702,6 +702,20 @@ namespace purify {
 			}
 			const auto solution = static_cast<Vector<t_real>>(A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b));
 			std::cout << solution << '\n';
-		}	
+		}
+
+		t_real median(const Vector<t_real> &input){
+			//Finds the median of a real vector x
+			auto size = input.size();
+			Vector<t_real> x(size);
+			std::copy(input.data(), input.data() + size, x.data());
+			std::sort(x.data(), x.data() + size);
+			if (std::floor(size / 2) - std::ceil(size / 2) == 0)
+				return (x(std::floor(size / 2) - 1) + x(std::floor(size / 2)))/ 2;
+			return x(std::ceil(size /2 ));
+		}
+
+
 	}
+
 }

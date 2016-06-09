@@ -94,6 +94,8 @@ namespace purify {
       bool file_exists(const std::string& name);
       //! Method to fit Gaussian to PSF
       void fit_fwhm(const Image<t_real> & psf);
+      //! Return median of real vector
+      t_real median(const Vector<t_real> &input);
  }
 }
 
