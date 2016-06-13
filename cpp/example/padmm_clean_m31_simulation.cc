@@ -16,7 +16,7 @@
 #include <ctime>
 
 int main( int nargs, char const** args ) {
-  if (nargs != 7 )
+  if (nargs != 8 )
   {
     std::cout << " Wrong number of arguments! " << '\n';
     return 1;
@@ -25,22 +25,21 @@ int main( int nargs, char const** args ) {
   using namespace purify;
   using namespace purify::notinstalled;
   sopt::logging::initialize();
-
-  std::string const fitsfile = image_filename("M31.fits");
   
-
   std::string const kernel = args[1];
   t_real const over_sample = std::stod(static_cast<std::string>(args[2]));
   t_int const J = static_cast<t_int>(std::stod(static_cast<std::string>(args[3])));
   t_real const m_over_n = std::stod(static_cast<std::string>(args[4]));
   std::string const test_number = static_cast<std::string>(args[5]);
   t_real const ISNR = std::stod(static_cast<std::string>(args[6]));
-  
+  std::string const name = static_cast<std::string>(args[7]);
 
 
+  std::string const fitsfile = image_filename(name + ".fits");
 
-  std::string const dirty_image_fits = output_filename("M31_dirty_" + kernel + "_" + test_number + ".fits");
-  std::string const results = output_filename("M31_results_" + kernel + "_" + test_number + ".txt");
+
+  std::string const dirty_image_fits = output_filename(name + "_dirty_" + kernel + "_" + test_number + ".fits");
+  std::string const results = output_filename(name + "_results_" + kernel + "_" + test_number + ".txt");
 
   auto sky_model = pfitsio::read2d(fitsfile);
   auto sky_model_max = sky_model.array().abs().maxCoeff();
@@ -86,23 +85,26 @@ int main( int nargs, char const** args ) {
   t_real const max_val = dimage.array().abs().maxCoeff();
   dimage = dimage / max_val;
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
-  pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image_fits);
+  // pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
-  std::printf("Using epsilon of %f \n", epsilon);
-  std::cout << "Starting sopt" << '\n';
+  auto const purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).real().maxCoeff() * 1e-3;
+
+  std::cout << "Starting sopt!" << '\n';
+  std::cout << "Epsilon = " << epsilon << '\n';
+  std::cout << "Gamma = " << purify_gamma << '\n';
   auto const padmm = sopt::algorithm::L1ProximalADMM<t_complex>(uv_data.vis)
-                         .itermax(1000)
-                         .gamma((measurements_transform.adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
+                         .itermax(500)
+                         .gamma(purify_gamma)
                          .relative_variation(1e-3)
-                         .l2ball_proximal_epsilon(epsilon)
+                         .l2ball_proximal_epsilon(epsilon * 1.001)
                          .tight_frame(false)
                          .l1_proximal_tolerance(1e-2)
                          .l1_proximal_nu(1)
                          .l1_proximal_itermax(50)
                          .l1_proximal_positivity_constraint(true)
                          .l1_proximal_real_constraint(true)
-                         .residual_convergence(epsilon)
+                         .residual_convergence(epsilon * 1.001)
                          .lagrange_update_scale(0.9)
                          .nu(1e0)
                          .Psi(Psi)
