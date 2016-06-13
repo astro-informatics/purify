@@ -57,6 +57,58 @@ namespace purify {
 			return clean_model;
 		}
 
+		Image<t_complex> model_estimate(const Image<t_complex> & dirty_image, const Image<t_complex> & dirty_beam,
+				const t_int & niters, const t_real& gain, const t_real clip){
+			/*
+				Fast method to produce a model for Purify to use as an initial estimate.
+			*/
+
+			Image<t_complex> res_image = dirty_image;
+			Image<t_complex> clean_model = res_image * 0;
+			Image<t_complex> temp_model = clean_model * 0;
+
+			FFTOperator fft;
+			const Image<t_complex> dirty_beam_fft = fft.forward(dirty_beam);
+			//should add a method to calculate clean steer clip automatically
+
+			for (t_int i = 0; i < niters; ++i)
+			{
+				//finding peak in residual image
+				t_int max_x;
+				t_int max_y;
+				
+				res_image.abs().maxCoeff(&max_y, &max_x);
+
+				//generating clean model
+					
+				t_real max = std::abs(res_image(max_y, max_x));
+				temp_model = res_image;
+				t_complex var = 0;
+				t_complex corr = 0;
+				//clipping residual map for clean model
+				for (t_int i = 0; i < temp_model.size(); ++i)
+				{
+					if (std::abs(temp_model(i)) < max * clip)
+						temp_model(i) = 0;
+				}
+				//convolve beam with temp model to create dirty model
+				Image<t_complex> dirty_model = fft.inverse(fft.forward(temp_model).array() * dirty_beam_fft);
+				//need to write in correction factor for beam volume, eta
+				t_complex eta = (res_image * dirty_model.conjugate()).sum()/(dirty_model * dirty_model.conjugate()).sum();
+				if (0 < std::abs(eta) < 0.02)
+					eta = 0.02 * eta / std::abs(eta); //empirical way to stop a semi-infinite loop, following miriad
+					
+				temp_model = eta * gain * temp_model;
+				//subtract model from data
+				res_image = res_image - eta * gain * dirty_model;
+				//add components to clean model
+				clean_model = clean_model + temp_model;
+				//clear temp model for next iteration
+				temp_model = temp_model * 0;
+			}
+			return clean_model;
+		}
+
 		Image<t_complex> restore(MeasurementOperator & op, const utilities::vis_params & uv_vis, const Image<t_complex> & clean_model){
 			/*
 				Produces the final image given a clean model
