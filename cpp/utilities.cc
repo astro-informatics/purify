@@ -600,9 +600,9 @@ namespace purify {
 	    	*/
 			if (sigma == 0)
 			{
-				return std::sqrt(y.size() + n_sigma * std::sqrt(2 * y.size()));
+				return std::sqrt(2 *y.size() + n_sigma * std::sqrt(4 * y.size()));
 			}
-	    	return std::sqrt(y.size() + n_sigma * std::sqrt(2 * y.size())) * sigma;
+	    	return std::sqrt(2 * y.size() + n_sigma * std::sqrt(4 * y.size())) * sigma;
 	    }
 	   	t_real SNR_to_standard_deviation(const Vector<t_complex>& y0, const t_real& SNR){
 	   		/*
