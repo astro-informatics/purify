@@ -89,22 +89,15 @@ int main( int nargs, char const** args ) {
   //pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
-<<<<<<< HEAD
+  
   auto const purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).real().maxCoeff() * 1e-3;
 
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
   std::cout << "Gamma = " << purify_gamma << '\n';
-  auto const padmm = sopt::algorithm::L1ProximalADMM<t_complex>(uv_data.vis)
-                         .itermax(500)
-                         .gamma(purify_gamma)
-=======
-  std::printf("Using epsilon of %f \n", epsilon);
-  std::cout << "Starting sopt" << '\n';
   auto const padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
                          .itermax(1000)
-                         .gamma((measurements_transform.adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
->>>>>>> fc1d210d6c81468f6cea0d9b43d7900d6fa9e0e2
+                         .gamma(purify_gamma)
                          .relative_variation(1e-3)
                          .l2ball_proximal_epsilon(epsilon * 1.001)
                          .tight_frame(false)
