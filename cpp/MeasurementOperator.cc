@@ -113,8 +113,8 @@ namespace purify {
       Given the fourier transform of a gridding kernel, creates the scaling image for gridding correction.
 
     */
-    t_int x_start = floor(ftsizeu * 0.5 - imsizex * 0.5);
-    t_int y_start = floor(ftsizev * 0.5 - imsizey * 0.5);
+    t_int x_start = std::floor(ftsizeu * 0.5 - imsizex * 0.5);
+    t_int y_start = std::floor(ftsizev * 0.5 - imsizey * 0.5);
     Array<t_real> range;
     range.setLinSpaced(std::max(ftsizeu, ftsizev), 0.5, std::max(ftsizeu, ftsizev) - 0.5);
     return (1e0 / range.segment(x_start, imsizex).unaryExpr(ftkernelu)).matrix() * (1e0 / range.segment(y_start, imsizey).unaryExpr(ftkernelv)).matrix().transpose();
@@ -137,8 +137,8 @@ namespace purify {
         K(n, m) = kernelu(i - Ju/2) * kernelv(j - Jv/2) * std::exp(-2 * purify_pi * I * ((i - Ju/2)  * 0.5 + (j - Jv/2) * 0.5 ));
       }
     }
-    t_int x_start = floor(ftsizeu * 0.5 - imsizex * 0.5);
-    t_int y_start = floor(ftsizev * 0.5 - imsizey * 0.5);
+    t_int x_start = std::floor(ftsizeu * 0.5 - imsizex * 0.5);
+    t_int y_start = std::floor(ftsizev * 0.5 - imsizey * 0.5);
     Image<t_real> S = fftop.inverse(K).array().real().block(y_start, x_start, imsizey, imsizex); // probably really slow!
     return 1/S;
 
@@ -150,7 +150,7 @@ namespace purify {
       Calculate the weights to be applied to the visibilities in the measurement operator. It does none, whiten, natural, uniform, and robust.
     */
     Vector<t_complex> out_weights(weights.size());
-    t_complex mean_weights = weights.sum();
+    t_complex const sum_weights = weights.sum();
     if (weighting_type == "none")
     {
       out_weights = weights.array() * 0 + 1;
@@ -159,7 +159,7 @@ namespace purify {
     }
     else if (weighting_type == "natural")
     {
-      out_weights = weights / mean_weights;
+      out_weights = weights;
     } else {
       auto step_function = [&] (t_real x) { return 1; };
       t_real scale = 1./oversample_factor; //scale for fov
@@ -168,10 +168,11 @@ namespace purify {
       {
         t_int q = utilities::mod(floor(u(i) * scale), ftsizeu);
         t_int p = utilities::mod(floor(v(i) * scale), ftsizev);
-        gridded_weights(p, q) += weights(i);
+        gridded_weights(p, q) += 1; //I get better results assuming all the weights are the same.
       }
-      t_complex mean_gridded_weights = (gridded_weights.array() * gridded_weights.array()).sum();
-      t_complex robust_scale = mean_weights/mean_gridded_weights * 12.5 * std::pow(10, -2 * R); // Need to check formula
+      t_complex const sum_grid_weights2 = (gridded_weights.array() * gridded_weights.array()).sum();
+      t_complex const sum_grid_weights = gridded_weights.array().sum();
+      t_complex const robust_scale = sum_weights/sum_grid_weights2 * 25. * std::pow(10, -2 * R); // Following standard formula, a bit different from miriad.
       
       for (t_int i = 0; i < weights.size(); ++i)
       {
@@ -188,11 +189,29 @@ namespace purify {
     return out_weights.array();
   }
 
-  Image<t_real> MeasurementOperator::init_primary_beam(const std::string & primary_beam){
+  Image<t_real> MeasurementOperator::init_primary_beam(const std::string & primary_beam, const t_real& cell_x, const t_real& cell_y){
     /*
       Calcualte primary beam, A, for the measurement operator.
     */
-
+      t_int x_start = std::floor(ftsizeu * 0.5 - imsizex * 0.5);
+      t_int y_start = std::floor(ftsizev * 0.5 - imsizey * 0.5);
+      Array<t_real> range;
+      range.setLinSpaced(std::max(ftsizeu, ftsizev), 0.5, std::max(ftsizeu, ftsizev) - 0.5);
+    
+      if (primary_beam == "atca")
+      {
+        auto const ftx = ftsizeu;
+        auto const fty = ftsizev;
+        auto pbcorr_x = [&cell_x, &ftx](const t_real& x){
+          auto x0 = std::floor(ftx / 2);
+          return std::exp(-4 * std::log(2) * 42. / ((x - x0) * cell_x));
+        };
+        auto pbcorr_y = [&cell_y, &fty](const t_real& y){
+          auto y0 = std::floor(fty / 2);
+          return std::exp(-4 * std::log(2) * 42. / ((y - y0) * cell_y));
+        };
+        return (1e0 / range.segment(x_start, imsizex).unaryExpr(pbcorr_x)).matrix() * (1e0 / range.segment(y_start, imsizey).unaryExpr(pbcorr_y)).matrix().transpose();
+      }
       return Image<t_real>::Zero(imsizey, imsizex) + 1.;
   }
 
@@ -272,16 +291,21 @@ namespace purify {
     
   {
     /*
-      Generates tools/operators needed for gridding and degridding.
+      Generates operators needed for gridding and degridding.
 
-      u:: visibilities in units of ftsizeu
-      v:: visibilities in units of ftsizev
-      Ju:: support size for u axis
-      Jv:: support size for v axis
-      kernel_name:: flag that determines what kernel to use (gauss, pswf, kb)
-      imsizex:: size of image along xaxis
-      imsizey:: size of image along yaxis
-      oversample_factor:: factor for oversampling the FFT grid
+      uv_vis_input:: coordinates, weights, and visibilities.
+      Ju, Jv:: support size in cells. e.g. Ju = 4, Jv =4.
+      kernel_name:: Name of kernel. e.g. "kb"
+      imsizey, imsizex:: size of image
+      oversample_factor:: ratio of fourier grid size to image size
+      cell_x, cell_y:: size of a pixel in arcseconds.
+      weighting_type:: weighting schemes such as whiten, natural, uniform, robust.
+      R:: robustness parameter, e.g. 0.
+      use_w_term:: weither to include wterm.
+      energy_fraction:: how much energy to keep for chirp matrix in w-projection
+      primary_beam:: which primary beam model to use, e.g. "atca"
+      fft_grid_correction:: Calculate grid correction using FFT or analytically
+
 
     */
     
@@ -310,6 +334,7 @@ namespace purify {
       std::printf("Resampling Factor: %f \n", resample_factor);
     std::printf("Kernel Name: %s \n", kernel_name.c_str());
     std::printf("Number of visibilities: %ld \n", uv_vis.u.size());
+    std::printf("Number of pixels: %d x %d \n", imsizex, imsizey);
     std::printf("Ju: %d \n", Ju);
     std::printf("Jv: %d \n", Jv);
 
@@ -344,7 +369,7 @@ namespace purify {
       std::printf("Calculating weights: W \n");
       W = MeasurementOperator::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R);
       std::printf("Calculating the primary beam: A \n");
-      auto A = MeasurementOperator::init_primary_beam(primary_beam);
+      auto A = MeasurementOperator::init_primary_beam(primary_beam, cell_x, cell_y);
       S = S * A;
       std::printf("Doing power method: eta_{i+1}x_{i + 1} = Psi^T Psi x_i \n");
       norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
@@ -447,7 +472,7 @@ namespace purify {
 
     //It makes sense to included the primary beam at the same time the gridding correction is performed.
     std::printf("Calculating the primary beam: A \n");
-    auto A = MeasurementOperator::init_primary_beam(primary_beam);
+    auto A = MeasurementOperator::init_primary_beam(primary_beam, cell_x, cell_y);
     S = S * A;
     std::printf("Doing power method: eta_{i+1}x_{i + 1} = Psi^T Psi x_i \n");
     norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
