@@ -593,16 +593,16 @@ namespace purify {
 	    		output_uv_vis.vis = uv_vis.vis.array() * uv_vis.weights.array().cwiseAbs().sqrt();
 	    		return output_uv_vis;
 	    }
-	    t_real calculate_l2_radius(const Vector<t_complex> & y, const t_real& sigma){
+	    t_real calculate_l2_radius(const Vector<t_complex> & y, const t_real& sigma, const t_real& n_sigma){
 	    	/*
 				Calculates the epsilon, the radius of the l2_ball in sopt
 				y:: vector for the l2 ball
 	    	*/
 			if (sigma == 0)
 			{
-				return std::sqrt(y.size() + 2 * std::sqrt(y.size()));
+				return std::sqrt(y.size() + n_sigma * std::sqrt(2 * y.size()));
 			}
-	    	return std::sqrt(y.size() + 2 * std::sqrt(y.size())) * sigma;
+	    	return std::sqrt(y.size() + n_sigma * std::sqrt(2 * y.size())) * sigma;
 	    }
 	   	t_real SNR_to_standard_deviation(const Vector<t_complex>& y0, const t_real& SNR){
 	   		/*
