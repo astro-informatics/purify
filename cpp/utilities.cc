@@ -593,16 +593,16 @@ namespace purify {
 	    		output_uv_vis.vis = uv_vis.vis.array() * uv_vis.weights.array().cwiseAbs().sqrt();
 	    		return output_uv_vis;
 	    }
-	    t_real calculate_l2_radius(const Vector<t_complex> & y, const t_real& sigma){
+	    t_real calculate_l2_radius(const Vector<t_complex> & y, const t_real& sigma, const t_real& n_sigma){
 	    	/*
 				Calculates the epsilon, the radius of the l2_ball in sopt
 				y:: vector for the l2 ball
 	    	*/
 			if (sigma == 0)
 			{
-				return std::sqrt(y.size() + 2 * std::sqrt(y.size()));
+				return std::sqrt(y.size() + n_sigma * std::sqrt(2 * y.size()));
 			}
-	    	return std::sqrt(y.size() + 2 * std::sqrt(y.size())) * sigma;
+	    	return std::sqrt(y.size() + n_sigma * std::sqrt(2 * y.size())) * sigma;
 	    }
 	   	t_real SNR_to_standard_deviation(const Vector<t_complex>& y0, const t_real& SNR){
 	   		/*
@@ -648,6 +648,74 @@ namespace purify {
 			*/
   			struct stat buffer;   
   			return (stat (name.c_str(), &buffer) == 0); 
-		}	
+		}
+
+		void fit_fwhm(const Image<t_real> & psf){
+			/*
+				Find FWHM of point spread function, using least squares.
+
+				psf:: point spread function, assumed to be normalised.
+
+				The method assumes that you have sampled at least 
+				3 pixels across the beam.
+			*/
+
+			
+			auto x0 = std::floor(psf.cols() * 0.5);
+			auto y0 = std::floor(psf.rows() * 0.5);
+			
+			//finding patch
+			t_real total = 0.;
+			Image<t_real> patch;
+			for (t_int i = 0; i < std::floor(std::min(psf.cols() * 0.5, psf.rows() * 0.5)); ++i)
+			{
+				auto temp = psf.block(std::floor(y0 - i * 0.5), i, std::floor(x0 - i * 0.5), i);
+				auto sum = temp.sum();
+				if (total >= sum)
+					patch = temp;
+					break;
+				total = sum;
+			}
+			//finding values for least squares
+
+			std::vector<t_tripletList> entries;
+			auto total_entries = 0;
+
+			for (t_int i = 0; i < patch.cols(); ++i)
+			{
+				for (t_int j = 0; j < patch.rows(); ++j)
+				{	
+					if(patch(j, i) >= 0.5)
+						entries.emplace_back(j, i, patch(i, j)); total_entries++;
+				}
+			}
+
+			Matrix<t_real> A = Matrix<t_real>::Zero(total_entries, 4);
+			Vector<t_real> b = Vector<t_real>::Zero(total_entries);
+			//putting values into a vector and matrix for least squares
+			for (t_int i = 0; i < total_entries; ++i)
+			{
+				A(i, 0) = static_cast<t_real>(entries.at(i).row() * entries.at(i).row()); // y^2
+				A(i, 1) = static_cast<t_real>(entries.at(i).col() * entries.at(i).col()); // x^2
+				A(i, 2) = static_cast<t_real>(entries.at(i).col() * entries.at(i).row()); // x*y
+				b(i) = std::real(entries.at(i).value());
+			}
+			const auto solution = static_cast<Vector<t_real>>(A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b));
+			std::cout << solution << '\n';
+		}
+
+		t_real median(const Vector<t_real> &input){
+			//Finds the median of a real vector x
+			auto size = input.size();
+			Vector<t_real> x(size);
+			std::copy(input.data(), input.data() + size, x.data());
+			std::sort(x.data(), x.data() + size);
+			if (std::floor(size / 2) - std::ceil(size / 2) == 0)
+				return (x(std::floor(size / 2) - 1) + x(std::floor(size / 2)))/ 2;
+			return x(std::ceil(size /2 ));
+		}
+
+
 	}
+
 }

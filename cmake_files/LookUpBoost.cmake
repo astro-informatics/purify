@@ -39,7 +39,7 @@ file(COPY "${PROJECT_BINARY_DIR}/CMakeFiles/external/boost_configure.sh"
 
 find_program(PATCH_EXECUTABLE patch REQUIRED)
 ExternalProject_Add(
-    Boost
+    Lookup-Boost
     PREFIX ${EXTERNAL_ROOT}
     # Downloads boost from url -- much faster than svn
     URL http://downloads.sourceforge.net/project/boost/boost/1.57.0/boost_1_57_0.tar.bz2
@@ -53,7 +53,7 @@ ExternalProject_Add(
     LOG_BUILD ON
 )
 # Rerun cmake to capture new boost install
-add_recursive_cmake_step(Boost DEPENDEES install)
+add_recursive_cmake_step(Lookup-Boost DEPENDEES install)
 set(BOOST_ROOT "${EXTERNAL_ROOT}" CACHE INTERNAL "Prefix for Boost install")
 # Makes sure those are not in the CACHE, otherwise, new version will not be found
 unset(Boost_INCLUDE_DIR CACHE)

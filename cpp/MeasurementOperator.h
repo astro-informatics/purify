@@ -6,7 +6,6 @@
 #include "FFTOperator.h"
 #include "kernels.h"
 
-#include <CCfits/CCfits>
 #include <string>
 #include <iostream>
 
@@ -84,15 +83,15 @@ namespace purify {
       //! Generates and calculates weights
       Array<t_complex> init_weights(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const t_real & oversample_factor, const std::string& weighting_type, const t_real& R);
       //! Calculate Primary Beam
-      Image<t_real> init_primary_beam(const std::string & primary_beam);
-      //! Estiamtes norm of operator
-      t_real power_method(const t_int & niters, const t_real & relative_difference = 1e-9);
+      Image<t_real> init_primary_beam(const std::string & primary_beam, const t_real& cell_x, const t_real& cell_y);
       //! Generates chirp matrix
       Matrix<t_complex> create_chirp_matrix(const Vector<t_real> & w_components, const t_real cell_x, const t_real cell_y, const t_real& energy_fraction = 1);
 
     public:
       //! Calculate column of covariance matrix for a given column/waveform
       Image<t_complex> covariance_calculation(const Image<t_complex> & vector);
+      //! Estiamtes norm of operator
+      t_real power_method(const t_int & niters, const t_real & relative_difference = 1e-9);
 
   };
 }

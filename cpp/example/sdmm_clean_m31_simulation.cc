@@ -101,11 +101,13 @@ int main( int nargs, char const** args ) {
             .append(sopt::proximal::l1_norm<t_complex>, Psi.adjoint(), Psi)
             .append(sopt::proximal::positive_quadrant<t_complex>);
   //Timing reconstruction
+  Vector<t_complex> result;
   std::clock_t c_start = std::clock();
-  auto const result = sdmm(initial_estimate);
+  auto const diagonstic = sdmm(result, initial_estimate);
   std::clock_t c_end = std::clock();
+  
 
-  Image<t_complex> image = Image<t_complex>::Map(result.out.data(), measurements.imsizey, measurements.imsizex);
+  Image<t_complex> image = Image<t_complex>::Map(result.data(), measurements.imsizey, measurements.imsizex);
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
 

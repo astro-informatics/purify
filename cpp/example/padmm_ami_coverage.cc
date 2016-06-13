@@ -2,7 +2,7 @@
 #include <memory>
 #include <random>
 #include "sopt/relative_variation.h"
-#include <sopt/l1_padmm.h>
+#include <sopt/imaging_padmm.h>
 #include "sopt/utilities.h"
 #include "sopt/wavelets.h"
 #include "sopt/wavelets/sara.h"
@@ -76,7 +76,7 @@ int main(int, char **) {
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
   std::printf("Using epsilon of %f \n", epsilon);
   std::cout << "Starting sopt!" << '\n';
-  auto const padmm = sopt::algorithm::L1ProximalADMM<t_complex>(uv_data.vis)
+  auto const padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
                          .itermax(500)
                          .gamma((measurements_transform.adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
                          .relative_variation(1e-3)
@@ -92,9 +92,10 @@ int main(int, char **) {
                          .nu(1e0)
                          .Psi(Psi)
                          .Phi(measurements_transform);
-   auto const result = padmm(initial_estimate);
-  assert(result.x.size() == M31.size());
-  Image<t_complex> image = Image<t_complex>::Map(result.x.data(), measurements.imsizey, measurements.imsizex);
+  
+  auto const diagnostic = padmm();
+  assert(diagnostic.x.size() == M31.size());
+  Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey, measurements.imsizex);
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
   sopt::utilities::write_tiff(image.real(), outfile);

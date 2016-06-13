@@ -85,13 +85,17 @@ namespace purify {
       //! A vector that whiten's the visibilities given the weights.
       utilities::vis_params whiten_vis(const utilities::vis_params& uv_vis);
       //! A function that calculates the l2 ball radius for sopt
-      t_real calculate_l2_radius(const Vector<t_complex> & y, const t_real& sigma = 0);
+      t_real calculate_l2_radius(const Vector<t_complex> & y, const t_real& sigma = 0, const t_real& n_sigma = 2.);
       //! Converts SNR to RMS noise
       t_real SNR_to_standard_deviation(const Vector<t_complex>& y0, const t_real& SNR = 30.);
       //! Add guassian noise to vector
       Vector<t_complex> add_noise(const Vector<t_complex>& y, const t_complex& mean, const t_real& standard_deviation);
       //! Test to see if file exists
       bool file_exists(const std::string& name);
+      //! Method to fit Gaussian to PSF
+      void fit_fwhm(const Image<t_real> & psf);
+      //! Return median of real vector
+      t_real median(const Vector<t_real> &input);
  }
 }
 

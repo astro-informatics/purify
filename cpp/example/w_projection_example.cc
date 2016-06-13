@@ -104,9 +104,10 @@ int main( int nargs, char const** args ){
                       measurements_transform)
               .append(sopt::proximal::l1_norm<t_complex>, Psi.adjoint(), Psi)
               .append(sopt::proximal::positive_quadrant<t_complex>);
-    auto const result = sdmm(initial_estimate);
-    assert(result.out.size() == M31.size());
-    Image<t_real> image = Image<t_complex>::Map(result.out.data(), M31.rows(), M31.cols()).real();
+    Vector<t_complex> result;
+    auto const diagnostic = sdmm(result, initial_estimate);
+    assert(result.size() == M31.size());
+    Image<t_real> image = Image<t_complex>::Map(result.data(), M31.rows(), M31.cols()).real();
     t_real max_val_final = image.array().abs().maxCoeff();
     image = image / max_val_final;
     sopt::utilities::write_tiff(image, outfile);

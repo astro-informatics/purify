@@ -2,7 +2,7 @@
 #include <memory>
 #include <random>
 #include "sopt/relative_variation.h"
-#include <sopt/l1_padmm.h>
+#include <sopt/imaging_padmm.h>
 #include "sopt/utilities.h"
 #include "sopt/wavelets.h"
 #include "sopt/wavelets/sara.h"
@@ -71,17 +71,16 @@ int main(int, char **) {
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), height, width), dirty_image_fits);
 
  
-  auto noise_variance = utilities::variance(input)/2;
-  t_real const noise_rms = std::sqrt(noise_variance);
+  t_real const noise_rms = 1.1577e+03;
   //std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
-  t_real epsilon = utilities::calculate_l2_radius(input); //Calculation of l_2 bound following SARA paper
-
+  t_real epsilon = utilities::calculate_l2_radius(input, noise_rms); //Calculation of l_2 bound following SARA paper
+  t_real epsilon_alt = std::sqrt(uv_data.vis.size()) * noise_rms;
   auto purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * (uv_data.weights.array().real().sqrt() * input.array()).matrix())).real().maxCoeff() * beta;
 
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
   std::cout << "Gamma = " << purify_gamma << '\n';
-  auto const padmm = sopt::algorithm::L1ProximalADMM<t_complex>(input)
+  auto const padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(input)
     .itermax(20)
     .gamma(purify_gamma)
     .relative_variation(1e-3)
@@ -98,9 +97,10 @@ int main(int, char **) {
     .nu(1e0)
     .Psi(Psi)
     .Phi(measurements_transform);
-  auto const result = padmm(initial_estimate);
-  assert(result.x.size() == width * height);
-  Image<t_complex> image = Image<t_complex>::Map(result.x.data(), measurements.imsizey, measurements.imsizex);
+  
+  auto const diagnostic = padmm();
+  assert(diagnostic.x.size() == width * height);
+  Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey, measurements.imsizex);
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
   sopt::utilities::write_tiff(image.real(), outfile);
