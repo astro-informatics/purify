@@ -9,8 +9,8 @@ namespace purify {
       eigen_image:: input image to be degridded
       st:: gridding parameters
     */
-      Matrix<t_complex> padded_image = Matrix<t_complex>::Zero(floor(imsizex * oversample_factor), floor(imsizey * oversample_factor));
-      Matrix<t_complex> ft_vector(ftsizeu, ftsizev);
+      Matrix<t_complex> padded_image = Matrix<t_complex>::Zero(floor(imsizey * oversample_factor), floor(imsizex * oversample_factor));
+      Matrix<t_complex> ft_vector(ftsizev, ftsizeu);
       t_int x_start = floor(floor(imsizex * oversample_factor) * 0.5 - imsizex * 0.5);
       t_int y_start = floor(floor(imsizey * oversample_factor) * 0.5 - imsizey * 0.5);
 
@@ -37,7 +37,7 @@ namespace purify {
       st:: gridding parameters
     */
       Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W).matrix()/norm;
-      ft_vector.resize(ftsizeu, ftsizev); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
+      ft_vector.resize(ftsizev, ftsizeu); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
       ft_vector = utilities::re_sample_ft_grid(ft_vector, 1./resample_factor);
       Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
       t_int x_start = floor(floor(imsizex * oversample_factor) * 0.5 - imsizex * 0.5);
@@ -74,8 +74,8 @@ namespace purify {
     */
 
   // Need to write exception for u.size() != v.size()
-  t_real rows = u.size();
-  t_real cols = ftsizeu * ftsizev;
+  t_int rows = u.size();
+  t_int cols = ftsizeu * ftsizev;
   t_int q;
   t_int p;
   t_int index;
@@ -95,7 +95,7 @@ namespace purify {
             p = utilities::mod(k_v(m) + jv, ftsizev);
             index = utilities::sub2ind(p, q, ftsizev, ftsizeu);
             const t_complex I(0, 1);
-            entries.emplace_back(m, index, std::exp(-2 * purify_pi * I *((k_u(m) + ju) * 0.5+ (k_v(m) + jv) * 0.5 )) * kernelu(u(m)-(k_u(m)+ju)) * kernelv(v(m)-(k_v(m)+jv)));
+            entries.emplace_back(m, index, std::exp(-2 * purify_pi * I *((k_u(m) + ju) * 0.5 + (k_v(m) + jv) * 0.5 )) * kernelu(u(m)-(k_u(m)+ju)) * kernelv(v(m)-(k_v(m)+jv)));
           }
       }
     }
@@ -110,14 +110,14 @@ namespace purify {
   Image<t_real> MeasurementOperator::init_correction2d(const std::function<t_real(t_real)> ftkernelu, const std::function<t_real(t_real)> ftkernelv)
   {
     /*
-      Given the fourier transform of a gridding kernel, creates the scaling image for gridding correction.
+      Given the Fourier transform of a gridding kernel, creates the scaling image for gridding correction.
 
     */
     t_int x_start = std::floor(ftsizeu * 0.5 - imsizex * 0.5);
     t_int y_start = std::floor(ftsizev * 0.5 - imsizey * 0.5);
     Array<t_real> range;
     range.setLinSpaced(std::max(ftsizeu, ftsizev), 0.5, std::max(ftsizeu, ftsizev) - 0.5);
-    return (1e0 / range.segment(x_start, imsizex).unaryExpr(ftkernelu)).matrix() * (1e0 / range.segment(y_start, imsizey).unaryExpr(ftkernelv)).matrix().transpose();
+    return (1e0 / range.segment(y_start, imsizey).unaryExpr(ftkernelv)).matrix() * (1e0 / range.segment(x_start, imsizex).unaryExpr(ftkernelu)).matrix().transpose();
   }
 
   Image<t_real> MeasurementOperator::init_correction2d_fft(const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int Ju, const t_int Jv)
@@ -126,7 +126,7 @@ namespace purify {
       Given the gridding kernel, creates the scaling image for gridding correction using an fft.
 
     */
-    Matrix<t_complex> K= Matrix<t_complex>::Zero(ftsizeu, ftsizev);
+    Matrix<t_complex> K = Matrix<t_complex>::Zero(ftsizeu, ftsizev);
     for (int i = 0; i < Ju; ++i)
     {
       t_int n = utilities::mod(i - Ju/2, ftsizeu);
@@ -168,7 +168,7 @@ namespace purify {
       {
         t_int q = utilities::mod(floor(u(i) * scale), ftsizeu);
         t_int p = utilities::mod(floor(v(i) * scale), ftsizev);
-        gridded_weights(p, q) += 1; //I get better results assuming all the weights are the same.
+        gridded_weights(p, q) += 1; //I get better results assuming all the weights are the same. I think miriad does this.
       }
       t_complex const sum_grid_weights2 = (gridded_weights.array() * gridded_weights.array()).sum();
       t_complex const sum_grid_weights = gridded_weights.array().sum();
