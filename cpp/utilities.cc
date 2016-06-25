@@ -593,16 +593,31 @@ namespace purify {
 	    		output_uv_vis.vis = uv_vis.vis.array() * uv_vis.weights.array().cwiseAbs().sqrt();
 	    		return output_uv_vis;
 	    }
-	    t_real calculate_l2_radius(const Vector<t_complex> & y, const t_real& sigma, const t_real& n_sigma){
+	    t_real calculate_l2_radius(const Vector<t_complex> & y, const t_real& sigma, const t_real& n_sigma, const std::string distirbution){
 	    	/*
 				Calculates the epsilon, the radius of the l2_ball in sopt
 				y:: vector for the l2 ball
 	    	*/
-			if (sigma == 0)
-			{
-				return std::sqrt(2 *y.size() + n_sigma * std::sqrt(4 * y.size()));
-			}
-	    	return std::sqrt(2 * y.size() + n_sigma * std::sqrt(4 * y.size())) * sigma;
+			if (distirbution == "chi^2"){
+				if (sigma == 0)
+				{
+					return std::sqrt(2 * y.size() + n_sigma * std::sqrt(4 * y.size()));
+				}
+		    	return std::sqrt(2 * y.size() + n_sigma * std::sqrt(4 * y.size())) * sigma;
+	    	}
+	    	if (distirbution == "chi")
+	    	{
+	    		auto alpha =  1./(8 * y.size()) - 1./(128 * y.size() * y.size()); //series expansion for gamma relation
+	    		auto mean = std::sqrt(2) * std::sqrt(y.size()) * (1 - alpha); //using Gamma(k+1/2)/Gamma(k) asymptotic formula
+	    		auto standard_deviation = std::sqrt(2 * y.size() * alpha * (2 - alpha));
+	    		if (sigma == 0)
+				{
+					return mean + n_sigma * standard_deviation;
+				}
+		    	return (mean + n_sigma * standard_deviation) * sigma;
+	    	}
+
+	    	return 1.;
 	    }
 	   	t_real SNR_to_standard_deviation(const Vector<t_complex>& y0, const t_real& SNR){
 	   		/*
@@ -715,6 +730,64 @@ namespace purify {
 			return x(std::ceil(size /2 ));
 		}
 
+	   	t_real dynamic_range(const Image<t_complex>& model, const Image<t_complex>& residuals, const t_real& operator_norm){
+	   		/*
+			Returns value of noise rms given a measurement vector and signal to noise ratio
+			y0:: complex valued vector before noise added
+			SNR:: signal to noise ratio
+
+			This calculation follows Carrillo et al. (2014), PURIFY a new approach to radio interferometric imaging
+	   		*/
+	    	return std::sqrt(model.size()) * (operator_norm * operator_norm) / residuals.matrix().norm() * model.cwiseAbs().maxCoeff();
+	    }
+
+		Array<t_complex> init_weights(const Vector<t_real>& u, const Vector<t_real>& v, 
+			const Vector<t_complex>& weights, const t_real & oversample_factor, 
+			const std::string& weighting_type, const t_real& R, const t_int & ftsizeu, const t_int & ftsizev)
+		  {
+		    /*
+		      Calculate the weights to be applied to the visibilities in the measurement operator. 
+		      It does none, whiten, natural, uniform, and robust.
+		    */
+		    Vector<t_complex> out_weights(weights.size());
+		    t_complex const sum_weights = weights.sum();
+		    if (weighting_type == "none")
+		    {
+		      out_weights = weights.array() * 0 + 1;
+		    } else if (weighting_type == "whiten"){
+		      out_weights = weights.array().sqrt();
+		    }
+		    else if (weighting_type == "natural")
+		    {
+		      out_weights = weights;
+		    } else {
+		      auto step_function = [&] (t_real x) { return 1; };
+		      t_real scale = 1./oversample_factor; //scale for fov
+		      Matrix<t_complex> gridded_weights = Matrix<t_complex>::Zero(ftsizev, ftsizeu);
+		      for (t_int i = 0; i < weights.size(); ++i)
+		      {
+		        t_int q = utilities::mod(floor(u(i) * scale), ftsizeu);
+		        t_int p = utilities::mod(floor(v(i) * scale), ftsizev);
+		        gridded_weights(p, q) += 1; //I get better results assuming all the weights are the same. I think miriad does this.
+		      }
+		      t_complex const sum_grid_weights2 = (gridded_weights.array() * gridded_weights.array()).sum();
+		      t_complex const sum_grid_weights = gridded_weights.array().sum();
+		      t_complex const robust_scale = sum_weights/sum_grid_weights2 * 25. * std::pow(10, -2 * R); // Following standard formula, a bit different from miriad.
+		      
+		      for (t_int i = 0; i < weights.size(); ++i)
+		      {
+		        t_int q = utilities::mod(floor(u(i) * scale), ftsizeu);
+		        t_int p = utilities::mod(floor(v(i) * scale), ftsizev);
+		        if (weighting_type == "uniform")
+		          out_weights(i) = weights(i) / gridded_weights(p, q);
+		        if (weighting_type == "robust"){
+		          out_weights(i) = weights(i) /(1. + robust_scale * gridded_weights(p, q));
+		        }
+		      }
+		      out_weights = out_weights/out_weights.sum();
+		    }
+		    return out_weights.array();
+		  }
 
 	}
 

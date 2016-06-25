@@ -144,50 +144,6 @@ namespace purify {
 
   }  
 
-  Array<t_complex> MeasurementOperator::init_weights(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const t_real & oversample_factor, const std::string& weighting_type, const t_real& R)
-  {
-    /*
-      Calculate the weights to be applied to the visibilities in the measurement operator. It does none, whiten, natural, uniform, and robust.
-    */
-    Vector<t_complex> out_weights(weights.size());
-    t_complex const sum_weights = weights.sum();
-    if (weighting_type == "none")
-    {
-      out_weights = weights.array() * 0 + 1;
-    } else if (weighting_type == "whiten"){
-      out_weights = weights.array().sqrt();
-    }
-    else if (weighting_type == "natural")
-    {
-      out_weights = weights;
-    } else {
-      auto step_function = [&] (t_real x) { return 1; };
-      t_real scale = 1./oversample_factor; //scale for fov
-      Matrix<t_complex> gridded_weights = Matrix<t_complex>::Zero(ftsizev, ftsizeu);
-      for (t_int i = 0; i < weights.size(); ++i)
-      {
-        t_int q = utilities::mod(floor(u(i) * scale), ftsizeu);
-        t_int p = utilities::mod(floor(v(i) * scale), ftsizev);
-        gridded_weights(p, q) += 1; //I get better results assuming all the weights are the same. I think miriad does this.
-      }
-      t_complex const sum_grid_weights2 = (gridded_weights.array() * gridded_weights.array()).sum();
-      t_complex const sum_grid_weights = gridded_weights.array().sum();
-      t_complex const robust_scale = sum_weights/sum_grid_weights2 * 25. * std::pow(10, -2 * R); // Following standard formula, a bit different from miriad.
-      
-      for (t_int i = 0; i < weights.size(); ++i)
-      {
-        t_int q = utilities::mod(floor(u(i) * scale), ftsizeu);
-        t_int p = utilities::mod(floor(v(i) * scale), ftsizev);
-        if (weighting_type == "uniform")
-          out_weights(i) = weights(i) / gridded_weights(p, q);
-        if (weighting_type == "robust"){
-          out_weights(i) = weights(i) /(1. + robust_scale * gridded_weights(p, q));
-        }
-      }
-      out_weights = out_weights/out_weights.sum();
-    }
-    return out_weights.array();
-  }
 
   Image<t_real> MeasurementOperator::init_primary_beam(const std::string & primary_beam, const t_real& cell_x, const t_real& cell_y){
     /*
@@ -367,7 +323,7 @@ namespace purify {
       }
       
       std::printf("Calculating weights: W \n");
-      W = MeasurementOperator::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R);
+      W = utilities::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R, ftsizeu, ftsizev);
       std::printf("Calculating the primary beam: A \n");
       auto A = MeasurementOperator::init_primary_beam(primary_beam, cell_x, cell_y);
       S = S * A;
@@ -468,7 +424,7 @@ namespace purify {
       G = utilities::convolution(G, C, ftsizeu, ftsizev, uv_vis.w.size());
     }
     std::printf("Calculating weights: W \n");
-    W = MeasurementOperator::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R);
+    W = utilities::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R, ftsizeu, ftsizev);
 
     //It makes sense to included the primary beam at the same time the gridding correction is performed.
     std::printf("Calculating the primary beam: A \n");
