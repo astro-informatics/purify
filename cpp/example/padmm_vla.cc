@@ -1,6 +1,5 @@
 
 #include <array>
-#include <memory>
 #include <random>
 #include "sopt/relative_variation.h"
 #include <sopt/imaging_padmm.h>
@@ -18,27 +17,26 @@ int main(int, char **) {
   using namespace purify::notinstalled;
   sopt::logging::initialize();
 
+  bool update_output = true; //save output after each iteration
 
   std::string const vla_1 = "at166B.3C129.c0";
 
   std::string const name = vla_1;
-  std::string const weighting = "robust";
+  std::string const weighting = "whiten";
   std::string const stokes = "I";
 
   std::string const visfile = vla_filename(name + stokes + ".vis");
   std::string const noisefile = vla_filename(name + "V.vis");
-  std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + ".fits");
-  std::string const dirty_image_fits = output_filename(name + "_dirty_"+ weighting + ".fits");
-  std::string const psf_fits = output_filename(name + "_psf_"+ weighting + ".fits");
-  std::string const residual_fits = output_filename(name + "_residual_"+ weighting + ".fits");
+
 
   t_int const niters = 1000;
-  t_real const beta = 1e+0;
+  t_real const beta = 1e-3;
   t_real const over_sample = 1.375;
 
   auto uv_data = utilities::read_visibility(visfile);
+  t_real const max_u = std::sqrt((uv_data.u.array() * uv_data.u.array() + uv_data.v.array() * uv_data.v.array()).maxCoeff());
   uv_data.units = "lambda";
-  t_real cellsize = 0.3;
+  t_real cellsize = (180 * 3600) / max_u / purify_pi / 3;
   t_int width = 512;
   t_int height = 512;
   //uv_data = utilities::uv_symmetry(uv_data);
@@ -50,7 +48,8 @@ int main(int, char **) {
   header.cell_x = cellsize;
   header.cell_y = cellsize;
 
-
+  std::string const dirty_image_fits = output_filename(name + "_dirty_"+ weighting + ".fits");
+  std::string const psf_fits = output_filename(name + "_psf_"+ weighting + ".fits");
 
   MeasurementOperator measurements(uv_data, 4, 4, "kb_min", width, height, over_sample, cellsize, cellsize, weighting, 0);
   auto const noise_uv_data = utilities::read_visibility(noisefile);
@@ -77,9 +76,9 @@ int main(int, char **) {
   );
 
   sopt::wavelets::SARA const sara{
-        std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u), 
-        std::make_tuple("DB3", 3u),  std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u), 
-        std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
+        std::make_tuple("Dirac", 4u), std::make_tuple("DB1", 4u), std::make_tuple("DB2", 4u), 
+        std::make_tuple("DB3", 4u),  std::make_tuple("DB4", 4u), std::make_tuple("DB5", 4u), 
+        std::make_tuple("DB6", 4u), std::make_tuple("DB7", 4u), std::make_tuple("DB8", 4u)};
 
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, height, width);
@@ -101,29 +100,27 @@ int main(int, char **) {
 
   pfitsio::write2d_header(Image<t_real>::Map(psf.data(), height, width), header);
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
-  if (utilities::file_exists(outfile_fits))
-    std::printf("Using previous run.");
-    //initial_estimate = pfitsio::read2d(outfile_fits);
-
+  Vector<t_complex> initial_residuals = Vector<t_complex>::Zero(input.size());
 
   t_real const noise_rms = std::sqrt(sigma_real * sigma_real + sigma_imag * sigma_imag)/std::sqrt(2);
-  t_real const n_sigma = 1;
+  t_real const n_sigma = 5;
   t_real const W_norm = measurements.W.abs().maxCoeff();
-  t_real epsilon = 3 * utilities::calculate_l2_radius(input, noise_rms, n_sigma); //Calculation of l_2 bound following SARA paper
+  t_real epsilon = utilities::calculate_l2_radius(input, noise_rms, n_sigma); //Calculation of l_2 bound following SARA paper
 
 
-  auto purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * input)).cwiseAbs().maxCoeff() * beta;
-  
+  t_real purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * input)).cwiseAbs().maxCoeff() * beta;
+
+
+
   uv_data.weights = measurements.W;
   measurements.W = measurements.W.array() * 0 + 1;
   measurements.norm = 1;
   measurements.norm = std::sqrt(measurements.power_method(100)); //renormalise, because weights are not in the operator
-  
 
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
   std::cout << "Gamma = " << purify_gamma << '\n';
-  auto const padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(input)
+  auto padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(input)
     .itermax(niters)
     .gamma(purify_gamma)
     .relative_variation(1e-3)
@@ -136,26 +133,60 @@ int main(int, char **) {
     .l1_proximal_positivity_constraint(true)
     .l1_proximal_real_constraint(true)
     .residual_convergence(epsilon)
-    .lagrange_update_scale(0.5)
+    .lagrange_update_scale(0.9)
     .nu(1e0)
     .Psi(Psi)
+    //
     .Phi(measurements_transform);
-  std::tuple<Vector<t_complex>, Vector<t_complex>> const estimates(initial_estimate, Vector<t_complex>::Zero(input.size()));  
+  std::tuple<Vector<t_complex>, Vector<t_complex>> const estimates(initial_estimate, initial_residuals); 
+  
+  auto algorithm_update  = [&padmm, &update_output, &header, &beta, &Psi, &measurements, &name, &weighting, &uv_data](Vector<t_complex> const & x){
+    if (update_output){
+      std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_update.fits");
+      std::string const residual_fits = output_filename(name + "_residual_"+ weighting + "_update.fits");
+
+      Image<t_complex> const image = Image<t_complex>::Map(x.data(), measurements.imsizey, measurements.imsizex);
+      // header information
+      header.pix_units = "JY/PIXEL";
+      header.fits_name = outfile_fits;
+      pfitsio::write2d_header(image.real(), header);
+
+      Image<t_complex> residual = measurements.grid(((uv_data.vis - measurements.degrid(image)).array() * uv_data.weights.array().real()).matrix() ).array();
+      header.pix_units = "JY/BEAM";
+      header.fits_name = residual_fits;
+      pfitsio::write2d_header(residual.real(), header);
+    }
+    //setting information for updating parameters
+
+    auto new_purify_gamma = (Psi.adjoint() * x).cwiseAbs().maxCoeff() * beta;
+    auto relative_gamma = std::abs(new_purify_gamma - padmm.gamma())/padmm.gamma();
+    std::cout << "Relative gamma = " << relative_gamma << '\n';
+    std::cout << "Old gamma = " << padmm.gamma() << '\n';
+    std::cout << "New gamma = " << new_purify_gamma << '\n';
+    if (relative_gamma > 0.01 and new_purify_gamma > 0)
+    {
+      padmm.gamma(new_purify_gamma);
+    }
+
+    return false;
+  };
+
+  padmm.is_converged(algorithm_update);
   auto const diagnostic = padmm(estimates);
-  assert(diagnostic.x.size() == width * height);
-  Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey, measurements.imsizex);
-  t_real const max_val_final = image.array().abs().maxCoeff();
-  image = image;
+
+  std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_final.fits");
+  std::string const residual_fits = output_filename(name + "_residual_"+ weighting + "_final.fits");
+  Image<t_complex> const image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey, measurements.imsizex);
   // header information
   header.pix_units = "JY/PIXEL";
   header.fits_name = outfile_fits;
   pfitsio::write2d_header(image.real(), header);
 
-  image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey, measurements.imsizex);
   Image<t_complex> residual = measurements.grid(((input - measurements.degrid(image)).array() * uv_data.weights.array().real()).matrix() ).array();
   header.pix_units = "JY/BEAM";
   header.fits_name = residual_fits;
   pfitsio::write2d_header(residual.real(), header);
+
   return 0;
 }
 
