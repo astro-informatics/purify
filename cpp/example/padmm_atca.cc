@@ -57,8 +57,12 @@ int main(int, char **) {
   std::string const psf_fits = output_filename(name + "_psf_"+ weighting + ".fits");
 
   MeasurementOperator measurements(uv_data, 4, 4, "kb_min", width, height, over_sample, cellsize, cellsize, weighting, 0);
+  uv_data.weights = utilities::init_weights(uv_data.u, uv_data.v, 
+      uv_data.weights, over_sample, 
+      weighting, 0, over_sample * width, over_sample * height);
+
   auto const noise_uv_data = utilities::read_visibility(noisefile);
-  Vector<t_complex> const noise_vis = measurements.W.array() * noise_uv_data.vis.array();
+  Vector<t_complex> const noise_vis = uv_data.weights.array() * noise_uv_data.vis.array();
 
   auto sigma_real = utilities::median(noise_vis.real().cwiseAbs())/0.6745;
   auto sigma_imag = utilities::median(noise_vis.imag().cwiseAbs())/0.6745;
@@ -88,44 +92,35 @@ int main(int, char **) {
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, height, width);
   std::printf("Saving dirty map \n");
-  //const Vector<t_complex> weighted_data = (uv_data.vis.array() * measurements.W).matrix(); //whitening data
-  const Vector<t_complex> & input = uv_data.vis.array();
 
-  Vector<> dimage = (measurements_transform.adjoint() * input).real();
+  Vector<> dimage = (measurements_transform.adjoint() * (uv_data.weights.array() * uv_data.vis.array()).matrix()).real();
   t_real max_val = dimage.array().abs().maxCoeff();
   
   header.fits_name = dirty_image_fits;
   pfitsio::write2d_header(Image<t_real>::Map(dimage.data(), height, width), header);
 
-  Vector<t_complex> const psf_vis = (input.array() * 0. + 1.).matrix();
-  Vector<> psf = (measurements_transform.adjoint() * psf_vis).real();
+  Vector<t_complex> const psf_vis = (uv_data.vis.array() * 0. + 1.).matrix();
+  Vector<> psf = (measurements_transform.adjoint() * (uv_data.weights.array() * psf_vis.array()).matrix()).real();
   max_val = psf.array().abs().maxCoeff();
   psf = psf / max_val;
   header.fits_name = psf_fits;
 
   pfitsio::write2d_header(Image<t_real>::Map(psf.data(), height, width), header);
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
-  Vector<t_complex> initial_residuals = Vector<t_complex>::Zero(input.size());
+  Vector<t_complex> initial_residuals = Vector<t_complex>::Zero(uv_data.vis.size());
 
   t_real const noise_rms = std::sqrt(sigma_real * sigma_real + sigma_imag * sigma_imag)/std::sqrt(2);
   t_real const n_sigma = 5;
-  t_real const W_norm = measurements.W.abs().maxCoeff();
-  t_real epsilon = utilities::calculate_l2_radius(input, noise_rms, n_sigma); //Calculation of l_2 bound following SARA paper
+  t_real const W_norm = uv_data.weights.array().abs().maxCoeff();
+  t_real epsilon = utilities::calculate_l2_radius(uv_data.vis, noise_rms, n_sigma); //Calculation of l_2 bound following SARA paper
 
 
-  t_real purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * input)).cwiseAbs().maxCoeff() * beta;
-
-
-
-  uv_data.weights = measurements.W;
-  measurements.W = measurements.W.array() * 0 + 1;
-  measurements.norm = 1;
-  measurements.norm = std::sqrt(measurements.power_method(100)); //renormalise, because weights are not in the operator
+  t_real purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * (uv_data.weights.array() * uv_data.vis.array()).matrix())).cwiseAbs().maxCoeff() * beta;
 
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
   std::cout << "Gamma = " << purify_gamma << '\n';
-  auto padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(input)
+  auto padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
     .itermax(niters)
     .gamma(purify_gamma)
     .relative_variation(1e-3)
@@ -187,7 +182,7 @@ int main(int, char **) {
   header.fits_name = outfile_fits;
   pfitsio::write2d_header(image.real(), header);
 
-  Image<t_complex> residual = measurements.grid(((input - measurements.degrid(image)).array() * uv_data.weights.array().real()).matrix() ).array();
+  Image<t_complex> residual = measurements.grid(((uv_data.vis - measurements.degrid(image)).array() * uv_data.weights.array().real()).matrix() ).array();
   header.pix_units = "JY/BEAM";
   header.fits_name = residual_fits;
   pfitsio::write2d_header(residual.real(), header);
