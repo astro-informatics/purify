@@ -17,6 +17,7 @@ find_package(TIFF REQUIRED)
 find_package(CBLAS REQUIRED)
 set(PURIFY_BLAS_H "${BLAS_INCLUDE_FILENAME}")
 
+
 if(data AND tests)
   lookup_package(Boost REQUIRED COMPONENTS filesystem)
 else()
@@ -24,6 +25,10 @@ else()
 endif()
 
 lookup_package(Eigen3 REQUIRED ARGUMENTS HG_REPOSITORY "https://bitbucket.org/LukePratley/eigen" HG_TAG "3.2")
+
+if(logging)
+  lookup_package(spdlog REQUIRED)
+endif()
 
 # Look up packages: if not found, installs them
 # Unless otherwise specified, if purify is not on master, then sopt will be
