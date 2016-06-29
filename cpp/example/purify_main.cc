@@ -9,6 +9,7 @@
 #include "types.h"
 #include "MeasurementOperator.h"
 #include <getopt.h>
+#include <ctime>
 
 int main(int argc, char **argv) {
   using namespace purify;
@@ -26,15 +27,19 @@ int main(int argc, char **argv) {
 
   t_int niters = 1000;
   t_real beta = 1e-3;
-  t_real over_sample = 2;
-  std::string kernel = "kb";
+  t_real over_sample = 1.375;
+  std::string kernel = "kb_min";
   t_int J = 4;
   t_int width = 512;
   t_int height = 512;
   t_real cellsize = 0;
+  t_real n_mu = 1.2;
+  t_int iter = 0;
 
   bool update_output = false; //save output after each iteration
-  bool adapt_gamma = true;
+  bool adapt_gamma = true; //update gamma/stepsize
+  bool run_diagnostic = false; //save and output diagnostic information
+  bool no_algo_update = false;
   opterr = 0;
 
   int c;
@@ -55,12 +60,14 @@ int main(int argc, char **argv) {
           {"update",    no_argument, 0, 'e'},
           {"beta",    required_argument, 0, 'g'},
           {"noadapt",    no_argument, 0, 'h'},
+          {"n_mu",    required_argument, 0, 'i'},
+          {"diagnostic",    no_argument, 0, 'j'},
           {0, 0, 0, 0}
         };
       /* getopt_long stores the option index here. */
       int option_index = 0;
 
-      c = getopt_long (argc, argv, "abcdefg",
+      c = getopt_long (argc, argv, "a:b:c:defghi",
                        long_options, &option_index);
 
       /* Detect the end of the options. */
@@ -107,6 +114,12 @@ int main(int argc, char **argv) {
           break;
         case 'h':
           adapt_gamma = false;
+          break;
+        case 'i':
+          n_mu = std::stod(optarg);
+          break;
+        case 'j':
+          run_diagnostic = true;
           break;
         case '?':
           /* getopt_long already printed an error message. */
@@ -168,9 +181,9 @@ int main(int argc, char **argv) {
   );
 
   sopt::wavelets::SARA const sara{
-        std::make_tuple("Dirac", 4u), std::make_tuple("DB1", 4u), std::make_tuple("DB2", 4u), 
-        std::make_tuple("DB3", 4u),  std::make_tuple("DB4", 4u), std::make_tuple("DB5", 4u), 
-        std::make_tuple("DB6", 4u), std::make_tuple("DB7", 4u), std::make_tuple("DB8", 4u)};
+        std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u), 
+        std::make_tuple("DB3", 3u),  std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u), 
+        std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, height, width);
@@ -194,19 +207,20 @@ int main(int argc, char **argv) {
   Vector<t_complex> initial_residuals = Vector<t_complex>::Zero(uv_data.vis.size());
 
   t_real const noise_rms = std::sqrt(sigma_real * sigma_real + sigma_imag * sigma_imag)/std::sqrt(2);
-  t_real const n_sigma = 5;
   t_real const W_norm = uv_data.weights.array().abs().maxCoeff();
-  t_real epsilon = utilities::calculate_l2_radius(uv_data.vis, noise_rms, n_sigma); //Calculation of l_2 bound following SARA paper
+  t_real epsilon = n_mu * std::sqrt(2 * uv_data.vis.size()) * noise_rms; //Calculation of l_2 bound following SARA paper
 
 
   t_real purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * (uv_data.weights.array() * uv_data.vis.array()).matrix())).cwiseAbs().maxCoeff() * beta;
+
+  std::ofstream out_diagnostic(name + "_diagnostic");
+  out_diagnostic.precision(13);
 
 
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
   std::cout << "Gamma = " << purify_gamma << '\n';
   auto padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
-    .itermax(niters)
     .gamma(purify_gamma)
     .relative_variation(1e-3)
     .l2ball_proximal_epsilon(epsilon)
@@ -221,29 +235,46 @@ int main(int argc, char **argv) {
     .lagrange_update_scale(0.9)
     .nu(1e0)
     .Psi(Psi)
-    //
     .Phi(measurements_transform);
   std::tuple<Vector<t_complex>, Vector<t_complex>> const estimates(initial_estimate, initial_residuals); 
-  
-  auto algorithm_update  = [&padmm, &update_output, &adapt_gamma, &header, &beta, &Psi, &measurements, &name, &weighting, &uv_data](Vector<t_complex> const & x){
+  std::clock_t c_start = std::clock();
+  auto algorithm_update  = [&padmm, &iter, &c_start, &update_output, &adapt_gamma, &header, &beta, &Psi, &measurements, &name, &weighting, &uv_data, &run_diagnostic, &out_diagnostic](Vector<t_complex> const & x){
+    
+    //diagnostic variables
+    t_real rms = 0;
+    t_real dr = 0;
+    t_real max = 0;
+    t_real min = 0;
+    std::clock_t c_end = std::clock();
+    auto total_time = (c_end-c_start) / CLOCKS_PER_SEC; // total time for solver to run in seconds
+    //Getting things ready for l1 and l2 norm calculation
+    Image<t_complex> const image = Image<t_complex>::Map(x.data(), measurements.imsizey, measurements.imsizex);
+    Vector<t_complex> const y_residual = ((uv_data.vis - measurements.degrid(image)).array() * uv_data.weights.array().real());
+    t_real const l2_norm = y_residual.stableNorm();
+    Vector<t_complex> const alpha = Psi.adjoint() * x;
+    t_real const l1_norm = alpha.lpNorm<1>();
     if (update_output){
       std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_update.fits");
       std::string const residual_fits = output_filename(name + "_residual_"+ weighting + "_update.fits");
 
-      Image<t_complex> const image = Image<t_complex>::Map(x.data(), measurements.imsizey, measurements.imsizex);
       // header information
       header.pix_units = "JY/PIXEL";
       header.fits_name = outfile_fits;
       pfitsio::write2d_header(image.real(), header);
-
-      Image<t_complex> residual = measurements.grid(((uv_data.vis - measurements.degrid(image)).array() * uv_data.weights.array().real()).matrix() ).array();
+      
+      Image<t_complex> residual = measurements.grid(y_residual).array();
       header.pix_units = "JY/BEAM";
       header.fits_name = residual_fits;
       pfitsio::write2d_header(residual.real(), header);
+      
+      rms = utilities::standard_deviation(Image<t_complex>::Map(residual.data(), residual.size(), 1));
+      dr = utilities::dynamic_range(image, residual);
+      max = residual.matrix().real().maxCoeff();
+      min = residual.matrix().real().minCoeff();
     }
     //setting information for updating parameters
 
-    auto new_purify_gamma = (Psi.adjoint() * x).cwiseAbs().maxCoeff() * beta;
+    auto new_purify_gamma = alpha.cwiseAbs().maxCoeff() * beta;
     auto relative_gamma = std::abs(new_purify_gamma - padmm.gamma())/padmm.gamma();
     std::cout << "Relative gamma = " << relative_gamma << '\n';
     std::cout << "Old gamma = " << padmm.gamma() << '\n';
@@ -253,10 +284,43 @@ int main(int argc, char **argv) {
       padmm.gamma(new_purify_gamma);
     }
 
+    if (run_diagnostic)
+    {
+      if (iter == 0)
+        out_diagnostic << "i Gamma RelativeGamma DynamicRange RMS(Res) Max(Res) Min(Res) l1_norm l2_norm Time(sec)" << std::endl;
+      out_diagnostic << iter << " ";
+      out_diagnostic << new_purify_gamma << " ";
+      out_diagnostic << relative_gamma << " ";
+      out_diagnostic << dr << " ";
+      out_diagnostic << rms << " ";
+      out_diagnostic << max << " ";
+      out_diagnostic << min << " ";
+      out_diagnostic << l1_norm << " ";
+      out_diagnostic << l2_norm << " ";
+      out_diagnostic << total_time << " ";
+      out_diagnostic << std::endl;
+      std::cout << "i Gamma RelativeGamma DynamicRange RMS(Res) Max(Res) Min(Res) Time(sec)" << std::endl;
+      std::cout << iter << " ";
+      std::cout << new_purify_gamma << " ";
+      std::cout << relative_gamma << " ";
+      std::cout << dr << " ";
+      std::cout << rms << " ";
+      std::cout << max << " ";
+      std::cout << min << " ";
+      std::cout << l1_norm << " ";
+      std::cout << l2_norm << " ";
+      std::cout << total_time << " ";
+      std::cout << std::endl;      
+    }
+
+    iter++;
+
     return false;
   };
-
-  padmm.is_converged(algorithm_update);
+  if (!no_algo_update)
+    padmm.is_converged(algorithm_update);
+  if (niters != 0)
+    padmm.itermax(niters);
   auto const diagnostic = padmm(estimates);
 
   std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_final.fits");
@@ -271,6 +335,8 @@ int main(int argc, char **argv) {
   header.pix_units = "JY/BEAM";
   header.fits_name = residual_fits;
   pfitsio::write2d_header(residual.real(), header);
+
+  out_diagnostic.close(); // closing diagnostic file
 
   return 0;
 }
