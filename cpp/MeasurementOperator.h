@@ -1,4 +1,4 @@
-#ifndef PURIFY_MEASUREMENT_OPERATOR_H
+ #ifndef PURIFY_MEASUREMENT_OPERATOR_H
 #define PURIFY_MEASUREMENT_OPERATOR_H
 
 #include "types.h"
@@ -32,35 +32,45 @@ namespace purify {
       
       
       MeasurementOperator(const utilities::vis_params& uv_vis_input, const t_int & Ju, const t_int & Jv, 
-        const std::string & kernel_name, const t_int & imsizex, const t_int & imsizey, const t_real & oversample_factor, 
-        const t_real & cell_x = 1, const t_real & cell_y = 1, const std::string& weighting_type = "none", const t_real& R = 0, 
-        bool use_w_term = false, const t_real & energy_fraction = 1, const std::string & primary_beam = "none", bool fft_grid_correction = false);
+       const std::string & kernel_name, const t_int & imsizex, const t_int & imsizey, const t_real & oversample_factor, 
+       const t_real & cell_x = 1, const t_real & cell_y = 1, const std::string& weighting_type = "none", const t_real& R = 0, 
+       bool use_w_term = false, const t_real & energy_fraction = 1, const std::string & primary_beam = "none", bool fft_grid_correction = false);
      
-#   define SOPT_MACRO(NAME, TYPE)                                                          \
-        TYPE const& NAME() const { return NAME ## _; }                                     \
-        MeasurementOperator & NAME(TYPE const &NAME) { NAME ## _ = NAME; return *this; }  \
-      protected:                                                                           \
-        TYPE NAME ## _;                                                                    \
-      public:
+
+#   define PURIFY_MACRO(NAME, TYPE) \
+      protected: \
+        TYPE NAME##_; \
+      public:    \
+        TYPE const &NAME() { return NAME##_; };  \
+        MeasurementOperator &NAME(TYPE const &NAME) { NAME##_ = NAME; return *this; };  \
+                                                                
+      
 
 
 
-/*
-     SOPT_MACRO(u, Vector<t_real>);
-     SOPT_MACRO(v, Vector<t_real>);
-     SOPT_MACRO(Ju, t_int);
-     SOPT_MACRO(Jv, t_int);
-     SOPT_MACRO(imsizex, t_int);
-     SOPT_MACRO(imsizey, t_int);
-     SOPT_MACRO(kernel_name, std::string);
-     SOPT_MACRO(oversample_factor, t_real); 
-     SOPT_MACRO(fft_grid_correction, bool);
-*/
-#     undef SOPT_MACRO
+        /*
+     PURIFY_MACRO(uv_vis_input, utilities::vis_params);
+     PURIFY_MACRO(Ju, t_int);
+     PURIFY_MACRO(Jv, t_int);
+     PURIFY_MACRO(kernel_name, std::string);
+     PURIFY_MACRO(imsizex, t_int);
+     PURIFY_MACRO(imsizey, t_int);
+     PURIFY_MACRO(oversample_factor, t_real);
+     PURIFY_MACRO(cell_x, t_real);
+     PURIFY_MACRO(cell_y, t_real);
+     PURIFY_MACRO(weighting_type, std::string);
+     PURIFY_MACRO(R, t_real);
+     PURIFY_MACRO(use_w_term, bool);
+     PURIFY_MACRO(energy_fraction, bool);
+     PURIFY_MACRO(fft_grid_correction, bool);
+     PURIFY_MACRO(primary_beam, std::string);
+  */
+
+#     undef PURIFY_MACRO
       //t_uint nx() const { return nx_; }
       //MeasurementOperator& nx(t_uint nx) { nx_ = nx; return *this; }
 
-
+    public:
       //! Degridding operator that degrids image to visibilities
       Vector<t_complex> degrid(const Image<t_complex>& eigen_image);
       //! Gridding operator that grids image from visibilities
