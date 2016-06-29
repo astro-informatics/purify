@@ -97,5 +97,38 @@ TEST_CASE("utilities [file exists]", "[file exists]"){
     CHECK(utilities::file_exists(vis_file));
     //File should not exist
     CHECK(not utilities::file_exists("adfadsf"));
-
+}
+TEST_CASE("utilities [fit_fwhm]", "[fit_fwhm]"){
+    t_int imsizex = 512;
+    t_int imsizey = 512;
+    Image<t_real> psf = Image<t_real>::Zero(imsizey, imsizex);
+    //choice of parameters
+    t_real const fwhm_x = 3;
+    t_real const fwhm_y = 6;
+    t_real const theta = 0;
+    //setting up Gaussian calculation
+    t_real const sigma_x = fwhm_x / (2 * std::sqrt(2 * std::log(2)));
+    t_real const sigma_y = fwhm_y / (2 * std::sqrt(2 * std::log(2)));
+    //calculating Gaussian
+    t_real const a = std::pow(std::cos(theta), 2)/(2 * sigma_x * sigma_x) + std::pow(std::sin(theta), 2)/(2 * sigma_y * sigma_y);
+    t_real const b = - std::sin(2 * theta)/(4 * sigma_x * sigma_x) + std::sin(2 * theta)/(4 * sigma_y * sigma_y);
+    t_real const c = std::pow(std::sin(theta), 2)/(2 * sigma_x * sigma_x) + std::pow(std::cos(theta), 2)/(2 * sigma_y * sigma_y);
+    auto x0 = imsizex * 0.5;
+    auto y0 = imsizey * 0.5;
+    for (t_int i = 0; i < imsizex; ++i)
+    {
+        for (t_int j = 0; j < imsizey; ++j)
+        {
+            t_real x = i - x0;
+            t_real y = j - y0;
+            psf(j, i) = std::exp(- a * x * x + 2 * b * x * y - c * y * y );
+        }
+    }
+    auto const fit = utilities::fit_fwhm(psf, 3);
+    auto new_fwhm_x = fit(0) * 2 * std::sqrt(2 * std::log(2));
+    auto new_fwhm_y = fit(1) * 2 * std::sqrt(2 * std::log(2));
+    auto new_theta = fit(2);
+    CHECK(std::abs(new_fwhm_x - fwhm_x)<1e-13);
+    CHECK(std::abs(new_fwhm_y - fwhm_y)<1e-13);
+    CHECK(std::abs(new_theta - theta)<1e-13);
 }
