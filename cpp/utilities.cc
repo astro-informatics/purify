@@ -126,11 +126,11 @@ namespace purify {
 	      {
 	        Vector<t_real> u_dist = uv_vis.u.array() * uv_vis.u.array();
 	        t_real max_u = std::sqrt(u_dist.maxCoeff());
-	        cell_size_u = (180 * 3600) / max_u / purify_pi / 3 * 1.02; //Calculate cell size if not given one
+	        cell_size_u = (180 * 3600) / max_u / purify_pi / 3; //Calculate cell size if not given one
 
 	        Vector<t_real> v_dist = uv_vis.v.array() * uv_vis.v.array();
 	        t_real max_v = std::sqrt(v_dist.maxCoeff());
-	        cell_size_v = (180 * 3600) / max_v / purify_pi / 3  * 1.02; //Calculate cell size if not given one
+	        cell_size_v = (180 * 3600) / max_v / purify_pi / 3; //Calculate cell size if not given one
 	        std::cout << "PSF has a FWHM of " << cell_size_u * 3 << " x " << cell_size_v * 3 << " arcseconds" << '\n';
 	      }
 	      if (cell_size_v == 0)
@@ -665,7 +665,7 @@ namespace purify {
   			return (stat (name.c_str(), &buffer) == 0); 
 		}
 
-		void fit_fwhm(const Image<t_real> & psf){
+		Vector<t_real> fit_fwhm(const Image<t_real> & psf, const t_int & size){
 			/*
 				Find FWHM of point spread function, using least squares.
 
@@ -678,19 +678,11 @@ namespace purify {
 			
 			auto x0 = std::floor(psf.cols() * 0.5);
 			auto y0 = std::floor(psf.rows() * 0.5);
-			
+
 			//finding patch
-			t_real total = 0.;
-			Image<t_real> patch;
-			for (t_int i = 0; i < std::floor(std::min(psf.cols() * 0.5, psf.rows() * 0.5)); ++i)
-			{
-				auto temp = psf.block(std::floor(y0 - i * 0.5), i, std::floor(x0 - i * 0.5), i);
-				auto sum = temp.sum();
-				if (total >= sum)
-					patch = temp;
-					break;
-				total = sum;
-			}
+			Image<t_real> patch = psf.block(std::floor(y0 - size * 0.5) + 1, std::floor(x0 - size * 0.5) + 1, size, size);
+			std::cout << "Fitting to Patch:\n " << patch << '\n';
+
 			//finding values for least squares
 
 			std::vector<t_tripletList> entries;
@@ -700,23 +692,52 @@ namespace purify {
 			{
 				for (t_int j = 0; j < patch.rows(); ++j)
 				{	
-					if(patch(j, i) >= 0.5)
-						entries.emplace_back(j, i, patch(i, j)); total_entries++;
+					
+					entries.emplace_back(j, i, std::log(patch(j, i))); total_entries++;
 				}
 			}
-
 			Matrix<t_real> A = Matrix<t_real>::Zero(total_entries, 4);
-			Vector<t_real> b = Vector<t_real>::Zero(total_entries);
+			Vector<t_real> q = Vector<t_real>::Zero(total_entries);
 			//putting values into a vector and matrix for least squares
 			for (t_int i = 0; i < total_entries; ++i)
 			{
-				A(i, 0) = static_cast<t_real>(entries.at(i).row() * entries.at(i).row()); // y^2
-				A(i, 1) = static_cast<t_real>(entries.at(i).col() * entries.at(i).col()); // x^2
-				A(i, 2) = static_cast<t_real>(entries.at(i).col() * entries.at(i).row()); // x*y
-				b(i) = std::real(entries.at(i).value());
+				t_real x = entries.at(i).col() - size * 0.5 + 0.5;
+				t_real y = entries.at(i).row() - size * 0.5 + 0.5;
+				A(i, 0) = static_cast<t_real>(x * x); // x^2
+				A(i, 1) = static_cast<t_real>(x * y); // x * y
+				A(i, 2) = static_cast<t_real>(y * y); // y^2
+				q(i) = std::real(entries.at(i).value());
 			}
-			const auto solution = static_cast<Vector<t_real>>(A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b));
-			std::cout << solution << '\n';
+			//least squares fitting
+			const auto solution = static_cast<Vector<t_real>>(A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(q));
+			t_real const a = - solution(0);
+			t_real const b = + solution(1) * 0.5;
+			t_real const c = - solution(2);
+			//std::cout << a << " " << b << " " << c << '\n';
+			//parameters of Gaussian
+			t_real theta = std::atan2(b, std::sqrt(std::pow(2 * b, 2) + std::pow(c - a, 2)) + (c - a) * 0.5); // some relatively complicated trig identity to go from tan(2theta) to tan(theta).
+			t_real t = 0.;
+			t_real s = 0.;
+			if (std::abs(b) <1e-13)
+			{
+				t = a;
+				s = c;
+				theta = 0;
+			} else {
+				t = (a + c - 2 * b / std::sin(2 * theta)) * 0.5;
+				s = (a + c + 2 * b / std::sin(2 * theta)) * 0.5;
+			}
+
+			t_real const sigma_x = std::sqrt(1/(2 * t));
+			t_real const sigma_y = std::sqrt(1/(2 * s));
+
+			Vector<t_real> fit_parameters = Vector<t_real>::Zero(3);
+
+			//fit for the beam rms, used for FWHM
+			fit_parameters(0) = sigma_x;
+			fit_parameters(1) = sigma_y;
+			fit_parameters(2) = theta; // because 2*theta is periodic with pi.
+			return fit_parameters;
 		}
 
 		t_real median(const Vector<t_real> &input){

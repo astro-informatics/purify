@@ -94,7 +94,7 @@ namespace purify {
       //! Test to see if file exists
       bool file_exists(const std::string& name);
       //! Method to fit Gaussian to PSF
-      void fit_fwhm(const Image<t_real> & psf);
+      Vector<t_real> fit_fwhm(const Image<t_real> & psf, const t_int & size = 3);
       //! Return median of real vector
       t_real median(const Vector<t_real> &input);
       //! Calculate the dynamic range between the model and residuals
