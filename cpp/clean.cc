@@ -8,14 +8,14 @@ namespace purify {
 			/*
 				hogbom and sdi clean algorithm
 			*/
-
-			Vector<t_complex> residual = uv_vis.vis;
-			Image<t_complex> res_image = op.grid(uv_vis.vis);
+			std::printf("Starting Clean...\n");
+			Vector<t_complex> residual = uv_vis.vis.array() * uv_vis.weights.array();
+			Image<t_complex> res_image = op.grid(residual);
 			Image<t_complex> clean_model = res_image * 0;
 			Image<t_complex> temp_model = clean_model * 0;
 
 			//should add a method to calculate clean sdi clip automatically
-
+			std::printf("Will run for %d iterations \n", niters);
 			for (t_int i = 0; i < niters; ++i)
 			{
 				//finding peak in residual image
@@ -23,9 +23,10 @@ namespace purify {
 				t_int max_y;
 				res_image = op.grid(residual);
 				res_image.abs().maxCoeff(&max_y, &max_x);
-
+				if (i % 50 == 0)
+					std::printf("Iteration: %d, Max: %f, RMS: %f \n", i, std::abs(res_image(max_y, max_x)), utilities::standard_deviation(Image<t_complex>::Map(res_image.data(), res_image.size(), 1)));
 				//generating clean model
-				if ( mode == "hogbom")
+				if (mode == "hogbom")
 					temp_model(max_y, max_x) = gain * res_image(max_y, max_x);
 					
 				if (mode == "steer"){
@@ -50,9 +51,10 @@ namespace purify {
 				//add components to clean model
 				clean_model = clean_model + temp_model;
 				//subtract model from data
-				residual = residual - op.degrid(temp_model);
+				residual = residual - (op.degrid(temp_model).array() * uv_vis.weights.array()).matrix();
 				//clear temp model for next iteration
 				temp_model = temp_model * 0;
+
 			}
 			return clean_model;
 		}
@@ -108,36 +110,63 @@ namespace purify {
 			}
 			return clean_model;
 		}
+		Image<t_complex> convolve_model(const Image<t_complex> & clean_model, const Image<t_complex> & gaussian){
+			Fft2d fft;
+			const Image<t_complex> fft_point_source = fft.forward(gaussian);
+    		const Image<t_complex> clean_model_fft = fft.forward(clean_model);
+    		return fft.inverse(clean_model_fft.array() * fft_point_source.array()).array();
 
+		}
+		Image<t_complex> fit_gaussian(MeasurementOperator & op, const utilities::vis_params & uv_vis){
+			Image<t_real> psf = op.grid(uv_vis.weights).real();
+			t_int psf_x;
+			t_int psf_y;
+			t_real max = psf.maxCoeff(&psf_x, &psf_y);
+			std::printf("PSF max pixel at (%d, %d) \n", psf_y, psf_x);
+			psf = psf / max;
+		    Image<t_complex> gaussian = Image<t_complex>::Zero(op.imsizey, op.imsizex);
+		    //choice of parameters
+		    auto const fit = utilities::fit_fwhm(psf, 3);
+		    auto fwhm_x = fit(0) * 2 * std::sqrt(2 * std::log(2));
+		    auto fwhm_y = fit(1) * 2 * std::sqrt(2 * std::log(2));
+		    auto theta = fit(2);
+		    std::printf("Fitted a Beam of %f x %f , %f \n", fwhm_x, fwhm_y, theta / purify_pi * 180);
+		    //setting up Gaussian calculation
+		    t_real const sigma_x = fwhm_x / (2 * std::sqrt(2 * std::log(2)));
+		    t_real const sigma_y = fwhm_y / (2 * std::sqrt(2 * std::log(2)));
+		    //calculating Gaussian
+		    t_real const a = std::pow(std::cos(theta), 2)/(2 * sigma_x * sigma_x) + std::pow(std::sin(theta), 2)/(2 * sigma_y * sigma_y);
+		    t_real const b = - std::sin(2 * theta)/(4 * sigma_x * sigma_x) + std::sin(2 * theta)/(4 * sigma_y * sigma_y);
+		    t_real const c = std::pow(std::sin(theta), 2)/(2 * sigma_x * sigma_x) + std::pow(std::cos(theta), 2)/(2 * sigma_y * sigma_y);
+		    auto x0 = op.imsizex * 0.5;
+		    auto y0 = op.imsizey * 0.5;
+		    for (t_int i = 0; i < op.imsizex; ++i)
+		    {
+		        for (t_int j = 0; j < op.imsizey; ++j)
+		        {
+		            t_real x = i - x0;
+		            t_real y = j - y0;
+		            gaussian(j, i) = std::exp(- a * x * x + 2 * b * x * y - c * y * y )/(2  * purify_pi * sigma_x * sigma_y);
+		        }
+		    }
+		   	t_int gaussian_x;
+			t_int gaussian_y;
+			std::cout << gaussian.abs().maxCoeff(&gaussian_x, &gaussian_y) << '\n';
+			std::printf("Gaussian max pixel at (%d, %d) \n", gaussian_y, gaussian_x);
+		    return gaussian;
+		}
 		Image<t_complex> restore(MeasurementOperator & op, const utilities::vis_params & uv_vis, const Image<t_complex> & clean_model){
 			/*
 				Produces the final image given a clean model
 			*/
-			FFTOperator fft;
 			
-			
-			const t_real fwhm = 3.; //assuming 3 pixels in image domain for fwhm of point spread function
-			const t_real sigma = fwhm / 2.355; // resolution of point source, determined by fwhm of point spread function
-			auto gaussian = [&sigma] (t_real x) {
-        		t_real a = x * sigma * purify_pi;
-        		return std::sqrt(purify_pi / 2) / sigma * std::exp(-a * a * 2);
-        	};
-        	//constructing guassian to do convolution
-        	Array<t_real> range;
-        	auto x_size = clean_model.cols();
-        	auto y_size = clean_model.rows();
-        	range.setLinSpaced(std::max(y_size, x_size), 0.5, std::max(y_size, x_size) - 0.5);
-    		const Image<t_real> point_source = (1e0 / range.segment(0, x_size).unaryExpr(gaussian)).matrix() 
-    												* (1e0 / range.segment(0, y_size).unaryExpr(gaussian)).matrix().transpose();
-    		
-    		const Image<t_complex> clean_model_fft = fft.forward(clean_model);
-
+			const Image<t_complex> final_model = clean::convolve_model(clean_model, clean::fit_gaussian(op, uv_vis));
     		//need to workout correction factor to multiply residuals by...
     		t_real residual_correction_factor = 1.;
     		//add convolved clean model to residual image
     		auto residual = uv_vis.vis - op.degrid(clean_model);
-    		Image<t_complex> restored_image = op.grid(residual) * residual_correction_factor 
-    													+ fft.inverse(clean_model_fft * point_source).array();
+    		Image<t_complex> restored_image = op.grid(residual.array() * uv_vis.weights.array()).array() * residual_correction_factor 
+    													+ final_model;
     		return restored_image;
 
 		}
