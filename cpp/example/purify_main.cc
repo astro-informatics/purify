@@ -10,6 +10,7 @@
 #include "MeasurementOperator.h"
 #include <getopt.h>
 #include <ctime>
+#include "clara.h"
 
 int main(int argc, char **argv) {
   using namespace purify;
@@ -25,16 +26,23 @@ int main(int argc, char **argv) {
   std::string noisefile = "";
 
 
-  t_int niters = 1000;
+  t_int niters = 0;
   t_real beta = 1e-3;
-  t_real over_sample = 1.375;
-  std::string kernel = "kb_min";
+  //measurement operator stuff
+  t_real over_sample = 2;
+  std::string kernel = "kb";
   t_int J = 4;
   t_int width = 512;
   t_int height = 512;
   t_real cellsize = 0;
   t_real n_mu = 1.2;
   t_int iter = 0;
+  t_int power_method_iterations = 20;
+  std::string primary_beam = "none";
+  bool fft_grid_correction = false;
+  //w_term stuff
+  t_real energy_fraction = 1;
+  bool use_w_term = false;
 
   bool update_output = false; //save output after each iteration
   bool adapt_gamma = true; //update gamma/stepsize
@@ -52,6 +60,7 @@ int main(int argc, char **argv) {
           //{"verbose", no_argument,       &verbose_flag, 1},
           /* These options don’t set a flag.
              We distinguish them by their indices. */
+          {"help", no_argument, 0, 'z'},
           {"vis",     required_argument,       0, 'a'},
           {"noise",  required_argument,       0, 'b'},
           {"name",  required_argument, 0, 'c'},
@@ -60,14 +69,19 @@ int main(int argc, char **argv) {
           {"update",    no_argument, 0, 'e'},
           {"beta",    required_argument, 0, 'g'},
           {"noadapt",    no_argument, 0, 'h'},
-          {"n_mu",    required_argument, 0, 'i'},
+          {"n_mean",    required_argument, 0, 'i'},
           {"diagnostic",    no_argument, 0, 'j'},
+          {"power_iterations", required_argument, 0, 'k'},
+          {"use_w_term", no_argument, 0, 'l'},
+          {"energy_fraction", required_argument, 0, 'm'},
+          {"primary_beam", required_argument, 0, 'n'},
+          {"fft_grid_correction", no_argument, 0, 'o'},
           {0, 0, 0, 0}
         };
       /* getopt_long stores the option index here. */
       int option_index = 0;
 
-      c = getopt_long (argc, argv, "a:b:c:defghi",
+      c = getopt_long(argc, argv, "a:bc:defghijklmno",
                        long_options, &option_index);
 
       /* Detect the end of the options. */
@@ -85,7 +99,27 @@ int main(int argc, char **argv) {
             printf (" with arg %s", optarg);
           printf ("\n");
           break;
+        case 'z':
+          printf("Purify: A program will reconstruct images from radio interferometers using PADMM. \n\n");
+          printf("--help: Print this information. \n\n");
+          printf("--vis: path of file with visibilities. (required) \n\n");
+          printf("--noise: path of file with visibilities noise estimate (Stokes V). \n\n");
+          printf("--name: path of file output. (required) \n\n");
+          printf("--niters: number of iterations. \n\n");
+          printf("--size: image size in pixels. \n\n");
+          printf("--update: Switch to allow updating input and output information of PADMM while it is running. \n\n");
+          printf("--beta: valued used to set the stepsize of PADMM\n\n");
+          printf("--noadapt: Choose not to update the stepsize. \n\n");
+          printf("--diagnostic: Save diagnostic information to log file.\n\n");
+          printf("--n_mean: Factor to multiply the l2 bound by.\n\n");
+          printf("--power_iterations: Maximum iterations for the power method.\n\n");
+          printf("--use_w_term: Choose to include the w-projection method (only for small data sets).\n\n");
+          printf("--energy_fraction: How sparse the chirp matrix (w-projection) should be.\n\n");
+          printf("--primary_beam: Choice of primary beam model. (none is the only option).\n\n");
+          printf("--fft_grid_correction: Choose calculate the gridding correction using an FFT rather than analytic formula. \n\n");
 
+          return 0;
+          break;
         case 'a':
           visfile = optarg;
           break;
@@ -106,24 +140,58 @@ int main(int argc, char **argv) {
           width = std::stoi(optarg);
           height = std::stoi(optarg);
           break;
+
         case 'e':
           update_output = true;
           break;
+
         case 'g':
           beta = std::stod(optarg);
           break;
+
         case 'h':
           adapt_gamma = false;
           break;
+
         case 'i':
           n_mu = std::stod(optarg);
           break;
+
         case 'j':
           run_diagnostic = true;
           break;
+
+        case 'k':
+          power_method_iterations = std::stoi(optarg);
+          if (power_method_iterations < 0)
+              power_method_iterations = 1;
+          break;
+
+        case 'l':
+          use_w_term = true;
+          break;
+
+        case 'm':
+          energy_fraction = std::stod(optarg);
+          if (energy_fraction <= 0 or energy_fraction > 1)
+          {
+            std::printf("Wrong energy fraction! %f", energy_fraction);
+            energy_fraction = 1;
+          }
+          break;
+
+        case 'n':
+          primary_beam = optarg;
+          break;
+
+        case 'o':
+          fft_grid_correction = true;
+          break;
+
         case '?':
           /* getopt_long already printed an error message. */
           break;
+
 
         default:
           abort ();
@@ -151,19 +219,29 @@ int main(int argc, char **argv) {
   std::string const dirty_image_fits = output_filename(name + "_dirty_"+ weighting + ".fits");
   std::string const psf_fits = output_filename(name + "_psf_"+ weighting + ".fits");
 
-  MeasurementOperator measurements(uv_data, J, J, kernel, width, height, over_sample, cellsize, cellsize, "none");
+  MeasurementOperator measurements(uv_data, J, J, kernel, width, height, power_method_iterations, 
+    over_sample, cellsize, cellsize, "none", 0, use_w_term, energy_fraction, 
+    primary_beam, fft_grid_correction);
+  
   //calculate weights outside of measurement operator
   uv_data.weights = utilities::init_weights(uv_data.u, uv_data.v, 
       uv_data.weights, over_sample, 
       weighting, 0, over_sample * width, over_sample * height);
+
   //Read in visibilities for noise estimate
-  auto const noise_uv_data = utilities::read_visibility(noisefile);
-  Vector<t_complex> const noise_vis = uv_data.weights.array() * noise_uv_data.vis.array();
+    t_real  sigma_real = 1;
+    t_real  sigma_imag = 1;
 
-  auto sigma_real = utilities::median(noise_vis.real().cwiseAbs())/0.6745;
-  auto sigma_imag = utilities::median(noise_vis.imag().cwiseAbs())/0.6745;
+  if (noisefile != "")
+    {  
+      auto const noise_uv_data = utilities::read_visibility(noisefile);
+      Vector<t_complex> const noise_vis = uv_data.weights.array() * noise_uv_data.vis.array();
 
-  std::cout << "Stokes V RMS noise of " << sigma_real * 1e3 << " mJy and " << sigma_real * 1e3 << " mJy" << '\n';
+      sigma_real = utilities::median(noise_vis.real().cwiseAbs())/0.6745;
+      sigma_imag = utilities::median(noise_vis.imag().cwiseAbs())/0.6745;
+    }
+
+  std::cout << "RMS noise of " << sigma_real << " Jy (real) and " << sigma_real  << " Jy (imaginary)" << '\n';
 
 
   auto direct = [&measurements, &width, &height](Vector<t_complex> &out, Vector<t_complex> const &x) {
