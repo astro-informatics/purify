@@ -34,7 +34,7 @@ int main(int, char **) {
   t_int width = 512;
   t_int height = 512;
   //uv_data = utilities::uv_symmetry(uv_data);ç
-  MeasurementOperator measurements(uv_data, 4, 4, "kb", width, height, over_sample, cellsize, cellsize, "none");
+  MeasurementOperator measurements(uv_data, 4, 4, "kb", width, height, 20, over_sample, cellsize, cellsize, "none");
  
   auto direct = [&measurements, &width, &height](Vector<t_complex> &out, Vector<t_complex> const &x) {
         assert(x.size() == width * height);

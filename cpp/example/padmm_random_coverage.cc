@@ -46,7 +46,7 @@ int main(int, char **) {
   utilities::write_visibility(uv_data, output_vis_file);
   std::cout << "Number of measurements / number of pixels: " << uv_data.u.size() * 1./M31.size() << '\n';
   //uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
-  MeasurementOperator measurements(uv_data, 4, 4, "kb", M31.cols(), M31.rows(), over_sample);
+  MeasurementOperator measurements(uv_data, 4, 4, "kb", M31.cols(), M31.rows(), 20, over_sample);
 
   
   auto direct = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {

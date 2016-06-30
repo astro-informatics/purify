@@ -42,7 +42,7 @@ int main( int nargs, char const** args ){
   {
     auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
     uv_data.units = "radians";
-    MeasurementOperator op(uv_data, J, J, kernel, width, height, over_sample); // Generating gridding matrix
+    MeasurementOperator op(uv_data, J, J, kernel, width, height, 20, over_sample); // Generating gridding matrix
     
     uv_data.vis = Vector<t_complex>::Random(number_of_vis) + I*Vector<t_complex>::Random(number_of_vis);
     std::clock_t c_start = std::clock();

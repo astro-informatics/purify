@@ -51,7 +51,7 @@ int main( int nargs, char const** args ) {
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";
   std::cout << "Number of measurements: " << uv_data.u.size() << '\n';
-  MeasurementOperator simulate_measurements(uv_data, 4, 4, "kb", sky_model.cols(), sky_model.rows(), 5); // Generating simulated high quality visibilities
+  MeasurementOperator simulate_measurements(uv_data, 4, 4, "kb", sky_model.cols(), sky_model.rows(), 20, 5); // Generating simulated high quality visibilities
   uv_data.vis = simulate_measurements.degrid(sky_model);
 
   MeasurementOperator measurements(uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(), over_sample);

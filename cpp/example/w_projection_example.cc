@@ -59,7 +59,7 @@ int main( int nargs, char const** args ){
   //uv_vis = utilities::uv_symmetry(uv_vis); //reflect uv measurements
 
   kernel = "kb";
-  MeasurementOperator measurements(uv_vis, J, J, kernel, width, height, over_sample, cellsize, cellsize, "none", 0, use_w_term, energy_fraction); // Create Measurement Operator
+  MeasurementOperator measurements(uv_vis, J, J, kernel, width, height, 20, over_sample, cellsize, cellsize, "none", 0, use_w_term, energy_fraction); // Create Measurement Operator
  
    auto direct = [&measurements, &M31](Vector<t_complex> &out, Vector<t_complex> const &x) {
           assert(x.size() == M31.size());

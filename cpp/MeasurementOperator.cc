@@ -241,7 +241,7 @@ namespace purify {
   }
 
   MeasurementOperator::MeasurementOperator(const utilities::vis_params& uv_vis_input, const t_int &Ju, const t_int &Jv,
-      const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_real &oversample_factor, const t_real & cell_x, const t_real & cell_y,
+      const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_int & norm_iterations, const t_real &oversample_factor, const t_real & cell_x, const t_real & cell_y,
        const std::string& weighting_type, const t_real& R, bool use_w_term, const t_real& energy_fraction,const std::string & primary_beam, bool fft_grid_correction)
       : imsizex(imsizex), imsizey(imsizey), ftsizeu(floor(oversample_factor * imsizex)), ftsizev(floor(oversample_factor * imsizey)), use_w_term(use_w_term), oversample_factor(oversample_factor)
     
@@ -295,7 +295,6 @@ namespace purify {
     std::printf("Jv: %d \n", Jv);
 
     S = Image<t_real>::Zero(imsizey, imsizex);
-    const t_int norm_iterations = 100; // number of iterations for power method
 
     //samples for kb_interp
     if (kernel_name == "kb_interp")

@@ -33,6 +33,7 @@ int main(int, char **) {
   std::string const output_vis_file = output_filename("M31_Random_coverage.vis");
 
   t_real const over_sample = 2;
+  auto beta = 1e-3;
   auto M31 = pfitsio::read2d(fitsfile);
   t_real const max = M31.array().abs().maxCoeff();
   M31 = M31 * 1. / max;
@@ -51,7 +52,7 @@ int main(int, char **) {
   utilities::write_visibility(uv_data, output_vis_file);
   SOPT_NOTICE("Number of measurements / number of pixels: {}", uv_data.u.size() * 1. / M31.size());
   // uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
-  MeasurementOperator measurements(uv_data, 4, 4, "kb", M31.cols(), M31.rows(), over_sample);
+  MeasurementOperator measurements(uv_data, 4, 4, "kb", M31.cols(), M31.rows(), 20, over_sample);
 
   auto direct = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {
     assert(x.size() == measurements.imsizex * measurements.imsizey);
@@ -78,7 +79,7 @@ int main(int, char **) {
   Vector<t_complex> const y0
       = (measurements_transform * Vector<t_complex>::Map(M31.data(), M31.size()));
   // working out value of signal given SNR of 30
-  t_real sigma = utilities::SNR_to_standard_deviation(y0, 10.);
+  t_real sigma = utilities::SNR_to_standard_deviation(y0, 30.);
   // adding noise to visibilities
   uv_data.vis = utilities::add_noise(y0, 0., sigma);
   Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
@@ -91,15 +92,19 @@ int main(int, char **) {
                    dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
+  auto const purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * beta;
+
+  //auto purify_gamma = 3 * utilities::median((Psi.adjoint() * (measurements_transform.adjoint() * (uv_data.vis - y0))).real().cwiseAbs())/0.6745; 
+
   SOPT_INFO("Using epsilon of {} \n", epsilon);
   auto const padmm
       = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
-            .itermax(500)
-            .gamma((measurements_transform.adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
-            .relative_variation(1e-3)
+            .itermax(1000)
+            .gamma(purify_gamma)
+            .relative_variation(1e-6)
             .l2ball_proximal_epsilon(epsilon)
             .tight_frame(false)
-            .l1_proximal_tolerance(1e-2)
+            .l1_proximal_tolerance(1e-4)
             .l1_proximal_nu(1)
             .l1_proximal_itermax(50)
             .l1_proximal_positivity_constraint(true)
@@ -111,19 +116,17 @@ int main(int, char **) {
             .Phi(measurements_transform);
 
   auto const posq = sopt::algorithm::positive_quadrant(padmm);
-  auto const min_delta = sigma * std::sqrt(y0.size()) / std::sqrt(8 * M31.size());
+  auto const min_delta = sigma * std::sqrt(y0.size()) / std::sqrt(9 * M31.size());
   // Sets weight after each padmm iteration.
   // In practice, this means replacing the proximal of the l1 objective function.
   auto const reweighted
-      = sopt::algorithm::reweighted(padmm).itermax(5).min_delta(min_delta).is_converged(
+      = sopt::algorithm::reweighted(padmm).itermax(10).min_delta(min_delta).is_converged(
           sopt::RelativeVariation<std::complex<t_real>>(1e-3));
   auto const diagnostic = reweighted();
   assert(diagnostic.algo.x.size() == M31.size());
   Image<t_complex> image
       = Image<t_complex>::Map(diagnostic.algo.x.data(), measurements.imsizey, measurements.imsizex);
   t_real const max_val_final = image.array().abs().maxCoeff();
-
-  image = image / max_val_final;
   sopt::utilities::write_tiff(image.real(), outfile);
   pfitsio::write2d(image.real(), outfile_fits);
   Image<t_complex> residual = measurements.grid(y0 - measurements.degrid(image));

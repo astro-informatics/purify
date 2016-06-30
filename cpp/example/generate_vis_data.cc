@@ -40,7 +40,7 @@ int main( int nargs, char const** args ) {
 
   std::cout << "Number of measurements: " << uv_data.u.size() << '\n';
   //uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
-  MeasurementOperator measurements(uv_data, J, J, kernel, M31.cols(), M31.rows(), over_sample);
+  MeasurementOperator measurements(uv_data, J, J, kernel, M31.cols(), M31.rows(), 20, over_sample);
   uv_data.vis = measurements.degrid(M31);
   utilities::write_visibility(uv_data, vis_file);
 

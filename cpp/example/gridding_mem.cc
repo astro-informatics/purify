@@ -31,7 +31,7 @@ int main( int nargs, char const** args ){
   uv_data.units = "radians";
 
 
-  MeasurementOperator op(uv_data, J, J, kernel, width, height, over_sample); // Generating gridding matrix
+  MeasurementOperator op(uv_data, J, J, kernel, width, height, 20, over_sample); // Generating gridding matrix
 
   op.grid(uv_data.vis);
 

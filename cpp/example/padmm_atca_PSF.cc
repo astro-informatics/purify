@@ -46,7 +46,7 @@ int main(int, char **) {
 
   MeasurementOperator image_generator(uv_data, 4, 4, "kb", width, height, over_sample, cellsize, cellsize, "uniform");
 
-  MeasurementOperator psf_generator(uv_data, 4, 4, "kb", 2 * width, 2 * height, over_sample, cellsize, cellsize, "uniform");
+  MeasurementOperator psf_generator(uv_data, 4, 4, "kb", 2 * width, 2 * height, 20, over_sample, cellsize, cellsize, "uniform");
 
   auto const dirty_image = image_generator.grid(uv_data.vis).real();
   Vector<t_complex> const dirty_measurements = image_generator.grid(uv_data.vis);

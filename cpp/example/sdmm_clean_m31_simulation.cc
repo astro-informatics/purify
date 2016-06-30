@@ -53,7 +53,7 @@ int main( int nargs, char const** args ) {
   MeasurementOperator simulate_measurements(uv_data, 4, 4, "kb", sky_model.cols(), sky_model.rows(), 5); // Generating simulated high quality visibilites
   uv_data.vis = simulate_measurements.degrid(sky_model);
 
-  MeasurementOperator measurements(uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(), over_sample);
+  MeasurementOperator measurements(uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(), 20, over_sample);
 
   // putting measurement operator in a form that sopt can use
   auto direct = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {

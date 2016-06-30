@@ -34,7 +34,7 @@ int main(int, char **) {
   t_int width = 512;
   t_int height = 512;
   uv_data = utilities::uv_symmetry(uv_data);
-  MeasurementOperator measurements(uv_data, 4, 4, "kb_interp", width, height, over_sample, cellsize, cellsize, "whiten");
+  MeasurementOperator measurements(uv_data, 4, 4, "kb_interp", width, height, 20, over_sample, cellsize, cellsize, "whiten");
 
  
   auto direct = [&measurements, &width, &height](Vector<t_complex> &out, Vector<t_complex> const &x) {

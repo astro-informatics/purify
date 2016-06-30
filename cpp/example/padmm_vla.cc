@@ -51,7 +51,7 @@ int main(int, char **) {
   std::string const dirty_image_fits = output_filename(name + "_dirty_"+ weighting + ".fits");
   std::string const psf_fits = output_filename(name + "_psf_"+ weighting + ".fits");
 
-  MeasurementOperator measurements(uv_data, 4, 4, "kb_min", width, height, over_sample, cellsize, cellsize, "none");
+  MeasurementOperator measurements(uv_data, 4, 4, "kb_min", width, height, 20, over_sample, cellsize, cellsize, "none");
   
   uv_data.weights = utilities::init_weights(uv_data.u, uv_data.v, 
       uv_data.weights, over_sample, 

@@ -31,7 +31,7 @@ TEST_CASE("Measurement Operator [Kaiser Bessel Linear Interpolation]", "[KB_Inte
   uv_vis = utilities::uv_symmetry(uv_vis); // Enforce condjugate symmetry by reflecting measurements in uv coordinates
 
   kernel = "kb_interp";
-  MeasurementOperator op(uv_vis, J, J, kernel, width, height, over_sample, cellsize, cellsize); // Generating gridding matrix
+  MeasurementOperator op(uv_vis, J, J, kernel, width, height, 5, over_sample, cellsize, cellsize); // Generating gridding matrix
   
   Vector<t_complex> point_source = uv_vis.vis * 0; point_source.setOnes();  // Creating model visibilities for point source
   Image<t_complex> psf;
@@ -70,7 +70,7 @@ TEST_CASE("Measurement Operator [Kaiser Bessel]", "[KB_Non-Interp]") {
   uv_vis = utilities::uv_symmetry(uv_vis); // Enforce condjugate symmetry by reflecting measurements in uv coordinates
 
   kernel = "kb";
-  MeasurementOperator op(uv_vis, J, J, kernel, width, height, over_sample, cellsize, cellsize); // Generating gridding matrix
+  MeasurementOperator op(uv_vis, J, J, kernel, width, height, 5, over_sample, cellsize, cellsize); // Generating gridding matrix
  
   Vector<t_complex> point_source = uv_vis.vis * 0; point_source.setOnes();  // Creating model visibilities for point source
   Image<t_complex> psf;
