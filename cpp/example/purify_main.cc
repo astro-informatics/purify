@@ -10,7 +10,7 @@
 #include "MeasurementOperator.h"
 #include <getopt.h>
 #include <ctime>
-#include "clara.h"
+//#include "clara.h"
 
 int main(int argc, char **argv) {
   using namespace purify;
