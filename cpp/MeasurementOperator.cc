@@ -24,8 +24,8 @@ namespace purify {
       // turn into vector
       ft_vector.resize(ftsizeu*ftsizev, 1); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
       // get visibilities
-      return (G * ft_vector).array() * W/norm;
-      
+      //return (G * ft_vector).array() * W/norm;
+      return utilities::sparse_multiply_matrix(G, ft_vector).array() * W/norm;
   }
 
   Image<t_complex> MeasurementOperator::grid(const Vector<t_complex>& visibilities)
@@ -36,7 +36,8 @@ namespace purify {
       visibilities:: input visibilities to be gridded
       st:: gridding parameters
     */
-      Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W).matrix()/norm;
+      //Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W).matrix()/norm;
+      Matrix<t_complex> ft_vector = utilities::sparse_multiply_matrix(G.adjoint(), (visibilities.array() * W).matrix())/norm;
       ft_vector.resize(ftsizev, ftsizeu); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
       ft_vector = utilities::re_sample_ft_grid(ft_vector, 1./resample_factor);
       Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
@@ -56,7 +57,6 @@ namespace purify {
     return omega.unaryExpr(std::ptr_fun<double,double>(std::floor));     
   }
 
-
   Sparse<t_complex> MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, 
           const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv) 
   {
@@ -73,7 +73,6 @@ namespace purify {
       ftsizev:: size of grid along v axis
     */
 
-  // Need to write exception for u.size() != v.size()
   t_int rows = u.size();
   t_int cols = ftsizeu * ftsizev;
   t_int q;
@@ -253,6 +252,7 @@ namespace purify {
       Ju, Jv:: support size in cells. e.g. Ju = 4, Jv =4.
       kernel_name:: Name of kernel. e.g. "kb"
       imsizey, imsizex:: size of image
+      norm_iterations:: number of max iterations in power method
       oversample_factor:: ratio of fourier grid size to image size
       cell_x, cell_y:: size of a pixel in arcseconds.
       weighting_type:: weighting schemes such as whiten, natural, uniform, robust.
