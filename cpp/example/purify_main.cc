@@ -229,8 +229,8 @@ int main(int argc, char **argv) {
       weighting, 0, over_sample * width, over_sample * height);
 
   //Read in visibilities for noise estimate
-    t_real  sigma_real = 1;
-    t_real  sigma_imag = 1;
+    t_real sigma_real = 1/std::sqrt(2);
+    t_real sigma_imag = 1/std::sqrt(2);
 
   if (noisefile != "")
     {  
@@ -274,8 +274,8 @@ int main(int argc, char **argv) {
   header.fits_name = dirty_image_fits;
   pfitsio::write2d_header(Image<t_real>::Map(dimage.data(), height, width), header);
 
-  Vector<t_complex> const psf_vis = (uv_data.vis.array() * 0. + 1.).matrix();
-  Vector<> psf = (measurements_transform.adjoint() * (uv_data.weights.array() * uv_data.vis.array()).matrix()).real();
+  
+  Vector<> psf = (measurements_transform.adjoint() * (uv_data.weights.array()).matrix()).real();
   max_val = psf.array().abs().maxCoeff();
   psf = psf / max_val;
   header.fits_name = psf_fits;
