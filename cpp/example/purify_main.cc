@@ -362,10 +362,16 @@ int main(int argc, char **argv) {
       padmm.gamma(new_purify_gamma);
     }
 
+
+    //Information saved for diagnostics
+    if (new_purify_gamma == 0)
+    {
+      new_purify_gamma = padmm.gamma();// so that first value on plot is not zero.
+    }
     if (run_diagnostic)
     {
       if (iter == 0)
-        out_diagnostic << "i Gamma RelativeGamma DynamicRange RMS(Res) Max(Res) Min(Res) l1_norm l2_norm Time(sec)" << std::endl;
+      out_diagnostic << "i Gamma RelativeGamma DynamicRange RMS(Res) Max(Res) Min(Res) l1_norm l2_norm Time(sec)" << std::endl;
       out_diagnostic << iter << " ";
       out_diagnostic << new_purify_gamma << " ";
       out_diagnostic << relative_gamma << " ";
@@ -377,7 +383,7 @@ int main(int argc, char **argv) {
       out_diagnostic << l2_norm << " ";
       out_diagnostic << total_time << " ";
       out_diagnostic << std::endl;
-      std::cout << "i Gamma RelativeGamma DynamicRange RMS(Res) Max(Res) Min(Res) Time(sec)" << std::endl;
+      std::cout << "i Gamma RelativeGamma DynamicRange RMS(Res) Max(Res) Min(Res) l1_norm l2_norm Time(sec)" << std::endl;
       std::cout << iter << " ";
       std::cout << new_purify_gamma << " ";
       std::cout << relative_gamma << " ";
