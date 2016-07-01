@@ -819,15 +819,15 @@ namespace purify {
 		  }
 
 		  Vector<t_complex> sparse_multiply_matrix(const Sparse<t_complex> & M, const Vector<t_complex> & x){
-		    t_int rows = M.rows();
-		    t_int cols = M.cols();
-		    Vector<t_complex> y = Vector<t_complex>::Zero(rows);
-
-		    #pragma omp parallel for
+		    Vector<t_complex> y = Vector<t_complex>::Zero(M.rows());
+		    
+		    //#pragma omp parallel for
+		    #pragma omp simd
 			for (t_int k=0; k < M.outerSize(); ++k)
 			  for (Sparse<t_complex>::InnerIterator it(M,k); it; ++it)
 			  {
-			    y(it.index()) += it.value() * x(k);
+			  	
+			    y(k) += it.value() * x(it.index());
 			  }
 		    return y;
 		  }

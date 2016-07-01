@@ -99,6 +99,7 @@ TEST_CASE("utilities [file exists]", "[file exists]"){
     CHECK(not utilities::file_exists("adfadsf"));
 }
 TEST_CASE("utilities [fit_fwhm]", "[fit_fwhm]"){
+    //testing that the gaussian fitting works.
     t_int imsizex = 512;
     t_int imsizey = 512;
     Image<t_real> psf = Image<t_real>::Zero(imsizey, imsizex);
@@ -131,4 +132,37 @@ TEST_CASE("utilities [fit_fwhm]", "[fit_fwhm]"){
     CHECK(std::abs(new_fwhm_x - fwhm_x)<1e-13);
     CHECK(std::abs(new_fwhm_y - fwhm_y)<1e-13);
     CHECK(std::abs(new_theta - theta)<1e-13);
+}
+
+TEST_CASE("utilities [sparse multiply]", "[sparse multiply]"){
+    //Checking that the parallel sparse matrix multiplication works against Eigen.
+    t_int cols = 1024 * 1024;
+    t_int rows = 1e3;
+    t_int nz_values = 16 * rows;
+    Vector<t_complex> const x = Vector<t_complex>::Random(cols);
+
+    std::vector<t_tripletList> tripletList;
+    tripletList.reserve(nz_values);
+    Vector<t_complex> M_values = Vector<t_complex>::Random(nz_values);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis_row(0, rows);
+    std::uniform_real_distribution<> dis_col(0, cols);
+    for (t_int i = 0; i < nz_values; ++i)
+    {
+        tripletList.emplace_back(std::floor(dis_row(rd)), std::floor(dis_col(rd)), M_values(i));
+    }
+    Sparse<t_complex> M(rows, cols);
+    M.setFromTriplets(tripletList.begin(), tripletList.end());
+
+
+    Vector<t_complex> const parallel_output = utilities::sparse_multiply_matrix(M, x); 
+    Vector<t_complex> const correct_output = M * x;
+
+    for (t_int i = 0; i < rows; ++i)
+    {
+        CHECK(std::abs((correct_output(i) - parallel_output(i))/correct_output(i)) < 1e-13);
+    }
+
+
 }
