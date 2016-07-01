@@ -35,6 +35,8 @@ int main(int argc, char **argv) {
   t_int width = 512;
   t_int height = 512;
   t_real cellsize = 0;
+  t_real ra = 0;
+  t_real dec = 0;
   t_real n_mu = 1.2;
   t_int iter = 0;
   t_int power_method_iterations = 20;
@@ -76,12 +78,14 @@ int main(int argc, char **argv) {
           {"energy_fraction", required_argument, 0, 'm'},
           {"primary_beam", required_argument, 0, 'n'},
           {"fft_grid_correction", no_argument, 0, 'o'},
+          {"ra", required_argument, 0, 'p'},
+          {"dec", required_argument, 0, 'q'},
           {0, 0, 0, 0}
         };
       /* getopt_long stores the option index here. */
       int option_index = 0;
 
-      c = getopt_long(argc, argv, "a:bc:defghijklmno",
+      c = getopt_long(argc, argv, "a:bc:defghijklmnopq",
                        long_options, &option_index);
 
       /* Detect the end of the options. */
@@ -117,7 +121,8 @@ int main(int argc, char **argv) {
           printf("--energy_fraction: How sparse the chirp matrix (w-projection) should be.\n\n");
           printf("--primary_beam: Choice of primary beam model. (none is the only option).\n\n");
           printf("--fft_grid_correction: Choose calculate the gridding correction using an FFT rather than analytic formula. \n\n");
-
+          printf("--ra: Centre of pointing in decimal degrees (Equatorial coordinates). \n\n");
+          printf("--dec: Centre of pointing in decimal degrees (Equatorial coordinates). \n\n");
           return 0;
           break;
         case 'a':
@@ -188,6 +193,14 @@ int main(int argc, char **argv) {
           fft_grid_correction = true;
           break;
 
+        case 'q':
+          ra = std::stod(optarg);
+          break;
+
+        case 'p':
+          dec = std::stod(optarg);
+          break;
+
         case '?':
           /* getopt_long already printed an error message. */
           break;
@@ -210,8 +223,8 @@ int main(int argc, char **argv) {
   //header information
   pfitsio::header_params header;
   header.mean_frequency = 1381.67703151703;
-  header.ra = 0;
-  header.dec = 0;
+  header.ra = ra;
+  header.dec = dec;
   header.cell_x = cellsize;
   header.cell_y = cellsize;
 
