@@ -193,11 +193,11 @@ int main(int argc, char **argv) {
           fft_grid_correction = true;
           break;
 
-        case 'q':
+        case 'p':
           ra = std::stod(optarg);
           break;
 
-        case 'p':
+        case 'q':
           dec = std::stod(optarg);
           break;
 
