@@ -46,7 +46,7 @@ ExternalProject_Add(
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND ./bootstrap.sh
     BUILD_COMMAND ${configure_command}
-    INSTALL_COMMAND ./b2 ${toolset} link=static variant=release --with-math
+    INSTALL_COMMAND ./b2 ${toolset} link=static variant=release --with-math --with-filesystem
         --prefix=${EXTERNAL_ROOT} install
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
