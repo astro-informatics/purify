@@ -242,8 +242,8 @@ int main(int argc, char **argv) {
       weighting, 0, over_sample * width, over_sample * height);
 
   //Read in visibilities for noise estimate
-    t_real sigma_real = 1;
-    t_real sigma_imag = 1;
+    t_real sigma_real = 1/std::sqrt(2);
+    t_real sigma_imag = 1/std::sqrt(2);
 
   if (noisefile != "")
     {  
