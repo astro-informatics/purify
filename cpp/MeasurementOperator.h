@@ -83,9 +83,9 @@ namespace purify {
       //! Generates interpolation matrix from kernels without using w-component
       Sparse<t_complex> init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, 
         const t_int Ju, const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv);
-      //! Generates interpolation matrix from kernels with using w-coponent
-      Sparse<t_complex> init_interpolation_matrix2d(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_real>& w, const t_int Ju, 
-        const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv);      
+      //! Generates interpolation matrix using openmp
+      Sparse<t_complex> init_interpolation_matrix2d_parallel(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, 
+          const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv);  
       //! Generates scaling factors for gridding correction using an fft
       Image<t_real> init_correction2d_fft(const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int Ju, const t_int Jv);
       //! Generates scaling factors for gridding correction

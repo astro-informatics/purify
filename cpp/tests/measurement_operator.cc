@@ -166,7 +166,7 @@ TEST_CASE("Measurement Operator [Gridding]", "[Gridding]") {
 
   SECTION("Kaiser Bessel Gridding") {
     kernel = "kb";
-    MeasurementOperator op(uv_vis, J, J, kernel, 1024, 1024, over_sample, cellsize, cellsize); // Generating gridding matrix
+    MeasurementOperator op(uv_vis, J, J, kernel, 1024, 1024, 5, over_sample, cellsize, cellsize); // Generating gridding matrix
 
     psf = op.grid(point_source);
     max = psf.real().maxCoeff();
@@ -202,7 +202,7 @@ TEST_CASE("Measurement Operator [Gridding]", "[Gridding]") {
   }
   SECTION("Prolate Spheroidal Wave Functon Gridding") {
     kernel = "pswf";
-    MeasurementOperator op(uv_vis, J, J, kernel, 1024, 1024, over_sample, cellsize, cellsize); // Generating gridding matrix
+    MeasurementOperator op(uv_vis, J, J, kernel, 1024, 1024, 5, over_sample, cellsize, cellsize); // Generating gridding matrix
     Image<t_real> pswf_img = op.grid(uv_vis.vis).real();
     max = pswf_img.maxCoeff();
     pswf_img = pswf_img / max;
@@ -234,7 +234,7 @@ TEST_CASE("Measurement Operator [Gridding]", "[Gridding]") {
   }
   SECTION("Gaussian Gridding") {
     kernel = "gauss";
-    MeasurementOperator op(uv_vis, J, J, kernel, 1024, 1024, over_sample, cellsize, cellsize); // Generating gridding matrix
+    MeasurementOperator op(uv_vis, J, J, kernel, 1024, 1024, 5, over_sample, cellsize, cellsize); // Generating gridding matrix
     Image<t_real> gauss_img = op.grid(uv_vis.vis).real();
     max = gauss_img.maxCoeff();
     gauss_img = gauss_img / max;
@@ -296,7 +296,7 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     uv_vis = utilities::uv_scale(uv_vis, img.cols() * over_sample, img.rows() * over_sample);
     uv_vis.v = - uv_vis.v;
     uv_vis.units = "pixels";
-    MeasurementOperator op(uv_vis, J, J, kernel, img.cols(), img.rows(), over_sample, cellsize, cellsize); // Calculates gridding matrix
+    MeasurementOperator op(uv_vis, J, J, kernel, img.cols(), img.rows(), 5, over_sample, cellsize, cellsize); // Calculates gridding matrix
 
     point = Image<t_complex>::Zero(img.cols(), img.rows()); point(floor(img.cols()/2) - 1, floor(img.rows()/2) - 1) = 1; // Creating model of point source in image
     psf_vis = op.degrid(point); // Creating visibilities from model
@@ -346,7 +346,7 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     uv_vis = utilities::uv_scale(uv_vis, img.cols() * over_sample, img.rows() * over_sample);
     uv_vis.v = - uv_vis.v;
     uv_vis.units = "pixels";
-    MeasurementOperator op(uv_vis, J, J, kernel, img.cols(), img.rows(), over_sample, cellsize, cellsize); // Calculates gridding matrix
+    MeasurementOperator op(uv_vis, J, J, kernel, img.cols(), img.rows(), 5, over_sample, cellsize, cellsize); // Calculates gridding matrix
 
     point = Image<t_complex>::Zero(img.cols(), img.rows()); point(floor(img.cols()/2) - 1, floor(img.rows()/2) - 1) = 1; // Creating model of point source in image
     psf_vis = op.degrid(point); // Creating visibilities from model
@@ -395,7 +395,7 @@ TEST_CASE("Measurement Operator [Degridding]", "[Degridding]") {
     uv_vis = utilities::uv_scale(uv_vis, img.cols() * over_sample, img.rows() * over_sample);
     uv_vis.v = - uv_vis.v;
     uv_vis.units = "pixels";
-    MeasurementOperator op(uv_vis, J, J, kernel, img.cols(), img.rows(), over_sample, cellsize, cellsize); // Calculates gridding matrix
+    MeasurementOperator op(uv_vis, J, J, kernel, img.cols(), img.rows(), 5, over_sample, cellsize, cellsize); // Calculates gridding matrix
 
     point = Image<t_complex>::Zero(img.cols(), img.rows()); point(floor(img.cols()/2) - 1, floor(img.rows()/2) - 1) = 1; // Creating model of point source in image
     psf_vis = op.degrid(point); // Creating visibilities from model
