@@ -36,7 +36,7 @@ namespace purify {
   //! \brief A matrix of a given type
   //! \details Operates as mathematical matrix.
   template<class T = t_real>
-    using Matrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
+    using Matrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
   //! \brief A matrix of a given type
   //! \details Operates as mathematical sparse matrix.
   template<class T = t_real>
