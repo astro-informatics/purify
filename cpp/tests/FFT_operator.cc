@@ -35,7 +35,7 @@ TEST_CASE("FFT Operator [FORWARD]", "[FORWARD]") {
       guassian(i, j) = std::exp(- (y(i) * y(i) + x(j) * x(j)) * 0.5/(sigma * sigma) -2. * I * purify_pi * 64. * (x(j) + y(i)));
     }
   }
-  pfitsio::write2d(newFFT.forward(guassian.transpose()).cwiseAbs(), "forward_guassian.fits");
+  pfitsio::write2d(newFFT.forward(guassian).cwiseAbs(), "forward_guassian.fits");
   pfitsio::write2d(oldFFT.forward(guassian).cwiseAbs(), "old_forward_guassian.fits");
 }
 
