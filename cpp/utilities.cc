@@ -492,7 +492,7 @@ namespace purify {
 	                    t_complex  chirptemp (0.0,0.0);
 
 	                    //only loop over the non-zero gmat elements
-	                    for (Eigen::SparseMatrix<t_complex>::InnerIterator pix(Grid,m); pix; ++pix){
+	                    for (Sparse<t_complex>::InnerIterator pix(Grid,m); pix; ++pix){
 	                        //express the column index as two-dimensional indices in image plane
 	                        t_int ii, jj, i_fftshift, j_fftshift;
 
