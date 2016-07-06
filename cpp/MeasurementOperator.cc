@@ -81,54 +81,6 @@ namespace purify {
   Vector<t_real> ones = u * 0; ones.setOnes();
   Vector<t_real> k_u = MeasurementOperator::omega_to_k(u - ones * Ju * 0.5);
   Vector<t_real> k_v = MeasurementOperator::omega_to_k(v - ones * Jv * 0.5);
-  std::vector<t_tripletList> entries;
-  entries.reserve(rows * Ju * Jv);
-  for (t_int m = 0; m < rows; ++m)
-    {
-      // I should write this as a tensor product! It would reduce the number of calculations of kernelu and kernelv.
-      for (t_int ju = 1; ju <= Ju; ++ju)
-       {
-         q = utilities::mod(k_u(m) + ju, ftsizeu);
-        for (t_int jv = 1; jv <= Jv; ++jv)
-          {
-            p = utilities::mod(k_v(m) + jv, ftsizev);
-            index = utilities::sub2ind(p, q, ftsizev, ftsizeu);
-            const t_complex I(0, 1);
-            entries.emplace_back(m, index, std::exp(-2 * purify_pi * I *((k_u(m) + ju) * 0.5 + (k_v(m) + jv) * 0.5 )) * kernelu(u(m)-(k_u(m)+ju)) * kernelv(v(m)-(k_v(m)+jv)));
-          }
-      }
-    }
-
-  //    
-  Sparse<t_complex> interpolation_matrix(rows, cols);
-  interpolation_matrix.setFromTriplets(entries.begin(), entries.end());
-
-  return interpolation_matrix; 
-  }
-  Sparse<t_complex> MeasurementOperator::init_interpolation_matrix2d_parallel(const Vector<t_real>& u, const Vector<t_real>& v, const t_int Ju, 
-          const t_int Jv, const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv) 
-  {
-    /* 
-      Given u and v coordinates, creates a gridding interpolation matrix that maps between visibilities and the fourier transform grid.
-
-      u:: fourier coordinates of visibilities for u axis
-      v:: fourier coordinates of visibilities for v axis
-      Ju:: support of kernel for u axis
-      Jv:: support of kernel for v axis
-      kernelu:: lambda function for kernel on u axis
-      kernelv:: lambda function for kernel on v axis
-      ftsizeu:: size of grid along u axis
-      ftsizev:: size of grid along v axis
-    */
-
-  t_int rows = u.size();
-  t_int cols = ftsizeu * ftsizev;
-  t_int q;
-  t_int p;
-  t_int index;
-  Vector<t_real> ones = u * 0; ones.setOnes();
-  Vector<t_real> k_u = MeasurementOperator::omega_to_k(u - ones * Ju * 0.5);
-  Vector<t_real> k_v = MeasurementOperator::omega_to_k(v - ones * Jv * 0.5);
 
   Sparse<t_complex> interpolation_matrix(rows, cols);
   interpolation_matrix.reserve(Vector<t_int>::Constant(rows, Ju * Jv));
@@ -360,7 +312,7 @@ namespace purify {
       ftkernelu = ftkb;
       ftkernelv = ftkb;
       S = MeasurementOperator::init_correction2d(ftkernelu, ftkernelv); // Does gridding correction using analytic formula
-      G = MeasurementOperator::init_interpolation_matrix2d_parallel(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
+      G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
       if (use_w_term)
       {
         C = MeasurementOperator::create_chirp_matrix(uv_vis.w, cell_x, cell_y, energy_fraction);
@@ -462,7 +414,7 @@ namespace purify {
       S = MeasurementOperator::init_correction2d(ftkernelu, ftkernelv); // Does gridding correction using analytic formula
     }
 
-    G = MeasurementOperator::init_interpolation_matrix2d_parallel(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
+    G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
     if (use_w_term)
     {
       C = MeasurementOperator::create_chirp_matrix(uv_vis.w, cell_x, cell_y, energy_fraction);

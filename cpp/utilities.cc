@@ -810,14 +810,6 @@ namespace purify {
 		    return out_weights.array();
 		  }
 
-		  t_complex sparse_multiply_row(const Eigen::SparseVector<t_complex> & row, const Vector<t_complex> & x){
-		    
-		    Eigen::SparseVector<t_complex> y_i = row * x;
-		    std::cout << y_i.sum() << '\n';
-		    return y_i.sum();
-
-		  }
-
 		  Vector<t_complex> sparse_multiply_matrix(const Sparse<t_complex> & M, const Vector<t_complex> & x){
 		    Vector<t_complex> y = Vector<t_complex>::Zero(M.rows());
 		    
