@@ -1,7 +1,6 @@
 #include "catch.hpp"
-
-#include "utilities.h"
-
+#include "types.h"
+#include <iostream>
 #include "directories.h"
 using namespace purify;
 using namespace purify::notinstalled;
@@ -23,7 +22,7 @@ TEST_CASE("sparse [iterator]", "[iterator]") {
     G.setFromTriplets(entries.begin(), entries.end());
     for (t_int i = 0; i < total_cols; ++i)
     {
-        for (Eigen::SparseMatrix<t_complex>::InnerIterator pix(G,i); pix; ++pix)
+        for (Sparse<t_complex>::InnerIterator pix(G,i); pix; ++pix)
         {
             std::cout << pix.row() << " " << pix.col() << " " << std::real(pix.value()) << '\n';
         }

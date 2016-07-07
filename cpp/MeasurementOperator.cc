@@ -20,7 +20,7 @@ namespace purify {
       
 
       // create fftgrid
-      ft_vector = utilities::re_sample_ft_grid(fftop.forward(padded_image), resample_factor); // the fftshift is not needed because of the phase shift in the gridding kernel
+      ft_vector = wprojection::re_sample_ft_grid(fftop.forward(padded_image), resample_factor); // the fftshift is not needed because of the phase shift in the gridding kernel
       // turn into vector
       ft_vector.resize(ftsizeu*ftsizev, 1); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
       // get visibilities
@@ -39,7 +39,7 @@ namespace purify {
       //Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W).matrix()/norm;
       Matrix<t_complex> ft_vector = utilities::sparse_multiply_matrix(G.adjoint(), (visibilities.array() * W).matrix())/norm;
       ft_vector.resize(ftsizev, ftsizeu); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
-      ft_vector = utilities::re_sample_ft_grid(ft_vector, 1./resample_factor);
+      ft_vector = wprojection::re_sample_ft_grid(ft_vector, 1./resample_factor);
       Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
       t_int x_start = floor(floor(imsizex * oversample_factor) * 0.5 - imsizex * 0.5);
       t_int y_start = floor(floor(imsizey * oversample_factor) * 0.5 - imsizey * 0.5);
@@ -193,50 +193,6 @@ namespace purify {
      return old_value;
   }
 
-
-  Matrix<t_complex> MeasurementOperator::create_chirp_matrix(const Vector<t_real> & w_components, const t_real cell_x, const t_real cell_y, const t_real& energy_fraction){
-
-    const t_int total_rows = w_components.size();
-    const t_int total_cols = ftsizeu * ftsizev;
-    //std::vector<t_tripletList> entries;
-    //entries.reserve(total_rows * total_cols);
-
-    Matrix<t_complex> chirp_matrix = Matrix<t_complex>::Zero(total_rows, total_cols);
-    std::cout << "Generating chirp matrix with " << total_rows << " x " << total_cols << '\n';
-    for (t_int m = 0; m < total_rows; ++m)
-    {
-      Image<t_complex> chirp_image = utilities::generate_chirp(w_components(m), cell_x, cell_y, ftsizeu, ftsizev);
-      
-      Matrix<t_complex> row = fftop.forward(chirp_image);
-      row = utilities::sparsify_chirp(row, energy_fraction);
-
-      row.resize(1, total_cols);
-      chirp_matrix.row(m) = row;
-      //for (t_int j = 0; j < row.size(); ++j)
-      //{
-        //if (std::abs(row(j)) == 0)
-        //{
-        //  entries.emplace_back(m, j, row(j));
-        //}
-      //}
-    }
-    //Sparse<t_complex> chirp_matrix(total_rows, total_cols);
-    //chirp_matrix.setFromTriplets(entries.begin(), entries.end());
-    
-    return chirp_matrix;
-  }
-
-  Image<t_complex> MeasurementOperator::covariance_calculation(const Image<t_complex> & vector){
-    /*
-      Calculates a new representation of the covariance matrix, using propogation of uncertainty A Sigma A^T
-
-      pixel:: determines the column to calculate for the covariance matrix.
-    */
-      Array<t_real> covariance = 1./(W.real());
-      return MeasurementOperator::grid(covariance * MeasurementOperator::degrid(vector).array());
-
-  }
-
   MeasurementOperator::MeasurementOperator(const utilities::vis_params& uv_vis_input, const t_int &Ju, const t_int &Jv,
       const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_int & norm_iterations, const t_real &oversample_factor, const t_real & cell_x, const t_real & cell_y,
        const std::string& weighting_type, const t_real& R, bool use_w_term, const t_real& energy_fraction,const std::string & primary_beam, bool fft_grid_correction)
@@ -264,7 +220,7 @@ namespace purify {
     */
     
     if (use_w_term){
-      resample_factor = utilities::upsample_ratio(uv_vis_input, cell_x, cell_y, ftsizeu, ftsizev);
+      resample_factor = wprojection::upsample_ratio(uv_vis_input, cell_x, cell_y, ftsizeu, ftsizev);
       ftsizeu = ftsizeu * resample_factor;
       ftsizev = ftsizev * resample_factor;
     }
@@ -315,8 +271,8 @@ namespace purify {
       G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
       if (use_w_term)
       {
-        C = MeasurementOperator::create_chirp_matrix(uv_vis.w, cell_x, cell_y, energy_fraction);
-        G = utilities::convolution(G, C, ftsizeu, ftsizev, uv_vis.w.size());
+        C = wprojection::create_chirp_matrix(uv_vis.w, cell_x, cell_y, ftsizeu, ftsizev, energy_fraction);
+        G = wprojection::convolution(G, C, ftsizeu, ftsizev, uv_vis.w.size());
       }
       
       std::printf("Calculating weights: W \n");
@@ -417,8 +373,8 @@ namespace purify {
     G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
     if (use_w_term)
     {
-      C = MeasurementOperator::create_chirp_matrix(uv_vis.w, cell_x, cell_y, energy_fraction);
-      G = utilities::convolution(G, C, ftsizeu, ftsizev, uv_vis.w.size());
+      C = wprojection::create_chirp_matrix(uv_vis.w, cell_x, cell_y, ftsizeu, ftsizev, energy_fraction);
+      G = wprojection::convolution(G, C, ftsizeu, ftsizev, uv_vis.w.size());
     }
     std::printf("Calculating weights: W \n");
     W = utilities::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R, ftsizeu, ftsizev);

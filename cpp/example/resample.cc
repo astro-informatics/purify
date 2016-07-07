@@ -1,6 +1,6 @@
 
 #include "MeasurementOperator.h"
-#include "utilities.h"
+#include "wprojection.h"
 #include "pfitsio.h"
 
 #include "directories.h"
@@ -16,7 +16,7 @@ int main( int nargs, char const** args ){
     FFTOperator fftop;
 
     auto ft_grid = fftop.forward(M31);
-    auto new_ft_grid = utilities::re_sample_ft_grid(ft_grid, 4.);
+    auto new_ft_grid = wprojection::re_sample_ft_grid(ft_grid, 4.);
     auto M31_resample = fftop.inverse(new_ft_grid).real();
     auto max = M31_resample.array().maxCoeff();
     M31_resample = M31_resample / max;

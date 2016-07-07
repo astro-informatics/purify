@@ -73,16 +73,6 @@ namespace purify {
       };
       //! Calculates the convolution between two images
       Image<t_complex> convolution_operator(const Image<t_complex>& a, const Image<t_complex>& b);
-      //! Calculates upsample ratio for w-projection
-      t_real upsample_ratio(const utilities::vis_params& uv_vis, const t_real& cell_x, const t_real& cell_y, const t_int& x_size, const t_int& y_size);
-      //! Calculates convolution between grid and chirp matrix
-      Sparse<t_complex> convolution(const Sparse<t_complex> & Grid, const Image<t_complex>& Chirp, const t_int& Nx, const t_int& Ny, const t_int& Nvis);
-      //! zero pads ft grid for image up sampling and downsampling
-      Matrix<t_complex> re_sample_ft_grid(const Matrix<t_complex>& input, const t_real& re_sample_factor);
-      //! Sparsifies chirp
-      Image<t_complex> sparsify_chirp(const Image<t_complex>& row, const t_real& energy);
-      //! Generates image of chirp for w component
-      Image<t_complex> generate_chirp(const t_real w_term, const t_real cellx, const t_real celly, const t_int x_size, const t_int y_size);
       //! A vector that whiten's the visibilities given the weights.
       utilities::vis_params whiten_vis(const utilities::vis_params& uv_vis);
       //! A function that calculates the l2 ball radius for sopt
