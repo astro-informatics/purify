@@ -218,7 +218,7 @@ namespace purify {
 
 
     */
-    
+    fftop.set_up_multithread();
     if (use_w_term){
       resample_factor = wprojection::upsample_ratio(uv_vis_input, cell_x, cell_y, ftsizeu, ftsizev);
       ftsizeu = ftsizeu * resample_factor;

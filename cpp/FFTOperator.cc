@@ -142,23 +142,15 @@ namespace purify {
 
   Matrix<t_complex> FFTOperator::forward(const Matrix<t_complex>& input)
   {
-    Matrix<t_complex> dest;
-    dest.resizeLike(input);
-    const t_int n0 = input.IsRowMajor ? input.rows(): input.cols();
-    const t_int n1 = input.IsRowMajor ? input.cols(): input.rows();
-    impl().fwd2(dest.data(), input.data(), n0, n1);
+    Matrix<t_complex> dest = Matrix<t_complex>::Zero(input.rows(), input.cols());
+    FFTOperator::fwd2(dest, input, rigor_flag_);
     return dest;
   }
   Matrix<t_complex> FFTOperator::inverse(const Matrix<t_complex>& input)
   {
-    Matrix<t_complex> dest;
-    dest.resizeLike(input);
-    const t_int n0 = input.IsRowMajor ? input.rows(): input.cols();
-    const t_int n1 = input.IsRowMajor ? input.cols(): input.rows();
-    impl().inv2(dest.data(), input.data(), n0, n1) ;
-    return dest / (input.cols() * input.rows());
+    Matrix<t_complex> dest = Matrix<t_complex>::Zero(input.rows(), input.cols());
+    FFTOperator::inv2(dest, input, rigor_flag_) ;
+    return dest;
   }
-
-
 
 }
