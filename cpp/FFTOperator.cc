@@ -152,5 +152,11 @@ namespace purify {
     FFTOperator::inv2(dest, input, rigor_flag_) ;
     return dest;
   }
+ void FFTOperator::set_up_multithread()
+  { 
+    FFTOperator::clear_plans();
+    fftw_init_threads();
+    fftw_plan_with_nthreads(omp_get_max_threads());
+ }
 
 }

@@ -4,9 +4,11 @@
 
 #include "types.h"
 
+
 #include <fftw3.h>
 #include <unsupported/Eigen/src/FFT/ei_fftw_impl.h>
 #include <unsupported/Eigen/FFT>
+#include <omp.h>
 
 
 namespace purify {
