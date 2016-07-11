@@ -16,7 +16,7 @@ namespace purify {
 
       // zero padding and gridding correction
       padded_image.block(y_start, x_start, imsizey, imsizex)
-          = S * eigen_image;
+          = utilities::parallel_multiply_image(S, eigen_image);
       
 
       // create fftgrid
@@ -43,7 +43,7 @@ namespace purify {
       Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
       t_int x_start = floor(floor(imsizex * oversample_factor) * 0.5 - imsizex * 0.5);
       t_int y_start = floor(floor(imsizey * oversample_factor) * 0.5 - imsizey * 0.5);
-      return S * padded_image.block(y_start, x_start, imsizey, imsizex);
+      return utilities::parallel_multiply_image(S, padded_image.block(y_start, x_start, imsizey, imsizex));
   }
 
 

@@ -97,6 +97,19 @@ namespace purify {
       t_complex sparse_multiply_row(const Eigen::SparseVector<t_complex> & row, const Vector<t_complex> & x);
       //! Multiply sparse matrix with column vector
       Vector<t_complex> sparse_multiply_matrix(const Sparse<t_complex> & M, const Vector<t_complex> & x);
+      //! Multiply images coefficient-wise using openmp
+      template<class K, class L>
+      Image<t_complex> parallel_multiply_image(const K & A, const L & B){
+        const t_int rows = A.rows();
+        const t_int cols = A.cols();
+        Image<t_complex> C = Matrix<t_complex>::Zero(rows, cols);
+
+        #pragma omp simd collapse(2)
+        for (t_int i = 0; i < cols; ++i)
+          for (t_int j = 0; j < rows; ++j)
+            C(j, i) = A(j, i) * B(j, i);
+        return C;
+      };
  }
 }
 
