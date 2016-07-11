@@ -233,6 +233,8 @@ namespace purify {
 
     //t_real new_upsample = utilities::upsample_ratio(uv_vis, ,);
     std::printf("------ \n");
+    std::printf("Planning FFT operator \n");
+    fftop.init_plan(Matrix<t_complex>::Zero(ftsizev, ftsizeu));
     std::printf("Constructing Gridding Operator: G\n");
 
     std::printf("Oversampling Factor: %f \n", oversample_factor);

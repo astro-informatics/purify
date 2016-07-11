@@ -4,11 +4,11 @@
 
 #include "types.h"
 
-
+#include <omp.h>
 #include <fftw3.h>
+
 #include <unsupported/Eigen/src/FFT/ei_fftw_impl.h>
 #include <unsupported/Eigen/FFT>
-#include <omp.h>
 
 
 namespace purify {
@@ -36,19 +36,21 @@ namespace purify {
   {
   public:
     //! Uses Eigen's perform 2D FFT
-    Matrix<t_complex> forward(const Matrix<t_complex>& input);
+    Matrix<t_complex> forward(const Matrix<t_complex>& input, bool only_plan = false);
     //! Uses Eigen's perform 2D IFFT
-    Matrix<t_complex> inverse(const Matrix<t_complex>& input);
+    Matrix<t_complex> inverse(const Matrix<t_complex>& input, bool only_plan = false);
     //! Set up multithread fft
     void set_up_multithread();
+    //! Set up plan
+    void init_plan(const Matrix<t_complex>& input);
 
   protected:
-    t_int rigor_flag_ = FFTW_PATIENT;
+    t_int fftw_flag_;
   public:
-    t_int const &rigor_flag() {return rigor_flag_;};
+    t_int const &fftw_flag() {return fftw_flag_;};
 
-    FFTOperator &rigor_flag(t_int const &rigor_flag){
-      t_int rigor_flag_ = rigor_flag;
+    FFTOperator &fftw_flag(t_int const &fftw_flag){
+      fftw_flag_ = fftw_flag;
       return *this;
     }
     

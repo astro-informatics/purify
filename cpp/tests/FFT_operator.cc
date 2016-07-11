@@ -6,10 +6,13 @@ using namespace purify;
 
 TEST_CASE("FFT Operator [FORWARD]", "[FORWARD]") {
 
+  t_int fft_flag = (FFTW_PATIENT|FFTW_PRESERVE_INPUT);
   Fft2d oldFFT;
-  FFTOperator newFFT;
-  Matrix<t_complex> const a = Matrix<t_complex>::Random(20, 16);
-
+  auto newFFT = purify::FFTOperator().fftw_flag(fft_flag);
+  CAPTURE(newFFT.fftw_flag());
+  CAPTURE(fft_flag);
+  newFFT.set_up_multithread();
+  Matrix<t_complex> const a = Matrix<t_complex>::Random(20, 19);
   Matrix<t_complex> old_output = oldFFT.forward(a);
   Matrix<t_complex> new_output = newFFT.forward(a);
   CAPTURE(old_output.row(0).head(4));
@@ -75,7 +78,7 @@ TEST_CASE("FFT Operator [BOTH]", "[BOTH]") {
   Matrix<t_complex> a = Matrix<t_complex>::Random(20, 19);
 
   Matrix<t_complex> new_output = newFFT.forward(newFFT.inverse(a));
-  CHECK(a.isApprox(new_output));
+  CHECK(a.isApprox(new_output, 1e-13));
 
   t_int xsize = 128;
   t_int ysize = 100;

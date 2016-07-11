@@ -140,17 +140,22 @@ namespace purify {
       return output;
   }
 
-  Matrix<t_complex> FFTOperator::forward(const Matrix<t_complex>& input)
+  Matrix<t_complex> FFTOperator::forward(const Matrix<t_complex>& input, bool only_plan)
   {
     Matrix<t_complex> dest = Matrix<t_complex>::Zero(input.rows(), input.cols());
-    FFTOperator::fwd2(dest, input, rigor_flag_);
+    FFTOperator::fwd2(dest, input, fftw_flag_, only_plan);
     return dest;
   }
-  Matrix<t_complex> FFTOperator::inverse(const Matrix<t_complex>& input)
+  Matrix<t_complex> FFTOperator::inverse(const Matrix<t_complex>& input, bool only_plan)
   {
     Matrix<t_complex> dest = Matrix<t_complex>::Zero(input.rows(), input.cols());
-    FFTOperator::inv2(dest, input, rigor_flag_) ;
+    FFTOperator::inv2(dest, input, fftw_flag_, only_plan) ;
     return dest;
+  }
+  void FFTOperator::init_plan(const Matrix<t_complex>& input){
+    Matrix<t_complex> dest = Matrix<t_complex>::Zero(input.rows(), input.cols());
+    FFTOperator::forward(dest, true);
+    FFTOperator::inverse(dest, true);
   }
  void FFTOperator::set_up_multithread()
   { 
