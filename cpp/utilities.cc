@@ -361,8 +361,8 @@ namespace purify {
 		Vector<t_complex> add_noise(const Vector<t_complex>& y0, 
 				const t_complex& mean, const t_real& standard_deviation){
 			/*
-				Adds complex valued gaussian noise to vector
-				y0:: vector beore noise
+				Adds complex valued Gaussian noise to vector
+				y0:: vector before noise
 				mean:: complex valued mean of noise
 				standard_deviation:: rms of noise
 			*/
@@ -540,7 +540,7 @@ namespace purify {
 
 		  Vector<t_complex> sparse_multiply_matrix(const Sparse<t_complex> & M, const Vector<t_complex> & x){
 		    Vector<t_complex> y = Vector<t_complex>::Zero(M.rows());
-		    
+		    //parallel sparse matrix multiplication with vector.
 		    #pragma omp parallel for
 		    //#pragma omp simd
 			for (t_int k=0; k < M.outerSize(); ++k)
@@ -551,6 +551,32 @@ namespace purify {
 			  }
 		    return y;
 		  }
+
+		  void checkpoint_log(const std::string& diagnostic, t_int * iters, t_real * gamma){
+		  	//reads a log file and returns the latest parameters
+		    if (!utilities::file_exists(diagnostic)){
+		    	*iters = 0;
+		    	return;
+		    }
+		    std::ifstream log_file(diagnostic);
+		    std::string entry;
+		    std::string s;
+		    
+		    std::getline(log_file, s);
+		    
+		    while (log_file)
+		    {
+		      if (!std::getline(log_file, s)) break;
+		      std::istringstream ss(s);
+		      std::getline(ss, entry, ' ');
+		      *iters = std::stoi(entry);
+		      std::getline(ss, entry, ' ');
+		      *gamma = std::stod(entry);
+		    }
+		   log_file.close();
+
+		  }
+
 	}
 
 }

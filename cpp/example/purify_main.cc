@@ -80,6 +80,10 @@ int main(int argc, char **argv) {
           {"fft_grid_correction", no_argument, 0, 'o'},
           {"ra", required_argument, 0, 'p'},
           {"dec", required_argument, 0, 'q'},
+          {"width", required_argument, 0, 'r'},
+          {"height", required_argument, 0, 's'},
+          {"kernel", required_argument, 0, 't'},
+          {"kernel_support", required_argument, 0, 'u'},
           {0, 0, 0, 0}
         };
       /* getopt_long stores the option index here. */
@@ -123,6 +127,8 @@ int main(int argc, char **argv) {
           printf("--fft_grid_correction: Choose calculate the gridding correction using an FFT rather than analytic formula. \n\n");
           printf("--ra: Centre of pointing in decimal degrees (Equatorial coordinates). \n\n");
           printf("--dec: Centre of pointing in decimal degrees (Equatorial coordinates). \n\n");
+          printf("--kernel: Type of gridding kernel to use, kb, gauss, pswf, box. (kb is default)\n");
+          printf("--kernel_support: Support of kernel in grid cells. (4 is the default)\n");
           return 0;
           break;
         case 'a':
@@ -199,6 +205,21 @@ int main(int argc, char **argv) {
 
         case 'q':
           dec = std::stod(optarg);
+          break;
+        case 'r':
+          width = std::stoi(optarg);
+          break;
+
+        case 's':
+          height = std::stoi(optarg);
+          break;
+
+        case 't':
+          kernel = optarg;
+          break;
+
+        case 'u':
+          J = std::stoi(optarg);
           break;
 
         case '?':
@@ -296,6 +317,23 @@ int main(int argc, char **argv) {
   pfitsio::write2d_header(Image<t_real>::Map(psf.data(), height, width), header);
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   Vector<t_complex> initial_residuals = Vector<t_complex>::Zero(uv_data.vis.size());
+  //loading data from check point.
+  if (utilities::file_exists(name + "_diagnostic"))
+  {
+    std::printf("Loading checkpoint for %s\n", name.c_str());
+    std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_update.fits");
+    if (utilities::file_exists(outfile_fits)){
+      auto const image = pfitsio::read2d(outfile_fits);
+      
+      if (height != image.rows() or width != image.cols())
+      {
+        std::runtime_error("initial Estimate is the wrong size.");
+      }
+      initial_estimate = Matrix<t_complex>::Map(image.data(), image.size(), 1);
+      initial_residuals = ((uv_data.vis - measurements.degrid(image)).array() * uv_data.weights.array().real());     
+    }
+  }
+
 
   t_real const noise_rms = std::sqrt(sigma_real * sigma_real + sigma_imag * sigma_imag)/std::sqrt(2);
   t_real const W_norm = uv_data.weights.array().abs().maxCoeff();
@@ -304,10 +342,11 @@ int main(int argc, char **argv) {
 
   t_real purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * (uv_data.weights.array() * uv_data.vis.array()).matrix())).cwiseAbs().maxCoeff() * beta;
 
-  std::ofstream out_diagnostic(name + "_diagnostic");
+  utilities::checkpoint_log(name + "_diagnostic", &iter, &purify_gamma);
+  std::ofstream out_diagnostic;
   out_diagnostic.precision(13);
-
-
+  out_diagnostic.open(name + "_diagnostic", std::ios_base::app);
+  
   std::cout << "Starting sopt!" << '\n';
   std::cout << "Epsilon = " << epsilon << '\n';
   std::cout << "Gamma = " << purify_gamma << '\n';

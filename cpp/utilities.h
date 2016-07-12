@@ -97,6 +97,9 @@ namespace purify {
       t_complex sparse_multiply_row(const Eigen::SparseVector<t_complex> & row, const Vector<t_complex> & x);
       //! Multiply sparse matrix with column vector
       Vector<t_complex> sparse_multiply_matrix(const Sparse<t_complex> & M, const Vector<t_complex> & x);
+      //! Reads a diagnostic file and updates parameters
+      void checkpoint_log(const std::string& diagnostic, 
+          t_int * iters, t_real * gamma);
  }
 }
 
