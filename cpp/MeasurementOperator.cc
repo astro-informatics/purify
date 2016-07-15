@@ -16,8 +16,7 @@ namespace purify {
 
       // zero padding and gridding correction
       padded_image.block(y_start, x_start, imsizey_, imsizex_)
-          = S * eigen_image;
-      
+          = utilities::parallel_multiply_image(S, eigen_image);
 
       // create fftgrid
       ft_vector = wprojection::re_sample_ft_grid(fftop.forward(padded_image), resample_factor); // the fftshift is not needed because of the phase shift in the gridding kernel
@@ -43,7 +42,7 @@ namespace purify {
       Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
       t_int x_start = floor(floor(imsizex_ * oversample_factor_) * 0.5 - imsizex_ * 0.5);
       t_int y_start = floor(floor(imsizey_ * oversample_factor_) * 0.5 - imsizey_ * 0.5);
-      return S * padded_image.block(y_start, x_start, imsizey_, imsizex_);
+      return utilities::parallel_multiply_image(S, padded_image.block(y_start, x_start, imsizey, imsizex));
   }
 
 
@@ -258,6 +257,9 @@ namespace purify {
     
 
     std::printf("------ \n");
+    std::printf("Planning FFT operator \n");
+    fftop.set_up_multithread();
+    fftop.init_plan(Matrix<t_complex>::Zero(ftsizev, ftsizeu));
     std::printf("Constructing Gridding Operator: G\n");
 
     std::printf("Oversampling Factor: %f \n", oversample_factor_);

@@ -140,25 +140,28 @@ namespace purify {
       return output;
   }
 
-  Matrix<t_complex> FFTOperator::forward(const Matrix<t_complex>& input)
+  Matrix<t_complex> FFTOperator::forward(const Matrix<t_complex>& input, bool only_plan)
   {
-    Matrix<t_complex> dest;
-    dest.resizeLike(input);
-    const t_int n0 = input.IsRowMajor ? input.rows(): input.cols();
-    const t_int n1 = input.IsRowMajor ? input.cols(): input.rows();
-    impl().fwd2(dest.data(), input.data(), n0, n1);
+    Matrix<t_complex> dest = Matrix<t_complex>::Zero(input.rows(), input.cols());
+    FFTOperator::fwd2(dest, input, fftw_flag_, only_plan);
     return dest;
   }
-  Matrix<t_complex> FFTOperator::inverse(const Matrix<t_complex>& input)
+  Matrix<t_complex> FFTOperator::inverse(const Matrix<t_complex>& input, bool only_plan)
   {
-    Matrix<t_complex> dest;
-    dest.resizeLike(input);
-    const t_int n0 = input.IsRowMajor ? input.rows(): input.cols();
-    const t_int n1 = input.IsRowMajor ? input.cols(): input.rows();
-    impl().inv2(dest.data(), input.data(), n0, n1) ;
-    return dest / (input.cols() * input.rows());
+    Matrix<t_complex> dest = Matrix<t_complex>::Zero(input.rows(), input.cols());
+    FFTOperator::inv2(dest, input, fftw_flag_, only_plan) ;
+    return dest;
   }
-
-
+  void FFTOperator::init_plan(const Matrix<t_complex>& input){
+    Matrix<t_complex> dest = Matrix<t_complex>::Zero(input.rows(), input.cols());
+    FFTOperator::forward(dest, true);
+    FFTOperator::inverse(dest, true);
+  }
+ void FFTOperator::set_up_multithread()
+  { 
+    FFTOperator::clear_plans();
+    fftw_init_threads();
+    fftw_plan_with_nthreads(omp_get_max_threads());
+ }
 
 }

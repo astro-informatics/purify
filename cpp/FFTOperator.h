@@ -4,7 +4,9 @@
 
 #include "types.h"
 
+#include <omp.h>
 #include <fftw3.h>
+
 #include <unsupported/Eigen/src/FFT/ei_fftw_impl.h>
 #include <unsupported/Eigen/FFT>
 
@@ -14,7 +16,6 @@ namespace purify {
   //! This does something
   class Fft2d {
   private:
-
       //! Performs fftshift on vector
       Vector<t_complex> fftshift_1d(const Vector<t_complex> input);
       //! Performs ifftshift on vector
@@ -31,13 +32,28 @@ namespace purify {
       Matrix<t_complex> ishift(const Matrix<t_complex>& input);
    };
 
-  class FFTOperator : protected Eigen::FFT<t_real, Eigen::internal::fftw_impl<t_real>>
+  class FFTOperator: protected Eigen::FFT<t_real, Eigen::internal::fftw_impl<t_real>>
   {
   public:
-    //! Uses Eigen's 1D FFT to perform 2D FFT
-    Matrix<t_complex> forward(const Matrix<t_complex>& input);
-    //! Uses Eigen's 1D IFFT to perform 2D IFFT
-    Matrix<t_complex> inverse(const Matrix<t_complex>& input);
+    //! Uses Eigen's perform 2D FFT
+    Matrix<t_complex> forward(const Matrix<t_complex>& input, bool only_plan = false);
+    //! Uses Eigen's perform 2D IFFT
+    Matrix<t_complex> inverse(const Matrix<t_complex>& input, bool only_plan = false);
+    //! Set up multithread fft
+    void set_up_multithread();
+    //! Set up plan
+    void init_plan(const Matrix<t_complex>& input);
+
+  protected:
+    t_int fftw_flag_;
+  public:
+    t_int const &fftw_flag() {return fftw_flag_;};
+
+    FFTOperator &fftw_flag(t_int const &fftw_flag){
+      fftw_flag_ = fftw_flag;
+      return *this;
+    }
+    
   };
 }
 
