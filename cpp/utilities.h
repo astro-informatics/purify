@@ -93,8 +93,8 @@ namespace purify {
       Array<t_complex> init_weights(const Vector<t_real>& u, const Vector<t_real>& v, 
       const Vector<t_complex>& weights, const t_real & oversample_factor, 
       const std::string& weighting_type, const t_real& R, const t_int & ftsizeu, const t_int & ftsizev);
-      //! Sparse row multiplication from a sparse matrix
-      t_complex sparse_multiply_row(const Eigen::SparseVector<t_complex> & row, const Vector<t_complex> & x);
+      //! Parallel multiplication with a sparse matrix and vector
+      Vector<t_complex> sparse_multiply_matrix(const Sparse<t_complex> & M, const Vector<t_complex> & x);
       //! Reads a diagnostic file and updates parameters
       void checkpoint_log(const std::string& diagnostic, 
           t_int * iters, t_real * gamma);

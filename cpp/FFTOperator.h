@@ -4,7 +4,7 @@
 
 #include "types.h"
 
-#include <omp.h>
+//#include <omp.h>
 #include <fftw3.h>
 
 #include <unsupported/Eigen/src/FFT/ei_fftw_impl.h>
