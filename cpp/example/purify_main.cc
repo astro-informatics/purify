@@ -238,7 +238,7 @@ int main(int argc, char **argv) {
   t_real const max_u = std::sqrt((uv_data.u.array() * uv_data.u.array() + uv_data.v.array() * uv_data.v.array()).maxCoeff());
   uv_data.units = "lambda";
   if (cellsize  == 0)
-    cellsize = (180 * 3600) / max_u / purify_pi / 3;
+    cellsize = (180 * 3600) / max_u / purify_pi / 3 /3;
 
 
   //header information
@@ -253,9 +253,24 @@ int main(int argc, char **argv) {
   std::string const dirty_image_fits = output_filename(name + "_dirty_"+ weighting + ".fits");
   std::string const psf_fits = output_filename(name + "_psf_"+ weighting + ".fits");
 
-  MeasurementOperator measurements(uv_data, J, J, kernel, width, height, power_method_iterations, 
-    over_sample, cellsize, cellsize, "none", 0, use_w_term, energy_fraction, 
-    primary_beam, fft_grid_correction);
+  auto measurements = MeasurementOperator()
+      .Ju(J)
+      .Jv(J)
+      .kernel_name(kernel)
+      .imsizex(width)
+      .imsizey(height)
+      .norm_iterations(power_method_iterations)
+      .oversample_factor(over_sample)
+      .cell_x(cellsize)
+      .cell_y(cellsize)
+      .weighting_type("none")
+      .R(0)
+      .use_w_term(use_w_term)
+      .energy_fraction(energy_fraction)
+      .primary_beam(primary_beam)
+      .fft_grid_correction(fft_grid_correction);
+
+    measurements(uv_data);
   
   //calculate weights outside of measurement operator
   uv_data.weights = utilities::init_weights(uv_data.u, uv_data.v, 
@@ -378,7 +393,7 @@ int main(int argc, char **argv) {
     std::clock_t c_end = std::clock();
     auto total_time = (c_end-c_start) / CLOCKS_PER_SEC; // total time for solver to run in seconds
     //Getting things ready for l1 and l2 norm calculation
-    Image<t_complex> const image = Image<t_complex>::Map(x.data(), measurements.imsizey, measurements.imsizex);
+    Image<t_complex> const image = Image<t_complex>::Map(x.data(), measurements.imsizey(), measurements.imsizex());
     Vector<t_complex> const y_residual = ((uv_data.vis - measurements.degrid(image)).array() * uv_data.weights.array().real());
     t_real const l2_norm = y_residual.stableNorm();
     Vector<t_complex> const alpha = Psi.adjoint() * x;
@@ -461,7 +476,7 @@ int main(int argc, char **argv) {
 
   std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_final.fits");
   std::string const residual_fits = output_filename(name + "_residual_"+ weighting + "_final.fits");
-  Image<t_complex> const image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey, measurements.imsizex);
+  Image<t_complex> const image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey(), measurements.imsizex());
   // header information
   header.pix_units = "JY/PIXEL";
   header.fits_name = outfile_fits;

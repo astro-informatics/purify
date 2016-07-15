@@ -124,7 +124,7 @@ namespace purify {
 			t_real max = psf.maxCoeff(&psf_x, &psf_y);
 			std::printf("PSF max pixel at (%d, %d) \n", psf_y, psf_x);
 			psf = psf / max;
-		    Image<t_complex> gaussian = Image<t_complex>::Zero(op.imsizey, op.imsizex);
+		    Image<t_complex> gaussian = Image<t_complex>::Zero(op.imsizey(), op.imsizex());
 		    //choice of parameters
 		    auto const fit = utilities::fit_fwhm(psf, 3);
 		    auto fwhm_x = fit(0) * 2 * std::sqrt(2 * std::log(2));
@@ -138,11 +138,11 @@ namespace purify {
 		    t_real const a = std::pow(std::cos(theta), 2)/(2 * sigma_x * sigma_x) + std::pow(std::sin(theta), 2)/(2 * sigma_y * sigma_y);
 		    t_real const b = - std::sin(2 * theta)/(4 * sigma_x * sigma_x) + std::sin(2 * theta)/(4 * sigma_y * sigma_y);
 		    t_real const c = std::pow(std::sin(theta), 2)/(2 * sigma_x * sigma_x) + std::pow(std::cos(theta), 2)/(2 * sigma_y * sigma_y);
-		    auto x0 = op.imsizex * 0.5;
-		    auto y0 = op.imsizey * 0.5;
-		    for (t_int i = 0; i < op.imsizex; ++i)
+		    auto x0 = op.imsizex() * 0.5;
+		    auto y0 = op.imsizey() * 0.5;
+		    for (t_int i = 0; i < op.imsizex(); ++i)
 		    {
-		        for (t_int j = 0; j < op.imsizey; ++j)
+		        for (t_int j = 0; j < op.imsizey(); ++j)
 		        {
 		            t_real x = i - x0;
 		            t_real y = j - y0;

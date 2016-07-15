@@ -81,7 +81,7 @@ int main(int, char **) {
   std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_clean.fits");
 
   std::string const residual_fits = output_filename(name + "_residual_"+ weighting + "_clean.fits");
-  Image<t_complex> const image = Image<t_complex>::Map(restored_image.data(), measurements.imsizey, measurements.imsizex);
+  Image<t_complex> const image = Image<t_complex>::Map(restored_image.data(), measurements.imsizey(), measurements.imsizex());
   // header information
   header.pix_units = "JY/BEAM";
   header.fits_name = outfile_fits;
