@@ -4,7 +4,13 @@ include(EnvironmentScript)
 include(PackageLookup)
 
 # Look for external software
-find_package(FFTW3 REQUIRED DOUBLE)
+if(openmp)
+  find_package(OpenMP)
+  find_package(FFTW3 REQUIRED DOUBLE COMPONENTS OPENMP)
+else()
+  find_package(FFTW3 REQUIRED DOUBLE)
+endif(openmp)
+
 find_package(TIFF REQUIRED)
 find_package(CBLAS REQUIRED)
 set(PURIFY_BLAS_H "${BLAS_INCLUDE_FILENAME}")
