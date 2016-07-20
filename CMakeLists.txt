@@ -19,6 +19,7 @@ include(AddC99Flags)
 include(AddCPP11Flags)
 
 option(tests          "Enable testing"                                  on)
+option(data           "Download measurement set for testing"            on)
 option(openmp         "Enable OpenMP"                                   off)
 option(python         "Enable python bindings"                          on)
 
@@ -50,6 +51,9 @@ if(EXISTS "${EXTERNAL_ROOT}/lib/")
 endif()
 if(python)
     include(python_dependencies)
+endif()
+if(tests AND data)
+    include(data_dependencies)
 endif()
 
 if(tests)  # Adds ctest

@@ -22,23 +22,17 @@ public:
     ONLY_SIGMA_SPECTRUM
   };
   //! Constructs the interface around a given measurement set
-  MeasurementSet(std::string const filename, int data_desc_id = 0)
-      : filename_(filename), data_desc_id_(data_desc_id),
+  MeasurementSet(std::string const filename)
+      : filename_(filename),
         tables_(new std::map<std::string, ::casacore::Table>){};
   //! Filename of the measurement set
   std::string const &filename() const { return filename_; }
   //! Set new filename
   MeasurementSet &filename(std::string const &filename);
 
-  //! This is the data we are looking for?
-  int data_desc_id() const { return data_desc_id_; }
-  MeasurementSet &data_desc_id(int d);
-
-  int spectral_window_id() const;
-  Array<t_real> frequencies() const;
+  // Array<t_real> frequencies() const;
 
   //! \brief Gets table or subtable
-  //! \details If this is a column in the main table, then the current data_desc_id is selected.
   ::casacore::Table const &table(std::string const &name = "") const;
 
   //! Gets scalar column from table
@@ -48,7 +42,6 @@ public:
     return get_column<T, ::casacore::ScalarColumn>(col, tabname);
   }
   //! \brief Gets array column from table
-  //! \details If this is a column in the main table, then the current data_desc_id is selected.
   template <class T>
   ::casacore::ArrayColumn<T>
   array_column(std::string const &col, std::string const &tabname = "") const {
@@ -65,24 +58,34 @@ public:
   Vector<t_real> u() const;
   Vector<t_real> v() const;
   Vector<t_real> w() const;
-  // Vector<t_real> sigma(int Nc, int Nf, Sigma const &option = PREFER_SIGMA_SPECTRUM) const;
+  //! Stokes I component
+  Matrix<t_complex> I(std::string const &name = "DATA") const;
+  //! Weights for the Stokes I component
+  Matrix<t_real> wI(std::string const &name = "SIGMA") const;
+  //! Stokes Q component
+  Matrix<t_complex> Q(std::string const &name = "DATA") const;
+  //! Weights for the Stokes Q component
+  Matrix<t_real> wQ(std::string const &name = "SIGMA") const;
+  //! Stokes U component
+  Matrix<t_complex> U(std::string const &name = "DATA") const;
+  //! Weights for the Stokes U component
+  Matrix<t_real> wU(std::string const &name = "SIGMA") const;
+  //! Stokes V component
+  Matrix<t_complex> V(std::string const &name = "DATA") const;
+  //! Weights for the Stokes V component
+  Matrix<t_real> wV(std::string const &name = "SIGMA") const;
 
 private:
+  //! Gets stokes of given array/object
+  template<class T> Matrix<T> stokes(std::string origin, std::string pol) const;
+
   template <class T, template <class> class TYPE>
   TYPE<T> get_column(std::string const &col, std::string const &tabname) const {
-    return {table(tabname, data_desc_id()), col};
+    return {table(tabname), col};
   }
-
-  //! \brief Gets table or subtable
-  //! \details If this is a column in the main table, then the current data_desc_id is selected.
-  ::casacore::Table const &table(std::string const &name, int data_desc_id) const;
-
-
 
   //! Name associated with the measurement set
   std::string filename_;
-
-  int data_desc_id_;
 
   //! Holds tables that have been opened
   std::unique_ptr<std::map<std::string, ::casacore::Table>> tables_;

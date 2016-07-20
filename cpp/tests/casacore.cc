@@ -1,5 +1,6 @@
 #include <boost/filesystem.hpp>
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
+#include <casacore/tables/TaQL/TableParse.h>
 #include <casacore/tables/Tables/ArrColDesc.h>
 #include <casacore/tables/Tables/ArrayColumn.h>
 #include <casacore/tables/Tables/ColumnDesc.h>
@@ -8,6 +9,7 @@
 #include <casacore/tables/Tables/SetupNewTab.h>
 #include <casacore/tables/Tables/TableColumn.h>
 #include "casacore.h"
+#include "directories.h"
 
 #include "catch.hpp"
 using namespace ::casacore;
@@ -86,34 +88,24 @@ TEST_CASE("From constructed") {
   }
   purify::casa::MeasurementSet pms(ms.path().string());
 
-  SECTION("spectral window id") {
-    ScalarColumn<Int> column(ms->dataDescription(), "SPECTRAL_WINDOW_ID");
-    column.put(1, 5);
-    CHECK(pms.spectral_window_id() == 0);
-    pms.data_desc_id(1);
-    CHECK(pms.spectral_window_id() == 5);
-  }
-  SECTION("frequencies") {
-    ArrayColumn<Double> column(ms->spectralWindow(), "CHAN_FREQ");
-    ms->spectralWindow().addRow();
-    ms->spectralWindow().addRow();
-
-    Array<Double> single(IPosition(1, 1));
-    single(IPosition(1, 0)) = 1.5;
-    column.put(0, single);
-
-    Array<Double> triple(IPosition(1, 3));
-    triple(IPosition(1, 0)) = 1.5;
-    triple(IPosition(1, 1)) = 2.5;
-    triple(IPosition(1, 2)) = 3.5;
-    column.put(1, triple);
-
-    CHECK(pms.frequencies().size() == 1);
-    CHECK(pms.frequencies().isApprox(purify::Array<purify::t_real>::Ones(1) * 1.5));
-    pms.data_desc_id(1);
-    CHECK(pms.frequencies().size() == 3);
-    CHECK(pms.frequencies().isApprox(Eigen::Array3d(1.5, 2.5, 3.5)));
-  }
+  // SECTION("frequencies") {
+  //   ArrayColumn<Double> column(ms->spectralWindow(), "CHAN_FREQ");
+  //   ms->spectralWindow().addRow();
+  //   ms->spectralWindow().addRow();
+  //
+  //   Array<Double> single(IPosition(1, 1));
+  //   single(IPosition(1, 0)) = 1.5;
+  //   column.put(0, single);
+  //
+  //   Array<Double> triple(IPosition(1, 3));
+  //   triple(IPosition(1, 0)) = 1.5;
+  //   triple(IPosition(1, 1)) = 2.5;
+  //   triple(IPosition(1, 2)) = 3.5;
+  //   column.put(1, triple);
+  //
+  //   CHECK(pms.frequencies().size() == 1);
+  //   CHECK(pms.frequencies().isApprox(purify::Array<purify::t_real>::Ones(1) * 1.5));
+  // }
 }
 
 TEST_CASE("DATA column") {
@@ -187,4 +179,15 @@ TEST_CASE("FSpectral Window ID") {
   CAPTURE(column.shape(0));
   auto const acol = column.getColumn();
   // CHECK(false);
+}
+
+TEST_CASE("TaQL") {
+  purify::casa::MeasurementSet const pms(purify::notinstalled::ngc3256_ms());
+  auto const I = pms.I();
+  CAPTURE(I(0, 0));
+  CAPTURE(I(10, 10));
+  CHECK(I.rows() == 239616);
+  CHECK(I.cols() == 128);
+  CHECK(std::abs(I(0, 0) - 0.954088 ) < 1e-5);
+  CHECK(std::abs(I(10, 10) - 3.42896e-6 ) < 1e-10);
 }

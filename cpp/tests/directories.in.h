@@ -2,12 +2,13 @@
 #define SOPT_DATA_DIR_H
 
 #include <string>
-namespace purify { namespace notinstalled {
+namespace purify {
+namespace notinstalled {
 
 //! Holds data and such
 inline std::string data_directory() { return "@PROJECT_SOURCE_DIR@/data"; }
 //! Holds data and such
-inline std::string data_filename(std::string const&filename) {
+inline std::string data_filename(std::string const &filename) {
   return data_directory() + "/" + filename;
 }
 //! Image filename
@@ -34,8 +35,11 @@ inline std::string degridding_filename(std::string const &filename) {
 //! Where test outputs go
 inline std::string output_directory() { return "@PROJECT_BINARY_DIR@/outputs"; }
 //! Test output file
-inline std::string output_filename(std::string const& filename) {
+inline std::string output_filename(std::string const &filename) {
   return output_directory() + "/" + filename;
 }
-}} /* sopt::notinstalled */
+
+inline std::string ngc3256_ms() { return "@NGC3256_MS@"; }
+}
+} /* sopt::notinstalled */
 #endif
