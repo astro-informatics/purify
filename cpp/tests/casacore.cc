@@ -77,37 +77,6 @@ protected:
   std::unique_ptr<casa::MeasurementSet> ms_;
 };
 
-TEST_CASE("From constructed") {
-  TmpMS ms;
-  { // setup spectral windo id
-    ScalarColumn<Int> column(ms->dataDescription(), "SPECTRAL_WINDOW_ID");
-    ms->dataDescription().addRow();
-    ms->dataDescription().addRow();
-    column.put(0, 0);
-    column.put(1, 1);
-  }
-  purify::casa::MeasurementSet pms(ms.path().string());
-
-  // SECTION("frequencies") {
-  //   ArrayColumn<Double> column(ms->spectralWindow(), "CHAN_FREQ");
-  //   ms->spectralWindow().addRow();
-  //   ms->spectralWindow().addRow();
-  //
-  //   Array<Double> single(IPosition(1, 1));
-  //   single(IPosition(1, 0)) = 1.5;
-  //   column.put(0, single);
-  //
-  //   Array<Double> triple(IPosition(1, 3));
-  //   triple(IPosition(1, 0)) = 1.5;
-  //   triple(IPosition(1, 1)) = 2.5;
-  //   triple(IPosition(1, 2)) = 3.5;
-  //   column.put(1, triple);
-  //
-  //   CHECK(pms.frequencies().size() == 1);
-  //   CHECK(pms.frequencies().isApprox(purify::Array<purify::t_real>::Ones(1) * 1.5));
-  // }
-}
-
 TEST_CASE("DATA column") {
   TmpMS ms;
   purify::casa::MeasurementSet pms(ms.path().string());
@@ -139,55 +108,58 @@ TEST_CASE("UVW") {
   uvw_column.put(2, casa::Array<casa::Double>(casa::IPosition(1, 3), uvw_data.data() + 6));
 
   purify::casa::MeasurementSet pms(ms.path().string());
-  CHECK(pms.u().isApprox(purify::Array<purify::t_real>::LinSpaced(3, 0, 6).matrix()));
-  CHECK(pms.v().isApprox(purify::Array<purify::t_real>::LinSpaced(3, 1, 7).matrix()));
-  CHECK(pms.w().isApprox(purify::Array<purify::t_real>::LinSpaced(3, 2, 8).matrix()));
+  CHECK(pms.uvw().col(0).isApprox(purify::Array<purify::t_real>::LinSpaced(3, 0, 6).matrix()));
+  CHECK(pms.uvw().col(1).isApprox(purify::Array<purify::t_real>::LinSpaced(3, 1, 7).matrix()));
+  CHECK(pms.uvw().col(2).isApprox(purify::Array<purify::t_real>::LinSpaced(3, 2, 8).matrix()));
 }
 
-TEST_CASE("SIGMA") {
-  TmpMS ms;
-  ms->addRow();
-  ms->addRow();
-  ms->addRow();
-  ArrayColumn<Double> uvw_column(*ms, "UVW");
-  std::vector<Double> const uvw_data = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-  casa::Array<casa::Double> uvw_array(casa::IPosition(1, 3), uvw_data.data());
-  uvw_column.put(0, casa::Array<casa::Double>(casa::IPosition(1, 3), uvw_data.data()));
-  uvw_column.put(1, casa::Array<casa::Double>(casa::IPosition(1, 3), uvw_data.data() + 3));
-  uvw_column.put(2, casa::Array<casa::Double>(casa::IPosition(1, 3), uvw_data.data() + 6));
-
-  purify::casa::MeasurementSet pms(ms.path().string());
-  CHECK(pms.u().isApprox(purify::Array<purify::t_real>::LinSpaced(3, 0, 6).matrix()));
-  CHECK(pms.v().isApprox(purify::Array<purify::t_real>::LinSpaced(3, 1, 7).matrix()));
-  CHECK(pms.w().isApprox(purify::Array<purify::t_real>::LinSpaced(3, 2, 8).matrix()));
-}
-
-TEST_CASE("FSpectral Window ID") {
-  auto const filename = "/Users/mdavezac/workspaces/purify/data/at166B.3C129.c0.ms";
-  // ::casacore::Table table(filename);
-  // REQUIRE(table.tableDesc().isColumn("UVW"));
-  purify::casa::MeasurementSet const pms(filename);
-  std::string NAME = "DATA";
-  REQUIRE(pms.table().tableDesc().isColumn(NAME));
-  CAPTURE(pms.table().tableDesc().columnDesc(NAME).trueDataType());
-  CAPTURE(pms.table().tableDesc().columnDesc(NAME).isArray());
-  CAPTURE(pms.table().tableDesc().columnDesc(NAME).ndim());
-  CAPTURE(pms.table().tableDesc().columnDesc(NAME).shape());
-  CAPTURE(pms.table().tableDesc().columnDesc(NAME).isFixedShape());
-  auto const column = pms.array_column<::casacore::Complex>(NAME);
-  CAPTURE(column.nrow());
-  CAPTURE(column.shape(0));
-  auto const acol = column.getColumn();
-  // CHECK(false);
-}
-
-TEST_CASE("TaQL") {
+TEST_CASE("Stokes I") {
   purify::casa::MeasurementSet const pms(purify::notinstalled::ngc3256_ms());
-  auto const I = pms.I();
+  auto const I = pms.I("DATA", "WHERE ALL(FLAG)");
   CAPTURE(I(0, 0));
-  CAPTURE(I(10, 10));
-  CHECK(I.rows() == 239616);
+  CAPTURE(I(10, 8));
+  CHECK(I.rows() == 98557);
   CHECK(I.cols() == 128);
-  CHECK(std::abs(I(0, 0) - 0.954088 ) < 1e-5);
-  CHECK(std::abs(I(10, 10) - 3.42896e-6 ) < 1e-10);
+  CHECK(std::abs(I(0, 0) - 0.95408797264099121) < 1e-12);
+  CHECK(std::abs(I(10, 8).real() - 9.6010975539684296e-5) < 1e-16);
+  CHECK(std::abs(I(10, 8).imag() + 0.00010972682503052056) < 1e-16);
+}
+
+TEST_CASE("Frequency table") {
+  purify::casa::MeasurementSet const pms(purify::notinstalled::ngc3256_ms());
+  auto const f = pms.frequency_table();
+  CHECK(f.rows() == 4);
+  CHECK(f.cols() == 128);
+  CHECK(std::abs(f(0, 0) - 113211987500.0) < 1e-8);
+  CHECK(std::abs(f(3, 10) - 102894612500.0) < 1e-8);
+}
+
+TEST_CASE("Data description id") {
+  purify::casa::MeasurementSet const pms(purify::notinstalled::ngc3256_ms());
+  auto const d = pms.data_desc_id("WHERE ALL(FLAG)");
+  CHECK(d.size() == 98557);
+  CHECK(d(0) == 0);
+  CHECK(d(98356) == 0);
+  CHECK(d(84) == 1);
+  CHECK(d(98399) == 1);
+  CHECK(d(168) == 2);
+  CHECK(d(98445) == 2);
+  CHECK(d(252) == 3);
+  CHECK(d(98555) == 3);
+}
+
+TEST_CASE("Frequencies") {
+  auto const filter = "WHERE ALL(FLAG)";
+  auto const freq
+      = purify::casa::MeasurementSet(purify::notinstalled::ngc3256_ms()).frequencies(filter);
+  auto const tab
+      = purify::casa::MeasurementSet(purify::notinstalled::ngc3256_ms()).frequency_table();
+  CHECK(freq.rows() == 98557);
+  CHECK(freq.cols() == 128);
+  CHECK(freq.row(0).isApprox(tab.row(0)));
+  CHECK(freq.row(98356).isApprox(tab.row(0)));
+  CHECK(freq.row(84).isApprox(tab.row(1)));
+  CHECK(freq.row(98399).isApprox(tab.row(1)));
+  CHECK(freq.row(168).isApprox(tab.row(2)));
+  CHECK(freq.row(252).isApprox(tab.row(3)));
 }

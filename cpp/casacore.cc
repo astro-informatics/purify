@@ -1,11 +1,15 @@
 #include <sstream>
 #include <casacore/casa/Arrays/IPosition.h>
 #include <casacore/tables/TaQL/ExprNode.h>
-#include <casacore/tables/TaQL/TableParse.h>
 #include "casacore.h"
 
 namespace purify {
 namespace casa {
+std::string const MeasurementSet::default_filter = "WHERE NOT ANY(FLAG)";
+
+Image<bool> MeasurementSet::flagged(std::string const &filter) const {
+  return column<bool>("FLAG", filter).array();
+}
 
 MeasurementSet &MeasurementSet::filename(std::string const &filename) {
   clear();
@@ -13,16 +17,26 @@ MeasurementSet &MeasurementSet::filename(std::string const &filename) {
   return *this;
 }
 
-// Array<t_real> MeasurementSet::frequencies() const {
-//   auto const column = array_column<::casacore::Double>("CHAN_FREQ", "SPECTRAL_WINDOW");
-//   auto const array = column.get(spectral_window_id());
-//   if(array.ndim() != 1)
-//     throw std::runtime_error("CHAN_FREQ is not a 1d array");
-//   Array<t_real> result(array.shape()[0]);
-//   for(int i(0); i < result.size(); ++i)
-//     result(i) = static_cast<t_real>(array(::casacore::IPosition(1, i)));
-//   return result;
-// }
+Image<t_real> MeasurementSet::frequency_table() const {
+  auto const column = array_column<::casacore::Double>("CHAN_FREQ", "SPECTRAL_WINDOW");
+  if(column.nrow() == 0)
+    return Image<t_real>::Zero(0, 0);
+  if(column.ndim(0) != 1)
+    throw std::runtime_error("CHAN_FREQ does not consist of 1d array");
+#ifndef _NDEBUG
+  for(unsigned int i(1), s(column.ndim(0)), n(column.shape(0)(0)); i < column.nrow(); ++i)
+    if(column.ndim(i) != s or column.shape(i)(0) != n)
+      throw std::runtime_error("CHAN_FREQ are not homogeneous");
+#endif
+  auto const data_column = column.getColumn();
+  return Eigen::Array<::casacore::Double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>::Map(
+             data_column.data(), column.nrow(), column.shape(0)(0))
+      .cast<t_real>();
+}
+
+Array<t_int> MeasurementSet::data_desc_id(std::string const &filter) const {
+  return column<t_int>("DATA_DESC_ID", filter).array();
+}
 
 std::string MeasurementSet::data_column_name(std::string const &col) const {
   auto const desc = table().tableDesc();
@@ -46,59 +60,31 @@ std::string MeasurementSet::data_column_name(std::string const &col) const {
   return i_result->second;
 }
 
-#define PURIFY_MACRO(NAME, INDEX)                                                                  \
-  Vector<t_real> MeasurementSet::NAME() const {                                                    \
-    auto const column = array_column<::casacore::Double>("UVW");                                   \
-    auto const data_column = column.getColumn();                                                   \
-    return Matrix<::casacore::Double>::Map(data_column.data(), 3, column.nrow())                   \
-        .row(INDEX)                                                                                \
-        .cast<t_real>();                                                                           \
-  }
-PURIFY_MACRO(u, 0);
-PURIFY_MACRO(v, 1);
-PURIFY_MACRO(w, 2);
-#undef PURIFY_MACRO
-
-namespace {
-// Will cast to double
-std::string dtype(::casacore::Float) { return "R8"; }
-// No-op
-std::string dtype(::casacore::Double) { return ""; }
-// Will cast to complex double
-std::string dtype(::casacore::Complex) { return "C8"; }
-// No-op
-std::string dtype(::casacore::DComplex) { return ""; }
+Matrix<t_real> MeasurementSet::uvw(std::string const &filter) const {
+  if(table().nrow() == 0)
+    return Matrix<t_real>::Zero(0, 3);
+  return column<t_real>("UVW", filter);
 }
 
-template <class T> Matrix<T> MeasurementSet::stokes(std::string origin, std::string pol) const {
-  // casting won't work if t_complex is not complex<double>
-  assert(sizeof(t_complex) == 16 and sizeof(t_real) == 8);
-  if(table().nrow() == 0)
-    return Matrix<T>::Zero(0, 0);
-  auto const taql_table
-      = ::casacore::tableCommand("SELECT mscal.stokes(" + origin + ", '" + pol + "') AS result "
-                                     + dtype(T(0)) + " " + "FROM $1 WHERE all(SIGMA >  0)",
-                                 table());
-  auto const vtable = taql_table.table();
-  if(not vtable.tableDesc().columnDesc("result").isArray())
-
-    throw std::runtime_error("Expected an array");
-  auto const column = ::casacore::ArrayColumn<T>(vtable, "result");
-  auto const shape = column.shape(0);
-  auto nsize
-      = std::accumulate(shape.begin(), shape.end(), 1, [](ssize_t a, ssize_t b) { return a * b; });
-  auto const data_column = column.getColumn();
-  auto const result = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>::Map(
-      data_column.data(), column.nrow(), nsize);
-  return result.template cast<T>();
+Image<t_real> MeasurementSet::frequencies(std::string const &filter) const {
+  auto desc_id = data_desc_id(filter);
+  auto const freqs = frequency_table();
+  Image<t_real> result(desc_id.rows(), freqs.cols());
+  for(Eigen::DenseIndex i(0); i < result.rows(); ++i)
+    result.row(i) = freqs.row(desc_id(i));
+  return result;
 }
 
 #define PURIFY_MACRO(NAME)                                                                         \
-  Matrix<t_complex> MeasurementSet::NAME(std::string const &data) const {                          \
-    return stokes<t_complex>(data, #NAME);                                                         \
+  Matrix<t_complex> MeasurementSet::NAME(std::string const &data, std::string const &filter)       \
+      const {                                                                                      \
+    auto const col = "mscal.stokes(" + data + ", '" #NAME "')";                                    \
+    return column<t_complex>(col, filter);                                                         \
   }                                                                                                \
-  Matrix<t_real> MeasurementSet::w##NAME(std::string const &data) const {                          \
-    return stokes<t_real>(data, "1.0/" #NAME);                                                     \
+  Matrix<t_real> MeasurementSet::w##NAME(std::string const &data, std::string const &filter)       \
+      const {                                                                                      \
+    auto const col = "1.0 / mscal.stokes(" + data + ", '" #NAME "')";                              \
+    return column<t_real>(col, filter);                                                            \
   }
 PURIFY_MACRO(I);
 PURIFY_MACRO(Q);
