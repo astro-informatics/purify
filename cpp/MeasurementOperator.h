@@ -23,54 +23,48 @@ namespace purify {
         Array<t_complex> W;
         Image<t_complex> C;
         t_real norm = 1;
-        const t_real oversample_factor;
         t_real resample_factor = 1;
-        const bool use_w_term = false;
-        const t_int imsizex;
-        const t_int imsizey;
-        t_int ftsizeu;
-        t_int ftsizev;
+
+
       
-      
+      MeasurementOperator();
       MeasurementOperator(const utilities::vis_params& uv_vis_input, const t_int & Ju, const t_int & Jv, 
        const std::string & kernel_name, const t_int & imsizex, const t_int & imsizey, const t_int & norm_iterations = 20, const t_real & oversample_factor = 2, 
        const t_real & cell_x = 1, const t_real & cell_y = 1, const std::string& weighting_type = "none", const t_real& R = 0, 
        bool use_w_term = false, const t_real & energy_fraction = 1, const std::string & primary_beam = "none", bool fft_grid_correction = false);
-     
+      
+      void operator() (const utilities::vis_params& uv_vis_input);
 
-#   define PURIFY_MACRO(NAME, TYPE) \
+
+#   define PURIFY_MACRO(NAME, TYPE, VALUE) \
       protected: \
-        TYPE NAME##_; \
+        TYPE NAME##_ = VALUE; \
       public:    \
         TYPE const &NAME() { return NAME##_; };  \
         MeasurementOperator &NAME(TYPE const &NAME) { NAME##_ = NAME; return *this; };  \
                                                                 
       
-
-
-
-        /*
-     PURIFY_MACRO(uv_vis_input, utilities::vis_params);
-     PURIFY_MACRO(Ju, t_int);
-     PURIFY_MACRO(Jv, t_int);
-     PURIFY_MACRO(kernel_name, std::string);
-     PURIFY_MACRO(imsizex, t_int);
-     PURIFY_MACRO(imsizey, t_int);
-     PURIFY_MACRO(oversample_factor, t_real);
-     PURIFY_MACRO(cell_x, t_real);
-     PURIFY_MACRO(cell_y, t_real);
-     PURIFY_MACRO(weighting_type, std::string);
-     PURIFY_MACRO(R, t_real);
-     PURIFY_MACRO(use_w_term, bool);
-     PURIFY_MACRO(energy_fraction, bool);
-     PURIFY_MACRO(fft_grid_correction, bool);
-     PURIFY_MACRO(primary_beam, std::string);
-  */
+     PURIFY_MACRO(Ju, t_int, 4);
+     PURIFY_MACRO(Jv, t_int, 4);
+     PURIFY_MACRO(kernel_name, std::string, "kb");
+     PURIFY_MACRO(imsizex, t_int, 512);
+     PURIFY_MACRO(imsizey, t_int, 512);
+     PURIFY_MACRO(norm_iterations, t_int, 20);
+     PURIFY_MACRO(oversample_factor, t_real, 2);
+     PURIFY_MACRO(cell_x, t_real, 1);
+     PURIFY_MACRO(cell_y, t_real, 1);
+     PURIFY_MACRO(weighting_type, std::string, "none");
+     PURIFY_MACRO(R, t_real, 0);
+     PURIFY_MACRO(use_w_term, bool, false);
+     PURIFY_MACRO(energy_fraction, t_real, 1.);
+     PURIFY_MACRO(fft_grid_correction, bool, false);
+     PURIFY_MACRO(primary_beam, std::string, "none");
+  
 
 #     undef PURIFY_MACRO
-      //t_uint nx() const { return nx_; }
-      //MeasurementOperator& nx(t_uint nx) { nx_ = nx; return *this; }
-
+    //Default values
+     t_int ftsizeu_;
+     t_int ftsizev_;
     public:
       //! Degridding operator that degrids image to visibilities
       Vector<t_complex> degrid(const Image<t_complex>& eigen_image);
@@ -92,7 +86,8 @@ namespace purify {
       Array<t_complex> init_weights(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const t_real & oversample_factor, const std::string& weighting_type, const t_real& R);
       //! Calculate Primary Beam
       Image<t_real> init_primary_beam(const std::string & primary_beam, const t_real& cell_x, const t_real& cell_y);
- 
+      //! Construct operator
+      void init_operator(const utilities::vis_params& uv_vis_input);
 
     public:
       //! Estiamtes norm of operator

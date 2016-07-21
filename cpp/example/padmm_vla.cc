@@ -141,7 +141,7 @@ int main(int, char **) {
       std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_update.fits");
       std::string const residual_fits = output_filename(name + "_residual_"+ weighting + "_update.fits");
 
-      Image<t_complex> const image = Image<t_complex>::Map(x.data(), measurements.imsizey, measurements.imsizex);
+      Image<t_complex> const image = Image<t_complex>::Map(x.data(), measurements.imsizey(), measurements.imsizex());
       // header information
       header.pix_units = "JY/PIXEL";
       header.fits_name = outfile_fits;
@@ -172,7 +172,7 @@ int main(int, char **) {
 
   std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_final.fits");
   std::string const residual_fits = output_filename(name + "_residual_"+ weighting + "_final.fits");
-  Image<t_complex> const image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey, measurements.imsizex);
+  Image<t_complex> const image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey(), measurements.imsizex());
   // header information
   header.pix_units = "JY/PIXEL";
   header.fits_name = outfile_fits;

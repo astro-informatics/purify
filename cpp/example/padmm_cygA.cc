@@ -100,7 +100,7 @@ int main(int, char **) {
   
   auto const diagnostic = padmm();
   assert(diagnostic.x.size() == width * height);
-  Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey, measurements.imsizex);
+  Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey(), measurements.imsizex());
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
   sopt::utilities::write_tiff(image.real(), outfile);

@@ -45,7 +45,8 @@ TEST_CASE("FFT Operator [FORWARD]", "[FORWARD]") {
 TEST_CASE("FFT Operator [INVERSE]", "[INVERSE]") {
 
   Fft2d oldFFT;
-  FFTOperator newFFT;
+  t_int fft_flag = (FFTW_PATIENT|FFTW_PRESERVE_INPUT);
+  auto newFFT = purify::FFTOperator().fftw_flag(fft_flag);
   Matrix<t_complex> a = Matrix<t_complex>::Random(20, 19);
 
   Matrix<t_complex> old_output = oldFFT.inverse(a);
@@ -74,7 +75,8 @@ TEST_CASE("FFT Operator [INVERSE]", "[INVERSE]") {
 TEST_CASE("FFT Operator [BOTH]", "[BOTH]") {
 
   Fft2d oldFFT;
-  FFTOperator newFFT;
+  t_int fft_flag = (FFTW_PATIENT|FFTW_PRESERVE_INPUT);
+  auto newFFT = purify::FFTOperator().fftw_flag(fft_flag);
   Matrix<t_complex> a = Matrix<t_complex>::Random(20, 19);
 
   Matrix<t_complex> new_output = newFFT.forward(newFFT.inverse(a));

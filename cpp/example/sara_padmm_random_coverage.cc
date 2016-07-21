@@ -55,17 +55,17 @@ int main(int, char **) {
   MeasurementOperator measurements(uv_data, 4, 4, "kb", M31.cols(), M31.rows(), 20, over_sample);
 
   auto direct = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {
-    assert(x.size() == measurements.imsizex * measurements.imsizey);
-    auto const image = Image<t_complex>::Map(x.data(), measurements.imsizey, measurements.imsizex);
+    assert(x.size() == measurements.imsizex() * measurements.imsizey());
+    auto const image = Image<t_complex>::Map(x.data(), measurements.imsizey(), measurements.imsizex());
     out = measurements.degrid(image);
   };
   auto adjoint = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {
-    auto image = Image<t_complex>::Map(out.data(), measurements.imsizey, measurements.imsizex);
+    auto image = Image<t_complex>::Map(out.data(), measurements.imsizey(), measurements.imsizex());
     image = measurements.grid(x);
   };
   auto measurements_transform = sopt::linear_transform<Vector<t_complex>>(
       direct, {{0, 1, static_cast<t_int>(uv_data.vis.size())}}, adjoint,
-      {{0, 1, static_cast<t_int>(measurements.imsizex * measurements.imsizey)}});
+      {{0, 1, static_cast<t_int>(measurements.imsizex() * measurements.imsizey())}});
 
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
@@ -73,7 +73,7 @@ int main(int, char **) {
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
   auto const Psi
-      = sopt::linear_transform<t_complex>(sara, measurements.imsizey, measurements.imsizex);
+      = sopt::linear_transform<t_complex>(sara, measurements.imsizey(), measurements.imsizex());
 
   std::mt19937_64 mersenne;
   Vector<t_complex> const y0
@@ -87,8 +87,8 @@ int main(int, char **) {
   dimage = dimage / max_val;
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   sopt::utilities::write_tiff(
-      Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex), dirty_image);
-  pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey, measurements.imsizex),
+      Image<t_real>::Map(dimage.data(), measurements.imsizey(), measurements.imsizex()), dirty_image);
+  pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey(), measurements.imsizex()),
                    dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
@@ -125,7 +125,7 @@ int main(int, char **) {
   auto const diagnostic = reweighted();
   assert(diagnostic.algo.x.size() == M31.size());
   Image<t_complex> image
-      = Image<t_complex>::Map(diagnostic.algo.x.data(), measurements.imsizey, measurements.imsizex);
+      = Image<t_complex>::Map(diagnostic.algo.x.data(), measurements.imsizey(), measurements.imsizex());
   t_real const max_val_final = image.array().abs().maxCoeff();
   sopt::utilities::write_tiff(image.real(), outfile);
   pfitsio::write2d(image.real(), outfile_fits);

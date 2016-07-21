@@ -9,20 +9,19 @@ namespace purify {
       eigen_image:: input image to be degridded
       st:: gridding parameters
     */
-      Matrix<t_complex> padded_image = Matrix<t_complex>::Zero(floor(imsizey * oversample_factor), floor(imsizex * oversample_factor));
-      Matrix<t_complex> ft_vector(ftsizev, ftsizeu);
-      t_int x_start = floor(floor(imsizex * oversample_factor) * 0.5 - imsizex * 0.5);
-      t_int y_start = floor(floor(imsizey * oversample_factor) * 0.5 - imsizey * 0.5);
+      Matrix<t_complex> padded_image = Matrix<t_complex>::Zero(floor(imsizey_ * oversample_factor_), floor(imsizex_ * oversample_factor_));
+      Matrix<t_complex> ft_vector(ftsizev_, ftsizeu_);
+      t_int x_start = floor(floor(imsizex_ * oversample_factor_) * 0.5 - imsizex_ * 0.5);
+      t_int y_start = floor(floor(imsizey_ * oversample_factor_) * 0.5 - imsizey_ * 0.5);
 
       // zero padding and gridding correction
-      padded_image.block(y_start, x_start, imsizey, imsizex)
+      padded_image.block(y_start, x_start, imsizey_, imsizex_)
           = utilities::parallel_multiply_image(S, eigen_image);
-      
 
       // create fftgrid
       ft_vector = wprojection::re_sample_ft_grid(fftop.forward(padded_image), resample_factor); // the fftshift is not needed because of the phase shift in the gridding kernel
       // turn into vector
-      ft_vector.resize(ftsizeu*ftsizev, 1); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
+      ft_vector.resize(ftsizeu_*ftsizev_, 1); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
       // get visibilities
       //return (G * ft_vector).array() * W/norm;
       return utilities::sparse_multiply_matrix(G, ft_vector).array() * W/norm;
@@ -38,12 +37,12 @@ namespace purify {
     */
       //Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W).matrix()/norm;
       Matrix<t_complex> ft_vector = utilities::sparse_multiply_matrix(G.adjoint(), (visibilities.array() * W).matrix())/norm;
-      ft_vector.resize(ftsizev, ftsizeu); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
+      ft_vector.resize(ftsizev_, ftsizeu_); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
       ft_vector = wprojection::re_sample_ft_grid(ft_vector, 1./resample_factor);
       Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
-      t_int x_start = floor(floor(imsizex * oversample_factor) * 0.5 - imsizex * 0.5);
-      t_int y_start = floor(floor(imsizey * oversample_factor) * 0.5 - imsizey * 0.5);
-      return utilities::parallel_multiply_image(S, padded_image.block(y_start, x_start, imsizey, imsizex));
+      t_int x_start = floor(floor(imsizex_ * oversample_factor_) * 0.5 - imsizex_ * 0.5);
+      t_int y_start = floor(floor(imsizey_ * oversample_factor_) * 0.5 - imsizey_ * 0.5);
+      return utilities::parallel_multiply_image(S, padded_image.block(y_start, x_start, imsizey_, imsizex_));
   }
 
 
@@ -74,7 +73,7 @@ namespace purify {
     */
 
   t_int rows = u.size();
-  t_int cols = ftsizeu * ftsizev;
+  t_int cols = ftsizeu_ * ftsizev_;
   t_int q;
   t_int p;
   t_int index;
@@ -93,9 +92,9 @@ namespace purify {
        {
         for (t_int jv = 1; jv <= Jv; ++jv)
           {
-            q = utilities::mod(k_u(m) + ju, ftsizeu);
-            p = utilities::mod(k_v(m) + jv, ftsizev);
-            index = utilities::sub2ind(p, q, ftsizev, ftsizeu);
+            q = utilities::mod(k_u(m) + ju, ftsizeu_);
+            p = utilities::mod(k_v(m) + jv, ftsizev_);
+            index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
             const t_complex I(0, 1);
             interpolation_matrix.coeffRef(m, index) += std::exp(-2 * purify_pi * I *((k_u(m) + ju) * 0.5 + (k_v(m) + jv) * 0.5 )) * kernelu(u(m)-(k_u(m)+ju)) * kernelv(v(m)-(k_v(m)+jv));
           }
@@ -110,11 +109,11 @@ namespace purify {
       Given the Fourier transform of a gridding kernel, creates the scaling image for gridding correction.
 
     */
-    t_int x_start = std::floor(ftsizeu * 0.5 - imsizex * 0.5);
-    t_int y_start = std::floor(ftsizev * 0.5 - imsizey * 0.5);
+    t_int x_start = std::floor(ftsizeu_ * 0.5 - imsizex_ * 0.5);
+    t_int y_start = std::floor(ftsizev_ * 0.5 - imsizey_ * 0.5);
     Array<t_real> range;
-    range.setLinSpaced(std::max(ftsizeu, ftsizev), 0.5, std::max(ftsizeu, ftsizev) - 0.5);
-    return (1e0 / range.segment(y_start, imsizey).unaryExpr(ftkernelv)).matrix() * (1e0 / range.segment(x_start, imsizex).unaryExpr(ftkernelu)).matrix().transpose();
+    range.setLinSpaced(std::max(ftsizeu_, ftsizev_), 0.5, std::max(ftsizeu_, ftsizev_) - 0.5);
+    return (1e0 / range.segment(y_start, imsizey_).unaryExpr(ftkernelv)).matrix() * (1e0 / range.segment(x_start, imsizex_).unaryExpr(ftkernelu)).matrix().transpose();
   }
 
   Image<t_real> MeasurementOperator::init_correction2d_fft(const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv, const t_int Ju, const t_int Jv)
@@ -123,20 +122,20 @@ namespace purify {
       Given the gridding kernel, creates the scaling image for gridding correction using an fft.
 
     */
-    Matrix<t_complex> K = Matrix<t_complex>::Zero(ftsizeu, ftsizev);
+    Matrix<t_complex> K = Matrix<t_complex>::Zero(ftsizeu_, ftsizev_);
     for (int i = 0; i < Ju; ++i)
     {
-      t_int n = utilities::mod(i - Ju/2, ftsizeu);
+      t_int n = utilities::mod(i - Ju/2, ftsizeu_);
       for (int j = 0; j < Jv; ++j)
       {
-        t_int m = utilities::mod(j - Jv/2, ftsizev);
+        t_int m = utilities::mod(j - Jv/2, ftsizev_);
         const t_complex I(0, 1);
         K(n, m) = kernelu(i - Ju/2) * kernelv(j - Jv/2) * std::exp(-2 * purify_pi * I * ((i - Ju/2)  * 0.5 + (j - Jv/2) * 0.5 ));
       }
     }
-    t_int x_start = std::floor(ftsizeu * 0.5 - imsizex * 0.5);
-    t_int y_start = std::floor(ftsizev * 0.5 - imsizey * 0.5);
-    Image<t_real> S = fftop.inverse(K).array().real().block(y_start, x_start, imsizey, imsizex); // probably really slow!
+    t_int x_start = std::floor(ftsizeu_ * 0.5 - imsizex_ * 0.5);
+    t_int y_start = std::floor(ftsizev_ * 0.5 - imsizey_ * 0.5);
+    Image<t_real> S = fftop.inverse(K).array().real().block(y_start, x_start, imsizey_, imsizex_); // probably really slow!
     return 1/S;
 
   }  
@@ -146,15 +145,15 @@ namespace purify {
     /*
       Calcualte primary beam, A, for the measurement operator.
     */
-      t_int x_start = std::floor(ftsizeu * 0.5 - imsizex * 0.5);
-      t_int y_start = std::floor(ftsizev * 0.5 - imsizey * 0.5);
+      t_int x_start = std::floor(ftsizeu_ * 0.5 - imsizex_ * 0.5);
+      t_int y_start = std::floor(ftsizev_ * 0.5 - imsizey_ * 0.5);
       Array<t_real> range;
-      range.setLinSpaced(std::max(ftsizeu, ftsizev), 0.5, std::max(ftsizeu, ftsizev) - 0.5);
+      range.setLinSpaced(std::max(ftsizeu_, ftsizev_), 0.5, std::max(ftsizeu_, ftsizev_) - 0.5);
     
       if (primary_beam == "atca")
       {
-        auto const ftx = ftsizeu;
-        auto const fty = ftsizev;
+        auto const ftx = ftsizeu_;
+        auto const fty = ftsizev_;
         auto pbcorr_x = [&cell_x, &ftx](const t_real& x){
           auto x0 = std::floor(ftx / 2);
           return std::exp(-4 * std::log(2) * 42. / ((x - x0) * cell_x));
@@ -163,9 +162,9 @@ namespace purify {
           auto y0 = std::floor(fty / 2);
           return std::exp(-4 * std::log(2) * 42. / ((y - y0) * cell_y));
         };
-        return (1e0 / range.segment(x_start, imsizex).unaryExpr(pbcorr_x)).matrix() * (1e0 / range.segment(y_start, imsizey).unaryExpr(pbcorr_y)).matrix().transpose();
+        return (1e0 / range.segment(x_start, imsizex_).unaryExpr(pbcorr_x)).matrix() * (1e0 / range.segment(y_start, imsizey_).unaryExpr(pbcorr_y)).matrix().transpose();
       }
-      return Image<t_real>::Zero(imsizey, imsizex) + 1.;
+      return Image<t_real>::Zero(imsizey_, imsizex_) + 1.;
   }
 
   t_real MeasurementOperator::power_method(const t_int & niters, const t_real & relative_difference){
@@ -176,7 +175,7 @@ namespace purify {
     */
      t_real estimate_eigen_value = 1;
      t_real old_value = 0;
-     Image<t_complex> estimate_eigen_vector = Image<t_complex>::Random(imsizey, imsizex);
+     Image<t_complex> estimate_eigen_vector = Image<t_complex>::Random(imsizey_, imsizex_);
      estimate_eigen_vector = estimate_eigen_vector / estimate_eigen_vector.matrix().norm();
      std::cout << "Starting power method " << '\n';
      std::cout << "Iteration: " << 0 << ", norm = " << estimate_eigen_value << '\n';
@@ -192,14 +191,10 @@ namespace purify {
      }
      return old_value;
   }
-
   MeasurementOperator::MeasurementOperator(const utilities::vis_params& uv_vis_input, const t_int &Ju, const t_int &Jv,
       const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey, const t_int & norm_iterations, const t_real &oversample_factor, const t_real & cell_x, const t_real & cell_y,
-       const std::string& weighting_type, const t_real& R, bool use_w_term, const t_real& energy_fraction,const std::string & primary_beam, bool fft_grid_correction)
-      : imsizex(imsizex), imsizey(imsizey), ftsizeu(floor(oversample_factor * imsizex)), ftsizev(floor(oversample_factor * imsizey)), use_w_term(use_w_term), oversample_factor(oversample_factor)
-    
-  {
-    /*
+       const std::string& weighting_type, const t_real& R, bool use_w_term, const t_real& energy_fraction,const std::string & primary_beam, bool fft_grid_correction){
+          /*
       Generates operators needed for gridding and degridding.
 
       uv_vis_input:: coordinates, weights, and visibilities.
@@ -218,175 +213,205 @@ namespace purify {
 
 
     */
-    fftop.set_up_multithread();
-    if (use_w_term){
-      resample_factor = wprojection::upsample_ratio(uv_vis_input, cell_x, cell_y, ftsizeu, ftsizev);
-      ftsizeu = ftsizeu * resample_factor;
-      ftsizev = ftsizev * resample_factor;
+      *this = MeasurementOperator::Ju(Ju)
+      .Jv(Jv)
+      .kernel_name(kernel_name)
+      .imsizex(imsizex)
+      .imsizey(imsizey)
+      .norm_iterations(norm_iterations)
+      .oversample_factor(oversample_factor)
+      .cell_x(cell_x)
+      .cell_y(cell_y)
+      .weighting_type(weighting_type)
+      .R(R)
+      .use_w_term(use_w_term)
+      .energy_fraction(energy_fraction)
+      .primary_beam(primary_beam)
+      .fft_grid_correction(fft_grid_correction);
+      MeasurementOperator::init_operator(uv_vis_input);
+
+      }
+  MeasurementOperator::MeasurementOperator(){
+    //Most basic constructor
+  }
+
+  void MeasurementOperator::operator() (const utilities::vis_params& uv_vis_input){
+    //setting up operator
+    MeasurementOperator::init_operator(uv_vis_input);
+  }
+  void MeasurementOperator::init_operator(const utilities::vis_params& uv_vis_input)
+  {
+    ftsizeu_ = floor(imsizex_ * oversample_factor_);
+    ftsizev_ = floor(imsizey_ * oversample_factor_);
+    
+    if (use_w_term_){
+      resample_factor = wprojection::upsample_ratio(uv_vis_input, cell_x_, cell_y_, ftsizeu_, ftsizev_);
+      ftsizeu_ = ftsizeu_ * resample_factor;
+      ftsizev_ = ftsizev_ * resample_factor;
     }
     utilities::vis_params uv_vis = uv_vis_input;
     if (uv_vis.units == "lambda")
-      uv_vis = utilities::set_cell_size(uv_vis_input, cell_x, cell_y);
+      uv_vis = utilities::set_cell_size(uv_vis_input, cell_x_, cell_y_);
     if (uv_vis.units == "radians")
-      uv_vis = utilities::uv_scale(uv_vis, floor(oversample_factor * imsizex), floor(oversample_factor * imsizey));
+      uv_vis = utilities::uv_scale(uv_vis, floor(oversample_factor_ * imsizex_), floor(oversample_factor_ * imsizey_));
     
 
-    //t_real new_upsample = utilities::upsample_ratio(uv_vis, ,);
     std::printf("------ \n");
     std::printf("Planning FFT operator \n");
-    fftop.init_plan(Matrix<t_complex>::Zero(ftsizev, ftsizeu));
+    fftop.set_up_multithread();
+    fftop.init_plan(Matrix<t_complex>::Zero(ftsizev_, ftsizeu_));
     std::printf("Constructing Gridding Operator: G\n");
 
-    std::printf("Oversampling Factor: %f \n", oversample_factor);
+    std::printf("Oversampling Factor: %f \n", oversample_factor_);
     std::function<t_real(t_real)> kernelu;
     std::function<t_real(t_real)> kernelv;
     std::function<t_real(t_real)> ftkernelu;
     std::function<t_real(t_real)> ftkernelv;
-    if (use_w_term)
+    if (use_w_term_)
       std::printf("Resampling Factor: %f \n", resample_factor);
-    std::printf("Kernel Name: %s \n", kernel_name.c_str());
+    std::printf("Kernel Name: %s \n", kernel_name_.c_str());
     std::printf("Number of visibilities: %ld \n", uv_vis.u.size());
-    std::printf("Number of pixels: %d x %d \n", imsizex, imsizey);
-    std::printf("Ju: %d \n", Ju);
-    std::printf("Jv: %d \n", Jv);
+    std::printf("Number of pixels: %d x %d \n", imsizex_, imsizey_);
+    std::printf("Ju: %d \n", Ju_);
+    std::printf("Jv: %d \n", Jv_);
 
-    S = Image<t_real>::Zero(imsizey, imsizex);
+    S = Image<t_real>::Zero(imsizey_, imsizex_);
 
     //samples for kb_interp
-    if (kernel_name == "kb_interp")
+    if (kernel_name_ == "kb_interp")
     {
 
-      const t_real kb_interp_alpha = purify_pi * std::sqrt(Ju * Ju/(oversample_factor * oversample_factor) * (oversample_factor - 0.5) * (oversample_factor - 0.5) - 0.8);
+      const t_real kb_interp_alpha = purify_pi * std::sqrt(Ju_ * Ju_/(oversample_factor_ * oversample_factor_) * (oversample_factor_ - 0.5) * (oversample_factor_ - 0.5) - 0.8);
       const t_int sample_density = 7280;
-      const t_int total_samples = sample_density * Ju;
-      auto kb_general = [&] (t_real x) { return kernels::kaiser_bessel_general(x, Ju, kb_interp_alpha); };
-      Vector<t_real> samples = kernels::kernel_samples(total_samples, kb_general, Ju);
-      auto kb_interp = [&] (t_real x) { return kernels::kernel_linear_interp(samples, x, Ju); };
+      const t_int total_samples = sample_density * Ju_;
+      auto kb_general = [&] (t_real x) { return kernels::kaiser_bessel_general(x, Ju_, kb_interp_alpha); };
+      Vector<t_real> samples = kernels::kernel_samples(total_samples, kb_general, Ju_);
+      auto kb_interp = [&] (t_real x) { return kernels::kernel_linear_interp(samples, x, Ju_); };
       kernelu = kb_interp;
       kernelv = kb_interp;
       //Since kb_interp needs the pre-samples, all calculations need to be done within scope of this if statement. Otherwise massif gets a segfault.
-      //S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, Ju, Jv);
-      auto ftkb = [&] (t_real x) { return kernels::ft_kaiser_bessel_general(x/ftsizeu - 0.5, Ju, kb_interp_alpha); };
+      //S = MeasurementOperator::MeasurementOperator::init_correction2d_fft(kernelu, kernelv, Ju_, Jv_);
+      auto ftkb = [&] (t_real x) { return kernels::ft_kaiser_bessel_general(x/ftsizeu_ - 0.5, Ju_, kb_interp_alpha); };
       ftkernelu = ftkb;
       ftkernelv = ftkb;
       S = MeasurementOperator::init_correction2d(ftkernelu, ftkernelv); // Does gridding correction using analytic formula
-      G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
-      if (use_w_term)
+      G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju_, Jv_, kernelu, kernelv);
+      if (use_w_term_)
       {
-        C = wprojection::create_chirp_matrix(uv_vis.w, cell_x, cell_y, ftsizeu, ftsizev, energy_fraction);
-        G = wprojection::convolution(G, C, ftsizeu, ftsizev, uv_vis.w.size());
+        C = wprojection::create_chirp_matrix(uv_vis.w, cell_x_, cell_y_, ftsizeu_, ftsizev_, energy_fraction_);
+        G = wprojection::convolution(G, C, ftsizeu_, ftsizev_, uv_vis.w.size());
       }
       
       std::printf("Calculating weights: W \n");
-      W = utilities::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R, ftsizeu, ftsizev);
+      W = utilities::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor_, weighting_type_, R_, ftsizeu_, ftsizev_);
       std::printf("Calculating the primary beam: A \n");
-      auto A = MeasurementOperator::init_primary_beam(primary_beam, cell_x, cell_y);
+      auto A = MeasurementOperator::init_primary_beam(primary_beam_, cell_x_, cell_y_);
       S = S * A;
       std::printf("Doing power method: eta_{i+1}x_{i + 1} = Psi^T Psi x_i \n");
-      norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
+      norm = std::sqrt(MeasurementOperator::power_method(norm_iterations_));
       std::printf("Found a norm of eta = %f \n", norm);
       std::printf("Gridding Operator Constructed: WGFSA \n");
       std::printf("------ \n");
       return;
     }
 
-    if ((kernel_name == "pswf") and (Ju != 6 or Jv != 6))
+    if ((kernel_name_ == "pswf") and (Ju_ != 6 or Jv_ != 6))
     {
       std::cout << "Error: Only a support of 6 is implemented for PSWFs.";
     }
-    if (kernel_name == "kb")
+    if (kernel_name_ == "kb")
     {
-      auto kbu = [&] (t_real x) { return kernels::kaiser_bessel(x, Ju); };
-      auto kbv = [&] (t_real x) { return kernels::kaiser_bessel(x, Jv); };
-      auto ftkbu = [&] (t_real x) { return kernels::ft_kaiser_bessel(x/ftsizeu - 0.5, Ju); };
-      auto ftkbv = [&] (t_real x) { return kernels::ft_kaiser_bessel(x/ftsizev - 0.5, Jv); };
+      auto kbu = [&] (t_real x) { return kernels::kaiser_bessel(x, Ju_); };
+      auto kbv = [&] (t_real x) { return kernels::kaiser_bessel(x, Jv_); };
+      auto ftkbu = [&] (t_real x) { return kernels::ft_kaiser_bessel(x/ftsizeu_ - 0.5, Ju_); };
+      auto ftkbv = [&] (t_real x) { return kernels::ft_kaiser_bessel(x/ftsizev_ - 0.5, Jv_); };
       kernelu = kbu;
       kernelv = kbv;
       ftkernelu = ftkbu;
       ftkernelv = ftkbv;
     }
-    if (kernel_name == "kb_min")
+    if (kernel_name_ == "kb_min")
     {
-      const t_real kb_interp_alpha_Ju = purify_pi * std::sqrt(Ju * Ju/(oversample_factor * oversample_factor) * (oversample_factor - 0.5) * (oversample_factor - 0.5) - 0.8);
-      const t_real kb_interp_alpha_Jv = purify_pi * std::sqrt(Jv * Jv/(oversample_factor * oversample_factor) * (oversample_factor - 0.5) * (oversample_factor - 0.5) - 0.8);
-      auto kbu = [&] (t_real x) { return kernels::kaiser_bessel_general(x, Ju, kb_interp_alpha_Ju); };
-      auto kbv = [&] (t_real x) { return kernels::kaiser_bessel_general(x, Jv, kb_interp_alpha_Jv); };
-      auto ftkbu = [&] (t_real x) { return kernels::ft_kaiser_bessel_general(x/ftsizeu - 0.5, Ju, kb_interp_alpha_Ju);  };
-      auto ftkbv = [&] (t_real x) { return kernels::ft_kaiser_bessel_general(x/ftsizev - 0.5, Jv, kb_interp_alpha_Jv);  };
+      const t_real kb_interp_alpha_Ju = purify_pi * std::sqrt(Ju_ * Ju_/(oversample_factor_ * oversample_factor_) * (oversample_factor_ - 0.5) * (oversample_factor_ - 0.5) - 0.8);
+      const t_real kb_interp_alpha_Jv = purify_pi * std::sqrt(Jv_ * Jv_/(oversample_factor_ * oversample_factor_) * (oversample_factor_ - 0.5) * (oversample_factor_ - 0.5) - 0.8);
+      auto kbu = [&] (t_real x) { return kernels::kaiser_bessel_general(x, Ju_, kb_interp_alpha_Ju); };
+      auto kbv = [&] (t_real x) { return kernels::kaiser_bessel_general(x, Jv_, kb_interp_alpha_Jv); };
+      auto ftkbu = [&] (t_real x) { return kernels::ft_kaiser_bessel_general(x/ftsizeu_ - 0.5, Ju_, kb_interp_alpha_Ju);  };
+      auto ftkbv = [&] (t_real x) { return kernels::ft_kaiser_bessel_general(x/ftsizev_ - 0.5, Jv_, kb_interp_alpha_Jv);  };
       kernelu = kbu;
       kernelv = kbv;
       ftkernelu = ftkbu;
       ftkernelv = ftkbv;
     }
-    if (kernel_name == "pswf")
+    if (kernel_name_ == "pswf")
     {
-      auto pswfu = [&] (t_real x) { return kernels::pswf(x, Ju); };
-      auto pswfv = [&] (t_real x) { return kernels::pswf(x, Jv); };
-      auto ftpswfu = [&] (t_real x) { return kernels::ft_pswf(x/ftsizeu - 0.5, Ju); };
-      auto ftpswfv = [&] (t_real x) { return kernels::ft_pswf(x/ftsizev - 0.5, Jv); };
+      auto pswfu = [&] (t_real x) { return kernels::pswf(x, Ju_); };
+      auto pswfv = [&] (t_real x) { return kernels::pswf(x, Jv_); };
+      auto ftpswfu = [&] (t_real x) { return kernels::ft_pswf(x/ftsizeu_ - 0.5, Ju_); };
+      auto ftpswfv = [&] (t_real x) { return kernels::ft_pswf(x/ftsizev_ - 0.5, Jv_); };
       kernelu = pswfu;
       kernelv = pswfv;
       ftkernelu = ftpswfu;
       ftkernelv = ftpswfv;
     }
-    if (kernel_name == "gauss")
+    if (kernel_name_ == "gauss")
     {
-      auto gaussu = [&] (t_real x) { return kernels::gaussian(x, Ju); };
-      auto gaussv = [&] (t_real x) { return kernels::gaussian(x, Jv); };
-      auto ftgaussu = [&] (t_real x) { return kernels::ft_gaussian(x/ftsizeu - 0.5, Ju); };
-      auto ftgaussv = [&] (t_real x) { return kernels::ft_gaussian(x/ftsizev - 0.5, Jv); };      
+      auto gaussu = [&] (t_real x) { return kernels::gaussian(x, Ju_); };
+      auto gaussv = [&] (t_real x) { return kernels::gaussian(x, Jv_); };
+      auto ftgaussu = [&] (t_real x) { return kernels::ft_gaussian(x/ftsizeu_ - 0.5, Ju_); };
+      auto ftgaussv = [&] (t_real x) { return kernels::ft_gaussian(x/ftsizev_ - 0.5, Jv_); };      
       kernelu = gaussu;
       kernelv = gaussv;
       ftkernelu = ftgaussu;
       ftkernelv = ftgaussv;
     }
-    if (kernel_name == "box")
+    if (kernel_name_ == "box")
     {
-      auto boxu = [&] (t_real x) { return kernels::pill_box(x, Ju); };
-      auto boxv = [&] (t_real x) { return kernels::pill_box(x, Jv); };
-      auto ftboxu = [&] (t_real x) { return kernels::ft_pill_box(x/ftsizeu - 0.5, Ju); };
-      auto ftboxv = [&] (t_real x) { return kernels::ft_pill_box(x/ftsizev - 0.5, Jv); };      
+      auto boxu = [&] (t_real x) { return kernels::pill_box(x, Ju_); };
+      auto boxv = [&] (t_real x) { return kernels::pill_box(x, Jv_); };
+      auto ftboxu = [&] (t_real x) { return kernels::ft_pill_box(x/ftsizeu_ - 0.5, Ju_); };
+      auto ftboxv = [&] (t_real x) { return kernels::ft_pill_box(x/ftsizev_ - 0.5, Jv_); };      
       kernelu = boxu;
       kernelv = boxv;
       ftkernelu = ftboxu;
       ftkernelv = ftboxv;
     }
-    if (kernel_name == "gauss_alt")
+    if (kernel_name_ == "gauss_alt")
     {
-      const t_real sigma = 1; //In units of radians, Rafael uses sigma = 2 * pi / ftsizeu. However, this should be 1 in units of pixels.
-      auto gaussu = [&] (t_real x) { return kernels::gaussian_general(x, Ju, sigma); };
-      auto gaussv = [&] (t_real x) { return kernels::gaussian_general(x, Jv, sigma); };
-      auto ftgaussu = [&] (t_real x) { return kernels::ft_gaussian_general(x/ftsizeu - 0.5, Ju, sigma); };
-      auto ftgaussv = [&] (t_real x) { return kernels::ft_gaussian_general(x/ftsizev - 0.5, Jv, sigma); };      
+      const t_real sigma = 1; //In units of radians, Rafael uses sigma = 2 * pi / ftsizeu_. However, this should be 1 in units of pixels.
+      auto gaussu = [&] (t_real x) { return kernels::gaussian_general(x, Ju_, sigma); };
+      auto gaussv = [&] (t_real x) { return kernels::gaussian_general(x, Jv_, sigma); };
+      auto ftgaussu = [&] (t_real x) { return kernels::ft_gaussian_general(x/ftsizeu_ - 0.5, Ju_, sigma); };
+      auto ftgaussv = [&] (t_real x) { return kernels::ft_gaussian_general(x/ftsizev_ - 0.5, Jv_, sigma); };      
       kernelu = gaussu;
       kernelv = gaussv;
       ftkernelu = ftgaussu;
       ftkernelv = ftgaussv;
     }
-    if ( fft_grid_correction == true )
+    if ( fft_grid_correction_ == true )
     {
-      S = MeasurementOperator::init_correction2d_fft(kernelu, kernelv, Ju, Jv); // Does gridding correction with FFT
+      S = MeasurementOperator::init_correction2d_fft(kernelu, kernelv, Ju_, Jv_); // Does gridding correction with FFT
     }
-    if ( fft_grid_correction == false )
+    if ( fft_grid_correction_ == false )
     {
       S = MeasurementOperator::init_correction2d(ftkernelu, ftkernelv); // Does gridding correction using analytic formula
     }
 
-    G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju, Jv, kernelu, kernelv);
-    if (use_w_term)
+    G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju_, Jv_, kernelu, kernelv);
+    if (use_w_term_)
     {
-      C = wprojection::create_chirp_matrix(uv_vis.w, cell_x, cell_y, ftsizeu, ftsizev, energy_fraction);
-      G = wprojection::convolution(G, C, ftsizeu, ftsizev, uv_vis.w.size());
+      C = wprojection::create_chirp_matrix(uv_vis.w, cell_x_, cell_y_, ftsizeu_, ftsizev_, energy_fraction_);
+      G = wprojection::convolution(G, C, ftsizeu_, ftsizev_, uv_vis.w.size());
     }
     std::printf("Calculating weights: W \n");
-    W = utilities::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor, weighting_type, R, ftsizeu, ftsizev);
+    W = utilities::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor_, weighting_type_, R_, ftsizeu_, ftsizev_);
 
     //It makes sense to included the primary beam at the same time the gridding correction is performed.
     std::printf("Calculating the primary beam: A \n");
-    auto A = MeasurementOperator::init_primary_beam(primary_beam, cell_x, cell_y);
+    auto A = MeasurementOperator::init_primary_beam(primary_beam_, cell_x_, cell_y_);
     S = S * A;
     std::printf("Doing power method: eta_{i+1}x_{i + 1} = Psi^T Psi x_i \n");
-    norm = std::sqrt(MeasurementOperator::power_method(norm_iterations));
+    norm = std::sqrt(MeasurementOperator::power_method(norm_iterations_));
     std::printf("Found a norm of eta = %f \n", norm);
     std::printf("Gridding Operator Constructed: WGFSA \n");
     std::printf("------ \n");
