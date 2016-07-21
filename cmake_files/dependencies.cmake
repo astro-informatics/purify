@@ -7,8 +7,10 @@ include(PackageLookup)
 if(openmp)
   find_package(OpenMP)
   find_package(FFTW3 REQUIRED DOUBLE COMPONENTS OPENMP)
+  set(FFTW3_DOUBLE_LIBRARY ${FFTW3_DOUBLE_OPENMP_LIBRARY})
 else()
   find_package(FFTW3 REQUIRED DOUBLE)
+  set(FFTW3_DOUBLE_LIBRARY ${FFTW3_DOUBLE_SERIAL_LIBRARY})
 endif(openmp)
 
 find_package(TIFF REQUIRED)
@@ -20,7 +22,8 @@ if(data AND tests)
 else()
   lookup_package(Boost REQUIRED)
 endif()
-lookup_package(Eigen3 REQUIRED ARGUMENTS HG_REPOSITORY https://bitbucket.org/LukePratley/eigen)
+
+lookup_package(Eigen3 REQUIRED ARGUMENTS HG_REPOSITORY "https://bitbucket.org/LukePratley/eigen" HG_TAG "3.2")
 
 # Look up packages: if not found, installs them
 # Unless otherwise specified, if purify is not on master, then sopt will be
