@@ -42,4 +42,6 @@ add_example(sara_padmm_random_coverage LIBRARIES cppurify libpurify ${Sopt_CPP_L
 
 add_example(clean_vla LIBRARIES cppurify libpurify ${Sopt_CPP_LIBRARY} NOTEST)
 
-add_example(casa LIBRARIES cppurify)
+if(data)
+  add_example(casa LIBRARIES cppurify)
+endif()

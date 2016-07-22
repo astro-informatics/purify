@@ -5,5 +5,7 @@ add_catch_test(FFT_operator LIBRARIES cppurify)
 add_catch_test(purify_fitsio LIBRARIES cppurify)
 add_catch_test(utils LIBRARIES cppurify)
 add_catch_test(sparse LIBRARIES cppurify)
-add_catch_test(casacore LIBRARIES cppurify casacore::ms ${Boost_FILESYSTEM_LIBRARY}
-  ${Boost_SYSTEM_LIBRARY})
+if(data)
+  add_catch_test(casacore LIBRARIES cppurify casacore::ms ${Boost_FILESYSTEM_LIBRARY}
+    ${Boost_SYSTEM_LIBRARY})
+endif()
