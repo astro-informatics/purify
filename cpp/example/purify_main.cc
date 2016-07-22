@@ -1,9 +1,13 @@
 #include <array>
 #include <random>
 #include "directories.h"
-#include <sopt/imaging_padmm.h>
+#include "sopt/relative_variation.h"
 #include "sopt/utilities.h"
 #include "sopt/wavelets.h"
+#include <sopt/imaging_padmm.h>
+#include <sopt/positive_quadrant.h>
+#include <sopt/relative_variation.h>
+#include <sopt/reweighted.h>
 #include "sopt/wavelets/sara.h"
 #include "pfitsio.h"
 #include "types.h"
@@ -34,11 +38,13 @@ int main(int argc, char **argv) {
   t_int J = 4;
   t_int width = 512;
   t_int height = 512;
-  t_real cellsize = 0;
+  t_real cellsizex = 0;
+  t_real cellsizey = 0;
   t_real ra = 0;
   t_real dec = 0;
   t_real n_mu = 1.2;
   t_int iter = 0;
+  t_real upsample_ratio = 3./2.;
   t_int power_method_iterations = 20;
   std::string primary_beam = "none";
   bool fft_grid_correction = false;
@@ -49,7 +55,8 @@ int main(int argc, char **argv) {
   bool update_output = false; //save output after each iteration
   bool adapt_gamma = true; //update gamma/stepsize
   bool run_diagnostic = false; //save and output diagnostic information
-  bool no_algo_update = false;
+  bool no_algo_update = false; //if to use lambda function to record/update algorithm variables
+  bool no_reweighted = true; //if to use reweighting
   opterr = 0;
 
   int c;
@@ -235,19 +242,27 @@ int main(int argc, char **argv) {
 
 
   auto uv_data = utilities::read_visibility(visfile);
-  t_real const max_u = std::sqrt((uv_data.u.array() * uv_data.u.array() + uv_data.v.array() * uv_data.v.array()).maxCoeff());
+  t_real const max_u = std::sqrt((uv_data.u.array() * uv_data.u.array()).maxCoeff());
+  t_real const max_v = std::sqrt((uv_data.v.array() * uv_data.v.array()).maxCoeff());
   uv_data.units = "lambda";
-  if (cellsize  == 0)
-    cellsize = (180 * 3600) / max_u / purify_pi / 3 /3;
-
+  if (cellsizex == 0 and cellsizey == 0)
+  {
+    t_real const max = std::sqrt((uv_data.u.array() * uv_data.u.array() + uv_data.v.array() * uv_data.v.array()).maxCoeff());
+    cellsizex = (180 * 3600) / max / purify_pi / 2;
+    cellsizex = (180 * 3600) / max / purify_pi / 2;
+  }
+  if (cellsizex == 0)
+    cellsizex = (180 * 3600) / max_u / purify_pi / 2;
+  if (cellsizey == 0)
+    cellsizey = (180 * 3600) / max_v / purify_pi / 2;
 
   //header information
   pfitsio::header_params header;
   header.mean_frequency = 1381.67703151703;
   header.ra = ra;
   header.dec = dec;
-  header.cell_x = cellsize;
-  header.cell_y = cellsize;
+  header.cell_x = cellsizex;
+  header.cell_y = cellsizey;
 
 
   std::string const dirty_image_fits = output_filename(name + "_dirty_"+ weighting + ".fits");
@@ -261,8 +276,8 @@ int main(int argc, char **argv) {
       .imsizey(height)
       .norm_iterations(power_method_iterations)
       .oversample_factor(over_sample)
-      .cell_x(cellsize)
-      .cell_y(cellsize)
+      .cell_x(cellsizex)
+      .cell_y(cellsizey)
       .weighting_type("none")
       .R(0)
       .use_w_term(use_w_term)
@@ -383,7 +398,14 @@ int main(int argc, char **argv) {
     .Phi(measurements_transform);
   std::tuple<Vector<t_complex>, Vector<t_complex>> const estimates(initial_estimate, initial_residuals); 
   std::clock_t c_start = std::clock();
-  auto algorithm_update  = [&padmm, &iter, &c_start, &update_output, &adapt_gamma, &header, &beta, &Psi, &measurements, &name, &weighting, &uv_data, &run_diagnostic, &out_diagnostic](Vector<t_complex> const & x){
+
+
+  // update function that saves information in algorithm
+  auto algorithm_update  = [&padmm, &iter, 
+    &c_start, &update_output, &upsample_ratio,
+    &adapt_gamma, &header, &beta, &Psi, 
+    &measurements, &name, &weighting, &uv_data, 
+    &run_diagnostic, &out_diagnostic](Vector<t_complex> const & x){
     
     //diagnostic variables
     t_real rms = 0;
@@ -400,13 +422,14 @@ int main(int argc, char **argv) {
     t_real const l1_norm = alpha.lpNorm<1>();
     if (update_output){
       std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_update.fits");
+      std::string const outfile_upsample_fits = output_filename(name + "_solution_"+ weighting + "_update_upsample.fits");
       std::string const residual_fits = output_filename(name + "_residual_"+ weighting + "_update.fits");
+
 
       // header information
       header.pix_units = "JY/PIXEL";
       header.fits_name = outfile_fits;
       pfitsio::write2d_header(image.real(), header);
-      
       Image<t_complex> residual = measurements.grid(y_residual).array();
       header.pix_units = "JY/BEAM";
       header.fits_name = residual_fits;
@@ -468,25 +491,50 @@ int main(int argc, char **argv) {
 
     return false;
   };
+
+
   if (!no_algo_update)
     padmm.is_converged(algorithm_update);
   if (niters != 0)
     padmm.itermax(niters);
-  auto const diagnostic = padmm(estimates);
+  if (no_reweighted)
+  {
 
-  std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_final.fits");
-  std::string const residual_fits = output_filename(name + "_residual_"+ weighting + "_final.fits");
-  Image<t_complex> const image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey(), measurements.imsizex());
-  // header information
-  header.pix_units = "JY/PIXEL";
-  header.fits_name = outfile_fits;
-  pfitsio::write2d_header(image.real(), header);
+    auto const diagnostic = padmm(estimates);
+    std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_final.fits");
+    std::string const residual_fits = output_filename(name + "_residual_"+ weighting + "_final.fits");
+    Image<t_complex> const image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey(), measurements.imsizex());
+    // header information
+    header.pix_units = "JY/PIXEL";
+    header.fits_name = outfile_fits;
+    pfitsio::write2d_header(image.real(), header);
 
-  Image<t_complex> residual = measurements.grid(((uv_data.vis - measurements.degrid(image)).array() * uv_data.weights.array().real()).matrix() ).array();
-  header.pix_units = "JY/BEAM";
-  header.fits_name = residual_fits;
-  pfitsio::write2d_header(residual.real(), header);
+    Image<t_complex> residual = measurements.grid(((uv_data.vis - measurements.degrid(image)).array() * uv_data.weights.array().real()).matrix() ).array();
+    header.pix_units = "JY/BEAM";
+    header.fits_name = residual_fits;
+    pfitsio::write2d_header(residual.real(), header);
+  }else{
+    auto const posq = sopt::algorithm::positive_quadrant(padmm);
+    auto const min_delta = noise_rms * std::sqrt(uv_data.vis.size()) / std::sqrt(9 * measurements.imsizey() * measurements.imsizex());
+  // Sets weight after each padmm iteration.
+  // In practice, this means replacing the proximal of the l1 objective function.
+    auto const reweighted
+      = sopt::algorithm::reweighted(padmm).itermax(10).min_delta(min_delta).is_converged(
+          sopt::RelativeVariation<std::complex<t_real>>(1e-3));
+    auto const diagnostic = reweighted();
+    std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_final_reweighted.fits");
+    std::string const residual_fits = output_filename(name + "_residual_"+ weighting + "_final_reweighted.fits");
+    Image<t_complex> const image = Image<t_complex>::Map(diagnostic.algo.x.data(), measurements.imsizey(), measurements.imsizex());
+    // header information
+    header.pix_units = "JY/PIXEL";
+    header.fits_name = outfile_fits;
+    pfitsio::write2d_header(image.real(), header);
 
+    Image<t_complex> residual = measurements.grid(((uv_data.vis - measurements.degrid(image)).array() * uv_data.weights.array().real()).matrix() ).array();
+    header.pix_units = "JY/BEAM";
+    header.fits_name = residual_fits;
+    pfitsio::write2d_header(residual.real(), header);
+  }
   out_diagnostic.close(); // closing diagnostic file
 
   return 0;
