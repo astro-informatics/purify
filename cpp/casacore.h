@@ -244,17 +244,20 @@ public:
 
   //! Channel this object is associated with
   t_uint channel() const { return channel_; }
-  //! U in meters
-  Vector<t_real> raw_u() const { return table_column<t_real>(ms_.table(), "UVW[0]", filter()); }
-  //! V in meters
-  Vector<t_real> raw_v() const { return table_column<t_real>(ms_.table(), "UVW[1]", filter()); }
-  //! W in meters
-  Vector<t_real> raw_w() const { return table_column<t_real>(ms_.table(), "UVW[2]", filter()); }
-  //! U scaled to purify values
-  //! param[in] res: Resolution of as pixel in arc-seconds
-  Vector<t_real> scaled_u(t_real const &res) const {
-    return (raw_u().array() * frequencies().array()).matrix() * scale(res);
+#define PURIFY_MACRO(NAME, INDEX)                                                                  \
+  /** Stokes component in meters **/                                                               \
+  Vector<t_real> raw_##NAME() const {                                                              \
+    return table_column<t_real>(ms_.table(), "UVW[" #INDEX "]", filter());                         \
+  }                                                                                                \
+  /** \brief U scaled to purify values **/                                                         \
+  /** param[in] res: Resolution of as pixel in arc-seconds **/                                     \
+  Vector<t_real> scaled_##NAME(t_real const &res) const {                                          \
+    return (raw_##NAME().array() * frequencies().array()).matrix() * scale(res);                   \
   }
+  PURIFY_MACRO(u, 0);
+  PURIFY_MACRO(v, 1);
+  PURIFY_MACRO(w, 2);
+# undef PURIFY_MACRO
 
   //! Frequencies for each DATA_DESC_ID
   Vector<t_real> raw_frequencies() const;
