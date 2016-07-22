@@ -9,7 +9,11 @@ find_package(TIFF REQUIRED)
 find_package(CBLAS REQUIRED)
 set(PURIFY_BLAS_H "${BLAS_INCLUDE_FILENAME}")
 
-lookup_package(Boost REQUIRED COMPONENTS filesystem)
+if(data and tests)
+  lookup_package(Boost REQUIRED COMPONENTS filesystem)
+else()
+  lookup_package(Boost REQUIRED)
+endif()
 lookup_package(Eigen3 REQUIRED ARGUMENTS HG_REPOSITORY https://bitbucket.org/LukePratley/eigen)
 
 # Look up packages: if not found, installs them
