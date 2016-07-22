@@ -249,7 +249,7 @@ int main(int argc, char **argv) {
   {
     t_real const max = std::sqrt((uv_data.u.array() * uv_data.u.array() + uv_data.v.array() * uv_data.v.array()).maxCoeff());
     cellsizex = (180 * 3600) / max / purify_pi / 2;
-    cellsizex = (180 * 3600) / max / purify_pi / 2;
+    cellsizey = (180 * 3600) / max / purify_pi / 2;
   }
   if (cellsizex == 0)
     cellsizex = (180 * 3600) / max_u / purify_pi / 2;
