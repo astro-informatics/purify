@@ -430,9 +430,15 @@ int main(int argc, char **argv) {
       header.pix_units = "JY/PIXEL";
       header.fits_name = outfile_fits;
       pfitsio::write2d_header(image.real(), header);
+      header.fits_name = outfile_upsample_fits;
+      header.cell_x *= upsample_ratio;
+      header.cell_y *= upsample_ratio;
+      pfitsio::write2d_header(utilities::re_sample_image(image, upsample_ratio).real(), header);
       Image<t_complex> residual = measurements.grid(y_residual).array();
       header.pix_units = "JY/BEAM";
       header.fits_name = residual_fits;
+      header.cell_x /= upsample_ratio;
+      header.cell_y /= upsample_ratio;
       pfitsio::write2d_header(residual.real(), header);
       
       rms = utilities::standard_deviation(Image<t_complex>::Map(residual.data(), residual.size(), 1));
