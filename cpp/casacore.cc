@@ -133,7 +133,6 @@ std::string MeasurementSet::ChannelWrapper::index(std::string const &variable) c
 }
 
 Vector<t_real> MeasurementSet::ChannelWrapper::frequencies() const {
-  assert(is_valid());
   auto const frequencies = raw_frequencies();
   auto const ids = data_desc_id();
   Vector<t_real> result(ids.size());
