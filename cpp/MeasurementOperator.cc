@@ -19,7 +19,7 @@ namespace purify {
           = utilities::parallel_multiply_image(S, eigen_image);
 
       // create fftgrid
-      ft_vector = wprojection::re_sample_ft_grid(fftop.forward(padded_image), resample_factor); // the fftshift is not needed because of the phase shift in the gridding kernel
+      ft_vector = utilities::re_sample_ft_grid(fftop.forward(padded_image), resample_factor); // the fftshift is not needed because of the phase shift in the gridding kernel
       // turn into vector
       ft_vector.resize(ftsizeu_*ftsizev_, 1); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
       // get visibilities
@@ -38,7 +38,7 @@ namespace purify {
       //Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W).matrix()/norm;
       Matrix<t_complex> ft_vector = utilities::sparse_multiply_matrix(G.adjoint(), (visibilities.array() * W).matrix())/norm;
       ft_vector.resize(ftsizev_, ftsizeu_); // using conservativeResize does not work, it garbles the image. Also, it is not what we want.
-      ft_vector = wprojection::re_sample_ft_grid(ft_vector, 1./resample_factor);
+      ft_vector = utilities::re_sample_ft_grid(ft_vector, 1./resample_factor);
       Image<t_complex> padded_image = fftop.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
       t_int x_start = floor(floor(imsizex_ * oversample_factor_) * 0.5 - imsizex_ * 0.5);
       t_int y_start = floor(floor(imsizey_ * oversample_factor_) * 0.5 - imsizey_ * 0.5);
@@ -239,11 +239,17 @@ namespace purify {
     //setting up operator
     MeasurementOperator::init_operator(uv_vis_input);
   }
+
   void MeasurementOperator::init_operator(const utilities::vis_params& uv_vis_input)
   {
+    //construction of linear operators in measurement operator, GFZSA
     ftsizeu_ = floor(imsizex_ * oversample_factor_);
     ftsizev_ = floor(imsizey_ * oversample_factor_);
-    
+    std::printf("------ \n");
+    std::printf("Planning FFT operator \n");
+    fftop.set_up_multithread();
+    fftop.init_plan(Matrix<t_complex>::Zero(ftsizev_, ftsizeu_));
+
     if (use_w_term_){
       resample_factor = wprojection::upsample_ratio(uv_vis_input, cell_x_, cell_y_, ftsizeu_, ftsizev_);
       ftsizeu_ = ftsizeu_ * resample_factor;
@@ -256,10 +262,7 @@ namespace purify {
       uv_vis = utilities::uv_scale(uv_vis, floor(oversample_factor_ * imsizex_), floor(oversample_factor_ * imsizey_));
     
 
-    std::printf("------ \n");
-    std::printf("Planning FFT operator \n");
-    fftop.set_up_multithread();
-    fftop.init_plan(Matrix<t_complex>::Zero(ftsizev_, ftsizeu_));
+
     std::printf("Constructing Gridding Operator: G\n");
 
     std::printf("Oversampling Factor: %f \n", oversample_factor_);

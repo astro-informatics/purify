@@ -72,7 +72,7 @@ namespace purify {
       Image<t_complex> grid(const Vector<t_complex>& visibilities);
 
     protected:
-      FFTOperator fftop = purify::FFTOperator().fftw_flag(FFTW_MEASURE|FFTW_PRESERVE_INPUT);
+      FFTOperator fftop = purify::FFTOperator().fftw_flag(FFTW_PATIENT|FFTW_PRESERVE_INPUT);
       //! Match uv coordinates to grid
       Vector<t_real> omega_to_k(const Vector<t_real>& omega);
       //! Generates interpolation matrix 

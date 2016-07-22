@@ -576,7 +576,84 @@ namespace purify {
 		   log_file.close();
 
 		  }
+	    Matrix<t_complex> re_sample_ft_grid(const Matrix<t_complex>& input, const t_real& re_sample_ratio){
+	    /*
+	      up samples image using by zero padding the fft
+	      
+	      input:: fft to be upsampled, with zero frequency at (0,0) of the matrix.
 
+	    */
+	      if (re_sample_ratio == 1)
+	      	return input;
+
+	      //sets up dimensions for old image
+	      t_int old_x = input.cols();
+	      t_int old_y = input.rows();
+
+	      t_int old_x_centre_floor = std::floor(input.cols() * 0.5);
+	      t_int old_y_centre_floor = std::floor(input.rows() * 0.5);
+	      //need ceilling in case image is of odd dimension
+	      t_int old_x_centre_ceil = std::ceil(input.cols() * 0.5);
+	      t_int old_y_centre_ceil = std::ceil(input.rows() * 0.5);
+
+	      //sets up dimensions for new image
+	      t_int new_x = std::floor(input.cols() * re_sample_ratio);
+	      t_int new_y = std::floor(input.rows() * re_sample_ratio);
+
+	      t_int new_x_centre_floor = std::floor(new_x * 0.5);
+	      t_int new_y_centre_floor = std::floor(new_y * 0.5);
+	      //need ceilling in case image is of odd dimension
+	      t_int new_x_centre_ceil = std::ceil(new_x * 0.5);
+	      t_int new_y_centre_ceil = std::ceil(new_y * 0.5);
+
+	      Matrix<t_complex> output = Matrix<t_complex>::Zero(new_y, new_x);
+
+	      t_int box_dim_x;
+	      t_int box_dim_y;
+
+
+	      //now have to move each quadrant into new grid
+	      box_dim_x = std::min(old_x_centre_ceil, new_x_centre_ceil);
+	      box_dim_y = std::min(old_y_centre_ceil, new_y_centre_ceil);   
+	      //(0, 0)
+	      output.bottomLeftCorner(box_dim_y, box_dim_x) = input.bottomLeftCorner(box_dim_y, box_dim_x);
+
+	      box_dim_x = std::min(old_x_centre_ceil, new_x_centre_ceil);
+	      box_dim_y = std::min(old_y_centre_floor, new_y_centre_floor);   
+	      //(y0, 0)
+	      output.topLeftCorner(box_dim_y, box_dim_x) = input.topLeftCorner(box_dim_y, box_dim_x);
+
+	      box_dim_x = std::min(old_x_centre_floor, new_x_centre_floor);
+	      box_dim_y = std::min(old_y_centre_ceil, new_y_centre_ceil);   
+	      //(0, x0)
+	      output.bottomRightCorner(box_dim_y, box_dim_x) = input.bottomRightCorner(box_dim_y, box_dim_x);
+
+	      box_dim_x = std::min(old_x_centre_floor, new_x_centre_floor);
+	      box_dim_y = std::min(old_y_centre_floor, new_y_centre_floor);  
+	      //(y0, x0)
+	      output.topRightCorner(box_dim_y, box_dim_x) = input.topRightCorner(box_dim_y, box_dim_x);
+
+	      return output;
+	  }
+	  Matrix<t_complex> re_sample_image(const Matrix<t_complex>& input, const t_real& re_sample_ratio){
+	  	Matrix<t_complex> output = Matrix<t_complex>::Zero(floor(input.rows() * re_sample_ratio), floor(input.cols() * re_sample_ratio));
+	  	//convolution
+	  	#pragma omp parallel for
+	  	for (t_int i = 0; i < output.cols(); ++i)
+	  	{
+	  		for (t_int j = 0; j < output.rows(); ++j)
+	  		{
+	  			for (t_int k = 0; k < input.cols(); ++k){
+	  				
+	  				for (t_int l = 0; l < input.rows(); ++l){
+	  					output(j, i) += boost::math::sinc_pi((i /re_sample_ratio - k)) * boost::math::sinc_pi((j /re_sample_ratio - l)) * input(l, k);
+	  				}
+	  			}
+	  		}
+	  	}
+
+	  	return output;
+	  }
 	}
 
 }

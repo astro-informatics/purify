@@ -10,6 +10,8 @@
 #include <random>
 #include <sys/stat.h>
 #include <boost/math/special_functions/gamma.hpp>
+#include <boost/math/special_functions/sinc.hpp>
+#include "FFTOperator.h"
 
 
 namespace purify {
@@ -111,6 +113,10 @@ namespace purify {
             C(j, i) = A(j, i) * B(j, i);
         return C;
       };
+      //! zero pads ft grid for image up sampling and downsampling
+      Matrix<t_complex> re_sample_ft_grid(const Matrix<t_complex>& input, const t_real& re_sample_factor);
+      //! resamples image size
+      Matrix<t_complex> re_sample_image(const Matrix<t_complex>& input, const t_real& re_sample_ratio);
  }
 }
 
