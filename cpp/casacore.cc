@@ -174,7 +174,7 @@ MeasurementSet::const_iterator MeasurementSet::const_iterator::operator++(int) {
 }
 
 bool MeasurementSet::const_iterator::operator==(const_iterator const &c) const {
-  if(&ms != &c.ms)
+  if(&ms.table() != &c.ms.table())
     throw std::runtime_error("Iterators are not over the same measurement set");
   return channel == c.channel;
 }
