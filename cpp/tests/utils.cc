@@ -1,6 +1,8 @@
 #include "catch.hpp"
 #include "utilities.h"
 
+#include "FFTOperator.h"
+
 #include "directories.h"
 using namespace purify;
 using namespace purify::notinstalled;
@@ -165,4 +167,16 @@ TEST_CASE("utilities [sparse multiply]", "[sparse multiply]"){
     }
 
 
+}
+
+TEST_CASE("utilities [resample]", "[resample]"){
+    //up samples random matrix
+    Matrix<t_complex> image = Matrix<t_complex>::Random(1024, 1024);
+    FFTOperator fftop = purify::FFTOperator().fftw_flag((FFTW_ESTIMATE|FFTW_PRESERVE_INPUT));
+
+    auto const ft_grid = fftop.forward(image);
+    auto const new_ft_grid = utilities::re_sample_ft_grid(ft_grid, 4.);
+    Matrix<t_complex> const image_resample = fftop.inverse(new_ft_grid) * 4 * 4 /ft_grid.size();
+    Matrix<t_complex> const image_resample_alt = utilities::re_sample_image(image, 4.);
+    CHECK(image_resample.isApprox(image_resample_alt, 1e-13));
 }

@@ -636,22 +636,11 @@ namespace purify {
 	      return output;
 	  }
 	  Matrix<t_complex> re_sample_image(const Matrix<t_complex>& input, const t_real& re_sample_ratio){
-	  	Matrix<t_complex> output = Matrix<t_complex>::Zero(floor(input.rows() * re_sample_ratio), floor(input.cols() * re_sample_ratio));
-	  	//convolution
-	  	#pragma omp parallel for
-	  	for (t_int i = 0; i < output.cols(); ++i)
-	  	{
-	  		for (t_int j = 0; j < output.rows(); ++j)
-	  		{
-	  			for (t_int k = 0; k < input.cols(); ++k){
-	  				
-	  				for (t_int l = 0; l < input.rows(); ++l){
-	  					output(j, i) += boost::math::sinc_pi((i /re_sample_ratio - k)) * boost::math::sinc_pi((j /re_sample_ratio - l)) * input(l, k);
-	  				}
-	  			}
-	  		}
-	  	}
-
+	  	t_int fft_flag = (FFTW_ESTIMATE|FFTW_PRESERVE_INPUT);
+    	auto fftop = purify::FFTOperator().fftw_flag(fft_flag);
+    	auto const ft_grid = fftop.forward(input);
+    	auto const new_ft_grid = utilities::re_sample_ft_grid(ft_grid, re_sample_ratio);
+    	auto const output = fftop.inverse(new_ft_grid) * re_sample_ratio * re_sample_ratio;
 	  	return output;
 	  }
 	}
