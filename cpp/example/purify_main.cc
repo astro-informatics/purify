@@ -18,7 +18,6 @@
 
 int main(int argc, char **argv) {
   using namespace purify;
-  using namespace purify::notinstalled;
   sopt::logging::initialize();
 
 
@@ -265,8 +264,8 @@ int main(int argc, char **argv) {
   header.cell_y = cellsizey;
 
 
-  std::string const dirty_image_fits = output_filename(name + "_dirty_"+ weighting + ".fits");
-  std::string const psf_fits = output_filename(name + "_psf_"+ weighting + ".fits");
+  std::string const dirty_image_fits = name + "_dirty_"+ weighting + ".fits";
+  std::string const psf_fits = name + "_psf_"+ weighting + ".fits";
 
   auto measurements = MeasurementOperator()
       .Ju(J)
@@ -351,7 +350,7 @@ int main(int argc, char **argv) {
   if (utilities::file_exists(name + "_diagnostic"))
   {
     std::printf("Loading checkpoint for %s\n", name.c_str());
-    std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_update.fits");
+    std::string const outfile_fits = name + "_solution_"+ weighting + "_update.fits";
     if (utilities::file_exists(outfile_fits)){
       auto const image = pfitsio::read2d(outfile_fits);
       
@@ -421,16 +420,18 @@ int main(int argc, char **argv) {
     Vector<t_complex> const alpha = Psi.adjoint() * x;
     t_real const l1_norm = alpha.lpNorm<1>();
     if (update_output){
-      std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_update.fits");
-      std::string const outfile_upsample_fits = output_filename(name + "_solution_"+ weighting + "_update_upsample.fits");
-      std::string const residual_fits = output_filename(name + "_residual_"+ weighting + "_update.fits");
+      std::string const outfile_fits = name + "_solution_"+ weighting + "_update.fits";
+      std::string const outfile_upsample_fits = name + "_solution_"+ weighting + "_update_upsample.fits";
+      std::string const residual_fits = name + "_residual_"+ weighting + "_update.fits";
 
 
       // header information
       header.pix_units = "JY/PIXEL";
       header.fits_name = outfile_fits;
+      std::printf("Saving %s \n", header.fits_name.c_str());
       pfitsio::write2d_header(image.real(), header);
       header.fits_name = outfile_upsample_fits;
+      std::printf("Saving %s \n", header.fits_name.c_str());
       header.cell_x *= upsample_ratio;
       header.cell_y *= upsample_ratio;
       pfitsio::write2d_header(utilities::re_sample_image(image, upsample_ratio).real(), header);
@@ -439,6 +440,7 @@ int main(int argc, char **argv) {
       header.fits_name = residual_fits;
       header.cell_x /= upsample_ratio;
       header.cell_y /= upsample_ratio;
+      std::printf("Saving %s \n", header.fits_name.c_str());
       pfitsio::write2d_header(residual.real(), header);
       
       rms = utilities::standard_deviation(Image<t_complex>::Map(residual.data(), residual.size(), 1));
@@ -507,8 +509,8 @@ int main(int argc, char **argv) {
   {
 
     auto const diagnostic = padmm(estimates);
-    std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_final.fits");
-    std::string const residual_fits = output_filename(name + "_residual_"+ weighting + "_final.fits");
+    std::string const outfile_fits = name + "_solution_"+ weighting + "_final.fits";
+    std::string const residual_fits = name + "_residual_"+ weighting + "_final.fits";
     Image<t_complex> const image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey(), measurements.imsizex());
     // header information
     header.pix_units = "JY/PIXEL";
@@ -528,8 +530,8 @@ int main(int argc, char **argv) {
       = sopt::algorithm::reweighted(padmm).itermax(10).min_delta(min_delta).is_converged(
           sopt::RelativeVariation<std::complex<t_real>>(1e-3));
     auto const diagnostic = reweighted();
-    std::string const outfile_fits = output_filename(name + "_solution_"+ weighting + "_final_reweighted.fits");
-    std::string const residual_fits = output_filename(name + "_residual_"+ weighting + "_final_reweighted.fits");
+    std::string const outfile_fits = name + "_solution_"+ weighting + "_final_reweighted.fits";
+    std::string const residual_fits = name + "_residual_"+ weighting + "_final_reweighted.fits";
     Image<t_complex> const image = Image<t_complex>::Map(diagnostic.algo.x.data(), measurements.imsizey(), measurements.imsizex());
     // header information
     header.pix_units = "JY/PIXEL";
