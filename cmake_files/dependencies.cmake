@@ -9,7 +9,7 @@ find_package(TIFF REQUIRED)
 find_package(CBLAS REQUIRED)
 set(PURIFY_BLAS_H "${BLAS_INCLUDE_FILENAME}")
 
-if(data and tests)
+if(data AND tests)
   lookup_package(Boost REQUIRED COMPONENTS filesystem)
 else()
   lookup_package(Boost REQUIRED)
