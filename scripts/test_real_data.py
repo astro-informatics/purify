@@ -7,6 +7,11 @@ import glob
 import subprocess
 import matplotlib.pyplot as plt
 
+
+"""
+Script that runs tests of purify on real data.
+"""
+
 nice_value = 0
 
 home = os.path.expanduser("~")
@@ -31,14 +36,17 @@ def run_test((name, inpath, size, epsilon_factor)):
 	path = make_path(name, outpath, epsilon_factor)
 	
 	make_directory(path)
-	os.system("nice -" + str(nice_value) + " screen -S "+ name.split("/")[-1] + "_" + str(epsilon_factor) + " -d -m ~/dev/purify/build/cpp/example/purify_main" +
+	proc = subprocess.Popen(["nice -" + str(nice_value) + " screen -S "+ name.split("/")[-1] + "_" + str(epsilon_factor) + 
+		" -d -m ~/dev/purify/build/cpp/example/purify_main" +
 		" --name " + path + name.split("/")[-1] +
 		" --vis " + inpath + "I.vis --n_mean " + str(epsilon_factor) + 
 		" --size " + str(size) +
-		" --update --diagnostic"
-		)
+		" --update --diagnostic power_iterations 200"], shell=True)
+	print "Waiting for " + path
+	while not os.path.exists(path + name.split("/")[-1] + "_solution_whiten_final.fits"):
+		time.sleep(10)
 	return
-	
+
 params = []
 for n in names:
 	print "Looking for " + data + n
@@ -56,5 +64,5 @@ for n in names:
 		print n + " not found!"
 
 n_processors = multiprocessing.cpu_count() + 1
-p = multiprocessing.Pool(min(n_processors, 5))
+p = multiprocessing.Pool(min(n_processors, 20))
 p.map(run_test, params)
