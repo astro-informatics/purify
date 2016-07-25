@@ -19,7 +19,7 @@
 int main(int argc, char **argv) {
   using namespace purify;
   sopt::logging::initialize();
-
+  std::string sopt_logging_level = "debug";
 
   std::string name = "";
   std::string weighting = "whiten";
@@ -90,6 +90,7 @@ int main(int argc, char **argv) {
           {"height", required_argument, 0, 's'},
           {"kernel", required_argument, 0, 't'},
           {"kernel_support", required_argument, 0, 'u'},
+          {"logging_level", required_argument, 0, 'v'},
           {0, 0, 0, 0}
         };
       /* getopt_long stores the option index here. */
@@ -135,6 +136,7 @@ int main(int argc, char **argv) {
           printf("--dec: Centre of pointing in decimal degrees (Equatorial coordinates). \n\n");
           printf("--kernel: Type of gridding kernel to use, kb, gauss, pswf, box. (kb is default)\n");
           printf("--kernel_support: Support of kernel in grid cells. (4 is the default)\n");
+          printf("--logging_level: Determines the output logging level for sopt and purify. (\"debug\" is the default)\n");
           return 0;
           break;
         case 'a':
@@ -227,7 +229,9 @@ int main(int argc, char **argv) {
         case 'u':
           J = std::stoi(optarg);
           break;
-
+        case 'v':
+          sopt_logging_level = optarg;
+          break;
         case '?':
           /* getopt_long already printed an error message. */
           break;
@@ -239,6 +243,7 @@ int main(int argc, char **argv) {
     }
 
 
+  sopt::logging::set_level(sopt_logging_level);
 
   auto uv_data = utilities::read_visibility(visfile);
   t_real const max_u = std::sqrt((uv_data.u.array() * uv_data.u.array()).maxCoeff());
@@ -455,7 +460,7 @@ int main(int argc, char **argv) {
     std::cout << "Relative gamma = " << relative_gamma << '\n';
     std::cout << "Old gamma = " << padmm.gamma() << '\n';
     std::cout << "New gamma = " << new_purify_gamma << '\n';
-    if (relative_gamma > 0.01 and new_purify_gamma > 0 and adapt_gamma)
+    if (iter < 1000 and relative_gamma > 0.01 and new_purify_gamma > 0 and adapt_gamma)
     {
       padmm.gamma(new_purify_gamma);
     }
