@@ -12,8 +12,16 @@ if(CCFits_INCLUDE_DIR)
 endif()
 include_directories(SYSTEM ${FFTW3_INCLUDE_DIR})
 
-add_library(cppurify MeasurementOperator.cc FFTOperator.cc clean.cc utilities.cc pfitsio.cc kernels.cc RMOperator.cc PSFOperator.cc wprojection.cc)
+set(SOURCES MeasurementOperator.cc FFTOperator.cc clean.cc utilities.cc pfitsio.cc
+  kernels.cc RMOperator.cc PSFOperator.cc wprojection.cc)
+if(TARGET casacore::ms)
+  list(APPEND SOURCES casacore.cc)
+endif()
+add_library(cppurify ${SOURCES})
 target_link_libraries(cppurify ${FFTW3_DOUBLE_LIBRARY} ${CCFits_LIBRARY} ${CFitsIO_LIBRARY})
+if(TARGET casacore::ms)
+  target_link_libraries(cppurify casacore::ms)
+endif()
 add_dependencies(cppurify lookup_dependencies)
 
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/include/purify/")

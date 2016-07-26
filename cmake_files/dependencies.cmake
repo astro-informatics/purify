@@ -9,8 +9,11 @@ find_package(TIFF REQUIRED)
 find_package(CBLAS REQUIRED)
 set(PURIFY_BLAS_H "${BLAS_INCLUDE_FILENAME}")
 
-lookup_package(Boost REQUIRED)
-
+if(data AND tests)
+  lookup_package(Boost REQUIRED COMPONENTS filesystem)
+else()
+  lookup_package(Boost REQUIRED)
+endif()
 lookup_package(Eigen3 REQUIRED ARGUMENTS HG_REPOSITORY https://bitbucket.org/LukePratley/eigen)
 
 # Look up packages: if not found, installs them
@@ -52,6 +55,7 @@ if(openmp)
 endif()
 
 find_package(Doxygen)
+find_package(CasaCore COMPONENTS ms)
 
 # Add script to execute to make sure libraries in the build tree can be found
 add_to_ld_path("${EXTERNAL_ROOT}/lib")
