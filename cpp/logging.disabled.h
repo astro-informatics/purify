@@ -1,6 +1,7 @@
 #ifndef PURIFY_LOGGING_DISABLED_H
 #define PURIFY_LOGGING_DISABLED_H
 
+#include "purify/config.h" //TODO: file missing (also in SOPT)
 #include <memory>
 #include <string>
 

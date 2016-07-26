@@ -22,7 +22,7 @@ option(tests          "Enable testing"                                  on)
 option(data           "Download measurement set for testing"            on)
 option(openmp         "Enable OpenMP"                                   off)
 option(python         "Enable python bindings"                          on)
-option(logging        "Enable logging"                         on)
+option(logging        "Enable logging"                                  on)
 
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   if(NOT "$ENV{VIRTUAL_ENV}" STREQUAL "")
