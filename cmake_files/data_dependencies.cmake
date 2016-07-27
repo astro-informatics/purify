@@ -12,6 +12,10 @@ file(DOWNLOAD
 
 # untar the data
 if(EXISTS "${NGC3256_TGZ}" AND NOT EXISTS "${NGC3256_MS}")
+  find_program(TAR_PROGRAM tar)
+  if(NOT TAR_PROGRAM)
+    message(FATAL_ERROR "Cannot untar data without tar")
+  endif()
   execute_process(
     COMMAND ${TAR_PROGRAM} -xf ${NGC3256_TGZ}
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/data)
