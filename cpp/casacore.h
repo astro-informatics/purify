@@ -11,6 +11,7 @@
 #include <casacore/tables/Tables/ScalarColumn.h>
 #include <casacore/tables/Tables/Table.h>
 #include <sopt/utilities.h>
+#include "utilities.h"
 #include "types.h"
 
 namespace purify {
@@ -239,6 +240,7 @@ class MeasurementSet::ChannelWrapper {
 public:
   //! Possible locations for SIGMA
   enum class Sigma { OVERALL, SPECTRUM };
+  enum class Stokes { I, Q, U, V };
   ChannelWrapper(t_uint channel, MeasurementSet const &ms, std::string const &filter = "")
       : ms_(ms), filter_(filter), channel_(channel) {}
 
@@ -249,15 +251,16 @@ public:
   Vector<t_real> raw_##NAME() const {                                                              \
     return table_column<t_real>(ms_.table(), "UVW[" #INDEX "]", filter());                         \
   }                                                                                                \
-  /** \brief U scaled to purify values **/                                                         \
-  /** param[in] res: Resolution of as pixel in arc-seconds **/                                     \
-  Vector<t_real> scaled_##NAME(t_real const &res) const {                                          \
-    return (raw_##NAME().array() * frequencies().array()).matrix() * scale(res);                   \
+  /** \brief U scaled to purify values of wavelengths **/                                                        \
+  Vector<t_real> lambda_##NAME() const {                                          \
+    return (raw_##NAME().array() * frequencies().array()).matrix() / constant::c;                   \
   }
   PURIFY_MACRO(u, 0);
   PURIFY_MACRO(v, 1);
   PURIFY_MACRO(w, 2);
 # undef PURIFY_MACRO
+  //! Number of rows in a channel
+  t_uint size() const;
 
   //! Frequencies for each DATA_DESC_ID
   Vector<t_real> raw_frequencies() const;
@@ -293,15 +296,10 @@ public:
 protected:
   //! Composes filter for current channel
   std::string filter() const;
-  //! Composes "<variable>[<channel>]"
+  //! Composes "<variable>[<channel>,]"
   std::string index(std::string const &variable = "") const;
   //! Computes given stokes polarization
   std::string stokes(std::string const &pol, std::string const &column = "DATA") const;
-  //! Scaling to purify thingie
-  t_real scale(t_real const &res) const {
-    return res / constant::c * 4e0 * constant::pi * constant::pi
-           / static_cast<t_real>(60 * 60 * 180);
-  }
 
   //! Table over which to operate
   MeasurementSet ms_;
@@ -334,7 +332,12 @@ protected:
   std::string const filter;
   std::shared_ptr<value_type> wrapper;
 };
+//! Read measurement set into vis_params structure
+utilities::vis_params read_measurementset(std::string const &filename, const std::vector<t_int> & channels = std::vector<t_int>(), 
+  const MeasurementSet::ChannelWrapper::Stokes stokes = MeasurementSet::ChannelWrapper::Stokes::I, std::string const &filter = "");
 }
+//! Return average frequency over channels
+t_real average_frequency(const purify::casa::MeasurementSet & ms_file, std::string const &filter, const std::vector<t_int> & channels);
 }
 
 #endif

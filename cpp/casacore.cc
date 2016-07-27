@@ -145,6 +145,8 @@ bool MeasurementSet::ChannelWrapper::is_valid() const {
   std::ostringstream sstr;
   sstr << "USING STYLE PYTHON SELECT FLAG[" << channel_ << ",] as R FROM $1 WHERE NOT any(FLAG["
        << channel_ << ",])";
+  if(not filter_.empty())
+    sstr << "AND " << filter_;
   auto const taql_table = ::casacore::tableCommand(sstr.str(), ms_.table());
   return taql_table.table().nrow() > 0;
 }
@@ -178,5 +180,97 @@ bool MeasurementSet::const_iterator::operator==(const_iterator const &c) const {
     throw std::runtime_error("Iterators are not over the same measurement set");
   return channel == c.channel;
 }
+
+
+
+utilities::vis_params read_measurementset(std::string const &filename, const std::vector<t_int> & channels_input, 
+  const MeasurementSet::ChannelWrapper::Stokes stokes, std::string const &filter){
+  auto const ms_file = purify::casa::MeasurementSet(filename);
+  utilities::vis_params uv_data;
+  t_uint rows = 0;
+  std::vector<t_int> channels = channels_input;
+  if (channels.empty())
+  {
+    std::printf("All Channels = %lu\n", ms_file.size());
+    Vector<t_int> temp_vector = Vector<t_int>::Zero(ms_file.size());
+    channels = std::vector<t_int>(temp_vector.data(), temp_vector.data() + temp_vector.size());
+  }
+
+  //counting number of rows
+  for (auto channel_number: channels)
+  {
+    rows += ms_file[channel_number].size();
+  }
+
+  std::printf("Visibilities = %lu\n", rows);
+  uv_data.u = Vector<t_real>::Zero(rows);
+  uv_data.v = Vector<t_real>::Zero(rows);
+  uv_data.w = Vector<t_real>::Zero(rows);
+  uv_data.vis = Vector<t_complex>::Zero(rows);
+  uv_data.weights = Vector<t_complex>::Zero(rows);
+
+  //add data to channel
+  t_uint row = 0;
+  for (auto channel_number: channels)
+  {
+    auto const channel = ms_file[channel_number];
+    uv_data.u.segment(row, channel.size()) = channel.lambda_u();
+    uv_data.v.segment(row, channel.size()) = channel.lambda_v();
+    uv_data.w.segment(row, channel.size()) = channel.lambda_w();
+    switch(stokes) {
+      case MeasurementSet::ChannelWrapper::Stokes::I:
+        std::printf("Stokes I\n");
+        uv_data.vis.segment(row, channel.size()) = channel.I("DATA");
+        uv_data.weights.segment(row, channel.size()).real() = channel.wI(MeasurementSet::ChannelWrapper::Sigma::OVERALL); //go for sigma rather than sigma_spectrum
+        break;
+      case MeasurementSet::ChannelWrapper::Stokes::Q:
+        uv_data.vis.segment(row, channel.size()) = channel.Q("DATA");
+        uv_data.weights.segment(row, channel.size()).real() = channel.wQ(MeasurementSet::ChannelWrapper::Sigma::OVERALL); //go for sigma rather than sigma_spectrum
+        break;
+      case MeasurementSet::ChannelWrapper::Stokes::U:
+        uv_data.vis.segment(row, channel.size()) = channel.U("DATA");
+        uv_data.weights.segment(row, channel.size()).real() = channel.wU(MeasurementSet::ChannelWrapper::Sigma::OVERALL); //go for sigma rather than sigma_spectrum
+        break;
+      case MeasurementSet::ChannelWrapper::Stokes::V:
+        uv_data.vis.segment(row, channel.size()) = channel.V("DATA");
+        uv_data.weights.segment(row, channel.size()).real() = channel.wV(MeasurementSet::ChannelWrapper::Sigma::OVERALL); //go for sigma rather than sigma_spectrum
+        break;
+
+    } 
+    row += channel.size();
+  }
+  std::printf("Done! \n");
+  return uv_data;
+}
+
+t_real average_frequency(const purify::casa::MeasurementSet & ms_file, std::string const &filter, const std::vector<t_int> & channels){
+
+  t_real frequency_sum = 0;
+  t_real rows = 0;
+  for (auto channel_number: channels)
+  {
+    auto const channel = ms_file[channel_number];
+    auto const frequencies = channel.frequencies();
+    frequency_sum += frequencies.sum();
+    rows += channel.size();
+  }
+  return frequency_sum / rows;
+}
+
+
+t_uint MeasurementSet::ChannelWrapper::size() const{
+  if (ms_.table().nrow() == 0)
+    return 0;
+  std::ostringstream sstr;
+  sstr << "USING STYLE PYTHON SELECT FLAG[" << channel_ << ",] as R FROM $1 WHERE NOT any(FLAG["
+       << channel_ << ",])";
+  if(not filter_.empty())
+    sstr << "AND " << filter_;
+  auto const taql_table = ::casacore::tableCommand(sstr.str(), ms_.table());
+  auto const vtable = taql_table.table();
+  return vtable.nrow();
+}
+
+
 }
 }

@@ -10,7 +10,7 @@ endif()
 if(CCFits_INCLUDE_DIR)
   include_directories(SYSTEM ${CCFits_INCLUDE_DIR}/.. ${CCFits_INCLUDE_DIR})
 endif()
-include_directories(SYSTEM ${FFTW3_INCLUDE_DIR})
+include_directories(SYSTEM ${FFTW3_INCLUDE_DIR} ${Sopt_INCLUDE_DIRS})
 
 set(SOURCES MeasurementOperator.cc FFTOperator.cc clean.cc utilities.cc pfitsio.cc
   kernels.cc RMOperator.cc PSFOperator.cc wprojection.cc)
