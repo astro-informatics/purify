@@ -41,11 +41,6 @@ public:
   //! Set new filename
   MeasurementSet &filename(std::string const &filename);
 
-  //! Frequencies for each data desc id (rows) and channel (columns)
-  Image<t_real> frequency_table() const;
-  //! Frequencies where rows match `uvw` and friends, and cols are channels.
-  Image<t_real> frequencies(std::string const &filter = default_filter) const;
-
   //! \brief Gets table or subtable
   ::casacore::Table const &table(std::string const &name = "") const;
 
@@ -61,51 +56,8 @@ public:
   array_column(std::string const &col, std::string const &tabname = "") const {
     return get_column<T, ::casacore::ArrayColumn>(col, tabname);
   }
-
-  //! Flags per measurement (rows) and per channel (cols)
-  Image<bool> flagged(std::string const &filter) const;
-
-  //! \brief Input name if given, otherwise DATA or DATA_CORRECTED
-  //! It is an error to give a column name if a column with a name does not exist
-  std::string data_column_name(std::string const &name = "") const;
-
   //! Clear memory
   void clear() { tables_ = std::make_shared<std::map<std::string, ::casacore::Table>>(); }
-
-  //! U, V, W in meters
-  Matrix<t_real> uvw(std::string const &filter = default_filter) const;
-  //! data desc ids
-  Array<t_int> data_desc_id(std::string const &filter = default_filter) const;
-  //! Stokes I component
-  Matrix<t_complex>
-  I(std::string const &name = "DATA", std::string const &filter = default_filter) const;
-  //! Weights for the Stokes I component
-  Matrix<t_real>
-  wI(std::string const &name = "SIGMA", std::string const &filter = default_filter) const;
-  //! Stokes Q component
-  Matrix<t_complex>
-  Q(std::string const &name = "DATA", std::string const &filter = default_filter) const;
-  //! Weights for the Stokes Q component
-  Matrix<t_real>
-  wQ(std::string const &name = "SIGMA", std::string const &filter = default_filter) const;
-  //! Stokes U component
-  Matrix<t_complex>
-  U(std::string const &name = "DATA", std::string const &filter = default_filter) const;
-  //! Weights for the Stokes U component
-  Matrix<t_real>
-  wU(std::string const &name = "SIGMA", std::string const &filter = default_filter) const;
-  //! Stokes V component
-  Matrix<t_complex>
-  V(std::string const &name = "DATA", std::string const &filter = default_filter) const;
-  //! Weights for the Stokes V component
-  Matrix<t_real>
-  wV(std::string const &name = "SIGMA", std::string const &filter = default_filter) const;
-
-  //! Gets a column using TaQL
-  template <class T>
-  Matrix<T> column(std::string const &column, std::string const &filter = default_filter) const {
-    return table_column<T>(table(), column, filter);
-  }
 
   //! Number of channels in the measurement set
   std::size_t size() const;
@@ -315,6 +267,7 @@ public:
   typedef MeasurementSet::ChannelWrapper value_type;
   typedef std::shared_ptr<value_type const> pointer;
   typedef value_type const &reference;
+  typedef t_int difference_type;
 
   const_iterator(t_int channel, MeasurementSet const &ms, std::string const &filter = "")
       : channel(channel), ms(ms), filter(filter), wrapper(new value_type(channel, ms, filter)){};
@@ -323,11 +276,26 @@ public:
   reference operator*() const { return *wrapper; }
   const_iterator &operator++();
   const_iterator operator++(int);
+  const_iterator &operator+=(difference_type n);
+  const_iterator &operator-=(difference_type n) { return operator+=(-n); }
+  const_iterator operator+(difference_type n) const {
+    return const_iterator(channel + n, ms, filter);
+  }
+  const_iterator operator-(difference_type n) const {
+    return const_iterator(channel - n, ms, filter);
+  }
+  bool operator>(const_iterator const &c) const;
+  bool operator>=(const_iterator const &c) const;
+  bool operator<(const_iterator const &c) const { return not operator>=(c); }
+  bool operator<=(const_iterator const &c) const { return not operator>(c); }
   bool operator==(const_iterator const &c) const;
   bool operator!=(const_iterator const &c) const { return not operator==(c); }
 
+  //! True if iterating over the same measurement set
+  bool same_measurement_set(const_iterator const &c) const { return &ms.table() == &c.ms.table(); }
+
 protected:
-  t_int channel;
+  difference_type channel;
   MeasurementSet ms;
   std::string const filter;
   std::shared_ptr<value_type> wrapper;
@@ -335,6 +303,15 @@ protected:
 //! Read measurement set into vis_params structure
 utilities::vis_params read_measurementset(std::string const &filename, const std::vector<t_int> & channels = std::vector<t_int>(), 
   const MeasurementSet::ChannelWrapper::Stokes stokes = MeasurementSet::ChannelWrapper::Stokes::I, std::string const &filter = "");
+
+inline MeasurementSet::const_iterator operator+(MeasurementSet::const_iterator::difference_type n,
+                                                MeasurementSet::const_iterator const &c) {
+  return c.operator+(n);
+}
+inline MeasurementSet::const_iterator operator-(MeasurementSet::const_iterator::difference_type n,
+                                                MeasurementSet::const_iterator const &c) {
+  return c.operator-(n);
+}
 }
 //! Return average frequency over channels
 t_real average_frequency(const purify::casa::MeasurementSet & ms_file, std::string const &filter, const std::vector<t_int> & channels);
