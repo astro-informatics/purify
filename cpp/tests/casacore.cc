@@ -11,9 +11,12 @@
 #include "casacore.h"
 #include "directories.h"
 
+#include "utilities.h"
+#include "types.h"
+
 #include "catch.hpp"
 using namespace ::casacore;
-
+using namespace purify::notinstalled;
 TEST_CASE("Casacore") {
   // create the table descriptor
   casa::TableDesc simpleDesc = casa::MS::requiredTableDesc();
@@ -177,6 +180,7 @@ TEST_CASE("Single channel") {
   }
   SECTION("Raw UVW") {
     auto const channel = pc::MeasurementSet::const_iterator::value_type(17, ms);
+    REQUIRE(channel.size() == 141059);
     auto const u = channel.raw_u();
     REQUIRE(u.size() == 141059);
     CHECK(std::abs(u[0] + 48.184256396979784) < 1e-8);
@@ -258,4 +262,17 @@ TEST_CASE("Channel iteration") {
     CHECK(is_valid == channel.is_valid());
     ++i;
   }
+}
+
+TEST_CASE("Read Measurement") {
+  purify::utilities::vis_params const vis_file = purify::utilities::read_visibility(vla_filename("at166B.3C129.c0.vis"));
+  purify::utilities::vis_params const ms_file = purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"));
+
+  REQUIRE(vis_file.u.size() == ms_file.u.size());
+  CHECK(vis_file.u.isApprox(ms_file.u, 1e-12));
+  CHECK(vis_file.v.isApprox(ms_file.v, 1e-12));
+  CHECK(vis_file.vis.isApprox(ms_file.vis, 1e-12));
+  CHECK(vis_file.weights.isApprox(ms_file.weights, 1e-12));
+
+
 }

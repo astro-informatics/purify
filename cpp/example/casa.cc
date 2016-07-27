@@ -18,7 +18,7 @@ int main(int, char **) {
     auto const channel0 = ngc3256[0];
     CHECK(channel0.is_valid() == false, "Expected channel to be invalid");
     CHECK(channel0.raw_u().size() == 0, "Expected raw u to be empty");
-    CHECK(channel0.scaled_u(1).size() == 0, "Expected frequencies to be empty");
+    CHECK(channel0.lambda_u().size() == 0, "Expected frequencies to be empty");
     CHECK(channel0.I().size() == 0, "Expected I component to be empty");
     CHECK(channel0.wI().size() == 0, "Expected weights associated with I to be empty");
 
@@ -42,7 +42,7 @@ int main(int, char **) {
     // Note that the filter "all(NOT FLAG[i,])" has already been applied, where i the channel index
     auto const filter = "OBSERVATION_ID=1 AND DATA_DESC_ID=0";
     auto const filtered = ngc3256[std::make_pair(17, filter)];
-    CHECK(filtered.scaled_w(1).size() == 6300, "Incorrect size for filtered data");
+    CHECK(filtered.lambda_w().size() == 6300, "Incorrect size for filtered data");
     // Loops can also be filtered
     for(auto i_first = ngc3256.begin(filter); i_first != ngc3256.end(filter); ++i_first) {
       if(not i_first->is_valid())
