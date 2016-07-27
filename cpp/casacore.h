@@ -269,6 +269,7 @@ public:
   typedef MeasurementSet::ChannelWrapper value_type;
   typedef std::shared_ptr<value_type const> pointer;
   typedef value_type const &reference;
+  typedef t_int difference_type;
 
   const_iterator(t_int channel, MeasurementSet const &ms, std::string const &filter = "")
       : channel(channel), ms(ms), filter(filter), wrapper(new value_type(channel, ms, filter)){};
@@ -277,15 +278,39 @@ public:
   reference operator*() const { return *wrapper; }
   const_iterator &operator++();
   const_iterator operator++(int);
+  const_iterator &operator+=(difference_type n);
+  const_iterator &operator-=(difference_type n) { return operator+=(-n); }
+  const_iterator operator+(difference_type n) const {
+    return const_iterator(channel + n, ms, filter);
+  }
+  const_iterator operator-(difference_type n) const {
+    return const_iterator(channel - n, ms, filter);
+  }
+  bool operator>(const_iterator const &c) const;
+  bool operator>=(const_iterator const &c) const;
+  bool operator<(const_iterator const &c) const { return not operator>=(c); }
+  bool operator<=(const_iterator const &c) const { return not operator>(c); }
   bool operator==(const_iterator const &c) const;
   bool operator!=(const_iterator const &c) const { return not operator==(c); }
 
+  //! True if iterating over the same measurement set
+  bool same_measurement_set(const_iterator const &c) const { return &ms.table() == &c.ms.table(); }
+
 protected:
-  t_int channel;
+  difference_type channel;
   MeasurementSet ms;
   std::string const filter;
   std::shared_ptr<value_type> wrapper;
 };
+
+inline MeasurementSet::const_iterator operator+(MeasurementSet::const_iterator::difference_type n,
+                                                MeasurementSet::const_iterator const &c) {
+  return c.operator+(n);
+}
+inline MeasurementSet::const_iterator operator-(MeasurementSet::const_iterator::difference_type n,
+                                                MeasurementSet::const_iterator const &c) {
+  return c.operator-(n);
+}
 }
 }
 

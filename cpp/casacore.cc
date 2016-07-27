@@ -105,9 +105,26 @@ MeasurementSet::const_iterator MeasurementSet::const_iterator::operator++(int) {
 }
 
 bool MeasurementSet::const_iterator::operator==(const_iterator const &c) const {
-  if(&ms.table() != &c.ms.table())
+  if(not same_measurement_set(c))
     throw std::runtime_error("Iterators are not over the same measurement set");
   return channel == c.channel;
+}
+
+MeasurementSet::const_iterator &MeasurementSet::const_iterator::operator+=(t_int n) {
+  channel += n;
+  return *this;
+}
+
+bool MeasurementSet::const_iterator::operator>(const_iterator const &c) const {
+  if(not same_measurement_set(c))
+    throw std::runtime_error("Iterators are not over the same measurement set");
+  return channel > c.channel;
+}
+
+bool MeasurementSet::const_iterator::operator>=(const_iterator const &c) const {
+  if(not same_measurement_set(c))
+    throw std::runtime_error("Iterators are not over the same measurement set");
+  return channel >= c.channel;
 }
 }
 }
