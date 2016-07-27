@@ -65,10 +65,15 @@ std::string MeasurementSet::ChannelWrapper::index(std::string const &variable) c
 
 Vector<t_real> MeasurementSet::ChannelWrapper::frequencies() const {
   auto const frequencies = raw_frequencies();
-  auto const ids = data_desc_id();
+  auto const ids = table_column<::casacore::Int>(ms_.table(), "DATA_DESC_ID", filter());
+  auto const spids
+      = table_column<::casacore::Int>(ms_.table("DATA_DESCRIPTION"), "SPECTRAL_WINDOW_ID");
   Vector<t_real> result(ids.size());
-  for(Eigen::DenseIndex i(0); i < ids.size(); ++i)
-    result(i) = frequencies(ids(i));
+  for(Eigen::DenseIndex i(0); i < ids.size(); ++i) {
+    assert(ids(i) < spds.size());
+    assert(spids(ids(i)) < frequencies.size());
+    result(i) = frequencies(spids(ids(i)));
+  }
   return result;
 }
 
