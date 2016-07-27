@@ -166,6 +166,7 @@ TEST_CASE("Channel iteration") {
       89,  90,  91,  92,  93,  94,  95,  96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 106,
       107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124};
   for(auto const channel : purify::casa::MeasurementSet(purify::notinstalled::ngc3256_ms())) {
+    CHECK(channel.channel() == i);
     CHECK(i < 128);
     bool const is_valid = std::find(valids.begin(), valids.end(), i) != valids.end();
     CHECK(is_valid == channel.is_valid());
