@@ -40,11 +40,6 @@ public:
   //! Set new filename
   MeasurementSet &filename(std::string const &filename);
 
-  //! Frequencies for each data desc id (rows) and channel (columns)
-  Image<t_real> frequency_table() const;
-  //! Frequencies where rows match `uvw` and friends, and cols are channels.
-  Image<t_real> frequencies(std::string const &filter = default_filter) const;
-
   //! \brief Gets table or subtable
   ::casacore::Table const &table(std::string const &name = "") const;
 
@@ -60,51 +55,8 @@ public:
   array_column(std::string const &col, std::string const &tabname = "") const {
     return get_column<T, ::casacore::ArrayColumn>(col, tabname);
   }
-
-  //! Flags per measurement (rows) and per channel (cols)
-  Image<bool> flagged(std::string const &filter) const;
-
-  //! \brief Input name if given, otherwise DATA or DATA_CORRECTED
-  //! It is an error to give a column name if a column with a name does not exist
-  std::string data_column_name(std::string const &name = "") const;
-
   //! Clear memory
   void clear() { tables_ = std::make_shared<std::map<std::string, ::casacore::Table>>(); }
-
-  //! U, V, W in meters
-  Matrix<t_real> uvw(std::string const &filter = default_filter) const;
-  //! data desc ids
-  Array<t_int> data_desc_id(std::string const &filter = default_filter) const;
-  //! Stokes I component
-  Matrix<t_complex>
-  I(std::string const &name = "DATA", std::string const &filter = default_filter) const;
-  //! Weights for the Stokes I component
-  Matrix<t_real>
-  wI(std::string const &name = "SIGMA", std::string const &filter = default_filter) const;
-  //! Stokes Q component
-  Matrix<t_complex>
-  Q(std::string const &name = "DATA", std::string const &filter = default_filter) const;
-  //! Weights for the Stokes Q component
-  Matrix<t_real>
-  wQ(std::string const &name = "SIGMA", std::string const &filter = default_filter) const;
-  //! Stokes U component
-  Matrix<t_complex>
-  U(std::string const &name = "DATA", std::string const &filter = default_filter) const;
-  //! Weights for the Stokes U component
-  Matrix<t_real>
-  wU(std::string const &name = "SIGMA", std::string const &filter = default_filter) const;
-  //! Stokes V component
-  Matrix<t_complex>
-  V(std::string const &name = "DATA", std::string const &filter = default_filter) const;
-  //! Weights for the Stokes V component
-  Matrix<t_real>
-  wV(std::string const &name = "SIGMA", std::string const &filter = default_filter) const;
-
-  //! Gets a column using TaQL
-  template <class T>
-  Matrix<T> column(std::string const &column, std::string const &filter = default_filter) const {
-    return table_column<T>(table(), column, filter);
-  }
 
   //! Number of channels in the measurement set
   std::size_t size() const;
