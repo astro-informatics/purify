@@ -231,6 +231,8 @@ public:
 
   //! FIELD_ID from table MAIN
   Vector<t_int> field_ids() const { return ms_.column<t_int>("FIELD_ID", filter()); }
+  //! DATA_DESC_ID from table MAIN
+  Vector<t_int> data_desc_id() const { return ms_.column<t_int>("DATA_DESC_ID", filter()); }
 
   //! Direction (RA, DEC) in radian
   Direction direction(t_real tolerance = 1e-8) const { return ms_.direction(tolerance, filter()); }
