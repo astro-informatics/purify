@@ -263,6 +263,14 @@ public:
 
   //! Frequencies for each valid measurement
   Vector<t_real> frequencies() const { return joined_spectral_window("CHAN_FREQ"); }
+  //! Channel width for each valid measurement
+  Vector<t_real> width() const { return joined_spectral_window("CHAN_WIDTH"); }
+  //! Effective noise band-width width for each valid measurement
+  Vector<t_real> effective_noise_bandwidth() const {
+    return joined_spectral_window("EFFECTIVE_BW");
+  }
+  //! Effective spectral resolution for each valid measurement
+  Vector<t_real> resolution() const { return joined_spectral_window("RESOLUTION"); }
 
   //! Check if channel has any data
   bool is_valid() const;
