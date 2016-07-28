@@ -161,7 +161,6 @@ TEST_CASE("Measurement channel") {
 }
 
 TEST_CASE("Channel iteration") {
-  int i = 0;
   std::vector<int> const valids{
       17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  33,  34,
       35,  36,  37,  38,  39,  40,  41,  42,  43,  44,  45,  46,  47,  48,  49,  50,  51,  52,
@@ -169,12 +168,14 @@ TEST_CASE("Channel iteration") {
       71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,  83,  84,  85,  86,  87,  88,
       89,  90,  91,  92,  93,  94,  95,  96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 106,
       107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124};
-  for(auto const channel : purify::casa::MeasurementSet(purify::notinstalled::ngc3256_ms())) {
-    CHECK(channel.channel() == i);
-    CHECK(i < 128);
-    bool const is_valid = std::find(valids.begin(), valids.end(), i) != valids.end();
-    CHECK(is_valid == channel.is_valid());
-    ++i;
+  auto const ms = purify::casa::MeasurementSet(purify::notinstalled::ngc3256_ms());
+  auto i_channel = ms.begin();
+  auto const i_end = ms.end();
+  for(; i_channel < i_end; i_channel += 10) {
+    CHECK(i_channel->channel() < 128);
+    bool const is_valid
+        = std::find(valids.begin(), valids.end(), i_channel->channel()) != valids.end();
+    CHECK(is_valid == i_channel->is_valid());
   }
 }
 
