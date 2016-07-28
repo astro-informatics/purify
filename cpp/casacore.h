@@ -1,6 +1,7 @@
 #ifndef PURIFY_CASACORE_H
 #define PURIFY_CASACORE_H
 
+#include <exception>
 #include <map>
 #include <memory>
 #include <string>
