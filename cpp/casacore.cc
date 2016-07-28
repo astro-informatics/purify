@@ -65,7 +65,7 @@ std::string MeasurementSet::ChannelWrapper::index(std::string const &variable) c
 
 Vector<t_real> MeasurementSet::ChannelWrapper::frequencies() const {
   auto const frequencies = raw_frequencies();
-  auto const ids = table_column<::casacore::Int>(ms_.table(), "DATA_DESC_ID", filter());
+  auto const ids = ms_.column<::casacore::Int>("DATA_DESC_ID", filter());
   auto const spids
       = table_column<::casacore::Int>(ms_.table("DATA_DESCRIPTION"), "SPECTRAL_WINDOW_ID");
   Vector<t_real> result(ids.size());
@@ -98,6 +98,26 @@ Vector<t_real> MeasurementSet::ChannelWrapper::raw_frequencies() const {
   std::ostringstream sstr;
   sstr << "CHAN_FREQ[" << channel_ << "]";
   return table_column<t_real>(ms_.table("SPECTRAL_WINDOW"), sstr.str());
+}
+
+MeasurementSet::Direction
+MeasurementSet::direction(t_real tolerance, std::string const &filter) const {
+  auto const field_ids_raw = column<::casacore::Int>("FIELD_ID", filter);
+  auto const source_ids_raw = table_column<::casacore::Int>(table("FIELD"), "SOURCE_ID");
+  std::set<::casacore::Int> source_ids;
+  for(Eigen::DenseIndex i(0); i < field_ids_raw.size(); ++i) {
+    assert(field_ids_raw(i) < source_ids_raw.size());
+    source_ids.insert(source_ids_raw(field_ids_raw(i)));
+  }
+  if(source_ids.size() == 0)
+    throw std::runtime_error("Could not find sources. Cannot determine direction");
+  auto const directions = table_column<::casacore::Double>(table("SOURCE"), "DIRECTION");
+  auto const original = directions.row(*source_ids.begin());
+  for(auto const other : source_ids)
+    if(not directions.row(other).isApprox(original, tolerance))
+      throw std::runtime_error("Found more than one direction");
+
+  return original;
 }
 
 MeasurementSet::const_iterator &MeasurementSet::const_iterator::operator++() {

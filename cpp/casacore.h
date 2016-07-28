@@ -30,6 +30,8 @@ public:
   class ChannelWrapper;
   //! Default filter specifying which data to accept
   static std::string const default_filter;
+  //! Type for (RA, DEC) direction
+  typedef Eigen::Array<t_real, 2, 1> Direction;
 
   //! Constructs the interface around a given measurement set
   MeasurementSet(std::string const filename)
@@ -77,6 +79,14 @@ public:
   ChannelWrapper operator[](t_uint i) const;
   //! Returns wrapper over specific channel
   ChannelWrapper operator[](std::tuple<t_uint, std::string> const &i) const;
+  //! Direction (RA, DEC) in radian
+  Direction direction(t_real tolerance = 1e-8, std::string const &filter = "") const;
+  Direction::Scalar right_ascension(t_real tolerance = 1e-8, std::string const &filter = "") const {
+    return direction(tolerance, filter)(0);
+  }
+  Direction::Scalar declination(t_real tolerance = 1e-8, std::string const &filter = "") const {
+    return direction(tolerance, filter)(1);
+  }
 
 private:
   //! Gets stokes of given array/object
@@ -218,6 +228,18 @@ public:
 #undef PURIFY_MACRO
   //! Number of rows in a channel
   t_uint size() const;
+
+  //! FIELD_ID from table MAIN
+  Vector<t_int> field_ids() const { return ms_.column<t_int>("FIELD_ID", filter()); }
+
+  //! Direction (RA, DEC) in radian
+  Direction direction(t_real tolerance = 1e-8) const { return ms_.direction(tolerance, filter()); }
+  Direction::Scalar right_ascension(t_real tolerance = 1e-8) const {
+    return ms_.right_ascension(tolerance, filter());
+  }
+  Direction::Scalar declination(t_real tolerance = 1e-8) const {
+    return ms_.declination(tolerance, filter());
+  }
 
   //! Frequencies for each DATA_DESC_ID
   Vector<t_real> raw_frequencies() const;

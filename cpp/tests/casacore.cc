@@ -188,6 +188,15 @@ TEST_CASE("Read Measurement") {
   CHECK(vis_file.v.isApprox(ms_file.v, 1e-12));
   CHECK(vis_file.vis.isApprox(ms_file.vis, 1e-12));
   CHECK(vis_file.weights.isApprox(ms_file.weights, 1e-12));
+}
 
-
+TEST_CASE("Direction") {
+  auto const ms = purify::casa::MeasurementSet(purify::notinstalled::ngc3256_ms());
+  auto const direction = ms.direction();
+  auto const right_ascention = ms.right_ascension();
+  auto const declination = ms.declination();
+  CHECK(std::abs(right_ascention - 2.7395560603928995) < 1e-8);
+  CHECK(std::abs(declination + 0.76628680808811045) < 1e-8);
+  CHECK(std::abs(direction[0] - 2.7395560603928995) < 1e-8);
+  CHECK(std::abs(direction[1] + 0.76628680808811045) < 1e-8);
 }
