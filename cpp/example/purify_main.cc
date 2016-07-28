@@ -502,7 +502,7 @@ int main(int argc, char **argv) {
 
     iter++;
 
-    return false;
+    return true;
   };
 
 
