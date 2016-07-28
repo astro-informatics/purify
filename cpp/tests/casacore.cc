@@ -193,9 +193,9 @@ TEST_CASE("Read Measurement") {
 TEST_CASE("Direction") {
   auto const ms = purify::casa::MeasurementSet(purify::notinstalled::ngc3256_ms());
   auto const direction = ms.direction();
-  auto const right_ascention = ms.right_ascension();
+  auto const right_ascension = ms.right_ascension();
   auto const declination = ms.declination();
-  CHECK(std::abs(right_ascention - 2.7395560603928995) < 1e-8);
+  CHECK(std::abs(right_ascension - 2.7395560603928995) < 1e-8);
   CHECK(std::abs(declination + 0.76628680808811045) < 1e-8);
   CHECK(std::abs(direction[0] - 2.7395560603928995) < 1e-8);
   CHECK(std::abs(direction[1] + 0.76628680808811045) < 1e-8);
