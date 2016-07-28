@@ -241,10 +241,8 @@ public:
     return ms_.declination(tolerance, filter());
   }
 
-  //! Frequencies for each DATA_DESC_ID
-  Vector<t_real> raw_frequencies() const;
-
-  Vector<t_int> data_desc_id() const { return ms_.column<t_int>("DATA_DESC_ID", filter()); }
+  //! Frequencies from SPECTRAL_WINDOW for a this channel
+  Vector<t_real> raw_frequencies() const { return raw_spectral_window("CHAN_FREQ"); }
 
 #define PURIFY_MACRO(NAME)                                                                         \
   /** Stokes component */                                                                          \
@@ -264,7 +262,7 @@ public:
 #undef PURIFY_MACRO
 
   //! Frequencies for each valid measurement
-  Vector<t_real> frequencies() const;
+  Vector<t_real> frequencies() const { return joined_spectral_window("CHAN_FREQ"); }
 
   //! Check if channel has any data
   bool is_valid() const;
@@ -276,6 +274,11 @@ protected:
   std::string index(std::string const &variable = "") const;
   //! Computes given stokes polarization
   std::string stokes(std::string const &pol, std::string const &column = "DATA") const;
+
+  //! column[<channel>] from SPECTRAL_WINDOW
+  Vector<t_real> raw_spectral_window(std::string const &column) const;
+  //! column[<channel>] from SPECTRAL_WINDOW joined to each measurement
+  Vector<t_real> joined_spectral_window(std::string const &column) const;
 
   //! Table over which to operate
   MeasurementSet ms_;

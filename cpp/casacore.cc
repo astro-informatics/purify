@@ -63,16 +63,17 @@ std::string MeasurementSet::ChannelWrapper::index(std::string const &variable) c
   return sstr.str();
 }
 
-Vector<t_real> MeasurementSet::ChannelWrapper::frequencies() const {
-  auto const frequencies = raw_frequencies();
+Vector<t_real>
+MeasurementSet::ChannelWrapper::joined_spectral_window(std::string const &column) const {
+  auto const raw = raw_spectral_window(column);
   auto const ids = ms_.column<::casacore::Int>("DATA_DESC_ID", filter());
   auto const spids
       = table_column<::casacore::Int>(ms_.table("DATA_DESCRIPTION"), "SPECTRAL_WINDOW_ID");
   Vector<t_real> result(ids.size());
   for(Eigen::DenseIndex i(0); i < ids.size(); ++i) {
-    assert(ids(i) < spids.size());
-    assert(spids(ids(i)) < frequencies.size());
-    result(i) = frequencies(spids(ids(i)));
+    assert(ids(i) < spds.size());
+    assert(spids(ids(i)) < raw.size());
+    result(i) = raw(spids(ids(i)));
   }
   return result;
 }
@@ -94,9 +95,9 @@ MeasurementSet::ChannelWrapper::stokes(std::string const &pol, std::string const
   return sstr.str();
 }
 
-Vector<t_real> MeasurementSet::ChannelWrapper::raw_frequencies() const {
+Vector<t_real> MeasurementSet::ChannelWrapper::raw_spectral_window(std::string const &stuff) const {
   std::ostringstream sstr;
-  sstr << "CHAN_FREQ[" << channel_ << "]";
+  sstr << stuff << "[" << channel_ << "]";
   return table_column<t_real>(ms_.table("SPECTRAL_WINDOW"), sstr.str());
 }
 
