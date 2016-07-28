@@ -101,20 +101,20 @@ Vector<t_real> MeasurementSet::ChannelWrapper::raw_frequencies() const {
 }
 
 MeasurementSet::const_iterator &MeasurementSet::const_iterator::operator++() {
-  ++channel;
-  wrapper = std::make_shared<value_type>(channel, ms, filter);
+  ++channel_;
+  wrapper_ = std::make_shared<value_type>(channel_, ms_, filter_);
   return *this;
 }
 
 MeasurementSet::const_iterator MeasurementSet::const_iterator::operator++(int) {
   operator++();
-  return const_iterator(channel - 1, ms, filter);
+  return const_iterator(channel_ - 1, ms_, filter_);
 }
 
 bool MeasurementSet::const_iterator::operator==(const_iterator const &c) const {
   if(not same_measurement_set(c))
     throw std::runtime_error("Iterators are not over the same measurement set");
-  return channel == c.channel;
+  return channel_ == c.channel_;
 }
 
 
@@ -209,20 +209,20 @@ t_uint MeasurementSet::ChannelWrapper::size() const{
 
 
 MeasurementSet::const_iterator &MeasurementSet::const_iterator::operator+=(t_int n) {
-  channel += n;
+  channel_ += n;
   return *this;
 }
 
 bool MeasurementSet::const_iterator::operator>(const_iterator const &c) const {
   if(not same_measurement_set(c))
     throw std::runtime_error("Iterators are not over the same measurement set");
-  return channel > c.channel;
+  return channel_ > c.channel_;
 }
 
 bool MeasurementSet::const_iterator::operator>=(const_iterator const &c) const {
   if(not same_measurement_set(c))
     throw std::runtime_error("Iterators are not over the same measurement set");
-  return channel >= c.channel;
+  return channel_ >= c.channel_;
 }
 }
 }

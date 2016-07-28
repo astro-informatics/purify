@@ -270,19 +270,20 @@ public:
   typedef t_int difference_type;
 
   const_iterator(t_int channel, MeasurementSet const &ms, std::string const &filter = "")
-      : channel(channel), ms(ms), filter(filter), wrapper(new value_type(channel, ms, filter)){};
+      : channel_(channel), ms_(ms), filter_(filter),
+        wrapper_(new value_type(channel_, ms_, filter_)){};
 
-  pointer operator->() const { return wrapper; }
-  reference operator*() const { return *wrapper; }
+  pointer operator->() const { return wrapper_; }
+  reference operator*() const { return *wrapper_; }
   const_iterator &operator++();
   const_iterator operator++(int);
   const_iterator &operator+=(difference_type n);
   const_iterator &operator-=(difference_type n) { return operator+=(-n); }
   const_iterator operator+(difference_type n) const {
-    return const_iterator(channel + n, ms, filter);
+    return const_iterator(channel_ + n, ms_, filter_);
   }
   const_iterator operator-(difference_type n) const {
-    return const_iterator(channel - n, ms, filter);
+    return const_iterator(channel_ - n, ms_, filter_);
   }
   bool operator>(const_iterator const &c) const;
   bool operator>=(const_iterator const &c) const;
@@ -292,13 +293,15 @@ public:
   bool operator!=(const_iterator const &c) const { return not operator==(c); }
 
   //! True if iterating over the same measurement set
-  bool same_measurement_set(const_iterator const &c) const { return &ms.table() == &c.ms.table(); }
+  bool same_measurement_set(const_iterator const &c) const {
+    return &ms_.table() == &c.ms_.table();
+  }
 
 protected:
-  difference_type channel;
-  MeasurementSet ms;
-  std::string const filter;
-  std::shared_ptr<value_type> wrapper;
+  difference_type channel_;
+  MeasurementSet ms_;
+  std::string const filter_;
+  std::shared_ptr<value_type> wrapper_;
 };
 //! Read measurement set into vis_params structure
 utilities::vis_params read_measurementset(std::string const &filename, const std::vector<t_int> & channels = std::vector<t_int>(), 
