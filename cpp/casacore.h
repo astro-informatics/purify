@@ -12,8 +12,8 @@
 #include <casacore/tables/Tables/ScalarColumn.h>
 #include <casacore/tables/Tables/Table.h>
 #include <sopt/utilities.h>
-#include "utilities.h"
 #include "types.h"
+#include "utilities.h"
 
 namespace purify {
 namespace casa {
@@ -59,6 +59,12 @@ public:
   }
   //! Clear memory
   void clear() { tables_ = std::make_shared<std::map<std::string, ::casacore::Table>>(); }
+
+  //! Data from a column
+  template <class T>
+  Matrix<T> column(std::string const &column, std::string const &filter = "") const {
+    return table_column<T>(this->table(), column, filter);
+  }
 
   //! Number of channels in the measurement set
   std::size_t size() const;
@@ -201,36 +207,31 @@ public:
   t_uint channel() const { return channel_; }
 #define PURIFY_MACRO(NAME, INDEX)                                                                  \
   /** Stokes component in meters **/                                                               \
-  Vector<t_real> raw_##NAME() const {                                                              \
-    return table_column<t_real>(ms_.table(), "UVW[" #INDEX "]", filter());                         \
-  }                                                                                                \
-  /** \brief U scaled to purify values of wavelengths **/                                                        \
-  Vector<t_real> lambda_##NAME() const {                                          \
-    return (raw_##NAME().array() * frequencies().array()).matrix() / constant::c;                   \
+  Vector<t_real> raw_##NAME() const { return ms_.column<t_real>("UVW[" #INDEX "]", filter()); }    \
+  /** \brief U scaled to purify values of wavelengths **/                                          \
+  Vector<t_real> lambda_##NAME() const {                                                           \
+    return (raw_##NAME().array() * frequencies().array()).matrix() / constant::c;                  \
   }
   PURIFY_MACRO(u, 0);
   PURIFY_MACRO(v, 1);
   PURIFY_MACRO(w, 2);
-# undef PURIFY_MACRO
+#undef PURIFY_MACRO
   //! Number of rows in a channel
   t_uint size() const;
 
   //! Frequencies for each DATA_DESC_ID
   Vector<t_real> raw_frequencies() const;
 
-  Vector<t_real> data_desc_id() const {
-    return table_column<t_real>(ms_.table(), "DATA_DESC_ID", filter());
-  }
+  Vector<t_int> data_desc_id() const { return ms_.column<t_int>("DATA_DESC_ID", filter()); }
 
 #define PURIFY_MACRO(NAME)                                                                         \
   /** Stokes component */                                                                          \
   Vector<t_complex> NAME(std::string const &col = "DATA") const {                                  \
-    return table_column<t_complex>(ms_.table(), stokes(#NAME, index(col)), filter());              \
+    return ms_.column<t_complex>(stokes(#NAME, index(col)), filter());                             \
   }                                                                                                \
   /** Standard deviation for the Stokes component */                                               \
   Vector<t_real> w##NAME(Sigma const &col = Sigma::OVERALL) const {                                \
-    return table_column<t_real>(                                                                   \
-        ms_.table(),                                                                               \
+    return ms_.column<t_real>(                                                                     \
         "1.0/" + stokes(#NAME, col == Sigma::OVERALL ? "SIGMA" : index("SIGMA_SPECTRUM")),         \
         filter());                                                                                 \
   }
@@ -305,8 +306,11 @@ protected:
   std::shared_ptr<value_type> wrapper_;
 };
 //! Read measurement set into vis_params structure
-utilities::vis_params read_measurementset(std::string const &filename, const std::vector<t_int> & channels = std::vector<t_int>(), 
-  const MeasurementSet::ChannelWrapper::Stokes stokes = MeasurementSet::ChannelWrapper::Stokes::I, std::string const &filter = "");
+utilities::vis_params read_measurementset(std::string const &filename,
+                                          const std::vector<t_int> &channels = std::vector<t_int>(),
+                                          const MeasurementSet::ChannelWrapper::Stokes stokes
+                                          = MeasurementSet::ChannelWrapper::Stokes::I,
+                                          std::string const &filter = "");
 
 inline MeasurementSet::const_iterator operator+(MeasurementSet::const_iterator::difference_type n,
                                                 MeasurementSet::const_iterator const &c) {
@@ -318,7 +322,8 @@ inline MeasurementSet::const_iterator operator-(MeasurementSet::const_iterator::
 }
 }
 //! Return average frequency over channels
-t_real average_frequency(const purify::casa::MeasurementSet & ms_file, std::string const &filter, const std::vector<t_int> & channels);
+t_real average_frequency(const purify::casa::MeasurementSet &ms_file, std::string const &filter,
+                         const std::vector<t_int> &channels);
 }
 
 #endif
