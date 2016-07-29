@@ -4,6 +4,11 @@ include(EnvironmentScript)
 include(PackageLookup)
 
 # Look for external software
+find_package(Threads)
+if(THREADS_FOUND)
+  set(CXX_FLAGS "-pthread")
+endif(THREADS_FOUND)
+
 if(openmp)
   find_package(OpenMP)
   find_package(FFTW3 REQUIRED DOUBLE COMPONENTS OPENMP)
@@ -60,12 +65,18 @@ lookup_package(CCFits REQUIRED)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${BLAS_LINKER_FLAGS}")
 
 if(openmp)
-  find_package(OpenMP)
   if(OPENMP_FOUND)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    list(APPEND CXX_FLAGS "${OpenMP_CXX_FLAGS}")
   else()
     message(STATUS "Could not find OpenMP. Compiling without.")
   endif()
+endif()
+
+if(CXX_FLAGS)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" "${CXX_FLAGS}")
+  # Changing the default list ";" separation so flags are not
+  # understood as different commands.
+  string(REPLACE ";" " " CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 endif()
 
 find_package(Doxygen)

@@ -1,7 +1,7 @@
 #ifndef PURIFY_LOGGING_H
 #define PURIFY_LOGGING_H
 
-#include "purify/config.h" // FIXME: file does not exit (neither in SOPT)
+#include "config.h"
 
 #ifdef PURIFY_DO_LOGGING
 #include "logging.enabled.h"
@@ -13,8 +13,7 @@
 //! \details Say "Residuals == "
 #define PURIFY_INFO(...) PURIFY_LOG_(, info, __VA_ARGS__)
 //! \macro Normal but signigicant condition
-//! TODO SOPT notice points to critical.
-#define PURIFY_NOTICE(...) PURIFY_LOG_(, notice, __VA_ARGS__)
+#define PURIFY_NOTICE(...) PURIFY_LOG_(, critical, __VA_ARGS__)
 //! \macro Something might be going wrong
 #define PURIFY_WARN(...) PURIFY_LOG_(, warn, __VA_ARGS__)
 //! \macro Something is definitely wrong, algorithm exits

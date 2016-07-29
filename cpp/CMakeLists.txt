@@ -9,12 +9,24 @@ else()
   set(PURIFY_TEST_LOG_LEVEL off)
 endif()
 
+set(version ${Purify_VERSION})
+string(REGEX REPLACE "\\." ";" version "${Purify_VERSION}")
+list(GET version 0 Purify_VERSION_MAJOR)
+list(GET version 1 Purify_VERSION_MINOR)
+list(GET version 2 Purify_VERSION_PATCH)
+
+configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
+
 set(SOURCES MeasurementOperator.cc FFTOperator.cc clean.cc utilities.cc pfitsio.cc
   kernels.cc RMOperator.cc PSFOperator.cc wprojection.cc)
 if(TARGET casacore::ms)
   list(APPEND SOURCES casacore.cc)
 endif()
 add_library(cppurify ${SOURCES})
+
+target_include_directories(cppurify PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include/purify>
+  $<INSTALL_INTERFACE:include/>)
 
 if(EIGEN3_INCLUDE_DIR)
   target_include_directories(cppurify SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})
@@ -29,7 +41,7 @@ if(CCFits_INCLUDE_DIR)
   target_include_directories(cppurify SYSTEM PUBLIC ${CCFits_INCLUDE_DIR}/.. ${CCFits_INCLUDE_DIR})
 endif()
 
-include_directories(SYSTEM ${FFTW3_INCLUDE_DIR} ${Sopt_INCLUDE_DIRS})
+target_include_directories(cppurify SYSTEM PURIFY ${FFTW3_INCLUDE_DIR} ${Sopt_INCLUDE_DIRS})
 
 target_link_libraries(cppurify ${FFTW3_DOUBLE_LIBRARY} ${CCFits_LIBRARY} ${CFitsIO_LIBRARY})
 if(TARGET casacore::ms)
