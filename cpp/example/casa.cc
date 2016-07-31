@@ -1,16 +1,27 @@
 #include "casacore.h"
 #include "directories.h"
 
+#define CHECK(CONDITION, ERROR)                                                                    \
+  if(not(CONDITION))                                                                               \
+    throw std::runtime_error(ERROR);
+#define CHECK_THROWS(STATEMENT, ERROR)                                                             \
+  {                                                                                                \
+    bool did_throw = false;                                                                        \
+    try {                                                                                          \
+      STATEMENT;                                                                                   \
+    } catch(...) {                                                                                 \
+      did_throw = true;                                                                            \
+    }                                                                                              \
+    if(not did_throw)                                                                              \
+      throw std::runtime_error(ERROR);                                                             \
+  }
+
 int main(int, char **) {
   // Loads a measurement set
   auto const ngc3256_filename = purify::notinstalled::ngc3256_ms();
   auto const ngc3256 = purify::casa::MeasurementSet(ngc3256_filename);
 
   try {
-#define CHECK(CONDITION, ERROR)                                                                    \
-  if(not(CONDITION))                                                                               \
-    throw std::runtime_error(ERROR);
-
     // Gets the number of channels
     CHECK(ngc3256.size() == 128, "Not the number of channels I expected");
     // some of these channels are invalid
@@ -26,11 +37,18 @@ int main(int, char **) {
     auto const channel17 = ngc3256[17];
     CHECK(channel17.is_valid(), "Channel should be valid");
     CHECK(channel17.frequencies().size() == 141059, "Incorrect channel size");
+    CHECK(channel17.width().size() == 141059, "Incorrect channel-width size");
     CHECK(channel17.raw_w().size() == 141059, "Incorrect channel size");
     CHECK(channel17.wQ().size() == 141059, "Incorrect channel size");
 
+    // valid channels have access to RA, DEC
+    CHECK(std::abs(channel17.right_ascension() - 2.7395560603928995) < 1e-8, "Right Ascension");
+    CHECK(std::abs(channel17.declination() + 0.76628680808811045) < 1e-8, "Declination");
+    // invalid channels do not
+    CHECK_THROWS(channel0.declination(), "Can't figure out direction of empty channel");
+
     // It is also possible to loop over channels
-    for(auto const &channel: ngc3256) {
+    for(auto const &channel : ngc3256) {
       if(not channel.is_valid())
         continue;
       // although we will stop at the first one
@@ -51,10 +69,11 @@ int main(int, char **) {
       CHECK(i_first->V().size() == 6300, "Incorrect size for the filtered V Stokes component");
       break;
     }
-#undef CHECK
   } catch(std::runtime_error const &e) {
     std::cerr << "Example did not run as expected:\n" << e.what() << "\n";
     return 1;
   }
   return 0;
 }
+#undef CHECK
+#undef CHECK_THROWS

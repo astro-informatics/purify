@@ -1,6 +1,7 @@
 #ifndef PURIFY_CASACORE_H
 #define PURIFY_CASACORE_H
 
+#include <exception>
 #include <map>
 #include <memory>
 #include <string>
@@ -11,8 +12,8 @@
 #include <casacore/tables/Tables/ScalarColumn.h>
 #include <casacore/tables/Tables/Table.h>
 #include <sopt/utilities.h>
-#include "utilities.h"
 #include "types.h"
+#include "utilities.h"
 
 namespace purify {
 namespace casa {
@@ -29,6 +30,8 @@ public:
   class ChannelWrapper;
   //! Default filter specifying which data to accept
   static std::string const default_filter;
+  //! Type for (RA, DEC) direction
+  typedef Eigen::Array<t_real, 2, 1> Direction;
 
   //! Constructs the interface around a given measurement set
   MeasurementSet(std::string const filename)
@@ -59,6 +62,12 @@ public:
   //! Clear memory
   void clear() { tables_ = std::make_shared<std::map<std::string, ::casacore::Table>>(); }
 
+  //! Data from a column
+  template <class T>
+  Matrix<T> column(std::string const &column, std::string const &filter = "") const {
+    return table_column<T>(this->table(), column, filter);
+  }
+
   //! Number of channels in the measurement set
   std::size_t size() const;
 
@@ -70,6 +79,14 @@ public:
   ChannelWrapper operator[](t_uint i) const;
   //! Returns wrapper over specific channel
   ChannelWrapper operator[](std::tuple<t_uint, std::string> const &i) const;
+  //! Direction (RA, DEC) in radian
+  Direction direction(t_real tolerance = 1e-8, std::string const &filter = "") const;
+  Direction::Scalar right_ascension(t_real tolerance = 1e-8, std::string const &filter = "") const {
+    return direction(tolerance, filter)(0);
+  }
+  Direction::Scalar declination(t_real tolerance = 1e-8, std::string const &filter = "") const {
+    return direction(tolerance, filter)(1);
+  }
 
 private:
   //! Gets stokes of given array/object
@@ -200,31 +217,39 @@ public:
   t_uint channel() const { return channel_; }
 #define PURIFY_MACRO(NAME, INDEX)                                                                  \
   /** Stokes component in meters **/                                                               \
-  Vector<t_real> raw_##NAME() const {                                                              \
-    return table_column<t_real>(ms_.table(), "UVW[" #INDEX "]", filter());                         \
-  }                                                                                                \
-  /** \brief U scaled to purify values of wavelengths **/                                                        \
-  Vector<t_real> lambda_##NAME() const {                                          \
-    return (raw_##NAME().array() * frequencies().array()).matrix() / constant::c;                   \
+  Vector<t_real> raw_##NAME() const { return ms_.column<t_real>("UVW[" #INDEX "]", filter()); }    \
+  /** \brief U scaled to purify values of wavelengths **/                                          \
+  Vector<t_real> lambda_##NAME() const {                                                           \
+    return (raw_##NAME().array() * frequencies().array()).matrix() / constant::c;                  \
   }
   PURIFY_MACRO(u, 0);
   PURIFY_MACRO(v, 1);
   PURIFY_MACRO(w, 2);
-# undef PURIFY_MACRO
+#undef PURIFY_MACRO
   //! Number of rows in a channel
   t_uint size() const;
 
-  //! Frequencies for each DATA_DESC_ID
-  Vector<t_real> raw_frequencies() const;
+  //! FIELD_ID from table MAIN
+  Vector<t_int> field_ids() const { return ms_.column<t_int>("FIELD_ID", filter()); }
+  //! DATA_DESC_ID from table MAIN
+  Vector<t_int> data_desc_id() const { return ms_.column<t_int>("DATA_DESC_ID", filter()); }
 
-  Vector<t_real> data_desc_id() const {
-    return table_column<t_real>(ms_.table(), "DATA_DESC_ID", filter());
+  //! Direction (RA, DEC) in radian
+  Direction direction(t_real tolerance = 1e-8) const { return ms_.direction(tolerance, filter()); }
+  Direction::Scalar right_ascension(t_real tolerance = 1e-8) const {
+    return ms_.right_ascension(tolerance, filter());
   }
+  Direction::Scalar declination(t_real tolerance = 1e-8) const {
+    return ms_.declination(tolerance, filter());
+  }
+
+  //! Frequencies from SPECTRAL_WINDOW for a this channel
+  Vector<t_real> raw_frequencies() const { return raw_spectral_window("CHAN_FREQ"); }
 
 #define PURIFY_MACRO(NAME)                                                                         \
   /** Stokes component */                                                                          \
   Vector<t_complex> NAME(std::string const &col = "DATA") const {                                  \
-    return table_column<t_complex>(ms_.table(), stokes(#NAME, index(col)), filter());              \
+    return ms_.column<t_complex>(stokes(#NAME, index(col)), filter());                             \
   }                                                                                                \
   /** Standard deviation for the Stokes component */                                               \
   Vector<t_real> w##NAME(Sigma const &col = Sigma::OVERALL) const {                                \
@@ -252,7 +277,15 @@ public:
 #undef PURIFY_MACRO
 
   //! Frequencies for each valid measurement
-  Vector<t_real> frequencies() const;
+  Vector<t_real> frequencies() const { return joined_spectral_window("CHAN_FREQ"); }
+  //! Channel width for each valid measurement
+  Vector<t_real> width() const { return joined_spectral_window("CHAN_WIDTH"); }
+  //! Effective noise band-width width for each valid measurement
+  Vector<t_real> effective_noise_bandwidth() const {
+    return joined_spectral_window("EFFECTIVE_BW");
+  }
+  //! Effective spectral resolution for each valid measurement
+  Vector<t_real> resolution() const { return joined_spectral_window("RESOLUTION"); }
 
   //! Check if channel has any data
   bool is_valid() const;
@@ -264,6 +297,11 @@ protected:
   std::string index(std::string const &variable = "") const;
   //! Computes given stokes polarization
   std::string stokes(std::string const &pol, std::string const &column = "DATA") const;
+
+  //! column[<channel>] from SPECTRAL_WINDOW
+  Vector<t_real> raw_spectral_window(std::string const &column) const;
+  //! column[<channel>] from SPECTRAL_WINDOW joined to each measurement
+  Vector<t_real> joined_spectral_window(std::string const &column) const;
 
   //! Table over which to operate
   MeasurementSet ms_;
@@ -282,19 +320,20 @@ public:
   typedef t_int difference_type;
 
   const_iterator(t_int channel, MeasurementSet const &ms, std::string const &filter = "")
-      : channel(channel), ms(ms), filter(filter), wrapper(new value_type(channel, ms, filter)){};
+      : channel_(channel), ms_(ms), filter_(filter),
+        wrapper_(new value_type(channel_, ms_, filter_)){};
 
-  pointer operator->() const { return wrapper; }
-  reference operator*() const { return *wrapper; }
+  pointer operator->() const { return wrapper_; }
+  reference operator*() const { return *wrapper_; }
   const_iterator &operator++();
   const_iterator operator++(int);
   const_iterator &operator+=(difference_type n);
   const_iterator &operator-=(difference_type n) { return operator+=(-n); }
   const_iterator operator+(difference_type n) const {
-    return const_iterator(channel + n, ms, filter);
+    return const_iterator(channel_ + n, ms_, filter_);
   }
   const_iterator operator-(difference_type n) const {
-    return const_iterator(channel - n, ms, filter);
+    return const_iterator(channel_ - n, ms_, filter_);
   }
   bool operator>(const_iterator const &c) const;
   bool operator>=(const_iterator const &c) const;
@@ -304,13 +343,15 @@ public:
   bool operator!=(const_iterator const &c) const { return not operator==(c); }
 
   //! True if iterating over the same measurement set
-  bool same_measurement_set(const_iterator const &c) const { return &ms.table() == &c.ms.table(); }
+  bool same_measurement_set(const_iterator const &c) const {
+    return &ms_.table() == &c.ms_.table();
+  }
 
 protected:
-  difference_type channel;
-  MeasurementSet ms;
-  std::string const filter;
-  std::shared_ptr<value_type> wrapper;
+  difference_type channel_;
+  MeasurementSet ms_;
+  std::string const filter_;
+  std::shared_ptr<value_type> wrapper_;
 };
 //! Read measurement set into vis_params structure
 utilities::vis_params read_measurementset(std::string const &filename, 
@@ -328,7 +369,8 @@ inline MeasurementSet::const_iterator operator-(MeasurementSet::const_iterator::
 }
 }
 //! Return average frequency over channels
-t_real average_frequency(const purify::casa::MeasurementSet & ms_file, std::string const &filter, const std::vector<t_int> & channels);
+t_real average_frequency(const purify::casa::MeasurementSet &ms_file, std::string const &filter,
+                         const std::vector<t_int> &channels);
 }
 
 #endif

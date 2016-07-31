@@ -87,8 +87,8 @@ TEST_CASE("Compare SDMMS", "") {
         / std::sqrt(static_cast<t_real>(y0.size()) / static_cast<t_real>(M31.size()));
 
   // Create SARA operators
-  std::array<sopt_wavelet_type, 3> wavelet_types{SOPT_WAVELET_DB1, SOPT_WAVELET_DB2,
-                                                 SOPT_WAVELET_DB3};
+  std::array<sopt_wavelet_type, 3> wavelet_types{
+      {SOPT_WAVELET_DB1, SOPT_WAVELET_DB2, SOPT_WAVELET_DB3}};
   sopt_sara_param sara_params{wavelet_types.size(), std::is_same<Scalar, Real>::value ? 1 : 0,
                               nullptr};
   sopt_sara_initop(&sara_params, M31.rows(), M31.cols(), 4, wavelet_types.data());

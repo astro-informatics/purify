@@ -63,16 +63,17 @@ std::string MeasurementSet::ChannelWrapper::index(std::string const &variable) c
   return sstr.str();
 }
 
-Vector<t_real> MeasurementSet::ChannelWrapper::frequencies() const {
-  auto const frequencies = raw_frequencies();
-  auto const ids = table_column<::casacore::Int>(ms_.table(), "DATA_DESC_ID", filter());
+Vector<t_real>
+MeasurementSet::ChannelWrapper::joined_spectral_window(std::string const &column) const {
+  auto const raw = raw_spectral_window(column);
+  auto const ids = ms_.column<::casacore::Int>("DATA_DESC_ID", filter());
   auto const spids
       = table_column<::casacore::Int>(ms_.table("DATA_DESCRIPTION"), "SPECTRAL_WINDOW_ID");
   Vector<t_real> result(ids.size());
   for(Eigen::DenseIndex i(0); i < ids.size(); ++i) {
-    assert(ids(i) < spids.size());
-    assert(spids(ids(i)) < frequencies.size());
-    result(i) = frequencies(spids(ids(i)));
+    assert(ids(i) < spds.size());
+    assert(spids(ids(i)) < raw.size());
+    result(i) = raw(spids(ids(i)));
   }
   return result;
 }
@@ -94,27 +95,47 @@ MeasurementSet::ChannelWrapper::stokes(std::string const &pol, std::string const
   return sstr.str();
 }
 
-Vector<t_real> MeasurementSet::ChannelWrapper::raw_frequencies() const {
+Vector<t_real> MeasurementSet::ChannelWrapper::raw_spectral_window(std::string const &stuff) const {
   std::ostringstream sstr;
-  sstr << "CHAN_FREQ[" << channel_ << "]";
+  sstr << stuff << "[" << channel_ << "]";
   return table_column<t_real>(ms_.table("SPECTRAL_WINDOW"), sstr.str());
 }
 
+MeasurementSet::Direction
+MeasurementSet::direction(t_real tolerance, std::string const &filter) const {
+  auto const field_ids_raw = column<::casacore::Int>("FIELD_ID", filter);
+  auto const source_ids_raw = table_column<::casacore::Int>(table("FIELD"), "SOURCE_ID");
+  std::set<::casacore::Int> source_ids;
+  for(Eigen::DenseIndex i(0); i < field_ids_raw.size(); ++i) {
+    assert(field_ids_raw(i) < source_ids_raw.size());
+    source_ids.insert(source_ids_raw(field_ids_raw(i)));
+  }
+  if(source_ids.size() == 0)
+    throw std::runtime_error("Could not find sources. Cannot determine direction");
+  auto const directions = table_column<::casacore::Double>(table("SOURCE"), "DIRECTION");
+  auto const original = directions.row(*source_ids.begin());
+  for(auto const other : source_ids)
+    if(not directions.row(other).isApprox(original, tolerance))
+      throw std::runtime_error("Found more than one direction");
+
+  return original;
+}
+
 MeasurementSet::const_iterator &MeasurementSet::const_iterator::operator++() {
-  ++channel;
-  wrapper = std::make_shared<value_type>(channel, ms, filter);
+  ++channel_;
+  wrapper_ = std::make_shared<value_type>(channel_, ms_, filter_);
   return *this;
 }
 
 MeasurementSet::const_iterator MeasurementSet::const_iterator::operator++(int) {
   operator++();
-  return const_iterator(channel - 1, ms, filter);
+  return const_iterator(channel_ - 1, ms_, filter_);
 }
 
 bool MeasurementSet::const_iterator::operator==(const_iterator const &c) const {
   if(not same_measurement_set(c))
     throw std::runtime_error("Iterators are not over the same measurement set");
-  return channel == c.channel;
+  return channel_ == c.channel_;
 }
 
 
@@ -237,20 +258,20 @@ t_uint MeasurementSet::ChannelWrapper::size() const{
 
 
 MeasurementSet::const_iterator &MeasurementSet::const_iterator::operator+=(t_int n) {
-  channel += n;
+  channel_ += n;
   return *this;
 }
 
 bool MeasurementSet::const_iterator::operator>(const_iterator const &c) const {
   if(not same_measurement_set(c))
     throw std::runtime_error("Iterators are not over the same measurement set");
-  return channel > c.channel;
+  return channel_ > c.channel_;
 }
 
 bool MeasurementSet::const_iterator::operator>=(const_iterator const &c) const {
   if(not same_measurement_set(c))
     throw std::runtime_error("Iterators are not over the same measurement set");
-  return channel >= c.channel;
+  return channel_ >= c.channel_;
 }
 }
 }
