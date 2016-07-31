@@ -193,6 +193,7 @@ TEST_CASE("Read Measurement") {
   purify::utilities::vis_params const ms_fileRR = purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"), purify::casa::MeasurementSet::ChannelWrapper::polarization::RR);
   purify::Vector<purify::t_complex> const weights = (1./(1./ms_fileLL.weights.array() + 1./ms_fileRR.weights.array())).matrix();
   CHECK(vis_file.weights.real().isApprox(weights.real(), 1e-6));
+}
 
 TEST_CASE("Direction") {
   auto const ms = purify::casa::MeasurementSet(purify::notinstalled::ngc3256_ms());

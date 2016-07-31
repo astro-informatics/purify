@@ -71,7 +71,7 @@ MeasurementSet::ChannelWrapper::joined_spectral_window(std::string const &column
       = table_column<::casacore::Int>(ms_.table("DATA_DESCRIPTION"), "SPECTRAL_WINDOW_ID");
   Vector<t_real> result(ids.size());
   for(Eigen::DenseIndex i(0); i < ids.size(); ++i) {
-    assert(ids(i) < spds.size());
+    assert(ids(i) < spids.size());
     assert(spids(ids(i)) < raw.size());
     result(i) = raw(spids(ids(i)));
   }
