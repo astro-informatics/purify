@@ -192,7 +192,7 @@ class MeasurementSet::ChannelWrapper {
 public:
   //! Possible locations for SIGMA
   enum class Sigma { OVERALL, SPECTRUM };
-  enum class Stokes { I, Q, U, V };
+  enum class polarization { I, Q, U, V, LL, RR, RL, LR, XX, YY, XY, YX };
   ChannelWrapper(t_uint channel, MeasurementSet const &ms, std::string const &filter = "")
       : ms_(ms), filter_(filter), channel_(channel) {}
 
@@ -230,13 +230,25 @@ public:
   Vector<t_real> w##NAME(Sigma const &col = Sigma::OVERALL) const {                                \
     return table_column<t_real>(                                                                   \
         ms_.table(),                                                                               \
-        "1.0/" + stokes(#NAME, col == Sigma::OVERALL ? "SIGMA" : index("SIGMA_SPECTRUM")),         \
+        "1.0/SQUARE(" + stokes(#NAME, col == Sigma::OVERALL ? "SIGMA" : index("SIGMA_SPECTRUM")) + ")",         \
         filter());                                                                                 \
   }
+  //Stokes parameters
   PURIFY_MACRO(I);
   PURIFY_MACRO(Q);
   PURIFY_MACRO(U);
   PURIFY_MACRO(V);
+  //Circular correlations
+  PURIFY_MACRO(LL);
+  PURIFY_MACRO(RR);
+  PURIFY_MACRO(LR);
+  PURIFY_MACRO(RL);
+  //Linear correlations
+  PURIFY_MACRO(XX);
+  PURIFY_MACRO(YY);
+  PURIFY_MACRO(XY);
+  PURIFY_MACRO(YX);
+
 #undef PURIFY_MACRO
 
   //! Frequencies for each valid measurement
@@ -301,8 +313,10 @@ protected:
   std::shared_ptr<value_type> wrapper;
 };
 //! Read measurement set into vis_params structure
-utilities::vis_params read_measurementset(std::string const &filename, const std::vector<t_int> & channels = std::vector<t_int>(), 
-  const MeasurementSet::ChannelWrapper::Stokes stokes = MeasurementSet::ChannelWrapper::Stokes::I, std::string const &filter = "");
+utilities::vis_params read_measurementset(std::string const &filename, 
+  const MeasurementSet::ChannelWrapper::polarization pol = MeasurementSet::ChannelWrapper::polarization::I, 
+  const std::vector<t_int> & channels = std::vector<t_int>(),
+   std::string const &filter = "");
 
 inline MeasurementSet::const_iterator operator+(MeasurementSet::const_iterator::difference_type n,
                                                 MeasurementSet::const_iterator const &c) {

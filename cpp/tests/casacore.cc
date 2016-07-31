@@ -16,6 +16,7 @@
 
 #include "catch.hpp"
 using namespace ::casacore;
+
 using namespace purify::notinstalled;
 TEST_CASE("Casacore") {
   // create the table descriptor
@@ -135,7 +136,7 @@ TEST_CASE("Single channel") {
     using namespace purify;
     auto const wI = pc::MeasurementSet::const_iterator::value_type(17, ms).wI();
     REQUIRE(wI.size() == 141059);
-    CHECK(wI.isApprox(2.0 * purify::Vector<t_real>::Ones(wI.size())));
+    CHECK(wI.isApprox(4.0 * purify::Vector<t_real>::Ones(wI.size())));
   }
 
   SECTION("frequencies") {
@@ -179,14 +180,18 @@ TEST_CASE("Channel iteration") {
 }
 
 TEST_CASE("Read Measurement") {
-  purify::utilities::vis_params const vis_file = purify::utilities::read_visibility(vla_filename("at166B.3C129.c0.vis"));
-  purify::utilities::vis_params const ms_file = purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"));
+  purify::utilities::vis_params const vis_file = purify::utilities::read_visibility(vla_filename("at166B.3C129.c0I.vis"));
+  purify::utilities::vis_params const ms_file = purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"), purify::casa::MeasurementSet::ChannelWrapper::polarization::I);
 
   REQUIRE(vis_file.u.size() == ms_file.u.size());
-  CHECK(vis_file.u.isApprox(ms_file.u, 1e-12));
-  CHECK(vis_file.v.isApprox(ms_file.v, 1e-12));
-  CHECK(vis_file.vis.isApprox(ms_file.vis, 1e-12));
-  CHECK(vis_file.weights.isApprox(ms_file.weights, 1e-12));
+
+  CHECK(vis_file.u.isApprox(ms_file.u, 1e-6));
+  CHECK(vis_file.v.isApprox(-ms_file.v, 1e-6));
+  CHECK(vis_file.vis.isApprox(ms_file.vis, 1e-6));
+  purify::utilities::vis_params const ms_fileLL = purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"), purify::casa::MeasurementSet::ChannelWrapper::polarization::LL);
+  purify::utilities::vis_params const ms_fileRR = purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"), purify::casa::MeasurementSet::ChannelWrapper::polarization::RR);
+  purify::Vector<purify::t_complex> const weights = (1./(1./ms_fileLL.weights.array() + 1./ms_fileRR.weights.array())).matrix();
+  CHECK(vis_file.weights.real().isApprox(weights.real(), 1e-6));
 
 
 }

@@ -12,6 +12,7 @@
 #include "pfitsio.h"
 #include "types.h"
 #include "MeasurementOperator.h"
+#include "casacore.h"
 #include <getopt.h>
 #include <ctime>
 //#include "clara.h"
