@@ -25,6 +25,7 @@ int main(int argc, char **argv) {
   std::string name = "";
   std::string weighting = "whiten";
   std::string stokes = "I";
+  auto stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::I;
 
   std::string visfile = "";
   std::string noisefile = "";
@@ -40,8 +41,6 @@ int main(int argc, char **argv) {
   t_int height = 512;
   t_real cellsizex = 0;
   t_real cellsizey = 0;
-  t_real ra = 0;
-  t_real dec = 0;
   t_real n_mu = 1.2;
   t_int iter = 0;
   t_real upsample_ratio = 3./2.;
@@ -70,7 +69,7 @@ int main(int argc, char **argv) {
           /* These options don’t set a flag.
              We distinguish them by their indices. */
           {"help", no_argument, 0, 'z'},
-          {"vis",     required_argument,       0, 'a'},
+          {"measurement_set",     required_argument,       0, 'a'},
           {"noise",  required_argument,       0, 'b'},
           {"name",  required_argument, 0, 'c'},
           {"niters",  required_argument, 0, 'd'},
@@ -85,13 +84,11 @@ int main(int argc, char **argv) {
           {"energy_fraction", required_argument, 0, 'm'},
           {"primary_beam", required_argument, 0, 'n'},
           {"fft_grid_correction", no_argument, 0, 'o'},
-          {"ra", required_argument, 0, 'p'},
-          {"dec", required_argument, 0, 'q'},
-          {"width", required_argument, 0, 'r'},
-          {"height", required_argument, 0, 's'},
-          {"kernel", required_argument, 0, 't'},
-          {"kernel_support", required_argument, 0, 'u'},
-          {"logging_level", required_argument, 0, 'v'},
+          {"width", required_argument, 0, 'p'},
+          {"height", required_argument, 0, 'q'},
+          {"kernel", required_argument, 0, 'r'},
+          {"kernel_support", required_argument, 0, 's'},
+          {"logging_level", required_argument, 0, 't'},
           {0, 0, 0, 0}
         };
       /* getopt_long stores the option index here. */
@@ -116,10 +113,10 @@ int main(int argc, char **argv) {
           printf ("\n");
           break;
         case 'z':
-          printf("Purify: A program will reconstruct images from radio interferometers using PADMM. \n\n");
+          printf("Purify: A program that will reconstruct images from radio interferometers using PADMM. \n\n");
           printf("--help: Print this information. \n\n");
-          printf("--vis: path of file with visibilities. (required) \n\n");
-          printf("--noise: path of file with visibilities noise estimate (Stokes V). \n\n");
+          printf("--measurement_set: path of measurement set. (required) \n\n");
+          printf("--noise: path of measurement_set with Stokes V noise estimate. (Assumes Stokes V of measurement set). \n\n");
           printf("--name: path of file output. (required) \n\n");
           printf("--niters: number of iterations. \n\n");
           printf("--size: image size in pixels. \n\n");
@@ -133,8 +130,6 @@ int main(int argc, char **argv) {
           printf("--energy_fraction: How sparse the chirp matrix (w-projection) should be.\n\n");
           printf("--primary_beam: Choice of primary beam model. (none is the only option).\n\n");
           printf("--fft_grid_correction: Choose calculate the gridding correction using an FFT rather than analytic formula. \n\n");
-          printf("--ra: Centre of pointing in decimal degrees (Equatorial coordinates). \n\n");
-          printf("--dec: Centre of pointing in decimal degrees (Equatorial coordinates). \n\n");
           printf("--kernel: Type of gridding kernel to use, kb, gauss, pswf, box. (kb is default)\n");
           printf("--kernel_support: Support of kernel in grid cells. (4 is the default)\n");
           printf("--logging_level: Determines the output logging level for sopt and purify. (\"debug\" is the default)\n");
@@ -209,28 +204,21 @@ int main(int argc, char **argv) {
           break;
 
         case 'p':
-          ra = std::stod(optarg);
-          break;
-
-        case 'q':
-          dec = std::stod(optarg);
-          break;
-        case 'r':
           width = std::stoi(optarg);
           break;
 
-        case 's':
+        case 'q':
           height = std::stoi(optarg);
           break;
 
-        case 't':
+        case 'r':
           kernel = optarg;
           break;
 
-        case 'u':
+        case 's':
           J = std::stoi(optarg);
           break;
-        case 'v':
+        case 't':
           sopt_logging_level = optarg;
           break;
         case '?':
@@ -246,9 +234,10 @@ int main(int argc, char **argv) {
 
   sopt::logging::set_level(sopt_logging_level);
 
-  auto uv_data = utilities::read_visibility(visfile);
+  auto uv_data = purify::casa::read_measurementset(visfile, stokes_val);
   t_real const max_u = std::sqrt((uv_data.u.array() * uv_data.u.array()).maxCoeff());
   t_real const max_v = std::sqrt((uv_data.v.array() * uv_data.v.array()).maxCoeff());
+
   uv_data.units = "lambda";
   if (cellsizex == 0 and cellsizey == 0)
   {
@@ -263,9 +252,9 @@ int main(int argc, char **argv) {
 
   //header information
   pfitsio::header_params header;
-  header.mean_frequency = 1381.67703151703;
-  header.ra = ra;
-  header.dec = dec;
+  header.mean_frequency = uv_data.average_frequency;
+  header.ra = uv_data.ra;
+  header.dec = uv_data.dec;
   header.cell_x = cellsizex;
   header.cell_y = cellsizey;
 
@@ -303,8 +292,8 @@ int main(int argc, char **argv) {
 
   if (noisefile != "")
     {  
-      auto const noise_uv_data = utilities::read_visibility(noisefile);
-      Vector<t_complex> const noise_vis = uv_data.weights.array() * noise_uv_data.vis.array();
+      auto const noise_uv_data = purify::casa::read_measurementset(noisefile, purify::casa::MeasurementSet::ChannelWrapper::polarization::V);
+      Vector<t_complex> const noise_vis = noise_uv_data.weights.array() * noise_uv_data.vis.array();
 
       sigma_real = utilities::median(noise_vis.real().cwiseAbs())/0.6745;
       sigma_imag = utilities::median(noise_vis.imag().cwiseAbs())/0.6745;
@@ -362,7 +351,7 @@ int main(int argc, char **argv) {
       
       if (height != image.rows() or width != image.cols())
       {
-        std::runtime_error("initial Estimate is the wrong size.");
+        std::runtime_error("Initial model estimate is the wrong size.");
       }
       initial_estimate = Matrix<t_complex>::Map(image.data(), image.size(), 1);
       initial_residuals = ((uv_data.vis - measurements.degrid(image)).array() * uv_data.weights.array().real());     
@@ -438,14 +427,14 @@ int main(int argc, char **argv) {
       pfitsio::write2d_header(image.real(), header);
       header.fits_name = outfile_upsample_fits;
       std::printf("Saving %s \n", header.fits_name.c_str());
-      header.cell_x *= upsample_ratio;
-      header.cell_y *= upsample_ratio;
+      header.cell_x /= upsample_ratio;
+      header.cell_y /= upsample_ratio;
       pfitsio::write2d_header(utilities::re_sample_image(image, upsample_ratio).real(), header);
       Image<t_complex> residual = measurements.grid(y_residual).array();
       header.pix_units = "JY/BEAM";
       header.fits_name = residual_fits;
-      header.cell_x /= upsample_ratio;
-      header.cell_y /= upsample_ratio;
+      header.cell_x *= upsample_ratio;
+      header.cell_y *= upsample_ratio;
       std::printf("Saving %s \n", header.fits_name.c_str());
       pfitsio::write2d_header(residual.real(), header);
       
