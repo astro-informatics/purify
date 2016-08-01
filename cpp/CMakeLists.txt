@@ -41,7 +41,7 @@ if(CCFits_INCLUDE_DIR)
   target_include_directories(cppurify SYSTEM PUBLIC ${CCFits_INCLUDE_DIR}/.. ${CCFits_INCLUDE_DIR})
 endif()
 
-target_include_directories(cppurify SYSTEM PURIFY ${FFTW3_INCLUDE_DIR} ${Sopt_INCLUDE_DIRS})
+target_include_directories(cppurify SYSTEM PUBLIC ${FFTW3_INCLUDE_DIR} ${Sopt_INCLUDE_DIRS})
 
 target_link_libraries(cppurify ${FFTW3_DOUBLE_LIBRARY} ${CCFits_LIBRARY} ${CFitsIO_LIBRARY})
 if(TARGET casacore::ms)
