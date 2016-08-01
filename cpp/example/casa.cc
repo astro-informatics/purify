@@ -42,8 +42,8 @@ int main(int, char **) {
     CHECK(channel17.wQ().size() == 141059, "Incorrect channel size");
 
     // valid channels have access to RA, DEC
-    CHECK(std::abs(channel17.right_ascension() - 2.7395560603928995) < 1e-8, "Right Ascension");
-    CHECK(std::abs(channel17.declination() + 0.76628680808811045) < 1e-8, "Declination");
+    CHECK(std::abs(channel17.right_ascension() - 2.7395560603928995 / 180. * purify::constant::pi) < 1e-8, "Right Ascension");
+    CHECK(std::abs(channel17.declination() + 0.76628680808811045 / 180. * purify::constant::pi) < 1e-8, "Declination");
     // invalid channels do not
     CHECK_THROWS(channel0.declination(), "Can't figure out direction of empty channel");
 
