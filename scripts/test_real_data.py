@@ -39,7 +39,8 @@ def run_test((name, inpath, size, epsilon_factor)):
 	proc = subprocess.Popen(["nice -" + str(nice_value) + " screen -S "+ name.split("/")[-1] + "_" + str(epsilon_factor) + 
 		" -d -m ~/dev/purify/build/cpp/example/purify_main" +
 		" --name " + path + name.split("/")[-1] +
-		" --vis " + inpath + "I.vis --n_mean " + str(epsilon_factor) + 
+		" --measurement_set " + inpath + ".ms --n_mean " + str(epsilon_factor) + 
+		" --noise " + inpath + ".ms "+
 		" --size " + str(size) +
 		" --update --diagnostic power_iterations 200"], shell=True)
 	print "Waiting for " + path
@@ -50,7 +51,7 @@ def run_test((name, inpath, size, epsilon_factor)):
 params = []
 for n in names:
 	print "Looking for " + data + n
-	if os.path.exists(data + n + "I.vis"):
+	if os.path.exists(data + n + ".ms"):
 		print n + " found!"
 		image_size = 512
 		if n == atca + "0114-476":
