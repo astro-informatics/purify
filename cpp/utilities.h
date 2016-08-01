@@ -22,9 +22,14 @@ namespace purify {
         Vector<t_real> v; // v coordinates
         Vector<t_real> w;
         Vector<t_complex> vis; // complex visiblities
+        Vector<t_complex> vis1;
+        Vector<t_complex> vis2;
+        Vector<t_complex> vis3;
         Vector<t_complex> weights; // weights for visibilities
         std::string units = "lambda";
-        t_real phase_centre = 0.;
+        t_real ra = 0.; //decimal degrees
+        t_real dec = 0.; //decimal degrees
+        t_real average_frequency = 0.;
       };
       struct rm_params {
         Vector<t_real> frequency; // u coordinates
@@ -41,8 +46,6 @@ namespace purify {
       void write_visibility(const utilities::vis_params& uv_vis, const std::string & file_name, const bool w_term = false);
       //! Scales visibilities to a given pixel size in arcseconds
       utilities::vis_params set_cell_size(const utilities::vis_params& uv_vis, t_real cell_size_u = 0, t_real cell_size_v = 0);
-      //! Apply weights to visiblities
-      Vector<t_complex> apply_weights(const Vector<t_complex> visiblities, const Vector<t_complex> weights);
       //! scales the visibilities to units of pixels
       utilities::vis_params uv_scale(const utilities::vis_params& uv_vis, const t_int& ftsizeu, const t_int& ftsizev);
       //! Puts in conjugate visibilities

@@ -28,7 +28,9 @@ namespace purify {
 			uv_vis.w = Vector<t_real>::Zero(vis_num).unaryExpr(sample);
 			uv_vis.weights = Vector<t_complex>::Constant(vis_num, 1);
 			uv_vis.vis = Vector<t_complex>::Constant(vis_num, 1);
-			uv_vis.phase_centre = 0;
+			uv_vis.ra = 0;
+			uv_vis.dec = 0;
+			uv_vis.average_frequency = 0;
 			return uv_vis;
 	}
 	utilities::vis_params read_visibility(const std::string& vis_name, const bool w_term)
@@ -87,7 +89,9 @@ namespace purify {
 	    uv_vis.w = wtemp;
 	    uv_vis.vis = vistemp;
 	    uv_vis.weights = weightstemp;
-		
+		uv_vis.ra = 0;
+		uv_vis.dec = 0;
+		uv_vis.average_frequency = 0;
 	    
 	    return uv_vis;
 	  }
@@ -160,18 +164,10 @@ namespace purify {
 	      scaled_vis.vis = uv_vis.vis;
 	      scaled_vis.weights = uv_vis.weights;
 	      scaled_vis.units = "radians";
-	      scaled_vis.phase_centre = uv_vis.phase_centre;
+	      scaled_vis.ra = uv_vis.ra;
+		  scaled_vis.dec = uv_vis.dec;
+		  scaled_vis.average_frequency = uv_vis.average_frequency;
 	      return scaled_vis;
-	  }
-
-	  Vector<t_complex> apply_weights(const Vector<t_complex> visiblities, const Vector<t_complex> weights)
-	  {
-	    /*
-	      Applies weights to visiblities, assuming they are 1/sigma^2.
-	    */
-	    Vector<t_complex> weighted_vis;
-	    weighted_vis = (visiblities.array() * weights.array()).matrix();
-	    return weighted_vis;
 	  }
 
 	  utilities::vis_params uv_scale(const utilities::vis_params& uv_vis, const t_int& sizex, const t_int& sizey)
@@ -191,7 +187,9 @@ namespace purify {
 	      }
 	      scaled_vis.w = uv_vis.w;
 	      scaled_vis.units = "pixels";
-	      scaled_vis.phase_centre = uv_vis.phase_centre;
+	      scaled_vis.ra = uv_vis.ra;
+	      scaled_vis.dec = uv_vis.dec;
+	      scaled_vis.average_frequency = uv_vis.average_frequency;
 	      return scaled_vis;
 	  }
 
@@ -232,7 +230,9 @@ namespace purify {
 	    conj_vis.vis = vistemp;
 	    conj_vis.weights = weightstemp;
 	    conj_vis.units = uv_vis.units;
-	    conj_vis.phase_centre = uv_vis.phase_centre;
+	    conj_vis.ra = uv_vis.ra;
+	    conj_vis.dec = uv_vis.dec;
+	    conj_vis.average_frequency = uv_vis.average_frequency;
 
 	    return conj_vis;
 	  }
