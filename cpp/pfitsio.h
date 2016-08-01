@@ -20,7 +20,7 @@ namespace purify {
       	t_real dec = 0;// in decimal degrees
       	t_int pix_ref_x = 0;
       	t_int pix_ref_y = 0;
-      	std::string pix_units = "Jy/Beam";
+      	std::string pix_units = "Jy/BEAM";
       	t_real channels_total = 1;
       	t_real channel_width = 8; // in MHz
       	t_real polarsiation = 1;

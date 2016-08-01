@@ -358,6 +358,9 @@ utilities::vis_params read_measurementset(std::string const &filename,
   const MeasurementSet::ChannelWrapper::polarization pol = MeasurementSet::ChannelWrapper::polarization::I, 
   const std::vector<t_int> & channels = std::vector<t_int>(),
    std::string const &filter = "");
+//! Return average frequency over channels
+t_real average_frequency(const purify::casa::MeasurementSet &ms_file, std::string const &filter,
+                         const std::vector<t_int> &channels);
 
 inline MeasurementSet::const_iterator operator+(MeasurementSet::const_iterator::difference_type n,
                                                 MeasurementSet::const_iterator const &c) {
@@ -368,9 +371,6 @@ inline MeasurementSet::const_iterator operator-(MeasurementSet::const_iterator::
   return c.operator-(n);
 }
 }
-//! Return average frequency over channels
-t_real average_frequency(const purify::casa::MeasurementSet &ms_file, std::string const &filter,
-                         const std::vector<t_int> &channels);
 }
 
 #endif

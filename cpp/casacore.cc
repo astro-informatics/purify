@@ -143,6 +143,7 @@ bool MeasurementSet::const_iterator::operator==(const_iterator const &c) const {
 utilities::vis_params read_measurementset(std::string const &filename, 
   const MeasurementSet::ChannelWrapper::polarization polarization, 
   const std::vector<t_int> & channels_input, std::string const &filter){
+
   auto const ms_file = purify::casa::MeasurementSet(filename);
   utilities::vis_params uv_data;
   t_uint rows = 0;
@@ -164,12 +165,21 @@ utilities::vis_params read_measurementset(std::string const &filename,
   uv_data.w = Vector<t_real>::Zero(rows);
   uv_data.vis = Vector<t_complex>::Zero(rows);
   uv_data.weights = Vector<t_complex>::Zero(rows);
+  uv_data.ra = ms_file[channels[0]].right_ascension(); // convert directions from radians to degrees
+  uv_data.dec = ms_file[channels[0]].declination();
+  //calculate average frequency
+  uv_data.average_frequency = average_frequency(ms_file, filter, channels);
 
   //add data to channel
   t_uint row = 0;
+
   for (auto channel_number: channels)
   {
+    
     auto const channel = ms_file[channel_number];
+    if (uv_data.ra != channel.right_ascension() or uv_data.dec != channel.declination())
+      throw std::runtime_error("Channels contain multiple pointings.");
+
     uv_data.u.segment(row, channel.size()) = channel.lambda_u();
     uv_data.v.segment(row, channel.size()) = -channel.lambda_v();
     uv_data.w.segment(row, channel.size()) = channel.lambda_w();
@@ -230,16 +240,19 @@ utilities::vis_params read_measurementset(std::string const &filename,
 
 t_real average_frequency(const purify::casa::MeasurementSet & ms_file, std::string const &filter, const std::vector<t_int> & channels){
 
+ //calculate average frequency
   t_real frequency_sum = 0;
-  t_real rows = 0;
+  t_real width_sum = 0.;
   for (auto channel_number: channels)
   {
     auto const channel = ms_file[channel_number];
     auto const frequencies = channel.frequencies();
-    frequency_sum += frequencies.sum();
-    rows += channel.size();
+    auto const width = channel.width();
+    frequency_sum += (frequencies.array() * width.array()).sum();
+    width_sum += width.sum();
   }
-  return frequency_sum / rows;
+  return frequency_sum / width_sum / 1e6;
+
 }
 
 
