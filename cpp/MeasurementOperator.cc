@@ -319,9 +319,8 @@ namespace purify {
     }
 
     if ((kernel_name_ == "pswf") and (Ju_ != 6 or Jv_ != 6))
-    {
-      std::cout << "Error: Only a support of 6 is implemented for PSWFs.";
-    }
+      throw std::runtime_error("PSWF calculation only implemented for a support of 6 x 6 pixels.");
+    
     if (kernel_name_ == "kb")
     {
       auto kbu = [&] (t_real x) { return kernels::kaiser_bessel(x, Ju_); };
