@@ -4,10 +4,12 @@ include(EnvironmentScript)
 include(PackageLookup)
 
 # Look for external software
-find_package(Threads)
-if(THREADS_FOUND)
-  set(CXX_FLAGS "-pthread")
-endif(THREADS_FOUND)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  find_package(Threads)
+  if(THREADS_FOUND)
+    add_compile_options(-pthread)
+  endif(THREADS_FOUND)
+endif()
 
 if(openmp)
   find_package(OpenMP)
@@ -66,17 +68,10 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${BLAS_LINKER_FLAGS}")
 
 if(openmp)
   if(OPENMP_FOUND)
-    list(APPEND CXX_FLAGS "${OpenMP_CXX_FLAGS}")
+    add_compile_options(${OpenMP_CXX_FLAGS})
   else()
     message(STATUS "Could not find OpenMP. Compiling without.")
   endif()
-endif()
-
-if(CXX_FLAGS)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" "${CXX_FLAGS}")
-  # Changing the default list ";" separation so flags are not
-  # understood as different commands.
-  string(REPLACE ";" " " CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 endif()
 
 find_package(Doxygen)
