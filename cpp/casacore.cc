@@ -171,7 +171,7 @@ utilities::vis_params read_measurementset(std::string const &filename,
   {
     auto const channel = ms_file[channel_number];
     uv_data.u.segment(row, channel.size()) = channel.lambda_u();
-    uv_data.v.segment(row, channel.size()) = channel.lambda_v();
+    uv_data.v.segment(row, channel.size()) = -channel.lambda_v();
     uv_data.w.segment(row, channel.size()) = channel.lambda_w();
     switch(polarization) {
       case MeasurementSet::ChannelWrapper::polarization::I:

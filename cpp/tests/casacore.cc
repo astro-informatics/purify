@@ -187,7 +187,7 @@ TEST_CASE("Read Measurement") {
   REQUIRE(vis_file.u.size() == ms_file.u.size());
 
   CHECK(vis_file.u.isApprox(ms_file.u, 1e-6));
-  CHECK(vis_file.v.isApprox(-ms_file.v, 1e-6));
+  CHECK(vis_file.v.isApprox(ms_file.v, 1e-6));
   CHECK(vis_file.vis.isApprox(ms_file.vis, 1e-6));
   purify::utilities::vis_params const ms_fileLL = purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"), purify::casa::MeasurementSet::ChannelWrapper::polarization::LL);
   purify::utilities::vis_params const ms_fileRR = purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"), purify::casa::MeasurementSet::ChannelWrapper::polarization::RR);
