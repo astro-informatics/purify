@@ -1,7 +1,7 @@
 #ifndef PURIFY_LOGGING_DISABLED_H
 #define PURIFY_LOGGING_DISABLED_H
 
-#include "config.h"
+#include "purify/config.h"
 #include <memory>
 #include <string>
 

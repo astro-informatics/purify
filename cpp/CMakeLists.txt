@@ -25,7 +25,7 @@ endif()
 add_library(cppurify ${SOURCES})
 
 target_include_directories(cppurify PUBLIC
-  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include/purify>
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include/>)
 
 if(EIGEN3_INCLUDE_DIR)

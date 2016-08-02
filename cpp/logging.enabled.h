@@ -1,9 +1,9 @@
 #ifndef PURIFY_LOGGING_ENABLED_H
 #define PURIFY_LOGGING_ENABLED_H
 
-#include "config.h"
-#include <spdlog/spdlog.h>
+#include "purify/config.h"
 #include <spdlog/fmt/ostr.h>
+#include <spdlog/spdlog.h>
 
 namespace purify {
 namespace logging {
