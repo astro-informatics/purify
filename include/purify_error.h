@@ -2,15 +2,15 @@
  *  Error functions used in PURIFY package.
  */
 
-#ifndef PURIFY_ERROR
-#define PURIFY_ERROR
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+#ifndef PURIFY_ERROR_HEADER
+#define PURIFY_ERROR_HEADER
 #include "purify_config.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 inline void PURIFY_ERROR_GENERIC(char const *comment) {
   printf("ERROR: %s.\n", comment);					
