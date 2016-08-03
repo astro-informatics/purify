@@ -3,10 +3,11 @@ if(logging)
   set(PURIFY_DO_LOGGING 1)
   set(PURIFY_TEST_LOG_LEVEL critical CACHE STRING "Level when logging tests")
   set_property(CACHE PURIFY_TEST_LOG_LEVEL PROPERTY STRINGS
-    emerg off trace debug info notice warn err critical alert)
+    off critical error warn info debug trace)
 else()
   unset(PURIFY_DO_LOGGING)
   set(PURIFY_TEST_LOG_LEVEL off)
+  set_property(CACHE SOPT_TEST_LOG_LEVEL PROPERTY STRINGS off)
 endif()
 
 set(version ${Purify_VERSION})
