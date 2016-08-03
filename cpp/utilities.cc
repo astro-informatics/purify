@@ -1,3 +1,5 @@
+#include "purify/config.h"
+#include "logging.h"
 #include "utilities.h"
 
 namespace purify {
@@ -18,7 +20,8 @@ namespace purify {
 				while(std::abs(output - mean) > 3 * standard_deviation){
 					output = normal_dist(rng);
 				}
-				if (output != output) std::cout << output << '\n';
+				if (output != output)
+          PURIFY_DEBUG("New random-sample density: {}", output);
 				return output;
 			 };
 
@@ -131,7 +134,7 @@ namespace purify {
 	        Vector<t_real> v_dist = uv_vis.v.array() * uv_vis.v.array();
 	        t_real max_v = std::sqrt(v_dist.maxCoeff());
 	        cell_size_v = (180 * 3600) / max_v / purify_pi / 3; //Calculate cell size if not given one
-	        std::cout << "PSF has a FWHM of " << cell_size_u * 3 << " x " << cell_size_v * 3 << " arcseconds" << '\n';
+	        PURIFY_MEDIUM_LOG("PSF has a FWHM of {} by {} arcseconds", cell_size_u * 3, cell_size_v * 3);
 	      }
 	      if (cell_size_v == 0)
 	      {
@@ -139,7 +142,7 @@ namespace purify {
 	      }
 
 	      
-	      std::cout << "Using a pixel size of " << cell_size_u << " x " << cell_size_v << " arcseconds" << '\n';
+	      PURIFY_MEDIUM_LOG("Using a pixel size of {} by {} arcseconds", cell_size_u, cell_size_v);
 	      t_real scale_factor_u = 1;
 	      t_real scale_factor_v = 1;
 	      if (uv_vis.units == "lambda")
@@ -409,7 +412,7 @@ namespace purify {
 
 			//finding patch
 			Image<t_real> patch = psf.block(std::floor(y0 - size * 0.5) + 1, std::floor(x0 - size * 0.5) + 1, size, size);
-			std::cout << "Fitting to Patch:\n " << patch << '\n';
+			PURIFY_LOW_LOG("Fitting to Patch");
 
 			//finding values for least squares
 
@@ -441,7 +444,6 @@ namespace purify {
 			t_real const a = - solution(0);
 			t_real const b = + solution(1) * 0.5;
 			t_real const c = - solution(2);
-			//std::cout << a << " " << b << " " << c << '\n';
 			//parameters of Gaussian
 			t_real theta = std::atan2(b, std::sqrt(std::pow(2 * b, 2) + std::pow(c - a, 2)) + (c - a) * 0.5); // some relatively complicated trig identity to go from tan(2theta) to tan(theta).
 			t_real t = 0.;

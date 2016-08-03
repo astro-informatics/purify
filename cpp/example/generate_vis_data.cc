@@ -1,6 +1,8 @@
 #include <array>
 #include <memory>
 #include <random>
+#include "purify/config.h"
+#include "logging.h"
 #include "directories.h"
 #include "pfitsio.h"
 #include "types.h"
@@ -11,6 +13,8 @@
 int main( int nargs, char const** args ) {
   using namespace purify;
   using namespace purify::notinstalled;
+  purify::logging::initialize();
+  purify::logging::set_level(purify::default_logging_level());
 
   std::string const fitsfile = image_filename("M31.fits");
   std::string const inputfile = output_filename("M31_input.fits");
@@ -38,7 +42,7 @@ int main( int nargs, char const** args ) {
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";
 
-  std::cout << "Number of measurements: " << uv_data.u.size() << '\n';
+  PURIFY_HIGH_LOG("Number of measurements: {}", uv_data.u.size());
   //uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
   MeasurementOperator measurements(uv_data, J, J, kernel, M31.cols(), M31.rows(), 20, over_sample);
   uv_data.vis = measurements.degrid(M31);

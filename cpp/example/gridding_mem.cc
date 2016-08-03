@@ -1,4 +1,5 @@
-
+#include "purify/config.h"
+#include "logging.h"
 #include "MeasurementOperator.h"
 #include "utilities.h"
 #include "pfitsio.h"
@@ -9,10 +10,12 @@ int main( int nargs, char const** args ){
   /*
     This is used to profile the gridding operator
   */
+  purify::logging::initialize();
+  purify::logging::set_level(purify::default_logging_level());
 
   if (nargs != 5 )
   {
-    std::cout << " Wrong number of arguments! " << '\n';
+    PURIFY_CRITICAL(" Wrong number of arguments!");
     return 1;
   }
   std::string const kernel = args[1];

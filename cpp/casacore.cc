@@ -1,8 +1,10 @@
+#include "purify/config.h"
 #include <sstream>
 #include <casacore/casa/Arrays/IPosition.h>
 #include <casacore/tables/TaQL/ExprNode.h>
 #include "casacore.h"
 #include "types.h"
+#include "logging.h"
 
 namespace purify {
 namespace casa {
@@ -127,7 +129,7 @@ utilities::vis_params read_measurementset(std::string const &filename, const std
   std::vector<t_int> channels = channels_input;
   if (channels.empty())
   {
-    std::printf("All Channels = %lu\n", ms_file.size());
+    PURIFY_LOW_LOG("All Channels = %lu", ms_file.size());
     Vector<t_int> temp_vector = Vector<t_int>::Zero(ms_file.size());
     channels = std::vector<t_int>(temp_vector.data(), temp_vector.data() + temp_vector.size());
   }
@@ -138,7 +140,7 @@ utilities::vis_params read_measurementset(std::string const &filename, const std
     rows += ms_file[channel_number].size();
   }
 
-  std::printf("Visibilities = %lu\n", rows);
+  PURIFY_LOW_LOG("Visibilities = %lu", rows);
   uv_data.u = Vector<t_real>::Zero(rows);
   uv_data.v = Vector<t_real>::Zero(rows);
   uv_data.w = Vector<t_real>::Zero(rows);
@@ -155,7 +157,7 @@ utilities::vis_params read_measurementset(std::string const &filename, const std
     uv_data.w.segment(row, channel.size()) = channel.lambda_w();
     switch(stokes) {
       case MeasurementSet::ChannelWrapper::Stokes::I:
-        std::printf("Stokes I\n");
+        PURIFY_DEBUG("Stokes I");
         uv_data.vis.segment(row, channel.size()) = channel.I("DATA");
         uv_data.weights.segment(row, channel.size()).real() = channel.wI(MeasurementSet::ChannelWrapper::Sigma::OVERALL); //go for sigma rather than sigma_spectrum
         break;
@@ -175,7 +177,7 @@ utilities::vis_params read_measurementset(std::string const &filename, const std
     } 
     row += channel.size();
   }
-  std::printf("Done! \n");
+  PURIFY_DEBUG("Done!");
   return uv_data;
 }
 

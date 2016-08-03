@@ -193,12 +193,12 @@ TEST_CASE("Measurement Operator [Gridding]", "[Gridding]") {
         }
         if (std::abs(kb_img(j, i) - kb_test_image(j + j_shift, i + i_shift)) >= 1e-12)
         {
-          std::cout << i << " " << j << '\n';
+          INFO(i << " " << j << "\n");
         }
         CHECK( std::abs(kb_img(j, i) - kb_test_image(j + j_shift, i + i_shift)) < 1e-12 );
       }
     }
-    std::cout << "Percentage max difference in Kaiser Bessel gridding: " << max_diff * 100 << "%" << '\n';
+    INFO("Percentage max difference in Kaiser Bessel gridding: " << max_diff * 100 << "%");
   }
   SECTION("Prolate Spheroidal Wave Functon Gridding") {
     kernel = "pswf";
