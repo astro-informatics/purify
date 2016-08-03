@@ -1,7 +1,7 @@
 # Setup logging
 if(logging)
   set(PURIFY_DO_LOGGING 1)
-  set(PURIFY_TEST_LOG_LEVEL off CACHE STRING "Level when logging tests")
+  set(PURIFY_TEST_LOG_LEVEL critical CACHE STRING "Level when logging tests")
   set_property(CACHE PURIFY_TEST_LOG_LEVEL PROPERTY STRINGS
     emerg off trace debug info notice warn err critical alert)
 else()
