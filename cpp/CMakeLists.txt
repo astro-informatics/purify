@@ -13,7 +13,7 @@ endif()
 include_directories(SYSTEM ${FFTW3_INCLUDE_DIR} ${Sopt_INCLUDE_DIRS})
 
 set(SOURCES MeasurementOperator.cc FFTOperator.cc clean.cc utilities.cc pfitsio.cc
-  kernels.cc RMOperator.cc PSFOperator.cc wprojection.cc)
+  kernels.cc RMOperator.cc PSFOperator.cc wprojection.cc AlgorithmUpdate.cc cmdl.cc)
 if(TARGET casacore::ms)
   list(APPEND SOURCES casacore.cc)
 endif()

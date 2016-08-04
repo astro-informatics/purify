@@ -552,12 +552,13 @@ namespace purify {
 		    return y;
 		  }
 
-		  void checkpoint_log(const std::string& diagnostic, t_int * iters, t_real * gamma){
+		  std::tuple<t_int, t_real> checkpoint_log(const std::string& diagnostic){
 		  	//reads a log file and returns the latest parameters
-		    if (!utilities::file_exists(diagnostic)){
-		    	*iters = 0;
-		    	return;
-		    }
+		    if (!utilities::file_exists(diagnostic))
+		    	return std::make_tuple(0, 0);
+		    
+		    t_int iters = 0;
+		    t_real gamma = 0;
 		    std::ifstream log_file(diagnostic);
 		    std::string entry;
 		    std::string s;
@@ -569,13 +570,14 @@ namespace purify {
 		      if (!std::getline(log_file, s)) break;
 		      std::istringstream ss(s);
 		      std::getline(ss, entry, ' ');
-		      *iters = std::stoi(entry);
+		      iters = std::stoi(entry);
 		      std::getline(ss, entry, ' ');
-		      *gamma = std::stod(entry);
+		      gamma = std::stod(entry);
 		    }
 		   log_file.close();
-
+            return std::make_tuple(iters, gamma);
 		  }
+
 	    Matrix<t_complex> re_sample_ft_grid(const Matrix<t_complex>& input, const t_real& re_sample_ratio){
 	    /*
 	      up samples image using by zero padding the fft
