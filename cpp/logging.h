@@ -24,7 +24,10 @@
 //! \details Except maybe when debugging.
 #define PURIFY_TRACE(...) PURIFY_LOG_(, trace, __VA_ARGS__)
 
+//! High priority message
 #define PURIFY_HIGH_LOG(...) PURIFY_LOG_(, critical, __VA_ARGS__)
+//! Medium priority message
 #define PURIFY_MEDIUM_LOG(...) PURIFY_LOG_(, error, __VA_ARGS__)
+//! Low priority message
 #define PURIFY_LOW_LOG(...) PURIFY_LOG_(, warn, __VA_ARGS__)
 #endif
