@@ -1,13 +1,11 @@
 #ifndef PURIFY_TYPES_H
 #define PURIFY_TYPES_H
 
+#include "purify/config.h"
 #include <complex>
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 #define purify_pi 3.14159265358979323846
 #define purify_c 299792458.0

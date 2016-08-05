@@ -1,3 +1,5 @@
+#include "purify/config.h"
+#include "logging.h"
 #include "PSFOperator.h"
 
 namespace purify {
@@ -21,14 +23,11 @@ namespace purify {
      t_real old_value = 0;
      Image<t_complex> estimate_eigen_vector = Image<t_complex>::Random(floor(ftsize_v * 0.5), floor(ftsize_u * 0.5));
      estimate_eigen_vector = estimate_eigen_vector / estimate_eigen_vector.matrix().norm();
-     std::cout << "Starting power method " << '\n';
-     std::cout << "Iteration: " << 0 << ", norm = " << estimate_eigen_value << '\n';
      for (t_int i = 0; i < niters; ++i)
      {
       auto new_estimate_eigen_vector = PSFOperator::adjoint(PSFOperator::forward(estimate_eigen_vector));
       estimate_eigen_value = new_estimate_eigen_vector.matrix().norm();
       estimate_eigen_vector = new_estimate_eigen_vector/estimate_eigen_value;
-      std::cout << "Iteration: " << i + 1 << ", norm = " << estimate_eigen_value << '\n';
       if (relative_difference > std::abs(old_value - estimate_eigen_value)/old_value)
         break;
       old_value = estimate_eigen_value;

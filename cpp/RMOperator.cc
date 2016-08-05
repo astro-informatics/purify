@@ -1,3 +1,5 @@
+#include "purify/config.h"
+#include "logging.h"
 #include "RMOperator.h"
 
 namespace purify {
@@ -159,14 +161,11 @@ namespace purify {
     */
      t_real estimate_eigen_value = 1;
      Vector<t_complex> estimate_eigen_vector = Vector<t_complex>::Random(imsize);
-     //std::cout << "Starting power method " << '\n';
-     //std::cout << "Iteration: " << 0 << ", norm = " << estimate_eigen_value << '\n';
      for (t_int i = 0; i < niters; ++i)
      {
       auto new_estimate_eigen_vector = RMOperator::grid(RMOperator::degrid(estimate_eigen_vector));
       estimate_eigen_value = new_estimate_eigen_vector.matrix().norm();
       estimate_eigen_vector = new_estimate_eigen_vector/estimate_eigen_value;
-      //std::cout << "Iteration: " << i + 1 << ", norm = " << estimate_eigen_value << '\n';
      }
      return estimate_eigen_value;
   }
@@ -220,17 +219,16 @@ namespace purify {
     
 
     //t_real new_upsample = utilities::upsample_ratio(uv_vis, ,);
-    std::printf("------ \n");
-    std::printf("Constructing RM Operator \n");
+    PURIFY_HIGH_LOG("Constructing RM Operator");
 
-    std::printf("Oversampling Factor: %f \n", oversample_factor);
+    PURIFY_MEDIUM_LOG("Oversampling Factor: %f", oversample_factor);
     std::function<t_real(t_real)> kernelu;
     
     std::function<t_real(t_real)> ftkernelu;
     
-    std::printf("Kernel Name: %s \n", kernel_name.c_str());
-    std::printf("Number of visibilities: %ld \n", rm_vis.frequency.size());
-    std::printf("Ju: %d \n", Ju);
+    PURIFY_MEDIUM_LOG("Kernel Name: %s", kernel_name.c_str());
+    PURIFY_MEDIUM_LOG("Number of visibilities: %ld", rm_vis.frequency.size());
+    PURIFY_MEDIUM_LOG("Ju: %d", Ju);
 
     S = Array<t_real>::Zero(imsize);
 
@@ -256,18 +254,18 @@ namespace purify {
       S = RMOperator::init_correction1d(ftkernelu); // Does gridding correction using analytic formula
       G = RMOperator::init_interpolation_matrix1d(rm_vis.frequency, Ju, kernelu);
       
-      std::printf("Calculating weights \n");
+      PURIFY_DEBUG("Calculating weights");
       W = RMOperator::init_weights(rm_vis.frequency, rm_vis.weights, oversample_factor, weighting_type, R);
-      std::printf("Doing power method \n");
+      PURIFY_DEBUG("Doing power method");
       norm = std::sqrt(RMOperator::power_method(norm_iterations));
-      std::printf("Gridding Operator Constructed \n");
-      std::printf("------ \n");
+      PURIFY_DEBUG("Gridding Operator Constructed");
       return;
     }
 
     if ((kernel_name == "pswf") and (Ju != 6))
     {
-      std::cout << "Error: Only a support of 6 is implimented for PSWFs.";
+      PURIFY_ERROR("Error: Only a support of 6 is implimented for PSWFs.");
+      throw std::runtime_error("Incorrect input: PSWF requires a support of 6");
     }
     if (kernel_name == "kb")
     {
@@ -302,13 +300,12 @@ namespace purify {
 
     G = RMOperator::init_interpolation_matrix1d(rm_vis.frequency, Ju, kernelu);
 
-    std::printf("Calculating weights \n");
+    PURIFY_DEBUG("Calculating weights");
     W = RMOperator::init_weights(rm_vis.frequency, rm_vis.weights, oversample_factor, weighting_type, R);
-    std::printf("Doing power method \n");
+    PURIFY_DEBUG("Doing power method");
     norm = std::sqrt(RMOperator::power_method(norm_iterations));
-    std::printf("Found a norm of %f \n", norm);
-    std::printf("Gridding Operator Constructed \n");
-    std::printf("------ \n");
+    PURIFY_DEBUG("Found a norm of %f", norm);
+    PURIFY_DEBUG("Gridding Operator Constructed");
   }
 
 

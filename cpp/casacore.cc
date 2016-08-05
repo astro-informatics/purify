@@ -1,8 +1,10 @@
+#include "purify/config.h"
 #include <sstream>
 #include <casacore/casa/Arrays/IPosition.h>
 #include <casacore/tables/TaQL/ExprNode.h>
 #include "casacore.h"
 #include "types.h"
+#include "logging.h"
 
 namespace purify {
 namespace casa {
@@ -150,6 +152,7 @@ utilities::vis_params read_measurementset(std::string const &filename,
   std::vector<t_int> channels = channels_input;
   if (channels.empty())
   {
+    PURIFY_LOW_LOG("All Channels = %lu", ms_file.size());
     Vector<t_int> temp_vector = Vector<t_int>::Zero(ms_file.size());
     channels = std::vector<t_int>(temp_vector.data(), temp_vector.data() + temp_vector.size());
   }
@@ -160,6 +163,7 @@ utilities::vis_params read_measurementset(std::string const &filename,
     rows += ms_file[channel_number].size();
   }
 
+  PURIFY_LOW_LOG("Visibilities = %lu", rows);
   uv_data.u = Vector<t_real>::Zero(rows);
   uv_data.v = Vector<t_real>::Zero(rows);
   uv_data.w = Vector<t_real>::Zero(rows);

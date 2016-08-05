@@ -37,7 +37,7 @@ TEST_CASE("utilities [reshape]", "[reshape]"){
      			5, 11, 10, 8,
      			9 ,7, 6, 12,
      			4, 14, 15, 1;
-    std::cout << magic << '\n' << '\n'; 
+    CAPTURE(magic);
     Vector<t_real> magic_vector(16);
     magic_vector << 16, 5, 9, 4, 2, 11, 7, 14, 3, 10, 6, 15, 13, 8, 12, 1;
     Matrix<t_real> magic_matrix(16, 1);
@@ -45,8 +45,8 @@ TEST_CASE("utilities [reshape]", "[reshape]"){
     magic_matrix.resize(4, 4);
     CHECK(magic.isApprox(magic_matrix, 1e-13));
     magic.resize(16, 1);
-    std::cout << magic << '\n' << '\n';
-    std::cout << magic_vector << '\n' << '\n';
+    CAPTURE(magic);
+    CAPTURE(magic_vector);
     CHECK(magic.isApprox(magic_vector, 1e-13));
 }
 TEST_CASE("utilities [variance]", "[variance]"){
@@ -58,10 +58,10 @@ TEST_CASE("utilities [variance]", "[variance]"){
     t_complex I(0, 1);
     Vector<t_complex> data = (real_data + I * imag_data);
     t_complex mu = utilities::mean(data);
-    std::cout << mu << '\n';
+    CAPTURE(mu);
     CHECK(std::abs(mu -(0.770634429899614 + 0.967954403523829 * I)) < 1e-13);
     t_real var = utilities::variance(data);
-    std::cout << var << '\n';
+    CAPTURE(var);
     CHECK(std::abs(var - 50.1405284663126) < 1e-13);
 }
 TEST_CASE("utilities [median]", "[median]"){

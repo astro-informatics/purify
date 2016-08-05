@@ -1,4 +1,6 @@
+#include "purify/config.h"
 #include "clean.h"
+#include "logging.h"
 
 namespace purify {
 
@@ -8,14 +10,14 @@ namespace purify {
 			/*
 				hogbom and sdi clean algorithm
 			*/
-			std::printf("Starting Clean...\n");
+			PURIFY_HIGH_LOG("Starting Clean...");
 			Vector<t_complex> residual = uv_vis.vis.array() * uv_vis.weights.array();
 			Image<t_complex> res_image = op.grid(residual);
 			Image<t_complex> clean_model = res_image * 0;
 			Image<t_complex> temp_model = clean_model * 0;
 
 			//should add a method to calculate clean sdi clip automatically
-			std::printf("Will run for %d iterations \n", niters);
+			PURIFY_MEDIUM_LOG("Will run for %d iterations", niters);
 			for (t_int i = 0; i < niters; ++i)
 			{
 				//finding peak in residual image
@@ -24,7 +26,7 @@ namespace purify {
 				res_image = op.grid(residual);
 				res_image.abs().maxCoeff(&max_y, &max_x);
 				if (i % 50 == 0)
-					std::printf("Iteration: %d, Max: %f, RMS: %f \n", i, std::abs(res_image(max_y, max_x)), utilities::standard_deviation(Image<t_complex>::Map(res_image.data(), res_image.size(), 1)));
+					PURIFY_LOW_LOG("Iteration: %d, Max: %f, RMS: %f", i, std::abs(res_image(max_y, max_x)), utilities::standard_deviation(Image<t_complex>::Map(res_image.data(), res_image.size(), 1)));
 				//generating clean model
 				if (mode == "hogbom")
 					temp_model(max_y, max_x) = gain * res_image(max_y, max_x);
@@ -122,7 +124,7 @@ namespace purify {
 			t_int psf_x;
 			t_int psf_y;
 			t_real max = psf.maxCoeff(&psf_x, &psf_y);
-			std::printf("PSF max pixel at (%d, %d) \n", psf_y, psf_x);
+			PURIFY_LOW_LOG("PSF max pixel at (%d, %d)", psf_y, psf_x);
 			psf = psf / max;
 		    Image<t_complex> gaussian = Image<t_complex>::Zero(op.imsizey(), op.imsizex());
 		    //choice of parameters
@@ -130,7 +132,7 @@ namespace purify {
 		    auto fwhm_x = fit(0) * 2 * std::sqrt(2 * std::log(2));
 		    auto fwhm_y = fit(1) * 2 * std::sqrt(2 * std::log(2));
 		    auto theta = fit(2);
-		    std::printf("Fitted a Beam of %f x %f , %f \n", fwhm_x, fwhm_y, theta / purify_pi * 180);
+		    PURIFY_MEDIUM_LOG("Fitted a Beam of %f x %f , %f", fwhm_x, fwhm_y, theta / purify_pi * 180);
 		    //setting up Gaussian calculation
 		    t_real const sigma_x = fwhm_x / (2 * std::sqrt(2 * std::log(2)));
 		    t_real const sigma_y = fwhm_y / (2 * std::sqrt(2 * std::log(2)));
@@ -151,8 +153,8 @@ namespace purify {
 		    }
 		   	t_int gaussian_x;
 			t_int gaussian_y;
-			std::cout << gaussian.abs().maxCoeff(&gaussian_x, &gaussian_y) << '\n';
-			std::printf("Gaussian max pixel at (%d, %d) \n", gaussian_y, gaussian_x);
+			PURIFY_DEBUG("{}", gaussian.abs().maxCoeff(&gaussian_x, &gaussian_y));
+			PURIFY_LOW_LOG("Gaussian max pixel at (%d, %d)", gaussian_y, gaussian_x);
 		    return gaussian;
 		}
 		Image<t_complex> restore(MeasurementOperator & op, const utilities::vis_params & uv_vis, const Image<t_complex> & clean_model){

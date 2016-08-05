@@ -1,4 +1,6 @@
-
+#include "purify/config.h"
+#include "logging.h"
+#include <string>
 #include "MeasurementOperator.h"
 #include "utilities.h"
 #include "pfitsio.h"
@@ -10,9 +12,11 @@ using namespace purify;
 using namespace purify::notinstalled;
 
 int main( int nargs, char const** args ){
+  purify::logging::initialize();
+  purify::logging::set_level(purify::default_logging_level());
   if (nargs != 6 )
   {
-    std::cout << " Wrong number of arguments! " << '\n';
+    PURIFY_CRITICAL(" Wrong number of arguments!");
     return 1;
   }
 
@@ -37,7 +41,6 @@ int main( int nargs, char const** args ){
   Vector<t_complex> vis = Vector<t_complex>::Random(number_of_vis);
   t_real inner_loop = 10000;
   t_complex const I(0, 1);
-  std::cout.precision(20);
   for (t_int i = 0; i < number_of_tests; ++i)
   {
     auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
@@ -52,7 +55,7 @@ int main( int nargs, char const** args ){
     }
     std::clock_t c_end = std::clock();
     grid_times(i) = static_cast<t_real>((c_end - c_start) / CLOCKS_PER_SEC)/inner_loop;
-    std::cout << (c_end - c_start) / CLOCKS_PER_SEC/inner_loop << "\n";
+    PURIFY_MEDIUM_LOG("inner: {:f20.12}", (c_end - c_start) / CLOCKS_PER_SEC/inner_loop);
   }
   
   for (t_int i = 0; i < number_of_tests; ++i)
@@ -68,9 +71,8 @@ int main( int nargs, char const** args ){
     }
     std::clock_t c_end = std::clock();
     degrid_times(i) = static_cast<t_real>((c_end - c_start) / CLOCKS_PER_SEC)/inner_loop;
-    std::cout << (c_end - c_start) / CLOCKS_PER_SEC/inner_loop << "\n";
-  }  
-  std::printf("Done! \n");
+    PURIFY_MEDIUM_LOG("inner: {:f20.12}", (c_end - c_start) / CLOCKS_PER_SEC/inner_loop);
+  }
   t_real const mean_grid_time = grid_times.array().mean();
   t_real const rms_grid_time = utilities::standard_deviation(grid_times);
 
@@ -80,6 +82,6 @@ int main( int nargs, char const** args ){
   std::ofstream out(results);
   out.precision(20);
   out << mean_grid_time << " " << rms_grid_time << " " << mean_degrid_time << " " << rms_degrid_time << "\n";
-  std::cout << mean_grid_time << " " << rms_grid_time << " " << mean_degrid_time << " " << rms_degrid_time << "\n";
   out.close();
+  PURIFY_HIGH_LOG("result: {:f20.12} {:f20.12} {:f20.12} {:f20.12}", mean_grid_time, rms_grid_time, mean_degrid_time, rms_degrid_time);
 }

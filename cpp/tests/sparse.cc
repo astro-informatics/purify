@@ -1,3 +1,5 @@
+#include "purify/config.h"
+#include "logging.h"
 #include "catch.hpp"
 #include "types.h"
 #include <iostream>
@@ -24,7 +26,7 @@ TEST_CASE("sparse [iterator]", "[iterator]") {
     {
         for (Sparse<t_complex>::InnerIterator pix(G,i); pix; ++pix)
         {
-            std::cout << pix.row() << " " << pix.col() << " " << std::real(pix.value()) << '\n';
+            PURIFY_HIGH_LOG("{} {} {}", pix.row(), pix.col(), std::real(pix.value()));
         }
     }
     //CHECK(expected.isApprox(output, 1e-13));

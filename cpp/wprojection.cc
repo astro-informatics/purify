@@ -1,3 +1,6 @@
+#include "purify/config.h"
+#include "logging.h"
+#include "types.h"
 #include "wprojection.h"
 
 namespace purify {
@@ -10,7 +13,7 @@ namespace purify {
 	    //entries.reserve(total_rows * total_cols);
 
 	    Matrix<t_complex> chirp_matrix = Matrix<t_complex>::Zero(total_rows, total_cols);
-	    std::cout << "Generating chirp matrix with " << total_rows << " x " << total_cols << '\n';
+	    PURIFY_HIGH_LOG("Generating {} by {} chirp matrix", total_rows, total_cols);
 	    for (t_int m = 0; m < total_rows; ++m)
 	    {
 	      Image<t_complex> chirp_image = wprojection::generate_chirp(w_components(m), cell_x, cell_y, ftsizeu, ftsizev);
@@ -73,7 +76,6 @@ namespace purify {
 	          max_tau = tau;
 	        }
 	        tau = (max_tau - min_tau) * 0.5 + min_tau;
-	        //std::cout << energy_sum << '\n';
 	        if (std::abs(tau - old_tau)/tau < 1e-6 and energy_sum > energy_fraction)
 	        {
 	        	tau = old_tau;
@@ -94,8 +96,7 @@ namespace purify {
 	          final_energy = final_energy + abs_row(i) * abs_row(i);
 	        }
 	      }
-	      //std::cout << "Final energy:" << '\n';
-	      //std::cout << final_energy / abs_row_total_energy << '\n';
+	      PURIFY_DEBUG("Sparsify chirp-matrix final energy: {}", final_energy / abs_row_total_energy);
 	      return output_row;
 	  }
 
@@ -137,9 +138,8 @@ namespace purify {
 	Sparse<t_complex> convolution(const Sparse<t_complex> & input_gridding_matrix, const Image<t_complex>& Chirp, const t_int& Nx, const t_int& Ny, const t_int& Nvis){
 
 			const Sparse<t_complex> & Grid = input_gridding_matrix.transpose();
-	        std::cout << "Convolving Gridding matrix with Chirp" << std::endl;
-	        std::cout << "Nx = " << Nx << " Ny = " << Ny << std::endl;
-	        std::cout << Chirp.rows() << " " << Chirp.cols() << std::endl;
+      PURIFY_LOW_LOG("Convolving {} by {} gridding matrix with {} by {} Chirp", Nx, Ny,
+          Chirp.rows(), Chirp.cols());
 	        t_int Npix = Nx * Ny;
 	        Sparse<t_complex> newG(Nvis, Npix);
 	        Image<t_complex> Gtemp_mat(Nx, Ny);
@@ -213,7 +213,7 @@ namespace purify {
 
 	        }
 
-	        std::cout<<"---- After convolution  ---- "<<std::endl;
+          PURIFY_DEBUG("---- After convolution  ---- ");
 
 	    newG.setFromTriplets(tripletList.begin(), tripletList.end());
 

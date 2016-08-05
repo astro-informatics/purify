@@ -4,18 +4,37 @@ include(EnvironmentScript)
 include(PackageLookup)
 
 # Look for external software
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  find_package(Threads)
+  if(THREADS_FOUND)
+    add_compile_options(-pthread)
+  endif(THREADS_FOUND)
+endif()
+
 if(openmp)
   find_package(OpenMP)
+  if(OPENMP_FOUND)
+    set(PURIFY_OPENMP TRUE)
+    add_library(openmp::openmp INTERFACE IMPORTED GLOBAL)
+    set_target_properties(openmp::openmp PROPERTIES
+      INTERFACE_COMPILE_OPTIONS "${OpenMP_CXX_FLAGS}"
+      INTERFACE_LINK_LIBRARIES  "${OpenMP_CXX_FLAGS}")
+  else()
+    message(STATUS "Could not find OpenMP. Compiling without.")
+  endif()
+endif()
+if(OPENMP_FOUND)
   find_package(FFTW3 REQUIRED DOUBLE COMPONENTS OPENMP)
   set(FFTW3_DOUBLE_LIBRARY ${FFTW3_DOUBLE_OPENMP_LIBRARY})
 else()
   find_package(FFTW3 REQUIRED DOUBLE)
   set(FFTW3_DOUBLE_LIBRARY ${FFTW3_DOUBLE_SERIAL_LIBRARY})
-endif(openmp)
+endif()
 
 find_package(TIFF REQUIRED)
 find_package(CBLAS REQUIRED)
 set(PURIFY_BLAS_H "${BLAS_INCLUDE_FILENAME}")
+
 
 if(data AND tests)
   lookup_package(Boost REQUIRED COMPONENTS filesystem)
@@ -23,7 +42,11 @@ else()
   lookup_package(Boost REQUIRED)
 endif()
 
-lookup_package(Eigen3 REQUIRED ARGUMENTS HG_REPOSITORY "https://bitbucket.org/LukePratley/eigen" HG_TAG "3.2")
+lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS HG_REPOSITORY "https://bitbucket.org/LukePratley/eigen" HG_TAG "3.2")
+
+if(logging)
+  lookup_package(spdlog REQUIRED)
+endif()
 
 # Look up packages: if not found, installs them
 # Unless otherwise specified, if purify is not on master, then sopt will be
@@ -53,15 +76,6 @@ lookup_package(CFitsIO REQUIRED ARGUMENTS CHECKCASA)
 lookup_package(CCFits REQUIRED)
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${BLAS_LINKER_FLAGS}")
-
-if(openmp)
-  find_package(OpenMP)
-  if(OPENMP_FOUND)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-  else()
-    message(STATUS "Could not find OpenMP. Compiling without.")
-  endif()
-endif()
 
 find_package(Doxygen)
 find_package(CasaCore OPTIONAL_COMPONENTS ms)

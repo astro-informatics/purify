@@ -1,3 +1,4 @@
+#include "purify/config.h"
 #include <array>
 #include <memory>
 #include <random>
@@ -12,12 +13,15 @@
 #include "types.h"
 #include "MeasurementOperator.h"
 #include "utilities.h"
+#include "logging.h"
 
 using namespace purify;  
 using namespace purify::notinstalled;  
 
 
 int main( int nargs, char const** args ){
+  purify::logging::initialize();
+  purify::logging::set_level(purify::default_logging_level());
   std::string const fitsfile = image_filename("M31.fits");
   //std::string const visfile = image_filename("Coverages/cont_sim4.vis");
   std::string const outfile = output_filename("M31_w_component.tiff");
@@ -93,7 +97,6 @@ int main( int nargs, char const** args ){
     pfitsio::write2d(Image<t_real>::Map(dimage.data(), M31.rows(), M31.cols()), dirty_image_fits);
 
     auto const epsilon = utilities::calculate_l2_radius(input, sigma);
-    std::cout << "Starting sopt!" << '\n';
     auto const sdmm
         = sopt::algorithm::SDMM<t_complex>()
               .itermax(500)
