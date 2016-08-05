@@ -1,4 +1,5 @@
-
+#include "purify/config.h"
+#include "logging.h"
 #include <array>
 #include <random>
 #include "directories.h"
@@ -10,6 +11,8 @@
 int main(int, char **) {
   using namespace purify;
   using namespace purify::notinstalled;
+  purify::logging::initialize();
+  purify::logging::set_level(purify::default_logging_level());
 
   bool update_output = true; //save output after each iteration
 

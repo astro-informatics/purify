@@ -217,7 +217,9 @@ public:
   t_uint channel() const { return channel_; }
 #define PURIFY_MACRO(NAME, INDEX)                                                                  \
   /** Stokes component in meters **/                                                               \
-  Vector<t_real> raw_##NAME() const { return ms_.column<t_real>("UVW[" #INDEX "]", filter()); }    \
+  Vector<t_real> raw_##NAME() const {                                                              \
+    return table_column<t_real>(ms_.table(), "UVW[" #INDEX "]", filter());                         \
+  }                                                                                                \
   /** \brief U scaled to purify values of wavelengths **/                                          \
   Vector<t_real> lambda_##NAME() const {                                                           \
     return (raw_##NAME().array() * frequencies().array()).matrix() / constant::c;                  \
@@ -254,8 +256,7 @@ public:
   /** Standard deviation for the Stokes component */                                               \
   Vector<t_real> w##NAME(Sigma const &col = Sigma::OVERALL) const {                                \
     return table_column<t_real>(                                                                   \
-        ms_.table(),                                                                               \
-        "1.0/SQUARE(" + stokes(#NAME, col == Sigma::OVERALL ? "SIGMA" : index("SIGMA_SPECTRUM")) + ")",         \
+        ms_.table(), stokes(#NAME, col == Sigma::OVERALL ? "SIGMA" : index("SIGMA_SPECTRUM")),     \
         filter());                                                                                 \
   }
   //Stokes parameters

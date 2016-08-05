@@ -1,5 +1,5 @@
-#ifndef SOPT_DATA_DIR_H
-#define SOPT_DATA_DIR_H
+#ifndef PURIFY_DATA_DIR_H
+#define PURIFY_DATA_DIR_H
 
 #include <string>
 namespace purify {

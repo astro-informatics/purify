@@ -7,9 +7,6 @@
 #include "sopt/utilities.h"
 #include "sopt/wavelets.h"
 #include <sopt/imaging_padmm.h>
-#include <sopt/positive_quadrant.h>
-#include <sopt/relative_variation.h>
-#include <sopt/reweighted.h>
 #include "sopt/wavelets/sara.h"
 #include "types.h"
 #include "cmdl.h"

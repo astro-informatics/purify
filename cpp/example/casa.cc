@@ -1,3 +1,5 @@
+#include "purify/config.h"
+#include "logging.h"
 #include "casacore.h"
 #include "directories.h"
 
@@ -17,6 +19,8 @@
   }
 
 int main(int, char **) {
+  purify::logging::initialize();
+  purify::logging::set_level(purify::default_logging_level());
   // Loads a measurement set
   auto const ngc3256_filename = purify::notinstalled::ngc3256_ms();
   auto const ngc3256 = purify::casa::MeasurementSet(ngc3256_filename);

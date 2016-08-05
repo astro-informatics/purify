@@ -1,3 +1,5 @@
+#include "purify/config.h"
+#include "logging.h"
 #include "MeasurementOperator.h"
 
 namespace purify {
@@ -177,14 +179,14 @@ namespace purify {
      t_real old_value = 0;
      Image<t_complex> estimate_eigen_vector = Image<t_complex>::Random(imsizey_, imsizex_);
      estimate_eigen_vector = estimate_eigen_vector / estimate_eigen_vector.matrix().norm();
-     std::cout << "Starting power method " << '\n';
-     std::cout << "Iteration: " << 0 << ", norm = " << estimate_eigen_value << '\n';
+     PURIFY_DEBUG("Starting power method");
+     PURIFY_DEBUG("Iteration: 0, norm = {}", estimate_eigen_value);
      for (t_int i = 0; i < niters; ++i)
      {
       auto new_estimate_eigen_vector = MeasurementOperator::grid(MeasurementOperator::degrid(estimate_eigen_vector));
       estimate_eigen_value = new_estimate_eigen_vector.matrix().norm();
       estimate_eigen_vector = new_estimate_eigen_vector/estimate_eigen_value;
-      std::cout << "Iteration: " << i + 1 << ", norm = " << estimate_eigen_value << '\n';
+      PURIFY_DEBUG("Iteration: {}, norm = {}", i + 1, estimate_eigen_value);
       if (relative_difference > std::abs(old_value - estimate_eigen_value)/old_value)
         break;
       old_value = estimate_eigen_value;
@@ -240,8 +242,7 @@ namespace purify {
     //construction of linear operators in measurement operator, GFZSA
     ftsizeu_ = floor(imsizex_ * oversample_factor_);
     ftsizev_ = floor(imsizey_ * oversample_factor_);
-    std::printf("------ \n");
-    std::printf("Planning FFT Operator \n");
+    PURIFY_LOW_LOG("Planning FFT operator");
     fftoperator_.set_up_multithread();
     fftoperator_.init_plan(Matrix<t_complex>::Zero(ftsizev_, ftsizeu_));
     if (use_w_term_){
@@ -256,20 +257,20 @@ namespace purify {
       uv_vis = utilities::uv_scale(uv_vis, floor(oversample_factor_ * imsizex_), floor(oversample_factor_ * imsizey_));
 
 
-    std::printf("Constructing Gridding Operator: G\n");
+    PURIFY_LOW_LOG("Constructing Gridding Operator: G");
+    PURIFY_MEDIUM_LOG("Oversampling Factor: %f", oversample_factor_);
 
-    std::printf("Oversampling Factor: %f \n", oversample_factor_);
     std::function<t_real(t_real)> kernelu;
     std::function<t_real(t_real)> kernelv;
     std::function<t_real(t_real)> ftkernelu;
     std::function<t_real(t_real)> ftkernelv;
     if (use_w_term_)
-      std::printf("Resampling Factor: %f \n", resample_factor);
-    std::printf("Kernel Name: %s \n", kernel_name_.c_str());
-    std::printf("Number of visibilities: %ld \n", uv_vis.u.size());
-    std::printf("Number of pixels: %d x %d \n", imsizex_, imsizey_);
-    std::printf("Ju: %d \n", Ju_);
-    std::printf("Jv: %d \n", Jv_);
+      PURIFY_MEDIUM_LOG("Resampling Factor: %f", resample_factor);
+    PURIFY_MEDIUM_LOG("Kernel Name: %s", kernel_name_.c_str());
+    PURIFY_MEDIUM_LOG("Number of visibilities: %ld", uv_vis.u.size());
+    PURIFY_MEDIUM_LOG("Number of pixels: %d x %d", imsizex_, imsizey_);
+    PURIFY_MEDIUM_LOG("Ju: %d", Ju_);
+    PURIFY_MEDIUM_LOG("Jv: %d", Jv_);
 
     S = Image<t_real>::Zero(imsizey_, imsizex_);
 
@@ -298,22 +299,23 @@ namespace purify {
         G = wprojection::convolution(G, C, ftsizeu_, ftsizev_, uv_vis.w.size());
       }
       
-      std::printf("Calculating weights: W \n");
+      PURIFY_DEBUG("Calculating weights: W");
       W = utilities::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor_, weighting_type_, R_, ftsizeu_, ftsizev_);
-      std::printf("Calculating the primary beam: A \n");
+      PURIFY_DEBUG("Calculating the primary beam: A");
       auto A = MeasurementOperator::init_primary_beam(primary_beam_, cell_x_, cell_y_);
       S = S * A;
-      std::printf("Doing power method: eta_{i+1}x_{i + 1} = Psi^T Psi x_i \n");
+      PURIFY_DEBUG("Doing power method: eta_{i+1}x_{i + 1} = Psi^T Psi x_i");
       norm = std::sqrt(MeasurementOperator::power_method(norm_iterations_));
-      std::printf("Found a norm of eta = %f \n", norm);
-      std::printf("Gridding Operator Constructed: WGFSA \n");
-      std::printf("------ \n");
+      PURIFY_LOW_LOG("Found a norm of eta = %f", norm);
+      PURIFY_HIGH_LOG("Gridding Operator Constructed: WGFSA");
       return;
     }
 
     if ((kernel_name_ == "pswf") and (Ju_ != 6 or Jv_ != 6))
-      throw std::runtime_error("PSWF calculation only implemented for a support of 6 x 6 pixels.");
-    
+    {
+      PURIFY_ERROR("Error: Only a support of 6 is implemented for PSWFs.");
+      throw std::runtime_error("Incorrect input: PSWF requires a support of 6");
+    }
     if (kernel_name_ == "kb")
     {
       auto kbu = [&] (t_real x) { return kernels::kaiser_bessel(x, Ju_); };
@@ -398,18 +400,17 @@ namespace purify {
       C = wprojection::create_chirp_matrix(uv_vis.w, cell_x_, cell_y_, ftsizeu_, ftsizev_, energy_fraction_);
       G = wprojection::convolution(G, C, ftsizeu_, ftsizev_, uv_vis.w.size());
     }
-    std::printf("Calculating weights: W \n");
+    PURIFY_DEBUG("Calculating weights: W");
     W = utilities::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor_, weighting_type_, R_, ftsizeu_, ftsizev_);
 
     //It makes sense to included the primary beam at the same time the gridding correction is performed.
-    std::printf("Calculating the primary beam: A \n");
+    PURIFY_DEBUG("Calculating the primary beam: A");
     auto A = MeasurementOperator::init_primary_beam(primary_beam_, cell_x_, cell_y_);
     S = S * A;
-    std::printf("Doing power method: eta_{i+1}x_{i + 1} = Psi^T Psi x_i \n");
+    PURIFY_DEBUG("Doing power method: eta_{i+1}x_{i + 1} = Psi^T Psi x_i");
     norm = std::sqrt(MeasurementOperator::power_method(norm_iterations_));
-    std::printf("Found a norm of eta = %f \n", norm);
-    std::printf("Gridding Operator Constructed: WGFSA \n");
-    std::printf("------ \n");
+    PURIFY_DEBUG("Found a norm of eta = %f", norm);
+    PURIFY_HIGH_LOG("Gridding Operator Constructed: WGFSA");
   }
 
 
