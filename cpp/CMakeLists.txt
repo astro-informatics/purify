@@ -1,4 +1,6 @@
 # Setup logging
+set(PURIFY_LOGGER_NAME "purify" CACHE STRING "NAME of the logger")
+set(PURIFY_COLOR_LOGGING true CACHE BOOL "Whether to add color to the log")
 if(logging)
   set(PURIFY_DO_LOGGING 1)
   set(PURIFY_TEST_LOG_LEVEL critical CACHE STRING "Level when logging tests")

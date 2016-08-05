@@ -25,6 +25,10 @@ namespace purify {
   inline std::string gitref() { return "@Purify_GITREF@"; }
   //! Default logging level
   inline std::string default_logging_level() { return "@PURIFY_TEST_LOG_LEVEL@"; }
+  //! Default logger name
+  inline std::string default_logger_name() { return "@PURIFY_LOGGER_NAME@"; }
+  //! Wether to add color to the logger
+  inline constexpr bool color_logger() { return @PURIFY_COLOR_LOGGING@; }
 }
 
 #endif
