@@ -50,6 +50,9 @@ target_link_libraries(cppurify ${FFTW3_DOUBLE_LIBRARY} ${CCFits_LIBRARY} ${CFits
 if(TARGET casacore::ms)
   target_link_libraries(cppurify casacore::ms)
 endif()
+if(TARGET openmp::openmp)
+  target_link_libraries(cppurify openmp::openmp)
+endif()
 
 add_dependencies(cppurify lookup_dependencies)
 
