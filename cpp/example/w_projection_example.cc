@@ -1,3 +1,4 @@
+#include "purify/config.h"
 #include <array>
 #include <memory>
 #include <random>
@@ -12,6 +13,7 @@
 #include "types.h"
 #include "MeasurementOperator.h"
 #include "utilities.h"
+#include "logging.h"
 
 using namespace purify;  
 using namespace purify::notinstalled;  
