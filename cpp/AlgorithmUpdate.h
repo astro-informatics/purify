@@ -23,7 +23,7 @@ class AlgorithmUpdate {
       const utilities::vis_params & uv_data,
       sopt::algorithm::ImagingProximalADMM<t_complex> & padmm,
       std::ostream & stream,
-      MeasurementOperator measurements,
+      const MeasurementOperator & measurements,
       const sopt::LinearTransform<sopt::Vector<sopt::t_complex>> & Psi);
 
   bool operator()(Vector<t_complex> const & x);
@@ -49,7 +49,7 @@ class AlgorithmUpdate {
     sopt::algorithm::ImagingProximalADMM<t_complex> &padmm;
     std::clock_t const c_start;
     const sopt::LinearTransform<sopt::Vector<sopt::t_complex>> & Psi;
-    MeasurementOperator measurements;
+    const MeasurementOperator &measurements;
   private:
     //!Method to modify gamma
     void modify_gamma(Vector<t_complex> const & alpha);

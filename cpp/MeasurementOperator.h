@@ -1,4 +1,4 @@
- #ifndef PURIFY_MEASUREMENT_OPERATOR_H
+#ifndef PURIFY_MEASUREMENT_OPERATOR_H
 #define PURIFY_MEASUREMENT_OPERATOR_H
 
 #include "types.h"
@@ -26,21 +26,18 @@ namespace purify {
         t_real resample_factor = 1;
 
 
-      
       MeasurementOperator();
       MeasurementOperator(const utilities::vis_params& uv_vis_input, const t_int & Ju, const t_int & Jv, 
        const std::string & kernel_name, const t_int & imsizex, const t_int & imsizey, const t_int & norm_iterations = 20, const t_real & oversample_factor = 2, 
        const t_real & cell_x = 1, const t_real & cell_y = 1, const std::string& weighting_type = "none", const t_real& R = 0, 
        bool use_w_term = false, const t_real & energy_fraction = 1, const std::string & primary_beam = "none", bool fft_grid_correction = false);
-      
-      void operator() (const utilities::vis_params& uv_vis_input);
 
 
 #   define PURIFY_MACRO(NAME, TYPE, VALUE) \
       protected: \
         TYPE NAME##_ = VALUE; \
       public:    \
-        TYPE const &NAME() { return NAME##_; };  \
+        TYPE const &NAME() const { return NAME##_; };  \
         MeasurementOperator &NAME(TYPE const &NAME) { NAME##_ = NAME; return *this; };  \
                                                                 
       
@@ -59,20 +56,32 @@ namespace purify {
      PURIFY_MACRO(energy_fraction, t_real, 1.);
      PURIFY_MACRO(fft_grid_correction, bool, false);
      PURIFY_MACRO(primary_beam, std::string, "none");
-  
 
+    //! Reads in visiblities and uses them to construct the operator for use 
+     MeasurementOperator &construct_operator(const utilities::vis_params& uv_vis_input)
+     {
+       MeasurementOperator::init_operator(uv_vis_input);
+       return *this;
+     };
+
+     //writing definiton of fftoperator so that it is mutable.
+    protected:
+      mutable FFTOperator fftoperator_ = purify::FFTOperator().fftw_flag((FFTW_MEASURE|FFTW_PRESERVE_INPUT));
+    public:
+      FFTOperator &fftoperator(){ return fftoperator_; };
+      MeasurementOperator &fftoperator(FFTOperator const &fftoperator){ fftoperator_ = fftoperator; return *this;  };
 #     undef PURIFY_MACRO
     //Default values
-     t_int ftsizeu_;
-     t_int ftsizev_;
+    protected:
+      t_int ftsizeu_ = floor(imsizex_ * oversample_factor_);
+      t_int ftsizev_ = floor(imsizey_ * oversample_factor_);
     public:
       //! Degridding operator that degrids image to visibilities
-      Vector<t_complex> degrid(const Image<t_complex>& eigen_image);
+      Vector<t_complex> degrid(const Image<t_complex>& eigen_image) const;
       //! Gridding operator that grids image from visibilities
-      Image<t_complex> grid(const Vector<t_complex>& visibilities);
+      Image<t_complex> grid(const Vector<t_complex>& visibilities) const;
 
     protected:
-      FFTOperator fftop = purify::FFTOperator().fftw_flag(FFTW_PATIENT|FFTW_PRESERVE_INPUT);
       //! Match uv coordinates to grid
       Vector<t_real> omega_to_k(const Vector<t_real>& omega);
       //! Generates interpolation matrix 

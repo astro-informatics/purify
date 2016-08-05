@@ -65,20 +65,22 @@ t_real estimate_noise(purify::Params const &params){
   return std::sqrt(sigma_real * sigma_real + sigma_imag * sigma_imag)/std::sqrt(2);
 }
 
-void save_psf_and_dirty_image(sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const & measurements_transform, purify::utilities::vis_params const & uv_data, purify::Params const &params){
+void save_psf_and_dirty_image(MeasurementOperator const &measurements,
+    purify::utilities::vis_params const & uv_data, purify::Params const &params){
 
-  auto header = create_new_header(uv_data, params);
+  purify::pfitsio::header_params header = create_new_header(uv_data, params);
   std::string const dirty_image_fits = params.name + "_dirty_"+ params.weighting + ".fits";
   std::string const psf_fits = params.name + "_psf_"+ params.weighting + ".fits";
 
-  Vector<> dimage = (measurements_transform.adjoint() * (uv_data.weights.array() * uv_data.vis.array()).matrix()).real();
+  Image<t_real> dimage = (measurements.grid(uv_data.weights.array() * uv_data.vis.array()).matrix()).real();
   header.fits_name = dirty_image_fits;
-  pfitsio::write2d_header(Image<t_real>::Map(dimage.data(), params.height, params.width), header);
-  Vector<> psf = (measurements_transform.adjoint() * (uv_data.weights.array()).matrix()).real();
+  std::cout << "Saving " + header.fits_name << std::endl;
+  pfitsio::write2d_header(dimage, header);
+  Image<t_real> psf = (measurements.grid(uv_data.weights.array() ).matrix()).real();
   t_real max_val = psf.array().abs().maxCoeff();
   psf = psf / max_val;
   header.fits_name = psf_fits;
-
+  std::cout << "Saving " + header.fits_name << std::endl;
   pfitsio::write2d_header(Image<t_real>::Map(psf.data(), params.height, params.width), header);
 
 }
@@ -86,20 +88,19 @@ void save_final_image(std::string const & outfile_fits, std::string const & resi
     utilities::vis_params const & uv_data, 
     Params const & params, MeasurementOperator measurements){
   //! Save final output image
-  auto header = create_new_header(uv_data, params);
+  purify::pfitsio::header_params header = create_new_header(uv_data, params);
   Image<t_complex> const image = Image<t_complex>::Map(x.data(), measurements.imsizey(), measurements.imsizex());
   // header information
   header.pix_units = "JY/PIXEL";
   header.fits_name = outfile_fits;
   pfitsio::write2d_header(image.real(), header);
-
   Image<t_complex> residual = measurements.grid(((uv_data.vis - measurements.degrid(image)).array() * uv_data.weights.array().real()).matrix() ).array();
   header.pix_units = "JY/BEAM";
   header.fits_name = residual_fits;
   pfitsio::write2d_header(residual.real(), header);
 };
 
-std::tuple<Vector<t_complex>, Vector<t_complex>> read_estimates(MeasurementOperator measurements, purify::utilities::vis_params const & uv_data, purify::Params const &params){
+std::tuple<Vector<t_complex>, Vector<t_complex>> read_estimates(MeasurementOperator const &measurements, purify::utilities::vis_params const & uv_data, purify::Params const &params){
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(params.width * params.height);
   Vector<t_complex> initial_residuals = Vector<t_complex>::Zero(uv_data.vis.size());
   //loading data from check point.
@@ -122,7 +123,7 @@ std::tuple<Vector<t_complex>, Vector<t_complex>> read_estimates(MeasurementOpera
 }
 
 template<class MEASUREMENT_OP>
-sopt::LinearTransform<sopt::Vector<sopt::t_complex>> linear_transform(MEASUREMENT_OP measurements,
+sopt::LinearTransform<sopt::Vector<sopt::t_complex>> linear_transform(MEASUREMENT_OP const & measurements,
                                                                       purify::utilities::vis_params const & uv_data,
                                                                       purify::Params const &params) {
   auto direct = [&measurements, &params](Vector<t_complex> &out, Vector<t_complex> const &x) {
@@ -153,11 +154,7 @@ int main(int argc, char **argv) {
   uv_data.units = "lambda";
   bandwidth_scaling(uv_data, params);
 
-  auto const header = create_new_header(uv_data, params);
-
-
-
-  auto measurements = MeasurementOperator()
+  auto const measurements = MeasurementOperator()
       .Ju(params.J)
       .Jv(params.J)
       .kernel_name(params.kernel)
@@ -172,16 +169,13 @@ int main(int argc, char **argv) {
       .use_w_term(params.use_w_term)
       .energy_fraction(params.energy_fraction)
       .primary_beam(params.primary_beam)
-      .fft_grid_correction(params.fft_grid_correction);
-
-    measurements(uv_data);
+      .fft_grid_correction(params.fft_grid_correction)
+      .construct_operator(uv_data);
   
   //calculate weights outside of measurement operator
   uv_data.weights = utilities::init_weights(uv_data.u, uv_data.v, 
       uv_data.weights, params.over_sample, 
       params.weighting, 0, params.over_sample * params.width, params.over_sample * params.height);
-
-
 
   auto const noise_rms = estimate_noise(params);
 
@@ -199,7 +193,7 @@ int main(int argc, char **argv) {
   auto const Psi = sopt::linear_transform<t_complex>(sara, params.height, params.width);
 
   std::printf("Saving dirty map \n");
-  save_psf_and_dirty_image(measurements_transform, uv_data, params);
+  save_psf_and_dirty_image(measurements, uv_data, params);
 
   auto const estimates = read_estimates(measurements, uv_data, params);
   

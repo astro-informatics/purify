@@ -7,7 +7,7 @@ namespace purify {
       const utilities::vis_params & uv_data,
       sopt::algorithm::ImagingProximalADMM<t_complex> & padmm,
       std::ostream & stream,
-      MeasurementOperator measurements,
+      const MeasurementOperator & measurements,
       const sopt::LinearTransform<sopt::Vector<sopt::t_complex>> & Psi)
    :params(params), uv_data(uv_data), padmm(padmm), c_start(std::clock()), stats(read_params_to_stats(params)), out_diagnostic(stream), measurements(measurements), Psi(Psi) {};
 
