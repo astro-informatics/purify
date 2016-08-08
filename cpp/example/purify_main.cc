@@ -72,7 +72,7 @@ void save_psf_and_dirty_image(MeasurementOperator const &measurements,
   std::string const dirty_image_fits = params.name + "_dirty_"+ params.weighting + ".fits";
   std::string const psf_fits = params.name + "_psf_"+ params.weighting + ".fits";
 
-  Image<t_real> dimage = (measurements.grid(uv_data.weights.array() * uv_data.vis.array()).matrix()).real();
+  Image<t_real> dimage = (measurements.grid(uv_data.weights.array() * uv_data.vis.array())).real();
   header.fits_name = dirty_image_fits;
   std::cout << "Saving " + header.fits_name << std::endl;
   pfitsio::write2d_header(dimage, header);
@@ -141,20 +141,8 @@ sopt::LinearTransform<sopt::Vector<sopt::t_complex>> linear_transform(MEASUREMEN
   );
 }
 
-}
-
-int main(int argc, char **argv) {
-  sopt::logging::initialize();
-
-  Params params = parse_cmdl(argc, argv);
-
-  sopt::logging::set_level(params.sopt_logging_level);
-
-  auto uv_data = purify::casa::read_measurementset(params.visfile, params.stokes_val);
-  uv_data.units = "lambda";
-  bandwidth_scaling(uv_data, params);
-
-  auto const measurements = MeasurementOperator()
+MeasurementOperator construct_measurement_operator(utilities::vis_params const & uv_data, purify::Params const & params){
+  auto measurements = MeasurementOperator()
       .Ju(params.J)
       .Jv(params.J)
       .kernel_name(params.kernel)
@@ -169,17 +157,30 @@ int main(int argc, char **argv) {
       .use_w_term(params.use_w_term)
       .energy_fraction(params.energy_fraction)
       .primary_beam(params.primary_beam)
-      .fft_grid_correction(params.fft_grid_correction)
-      .construct_operator(uv_data);
-  
+      .fft_grid_correction(params.fft_grid_correction);
+  measurements.init_operator(uv_data);
+  return measurements;
+};
+}
+
+int main(int argc, char **argv) {
+  sopt::logging::initialize();
+
+  Params params = parse_cmdl(argc, argv);
+
+  sopt::logging::set_level(params.sopt_logging_level);
+
+  auto uv_data = purify::casa::read_measurementset(params.visfile, params.stokes_val);
+  uv_data.units = "lambda";
+  bandwidth_scaling(uv_data, params);
+
   //calculate weights outside of measurement operator
   uv_data.weights = utilities::init_weights(uv_data.u, uv_data.v, 
       uv_data.weights, params.over_sample, 
       params.weighting, 0, params.over_sample * params.width, params.over_sample * params.height);
-
   auto const noise_rms = estimate_noise(params);
 
-
+  auto const measurements = construct_measurement_operator(uv_data, params);
 
   auto const measurements_transform = linear_transform(measurements, uv_data, params);
  
@@ -196,7 +197,6 @@ int main(int argc, char **argv) {
   save_psf_and_dirty_image(measurements, uv_data, params);
 
   auto const estimates = read_estimates(measurements, uv_data, params);
-  
   t_real const epsilon = params.n_mu * std::sqrt(2 * uv_data.vis.size()) * noise_rms; //Calculation of l_2 bound following SARA paper
 
 
@@ -228,31 +228,29 @@ int main(int argc, char **argv) {
     .nu(1e0)
     .Psi(Psi)
     .Phi(measurements_transform);
-
-  
   std::clock_t c_start = std::clock();
-
-
 
   auto convergence_function = [](Vector<t_complex> x){
     return true;
   };
   AlgorithmUpdate algo_update(params, uv_data, padmm, out_diagnostic, measurements, Psi);
+  
   auto lambda = [&convergence_function, &algo_update](Vector<t_complex> const &x) {
-     return convergence_function(x) and algo_update(x);
+//     return convergence_function(x) and algo_update(x);
+       return true;
   };
   
   Vector<t_complex> final_model = Vector<t_complex>::Zero(params.width * params.height);
+  
   std::string outfile_fits = "";
   std::string residual_fits = "";
 
-  if (!params.no_algo_update)
-    padmm.is_converged(lambda);
+  padmm.is_converged(lambda);
   if (params.niters != 0)
     padmm.itermax(params.niters);
   if (params.no_reweighted)
   {
-    auto const diagnostic = padmm(estimates);
+    auto const diagnostic = padmm();
     outfile_fits = params.name + "_solution_"+ params.weighting + "_final.fits";
     residual_fits = params.name + "_residual_"+ params.weighting + "_final.fits";
     final_model = diagnostic.x;
