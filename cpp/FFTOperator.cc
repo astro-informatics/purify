@@ -158,10 +158,10 @@ namespace purify {
     FFTOperator::inverse(dest, true);
   }
  void FFTOperator::set_up_multithread()
-  { 
+  {
     FFTOperator::clear_plans();
-    //fftw_init_threads();
-    //fftw_plan_with_nthreads(omp_get_max_threads());
+    fftw_init_threads();
+    fftw_plan_with_nthreads(omp_get_max_threads());
  }
 
 }
