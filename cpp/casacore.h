@@ -79,13 +79,15 @@ public:
   ChannelWrapper operator[](t_uint i) const;
   //! Returns wrapper over specific channel
   ChannelWrapper operator[](std::tuple<t_uint, std::string> const &i) const;
-  //! Direction (RA, DEC) in decimal degrees
+  //! Direction (RA, DEC) in radians
   Direction direction(t_real tolerance = 1e-8, std::string const &filter = "") const;
+  //! Right ascention in radians
   Direction::Scalar right_ascension(t_real tolerance = 1e-8, std::string const &filter = "") const {
-    return direction(tolerance, filter)(0) * 180 / constant::pi;
+    return direction(tolerance, filter)(0);
   }
+  //! Declination in radians
   Direction::Scalar declination(t_real tolerance = 1e-8, std::string const &filter = "") const {
-    return direction(tolerance, filter)(1) * 180 / constant::pi;
+    return direction(tolerance, filter)(1);
   }
 
 private:
