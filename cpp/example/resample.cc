@@ -1,8 +1,5 @@
-
 #include "MeasurementOperator.h"
-#include "wprojection.h"
 #include "pfitsio.h"
-
 #include "directories.h"
 
 using namespace purify;  

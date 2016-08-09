@@ -6,32 +6,29 @@ set(PURIFY_SOURCES
 set(TEST_SOURCE purify_test.c)
 set(ABOUT_SOURCE purify_about.c)
 
-# Adds include directories
-if(BLAS_INCLUDE_DIR)
-  include_directories(SYSTEM ${BLAS_INCLUDE_DIR})
-endif()
-if(Sopt_INCLUDE_DIRS)
-  include_directories(SYSTEM ${Sopt_INCLUDE_DIRS})
-endif()
-include_directories(SYSTEM
-  ${FFTW3_INCLUDE_DIR}
-  ${CFitsIO_INCLUDE_DIR}
-  ${TIFF_INCLUDE_DIR}
-)
-
-# Target libraries for the different executables
-set(TARGET_LIBRARIES
-     ${Sopt_C_LIBRARY}
-     ${FFTW3_DOUBLE_LIBRARY}
-     ${CFitsIO_LIBRARY}
-     ${TIFF_LIBRARY}
-     ${BLAS_LIBRARIES}
-)
-
 # Creates library
 add_library(libpurify SHARED ${PURIFY_SOURCES})
 set_target_properties(libpurify PROPERTIES OUTPUT_NAME "purify")
-target_link_libraries(libpurify ${TARGET_LIBRARIES})
+# Adds include directories
+if(BLAS_INCLUDE_DIR)
+  target_include_directories(libpurify SYSTEM PUBLIC ${BLAS_INCLUDE_DIR})
+endif()
+target_include_directories(libpurify SYSTEM PUBLIC
+  ${CFitsIO_INCLUDE_DIR}
+  ${TIFF_INCLUDE_DIR}
+)
+target_include_directories(libpurify PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include/>)
+
+target_link_libraries(libpurify
+  ${Sopt_C_LIBRARY}
+  ${FFTW3_DOUBLE_LIBRARY}
+  ${CFitsIO_LIBRARY}
+  ${TIFF_LIBRARY}
+  ${BLAS_LIBRARIES}
+)
 depends_on_lookups(libpurify)
 
 # Now add each example and purify_about

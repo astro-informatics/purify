@@ -62,11 +62,6 @@ if(tests)  # Adds ctest
     include(AddCatchTest)
 endif()
 
-include_directories(
-    "${PROJECT_SOURCE_DIR}/include"
-    "${PROJECT_BINARY_DIR}/include/purify"
-)
-
 add_subdirectory(src)
 add_subdirectory(include)
 add_subdirectory(python)

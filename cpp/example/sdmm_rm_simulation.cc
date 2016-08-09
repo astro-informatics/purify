@@ -8,7 +8,6 @@
 #include "sopt/wavelets/sara.h"
 #include "directories.h"
 #include "pfitsio.h"
-#include "regressions/cwrappers.h"
 #include "types.h"
 #include "RMOperator.h"
 #include "utilities.h"

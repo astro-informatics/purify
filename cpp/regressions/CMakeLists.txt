@@ -7,4 +7,4 @@ function(add_regression targetname)
     "${PROJECT_SOURCE_DIR}/cpp" ${Sopt_INCLUDE_DIRS})
 endfunction()
 
-add_regression(sdmm LIBRARIES libpurify cppurify ${Sopt_CPP_LIBRARY} ${Sopt_C_LIBRARY} )
+add_regression(sdmm LIBRARIES libpurify cppurify)

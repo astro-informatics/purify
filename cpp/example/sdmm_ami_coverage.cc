@@ -8,7 +8,6 @@
 #include "sopt/wavelets/sara.h"
 #include "directories.h"
 #include "pfitsio.h"
-#include "regressions/cwrappers.h"
 #include "types.h"
 #include "MeasurementOperator.h"
 #include "utilities.h"
@@ -31,7 +30,7 @@ int main(int, char **) {
   auto M31 = pfitsio::read2d(fitsfile);
   t_real const max = M31.array().abs().maxCoeff();
   M31 = M31 * 1. / max;
-  auto uv_data = utilities::read_visibilities(visfile, PURIFY_VISIBILITY_FILETYPE_PROFILE_VIS);
+  auto uv_data = utilities::read_visibility(visfile);
   uv_data.units = "radians";
   uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
   std::cout << "Number of measurements / number of pixels: " << uv_data.u.size() * 1./M31.size() << '\n';
