@@ -39,8 +39,7 @@ namespace purify {
       public:    \
         TYPE const &NAME() const { return NAME##_; };  \
         MeasurementOperator &NAME(TYPE const &NAME) { NAME##_ = NAME; return *this; };  \
-                                                                
-      
+    
      PURIFY_MACRO(Ju, t_int, 4);
      PURIFY_MACRO(Jv, t_int, 4);
      PURIFY_MACRO(kernel_name, std::string, "kb");
