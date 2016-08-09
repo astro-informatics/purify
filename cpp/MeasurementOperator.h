@@ -39,8 +39,7 @@ namespace purify {
       public:    \
         TYPE const &NAME() const { return NAME##_; };  \
         MeasurementOperator &NAME(TYPE const &NAME) { NAME##_ = NAME; return *this; };  \
-                                                                
-      
+    
      PURIFY_MACRO(Ju, t_int, 4);
      PURIFY_MACRO(Jv, t_int, 4);
      PURIFY_MACRO(kernel_name, std::string, "kb");
@@ -73,8 +72,8 @@ namespace purify {
 #     undef PURIFY_MACRO
     //Default values
     protected:
-      t_int ftsizeu_ = floor(imsizex_ * oversample_factor_);
-      t_int ftsizev_ = floor(imsizey_ * oversample_factor_);
+      t_int ftsizeu_;
+      t_int ftsizev_;
     public:
       //! Degridding operator that degrids image to visibilities
       Vector<t_complex> degrid(const Image<t_complex>& eigen_image) const;
@@ -95,6 +94,7 @@ namespace purify {
       Array<t_complex> init_weights(const Vector<t_real>& u, const Vector<t_real>& v, const Vector<t_complex>& weights, const t_real & oversample_factor, const std::string& weighting_type, const t_real& R);
       //! Calculate Primary Beam
       Image<t_real> init_primary_beam(const std::string & primary_beam, const t_real& cell_x, const t_real& cell_y);
+    public:
       //! Construct operator
       void init_operator(const utilities::vis_params& uv_vis_input);
 

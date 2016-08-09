@@ -12,15 +12,17 @@ namespace purify {
    :params(params), uv_data(uv_data), padmm(padmm), c_start(std::clock()), stats(read_params_to_stats(params)), out_diagnostic(stream), measurements(measurements), Psi(Psi) {};
 
 
-  bool AlgorithmUpdate::operator()(Vector<t_complex> const & x) {
+  bool AlgorithmUpdate::operator()(const Vector<t_complex> & x) {
     std::clock_t c_end = std::clock();
     stats.total_time = (c_end-c_start) / CLOCKS_PER_SEC; // total time for solver to run in seconds
     //Getting things ready for l1 and l2 norm calculation
     Image<t_complex> const image = Image<t_complex>::Map(x.data(), params.height, params.width);
     Vector<t_complex> const y_residual = ((uv_data.vis - measurements.degrid(image)).array() * uv_data.weights.array().real());
-    t_real const l2_norm = y_residual.stableNorm();
+    stats.l2_norm = y_residual.stableNorm();
     Vector<t_complex> const alpha = Psi.adjoint() * x;
-    t_real const l1_norm = alpha.lpNorm<1>();
+    //updating parameter
+    AlgorithmUpdate::modify_gamma(alpha);
+    stats.l1_norm = alpha.lpNorm<1>();
     if (params.update_output) {
       std::string const outfile_fits = params.name + "_solution_"+ params.weighting + "_update.fits";
       std::string const outfile_upsample_fits = params.name + "_solution_"+ params.weighting + "_update_upsample.fits";
@@ -36,15 +38,12 @@ namespace purify {
       stats.min = residual.matrix().real().minCoeff();
 
     }
-    //updating parameters
-    AlgorithmUpdate::modify_gamma(alpha);
     if (params.run_diagnostic)
     {
       //printing log information to stream
       AlgorithmUpdate::print_to_stream(out_diagnostic);
-      AlgorithmUpdate::print_to_stream(std::cout);
     }
-
+    AlgorithmUpdate::print_to_stream(std::cout);
     stats.iter++;
 
     return true;
@@ -60,14 +59,15 @@ namespace purify {
     std::cout << "Relative gamma = " << stats.relative_gamma << '\n';
     std::cout << "Old gamma = " << padmm.gamma() << '\n';
     std::cout << "New gamma = " << stats.new_purify_gamma << '\n';
-    if (stats.iter < 1000 and stats.relative_gamma > 0.01 and stats.new_purify_gamma > 0 and params.adapt_gamma)
+    if (stats.iter < 1000 and stats.relative_gamma > 0.01
+        and stats.new_purify_gamma > 0 and params.adapt_gamma)
     {
       padmm.gamma(stats.new_purify_gamma);
     }
 
 
     //Information saved for diagnostics
-    if (stats.new_purify_gamma == 0)
+    if (stats.iter == 0)
     {
       stats.new_purify_gamma = padmm.gamma();// so that first value on plot is not zero.
     }
@@ -88,7 +88,9 @@ namespace purify {
     stream << stats.total_time << " ";
     stream << std::endl;
   }
-  void AlgorithmUpdate::save_figure(const Vector<t_complex> & image, std::string const & output_file_name, std::string const & units, t_real const & upsample_ratio){
+
+  void AlgorithmUpdate::save_figure(const Vector<t_complex> & image, std::string const & output_file_name,
+      std::string const & units, t_real const & upsample_ratio){
     //Saves update images to fits files, with correct headers
     auto header = AlgorithmUpdate::create_header(uv_data, params);
     header.fits_name = output_file_name;
@@ -96,7 +98,11 @@ namespace purify {
     std::printf("Saving %s \n", header.fits_name.c_str());
     header.cell_x /= upsample_ratio;
     header.cell_y /= upsample_ratio;
-    pfitsio::write2d_header(utilities::re_sample_image(image, upsample_ratio).real(), header);
+    Image<t_complex> temp_image = Image<t_complex>::Map(image.data(), params.height, params.width);
+    if (upsample_ratio != 1) {
+      temp_image = utilities::re_sample_image(temp_image, upsample_ratio);
+    }
+    pfitsio::write2d_header(temp_image.real(), header);
   }
 
   pfitsio::header_params AlgorithmUpdate::create_header(purify::utilities::vis_params const & uv_data, purify::Params const &params){

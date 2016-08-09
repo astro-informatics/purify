@@ -65,23 +65,24 @@ t_real estimate_noise(purify::Params const &params){
   return std::sqrt(sigma_real * sigma_real + sigma_imag * sigma_imag)/std::sqrt(2);
 }
 
-void save_psf_and_dirty_image(MeasurementOperator const &measurements,
+void save_psf_and_dirty_image(sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const &measurements,
     purify::utilities::vis_params const & uv_data, purify::Params const &params){
 
   purify::pfitsio::header_params header = create_new_header(uv_data, params);
   std::string const dirty_image_fits = params.name + "_dirty_"+ params.weighting + ".fits";
   std::string const psf_fits = params.name + "_psf_"+ params.weighting + ".fits";
-
-  Image<t_real> dimage = (measurements.grid(uv_data.weights.array() * uv_data.vis.array()).matrix()).real();
+  Vector<t_complex> const dirty_image = measurements.adjoint() * (uv_data.weights.array() * uv_data.vis.array());
+  Image<t_real> dimage = Image<t_complex>::Map(dirty_image.data(), params.height, params.width).real();
   header.fits_name = dirty_image_fits;
   std::cout << "Saving " + header.fits_name << std::endl;
   pfitsio::write2d_header(dimage, header);
-  Image<t_real> psf = (measurements.grid(uv_data.weights.array() ).matrix()).real();
+  Vector<t_complex> const psf_image = measurements.adjoint() * (uv_data.weights.array());
+  Image<t_real> psf = Image<t_complex>::Map(psf_image.data(), params.height, params.width).real();
   t_real max_val = psf.array().abs().maxCoeff();
   psf = psf / max_val;
   header.fits_name = psf_fits;
   std::cout << "Saving " + header.fits_name << std::endl;
-  pfitsio::write2d_header(Image<t_real>::Map(psf.data(), params.height, params.width), header);
+  pfitsio::write2d_header(psf, header);
 
 }
 void save_final_image(std::string const & outfile_fits, std::string const & residual_fits, Vector<t_complex> const & x, 
@@ -100,8 +101,8 @@ void save_final_image(std::string const & outfile_fits, std::string const & resi
   pfitsio::write2d_header(residual.real(), header);
 };
 
-std::tuple<Vector<t_complex>, Vector<t_complex>> read_estimates(MeasurementOperator const &measurements, purify::utilities::vis_params const & uv_data, purify::Params const &params){
-  Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(params.width * params.height);
+std::tuple<Vector<t_complex>, Vector<t_complex>> read_estimates(sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const &measurements, purify::utilities::vis_params const & uv_data, purify::Params const &params){
+  Vector<t_complex> initial_estimate = measurements.adjoint() * (uv_data.weights.array() * uv_data.vis.array());
   Vector<t_complex> initial_residuals = Vector<t_complex>::Zero(uv_data.vis.size());
   //loading data from check point.
   if (utilities::file_exists(params.name + "_diagnostic"))
@@ -115,7 +116,8 @@ std::tuple<Vector<t_complex>, Vector<t_complex>> read_estimates(MeasurementOpera
         std::runtime_error("Initial model estimate is the wrong size.");
       }
       initial_estimate = Matrix<t_complex>::Map(image.data(), image.size(), 1);
-      initial_residuals = ((uv_data.vis - measurements.degrid(image)).array() * uv_data.weights.array().real());     
+      Vector<t_complex> const model = measurements * image;
+      initial_residuals = (uv_data.vis - model ).array() * (uv_data.weights.array().real());
     }
   }
   std::tuple<Vector<t_complex>, Vector<t_complex>> const estimates(initial_estimate, initial_residuals); 
@@ -141,20 +143,8 @@ sopt::LinearTransform<sopt::Vector<sopt::t_complex>> linear_transform(MEASUREMEN
   );
 }
 
-}
-
-int main(int argc, char **argv) {
-  sopt::logging::initialize();
-
-  Params params = parse_cmdl(argc, argv);
-
-  sopt::logging::set_level(params.sopt_logging_level);
-
-  auto uv_data = purify::casa::read_measurementset(params.visfile, params.stokes_val);
-  uv_data.units = "lambda";
-  bandwidth_scaling(uv_data, params);
-
-  auto const measurements = MeasurementOperator()
+MeasurementOperator construct_measurement_operator(utilities::vis_params const & uv_data, purify::Params const & params){
+  auto measurements = MeasurementOperator()
       .Ju(params.J)
       .Jv(params.J)
       .kernel_name(params.kernel)
@@ -169,20 +159,28 @@ int main(int argc, char **argv) {
       .use_w_term(params.use_w_term)
       .energy_fraction(params.energy_fraction)
       .primary_beam(params.primary_beam)
-      .fft_grid_correction(params.fft_grid_correction)
-      .construct_operator(uv_data);
-  
+      .fft_grid_correction(params.fft_grid_correction);
+  measurements.init_operator(uv_data);
+  return measurements;
+};
+}
+
+int main(int argc, char **argv) {
+  sopt::logging::initialize();
+
+  Params params = parse_cmdl(argc, argv);
+  sopt::logging::set_level(params.sopt_logging_level);
+
+  auto uv_data = purify::casa::read_measurementset(params.visfile, params.stokes_val);
+  bandwidth_scaling(uv_data, params);
+
   //calculate weights outside of measurement operator
-  uv_data.weights = utilities::init_weights(uv_data.u, uv_data.v, 
-      uv_data.weights, params.over_sample, 
+  uv_data.weights = utilities::init_weights(uv_data.u, uv_data.v,
+      uv_data.weights, params.over_sample,
       params.weighting, 0, params.over_sample * params.width, params.over_sample * params.height);
-
   auto const noise_rms = estimate_noise(params);
-
-
-
+  auto const measurements = construct_measurement_operator(uv_data, params);
   auto const measurements_transform = linear_transform(measurements, uv_data, params);
- 
 
   sopt::wavelets::SARA const sara{
         std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u), 
@@ -193,10 +191,9 @@ int main(int argc, char **argv) {
   auto const Psi = sopt::linear_transform<t_complex>(sara, params.height, params.width);
 
   std::printf("Saving dirty map \n");
-  save_psf_and_dirty_image(measurements, uv_data, params);
+  save_psf_and_dirty_image(measurements_transform, uv_data, params);
 
-  auto const estimates = read_estimates(measurements, uv_data, params);
-  
+  auto const estimates = read_estimates(measurements_transform, uv_data, params);
   t_real const epsilon = params.n_mu * std::sqrt(2 * uv_data.vis.size()) * noise_rms; //Calculation of l_2 bound following SARA paper
 
 
@@ -228,25 +225,19 @@ int main(int argc, char **argv) {
     .nu(1e0)
     .Psi(Psi)
     .Phi(measurements_transform);
-
-  
   std::clock_t c_start = std::clock();
 
-
-
-  auto convergence_function = [](Vector<t_complex> x){
+  auto convergence_function = [](const Vector<t_complex> &x){
     return true;
   };
   AlgorithmUpdate algo_update(params, uv_data, padmm, out_diagnostic, measurements, Psi);
   auto lambda = [&convergence_function, &algo_update](Vector<t_complex> const &x) {
-     return convergence_function(x) and algo_update(x);
+    return convergence_function(x) and algo_update(x);
   };
-  
   Vector<t_complex> final_model = Vector<t_complex>::Zero(params.width * params.height);
   std::string outfile_fits = "";
   std::string residual_fits = "";
-
-  if (!params.no_algo_update)
+  if (params.algo_update)
     padmm.is_converged(lambda);
   if (params.niters != 0)
     padmm.itermax(params.niters);

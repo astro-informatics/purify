@@ -43,7 +43,7 @@ namespace purify {
   bool update_output = false; //save output after each iteration
   bool adapt_gamma = true; //update gamma/stepsize
   bool run_diagnostic = false; //save and output diagnostic information
-  bool no_algo_update = false; //if to use lambda function to record/update algorithm variables
+  bool algo_update = true; //if to use lambda function to record/update algorithm variables
   bool no_reweighted = true; //if to use reweighting
   };
 
