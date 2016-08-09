@@ -7,7 +7,7 @@
 #define PURIFY_HAS_NOT_USING
 #endif
 
-//! Macro to start logging or not
+//! Whether to do logging or not
 #cmakedefine PURIFY_DO_LOGGING
 
 //! Whether to do openmp
