@@ -21,11 +21,11 @@ list(GET version 2 Purify_VERSION_PATCH)
 configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(SOURCES MeasurementOperator.cc FFTOperator.cc clean.cc utilities.cc pfitsio.cc
-  kernels.cc RMOperator.cc PSFOperator.cc wprojection.cc AlgorithmUpdate.cc cmdl.cc)
+  kernels.cc RMOperator.cc PSFOperator.cc wprojection.cc)
 if(TARGET casacore::ms)
-  list(APPEND SOURCES casacore.cc)
+  list(APPEND SOURCES casacore.cc AlgorithmUpdate.cc cmdl.cc)
 endif()
-add_library(cppurify ${SOURCES})
+add_library(cppurify SHARED ${SOURCES})
 
 target_include_directories(cppurify PUBLIC
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
@@ -42,9 +42,6 @@ if(CFitsIO_INCLUDE_DIR)
 endif()
 if(CCFits_INCLUDE_DIR)
   target_include_directories(cppurify SYSTEM PUBLIC ${CCFits_INCLUDE_DIR}/.. ${CCFits_INCLUDE_DIR})
-endif()
-if(Sopt_INCLUDE_DIRS)
-  target_include_directories(cppurify SYSTEM PUBLIC ${Sopt_INCLUDE_DIRS})
 endif()
 target_link_libraries(cppurify ${FFTW3_DOUBLE_LIBRARY} ${CCFits_LIBRARY} ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY})
 if(TARGET casacore::ms)
