@@ -34,7 +34,6 @@ add_example(padmm_ami_coverage LIBRARIES cppurify libpurify NOTEST)
 add_example(padmm_random_coverage LIBRARIES cppurify libpurify NOTEST)
 add_example(padmm_vla LIBRARIES cppurify libpurify NOTEST)
 
-add_example(purify_main LIBRARIES cppurify libpurify NOTEST)
 
 add_example(padmm_atca LIBRARIES cppurify libpurify NOTEST)
 add_example(padmm_cygA LIBRARIES cppurify libpurify NOTEST)
@@ -42,6 +41,9 @@ add_example(sara_padmm_random_coverage LIBRARIES cppurify libpurify NOTEST)
 
 add_example(clean_vla LIBRARIES cppurify libpurify NOTEST)
 
-if(data)
+if(TARGET casacore::ms)
+  add_example(purify_main LIBRARIES cppurify libpurify NOTEST)
+endif()
+if(data AND TARGET casacore::ms)
   add_example(casa LIBRARIES cppurify)
 endif()
