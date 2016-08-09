@@ -33,8 +33,8 @@ namespace purify {
 	    pFits->pHDU().addKey("CRPIX2",  static_cast<t_int>(std::floor(eigen_image.rows()/2)), "");
 	    pFits->pHDU().addKey("CRPIX3", 1, "");
 	    pFits->pHDU().addKey("CRPIX4", 1, "");
-	    pFits->pHDU().addKey("CRVAL1", header.ra , "");
-	    pFits->pHDU().addKey("CRVAL2", header.dec , "");
+	    pFits->pHDU().addKey("CRVAL1", header.ra * 180. / purify::pi, "");
+	    pFits->pHDU().addKey("CRVAL2", header.dec * 180. / purify::pi, "");
 	    pFits->pHDU().addKey("CRVAL3", header.mean_frequency * std::pow(10, 6) * 1., "");
 	    pFits->pHDU().addKey("CRVAL4", 1, "");
 	    pFits->pHDU().addKey("CTYPE1", "RA---NCP", "");

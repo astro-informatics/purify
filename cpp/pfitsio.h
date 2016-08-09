@@ -16,8 +16,8 @@ namespace purify {
       	t_real mean_frequency = 1400; // in MHz
       	t_real cell_x = 1;//in arcseconds
       	t_real cell_y = 1;//in arcseconds
-      	t_real ra = 0;// in decimal degrees
-      	t_real dec = 0;// in decimal degrees
+      	t_real ra = 0;// in radians, converted to decimal degrees before write
+      	t_real dec = 0;// in radians, converted to decimal degrees before write
       	t_int pix_ref_x = 0;
       	t_int pix_ref_y = 0;
       	std::string pix_units = "Jy/BEAM";
