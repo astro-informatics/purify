@@ -10,6 +10,9 @@
 //! Macro to start logging or not
 #cmakedefine PURIFY_DO_LOGGING
 
+//! Whether to do openmp
+#cmakedefine PURIFY_OPENMP
+
 #include <string>
 #include <tuple>
 

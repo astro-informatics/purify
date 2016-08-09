@@ -2,9 +2,12 @@
 #define PURIFY_FFT_OPERATOR_H
 
 
+#include "purify/config.h"
 #include "types.h"
 
-//#include <omp.h>
+#ifdef PURIFY_OPENMP
+#include <omp.h>
+#endif
 #include <fftw3.h>
 
 #include <unsupported/Eigen/src/FFT/ei_fftw_impl.h>
