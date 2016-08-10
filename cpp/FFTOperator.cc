@@ -162,7 +162,7 @@ namespace purify {
     FFTOperator::clear_plans();
 #ifdef PURIFY_OPENMP
     fftw_init_threads();
-    fftw_plan_with_nthr eads(omp_get_max_threads());
+    fftw_plan_with_nthreads(omp_get_max_threads());
 #endif
  }
 
