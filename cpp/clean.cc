@@ -132,7 +132,7 @@ namespace purify {
 		    auto fwhm_x = fit(0) * 2 * std::sqrt(2 * std::log(2));
 		    auto fwhm_y = fit(1) * 2 * std::sqrt(2 * std::log(2));
 		    auto theta = fit(2);
-		    PURIFY_MEDIUM_LOG("Fitted a Beam of %f x %f , %f", fwhm_x, fwhm_y, theta / purify_pi * 180);
+		    PURIFY_MEDIUM_LOG("Fitted a Beam of %f x %f , %f", fwhm_x, fwhm_y, theta / constant::pi * 180);
 		    //setting up Gaussian calculation
 		    t_real const sigma_x = fwhm_x / (2 * std::sqrt(2 * std::log(2)));
 		    t_real const sigma_y = fwhm_y / (2 * std::sqrt(2 * std::log(2)));
@@ -148,7 +148,7 @@ namespace purify {
 		        {
 		            t_real x = i - x0;
 		            t_real y = j - y0;
-		            gaussian(j, i) = std::exp(- a * x * x + 2 * b * x * y - c * y * y )/(2  * purify_pi * sigma_x * sigma_y);
+		            gaussian(j, i) = std::exp(- a * x * x + 2 * b * x * y - c * y * y )/(2  * constant::pi * sigma_x * sigma_y);
 		        }
 		    }
 		   	t_int gaussian_x;

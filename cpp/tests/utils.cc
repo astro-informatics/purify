@@ -84,7 +84,7 @@ TEST_CASE("utilities [read_write_vis]", "[read_write_vis]"){
     CHECK(new_uv_data.weights.isApprox(uv_data.weights, 1e-13));
     t_int number_of_random_vis = 1e5;
     const bool w_term = true;
-    auto random_uv_data = utilities::random_sample_density(number_of_random_vis, 0, purify_pi /3);
+    auto random_uv_data = utilities::random_sample_density(number_of_random_vis, 0, constant::pi /3);
     utilities::write_visibility(random_uv_data, out_w_file, w_term);
     auto new_random_uv_data = utilities::read_visibility(out_w_file, w_term);
     CHECK(new_random_uv_data.u.isApprox(random_uv_data.u, 1e-8));

@@ -133,11 +133,11 @@ namespace purify {
 	      {
 	        Vector<t_real> u_dist = uv_vis.u.array() * uv_vis.u.array();
 	        t_real max_u = std::sqrt(u_dist.maxCoeff());
-	        cell_size_u = (180 * 3600) / max_u / purify_pi / 3; //Calculate cell size if not given one
+	        cell_size_u = (180 * 3600) / max_u / constant::pi / 3; //Calculate cell size if not given one
 
 	        Vector<t_real> v_dist = uv_vis.v.array() * uv_vis.v.array();
 	        t_real max_v = std::sqrt(v_dist.maxCoeff());
-	        cell_size_v = (180 * 3600) / max_v / purify_pi / 3; //Calculate cell size if not given one
+	        cell_size_v = (180 * 3600) / max_v / constant::pi / 3; //Calculate cell size if not given one
 	        PURIFY_MEDIUM_LOG("PSF has a FWHM of {} by {} arcseconds", cell_size_u * 3, cell_size_v * 3);
 	      }
 	      if (cell_size_v == 0)
@@ -151,18 +151,18 @@ namespace purify {
 	      t_real scale_factor_v = 1;
 	      if (uv_vis.units == "lambda")
 	      {
-	      	scale_factor_u = 180 * 3600 / cell_size_u / purify_pi;
-	      	scale_factor_v = 180 * 3600 / cell_size_v / purify_pi;
+	      	scale_factor_u = 180 * 3600 / cell_size_u / constant::pi;
+	      	scale_factor_v = 180 * 3600 / cell_size_v / constant::pi;
 	      	scaled_vis.w = uv_vis.w;
 	      }
 	      if (uv_vis.units == "radians")
 	      {
-	      	scale_factor_u = 180 * 3600 / purify_pi;
-	      	scale_factor_v = 180 * 3600 / purify_pi;
+	      	scale_factor_u = 180 * 3600 / constant::pi;
+	      	scale_factor_v = 180 * 3600 / constant::pi;
 	      	scaled_vis.w = uv_vis.w;	      	
 	      }
-	      scaled_vis.u = uv_vis.u / scale_factor_u * 2 * purify_pi;
-	      scaled_vis.v = uv_vis.v / scale_factor_v * 2 * purify_pi;
+	      scaled_vis.u = uv_vis.u / scale_factor_u * 2 * constant::pi;
+	      scaled_vis.v = uv_vis.v / scale_factor_v * 2 * constant::pi;
 	      
 	      scaled_vis.vis = uv_vis.vis;
 	      scaled_vis.weights = uv_vis.weights;
@@ -179,8 +179,8 @@ namespace purify {
 	      scales the uv coordinates from being in units of 2 * pi to units of pixels.
 	    */
 	      utilities::vis_params scaled_vis;
-	      scaled_vis.u = uv_vis.u / (2 * purify_pi) * sizex;
-	      scaled_vis.v = uv_vis.v / (2 * purify_pi) * sizey;
+	      scaled_vis.u = uv_vis.u / (2 * constant::pi) * sizex;
+	      scaled_vis.v = uv_vis.v / (2 * constant::pi) * sizey;
 	      scaled_vis.vis = uv_vis.vis;
 	      scaled_vis.weights = uv_vis.weights;
 	      for (t_int i = 0; i < uv_vis.u.size(); ++i)

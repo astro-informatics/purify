@@ -37,7 +37,7 @@ int main( int nargs, char const** args ){
 
 
   //Gridding example
-  cellsize = 1./2000. * 180./ purify_pi / 3. * (60. * 60.);
+  cellsize = 1./2000. * 180./ constant::pi / 3. * (60. * 60.);
   t_real energy_fraction = 0.99;
   over_sample = 2;
   t_int J = 4;
@@ -55,8 +55,8 @@ int main( int nargs, char const** args ){
   const t_real theta_FoV_L = cellsize * width * over_sample;
   const t_real theta_FoV_M = cellsize * height * over_sample;
 
-  const t_real L = 2 * std::sin(purify_pi / 180.* theta_FoV_L / (60. * 60.) * 0.5);
-  const t_real M = 2 * std::sin(purify_pi / 180.* theta_FoV_M / (60. * 60.) * 0.5);
+  const t_real L = 2 * std::sin(constant::pi / 180.* theta_FoV_L / (60. * 60.) * 0.5);
+  const t_real M = 2 * std::sin(constant::pi / 180.* theta_FoV_M / (60. * 60.) * 0.5);
   const t_real FoV = std::max(L, M);
   uv_vis.w = Vector<t_real>::Constant(number_of_vis, 1)/FoV * (uv_vis.u.array() * uv_vis.u.array() + uv_vis.v.array() * uv_vis.v.array()).sqrt().maxCoeff();
   //uv_vis = utilities::uv_symmetry(uv_vis); //reflect uv measurements

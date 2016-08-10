@@ -45,7 +45,7 @@ int main( int nargs, char const** args ) {
   auto sky_model_max = sky_model.array().abs().maxCoeff();
   sky_model = sky_model / sky_model_max;
   t_int const number_of_vis = std::floor(m_over_n * sky_model.size());
-  t_real const sigma_m = purify_pi/3;
+  t_real const sigma_m = constant::pi/3;
   
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";

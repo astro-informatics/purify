@@ -7,8 +7,6 @@
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
 
-#define purify_pi 3.14159265358979323846
-#define purify_c 299792458.0
 
 namespace purify {
 //! Root of the type hierarchy for signed integers
@@ -42,9 +40,9 @@ template <class T = t_real> using Image = Eigen::Array<T, Eigen::Dynamic, Eigen:
 
 namespace constant {
 //! mathematical constant
-const t_real pi = purify_pi;
+const t_real pi = 3.14159265358979323846;
 //! speed of light in vacuum
-const t_real c = purify_c;
+const t_real c = 299792458.0;
 }
 }
 #endif

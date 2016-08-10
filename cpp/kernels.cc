@@ -28,7 +28,7 @@ namespace purify {
           Fourier transform of kaiser bessel gridding kernel
         */
         
-        t_complex eta = std::sqrt(static_cast<t_complex>((purify_pi * x * J)*(purify_pi * x * J) - alpha * alpha));
+        t_complex eta = std::sqrt(static_cast<t_complex>((constant::pi * x * J)*(constant::pi * x * J) - alpha * alpha));
         t_real normalisation = 38828.11016883; //Factor that keeps it consistent with fessler formula
 
         return std::real(std::sin(eta) / eta) / normalisation; //simple way of doing the calculation, the boost bessel funtions do not support complex valued arguments
@@ -212,7 +212,7 @@ namespace purify {
         x:: value to evaluate
         J:: support size
       */
-        return boost::math::sinc_pi( J * x * purify_pi);
+        return boost::math::sinc_pi( J * x * constant::pi);
     }
     t_real gaussian_general(const t_real& x, const t_int& J, const t_real& sigma)
     {
@@ -238,8 +238,8 @@ namespace purify {
         sigma:: standard deviation of Gaussian kernel (in pixels)
       */
         
-        t_real a = x * sigma * purify_pi;
-        return std::sqrt(purify_pi / 2) / sigma * std::exp(-a * a * 2);
+        t_real a = x * sigma * constant::pi;
+        return std::sqrt(constant::pi / 2) / sigma * std::exp(-a * a * 2);
     }
 
  }

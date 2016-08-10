@@ -114,8 +114,8 @@ namespace purify {
 	    const t_real theta_FoV_L = cell_x * x_size;
 	    const t_real theta_FoV_M = cell_y * y_size;
 
-	    const t_real L = 2 * std::sin(purify_pi / 180.* theta_FoV_L / (60. * 60.) * 0.5);
-	    const t_real M = 2 * std::sin(purify_pi / 180.* theta_FoV_M / (60. * 60.) * 0.5);
+	    const t_real L = 2 * std::sin(constant::pi / 180.* theta_FoV_L / (60. * 60.) * 0.5);
+	    const t_real M = 2 * std::sin(constant::pi / 180.* theta_FoV_M / (60. * 60.) * 0.5);
 
 	    const t_real delt_x = L / x_size;
 	    const t_real delt_y = M / y_size;
@@ -129,7 +129,7 @@ namespace purify {
 	        t_real x = (l + 0.5 - x_size * 0.5) * delt_x;
 	        t_real y = (m + 0.5 - y_size * 0.5) * delt_y;
 
-	        chirp(m, l) = std::exp(- 2 * purify_pi * I * w_term * (std::sqrt(1 - x*x - y*y) - 1)) * std::exp(- 2 * purify_pi * I * (l * 0.5 + m * 0.5));
+	        chirp(m, l) = std::exp(- 2 * constant::pi * I * w_term * (std::sqrt(1 - x*x - y*y) - 1)) * std::exp(- 2 * constant::pi * I * (l * 0.5 + m * 0.5));
 	      }
 	    }
 	    return chirp/chirp.size();
@@ -230,8 +230,8 @@ namespace purify {
 	        const t_real theta_FoV_L = cell_x * x_size;
 	    	const t_real theta_FoV_M = cell_y * y_size;
 
-	    	const t_real L = 2 * std::sin(purify_pi / 180.* theta_FoV_L / (60. * 60.) * 0.5);
-	    	const t_real M = 2 * std::sin(purify_pi / 180.* theta_FoV_M / (60. * 60.) * 0.5);
+	    	const t_real L = 2 * std::sin(constant::pi / 180.* theta_FoV_L / (60. * 60.) * 0.5);
+	    	const t_real M = 2 * std::sin(constant::pi / 180.* theta_FoV_M / (60. * 60.) * 0.5);
 
 	    	const t_real FoV = std::max(L, M);
 	        
