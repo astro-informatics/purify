@@ -26,7 +26,8 @@ def _debug_multiply(matrix, vector):
     """
     from numpy import zeros
     if matrix.dtype != vector.dtype:
-        raise TypeError("Matrix and vector have different types")
+        raise TypeError("Matrix and vector have different types: %s vs %s" % (matrix.dtype,
+                                                                              vector.dtype))
     if matrix.dtype != "complex" and matrix.dtype != "double":
         raise TypeError("Matrix should be of type complex or double")
     cdef _SparseMatRow c_sparse

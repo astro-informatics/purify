@@ -32,7 +32,7 @@ def test_python_to_c_random():
     for type in [dtype('complex')]:
         for i in range(1):
             shape = randint(3, 90), randint(3, 90)
-            matrix = rand(*shape, density=0.4, format='csr', dtype=type)
+            matrix = rand(*shape, density=0.4, format='csr', dtype="float").astype(type)
             x = random_sample(shape[1])
             if type == "complex":
                 x = x + 1j * random_sample(shape[1])
@@ -53,7 +53,7 @@ def test_cycle_python_to_c_to_python():
     for type in [dtype('double'), dtype('complex')]:
         for i in range(10):
             shape = randint(3, 90), randint(3, 90)
-            expected = rand(*shape, density=0.4, format='csr', dtype=type)
+            expected = rand(*shape, density=0.4, format='csr', dtype="float").astype(type)
 
             actual = _cycle_python_to_c_to_python(expected)
 
