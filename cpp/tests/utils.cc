@@ -158,7 +158,7 @@ TEST_CASE("utilities [sparse multiply]", "[sparse multiply]"){
     M.setFromTriplets(tripletList.begin(), tripletList.end());
 
 
-    Vector<t_complex> const parallel_output = utilities::sparse_multiply_matrix(M, x); 
+    Vector<t_complex> const parallel_output = utilities::sparse_multiply_matrix(M, x);
     Vector<t_complex> const correct_output = M * x;
 
     for (t_int i = 0; i < rows; ++i)
@@ -171,12 +171,13 @@ TEST_CASE("utilities [sparse multiply]", "[sparse multiply]"){
 
 TEST_CASE("utilities [resample]", "[resample]"){
     //up samples random matrix
-    Matrix<t_complex> image = Matrix<t_complex>::Random(1024, 1024);
+    Matrix<t_complex> const image = Matrix<t_complex>::Random(1024, 1024);
     FFTOperator fftop = purify::FFTOperator().fftw_flag((FFTW_ESTIMATE|FFTW_PRESERVE_INPUT));
 
     auto const ft_grid = fftop.forward(image);
-    auto const new_ft_grid = utilities::re_sample_ft_grid(ft_grid, 4.);
-    Matrix<t_complex> const image_resample = fftop.inverse(new_ft_grid) * 4 * 4 /ft_grid.size();
+    auto const new_ft_grid = utilities::re_sample_ft_grid(ft_grid, 4.) * 4. * 4.;
+    Matrix<t_complex> const image_resample = fftop.inverse(new_ft_grid);
     Matrix<t_complex> const image_resample_alt = utilities::re_sample_image(image, 4.);
     CHECK(image_resample.isApprox(image_resample_alt, 1e-13));
+    CHECK(image_resample(0) == image_resample_alt(0));
 }
