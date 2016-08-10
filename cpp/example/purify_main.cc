@@ -26,13 +26,13 @@ void bandwidth_scaling(purify::utilities::vis_params const & uv_data, purify::Pa
   if (params.cellsizex == 0 and params.cellsizey == 0)
   {
     t_real const max = std::sqrt((uv_data.u.array() * uv_data.u.array() + uv_data.v.array() * uv_data.v.array()).maxCoeff());
-    params.cellsizex = (180 * 3600) / max / purify_pi / 2;
-    params.cellsizey = (180 * 3600) / max / purify_pi / 2;
+    params.cellsizex = (180 * 3600) / max / constant::pi / 2;
+    params.cellsizey = (180 * 3600) / max / constant::pi / 2;
   }
   if (params.cellsizex == 0)
-    params.cellsizex = (180 * 3600) / max_u / purify_pi / 2;
+    params.cellsizex = (180 * 3600) / max_u / constant::pi / 2;
   if (params.cellsizey == 0)
-    params.cellsizey = (180 * 3600) / max_v / purify_pi / 2;
+    params.cellsizey = (180 * 3600) / max_v / constant::pi / 2;
 }
 
 pfitsio::header_params create_new_header(purify::utilities::vis_params const & uv_data, purify::Params const &params){

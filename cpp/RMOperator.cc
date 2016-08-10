@@ -75,7 +75,7 @@ namespace purify {
        {
          q = utilities::mod(k_u(m) + j, ftsize);
          const t_complex I(0, 1);
-         entries.emplace_back(m, q, std::exp(-2 * purify_pi * I * ((k_u(m) + j) * 0.5)) * kernelu(u(m)-(k_u(m)+j)));
+         entries.emplace_back(m, q, std::exp(-2 * constant::pi * I * ((k_u(m) + j) * 0.5)) * kernelu(u(m)-(k_u(m)+j)));
       }
     }
 
@@ -109,7 +109,7 @@ namespace purify {
     {
       t_int n = utilities::mod(i - Ju/2, ftsize);
       const t_complex I(0, 1);
-      K(n) = kernelu(i - Ju/2) * std::exp(-2 * purify_pi * I * (i - Ju/2.)  * 0.5);
+      K(n) = kernelu(i - Ju/2) * std::exp(-2 * constant::pi * I * (i - Ju/2.)  * 0.5);
     }
     t_int x_start = floor(ftsize * 0.5 - imsize * 0.5);
     Array<t_real> S = fft.inv(K).real().segment(x_start, imsize); // probably really slow!
@@ -204,7 +204,7 @@ namespace purify {
     
     utilities::rm_params rm_vis = rm_vis_input;
     if (rm_vis.units == "MHz"){
-      rm_vis.frequency = (purify_c / rm_vis.frequency.array()) * (purify_c / rm_vis.frequency.array()) * 1e-12;
+      rm_vis.frequency = (constant::c / rm_vis.frequency.array()) * (constant::c / rm_vis.frequency.array()) * 1e-12;
   	  rm_vis.units = "wavelength_squared";
 	}
     if (rm_vis.units == "wavelength_squared"){
@@ -213,7 +213,7 @@ namespace purify {
     }
     if (rm_vis.units == "radians")
     {
-      rm_vis.frequency = rm_vis.frequency / purify_pi * ftsize;
+      rm_vis.frequency = rm_vis.frequency / constant::pi * ftsize;
       rm_vis.units = "pixels";
     }
     
@@ -238,7 +238,7 @@ namespace purify {
     if (kernel_name == "kb_interp")
     {
       //It is suggested you use Ju = 5 for this alpha
-      const t_real kb_interp_alpha = purify_pi * 
+      const t_real kb_interp_alpha = constant::pi * 
                                     std::sqrt(Ju * Ju/(oversample_factor * oversample_factor) * (oversample_factor - 0.5) * (oversample_factor - 0.5) - 0.8); 
       const t_int sample_density = 7280;
       const t_int total_samples = sample_density * Ju;

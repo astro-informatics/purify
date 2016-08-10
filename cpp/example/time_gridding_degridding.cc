@@ -32,7 +32,7 @@ int main( int nargs, char const** args ){
   t_int const width = 256;
   t_int const height = 256;
   t_int const number_of_vis = 2 * std::floor(width * height * sample / 10.);
-  t_real const sigma_m = purify_pi/3;
+  t_real const sigma_m = constant::pi/3;
 
   Vector<t_real> grid_times = Vector<t_real>::Zero(number_of_tests);
   Vector<t_real> degrid_times = Vector<t_real>::Zero(number_of_tests);

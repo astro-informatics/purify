@@ -24,7 +24,7 @@ int main( int nargs, char const** args ){
   t_real RM2 = 50;
 
   rm_vis.frequency.setLinSpaced(number_of_samples, 100, 110);
-  Array<t_real> wavelength_squared = purify_c * purify_c/(rm_vis.frequency.array() * rm_vis.frequency.array()) * 1e-12;
+  Array<t_real> wavelength_squared = constant::c * constant::c/(rm_vis.frequency.array() * rm_vis.frequency.array()) * 1e-12;
   t_complex I(0, 1);
   rm_vis.linear_polarisation = exp(-2. * I * RM1 * wavelength_squared) + exp(-2. * I * RM2 * wavelength_squared); // rotation measure component
   rm_vis.weights = rm_vis.linear_polarisation.array() * 0. + 1.;

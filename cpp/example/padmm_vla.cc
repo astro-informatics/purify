@@ -35,7 +35,7 @@ int main(int, char **) {
   auto uv_data = utilities::read_visibility(visfile);
   t_real const max_u = std::sqrt((uv_data.u.array() * uv_data.u.array() + uv_data.v.array() * uv_data.v.array()).maxCoeff());
   uv_data.units = "lambda";
-  t_real cellsize = (180 * 3600) / max_u / purify_pi / 3;
+  t_real cellsize = (180 * 3600) / max_u / constant::pi / 3;
   t_int width = 512;
   t_int height = 512;
   //uv_data = utilities::uv_symmetry(uv_data);

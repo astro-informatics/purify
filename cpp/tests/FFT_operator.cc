@@ -35,7 +35,7 @@ TEST_CASE("FFT Operator [FORWARD]", "[FORWARD]") {
     {
       t_real sigma = 0.1;
       t_complex I(0, 1);
-      guassian(i, j) = std::exp(- (y(i) * y(i) + x(j) * x(j)) * 0.5/(sigma * sigma) -2. * I * purify_pi * 64. * (x(j) + y(i)));
+      guassian(i, j) = std::exp(- (y(i) * y(i) + x(j) * x(j)) * 0.5/(sigma * sigma) -2. * I * constant::pi * 64. * (x(j) + y(i)));
     }
   }
   pfitsio::write2d(newFFT.forward(guassian).cwiseAbs(), "forward_guassian.fits");
@@ -65,7 +65,7 @@ TEST_CASE("FFT Operator [INVERSE]", "[INVERSE]") {
     {
       t_real sigma = 0.1;
       t_complex I(0, 1);
-      guassian(i, j) = std::exp(- (y(i) * y(i) + x(j) * x(j)) * 0.5/(sigma * sigma) -2. * I * purify_pi * 64. * (x(j) + y(i)));
+      guassian(i, j) = std::exp(- (y(i) * y(i) + x(j) * x(j)) * 0.5/(sigma * sigma) -2. * I * constant::pi * 64. * (x(j) + y(i)));
     }
   }
   pfitsio::write2d(newFFT.inverse(guassian).real(), "inverse_guassian.fits");
@@ -94,7 +94,7 @@ TEST_CASE("FFT Operator [BOTH]", "[BOTH]") {
     {
       t_real sigma = 0.1;
       t_complex I(0, 1);
-      guassian(i, j) = std::exp(- (y(i) * y(i) + x(j) * x(j)) * 0.5/(sigma * sigma) -2. * I * purify_pi * 64. * (x(j) + y(i)));
+      guassian(i, j) = std::exp(- (y(i) * y(i) + x(j) * x(j)) * 0.5/(sigma * sigma) -2. * I * constant::pi * 64. * (x(j) + y(i)));
     }
   }
   pfitsio::write2d(newFFT.forward(newFFT.inverse(guassian)).real(), "guassian.fits");

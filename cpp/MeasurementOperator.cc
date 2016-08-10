@@ -98,7 +98,7 @@ namespace purify {
             p = utilities::mod(k_v(m) + jv, ftsizev_);
             index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
             const t_complex I(0, 1);
-            interpolation_matrix.coeffRef(m, index) += std::exp(-2 * purify_pi * I *((k_u(m) + ju) * 0.5 + (k_v(m) + jv) * 0.5 )) * kernelu(u(m)-(k_u(m)+ju)) * kernelv(v(m)-(k_v(m)+jv));
+            interpolation_matrix.coeffRef(m, index) += std::exp(-2 * constant::pi * I *((k_u(m) + ju) * 0.5 + (k_v(m) + jv) * 0.5 )) * kernelu(u(m)-(k_u(m)+ju)) * kernelv(v(m)-(k_v(m)+jv));
           }
       }
     }
@@ -132,7 +132,7 @@ namespace purify {
       {
         t_int m = utilities::mod(j - Jv/2, ftsizev_);
         const t_complex I(0, 1);
-        K(n, m) = kernelu(i - Ju/2) * kernelv(j - Jv/2) * std::exp(-2 * purify_pi * I * ((i - Ju/2)  * 0.5 + (j - Jv/2) * 0.5 ));
+        K(n, m) = kernelu(i - Ju/2) * kernelv(j - Jv/2) * std::exp(-2 * constant::pi * I * ((i - Ju/2)  * 0.5 + (j - Jv/2) * 0.5 ));
       }
     }
     t_int x_start = std::floor(ftsizeu_ * 0.5 - imsizex_ * 0.5);
@@ -278,7 +278,7 @@ namespace purify {
     if (kernel_name_ == "kb_interp")
     {
 
-      const t_real kb_interp_alpha = purify_pi * std::sqrt(Ju_ * Ju_/(oversample_factor_ * oversample_factor_) * (oversample_factor_ - 0.5) * (oversample_factor_ - 0.5) - 0.8);
+      const t_real kb_interp_alpha = constant::pi * std::sqrt(Ju_ * Ju_/(oversample_factor_ * oversample_factor_) * (oversample_factor_ - 0.5) * (oversample_factor_ - 0.5) - 0.8);
       const t_int sample_density = 7280;
       const t_int total_samples = sample_density * Ju_;
       auto kb_general = [&] (t_real x) { return kernels::kaiser_bessel_general(x, Ju_, kb_interp_alpha); };
@@ -329,8 +329,8 @@ namespace purify {
     }
     if (kernel_name_ == "kb_min")
     {
-      const t_real kb_interp_alpha_Ju = purify_pi * std::sqrt(Ju_ * Ju_/(oversample_factor_ * oversample_factor_) * (oversample_factor_ - 0.5) * (oversample_factor_ - 0.5) - 0.8);
-      const t_real kb_interp_alpha_Jv = purify_pi * std::sqrt(Jv_ * Jv_/(oversample_factor_ * oversample_factor_) * (oversample_factor_ - 0.5) * (oversample_factor_ - 0.5) - 0.8);
+      const t_real kb_interp_alpha_Ju = constant::pi * std::sqrt(Ju_ * Ju_/(oversample_factor_ * oversample_factor_) * (oversample_factor_ - 0.5) * (oversample_factor_ - 0.5) - 0.8);
+      const t_real kb_interp_alpha_Jv = constant::pi * std::sqrt(Jv_ * Jv_/(oversample_factor_ * oversample_factor_) * (oversample_factor_ - 0.5) * (oversample_factor_ - 0.5) - 0.8);
       auto kbu = [&] (t_real x) { return kernels::kaiser_bessel_general(x, Ju_, kb_interp_alpha_Ju); };
       auto kbv = [&] (t_real x) { return kernels::kaiser_bessel_general(x, Jv_, kb_interp_alpha_Jv); };
       auto ftkbu = [&] (t_real x) { return kernels::ft_kaiser_bessel_general(x/ftsizeu_ - 0.5, Ju_, kb_interp_alpha_Ju);  };

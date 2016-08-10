@@ -32,7 +32,7 @@ int main( int nargs, char const** args ){
   t_real RM = 0;
 
   rm_vis.frequency.setLinSpaced(number_of_samples, 100, 200);
-  Array<t_real> wavelength_squared = purify_c * purify_c/(rm_vis.frequency.array() * rm_vis.frequency.array()) * 1e-12;
+  Array<t_real> wavelength_squared = constant::c * constant::c/(rm_vis.frequency.array() * rm_vis.frequency.array()) * 1e-12;
   t_complex I(0, 1);
   rm_vis.linear_polarisation = exp(2. * I * RM * wavelength_squared);
   rm_vis.weights = rm_vis.linear_polarisation.array() * 0. + 1.;

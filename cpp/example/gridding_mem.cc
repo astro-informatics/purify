@@ -28,7 +28,7 @@ int main( int nargs, char const** args ){
   t_int height = width;
 
   t_int const number_of_vis = std::floor(M_N_ratio * width * height);
-  t_real const sigma_m = purify_pi/3;
+  t_real const sigma_m = constant::pi/3;
   
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";
