@@ -1,16 +1,15 @@
+#include "purify/config.h"
 #include <array>
 #include <memory>
 #include <random>
-#include "purify/config.h"
-#include "logging.h"
+#include "MeasurementOperator.h"
 #include "directories.h"
+#include "logging.h"
 #include "pfitsio.h"
 #include "types.h"
-#include "MeasurementOperator.h"
 #include "utilities.h"
 
-
-int main( int nargs, char const** args ) {
+int main(int nargs, char const **args) {
   using namespace purify;
   using namespace purify::notinstalled;
   purify::logging::initialize();
@@ -18,7 +17,6 @@ int main( int nargs, char const** args ) {
 
   std::string const fitsfile = image_filename("M31.fits");
   std::string const inputfile = output_filename("M31_input.fits");
-  
 
   std::string const kernel = "kb";
   t_real const over_sample = 5.;
@@ -32,20 +30,21 @@ int main( int nargs, char const** args ) {
   t_real const max = M31.array().abs().maxCoeff();
   M31 = M31 * 1. / max;
   pfitsio::write2d(M31.real(), inputfile);
-  //Following same formula in matlab example
+  // Following same formula in matlab example
   t_real const p = 0.15;
-  t_real const sigma_m = constant::pi/3;
-  t_real const rho = 2 - (boost::math::erf(constant::pi/(sigma_m * std::sqrt(2)))) * (boost::math::erf(constant::pi/(sigma_m * std::sqrt(2))));
-  //t_int const number_of_vis = std::floor(p * rho * M31.size());
+  t_real const sigma_m = constant::pi / 3;
+  t_real const rho = 2
+                     - (boost::math::erf(constant::pi / (sigma_m * std::sqrt(2))))
+                           * (boost::math::erf(constant::pi / (sigma_m * std::sqrt(2))));
+  // t_int const number_of_vis = std::floor(p * rho * M31.size());
   t_int const number_of_vis = std::floor(m_over_n * M31.size());
-  //Generating random uv(w) coverage
+  // Generating random uv(w) coverage
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";
 
   PURIFY_HIGH_LOG("Number of measurements: {}", uv_data.u.size());
-  //uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
+  // uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
   MeasurementOperator measurements(uv_data, J, J, kernel, M31.cols(), M31.rows(), 20, over_sample);
   uv_data.vis = measurements.degrid(M31);
   utilities::write_visibility(uv_data, vis_file);
-
 }

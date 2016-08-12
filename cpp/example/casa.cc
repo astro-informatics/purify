@@ -1,7 +1,7 @@
 #include "purify/config.h"
-#include "logging.h"
 #include "casacore.h"
 #include "directories.h"
+#include "logging.h"
 
 #define CHECK(CONDITION, ERROR)                                                                    \
   if(not(CONDITION))                                                                               \
@@ -61,7 +61,8 @@ int main(int, char **) {
     }
 
     // Finally, it is possible to filter down some components
-    // Note that the filter "all(NOT FLAG[i,])" has already been applied, where i the channel index
+    // Note that the filter "all(NOT FLAG[i,])" has already been applied, where
+    // i the channel index
     auto const filter = "OBSERVATION_ID=1 AND DATA_DESC_ID=0";
     auto const filtered = ngc3256[std::make_pair(17, filter)];
     CHECK(filtered.lambda_w().size() == 6300, "Incorrect size for filtered data");

@@ -261,17 +261,17 @@ public:
         ms_.table(), stokes(#NAME, col == Sigma::OVERALL ? "SIGMA" : index("SIGMA_SPECTRUM")),     \
         filter());                                                                                 \
   }
-  //Stokes parameters
+  // Stokes parameters
   PURIFY_MACRO(I);
   PURIFY_MACRO(Q);
   PURIFY_MACRO(U);
   PURIFY_MACRO(V);
-  //Circular correlations
+  // Circular correlations
   PURIFY_MACRO(LL);
   PURIFY_MACRO(RR);
   PURIFY_MACRO(LR);
   PURIFY_MACRO(RL);
-  //Linear correlations
+  // Linear correlations
   PURIFY_MACRO(XX);
   PURIFY_MACRO(YY);
   PURIFY_MACRO(XY);
@@ -357,10 +357,11 @@ protected:
   std::shared_ptr<value_type> wrapper_;
 };
 //! Read measurement set into vis_params structure
-utilities::vis_params read_measurementset(std::string const &filename, 
-  const MeasurementSet::ChannelWrapper::polarization pol = MeasurementSet::ChannelWrapper::polarization::I, 
-  const std::vector<t_int> & channels = std::vector<t_int>(),
-   std::string const &filter = "");
+utilities::vis_params read_measurementset(std::string const &filename,
+                                          const MeasurementSet::ChannelWrapper::polarization pol
+                                          = MeasurementSet::ChannelWrapper::polarization::I,
+                                          const std::vector<t_int> &channels = std::vector<t_int>(),
+                                          std::string const &filter = "");
 //! Return average frequency over channels
 t_real average_frequency(const purify::casa::MeasurementSet &ms_file, std::string const &filter,
                          const std::vector<t_int> &channels);

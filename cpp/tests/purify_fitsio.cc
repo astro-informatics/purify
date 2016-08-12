@@ -1,6 +1,6 @@
 #include "catch.hpp"
-#include "pfitsio.h"
 #include "directories.h"
+#include "pfitsio.h"
 using namespace purify;
 using namespace purify::notinstalled;
 
@@ -11,6 +11,4 @@ TEST_CASE("Purify fitsio", "[readwrite]") {
   Image<t_complex> input2 = pfitsio::read2d(output_filename("fits_output.fits"));
   CAPTURE(input2);
   CHECK(input.isApprox(input2, 1e-6));
-
 }
-

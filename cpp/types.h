@@ -7,7 +7,6 @@
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
 
-
 namespace purify {
 //! Root of the type hierarchy for signed integers
 typedef int t_int;
