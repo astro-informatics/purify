@@ -18,6 +18,7 @@ get_gitref()
 include(AddC99Flags)
 include(AddCPP11Flags)
 
+option(cpp            "Enable cpp"                                      on)
 option(tests          "Enable testing"                                  on)
 option(data           "Download measurement set for testing"            on)
 option(openmp         "Enable OpenMP"                                   on)
@@ -66,7 +67,10 @@ add_subdirectory(src)
 add_subdirectory(include)
 add_subdirectory(python)
 add_subdirectory(doc)
-add_subdirectory(cpp)
+
+if (cpp)
+  add_subdirectory(cpp)
+endif()
 
 if(LINK_TO_ABSOLUTE_PYTHON_PATH AND APPLE)
     configure_file(
