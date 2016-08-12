@@ -9,7 +9,6 @@ if(logging)
 else()
   unset(PURIFY_DO_LOGGING)
   set(PURIFY_TEST_LOG_LEVEL off)
-  set_property(CACHE SOPT_TEST_LOG_LEVEL PROPERTY STRINGS off)
 endif()
 
 set(version ${Purify_VERSION})
@@ -61,7 +60,7 @@ target_include_directories(cppurify PUBLIC
   $<INSTALL_INTERFACE:include/purify>)
 
 add_subdirectory(example)
-add_subdirectory(regressions)
+
 if(tests)
   add_subdirectory(tests)
 endif()

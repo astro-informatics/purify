@@ -43,12 +43,10 @@ else()
   lookup_package(Boost REQUIRED)
 endif()
 
-if(cpp)
-  lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS HG_REPOSITORY "https://bitbucket.org/LukePratley/eigen" HG_TAG "3.2")
+lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS HG_REPOSITORY "https://bitbucket.org/LukePratley/eigen" HG_TAG "3.2")
 
-  if(logging)
-    lookup_package(spdlog REQUIRED)
-  endif()
+if(logging)
+  lookup_package(spdlog REQUIRED)
 endif()
 
 # Look up packages: if not found, installs them

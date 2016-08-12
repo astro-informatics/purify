@@ -18,11 +18,9 @@ get_gitref()
 include(AddC99Flags)
 include(AddCPP11Flags)
 
-option(cpp            "Enable cpp"                                      on)
 option(tests          "Enable testing"                                  on)
 option(data           "Download measurement set for testing"            on)
 option(openmp         "Enable OpenMP"                                   on)
-option(python         "Enable python bindings"                          on)
 option(logging        "Enable logging"                                  on)
 
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -51,9 +49,7 @@ if(EXISTS "${EXTERNAL_ROOT}/lib/")
         PATTERN "*.a" EXCLUDE
     )
 endif()
-if(python)
-    include(python_dependencies)
-endif()
+
 if(tests AND data)
     include(data_dependencies)
 endif()
@@ -63,14 +59,7 @@ if(tests)  # Adds ctest
     include(AddCatchTest)
 endif()
 
-add_subdirectory(src)
-add_subdirectory(include)
-add_subdirectory(python)
-add_subdirectory(doc)
-
-if (cpp)
-  add_subdirectory(cpp)
-endif()
+add_subdirectory(cpp)
 
 if(LINK_TO_ABSOLUTE_PYTHON_PATH AND APPLE)
     configure_file(
