@@ -24,8 +24,7 @@ int main( int nargs, char const** args ) {
   using namespace purify;
   using namespace purify::notinstalled;
   sopt::logging::initialize();
-  
-
+  sopt::logging::set_level("debug");
   std::string const kernel = args[1];
   t_real const over_sample = std::stod(static_cast<std::string>(args[2]));
   t_int const J = static_cast<t_int>(std::stod(static_cast<std::string>(args[3])));
@@ -118,8 +117,6 @@ int main( int nargs, char const** args ) {
   std::clock_t c_end = std::clock();
 
   Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey(), measurements.imsizex());
-  t_real const max_val_final = image.array().abs().maxCoeff();
-  image = image / max_val_final;
 
   Vector<t_complex> original = Vector<t_complex>::Map(sky_model.data(), sky_model.size(), 1);
   Image<t_complex> res = sky_model - image;
