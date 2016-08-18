@@ -34,12 +34,25 @@ def kernel_settings(kernel):
 		kernel = "kb_interp"
 	
 	return J, oversample, kernel
+def run_test_padmm_reweighted((i, kernel, M_N_ratio, start_time, input_SNR, image)):
+	time.sleep(start_time)
+
+	J, oversample, kernel = kernel_settings(kernel)
+
+  	os.system("../build/cpp/example/padmm_reweighted_simulation " + kernel + " " 
+      + str(oversample) + " " +str(J) + " " +str(M_N_ratio) + " " + str(i) + " "+str(input_SNR)+ " " + str(image))
+  	results_file = "../build/outputs/"+image+"_results_" + kernel + "_" + str(i) + ".txt"
+  	results = np.loadtxt(results_file, dtype = str)
+  	SNR = results[0]
+  	total_time = results[1]
+	os.system("rm " + results_file)
+  	return [float(SNR), float(total_time)]
 def run_test_padmm((i, kernel, M_N_ratio, start_time, input_SNR, image)):
 	time.sleep(start_time)
 
 	J, oversample, kernel = kernel_settings(kernel)
 
-  	os.system("../build/cpp/example/padmm_m31_simulation " + kernel + " " 
+  	os.system("../build/cpp/example/padmm_simulation " + kernel + " " 
       + str(oversample) + " " +str(J) + " " +str(M_N_ratio) + " " + str(i) + " "+str(input_SNR)+ " " + str(image))
   	results_file = "../build/outputs/"+image+"_results_" + kernel + "_" + str(i) + ".txt"
   	results = np.loadtxt(results_file, dtype = str)
@@ -52,7 +65,7 @@ def run_test_ms_clean((i, kernel, M_N_ratio, start_time, input_SNR, image)):
 	
 	J, oversample, kernel = kernel_settings(kernel)
 	
-  	os.system("../build/cpp/example/padmm_ms_clean_m31_simulation " + kernel + " " 
+  	os.system("../build/cpp/example/padmm_ms_clean_simulation " + kernel + " " 
       + str(oversample) + " " +str(J) + " " +str(M_N_ratio) + " " + str(i) + " " + str(input_SNR)+ " " +str(image))
   	results_file = "../build/outputs/"+image+"_results_" + kernel + "_" + str(i) + ".txt"
   	results = np.loadtxt(results_file, dtype = str)
@@ -66,7 +79,7 @@ def run_test_clean((i, kernel, M_N_ratio, start_time, input_SNR, image)):
 
 	J, oversample, kernel = kernel_settings(kernel)
 
-  	os.system("../build/cpp/example/padmm_clean_m31_simulation " + kernel + " " 
+  	os.system("../build/cpp/example/padmm_clean_simulation " + kernel + " " 
       + str(oversample) + " " +str(J) + " " +str(M_N_ratio) + " " + str(i) + " " + str(input_SNR) + " " + str(image))
   	results_file = "../build/outputs/"+image+"results_" + kernel + "_" + str(i) + ".txt"
   	results = np.loadtxt(results_file, dtype = str)
@@ -130,7 +143,7 @@ if __name__ == '__main__':
 
 	test_num = 0
 	#kernels = ["kb", "kb_interp", "pswf", "gauss", "box", "gauss_alt", "kb_min", "kb_min4"]#, "kb_interp4"]
-	kernels = ["kb", "pswf", "gauss", "gauss_alt"]
+	kernels = ["kb", "pswf", "gauss", "gauss_alt", "box"]
 	total_tests = n_tests * len(kernels) * len(M_N_ratios)
 	for i in range(1, n_tests + 1):
 		for k in kernels:
@@ -139,11 +152,11 @@ if __name__ == '__main__':
 				args.append((test_num, k, m, test_num * 1./ total_tests * 30., input_SNR, image))
 				print test_num
 	n_processors = multiprocessing.cpu_count() + 1
-	p = multiprocessing.Pool(min(n_processors, 41)) # Limiting the number of processes used to 40, otherwise it will cause problems with the user limit
+	p = multiprocessing.Pool(min(n_processors, 10)) # Limiting the number of processes used to 40, otherwise it will cause problems with the user limit
 	
 	#legend = ["Kaiser Bessel (KB)", "KB (Linear-interp, Min-oversample)", "PSWF", "Gaussian (Optimal)", "Box", "Gaussian (non-Optimal)", "KB (Min-oversample)", "KB4 (Min-oversample)"]#, "KB4 (Linear-interp, Min-oversample)"]
 	#colours = ['blue', 'red', 'black', 'green', 'magenta', 'cyan', 'yellow', "#800000"]#, "#808000"]
-	legend = ["Kaiser Bessel (KB)", "PSWF", "Gaussian (Optimal)", "Gaussian (non-Optimal)"]
+	legend = ["Kaiser Bessel (KB)", "PSWF", "Gaussian (Optimal)", "Gaussian (non-Optimal)", "Box"]
 	colours = ['blue', 'black', 'green', 'cyan']
 	results = p.map(run_test_padmm, args)
 	create_plots(args, results, M_N_ratios, "padmm", kernels, colours, legend)
@@ -153,4 +166,8 @@ if __name__ == '__main__':
 	print "MS CLEAN Done!"
 	results = p.map(run_test_clean, args)
 	create_plots(args, results, M_N_ratios, "clean", kernels, colours)
-	print "All Done!"
+	print "CLEAN Done!"
+	results = p.map(run_test_padmm_reweighted, args)
+	create_plots(args, results, M_N_ratios, "padmm_reweighted", kernels, colours, legend)
+	print "PADMM REWEIGHTED Done!"
+
