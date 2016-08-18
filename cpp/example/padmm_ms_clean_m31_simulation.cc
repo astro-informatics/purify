@@ -70,7 +70,7 @@ int main( int nargs, char const** args ) {
     adjoint, {0, 1, static_cast<t_int>(measurements.imsizex() * measurements.imsizey())}
   );
 
-  sopt::wavelets::SARA const sara{std::make_tuple("DB8", 3u)};
+  sopt::wavelets::SARA const sara{std::make_tuple("DB4", 3u)};
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, measurements.imsizey(), measurements.imsizex());
 
@@ -95,7 +95,6 @@ int main( int nargs, char const** args ) {
   std::cout << "Epsilon = " << epsilon << '\n';
   std::cout << "Gamma = " << purify_gamma << '\n';
   auto const padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
-                         .itermax(1000)
                          .gamma(purify_gamma)
                          .relative_variation(1e-3)
                          .l2ball_proximal_epsilon(epsilon * 1.001)

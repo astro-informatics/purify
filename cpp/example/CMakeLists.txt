@@ -21,6 +21,7 @@ add_example(sdmm_m31_simulation LIBRARIES cppurify NOTEST)
 
 add_example(padmm_m31_simulation LIBRARIES cppurify NOTEST)
 add_example(padmm_clean_m31_simulation LIBRARIES cppurify NOTEST)
+add_example(padmm_m31_reweighted_simulation LIBRARIES cppurify NOTEST)
 add_example(padmm_ms_clean_m31_simulation LIBRARIES cppurify NOTEST)
 
 add_example(padmm_random_coverage LIBRARIES cppurify NOTEST)

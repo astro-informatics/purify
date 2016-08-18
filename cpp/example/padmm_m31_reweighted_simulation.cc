@@ -5,6 +5,8 @@
 #include <sopt/imaging_padmm.h>
 #include "sopt/utilities.h"
 #include "sopt/wavelets.h"
+#include <sopt/positive_quadrant.h>
+#include <sopt/reweighted.h>
 #include "sopt/wavelets/sara.h"
 #include "directories.h"
 #include "pfitsio.h"
@@ -33,7 +35,6 @@ int main( int nargs, char const** args ) {
   t_real const ISNR = std::stod(static_cast<std::string>(args[6]));
   std::string const name = static_cast<std::string>(args[7]);
 
-
   std::string const fitsfile = image_filename(name + ".fits");
 
 
@@ -45,11 +46,10 @@ int main( int nargs, char const** args ) {
   sky_model = sky_model / sky_model_max;
   t_int const number_of_vis = std::floor(m_over_n * sky_model.size());
   t_real const sigma_m = constant::pi/3;
-  
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";
   std::cout << "Number of measurements: " << uv_data.u.size() << '\n';
-  MeasurementOperator simulate_measurements(uv_data, 4, 4, "kb", sky_model.cols(), sky_model.rows(), 20, 5); // Generating simulated high quality visibilites
+  MeasurementOperator simulate_measurements(uv_data, 4, 4, "kb", sky_model.cols(), sky_model.rows(), 20, 5); // Generating simulated high quality visibilities
   uv_data.vis = simulate_measurements.degrid(sky_model);
 
   MeasurementOperator measurements(uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(), over_sample);
@@ -69,7 +69,9 @@ int main( int nargs, char const** args ) {
     adjoint, {0, 1, static_cast<t_int>(measurements.imsizex() * measurements.imsizey())}
   );
 
-  sopt::wavelets::SARA const sara{std::make_tuple("Dirac", 3u)};
+  sopt::wavelets::SARA const sara{std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u), std::make_tuple("DB3", 3u), 
+          std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u), std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), 
+          std::make_tuple("DB8", 3u)};
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, measurements.imsizey(), measurements.imsizex());
 
@@ -87,7 +89,6 @@ int main( int nargs, char const** args ) {
   // pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey(), measurements.imsizex()), dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
-
   auto const purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).real().maxCoeff() * 1e-3;
 
   std::cout << "Starting sopt!" << '\n';
@@ -109,11 +110,18 @@ int main( int nargs, char const** args ) {
                          .Psi(Psi)
                          .Phi(measurements_transform);
   //Timing reconstruction
+  auto const posq = sopt::algorithm::positive_quadrant(padmm);
+  auto const min_delta = sigma * std::sqrt(uv_data.vis.size()) / std::sqrt(9 * sky_model.size());
+  // Sets weight after each padmm iteration.
+  // In practice, this means replacing the proximal of the l1 objective function.
+  auto const reweighted
+      = sopt::algorithm::reweighted(padmm).min_delta(min_delta).is_converged(
+          sopt::RelativeVariation<std::complex<t_real>>(1e-3));
   std::clock_t c_start = std::clock();
-  auto const diagnostic = padmm();
+  auto const diagnostic = reweighted();
   std::clock_t c_end = std::clock();
 
-  Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey(), measurements.imsizex());
+  Image<t_complex> image = Image<t_complex>::Map(diagnostic.algo.x.data(), measurements.imsizey(), measurements.imsizex());
 
   Vector<t_complex> original = Vector<t_complex>::Map(sky_model.data(), sky_model.size(), 1);
   Image<t_complex> res = sky_model - image;
