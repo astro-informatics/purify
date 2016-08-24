@@ -9,10 +9,10 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include "purify/AlgorithmUpdate.h"
+#include "AlgorithmUpdate.h"
+#include "cmdl.h"
 #include "purify/MeasurementOperator.h"
 #include "purify/casacore.h"
-#include "purify/cmdl.h"
 #include "purify/logging.h"
 #include "purify/pfitsio.h"
 #include "purify/types.h"

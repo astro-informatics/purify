@@ -1,5 +1,5 @@
 #include "purify/config.h"
-#include "purify/cmdl.h"
+#include "cmdl.h"
 
 namespace purify {
 

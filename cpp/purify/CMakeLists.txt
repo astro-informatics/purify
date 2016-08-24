@@ -3,7 +3,7 @@ configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 set(SOURCES MeasurementOperator.cc FFTOperator.cc clean.cc utilities.cc pfitsio.cc
   kernels.cc RMOperator.cc PSFOperator.cc wprojection.cc)
 if(TARGET casacore::ms)
-  list(APPEND SOURCES casacore.cc AlgorithmUpdate.cc cmdl.cc)
+  list(APPEND SOURCES casacore.cc)
 endif()
 add_library(libpurify SHARED ${SOURCES})
 set(version "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}.${Purify_VERSION_PATCH}")
