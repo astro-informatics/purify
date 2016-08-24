@@ -33,8 +33,6 @@ else()
 endif()
 
 find_package(TIFF REQUIRED)
-find_package(CBLAS REQUIRED)
-set(PURIFY_BLAS_H "${BLAS_INCLUDE_FILENAME}")
 
 
 if(data AND tests)
@@ -76,9 +74,6 @@ lookup_package(
 lookup_package(CFitsIO REQUIRED ARGUMENTS CHECKCASA)
 lookup_package(CCFits REQUIRED)
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${BLAS_LINKER_FLAGS}")
-
-find_package(Doxygen)
 find_package(CasaCore OPTIONAL_COMPONENTS ms)
 
 # Add script to execute to make sure libraries in the build tree can be found
