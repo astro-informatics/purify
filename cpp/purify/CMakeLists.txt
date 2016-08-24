@@ -6,6 +6,8 @@ if(TARGET casacore::ms)
   list(APPEND SOURCES casacore.cc AlgorithmUpdate.cc cmdl.cc)
 endif()
 add_library(libpurify SHARED ${SOURCES})
+set(version "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}.${Purify_VERSION_PATCH}")
+set_target_properties(libpurify PROPERTIES VERSION ${version} SOVERSION ${version})
 
 target_include_directories(libpurify PUBLIC
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
