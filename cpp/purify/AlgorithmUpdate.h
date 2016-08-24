@@ -6,11 +6,11 @@
 #include <sopt/wavelets.h>
 #include <sopt/imaging_padmm.h>
 #include <sopt/wavelets/sara.h>
-#include "MeasurementOperator.h"
-#include "cmdl.h"
-#include "pfitsio.h"
-#include "types.h"
-#include "utilities.h"
+#include "purify/MeasurementOperator.h"
+#include "purify/cmdl.h"
+#include "purify/pfitsio.h"
+#include "purify/types.h"
+#include "purify/utilities.h"
 
 namespace purify {
 class AlgorithmUpdate {

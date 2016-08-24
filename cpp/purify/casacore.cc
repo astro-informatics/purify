@@ -1,10 +1,10 @@
-#include "casacore.h"
+#include "purify/casacore.h"
 #include "purify/config.h"
 #include <sstream>
 #include <casacore/casa/Arrays/IPosition.h>
 #include <casacore/tables/TaQL/ExprNode.h>
-#include "logging.h"
-#include "types.h"
+#include "purify/logging.h"
+#include "purify/types.h"
 
 namespace purify {
 namespace casa {

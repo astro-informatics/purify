@@ -7,12 +7,12 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include "MeasurementOperator.h"
-#include "directories.h"
-#include "logging.h"
-#include "pfitsio.h"
-#include "types.h"
-#include "utilities.h"
+#include "purify/MeasurementOperator.h"
+#include "purify/directories.h"
+#include "purify/logging.h"
+#include "purify/pfitsio.h"
+#include "purify/types.h"
+#include "purify/utilities.h"
 
 using namespace purify;
 using namespace purify::notinstalled;

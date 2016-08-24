@@ -1,4 +1,4 @@
-#include "casacore.h"
+#include "purify/casacore.h"
 #include <boost/filesystem.hpp>
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
 #include <casacore/tables/TaQL/TableParse.h>
@@ -9,10 +9,10 @@
 #include <casacore/tables/Tables/ScalarColumn.h>
 #include <casacore/tables/Tables/SetupNewTab.h>
 #include <casacore/tables/Tables/TableColumn.h>
-#include "directories.h"
+#include "purify/directories.h"
 
-#include "types.h"
-#include "utilities.h"
+#include "purify/types.h"
+#include "purify/utilities.h"
 
 #include "catch.hpp"
 using namespace ::casacore;

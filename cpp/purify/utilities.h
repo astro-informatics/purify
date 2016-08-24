@@ -1,7 +1,7 @@
 #ifndef PURIFY_UTILITIES_H
 #define PURIFY_UTILITIES_H
 
-#include "types.h"
+#include "purify/types.h"
 
 #include <fstream>
 #include <iostream>
@@ -11,7 +11,7 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/sinc.hpp>
 #include <sys/stat.h>
-#include "FFTOperator.h"
+#include "purify/FFTOperator.h"
 
 namespace purify {
 

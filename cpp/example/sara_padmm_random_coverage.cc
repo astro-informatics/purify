@@ -10,11 +10,11 @@
 #include <sopt/positive_quadrant.h>
 #include <sopt/relative_variation.h>
 #include <sopt/reweighted.h>
-#include "MeasurementOperator.h"
-#include "directories.h"
-#include "pfitsio.h"
-#include "types.h"
-#include "utilities.h"
+#include "purify/MeasurementOperator.h"
+#include "purify/directories.h"
+#include "purify/pfitsio.h"
+#include "purify/types.h"
+#include "purify/utilities.h"
 
 int main(int, char **) {
   using namespace purify;

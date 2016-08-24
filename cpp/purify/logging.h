@@ -4,9 +4,9 @@
 #include "purify/config.h"
 
 #ifdef PURIFY_DO_LOGGING
-#include "logging.enabled.h"
+#include "purify/logging.enabled.h"
 #else
-#include "logging.disabled.h"
+#include "purify/logging.disabled.h"
 #endif
 
 //! \macro Normal but signigicant condition

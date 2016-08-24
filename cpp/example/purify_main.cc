@@ -9,13 +9,13 @@
 #include <sopt/relative_variation.h>
 #include <sopt/reweighted.h>
 #include <sopt/wavelets/sara.h>
-#include "AlgorithmUpdate.h"
-#include "MeasurementOperator.h"
-#include "casacore.h"
-#include "cmdl.h"
-#include "pfitsio.h"
-#include "types.h"
-//#include "clara.h"
+#include "purify/AlgorithmUpdate.h"
+#include "purify/MeasurementOperator.h"
+#include "purify/casacore.h"
+#include "purify/cmdl.h"
+#include "purify/pfitsio.h"
+#include "purify/types.h"
+//#include "purify/clara.h"
 
 using namespace purify;
 namespace {

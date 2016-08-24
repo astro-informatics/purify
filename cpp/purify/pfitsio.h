@@ -1,11 +1,11 @@
 #ifndef PURIFY_PFITSIO_H
 #define PURIFY_PFITSIO_H
 
-#include "types.h"
+#include "purify/types.h"
 
 #include <string>
 #include <CCfits/CCfits>
-#include "utilities.h"
+#include "purify/utilities.h"
 
 namespace purify {
 

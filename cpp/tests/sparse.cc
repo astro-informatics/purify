@@ -1,9 +1,9 @@
 #include "purify/config.h"
 #include <iostream>
 #include "catch.hpp"
-#include "directories.h"
-#include "logging.h"
-#include "types.h"
+#include "purify/directories.h"
+#include "purify/logging.h"
+#include "purify/types.h"
 using namespace purify;
 using namespace purify::notinstalled;
 

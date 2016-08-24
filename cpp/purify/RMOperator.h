@@ -1,10 +1,10 @@
 #ifndef PURIFY_RM_OPERATOR_H
 #define PURIFY_RM_OPERATOR_H
 
-#include "FFTOperator.h"
-#include "kernels.h"
-#include "types.h"
-#include "utilities.h"
+#include "purify/FFTOperator.h"
+#include "purify/kernels.h"
+#include "purify/types.h"
+#include "purify/utilities.h"
 
 #include <iostream>
 #include <string>

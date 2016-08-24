@@ -12,8 +12,8 @@
 #include <casacore/tables/Tables/ScalarColumn.h>
 #include <casacore/tables/Tables/Table.h>
 #include <sopt/utilities.h>
-#include "types.h"
-#include "utilities.h"
+#include "purify/types.h"
+#include "purify/utilities.h"
 
 namespace purify {
 namespace casa {

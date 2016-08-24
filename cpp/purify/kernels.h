@@ -4,7 +4,7 @@
 #include <array>
 #include <boost/math/special_functions/bessel.hpp>
 #include <boost/math/special_functions/sinc.hpp>
-#include "types.h"
+#include "purify/types.h"
 
 namespace purify {
 

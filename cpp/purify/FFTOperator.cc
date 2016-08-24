@@ -1,4 +1,4 @@
-#include "FFTOperator.h"
+#include "purify/FFTOperator.h"
 #include "purify/config.h"
 
 namespace purify {

@@ -1,10 +1,10 @@
 #include <iomanip>
-#include "MeasurementOperator.h"
+#include "purify/MeasurementOperator.h"
 #include "catch.hpp"
-#include "directories.h"
-#include "kernels.h"
-#include "pfitsio.h"
-#include "utilities.h"
+#include "purify/directories.h"
+#include "purify/kernels.h"
+#include "purify/pfitsio.h"
+#include "purify/utilities.h"
 
 using namespace purify;
 using namespace purify::notinstalled;

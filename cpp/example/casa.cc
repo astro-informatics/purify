@@ -1,7 +1,7 @@
 #include "purify/config.h"
-#include "casacore.h"
-#include "directories.h"
-#include "logging.h"
+#include "purify/casacore.h"
+#include "purify/directories.h"
+#include "purify/logging.h"
 
 #define CHECK(CONDITION, ERROR)                                                                    \
   if(not(CONDITION))                                                                               \

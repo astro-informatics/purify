@@ -1,10 +1,10 @@
 #ifndef PURIFY_CLEAN_H
 #define PURIFY_CLEAN_H
 
-#include "types.h"
+#include "purify/types.h"
 
-#include "FFTOperator.h"
-#include "MeasurementOperator.h"
+#include "purify/FFTOperator.h"
+#include "purify/MeasurementOperator.h"
 
 #include <fstream>
 #include <iostream>

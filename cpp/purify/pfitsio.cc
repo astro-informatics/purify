@@ -1,4 +1,4 @@
-#include "pfitsio.h"
+#include "purify/pfitsio.h"
 
 namespace purify {
 namespace pfitsio {

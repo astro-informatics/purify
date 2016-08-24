@@ -1,7 +1,7 @@
 
-#include "MeasurementOperator.h"
-#include "pfitsio.h"
-#include "utilities.h"
+#include "purify/MeasurementOperator.h"
+#include "purify/pfitsio.h"
+#include "purify/utilities.h"
 
 using namespace purify;
 

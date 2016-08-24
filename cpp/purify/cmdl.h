@@ -4,8 +4,8 @@
 #include <cstdlib>
 #include <getopt.h>
 #include <string>
-#include "casacore.h"
-#include "types.h"
+#include "purify/casacore.h"
+#include "purify/types.h"
 
 namespace purify {
 

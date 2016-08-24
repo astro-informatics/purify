@@ -8,11 +8,11 @@
 #include <sopt/wavelets.h>
 #include <sopt/imaging_padmm.h>
 #include <sopt/wavelets/sara.h>
-#include "MeasurementOperator.h"
-#include "directories.h"
-#include "pfitsio.h"
-#include "types.h"
-#include "utilities.h"
+#include "purify/MeasurementOperator.h"
+#include "purify/directories.h"
+#include "purify/pfitsio.h"
+#include "purify/types.h"
+#include "purify/utilities.h"
 
 int main(int nargs, char const **args) {
   if(nargs != 8) {

@@ -1,6 +1,6 @@
-#include "MeasurementOperator.h"
+#include "purify/MeasurementOperator.h"
 #include "purify/config.h"
-#include "logging.h"
+#include "purify/logging.h"
 
 namespace purify {
 Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex> &eigen_image) const {

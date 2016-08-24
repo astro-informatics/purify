@@ -6,10 +6,10 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include "MeasurementOperator.h"
-#include "directories.h"
-#include "pfitsio.h"
-#include "types.h"
+#include "purify/MeasurementOperator.h"
+#include "purify/directories.h"
+#include "purify/pfitsio.h"
+#include "purify/types.h"
 
 int main(int, char **) {
   using namespace purify;

@@ -1,12 +1,12 @@
-#include "clean.h"
+#include "purify/clean.h"
 #include "purify/config.h"
 #include <array>
 #include <random>
-#include "MeasurementOperator.h"
-#include "directories.h"
-#include "logging.h"
-#include "pfitsio.h"
-#include "types.h"
+#include "purify/MeasurementOperator.h"
+#include "purify/directories.h"
+#include "purify/logging.h"
+#include "purify/pfitsio.h"
+#include "purify/types.h"
 
 int main(int, char **) {
   using namespace purify;

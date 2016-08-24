@@ -1,6 +1,6 @@
-#include "MeasurementOperator.h"
-#include "directories.h"
-#include "pfitsio.h"
+#include "purify/MeasurementOperator.h"
+#include "purify/directories.h"
+#include "purify/pfitsio.h"
 
 using namespace purify;
 using namespace purify::notinstalled;

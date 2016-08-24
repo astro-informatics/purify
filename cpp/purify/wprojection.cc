@@ -1,7 +1,7 @@
-#include "wprojection.h"
+#include "purify/wprojection.h"
 #include "purify/config.h"
-#include "logging.h"
-#include "types.h"
+#include "purify/logging.h"
+#include "purify/types.h"
 
 namespace purify {
 namespace wprojection {

@@ -2,7 +2,7 @@
 #define PURIFY_FFT_OPERATOR_H
 
 #include "purify/config.h"
-#include "types.h"
+#include "purify/types.h"
 
 #ifdef PURIFY_OPENMP
 #include <omp.h>

@@ -1,10 +1,10 @@
 #include "purify/config.h"
 #include <string>
-#include "MeasurementOperator.h"
-#include "directories.h"
-#include "logging.h"
-#include "pfitsio.h"
-#include "utilities.h"
+#include "purify/MeasurementOperator.h"
+#include "purify/directories.h"
+#include "purify/logging.h"
+#include "purify/pfitsio.h"
+#include "purify/utilities.h"
 
 #include <ctime>
 

@@ -1,10 +1,10 @@
 
-#include "FFTOperator.h"
-#include "MeasurementOperator.h"
-#include "pfitsio.h"
-#include "wprojection.h"
+#include "purify/FFTOperator.h"
+#include "purify/MeasurementOperator.h"
+#include "purify/pfitsio.h"
+#include "purify/wprojection.h"
 
-#include "directories.h"
+#include "purify/directories.h"
 
 using namespace purify;
 using namespace purify::notinstalled;

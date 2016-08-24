@@ -1,11 +1,11 @@
 #ifndef PURIFY_MEASUREMENT_OPERATOR_H
 #define PURIFY_MEASUREMENT_OPERATOR_H
 
-#include "FFTOperator.h"
-#include "kernels.h"
-#include "types.h"
-#include "utilities.h"
-#include "wprojection.h"
+#include "purify/FFTOperator.h"
+#include "purify/kernels.h"
+#include "purify/types.h"
+#include "purify/utilities.h"
+#include "purify/wprojection.h"
 
 #include <iostream>
 #include <string>

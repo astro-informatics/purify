@@ -1,7 +1,7 @@
-#include "FFTOperator.h"
+#include "purify/FFTOperator.h"
 #include "catch.hpp"
-#include "pfitsio.h"
-#include "utilities.h"
+#include "purify/pfitsio.h"
+#include "purify/utilities.h"
 using namespace purify;
 
 TEST_CASE("FFT Operator [FORWARD]", "[FORWARD]") {

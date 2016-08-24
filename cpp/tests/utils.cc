@@ -1,9 +1,9 @@
 #include "catch.hpp"
-#include "utilities.h"
+#include "purify/utilities.h"
 
-#include "FFTOperator.h"
+#include "purify/FFTOperator.h"
 
-#include "directories.h"
+#include "purify/directories.h"
 using namespace purify;
 using namespace purify::notinstalled;
 

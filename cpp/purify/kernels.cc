@@ -1,4 +1,4 @@
-#include "kernels.h"
+#include "purify/kernels.h"
 
 namespace purify {
 

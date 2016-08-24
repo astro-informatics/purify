@@ -1,6 +1,6 @@
-#include "RMOperator.h"
+#include "purify/RMOperator.h"
 #include "purify/config.h"
-#include "logging.h"
+#include "purify/logging.h"
 
 namespace purify {
 Vector<t_complex> RMOperator::degrid(const Vector<t_complex> &eigen_image) {

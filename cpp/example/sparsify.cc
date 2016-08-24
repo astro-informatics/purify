@@ -1,6 +1,6 @@
-#include "directories.h"
-#include "pfitsio.h"
-#include "wprojection.h"
+#include "purify/directories.h"
+#include "purify/pfitsio.h"
+#include "purify/wprojection.h"
 
 using namespace purify;
 using namespace purify::notinstalled;

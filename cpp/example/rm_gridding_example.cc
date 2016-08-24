@@ -1,8 +1,8 @@
 
-#include "RMOperator.h"
-#include "pfitsio.h"
-#include "types.h"
-#include "utilities.h"
+#include "purify/RMOperator.h"
+#include "purify/pfitsio.h"
+#include "purify/types.h"
+#include "purify/utilities.h"
 using namespace purify;
 
 int main(int nargs, char const **args) {
