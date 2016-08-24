@@ -12,6 +12,6 @@ endif()
 
 if(TARGET casacore::ms)
   add_executable(main main.cc)
-  target_link_libraries(main cppurify)
+  target_link_libraries(main libpurify)
   set_target_properties(main PROPERTIES OUTPUT_NAME ${PROJECT_BINARY_DIR}/purify)
 endif()
