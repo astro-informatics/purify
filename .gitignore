@@ -9,3 +9,4 @@ pkg_install/
 dist/
 casapy-*.log
 ipython-*.log
+.DS_Store

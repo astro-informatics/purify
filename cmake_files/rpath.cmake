@@ -6,6 +6,9 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
             "Use rpath to make libraries relocatable")
     endif()
 endif()
+if(NOT LIBRARY_INSTALL_PATH)
+  return()
+endif()
 
 # Set RPATH to location where libraries will be installed,
 # unless it is already part of the platform
