@@ -2,6 +2,7 @@
 #include "purify/MeasurementOperator.h"
 #include "purify/pfitsio.h"
 #include "purify/utilities.h"
+#include "purify/directories.h"
 
 using namespace purify;
 
@@ -12,8 +13,7 @@ int main(int nargs, char const **args) {
   t_real over_sample;
   t_real cellsize;
   std::string kernel;
-  std::string vis_file = "../data/vla/at166B.3C129.c0.vis";
-  // std::string vis_file = "../data/atca/1637-77V.vis";
+  std::string vis_file = notinstalled::vla_filename("at166B.3C129.c0.vis");
 
   // Gridding example
   cellsize = 0.3;
@@ -22,8 +22,6 @@ int main(int nargs, char const **args) {
   uv_vis = utilities::read_visibility(vis_file); // visibility data being read in
   t_int width = 1024;
   t_int height = 1024;
-  // uv_vis = utilities::uv_symmetry(uv_vis); // Enforce condjugate symmetry by reflecting
-  // measurements in uv coordinates
 
   kernel = "kb";
   MeasurementOperator op(uv_vis, J, J, kernel, width, height, 20, over_sample, cellsize, cellsize,
@@ -31,5 +29,4 @@ int main(int nargs, char const **args) {
 
   Image<t_real> kb_img = op.grid(uv_vis.vis).real();
   pfitsio::write2d(kb_img.real(), "grid_image.fits");
-  // pfitsio::write2d(op.S.real(), "scale_kb_4.fits");
 }
