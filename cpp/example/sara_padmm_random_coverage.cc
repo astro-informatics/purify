@@ -2,19 +2,19 @@
 #include <memory>
 #include <random>
 #include <boost/math/special_functions/erf.hpp>
-#include "sopt/relative_variation.h"
-#include "sopt/utilities.h"
-#include "sopt/wavelets.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/positive_quadrant.h>
 #include <sopt/relative_variation.h>
+#include <sopt/relative_variation.h>
 #include <sopt/reweighted.h>
-#include "sopt/wavelets/sara.h"
-#include "MeasurementOperator.h"
-#include "directories.h"
-#include "pfitsio.h"
-#include "types.h"
-#include "utilities.h"
+#include <sopt/utilities.h>
+#include <sopt/wavelets.h>
+#include <sopt/wavelets/sara.h>
+#include "purify/MeasurementOperator.h"
+#include "purify/directories.h"
+#include "purify/pfitsio.h"
+#include "purify/types.h"
+#include "purify/utilities.h"
 
 int main(int, char **) {
   using namespace purify;
@@ -55,7 +55,8 @@ int main(int, char **) {
 
   auto direct = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {
     assert(x.size() == measurements.imsizex() * measurements.imsizey());
-    auto const image = Image<t_complex>::Map(x.data(), measurements.imsizey(), measurements.imsizex());
+    auto const image
+        = Image<t_complex>::Map(x.data(), measurements.imsizey(), measurements.imsizex());
     out = measurements.degrid(image);
   };
   auto adjoint = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {
@@ -86,33 +87,37 @@ int main(int, char **) {
   dimage = dimage / max_val;
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   sopt::utilities::write_tiff(
-      Image<t_real>::Map(dimage.data(), measurements.imsizey(), measurements.imsizex()), dirty_image);
-  pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey(), measurements.imsizex()),
-                   dirty_image_fits);
+      Image<t_real>::Map(dimage.data(), measurements.imsizey(), measurements.imsizex()),
+      dirty_image);
+  pfitsio::write2d(
+      Image<t_real>::Map(dimage.data(), measurements.imsizey(), measurements.imsizex()),
+      dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
-  auto const purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * beta;
+  auto const purify_gamma
+      = (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff()
+        * beta;
 
-  //auto purify_gamma = 3 * utilities::median((Psi.adjoint() * (measurements_transform.adjoint() * (uv_data.vis - y0))).real().cwiseAbs())/0.6745; 
+  // auto purify_gamma = 3 * utilities::median((Psi.adjoint() * (measurements_transform.adjoint() *
+  // (uv_data.vis - y0))).real().cwiseAbs())/0.6745;
 
   SOPT_INFO("Using epsilon of {} \n", epsilon);
-  auto const padmm
-      = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
-            .itermax(1000)
-            .gamma(purify_gamma)
-            .relative_variation(1e-6)
-            .l2ball_proximal_epsilon(epsilon)
-            .tight_frame(false)
-            .l1_proximal_tolerance(1e-4)
-            .l1_proximal_nu(1)
-            .l1_proximal_itermax(50)
-            .l1_proximal_positivity_constraint(true)
-            .l1_proximal_real_constraint(true)
-            .residual_convergence(epsilon * 1.001)
-            .lagrange_update_scale(0.9)
-            .nu(1e0)
-            .Psi(Psi)
-            .Phi(measurements_transform);
+  auto const padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
+                         .itermax(1000)
+                         .gamma(purify_gamma)
+                         .relative_variation(1e-6)
+                         .l2ball_proximal_epsilon(epsilon)
+                         .tight_frame(false)
+                         .l1_proximal_tolerance(1e-4)
+                         .l1_proximal_nu(1)
+                         .l1_proximal_itermax(50)
+                         .l1_proximal_positivity_constraint(true)
+                         .l1_proximal_real_constraint(true)
+                         .residual_convergence(epsilon * 1.001)
+                         .lagrange_update_scale(0.9)
+                         .nu(1e0)
+                         .Psi(Psi)
+                         .Phi(measurements_transform);
 
   auto const posq = sopt::algorithm::positive_quadrant(padmm);
   auto const min_delta = sigma * std::sqrt(y0.size()) / std::sqrt(9 * M31.size());
@@ -123,8 +128,8 @@ int main(int, char **) {
           sopt::RelativeVariation<std::complex<t_real>>(1e-3));
   auto const diagnostic = reweighted();
   assert(diagnostic.algo.x.size() == M31.size());
-  Image<t_complex> image
-      = Image<t_complex>::Map(diagnostic.algo.x.data(), measurements.imsizey(), measurements.imsizex());
+  Image<t_complex> image = Image<t_complex>::Map(diagnostic.algo.x.data(), measurements.imsizey(),
+                                                 measurements.imsizex());
   t_real const max_val_final = image.array().abs().maxCoeff();
   sopt::utilities::write_tiff(image.real(), outfile);
   pfitsio::write2d(image.real(), outfile_fits);

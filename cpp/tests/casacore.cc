@@ -8,11 +8,11 @@
 #include <casacore/tables/Tables/ScalarColumn.h>
 #include <casacore/tables/Tables/SetupNewTab.h>
 #include <casacore/tables/Tables/TableColumn.h>
-#include "casacore.h"
-#include "directories.h"
+#include "purify/casacore.h"
+#include "purify/directories.h"
 
-#include "utilities.h"
-#include "types.h"
+#include "purify/types.h"
+#include "purify/utilities.h"
 
 #include "catch.hpp"
 using namespace ::casacore;
@@ -182,17 +182,25 @@ TEST_CASE("Channel iteration") {
 }
 
 // TEST_CASE("Read Measurement") {
-//   purify::utilities::vis_params const vis_file = purify::utilities::read_visibility(vla_filename("at166B.3C129.c0I.vis"));
-//   purify::utilities::vis_params const ms_file = purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"), purify::casa::MeasurementSet::ChannelWrapper::polarization::I);
+//   purify::utilities::vis_params const vis_file =
+//   purify::utilities::read_visibility(vla_filename("at166B.3C129.c0I.vis"));
+//   purify::utilities::vis_params const ms_file =
+//   purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"),
+//   purify::casa::MeasurementSet::ChannelWrapper::polarization::I);
 //
 //   REQUIRE(vis_file.u.size() == ms_file.u.size());
 //
 //   CHECK(vis_file.u.isApprox(ms_file.u, 1e-6));
 //   CHECK(vis_file.v.isApprox(ms_file.v, 1e-6));
 //   CHECK(vis_file.vis.isApprox(ms_file.vis, 1e-6));
-//   purify::utilities::vis_params const ms_fileLL = purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"), purify::casa::MeasurementSet::ChannelWrapper::polarization::LL);
-//   purify::utilities::vis_params const ms_fileRR = purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"), purify::casa::MeasurementSet::ChannelWrapper::polarization::RR);
-//   purify::Vector<purify::t_complex> const weights = (1./(1./ms_fileLL.weights.array() + 1./ms_fileRR.weights.array())).matrix();
+//   purify::utilities::vis_params const ms_fileLL =
+//   purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"),
+//   purify::casa::MeasurementSet::ChannelWrapper::polarization::LL);
+//   purify::utilities::vis_params const ms_fileRR =
+//   purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"),
+//   purify::casa::MeasurementSet::ChannelWrapper::polarization::RR);
+//   purify::Vector<purify::t_complex> const weights = (1./(1./ms_fileLL.weights.array() +
+//   1./ms_fileRR.weights.array())).matrix();
 //   CHECK(vis_file.weights.real().isApprox(weights.real(), 1e-6));
 // }
 
