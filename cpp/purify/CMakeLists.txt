@@ -1,9 +1,16 @@
 configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
+set(HEADERS 
+  RMOperator.h logging.h wprojection.h FFTOperator.h kernels.h
+  pfitsio.h MeasurementOperator.h clean.h logging.disabled.h types.h PSFOperator.h
+  logging.enabled.h utilities.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
+
 set(SOURCES MeasurementOperator.cc FFTOperator.cc clean.cc utilities.cc pfitsio.cc
   kernels.cc RMOperator.cc PSFOperator.cc wprojection.cc)
+
 if(TARGET casacore::ms)
   list(APPEND SOURCES casacore.cc)
+  list(APPEND HEADERS casacore.h)
 endif()
 add_library(libpurify SHARED ${SOURCES})
 set(version "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}.${Purify_VERSION_PATCH}")
@@ -14,20 +21,29 @@ target_include_directories(libpurify PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/cpp>
   $<INSTALL_INTERFACE:include/>)
 
+# Add to install includes only if outside build dir
+function(add_include_dir)
+  unset(publics)
+  unset(privates)
+  foreach(dir ${ARGN})
+    file(RELATIVE_PATH rel "${PROJECT_BINARY_DIR}" "${dir}" )
+    if("${rel}" MATCHES "^\\.\\./")
+      list(APPEND publics "${dir}")
+    endif()
+  endforeach() 
+  if(public)
+    target_include_directories(libpurify SYSTEM PUBLIC ${publics})
+  endif()
+endfunction()
 
-if(EIGEN3_INCLUDE_DIR)
-  target_include_directories(libpurify SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})
-endif()
-if(Boost_INCLUDE_DIR)
-  target_include_directories(libpurify SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
-endif()
-if(CFitsIO_INCLUDE_DIR)
-  target_include_directories(libpurify SYSTEM PUBLIC ${CFitsIO_INCLUDE_DIR})
-endif()
-if(CCFits_INCLUDE_DIR)
-  target_include_directories(libpurify SYSTEM PUBLIC ${CCFits_INCLUDE_DIR}/.. ${CCFits_INCLUDE_DIR})
-endif()
-target_link_libraries(libpurify ${FFTW3_DOUBLE_LIBRARY} ${CCFits_LIBRARY} ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY})
+add_include_dir(
+  ${EIGEN3_INCLUDE_DIR}
+  ${Boost_INCLUDE_DIR}
+  ${CFitsIO_INCLUDE_DIR}
+  ${CCFits_INCLUDE_DIR}/..
+)
+target_link_libraries(libpurify
+  ${FFTW3_DOUBLE_LIBRARY} ${CCFits_LIBRARY} ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY})
 if(TARGET casacore::ms)
   target_link_libraries(libpurify casacore::ms)
 endif()
@@ -36,3 +52,13 @@ if(TARGET openmp::openmp)
 endif()
 
 add_dependencies(libpurify lookup_dependencies)
+
+install(FILES ${HEADERS} DESTINATION include/purify)
+install(TARGETS libpurify
+  EXPORT PurifyTargets
+  DESTINATION share/cmake/Purify
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  INCLUDES DESTINATION include
+)

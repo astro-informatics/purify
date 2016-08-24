@@ -46,3 +46,6 @@ if(tests)  # Adds ctest
 endif()
 
 add_subdirectory(cpp)
+
+# Exports Purify so other packages can access it
+include(export_purify)
