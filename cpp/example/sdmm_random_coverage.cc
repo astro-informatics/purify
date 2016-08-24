@@ -1,12 +1,12 @@
-#include "sopt/sdmm.h"
+#include <sopt/sdmm.h>
 #include <array>
 #include <memory>
 #include <random>
 #include <boost/math/special_functions/erf.hpp>
-#include "sopt/relative_variation.h"
-#include "sopt/utilities.h"
-#include "sopt/wavelets.h"
-#include "sopt/wavelets/sara.h"
+#include <sopt/relative_variation.h>
+#include <sopt/utilities.h>
+#include <sopt/wavelets.h>
+#include <sopt/wavelets/sara.h>
 #include "MeasurementOperator.h"
 #include "directories.h"
 #include "pfitsio.h"

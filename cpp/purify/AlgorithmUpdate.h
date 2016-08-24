@@ -1,11 +1,11 @@
 #ifndef ALGORITHMUPDATE_H
 #define ALGORITHMUPDATE_H
 
-#include "sopt/relative_variation.h"
-#include "sopt/utilities.h"
-#include "sopt/wavelets.h"
+#include <sopt/relative_variation.h>
+#include <sopt/utilities.h>
+#include <sopt/wavelets.h>
 #include <sopt/imaging_padmm.h>
-#include "sopt/wavelets/sara.h"
+#include <sopt/wavelets/sara.h>
 #include "MeasurementOperator.h"
 #include "cmdl.h"
 #include "pfitsio.h"
