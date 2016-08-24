@@ -1,3 +1,4 @@
+#include "purify/config.h"
 #include "purify/AlgorithmUpdate.h"
 
 namespace purify {

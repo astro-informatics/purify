@@ -1,6 +1,6 @@
 #include <iomanip>
-#include "purify/MeasurementOperator.h"
 #include "catch.hpp"
+#include "purify/MeasurementOperator.h"
 #include "purify/directories.h"
 #include "purify/kernels.h"
 #include "purify/pfitsio.h"

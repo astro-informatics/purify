@@ -1,10 +1,10 @@
 #ifndef PURIFY_WPROJECTION_H
 #define PURIFY_WPROJECTION_H
 
-#include "purify/types.h"
-
+#include "purify/config.h"
 #include <string>
 #include "purify/FFTOperator.h"
+#include "purify/types.h"
 #include "purify/utilities.h"
 
 namespace purify {

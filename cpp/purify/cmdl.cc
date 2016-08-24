@@ -1,3 +1,4 @@
+#include "purify/config.h"
 #include "purify/cmdl.h"
 
 namespace purify {

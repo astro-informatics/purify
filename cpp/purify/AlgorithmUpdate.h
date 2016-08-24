@@ -1,10 +1,11 @@
 #ifndef ALGORITHMUPDATE_H
 #define ALGORITHMUPDATE_H
 
+#include "purify/config.h"
+#include <sopt/imaging_padmm.h>
 #include <sopt/relative_variation.h>
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
-#include <sopt/imaging_padmm.h>
 #include <sopt/wavelets/sara.h>
 #include "purify/MeasurementOperator.h"
 #include "purify/cmdl.h"

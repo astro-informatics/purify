@@ -1,5 +1,5 @@
-#include "purify/FFTOperator.h"
 #include "purify/config.h"
+#include "purify/FFTOperator.h"
 
 namespace purify {
 Vector<t_complex> Fft2d::fftshift_1d(const Vector<t_complex> input) {

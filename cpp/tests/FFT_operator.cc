@@ -1,5 +1,5 @@
-#include "purify/FFTOperator.h"
 #include "catch.hpp"
+#include "purify/FFTOperator.h"
 #include "purify/pfitsio.h"
 #include "purify/utilities.h"
 using namespace purify;

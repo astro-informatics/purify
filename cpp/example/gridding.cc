@@ -1,8 +1,8 @@
 
 #include "purify/MeasurementOperator.h"
+#include "purify/directories.h"
 #include "purify/pfitsio.h"
 #include "purify/utilities.h"
-#include "purify/directories.h"
 
 using namespace purify;
 

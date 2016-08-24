@@ -1,3 +1,4 @@
+#include "purify/config.h"
 #include "purify/pfitsio.h"
 
 namespace purify {

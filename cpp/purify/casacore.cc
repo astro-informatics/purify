@@ -1,8 +1,8 @@
-#include "purify/casacore.h"
 #include "purify/config.h"
 #include <sstream>
 #include <casacore/casa/Arrays/IPosition.h>
 #include <casacore/tables/TaQL/ExprNode.h>
+#include "purify/casacore.h"
 #include "purify/logging.h"
 #include "purify/types.h"
 

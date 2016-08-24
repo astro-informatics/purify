@@ -1,5 +1,5 @@
-#include "purify/PSFOperator.h"
 #include "purify/config.h"
+#include "purify/PSFOperator.h"
 #include "purify/logging.h"
 
 namespace purify {

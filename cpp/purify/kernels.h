@@ -1,6 +1,7 @@
 #ifndef PURIFY_KERNELS_H
 #define PURIFY_KERNELS_H
 
+#include "purify/config.h"
 #include <array>
 #include <boost/math/special_functions/bessel.hpp>
 #include <boost/math/special_functions/sinc.hpp>

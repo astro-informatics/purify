@@ -1,8 +1,8 @@
-#include "purify/clean.h"
 #include "purify/config.h"
 #include <array>
 #include <random>
 #include "purify/MeasurementOperator.h"
+#include "purify/clean.h"
 #include "purify/directories.h"
 #include "purify/logging.h"
 #include "purify/pfitsio.h"

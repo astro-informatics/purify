@@ -1,6 +1,7 @@
 #ifndef PURIFY_MEASUREMENT_OPERATOR_H
 #define PURIFY_MEASUREMENT_OPERATOR_H
 
+#include "purify/config.h"
 #include "purify/FFTOperator.h"
 #include "purify/kernels.h"
 #include "purify/types.h"

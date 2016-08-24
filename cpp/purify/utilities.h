@@ -1,8 +1,7 @@
 #ifndef PURIFY_UTILITIES_H
 #define PURIFY_UTILITIES_H
 
-#include "purify/types.h"
-
+#include "purify/config.h"
 #include <fstream>
 #include <iostream>
 #include <random>
@@ -12,6 +11,7 @@
 #include <boost/math/special_functions/sinc.hpp>
 #include <sys/stat.h>
 #include "purify/FFTOperator.h"
+#include "purify/types.h"
 
 namespace purify {
 

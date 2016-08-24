@@ -1,5 +1,5 @@
-#include "purify/clean.h"
 #include "purify/config.h"
+#include "purify/clean.h"
 #include "purify/logging.h"
 
 namespace purify {

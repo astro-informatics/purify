@@ -1,15 +1,14 @@
 #ifndef PURIFY_CLEAN_H
 #define PURIFY_CLEAN_H
 
-#include "purify/types.h"
-
-#include "purify/FFTOperator.h"
-#include "purify/MeasurementOperator.h"
-
+#include "purify/config.h"
 #include <fstream>
 #include <iostream>
 #include <stdio.h>
 #include <string>
+#include "purify/FFTOperator.h"
+#include "purify/MeasurementOperator.h"
+#include "purify/types.h"
 
 namespace purify {
 

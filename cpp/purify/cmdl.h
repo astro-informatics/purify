@@ -1,6 +1,7 @@
 #ifndef CMLD_H
 #define CMLD_H
 
+#include "purify/config.h"
 #include <cstdlib>
 #include <getopt.h>
 #include <string>

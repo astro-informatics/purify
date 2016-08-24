@@ -2,10 +2,10 @@
 #include <memory>
 #include <random>
 #include <boost/math/special_functions/erf.hpp>
+#include <sopt/imaging_padmm.h>
 #include <sopt/relative_variation.h>
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
-#include <sopt/imaging_padmm.h>
 #include <sopt/wavelets/sara.h>
 #include "purify/MeasurementOperator.h"
 #include "purify/directories.h"

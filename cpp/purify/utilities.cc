@@ -1,6 +1,6 @@
-#include "purify/utilities.h"
 #include "purify/config.h"
 #include "purify/logging.h"
+#include "purify/utilities.h"
 
 namespace purify {
 namespace utilities {

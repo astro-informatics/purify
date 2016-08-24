@@ -1,6 +1,7 @@
 #ifndef PURIFY_PFITSIO_H
 #define PURIFY_PFITSIO_H
 
+#include "purify/config.h"
 #include "purify/types.h"
 
 #include <string>
