@@ -8,37 +8,23 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_files)
 # It contains a number of cmake recipes
 include(LookUp-GreatCMakeCookOff)
 
-# Set version and build id of this package
-include(VersionAndGitRef)
-set_version(0.1.1)
-get_gitref()
-
-# Add C99 flag, since code uses inline
-# yeah, yeah it is GNU C, and others since for ever, but it was not part of the standard.
-include(AddC99Flags)
-include(AddCPP11Flags)
-
 option(tests          "Enable testing"                                  on)
+option(examples       "Compile examples"                                on)
 option(data           "Download measurement set for testing"            on)
 option(openmp         "Enable OpenMP"                                   on)
 option(logging        "Enable logging"                                  on)
 
-if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  if(NOT "$ENV{VIRTUAL_ENV}" STREQUAL "")
-    set(CMAKE_INSTALL_PREFIX
-      "$ENV{VIRTUAL_ENV}" CACHE PATH "Installation location" FORCE)
-    message(STATUS
-      "Install dir unspecified and virtual env found. "
-      "Defaults to installing in ${CMAKE_INSTALL_PREFIX}"
-    )
-  endif()
-endif()
+# Set version and build id of this package
+include(version)
 
-# Extra parameters
-if(NOT DEFINED LIBRARY_INSTALL_PATH)
-    set(LIBRARY_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/lib")
-endif()
+# we are doing c++11
+include(AddCPP11Flags)
+
+# sets up rpath so libraries can be found
 include(rpath)
+
+# adds logging variables
+include(logging)
 
 # include exernal dependencies
 include(dependencies)
