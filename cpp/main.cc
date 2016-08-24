@@ -13,9 +13,9 @@
 #include "purify/MeasurementOperator.h"
 #include "purify/casacore.h"
 #include "purify/cmdl.h"
+#include "purify/logging.h"
 #include "purify/pfitsio.h"
 #include "purify/types.h"
-//#include "purify/clara.h"
 
 using namespace purify;
 namespace {
@@ -62,8 +62,7 @@ t_real estimate_noise(purify::Params const &params) {
     sigma_imag = utilities::median(noise_vis.imag().cwiseAbs()) / 0.6745;
   }
 
-  std::cout << "RMS noise of " << sigma_real << " Jy (real) and " << sigma_real << " Jy (imaginary)"
-            << '\n';
+  PURIFY_MEDIUM_LOG("RMS noise of {}Jy + i{}Jy", sigma_real, sigma_real);
   return std::sqrt(sigma_real * sigma_real + sigma_imag * sigma_imag) / std::sqrt(2);
 }
 
@@ -79,14 +78,14 @@ void save_psf_and_dirty_image(
   Image<t_real> dimage
       = Image<t_complex>::Map(dirty_image.data(), params.height, params.width).real();
   header.fits_name = dirty_image_fits;
-  std::cout << "Saving " + header.fits_name << std::endl;
+  PURIFY_HIGH_LOG("Saving {}", header.fits_name);
   pfitsio::write2d_header(dimage, header);
   Vector<t_complex> const psf_image = measurements.adjoint() * (uv_data.weights.array());
   Image<t_real> psf = Image<t_complex>::Map(psf_image.data(), params.height, params.width).real();
   t_real max_val = psf.array().abs().maxCoeff();
   psf = psf / max_val;
   header.fits_name = psf_fits;
-  std::cout << "Saving " + header.fits_name << std::endl;
+  PURIFY_HIGH_LOG("Saving {}", header.fits_name);
   pfitsio::write2d_header(psf, header);
 }
 void save_final_image(std::string const &outfile_fits, std::string const &residual_fits,
@@ -118,7 +117,7 @@ read_estimates(sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const &measu
   Vector<t_complex> initial_residuals = Vector<t_complex>::Zero(uv_data.vis.size());
   // loading data from check point.
   if(utilities::file_exists(params.name + "_diagnostic")) {
-    std::printf("Loading checkpoint for %s\n", params.name.c_str());
+    PURIFY_HIGH_LOG("Loading checkpoint for {}", params.name.c_str());
     std::string const outfile_fits = params.name + "_solution_" + params.weighting + "_update.fits";
     if(utilities::file_exists(outfile_fits)) {
       auto const image = pfitsio::read2d(outfile_fits);
@@ -178,9 +177,11 @@ construct_measurement_operator(utilities::vis_params const &uv_data, purify::Par
 
 int main(int argc, char **argv) {
   sopt::logging::initialize();
+  purify::logging::initialize();
 
   Params params = parse_cmdl(argc, argv);
   sopt::logging::set_level(params.sopt_logging_level);
+  purify::logging::set_level(params.sopt_logging_level);
 
   auto uv_data = purify::casa::read_measurementset(params.visfile, params.stokes_val);
   bandwidth_scaling(uv_data, params);
@@ -200,7 +201,7 @@ int main(int argc, char **argv) {
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, params.height, params.width);
 
-  std::printf("Saving dirty map \n");
+  PURIFY_LOW_LOG("Saving dirty map");
   save_psf_and_dirty_image(measurements_transform, uv_data, params);
 
   auto const estimates = read_estimates(measurements_transform, uv_data, params);
@@ -220,9 +221,9 @@ int main(int argc, char **argv) {
   out_diagnostic.precision(13);
   out_diagnostic.open(params.name + "_diagnostic", std::ios_base::app);
 
-  std::cout << "Starting sopt!" << '\n';
-  std::cout << "Epsilon = " << epsilon << '\n';
-  std::cout << "Gamma = " << purify_gamma << '\n';
+  PURIFY_HIGH_LOG("Starting sopt!");
+  PURIFY_MEDIUM_LOG("Epsilon = {}", epsilon);
+  PURIFY_MEDIUM_LOG("Gamma = {}", purify_gamma);
   auto padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
                    .gamma(purify_gamma)
                    .relative_variation(1e-3)
@@ -273,7 +274,7 @@ int main(int argc, char **argv) {
     final_model = diagnostic.algo.x;
   }
   save_final_image(outfile_fits, residual_fits, final_model, uv_data, params, measurements);
-  out_diagnostic.close(); // closing diagnostic file
+  out_diagnostic.close();
 
   return 0;
 }
