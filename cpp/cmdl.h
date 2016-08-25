@@ -74,6 +74,7 @@ static struct option long_options[] = {
     {"kernel", required_argument, 0, 'r'},
     {"kernel_support", required_argument, 0, 's'},
     {"logging_level", required_argument, 0, 't'},
+    {"cellsize", required_argument, 0, 'u'},
     {0, 0, 0, 0}};
 
 std::string usage();
