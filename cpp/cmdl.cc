@@ -12,6 +12,7 @@ std::string usage() {
          "measurement set). \n\n"
          "--name: path of file output. (required) \n\n"
          "--niters: number of iterations. \n\n"
+         "--cellsize: the dimensions of a pixel in arcseconds. \n\n"
          "--size: image size in pixels. \n\n"
          "--width: image width in pixels. \n\n"
          "--height: image height in pixels. \n\n"
@@ -148,6 +149,9 @@ Params parse_cmdl(int argc, char **argv) {
     case 't':
       params.sopt_logging_level = optarg;
       break;
+    case 'u':
+      params.cellsizex = std::stod(optarg);
+      params.cellsizey = std::stod(optarg);
     case '?':
       /* getopt_long already printed an error message. */
       break;
