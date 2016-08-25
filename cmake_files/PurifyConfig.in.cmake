@@ -6,4 +6,6 @@ endif()
 
 set(Purify_INCLUDE_DIRS "@ALL_INCLUDE_DIRS@")
 set(Purify_LIBRARIES libpurify)
-set(Purify_EXECUTABLE purify)
+if(TARGET purify)
+  set(Purify_EXECUTABLE purify)
+endif()
