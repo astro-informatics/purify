@@ -28,6 +28,7 @@ int main(int nargs, char const **args) {
   using namespace purify::notinstalled;
   sopt::logging::initialize();
   purify::logging::initialize();
+  sopt::logging::set_level("debug");
 
   std::string const kernel = args[1];
   t_real const over_sample = std::stod(static_cast<std::string>(args[2]));
@@ -52,13 +53,13 @@ int main(int nargs, char const **args) {
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";
   PURIFY_MEDIUM_LOG("Number of measurements: {}", uv_data.u.size());
-  MeasurementOperator simulate_measurements(uv_data, 4, 4, "kb", sky_model.cols(), sky_model.rows(),
-                                            20,
-                                            5); // Generating simulated high quality visibilities
+  MeasurementOperator simulate_measurements(uv_data, 8, 8, "kb", sky_model.cols(), sky_model.rows(),
+                                            200,
+                                            2); // Generating simulated high quality visibilities
   uv_data.vis = simulate_measurements.degrid(sky_model);
 
   MeasurementOperator measurements(uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(),
-                                   over_sample);
+                                   200, over_sample);
 
   // putting measurement operator in a form that sopt can use
   auto direct = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {

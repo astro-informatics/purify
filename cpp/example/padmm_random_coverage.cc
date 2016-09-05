@@ -17,7 +17,7 @@ int main(int, char **) {
   using namespace purify;
   using namespace purify::notinstalled;
   sopt::logging::initialize();
-
+  sopt::logging::set_level("debug");
   std::string const fitsfile = image_filename("30dor_256.fits");
   std::string const inputfile = output_filename("M31_input.fits");
   std::string const outfile = output_filename("M31.tiff");
@@ -39,7 +39,7 @@ int main(int, char **) {
                      - (boost::math::erf(constant::pi / (sigma_m * std::sqrt(2))))
                            * (boost::math::erf(constant::pi / (sigma_m * std::sqrt(2))));
   // t_int const number_of_vis = std::floor(p * rho * M31.size());
-  t_int const number_of_vis = 1e4;
+  t_int const number_of_vis = std::floor(M31.size() * 2.);
   // Generating random uv(w) coverage
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";
@@ -115,7 +115,6 @@ int main(int, char **) {
   Image<t_complex> image
       = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey(), measurements.imsizex());
   t_real const max_val_final = image.array().abs().maxCoeff();
-  image = image / max_val_final;
   sopt::utilities::write_tiff(image.real(), outfile);
   pfitsio::write2d(image.real(), outfile_fits);
   Image<t_complex> residual = measurements.grid(y0 - measurements.degrid(image));
