@@ -83,6 +83,7 @@ void save_psf_and_dirty_image(
   Vector<t_complex> const psf_image = measurements.adjoint() * (uv_data.weights.array());
   Image<t_real> psf = Image<t_complex>::Map(psf_image.data(), params.height, params.width).real();
   t_real max_val = psf.array().abs().maxCoeff();
+  PURIFY_LOW_LOG("PSF normalised by ", max_val);
   psf = psf / max_val;
   header.fits_name = psf_fits;
   PURIFY_HIGH_LOG("Saving {}", header.fits_name);
@@ -226,7 +227,7 @@ int main(int argc, char **argv) {
   PURIFY_MEDIUM_LOG("Gamma = {}", purify_gamma);
   auto padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
                    .gamma(purify_gamma)
-                   .relative_variation(1e-3)
+                   .relative_variation(1e-2)
                    .l2ball_proximal_epsilon(epsilon)
                    .l2ball_proximal_weights(uv_data.weights.array().real())
                    .tight_frame(false)
