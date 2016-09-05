@@ -17,7 +17,7 @@
 #include "purify/utilities.h"
 
 int main(int nargs, char const **args) {
-  if(nargs != 8) {
+  if(nargs != 9) {
     std::cerr << " Wrong number of arguments! " << '\n';
     return 1;
   }
@@ -26,14 +26,17 @@ int main(int nargs, char const **args) {
   using namespace purify::notinstalled;
   sopt::logging::initialize();
   purify::logging::initialize();
-
-  std::string const kernel = args[1];
-  t_real const over_sample = std::stod(static_cast<std::string>(args[2]));
-  t_int const J = static_cast<t_int>(std::stod(static_cast<std::string>(args[3])));
-  t_real const m_over_n = std::stod(static_cast<std::string>(args[4]));
-  std::string const test_number = static_cast<std::string>(args[5]);
-  t_real const ISNR = std::stod(static_cast<std::string>(args[6]));
-  std::string const name = static_cast<std::string>(args[7]);
+  sopt::logging::set_level("debug");
+  purify::logging::set_level("debug");
+  
+  std::string const test_type = args[1];
+  std::string const kernel = args[2];
+  t_real const over_sample = std::stod(static_cast<std::string>(args[3]));
+  t_int const J = static_cast<t_int>(std::stod(static_cast<std::string>(args[4])));
+  t_real const m_over_n = std::stod(static_cast<std::string>(args[5]));
+  std::string const test_number = static_cast<std::string>(args[6]);
+  t_real const ISNR = std::stod(static_cast<std::string>(args[7]));
+  std::string const name = static_cast<std::string>(args[8]);
 
   std::string const fitsfile = image_filename(name + ".fits");
 
@@ -51,14 +54,13 @@ int main(int nargs, char const **args) {
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";
   PURIFY_MEDIUM_LOG("Number of measurements: {}", uv_data.u.size());
-  MeasurementOperator simulate_measurements(uv_data, 4, 4, "kb", sky_model.cols(), sky_model.rows(),
-                                            20,
-                                            5); // Generating simulated high quality visibilities
-  uv_data.vis = simulate_measurements.degrid(sky_model);
 
+  MeasurementOperator sky_measurements(uv_data, 8, 8, "kb", sky_model.cols(), sky_model.rows(),
+                                   100, over_sample);
+  uv_data.vis = sky_measurements.degrid(sky_model);
   MeasurementOperator measurements(uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(),
-                                   over_sample);
-
+                                   100, over_sample);
+  
   // putting measurement operator in a form that sopt can use
   auto direct = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {
     assert(x.size() == measurements.imsizex() * measurements.imsizey());
@@ -74,11 +76,24 @@ int main(int nargs, char const **args) {
       direct, {0, 1, static_cast<t_int>(uv_data.vis.size())}, adjoint,
       {0, 1, static_cast<t_int>(measurements.imsizex() * measurements.imsizey())});
 
-  sopt::wavelets::SARA const sara{
-      std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
-      std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
-      std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
-
+  std::vector<std::tuple<std::string, t_uint>> wavelets;
+	
+  if (test_type == "clean")
+  	wavelets.push_back(std::make_tuple("Dirac" ,3u));
+  if (test_type == "ms_clean")
+  	wavelets.push_back(std::make_tuple("DB4" ,3u));
+  if (test_type == "padmm"){
+  	wavelets.push_back(std::make_tuple("Dirac" ,3u));
+  	wavelets.push_back(std::make_tuple("DB1" ,3u));
+  	wavelets.push_back(std::make_tuple("DB2" ,3u));
+  	wavelets.push_back(std::make_tuple("DB3" ,3u));
+  	wavelets.push_back(std::make_tuple("DB4" ,3u));
+  	wavelets.push_back(std::make_tuple("DB5" ,3u));
+  	wavelets.push_back(std::make_tuple("DB6" ,3u));
+  	wavelets.push_back(std::make_tuple("DB7" ,3u));
+  	wavelets.push_back(std::make_tuple("DB8" ,3u));
+  }
+  sopt::wavelets::SARA const sara(wavelets.begin(), wavelets.end());
   auto const Psi
       = sopt::linear_transform<t_complex>(sara, measurements.imsizey(), measurements.imsizex());
 
@@ -97,7 +112,8 @@ int main(int nargs, char const **args) {
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
   auto const purify_gamma
       = (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).real().maxCoeff() * 1e-3;
-
+  t_int iters = 0;
+  auto convergence_function = [&iters](const Vector<t_complex> &x) { iters = iters + 1; return true; };
   PURIFY_HIGH_LOG("Starting sopt!");
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
   PURIFY_MEDIUM_LOG("Gamma {}", purify_gamma);
@@ -115,12 +131,21 @@ int main(int nargs, char const **args) {
                          .lagrange_update_scale(0.9)
                          .nu(1e0)
                          .Psi(Psi)
+			 .itermax(100)
+			 .is_converged(convergence_function)
                          .Phi(measurements_transform);
-  // Timing reconstruction
+  // Timing reconstructionu
 
   std::clock_t c_start = std::clock();
   auto const diagnostic = padmm();
   std::clock_t c_end = std::clock();
+
+  // Reading if algo has converged
+  t_int converged = 0;
+  if (diagnostic.good) {
+	converged = 1;
+  }
+  const t_uint maxiters = iters;
 
   Image<t_complex> image
       = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey(), measurements.imsizex());
@@ -134,7 +159,7 @@ int main(int nargs, char const **args) {
   // writing snr and time to a file
   std::ofstream out(results);
   out.precision(13);
-  out << snr << " " << total_time;
+  out << snr << " " << total_time << " " << converged << " " << maxiters;
   out.close();
 
   return 0;
