@@ -116,6 +116,8 @@ pfitsio::header_params AlgorithmUpdate::create_header(purify::utilities::vis_par
   header.dec = uv_data.dec;
   header.cell_x = params.cellsizex;
   header.cell_y = params.cellsizey;
+  header.niters = params.iter;
+  header.hasconverged = false;
   return header;
 }
 }

@@ -46,6 +46,10 @@ struct Params {
   bool run_diagnostic = false; // save and output diagnostic information
   bool algo_update = true;     // if to use lambda function to record/update algorithm variables
   bool no_reweighted = true;   // if to use reweighting
+
+ // flux scaling
+ t_real norm = 1; // norm of the measurement operator
+ t_real psf_norm = 1; // the peak value of the PSF
 };
 
 static struct option long_options[] = {

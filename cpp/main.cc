@@ -66,10 +66,10 @@ t_real estimate_noise(purify::Params const &params) {
   return std::sqrt(sigma_real * sigma_real + sigma_imag * sigma_imag) / std::sqrt(2);
 }
 
-void save_psf_and_dirty_image(
+t_real save_psf_and_dirty_image(
     sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const &measurements,
     purify::utilities::vis_params const &uv_data, purify::Params const &params) {
-
+  // returns psf normalisation
   purify::pfitsio::header_params header = create_new_header(uv_data, params);
   std::string const dirty_image_fits = params.name + "_dirty_" + params.weighting + ".fits";
   std::string const psf_fits = params.name + "_psf_" + params.weighting + ".fits";
@@ -88,6 +88,7 @@ void save_psf_and_dirty_image(
   header.fits_name = psf_fits;
   PURIFY_HIGH_LOG("Saving {}", header.fits_name);
   pfitsio::write2d_header(psf, header);
+  return max_val;
 }
 void save_final_image(std::string const &outfile_fits, std::string const &residual_fits,
                       Vector<t_complex> const &x, utilities::vis_params const &uv_data,
@@ -98,7 +99,7 @@ void save_final_image(std::string const &outfile_fits, std::string const &residu
       = Image<t_complex>::Map(x.data(), measurements.imsizey(), measurements.imsizex());
   // header information
   header.pix_units = "JY/PIXEL";
-  header.fits_name = outfile_fits;
+  header.fits_name = outfile_fits + ".fits";
   pfitsio::write2d_header(image.real(), header);
   Image<t_complex> residual = measurements
                                   .grid(((uv_data.vis - measurements.degrid(image)).array()
@@ -108,6 +109,10 @@ void save_final_image(std::string const &outfile_fits, std::string const &residu
   header.pix_units = "JY/BEAM";
   header.fits_name = residual_fits;
   pfitsio::write2d_header(residual.real(), header);
+  
+  header.fits_name = residual_fits + "_scaled.fits";
+  pfitsio::write2d_header(residual.real() / params.psf_norm, header);
+
 };
 
 std::tuple<Vector<t_complex>, Vector<t_complex>>
@@ -193,6 +198,7 @@ int main(int argc, char **argv) {
       params.over_sample * params.width, params.over_sample * params.height);
   auto const noise_rms = estimate_noise(params);
   auto const measurements = construct_measurement_operator(uv_data, params);
+  params.norm = measurements.norm;
   auto const measurements_transform = linear_transform(measurements, uv_data, params);
 
   sopt::wavelets::SARA const sara{
@@ -203,7 +209,7 @@ int main(int argc, char **argv) {
   auto const Psi = sopt::linear_transform<t_complex>(sara, params.height, params.width);
 
   PURIFY_LOW_LOG("Saving dirty map");
-  save_psf_and_dirty_image(measurements_transform, uv_data, params);
+  params.psf_norm = save_psf_and_dirty_image(measurements_transform, uv_data, params);
 
   auto const estimates = read_estimates(measurements_transform, uv_data, params);
   t_real const epsilon = params.n_mu * std::sqrt(2 * uv_data.vis.size())
@@ -257,8 +263,8 @@ int main(int argc, char **argv) {
     padmm.itermax(params.niters);
   if(params.no_reweighted) {
     auto const diagnostic = padmm(estimates);
-    outfile_fits = params.name + "_solution_" + params.weighting + "_final.fits";
-    residual_fits = params.name + "_residual_" + params.weighting + "_final.fits";
+    outfile_fits = params.name + "_solution_" + params.weighting + "_final";
+    residual_fits = params.name + "_residual_" + params.weighting + "_final";
     final_model = diagnostic.x;
   } else {
     auto const posq = sopt::algorithm::positive_quadrant(padmm);
@@ -270,8 +276,8 @@ int main(int argc, char **argv) {
         = sopt::algorithm::reweighted(padmm).itermax(10).min_delta(min_delta).is_converged(
             sopt::RelativeVariation<std::complex<t_real>>(1e-3));
     auto const diagnostic = reweighted();
-    outfile_fits = params.name + "_solution_" + params.weighting + "_final_reweighted.fits";
-    residual_fits = params.name + "_residual_" + params.weighting + "_final_reweighted.fits";
+    outfile_fits = params.name + "_solution_" + params.weighting + "_final_reweighted";
+    residual_fits = params.name + "_residual_" + params.weighting + "_final_reweighted";
     final_model = diagnostic.algo.x;
   }
   save_final_image(outfile_fits, residual_fits, final_model, uv_data, params, measurements);

@@ -25,6 +25,8 @@ struct header_params {
   t_real channels_total = 1;
   t_real channel_width = 8; // in MHz
   t_real polarsiation = 1;
+  t_int niters = 0; // number of iterations
+  bool hasconverged = false; // stating if model has converged
 };
 //! Write image to fits file using header information
 void write2d_header(const Image<t_real> &image, const pfitsio::header_params &header,

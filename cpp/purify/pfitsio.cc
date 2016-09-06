@@ -42,8 +42,8 @@ void write2d_header(const Image<t_real> &eigen_image, const pfitsio::header_para
   pFits->pHDU().addKey("CRVAL2", header.dec * 180. / purify::constant::pi, "");
   pFits->pHDU().addKey("CRVAL3", header.mean_frequency * std::pow(10, 6) * 1., "");
   pFits->pHDU().addKey("CRVAL4", 1, "");
-  pFits->pHDU().addKey("CTYPE1", "RA---NCP", "");
-  pFits->pHDU().addKey("CTYPE2", "DEC---NCP", "");
+  pFits->pHDU().addKey("CTYPE1", "RA---SIN", "");
+  pFits->pHDU().addKey("CTYPE2", "DEC---SIN", "");
   pFits->pHDU().addKey("CTYPE3", "FREQ-OBS", "");
   pFits->pHDU().addKey("CTYPE4", "STOKES", "");
   pFits->pHDU().addKey("CDELT1", -header.cell_x / 3600., "");
@@ -51,7 +51,11 @@ void write2d_header(const Image<t_real> &eigen_image, const pfitsio::header_para
   pFits->pHDU().addKey("CDELT3", header.channel_width * std::pow(10, 6) * 1., "");
   pFits->pHDU().addKey("CDELT4", 1, "");
   pFits->pHDU().addKey("BTYPE", "intensity", "");
-  pFits->pHDU().addKey("EPOCH", 2000, "");
+  pFits->pHDU().addKey("EQUINOX", 2000, "");
+  pFits->pHDU().addKey("PURIFY-NITERS", header.niters, "");
+  (header.hasconverged) ? pFits->pHDU().addKey("PURIFY-CONVERGED", "T", "") : pFits->pHDU().addKey("PURIFY-CONVERGED", "F", "");
+
+  // Writing image to fits file
   pFits->pHDU().write(fpixel, naxes[0] * naxes[1], image);
 }
 
