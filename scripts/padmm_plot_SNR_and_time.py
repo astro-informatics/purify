@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 image = "30dor_256"
 n_tests = 10
-input_SNR = 10
+input_SNR = 30
 
 def kernel_settings(kernel):
         J = 4
