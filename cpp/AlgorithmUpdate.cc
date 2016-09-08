@@ -29,6 +29,8 @@ bool AlgorithmUpdate::operator()(const Vector<t_complex> &x) {
         = params.name + "_solution_" + params.weighting + "_update_upsample.fits";
     std::string const residual_fits
         = params.name + "_residual_" + params.weighting + "_update.fits";
+    std::string const residual_fits_scaled
+        = params.name + "_residual_" + params.weighting + "_update_scaled.fits";
 
     auto const residual = measurements.grid(y_residual);
     AlgorithmUpdate::save_figure(x, outfile_fits, "JY/PIXEL", 1);
@@ -36,6 +38,8 @@ bool AlgorithmUpdate::operator()(const Vector<t_complex> &x) {
       AlgorithmUpdate::save_figure(x, outfile_upsample_fits, "JY/PIXEL", params.upsample_ratio);
     AlgorithmUpdate::save_figure(Image<t_complex>::Map(residual.data(), residual.size(), 1),
                                  residual_fits, "JY/BEAM", 1);
+    AlgorithmUpdate::save_figure(Image<t_complex>::Map(residual.data(), residual.size(), 1)/params.psf_norm,
+                                 residual_fits_scaled, "JY/BEAM", 1);
     stats.rms
         = utilities::standard_deviation(Image<t_complex>::Map(residual.data(), residual.size(), 1));
     stats.dr = utilities::dynamic_range(image, residual);

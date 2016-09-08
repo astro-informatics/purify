@@ -86,7 +86,7 @@ t_real save_psf_and_dirty_image(
   Image<t_real> psf = Image<t_complex>::Map(psf_image.data(), params.height, params.width).real();
   t_real max_val = psf.array().abs().maxCoeff();
   PURIFY_LOW_LOG("PSF normalised by ", max_val);
-  psf = psf / max_val;
+  psf = psf;//not normalised, so it is easy to compare scales
   header.fits_name = psf_fits;
   PURIFY_HIGH_LOG("Saving {}", header.fits_name);
   pfitsio::write2d_header(psf, header);
@@ -172,7 +172,7 @@ construct_measurement_operator(utilities::vis_params const &uv_data, purify::Par
                           .oversample_factor(params.over_sample)
                           .cell_x(params.cellsizex)
                           .cell_y(params.cellsizey)
-                          .weighting_type("none")
+                          .weighting_type("none") //weighting is done outside of the operator
                           .R(0)
                           .use_w_term(params.use_w_term)
                           .energy_fraction(params.energy_fraction)
