@@ -188,7 +188,7 @@ t_real MeasurementOperator::power_method(const t_int &niters, const t_real &rela
     niters:: max number of iterations
     relative_difference:: percentage difference at which eigen value has converged
   */
-  t_real estimate_eigen_value = 1;
+  t_real estimate_eigen_value = norm;
   t_real old_value = 0;
   Image<t_complex> estimate_eigen_vector = Image<t_complex>::Random(imsizey_, imsizex_);
   estimate_eigen_vector = estimate_eigen_vector / estimate_eigen_vector.matrix().norm();
@@ -272,20 +272,20 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
     uv_vis = utilities::uv_scale(uv_vis, floor(oversample_factor_ * imsizex_),
                                  floor(oversample_factor_ * imsizey_));
 
-  PURIFY_LOW_LOG("Constructing Gridding Operator: G");
-  PURIFY_MEDIUM_LOG("Oversampling Factor: %f", oversample_factor_);
+  PURIFY_LOW_LOG("Constructing Gridding Operator: D");
+  PURIFY_MEDIUM_LOG("Oversampling Factor: {}", oversample_factor_);
 
   std::function<t_real(t_real)> kernelu;
   std::function<t_real(t_real)> kernelv;
   std::function<t_real(t_real)> ftkernelu;
   std::function<t_real(t_real)> ftkernelv;
   if(use_w_term_)
-    PURIFY_MEDIUM_LOG("Resampling Factor: %f", resample_factor);
-  PURIFY_MEDIUM_LOG("Kernel Name: %s", kernel_name_.c_str());
-  PURIFY_MEDIUM_LOG("Number of visibilities: %ld", uv_vis.u.size());
-  PURIFY_MEDIUM_LOG("Number of pixels: %d x %d", imsizex_, imsizey_);
-  PURIFY_MEDIUM_LOG("Ju: %d", Ju_);
-  PURIFY_MEDIUM_LOG("Jv: %d", Jv_);
+    PURIFY_MEDIUM_LOG("Resampling Factor: {}", resample_factor);
+  PURIFY_MEDIUM_LOG("Kernel Name: {}", kernel_name_.c_str());
+  PURIFY_MEDIUM_LOG("Number of visibilities: {}", uv_vis.u.size());
+  PURIFY_MEDIUM_LOG("Number of pixels: {} x {}", imsizex_, imsizey_);
+  PURIFY_MEDIUM_LOG("Ju: {}", Ju_);
+  PURIFY_MEDIUM_LOG("Jv: {}", Jv_);
 
   S = Image<t_real>::Zero(imsizey_, imsizex_);
 
@@ -331,7 +331,7 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
     S = S * A;
     PURIFY_DEBUG("Doing power method: eta_{i+1}x_{i + 1} = Psi^T Psi x_i");
     norm = std::sqrt(MeasurementOperator::power_method(norm_iterations_));
-    PURIFY_LOW_LOG("Found a norm of eta = %f", norm);
+    PURIFY_LOW_LOG("Found a norm of eta = {}", norm);
     PURIFY_HIGH_LOG("Gridding Operator Constructed: WGFSA");
     return;
   }
@@ -442,8 +442,9 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
   auto A = MeasurementOperator::init_primary_beam(primary_beam_, cell_x_, cell_y_);
   S = S * A;
   PURIFY_DEBUG("Doing power method: eta_{i+1}x_{i + 1} = Psi^T Psi x_i");
-  norm = std::sqrt(MeasurementOperator::power_method(norm_iterations_));
-  PURIFY_DEBUG("Found a norm of eta = %f", norm);
+  norm = MeasurementOperator::grid(Vector<t_complex>::Constant(uv_vis.u.size(), 1.)).real().maxCoeff();
+  norm *= std::sqrt(MeasurementOperator::power_method(norm_iterations_));
+  PURIFY_DEBUG("Found a norm of eta = {}", norm);
   PURIFY_HIGH_LOG("Gridding Operator Constructed: WGFSA");
 }
 }
