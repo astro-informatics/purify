@@ -13,48 +13,19 @@
 #include "purify/types.h"
 #include "purify/utilities.h"
 #include "purify/logging.h"
-int main(int, char **) {
-  using namespace purify;
-  using namespace purify::notinstalled;
-  sopt::logging::initialize();
-  purify::logging::initialize();
-  sopt::logging::set_level("debug");
-  purify::logging::set_level("debug");
-  std::string const name = "30dor_256";
-  std::string const kernel = "kb";
-  t_int const J = 4;
-  t_real const snr = 30.;
-  std::string const fitsfile = image_filename(name + ".fits");
-  std::string const inputfile = output_filename(name + "_" + kernel + "input.fits");
+
+using namespace purify;
+using namespace purify::notinstalled;
+
+void padmm(const std::string & name, const Image<t_complex> & M31, const std::string & kernel, const t_int J, const utilities::vis_params & uv_data, const t_real sigma){
   std::string const outfile = output_filename(name + "_" + kernel + ".tiff");
   std::string const outfile_fits = output_filename(name +  "_" + kernel + "_solution.fits");
   std::string const residual_fits = output_filename(name +  "_" + kernel + "_residual.fits");
   std::string const dirty_image = output_filename(name +  "_" + kernel + "_dirty.tiff");
   std::string const dirty_image_fits = output_filename(name +  "_" + kernel + "_dirty.fits");
-  std::string const output_vis_file = output_filename(name +  "_" + kernel + "_Random_coverage.vis");
+
 
   t_real const over_sample = 2;
-  auto M31 = pfitsio::read2d(fitsfile);
-  t_real const max = M31.array().abs().maxCoeff();
-  M31 = M31 * 1. / max;
-  pfitsio::write2d(M31.real(), inputfile);
-  // Following same formula in matlab example
-  t_real const p = 0.15;
-  t_real const sigma_m = constant::pi / 3;
-  t_real const rho = 2
-                     - (boost::math::erf(constant::pi / (sigma_m * std::sqrt(2))))
-                           * (boost::math::erf(constant::pi / (sigma_m * std::sqrt(2))));
-  // t_int const number_of_vis = std::floor(p * rho * M31.size());
-  t_int const number_of_vis = std::floor(M31.size() * 2.);
-  // Generating random uv(w) coverage
-  auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
-  uv_data.units = "radians";
-  utilities::write_visibility(uv_data, output_vis_file);
-  std::cout << "Number of measurements / number of pixels: " << uv_data.u.size() * 1. / M31.size()
-            << '\n';
-  // uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
-  MeasurementOperator sky_measurements(uv_data, 8, 8, "kb", M31.cols(), M31.rows(), 100, 2);
-
   MeasurementOperator measurements(uv_data, J, J, kernel, M31.cols(), M31.rows(), 100, over_sample);
   
   auto direct = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {
@@ -81,13 +52,6 @@ int main(int, char **) {
   auto const Psi
       = sopt::linear_transform<t_complex>(sara, measurements.imsizey(), measurements.imsizex());
 
-  std::mt19937_64 mersenne;
-  Vector<t_complex> const y0
-      = sky_measurements.degrid(M31);
-  // working out value of signal given SNR of 30
-  t_real sigma = utilities::SNR_to_standard_deviation(y0, snr);
-  // adding noise to visibilities
-  uv_data.vis = utilities::add_noise(y0, 0., sigma);
   Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
   t_real const max_val = dimage.array().abs().maxCoeff();
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
@@ -103,7 +67,7 @@ int main(int, char **) {
   std::cout << "Starting sopt" << '\n';
   auto const padmm
       = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
-            .itermax(500)
+            .itermax(100)
             .gamma((measurements_transform.adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
             .relative_variation(1e-3)
             .l2ball_proximal_epsilon(epsilon)
@@ -125,7 +89,43 @@ int main(int, char **) {
       = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey(), measurements.imsizex());
   t_real const max_val_final = image.array().abs().maxCoeff();
   pfitsio::write2d(image.real(), outfile_fits);
-  Image<t_complex> residual = measurements.grid(y0 - measurements.degrid(image));
+  Image<t_complex> residual = measurements.grid(uv_data.vis - measurements.degrid(image));
   pfitsio::write2d(residual.real(), residual_fits);
+};
+
+
+int main(int, char **) {
+  sopt::logging::initialize();
+  purify::logging::initialize();
+  sopt::logging::set_level("debug");
+  purify::logging::set_level("debug");
+  const std::string & name = "30dor_256";
+  const t_real snr = 30;
+  std::string const fitsfile = image_filename(name + ".fits");
+  auto M31 = pfitsio::read2d(fitsfile);
+  std::string const inputfile = output_filename(name + "_" + "input.fits");
+  
+  t_real const max = M31.array().abs().maxCoeff();
+  M31 = M31 * 1. / max;
+  pfitsio::write2d(M31.real(), inputfile);
+  
+  t_int const number_of_pxiels = M31.size();
+  t_int const number_of_vis = std::floor( number_of_pxiels * 2.);
+  // Generating random uv(w) coverage
+  t_real const sigma_m = constant::pi / 3;
+  auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
+  uv_data.units = "radians";
+  std::cout << "Number of measurements / number of pixels: " << uv_data.u.size() * 1. / number_of_pxiels
+            << '\n';
+  // uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
+  MeasurementOperator sky_measurements(uv_data, 8, 8, "kb", M31.cols(), M31.rows(), 100, 2);
+  uv_data.vis = sky_measurements.degrid(M31);
+  Vector<t_complex> const y0 = uv_data.vis;
+  // working out value of signal given SNR of 30
+  t_real const sigma = utilities::SNR_to_standard_deviation(y0, snr);
+  // adding noise to visibilities
+  uv_data.vis = utilities::add_noise(y0, 0., sigma);
+  padmm(name + "30", M31, "box", 1, uv_data, sigma);
+  padmm(name + "30", M31, "kb", 4, uv_data, sigma);
   return 0;
 }
