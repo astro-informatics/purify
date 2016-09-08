@@ -31,10 +31,7 @@ struct Params {
   t_int height = 512;
   t_real cellsizex = 0;
   t_real cellsizey = 0;
-  t_real n_mu = 1.2;
-  t_int iter = 0;
-  t_real upsample_ratio = 3. / 2.;
-  t_int power_method_iterations = 20;
+  t_real upsample_ratio = 1;
   std::string primary_beam = "none";
   bool fft_grid_correction = false;
   // w_term stuff
@@ -50,6 +47,13 @@ struct Params {
  // flux scaling
  t_real norm = 1; // norm of the measurement operator
  t_real psf_norm = 1; // the peak value of the PSF
+
+ //convergence information
+ t_real n_mu = 1.2; //Factor to multiply scale the l2 bound by
+ t_int iter = 0; // number of iterations, 0 means unlimited
+ t_int power_method_iterations = 20; // number of power method iterations for setting the flux scale
+ t_real relative_variation = 1e-2; // relative difference in model for convergence
+ t_real residual_convergence = -1; // max l2 norm reisudals can have for convergence
 };
 
 static struct option long_options[] = {
@@ -79,6 +83,8 @@ static struct option long_options[] = {
     {"kernel_support", required_argument, 0, 's'},
     {"logging_level", required_argument, 0, 't'},
     {"cellsize", required_argument, 0, 'u'},
+    {"relative_variation", required_argument, 0, 'v'},
+    {"residual_convergence", required_argument, 0, 'w'},
     {0, 0, 0, 0}};
 
 std::string usage();

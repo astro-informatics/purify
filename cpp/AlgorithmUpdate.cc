@@ -32,7 +32,8 @@ bool AlgorithmUpdate::operator()(const Vector<t_complex> &x) {
 
     auto const residual = measurements.grid(y_residual);
     AlgorithmUpdate::save_figure(x, outfile_fits, "JY/PIXEL", 1);
-    AlgorithmUpdate::save_figure(x, outfile_upsample_fits, "JY/PIXEL", params.upsample_ratio);
+    if (params.upsample_ratio != 1)
+      AlgorithmUpdate::save_figure(x, outfile_upsample_fits, "JY/PIXEL", params.upsample_ratio);
     AlgorithmUpdate::save_figure(Image<t_complex>::Map(residual.data(), residual.size(), 1),
                                  residual_fits, "JY/BEAM", 1);
     stats.rms
@@ -118,6 +119,8 @@ pfitsio::header_params AlgorithmUpdate::create_header(purify::utilities::vis_par
   header.cell_y = params.cellsizey;
   header.niters = params.iter;
   header.hasconverged = false;
+  header.residual_convergence = params.residual_convergence;
+  header.relative_variation = params.relative_variation;
   return header;
 }
 }

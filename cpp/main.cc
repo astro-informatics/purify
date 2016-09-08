@@ -44,6 +44,8 @@ create_new_header(purify::utilities::vis_params const &uv_data, purify::Params c
   header.dec = uv_data.dec;
   header.cell_x = params.cellsizex;
   header.cell_y = params.cellsizey;
+  header.residual_convergence = params.residual_convergence;
+  header.relative_variation = params.relative_variation;
   return header;
 }
 
@@ -214,7 +216,7 @@ int main(int argc, char **argv) {
   auto const estimates = read_estimates(measurements_transform, uv_data, params);
   t_real const epsilon = params.n_mu * std::sqrt(2 * uv_data.vis.size())
                          * noise_rms; // Calculation of l_2 bound following SARA paper
-
+  params.residual_convergence = (params.residual_convergence == -1) ? epsilon : params.residual_convergence;
   t_real purify_gamma = 0;
   std::tie(params.iter, purify_gamma) = utilities::checkpoint_log(params.name + "_diagnostic");
   if(params.iter == 0)
@@ -230,10 +232,13 @@ int main(int argc, char **argv) {
 
   PURIFY_HIGH_LOG("Starting sopt!");
   PURIFY_MEDIUM_LOG("Epsilon = {}", epsilon);
+  PURIFY_MEDIUM_LOG("Convergence criteria: Relative variation is less than {}.", params.relative_variation);
+  if (params.residual_convergence > 0)
+    PURIFY_MEDIUM_LOG("Convergence criteria: Residual norm is less than {}.", params.residual_convergence);
   PURIFY_MEDIUM_LOG("Gamma = {}", purify_gamma);
   auto padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
                    .gamma(purify_gamma)
-                   .relative_variation(1e-2)
+                   .relative_variation(params.relative_variation)
                    .l2ball_proximal_epsilon(epsilon)
                    .l2ball_proximal_weights(uv_data.weights.array().real())
                    .tight_frame(false)
@@ -242,7 +247,7 @@ int main(int argc, char **argv) {
                    .l1_proximal_itermax(100)
                    .l1_proximal_positivity_constraint(true)
                    .l1_proximal_real_constraint(true)
-                   .residual_convergence(epsilon)
+                   .residual_convergence(params.residual_convergence)
                    .lagrange_update_scale(0.9)
                    .nu(1e0)
                    .Psi(Psi)
