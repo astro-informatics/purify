@@ -27,6 +27,8 @@ struct header_params {
   t_real polarsiation = 1;
   t_int niters = 0; // number of iterations
   bool hasconverged = false; // stating if model has converged
+  t_real relative_variation = 0;
+  t_real residual_convergence = 0;
 };
 //! Write image to fits file using header information
 void write2d_header(const Image<t_real> &image, const pfitsio::header_params &header,

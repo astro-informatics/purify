@@ -53,7 +53,13 @@ void write2d_header(const Image<t_real> &eigen_image, const pfitsio::header_para
   pFits->pHDU().addKey("BTYPE", "intensity", "");
   pFits->pHDU().addKey("EQUINOX", 2000, "");
   pFits->pHDU().addKey("PURIFY-NITERS", header.niters, "");
-  (header.hasconverged) ? pFits->pHDU().addKey("PURIFY-CONVERGED", "T", "") : pFits->pHDU().addKey("PURIFY-CONVERGED", "F", "");
+  if (header.hasconverged){
+    pFits->pHDU().addKey("PURIFY-CONVERGED", "T", "");
+  } else {
+    pFits->pHDU().addKey("PURIFY-CONVERGED", "F", "");
+  }
+  pFits->pHDU().addKey("PURIFY-RELATIVEVARIATION", header.relative_variation, "");
+  pFits->pHDU().addKey("PURIFY-RESIDUALCONVERGENCE", header.residual_convergence, "");
 
   // Writing image to fits file
   pFits->pHDU().write(fpixel, naxes[0] * naxes[1], image);
