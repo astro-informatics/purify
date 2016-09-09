@@ -37,23 +37,24 @@ struct Params {
   // w_term stuff
   t_real energy_fraction = 1;
   bool use_w_term = false;
-
+  //adapting the algorithm
   bool update_output = false;  // save output after each iteration
   bool adapt_gamma = true;     // update gamma/stepsize
   bool run_diagnostic = false; // save and output diagnostic information
   bool algo_update = true;     // if to use lambda function to record/update algorithm variables
   bool no_reweighted = true;   // if to use reweighting
-
+  t_real relative_gamma_adapt = 0.01;
+  t_int adapt_iter = 100;
  // flux scaling
  t_real norm = 1; // norm of the measurement operator
  t_real psf_norm = 1; // the peak value of the PSF
+ t_int power_method_iterations = 20; // number of power method iterations for setting the flux scale
 
  //convergence information
  t_real n_mu = 1.2; //Factor to multiply scale the l2 bound by
  t_int iter = 0; // number of iterations, 0 means unlimited
- t_int power_method_iterations = 20; // number of power method iterations for setting the flux scale
- t_real relative_variation = 1e-2; // relative difference in model for convergence
- t_real residual_convergence = -1; // max l2 norm reisudals can have for convergence
+ t_real relative_variation = 1e-3; // relative difference in model for convergence
+ t_real residual_convergence = -1; // max l2 norm reisudals can have for convergence, -1 means it will choose epsilon by default
 };
 
 static struct option long_options[] = {
@@ -85,6 +86,8 @@ static struct option long_options[] = {
     {"cellsize", required_argument, 0, 'u'},
     {"relative_variation", required_argument, 0, 'v'},
     {"residual_convergence", required_argument, 0, 'w'},
+    {"relative_gamma_adapt", required_argument, 0, 'x'},
+    {"adapt_iter", required_argument, 0, 'y'},
     {0, 0, 0, 0}};
 
 std::string usage();

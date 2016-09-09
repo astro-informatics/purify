@@ -66,7 +66,7 @@ void AlgorithmUpdate::modify_gamma(Vector<t_complex> const &alpha) {
   std::cout << "Relative gamma = " << stats.relative_gamma << '\n';
   std::cout << "Old gamma = " << padmm.gamma() << '\n';
   std::cout << "New gamma = " << stats.new_purify_gamma << '\n';
-  if(stats.iter < 1000 and stats.relative_gamma > 0.01 and stats.new_purify_gamma > 0
+  if(stats.iter < params.adapt_iter and stats.relative_gamma > params.relative_gamma_adapt and stats.new_purify_gamma > 0
      and params.adapt_gamma) {
     padmm.gamma(stats.new_purify_gamma);
   }
@@ -121,7 +121,7 @@ pfitsio::header_params AlgorithmUpdate::create_header(purify::utilities::vis_par
   header.dec = uv_data.dec;
   header.cell_x = params.cellsizex;
   header.cell_y = params.cellsizey;
-  header.niters = params.iter;
+  header.niters = stats.iter;
   header.hasconverged = false;
   header.residual_convergence = params.residual_convergence;
   header.relative_variation = params.relative_variation;

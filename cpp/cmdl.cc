@@ -152,10 +152,19 @@ Params parse_cmdl(int argc, char **argv) {
     case 'u':
       params.cellsizex = std::stod(optarg);
       params.cellsizey = std::stod(optarg);
+      break;
     case 'v':
       params.relative_variation = std::stod(optarg);
+      break;
     case 'w':
       params.residual_convergence = std::stod(optarg);
+      break;
+    case 'x':
+      params.relative_gamma_adapt = std::stod(optarg);
+      break;
+    case 'y':
+      params.adapt_iter = std::stod(optarg);
+      break;
     case '?':
       /* getopt_long already printed an error message. */
       break;
