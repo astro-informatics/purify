@@ -60,6 +60,7 @@ void write2d_header(const Image<t_real> &eigen_image, const pfitsio::header_para
   }
   pFits->pHDU().addKey("PURIFY-RELATIVEVARIATION", header.relative_variation, "");
   pFits->pHDU().addKey("PURIFY-RESIDUALCONVERGENCE", header.residual_convergence, "");
+  pFits->pHDU().addKey("PURIFY-EPSILON", header.epsilon, "");
 
   // Writing image to fits file
   pFits->pHDU().write(fpixel, naxes[0] * naxes[1], image);

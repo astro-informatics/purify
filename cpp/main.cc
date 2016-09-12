@@ -216,6 +216,7 @@ int main(int argc, char **argv) {
   auto const estimates = read_estimates(measurements_transform, uv_data, params);
   t_real const epsilon = params.n_mu * std::sqrt(2 * uv_data.vis.size())
                          * noise_rms; // Calculation of l_2 bound following SARA paper
+  params.epsilon = epsilon;
   params.residual_convergence = (params.residual_convergence == -1) ? epsilon : params.residual_convergence;
   t_real purify_gamma = 0;
   std::tie(params.iter, purify_gamma) = utilities::checkpoint_log(params.name + "_diagnostic");

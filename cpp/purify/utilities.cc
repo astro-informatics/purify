@@ -562,7 +562,7 @@ std::tuple<t_int, t_real> checkpoint_log(const std::string &diagnostic) {
       break;
     std::istringstream ss(s);
     std::getline(ss, entry, ' ');
-    iters = std::stoi(entry);
+    iters = std::floor(std::stod(entry));
     std::getline(ss, entry, ' ');
     gamma = std::stod(entry);
   }
