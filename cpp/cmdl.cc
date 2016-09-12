@@ -16,8 +16,6 @@ std::string usage() {
          "--size: image size in pixels. \n\n"
          "--width: image width in pixels. \n\n"
          "--height: image height in pixels. \n\n"
-         "--update: Switch to allow updating input and output information of PADMM while it is "
-         "running. \n\n"
          "--beta: valued used to set the stepsize of PADMM\n\n"
          "--noadapt: Choose not to update the stepsize. \n\n"
          "--diagnostic: Save diagnostic information to log file.\n\n"
@@ -28,10 +26,10 @@ std::string usage() {
          "--primary_beam: Choice of primary beam model. (none is the only option).\n\n"
          "--fft_grid_correction: Choose calculate the gridding correction using an FFT rather than "
          "analytic formula. \n\n"
-         "--kernel: Type of gridding kernel to use, kb, gauss, pswf, box. (kb is default)\n"
-         "--kernel_support: Support of kernel in grid cells. (4 is the default)\n"
+         "--kernel: Type of gridding kernel to use, kb, gauss, pswf, box. (kb is default) \n\n"
+         "--kernel_support: Support of kernel in grid cells. (4 is the default) \n\n"
          "--logging_level: Determines the output logging level for sopt and purify. (\"debug\" is "
-         "the default)\n";
+         "the default) \n\n";
 }
 
 Params parse_cmdl(int argc, char **argv) {
@@ -83,10 +81,6 @@ Params parse_cmdl(int argc, char **argv) {
     case 'f':
       params.width = std::stoi(optarg);
       params.height = std::stoi(optarg);
-      break;
-
-    case 'e':
-      params.update_output = true;
       break;
 
     case 'g':
@@ -146,25 +140,32 @@ Params parse_cmdl(int argc, char **argv) {
     case 's':
       params.J = std::stoi(optarg);
       break;
+
     case 't':
       params.sopt_logging_level = optarg;
       break;
+
     case 'u':
       params.cellsizex = std::stod(optarg);
       params.cellsizey = std::stod(optarg);
       break;
+
     case 'v':
       params.relative_variation = std::stod(optarg);
       break;
+
     case 'w':
       params.residual_convergence = std::stod(optarg);
       break;
+
     case 'x':
       params.relative_gamma_adapt = std::stod(optarg);
       break;
+
     case 'y':
       params.adapt_iter = std::stod(optarg);
       break;
+
     case '?':
       /* getopt_long already printed an error message. */
       break;

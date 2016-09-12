@@ -23,7 +23,7 @@ bool AlgorithmUpdate::operator()(const Vector<t_complex> &x) {
   // updating parameter
   AlgorithmUpdate::modify_gamma(alpha);
   stats.l1_norm = alpha.lpNorm<1>();
-  if(params.update_output) {
+  if(params.run_diagnostic) {
     std::string const outfile_fits = params.name + "_solution_" + params.weighting + "_update.fits";
     std::string const outfile_upsample_fits
         = params.name + "_solution_" + params.weighting + "_update_upsample.fits";
@@ -45,8 +45,6 @@ bool AlgorithmUpdate::operator()(const Vector<t_complex> &x) {
     stats.dr = utilities::dynamic_range(image, residual);
     stats.max = residual.matrix().real().maxCoeff();
     stats.min = residual.matrix().real().minCoeff();
-  }
-  if(params.run_diagnostic) {
     // printing log information to stream
     AlgorithmUpdate::print_to_stream(out_diagnostic);
   }
@@ -60,13 +58,16 @@ void AlgorithmUpdate::modify_gamma(Vector<t_complex> const &alpha) {
   // modifies gamma value in padmm
 
   // setting information for updating parameters
-
+ if (params.run_diagnostic or (params.adapt_gamma and params.adapt_iter)){
   stats.new_purify_gamma = alpha.cwiseAbs().maxCoeff() * params.beta;
   stats.relative_gamma = std::abs(stats.new_purify_gamma - padmm.gamma()) / padmm.gamma();
-  std::cout << "Relative gamma = " << stats.relative_gamma << '\n';
-  std::cout << "Old gamma = " << padmm.gamma() << '\n';
-  std::cout << "New gamma = " << stats.new_purify_gamma << '\n';
-  if(stats.iter < params.adapt_iter and stats.relative_gamma > params.relative_gamma_adapt and stats.new_purify_gamma > 0
+  std::cout << "Relative variation of step size = " << stats.relative_gamma << '\n';
+  std::cout << "Old step size = " << padmm.gamma() << '\n';
+  std::cout << "New step size = " << stats.new_purify_gamma << '\n';
+ }
+  if(stats.iter < params.adapt_iter
+      and stats.relative_gamma > params.relative_gamma_adapt
+      and stats.new_purify_gamma > 0
      and params.adapt_gamma) {
     padmm.gamma(stats.new_purify_gamma);
   }
@@ -78,7 +79,7 @@ void AlgorithmUpdate::modify_gamma(Vector<t_complex> const &alpha) {
 }
 
 void AlgorithmUpdate::print_to_stream(std::ostream &stream) {
-  if(params.iter == 0)
+  if(stats.iter == 0)
     stream
         << "i Gamma RelativeGamma DynamicRange RMS(Res) Max(Res) Min(Res) l1_norm l2_norm Time(sec)"
         << std::endl;
@@ -125,6 +126,7 @@ pfitsio::header_params AlgorithmUpdate::create_header(purify::utilities::vis_par
   header.hasconverged = false;
   header.residual_convergence = params.residual_convergence;
   header.relative_variation = params.relative_variation;
+  header.epsilon = params.epsilon;
   return header;
 }
 }
