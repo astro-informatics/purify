@@ -25,8 +25,10 @@ data = home + "/Dropbox/Visibility_Files/"
 atca = "atca/"
 vla = "vla/"
 names = [atca + "0332-391", atca + "0114-476", vla + "CygA-X", vla + "3C129BC"]
-imsize = ["2048", "2048", "1024", "1024"]
+imsize = ["1024", "1024", "1024", "1024"]
 cellsizes = ["2", "2", "0.5","0.4"]
+
+residual_convergences = ["3700", "-1", "18000", "-1"]
 
 def make_path(name, outpath, epsilon_factor):
 	return outpath + name + "/" + str(epsilon_factor) + "/"
@@ -35,26 +37,28 @@ def make_directory(path):
 	if not os.path.exists(path):
 		os.makedirs(path)
 
-def run_test((name, inpath, cellsize, size, epsilon_factor)):
+def run_test((name, inpath, cellsize, size, epsilon_factor, residual_convergence)):
 	path = make_path(name, outpath, epsilon_factor)
 	noise = " "
 	make_directory(path)
 	if stokes_v_calculation == True:
 		noise = " --noise " + inpath + ".ms "
-	proc = subprocess.Popen(["screen -S "+ name.split("/")[-1] + "_" + str(epsilon_factor) + 
+        cmd = ["screen -S "+ name.split("/")[-1] + "_" + str(epsilon_factor) + 
 		" -d -m ~/dev/purify/build/purify" +
 		" --name " + path + name.split("/")[-1] +
 		" --measurement_set " + inpath + ".ms --n_mean " + str(epsilon_factor) + 
 		noise +
 		" --cellsize " + cellsize +
 		" --size " + str(size) +
-		" --update --diagnostic power_iterations 200" +
-                " --residual_convergence 0. " +
+		" --diagnostic power_iterations 500" +
+                " --residual_convergence " + residual_convergence +
                 " --relative_variation 0.0001" +
                 " --adapt_iter 100" +
                 " --niters 200" +
-                " --relative_gamma_adapt 0.01"
-        ], shell=True)
+                " --relative_gamma_adapt 1e-3"
+        ]
+	proc = subprocess.Popen(cmd, shell=True)
+        print cmd
 	print "Waiting for " + path
 	while not os.path.exists(path + name.split("/")[-1] + "_solution_whiten_final.fits"):
 		time.sleep(10)
@@ -69,11 +73,7 @@ for i in range(len(names)):
 		print n + " found!"
 		image_size = imsize[i] 
 		pix_size = cellsizes[i]
-		#params.append((n, data + n, pix_size, image_size, 1))
-		params.append((n, data + n, pix_size, image_size, 2))
-		#params.append((n, data + n, pix_size, image_size, 1.3))
-		#params.append((n, data + n, pix_size, image_size, 1.4))
-		#params.append((n, data + n, pix_size, image_size, 2.5))
+		params.append((n, data + n, pix_size, image_size, 7, residual_convergences[i]))
 	else:
 		print n + " not found!"
 	break
