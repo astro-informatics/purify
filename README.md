@@ -2,7 +2,7 @@
 
 ## Description
 
-PURIFY is a collection of routines written in C that implements different tools for radio
+PURIFY is a collection of routines written in C++ that implements different tools for radio
 interferometric imaging including file handling (for both visibilities and fits files),
 implementation of the measurement operator and set-up of the different optimization problems
 used for image deconvolution. The code calls the generic Sparse OPTimization (SOPT) package to solve
@@ -27,20 +27,19 @@ It is possible to add other options, such as limited the number of iterations to
 * `--n_mean` this value can be used to scale the error on the model matching the measurements. `Default value is 1.4`.
 * `--power_iterations` number of iterations needed to normalize the measurement operator. This is needed to ensure that the measurement operator reconstruct a model to the correct flux scale. `Default value is 100`.
 * `--noadapt` will turn off the adapting step size.
-* `--size` will  change the height and width of the output image (Daubechies wavelets only support powers of 2).
+* `--size` the height and width of the output image in pixels (only powers of 2 supported at present).
 * `--cellsize` is the width and height of a pixel in arcseconds. If not specified, this is determined from the Nyquist limit.
 * `--niters` max number of iterations. Default is max unsigned integer.
 * `--relative_variation` the relative difference of the model between iterations needed for convergence.
 * `--residual_convergence` the upper bound on the residual norm needed for convergence.
 
-# Creators
-
-* [R. E. Carrillo](http://people.epfl.ch/rafael.carrill)
-* [J. D. McEwen](http://www.jasonmcewen.org)
-* [Y. Wiaux](http://basp.eps.hw.ac.uk)
-
 ## Contributors
 
+PURIFY was initially created by Rafael Carrillo, Jason McEwen and Yves Wiaux but major contirbutions have since been made by a number of others. The full list of contributors is as follows:
+
+* [Rafael E. Carrillo](http://people.epfl.ch/rafael.carrill)
+* [Jason D. McEwen](http://www.jasonmcewen.org)
+* [Yves Wiaux](http://basp.eps.hw.ac.uk)
 * Luke Pratley
 * Mayeul d'Avezac
 
@@ -57,7 +56,7 @@ When referencing this code, please cite our related paper:
 [1] R. E. Carrillo, J. D. McEwen and Y. Wiaux.  "PURIFY: a new
 approach to radio-interferometric
 imaging". Mon. Not. Roy. Astron. Soc., 439(4):3591-3604, 2014,
-`arXiv:1307.4370 <http://arxiv.org/abs/1307.4370>`__
+[arXiv:1307.4370](http://arxiv.org/abs/1307.4370)
 
 ## Webpage
 
