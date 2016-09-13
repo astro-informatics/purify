@@ -51,7 +51,7 @@ struct Params {
   t_int power_method_iterations = 100; // number of power method iterations for setting the flux scale
 
   //convergence information
-  t_real n_mu = 1.2; //Factor to multiply scale the l2 bound by
+  t_real n_mu = 1.4; //Factor to multiply scale the l2 bound by
   t_int iter = 0; // number of iterations, 0 means unlimited
   t_real relative_variation = 1e-3; // relative difference in model for convergence
   t_real residual_convergence = -1; // max l2 norm reisudals can have for convergence, -1 means it will choose epsilon by default

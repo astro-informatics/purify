@@ -8,6 +8,31 @@ implementation of the measurement operator and set-up of the different optimizat
 used for image deconvolution. The code calls the generic Sparse OPTimization (SOPT) package to solve
 the imaging optimization problems.
 
+##Usage
+`purify` has two required arguments, `--measurement_set` and `--name`, the path of the measurement set and the prefix name of the output files.
+
+`purify --measurement_set <path/to/measurements> --name <output/path/name>`.
+
+It is possible to add other options, such as limited the number of iterations to 100, and save output diagnostic images with each iteration. These
+
+`purify --measurement_set path/to/measurements --name output/path/name --niters 100 --diagnostic`
+
+
+### Arguments
+#### Important Arguments
+* `--help` will print basic help information, showing what arguments are possible (more than this list).
+* `--measurement_set` is the path to the CASA measurement set folder. `(required argument)`
+* `--name` is the prefix name used to save the output model, residual, and dirty map. `(required argument)`
+* `--diagnostic` will record variables and output images with each iteration. This is useful for testing or trial runs, but will take up some more computation in calculating and saving diagnostic updates. The update images and diagnostic file will be used as a checkpoint, in the case that purify locates the images from a previous run.
+* `--n_mean` this value can be used to scale the error on the model matching the measurements. `Default value is 1.4`.
+* `--power_iterations` number of iterations needed to normalize the measurement operator. This is needed to ensure that the measurement operator reconstruct a model to the correct flux scale. `Default value is 100`
+* `--noadapt` will turn off the adapting step size.
+* "--size" will  change the height and width of the output image (Daubechies wavelets only support powers of 2).
+* `--cellsize` is the width and height of a pixel in arcseconds. If not specified, this is determined from the Nyquist limit.
+* `--niters` max number of iterations. Default is max unsigned integer.
+* `--relative_variation` the relative difference of the model between iterations needed for convergence.
+* `--residual_convergence` the upper bound on the residual norm needed for convergence.
+
 # Creators
 
 * [R. E. Carrillo](http://people.epfl.ch/rafael.carrill)
