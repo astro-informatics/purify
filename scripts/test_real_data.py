@@ -28,7 +28,7 @@ names = [atca + "0332-391", atca + "0114-476", vla + "CygA-X", vla + "3C129BC"]
 imsize = ["1024", "1024", "1024", "1024"]
 cellsizes = ["2", "2", "0.5","0.4"]
 
-residual_convergences = ["3700", "-1", "18000", "-1"]
+residual_convergences = ["3700", "-1", "20000", "-1"]
 
 def make_path(name, outpath, epsilon_factor):
 	return outpath + name + "/" + str(epsilon_factor) + "/"
@@ -50,11 +50,11 @@ def run_test((name, inpath, cellsize, size, epsilon_factor, residual_convergence
 		noise +
 		" --cellsize " + cellsize +
 		" --size " + str(size) +
-		" --diagnostic power_iterations 500" +
+		" --diagnostic --power_iterations 200" +
                 " --residual_convergence " + residual_convergence +
-                " --relative_variation 0.0001" +
+                " --relative_variation 0.005" +
                 " --adapt_iter 100" +
-                " --niters 200" +
+                " --niters 500" +
                 " --relative_gamma_adapt 1e-3"
         ]
 	proc = subprocess.Popen(cmd, shell=True)
