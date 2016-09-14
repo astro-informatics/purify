@@ -22,7 +22,9 @@ bool AlgorithmUpdate::operator()(const Vector<t_complex> &x) {
   Vector<t_complex> const alpha = Psi.adjoint() * x;
   // updating parameter
   AlgorithmUpdate::modify_gamma(alpha);
-  stats.l1_norm = alpha.lpNorm<1>();
+  auto new_l1_norm = alpha.lpNorm<1>();
+  stats.l1_variation = std::abs(stats.l1_norm - new_l1_norm)/stats.l1_norm;
+  stats.l1_norm = new_l1_norm;
   if(params.run_diagnostic) {
     std::string const outfile_fits = params.name + "_solution_" + params.weighting + "_update.fits";
     std::string const outfile_upsample_fits
@@ -81,7 +83,7 @@ void AlgorithmUpdate::modify_gamma(Vector<t_complex> const &alpha) {
 void AlgorithmUpdate::print_to_stream(std::ostream &stream) {
   if(stats.iter == 0)
     stream
-        << "i Gamma RelativeGamma DynamicRange RMS(Res) Max(Res) Min(Res) l1_norm l2_norm Time(sec)"
+        << "i Gamma RelativeGamma DynamicRange RMS(Res) Max(Res) Min(Res) l1_norm l2_norm l1_variation Time(sec)"
         << std::endl;
   stream << stats.iter << " ";
   stream << stats.new_purify_gamma << " ";
@@ -92,6 +94,7 @@ void AlgorithmUpdate::print_to_stream(std::ostream &stream) {
   stream << stats.min << " ";
   stream << stats.l1_norm << " ";
   stream << stats.l2_norm << " ";
+  stream << stats.l1_variation << " ";
   stream << stats.total_time << " ";
   stream << std::endl;
 }

@@ -15,7 +15,7 @@ struct Params {
   std::string name = "";
   std::string weighting = "whiten";
   std::string stokes = "I";
-  const purify::casa::MeasurementSet::ChannelWrapper::polarization stokes_val
+  purify::casa::MeasurementSet::ChannelWrapper::polarization stokes_val
       = purify::casa::MeasurementSet::ChannelWrapper::polarization::I;
 
   std::string visfile = "";
@@ -68,6 +68,7 @@ static struct option long_options[] = {
     {"noise", required_argument, 0, 'b'},
     {"name", required_argument, 0, 'c'},
     {"niters", required_argument, 0, 'd'},
+    {"stokes", required_argument, 0, 'e'},
     {"size", required_argument, 0, 'f'},
     {"beta", required_argument, 0, 'g'},
     {"noadapt", no_argument, 0, 'h'},
