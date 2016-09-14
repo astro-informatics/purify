@@ -173,6 +173,10 @@ Params parse_cmdl(int argc, char **argv) {
       params.adapt_iter = std::stod(optarg);
       break;
 
+    case '1':
+      params.fftw_plan = optarg;
+      break;
+
     case '?':
       /* getopt_long already printed an error message. */
       break;

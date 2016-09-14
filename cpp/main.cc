@@ -214,7 +214,8 @@ construct_measurement_operator(utilities::vis_params const &uv_data, purify::Par
                           .use_w_term(params.use_w_term)
                           .energy_fraction(params.energy_fraction)
                           .primary_beam(params.primary_beam)
-                          .fft_grid_correction(params.fft_grid_correction);
+                          .fft_grid_correction(params.fft_grid_correction)
+                          .fftw_plan_flag(params.fftw_plan);
   measurements.init_operator(uv_data);
   return measurements;
 };
