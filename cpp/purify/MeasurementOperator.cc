@@ -257,6 +257,12 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
   ftsizeu_ = floor(imsizex_ * oversample_factor_);
   ftsizev_ = floor(imsizey_ * oversample_factor_);
   PURIFY_LOW_LOG("Planning FFT operator");
+  if (fftw_plan_flag_ == "measure")
+  PURIFY_LOW_LOG("Measuring...");
+    fftoperator_.fftw_flag((FFTW_MEASURE | FFTW_PRESERVE_INPUT));
+  if (fftw_plan_flag_ == "estimate")
+  PURIFY_LOW_LOG("Using an estimate");
+    fftoperator_.fftw_flag((FFTW_ESTIMATE | FFTW_PRESERVE_INPUT));
   fftoperator_.set_up_multithread();
   fftoperator_.init_plan(Matrix<t_complex>::Zero(ftsizev_, ftsizeu_));
   if(use_w_term_) {

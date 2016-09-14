@@ -15,7 +15,7 @@ struct Params {
   std::string name = "";
   std::string weighting = "whiten";
   std::string stokes = "I";
-  const purify::casa::MeasurementSet::ChannelWrapper::polarization stokes_val
+  purify::casa::MeasurementSet::ChannelWrapper::polarization stokes_val
       = purify::casa::MeasurementSet::ChannelWrapper::polarization::I;
 
   std::string visfile = "";
@@ -34,6 +34,7 @@ struct Params {
   t_real upsample_ratio = 1;
   std::string primary_beam = "none";
   bool fft_grid_correction = false;
+  std::string fftw_plan = "measure";
   // w_term stuff
   t_real energy_fraction = 1;
   bool use_w_term = false;
@@ -68,6 +69,7 @@ static struct option long_options[] = {
     {"noise", required_argument, 0, 'b'},
     {"name", required_argument, 0, 'c'},
     {"niters", required_argument, 0, 'd'},
+    {"stokes", required_argument, 0, 'e'},
     {"size", required_argument, 0, 'f'},
     {"beta", required_argument, 0, 'g'},
     {"noadapt", no_argument, 0, 'h'},
@@ -88,6 +90,7 @@ static struct option long_options[] = {
     {"residual_convergence", required_argument, 0, 'w'},
     {"relative_gamma_adapt", required_argument, 0, 'x'},
     {"adapt_iter", required_argument, 0, 'y'},
+    {"fftw_plan", required_argument, 0, '1'},
     {0, 0, 0, 0}};
 
 std::string usage();

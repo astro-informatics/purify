@@ -68,31 +68,66 @@ t_real estimate_noise(purify::Params const &params) {
   return std::sqrt(sigma_real * sigma_real + sigma_imag * sigma_imag) / std::sqrt(2);
 }
 
-t_real
-save_psf_and_dirty_image(sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const &measurements,
-                         purify::utilities::vis_params const &uv_data,
-                         purify::Params const &params) {
+purify::casa::MeasurementSet::ChannelWrapper::polarization choose_pol(std::string const & stokes){
+  /*
+   Chooses the polarisation to read from a measurement set.
+   */
+  auto stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::I;
+  //stokes
+  if (stokes == "I" or stokes == "i")
+    stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::I;
+  if (stokes == "Q" or stokes == "q")
+    stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::Q;
+  if (stokes == "U" or stokes == "u")
+    stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::U;
+  if (stokes == "V" or stokes == "v")
+    stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::V;
+  //linear
+  if (stokes == "XX" or stokes == "xx")
+    stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::XX;
+  if (stokes == "YY" or stokes == "yy")
+    stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::YY;
+  if (stokes == "XY" or stokes == "xy")
+    stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::XY;
+  if (stokes == "YX" or stokes == "yx")
+    stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::YX;
+  //circular
+  if (stokes == "LL" or stokes == "ll")
+    stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::LL;
+  if (stokes == "RR" or stokes == "rr")
+    stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::RR;
+  if (stokes == "LR" or stokes == "lr")
+    stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::LR;
+  if (stokes == "RL" or stokes == "rl")
+    stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::RL;
+  
+  return stokes_val;
+}
+t_real save_psf_and_dirty_image(
+    sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const &measurements,
+    purify::utilities::vis_params const &uv_data, purify::Params const &params) {
   // returns psf normalisation
   purify::pfitsio::header_params header = create_new_header(uv_data, params);
   std::string const dirty_image_fits = params.name + "_dirty_" + params.weighting + ".fits";
   std::string const psf_fits = params.name + "_psf_" + params.weighting + ".fits";
+  Vector<t_complex> const psf_image = measurements.adjoint() * (uv_data.weights.array());
+  Image<t_real> psf = Image<t_complex>::Map(psf_image.data(), params.height, params.width).real();
+  t_real max_val = psf.array().abs().maxCoeff();
+  PURIFY_LOW_LOG("PSF normalised by {}", max_val);
+  psf = psf;//not normalised, so it is easy to compare scales
+  header.fits_name = psf_fits;
+  PURIFY_HIGH_LOG("Saving {}", header.fits_name);
+  pfitsio::write2d_header(psf, header);
   Vector<t_complex> const dirty_image
       = measurements.adjoint() * (uv_data.weights.array() * uv_data.vis.array());
   Image<t_real> dimage
       = Image<t_complex>::Map(dirty_image.data(), params.height, params.width).real();
   header.fits_name = dirty_image_fits;
   PURIFY_HIGH_LOG("Saving {}", header.fits_name);
-  pfitsio::write2d_header(dimage, header);
-  Vector<t_complex> const psf_image = measurements.adjoint() * (uv_data.weights.array());
-  Image<t_real> psf = Image<t_complex>::Map(psf_image.data(), params.height, params.width).real();
-  t_real max_val = psf.array().abs().maxCoeff();
-  PURIFY_LOW_LOG("PSF normalised by ", max_val);
-  psf = psf; // not normalised, so it is easy to compare scales
-  header.fits_name = psf_fits;
-  PURIFY_HIGH_LOG("Saving {}", header.fits_name);
-  pfitsio::write2d_header(psf, header);
+  pfitsio::write2d_header(dimage/max_val, header);
   return max_val;
 }
+
 void save_final_image(std::string const &outfile_fits, std::string const &residual_fits,
                       Vector<t_complex> const &x, utilities::vis_params const &uv_data,
                       Params const &params, MeasurementOperator measurements) {
@@ -103,6 +138,8 @@ void save_final_image(std::string const &outfile_fits, std::string const &residu
   // header information
   header.pix_units = "JY/PIXEL";
   header.fits_name = outfile_fits + ".fits";
+  header.niters = params.iter;
+  header.epsilon = params.epsilon;
   pfitsio::write2d_header(image.real(), header);
   Image<t_complex> residual = measurements
                                   .grid(((uv_data.vis - measurements.degrid(image)).array()
@@ -159,7 +196,8 @@ construct_measurement_operator(utilities::vis_params const &uv_data, purify::Par
                           .use_w_term(params.use_w_term)
                           .energy_fraction(params.energy_fraction)
                           .primary_beam(params.primary_beam)
-                          .fft_grid_correction(params.fft_grid_correction);
+                          .fft_grid_correction(params.fft_grid_correction)
+                          .fftw_plan_flag(params.fftw_plan);
   measurements.init_operator(uv_data);
   return measurements;
 };
@@ -172,7 +210,7 @@ int main(int argc, char **argv) {
   Params params = parse_cmdl(argc, argv);
   sopt::logging::set_level(params.sopt_logging_level);
   purify::logging::set_level(params.sopt_logging_level);
-
+  params.stokes_val = choose_pol(params.stokes);
   auto uv_data = purify::casa::read_measurementset(params.visfile, params.stokes_val);
   bandwidth_scaling(uv_data, params);
 

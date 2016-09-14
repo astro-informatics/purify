@@ -35,6 +35,7 @@ private:
     t_real min = 0;
     t_real l1_norm = 0;
     t_real l2_norm = 0;
+    t_real l1_variation = 0;
     t_real total_time = 0;
   };
 

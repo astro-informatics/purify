@@ -59,7 +59,7 @@ public:                                                                         
   PURIFY_MACRO(energy_fraction, t_real, 1.);
   PURIFY_MACRO(fft_grid_correction, bool, false);
   PURIFY_MACRO(primary_beam, std::string, "none");
-
+  PURIFY_MACRO(fftw_plan_flag, std::string, "estimate");
   //! Reads in visiblities and uses them to construct the operator for use
   MeasurementOperator &construct_operator(const utilities::vis_params &uv_vis_input) {
     MeasurementOperator::init_operator(uv_vis_input);
@@ -69,7 +69,7 @@ public:                                                                         
   // writing definiton of fftoperator so that it is mutable.
 protected:
   mutable FFTOperator fftoperator_
-      = purify::FFTOperator().fftw_flag((FFTW_MEASURE | FFTW_PRESERVE_INPUT));
+      = purify::FFTOperator();
 
 public:
   FFTOperator &fftoperator() { return fftoperator_; };

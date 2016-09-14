@@ -12,6 +12,7 @@ std::string usage() {
          "measurement set). \n\n"
          "--name: path of file output. (required) \n\n"
          "--niters: number of iterations. \n\n"
+         "--stokes: choice of stokes I, Q, U, or V (I is default). \n\n"
          "--cellsize: the dimensions of a pixel in arcseconds. \n\n"
          "--size: image size in pixels. \n\n"
          "--width: image width in pixels. \n\n"
@@ -58,10 +59,12 @@ Params parse_cmdl(int argc, char **argv) {
         printf(" with arg %s", optarg);
       printf("\n");
       break;
+
     case 'z':
       std::cout << usage();
       std::exit(0);
       break;
+
     case 'a':
       params.visfile = optarg;
       break;
@@ -76,6 +79,10 @@ Params parse_cmdl(int argc, char **argv) {
 
     case 'd':
       params.niters = std::stoi(optarg);
+      break;
+    
+    case 'e':
+      params.name = params.stokes;
       break;
 
     case 'f':
@@ -164,6 +171,10 @@ Params parse_cmdl(int argc, char **argv) {
 
     case 'y':
       params.adapt_iter = std::stod(optarg);
+      break;
+
+    case '1':
+      params.fftw_plan = optarg;
       break;
 
     case '?':
