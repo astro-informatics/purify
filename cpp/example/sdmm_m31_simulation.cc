@@ -53,21 +53,8 @@ int main(int nargs, char const **args) {
 
   MeasurementOperator measurements(uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(),
                                    over_sample);
-
   // putting measurement operator in a form that sopt can use
-  auto direct = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {
-    assert(x.size() == measurements.imsizex() * measurements.imsizey());
-    auto const image
-        = Image<t_complex>::Map(x.data(), measurements.imsizey(), measurements.imsizex());
-    out = measurements.degrid(image);
-  };
-  auto adjoint = [&measurements](Vector<t_complex> &out, Vector<t_complex> const &x) {
-    auto image = Image<t_complex>::Map(out.data(), measurements.imsizey(), measurements.imsizex());
-    image = measurements.grid(x);
-  };
-  auto measurements_transform = sopt::linear_transform<Vector<t_complex>>(
-      direct, {{0, 1, static_cast<t_int>(uv_data.vis.size())}}, adjoint,
-      {{0, 1, static_cast<t_int>(measurements.imsizex() * measurements.imsizey())}});
+  auto measurements_transform = linear_transform(measurements, uv_data.vis.size());
 
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),

@@ -442,9 +442,30 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
   auto A = MeasurementOperator::init_primary_beam(primary_beam_, cell_x_, cell_y_);
   S = S * A;
   PURIFY_DEBUG("Doing power method: eta_{i+1}x_{i + 1} = Psi^T Psi x_i");
-  norm = MeasurementOperator::grid(Vector<t_complex>::Constant(uv_vis.u.size(), 1.)).real().maxCoeff();
+  norm = MeasurementOperator::grid(Vector<t_complex>::Constant(uv_vis.u.size(), 1.))
+             .real()
+             .maxCoeff();
   norm *= std::sqrt(MeasurementOperator::power_method(norm_iterations_));
   PURIFY_DEBUG("Found a norm of eta = {}", norm);
   PURIFY_HIGH_LOG("Gridding Operator Constructed: WGFSA");
+}
+
+sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
+linear_transform(MeasurementOperator const &measurements, t_uint nvis) {
+  auto const height = measurements.imsizey();
+  auto const width = measurements.imsizex();
+  auto direct = [&measurements, width, height](Vector<t_complex> &out, Vector<t_complex> const &x) {
+    assert(x.size() == width * height);
+    auto const image = Image<t_complex>::Map(x.data(), height, width);
+    out = measurements.degrid(image);
+  };
+  auto adjoint
+      = [&measurements, width, height](Vector<t_complex> &out, Vector<t_complex> const &x) {
+          auto image = Image<t_complex>::Map(out.data(), height, width);
+          image = measurements.grid(x);
+        };
+  return sopt::linear_transform<Vector<t_complex>>(direct, {{0, 1, static_cast<t_int>(nvis)}},
+                                                   adjoint,
+                                                   {{0, 1, static_cast<t_int>(width * height)}});
 }
 }

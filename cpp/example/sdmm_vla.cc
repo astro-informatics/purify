@@ -35,21 +35,8 @@ int main(int, char **) {
   uv_data = utilities::uv_symmetry(uv_data);
   MeasurementOperator measurements(uv_data, 4, 4, "kb_interp", width, height, 20, over_sample,
                                    cellsize, cellsize, "whiten");
-
-  auto direct
-      = [&measurements, &width, &height](Vector<t_complex> &out, Vector<t_complex> const &x) {
-          assert(x.size() == width * height);
-          auto const image = Image<t_complex>::Map(x.data(), height, width);
-          out = measurements.degrid(image);
-        };
-  auto adjoint
-      = [&measurements, &width, &height](Vector<t_complex> &out, Vector<t_complex> const &x) {
-          auto image = Image<t_complex>::Map(out.data(), height, width);
-          image = measurements.grid(x);
-        };
-  auto measurements_transform = sopt::linear_transform<Vector<t_complex>>(
-      direct, {{0, 1, static_cast<t_int>(uv_data.vis.size())}}, adjoint,
-      {{0, 1, static_cast<t_int>(width * height)}});
+  // putting measurement operator in a form that sopt can use
+  auto measurements_transform = linear_transform(measurements, uv_data.vis.size());
 
   sopt::wavelets::SARA const sara{std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
                                   std::make_tuple("DB3", 3u), std::make_tuple("DB4", 3u),

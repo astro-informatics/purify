@@ -68,9 +68,10 @@ t_real estimate_noise(purify::Params const &params) {
   return std::sqrt(sigma_real * sigma_real + sigma_imag * sigma_imag) / std::sqrt(2);
 }
 
-t_real save_psf_and_dirty_image(
-    sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const &measurements,
-    purify::utilities::vis_params const &uv_data, purify::Params const &params) {
+t_real
+save_psf_and_dirty_image(sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const &measurements,
+                         purify::utilities::vis_params const &uv_data,
+                         purify::Params const &params) {
   // returns psf normalisation
   purify::pfitsio::header_params header = create_new_header(uv_data, params);
   std::string const dirty_image_fits = params.name + "_dirty_" + params.weighting + ".fits";
@@ -86,7 +87,7 @@ t_real save_psf_and_dirty_image(
   Image<t_real> psf = Image<t_complex>::Map(psf_image.data(), params.height, params.width).real();
   t_real max_val = psf.array().abs().maxCoeff();
   PURIFY_LOW_LOG("PSF normalised by ", max_val);
-  psf = psf;//not normalised, so it is easy to compare scales
+  psf = psf; // not normalised, so it is easy to compare scales
   header.fits_name = psf_fits;
   PURIFY_HIGH_LOG("Saving {}", header.fits_name);
   pfitsio::write2d_header(psf, header);
@@ -111,10 +112,9 @@ void save_final_image(std::string const &outfile_fits, std::string const &residu
   header.pix_units = "JY/BEAM";
   header.fits_name = residual_fits;
   pfitsio::write2d_header(residual.real(), header);
-  
+
   header.fits_name = residual_fits + "_scaled.fits";
   pfitsio::write2d_header(residual.real() / params.psf_norm, header);
-
 };
 
 std::tuple<Vector<t_complex>, Vector<t_complex>>
@@ -142,24 +142,6 @@ read_estimates(sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const &measu
   return estimates;
 }
 
-template <class MEASUREMENT_OP>
-sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
-linear_transform(MEASUREMENT_OP const &measurements, purify::utilities::vis_params const &uv_data,
-                 purify::Params const &params) {
-  auto direct = [&measurements, &params](Vector<t_complex> &out, Vector<t_complex> const &x) {
-    assert(x.size() == params.width * params.height);
-    auto const image = Image<t_complex>::Map(x.data(), params.height, params.width);
-    out = measurements.degrid(image);
-  };
-  auto adjoint = [&measurements, &params](Vector<t_complex> &out, Vector<t_complex> const &x) {
-    auto image = Image<t_complex>::Map(out.data(), params.height, params.width);
-    image = measurements.grid(x);
-  };
-  return sopt::linear_transform<Vector<t_complex>>(
-      direct, {{0, 1, static_cast<t_int>(uv_data.vis.size())}}, adjoint,
-      {{0, 1, static_cast<t_int>(params.width * params.height)}});
-}
-
 MeasurementOperator
 construct_measurement_operator(utilities::vis_params const &uv_data, purify::Params const &params) {
   auto measurements = MeasurementOperator()
@@ -172,7 +154,7 @@ construct_measurement_operator(utilities::vis_params const &uv_data, purify::Par
                           .oversample_factor(params.over_sample)
                           .cell_x(params.cellsizex)
                           .cell_y(params.cellsizey)
-                          .weighting_type("none") //weighting is done outside of the operator
+                          .weighting_type("none") // weighting is done outside of the operator
                           .R(0)
                           .use_w_term(params.use_w_term)
                           .energy_fraction(params.energy_fraction)
@@ -201,7 +183,7 @@ int main(int argc, char **argv) {
   auto const noise_rms = estimate_noise(params);
   auto const measurements = construct_measurement_operator(uv_data, params);
   params.norm = measurements.norm;
-  auto const measurements_transform = linear_transform(measurements, uv_data, params);
+  auto const measurements_transform = linear_transform(measurements, uv_data.vis.size());
 
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
@@ -217,7 +199,8 @@ int main(int argc, char **argv) {
   t_real const epsilon = params.n_mu * std::sqrt(2 * uv_data.vis.size())
                          * noise_rms; // Calculation of l_2 bound following SARA paper
   params.epsilon = epsilon;
-  params.residual_convergence = (params.residual_convergence == -1) ? epsilon : params.residual_convergence;
+  params.residual_convergence
+      = (params.residual_convergence == -1) ? epsilon : params.residual_convergence;
   t_real purify_gamma = 0;
   std::tie(params.iter, purify_gamma) = utilities::checkpoint_log(params.name + "_diagnostic");
   if(params.iter == 0)
@@ -233,9 +216,11 @@ int main(int argc, char **argv) {
 
   PURIFY_HIGH_LOG("Starting sopt!");
   PURIFY_MEDIUM_LOG("Epsilon = {}", epsilon);
-  PURIFY_MEDIUM_LOG("Convergence criteria: Relative variation is less than {}.", params.relative_variation);
-  if (params.residual_convergence > 0)
-    PURIFY_MEDIUM_LOG("Convergence criteria: Residual norm is less than {}.", params.residual_convergence);
+  PURIFY_MEDIUM_LOG("Convergence criteria: Relative variation is less than {}.",
+                    params.relative_variation);
+  if(params.residual_convergence > 0)
+    PURIFY_MEDIUM_LOG("Convergence criteria: Residual norm is less than {}.",
+                      params.residual_convergence);
   PURIFY_MEDIUM_LOG("Gamma = {}", purify_gamma);
   auto padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
                    .gamma(purify_gamma)

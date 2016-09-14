@@ -2,6 +2,7 @@
 #define PURIFY_MEASUREMENT_OPERATOR_H
 
 #include "purify/config.h"
+#include <sopt/linear_transform.h>
 #include "purify/FFTOperator.h"
 #include "purify/kernels.h"
 #include "purify/types.h"
@@ -119,6 +120,9 @@ public:
   //! Estiamtes norm of operator
   t_real power_method(const t_int &niters, const t_real &relative_difference = 1e-9);
 };
-}
 
+//! Helper function to create a linear transform from a measurement operator
+sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
+linear_transform(MeasurementOperator const &measurements, t_uint nvis);
+}
 #endif
