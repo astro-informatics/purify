@@ -502,7 +502,6 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
   } else if(weighting_type == "natural") {
     out_weights = weights;
   } else {
-    auto step_function = [&](t_real x) { return 1; };
     t_real scale = 1. / oversample_factor; // scale for fov
     Matrix<t_complex> gridded_weights = Matrix<t_complex>::Zero(ftsizev, ftsizeu);
     for(t_int i = 0; i < weights.size(); ++i) {
@@ -512,7 +511,6 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
                                   // think miriad does this.
     }
     t_complex const sum_grid_weights2 = (gridded_weights.array() * gridded_weights.array()).sum();
-    t_complex const sum_grid_weights = gridded_weights.array().sum();
     t_complex const robust_scale
         = sum_weights / sum_grid_weights2 * 25.
           * std::pow(10, -2 * R); // Following standard formula, a bit different from miriad.
@@ -581,9 +579,6 @@ Matrix<t_complex> re_sample_ft_grid(const Matrix<t_complex> &input, const t_real
     return input;
 
   // sets up dimensions for old image
-  t_int old_x = input.cols();
-  t_int old_y = input.rows();
-
   t_int old_x_centre_floor = std::floor(input.cols() * 0.5);
   t_int old_y_centre_floor = std::floor(input.rows() * 0.5);
   // need ceilling in case image is of odd dimension

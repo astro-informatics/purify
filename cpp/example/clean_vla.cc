@@ -14,8 +14,6 @@ int main(int, char **) {
   purify::logging::initialize();
   purify::logging::set_level(purify::default_logging_level());
 
-  bool update_output = true; // save output after each iteration
-
   std::string const vla_1 = "at166B.3C129.c0";
 
   std::string const name = vla_1;
@@ -59,7 +57,6 @@ int main(int, char **) {
   Vector<t_complex> const noise_vis = uv_data.weights.array() * noise_uv_data.vis.array();
 
   auto sigma_real = utilities::median(noise_vis.real().cwiseAbs()) / 0.6745;
-  auto sigma_imag = utilities::median(noise_vis.imag().cwiseAbs()) / 0.6745;
 
   std::cout << "Stokes V RMS noise of " << sigma_real * 1e3 << " mJy and " << sigma_real * 1e3
             << " mJy" << '\n';

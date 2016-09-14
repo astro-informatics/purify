@@ -38,11 +38,7 @@ int main(int, char **) {
   M31 = M31 * 1. / max;
   pfitsio::write2d(M31.real(), inputfile);
   // Following same formula in matlab example
-  t_real const p = 0.15;
   t_real const sigma_m = constant::pi / 3;
-  t_real const rho = 2
-                     - (boost::math::erf(constant::pi / (sigma_m * std::sqrt(2))))
-                           * (boost::math::erf(constant::pi / (sigma_m * std::sqrt(2))));
   // t_int const number_of_vis = std::floor(p * rho * M31.size());
   t_int const number_of_vis = 1e4;
   // Generating random uv(w) coverage
@@ -130,7 +126,6 @@ int main(int, char **) {
   assert(diagnostic.algo.x.size() == M31.size());
   Image<t_complex> image = Image<t_complex>::Map(diagnostic.algo.x.data(), measurements.imsizey(),
                                                  measurements.imsizex());
-  t_real const max_val_final = image.array().abs().maxCoeff();
   sopt::utilities::write_tiff(image.real(), outfile);
   pfitsio::write2d(image.real(), outfile_fits);
   Image<t_complex> residual = measurements.grid(y0 - measurements.degrid(image));

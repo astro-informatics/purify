@@ -77,8 +77,8 @@ int main(int nargs, char const **args) {
     image = measurements.grid(x);
   };
   auto measurements_transform = sopt::linear_transform<Vector<t_complex>>(
-      direct, {0, 1, static_cast<t_int>(uv_vis.vis.size())}, adjoint,
-      {0, 1, static_cast<t_int>(M31.size())});
+      direct, {{0, 1, static_cast<t_int>(uv_vis.vis.size())}}, adjoint,
+      {{0, 1, static_cast<t_int>(M31.size())}});
 
   sopt::wavelets::SARA const sara{std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
                                   std::make_tuple("DB3", 3u), std::make_tuple("DB4", 3u),
@@ -114,6 +114,8 @@ int main(int nargs, char const **args) {
             .append(sopt::proximal::positive_quadrant<t_complex>);
   Vector<t_complex> result;
   auto const diagnostic = sdmm(result, initial_estimate);
+  if(not diagnostic.good)
+    PURIFY_HIGH_LOG("SDMM did no converge");
   assert(result.size() == M31.size());
   Image<t_real> image = Image<t_complex>::Map(result.data(), M31.rows(), M31.cols()).real();
   t_real max_val_final = image.array().abs().maxCoeff();

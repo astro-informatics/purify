@@ -25,6 +25,15 @@ public:
   const t_int imsize;
   const t_int ftsize;
 
+  //! \brief Generates tools/operators needed for gridding and degridding.
+  //! \param[in] u: visibilities in units of ftsizeu
+  //! \param[in] v: visibilities in units of ftsizev
+  //! \param[in] Ju: support size for u axis
+  //! \param[in] Jv: support size for v axis
+  //! \param[in] kernel_name: flag that determines what kernel to use (gauss, pswf, kb)
+  //! \param[in] imsizex: size of image along xaxis
+  //! \param[in] imsizey: size of image along yaxis
+  //! \param[in] oversample_factor: factor for oversampling the FFT grid
   RMOperator(const utilities::rm_params &rm_vis_input, const t_int &J,
              const std::string &kernel_name, const t_int &imsize, const t_real &oversample_factor,
              const t_real &cell_size = 1, const std::string &weighting_type = "none",

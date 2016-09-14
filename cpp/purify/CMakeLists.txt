@@ -47,7 +47,7 @@ add_include_dir(
 )
 target_link_libraries(libpurify
   ${FFTW3_DOUBLE_LIBRARY} ${CCFits_LIBRARY} ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY})
-if(TARGET casacore::ms)
+if(TARGET casacore::casa)
   target_link_libraries(libpurify casacore::ms)
 endif()
 if(TARGET openmp::openmp)

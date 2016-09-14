@@ -31,11 +31,7 @@ int main(int nargs, char const **args) {
   M31 = M31 * 1. / max;
   pfitsio::write2d(M31.real(), inputfile);
   // Following same formula in matlab example
-  t_real const p = 0.15;
   t_real const sigma_m = constant::pi / 3;
-  t_real const rho = 2
-                     - (boost::math::erf(constant::pi / (sigma_m * std::sqrt(2))))
-                           * (boost::math::erf(constant::pi / (sigma_m * std::sqrt(2))));
   // t_int const number_of_vis = std::floor(p * rho * M31.size());
   t_int const number_of_vis = std::floor(m_over_n * M31.size());
   // Generating random uv(w) coverage

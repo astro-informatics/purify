@@ -41,8 +41,8 @@ void padmm(const std::string & name, const Image<t_complex> & M31, const std::st
 
   
   auto measurements_transform = sopt::linear_transform<Vector<t_complex>>(
-      direct, {0, 1, static_cast<t_int>(uv_data.vis.size())}, adjoint,
-      {0, 1, static_cast<t_int>(measurements.imsizex() * measurements.imsizey())});
+      direct, {{0, 1, static_cast<t_int>(uv_data.vis.size())}}, adjoint,
+      {{0, 1, static_cast<t_int>(measurements.imsizex() * measurements.imsizey())}});
 
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
@@ -53,7 +53,6 @@ void padmm(const std::string & name, const Image<t_complex> & M31, const std::st
       = sopt::linear_transform<t_complex>(sara, measurements.imsizey(), measurements.imsizex());
 
   Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
-  t_real const max_val = dimage.array().abs().maxCoeff();
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   sopt::utilities::write_tiff(
       Image<t_real>::Map(dimage.data(), measurements.imsizey(), measurements.imsizex()),
@@ -87,7 +86,6 @@ void padmm(const std::string & name, const Image<t_complex> & M31, const std::st
   assert(diagnostic.x.size() == M31.size());
   Image<t_complex> image
       = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey(), measurements.imsizex());
-  t_real const max_val_final = image.array().abs().maxCoeff();
   pfitsio::write2d(image.real(), outfile_fits);
   Image<t_complex> residual = measurements.grid(uv_data.vis - measurements.degrid(image));
   pfitsio::write2d(residual.real(), residual_fits);

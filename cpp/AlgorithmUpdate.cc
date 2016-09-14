@@ -7,9 +7,8 @@ AlgorithmUpdate::AlgorithmUpdate(const purify::Params &params, const utilities::
                                  sopt::algorithm::ImagingProximalADMM<t_complex> &padmm,
                                  std::ostream &stream, const MeasurementOperator &measurements,
                                  const sopt::LinearTransform<sopt::Vector<sopt::t_complex>> &Psi)
-    : params(params), uv_data(uv_data), padmm(padmm), c_start(std::clock()),
-      stats(read_params_to_stats(params)), out_diagnostic(stream), measurements(measurements),
-      Psi(Psi){};
+    : params(params), stats(read_params_to_stats(params)), uv_data(uv_data), out_diagnostic(stream),
+      padmm(padmm), c_start(std::clock()), Psi(Psi), measurements(measurements){};
 
 bool AlgorithmUpdate::operator()(const Vector<t_complex> &x) {
   std::clock_t c_end = std::clock();
@@ -34,11 +33,12 @@ bool AlgorithmUpdate::operator()(const Vector<t_complex> &x) {
 
     auto const residual = measurements.grid(y_residual);
     AlgorithmUpdate::save_figure(x, outfile_fits, "JY/PIXEL", 1);
-    if (params.upsample_ratio != 1)
+    if(params.upsample_ratio != 1)
       AlgorithmUpdate::save_figure(x, outfile_upsample_fits, "JY/PIXEL", params.upsample_ratio);
     AlgorithmUpdate::save_figure(Image<t_complex>::Map(residual.data(), residual.size(), 1),
                                  residual_fits, "JY/BEAM", 1);
-    AlgorithmUpdate::save_figure(Image<t_complex>::Map(residual.data(), residual.size(), 1)/params.psf_norm,
+    AlgorithmUpdate::save_figure(Image<t_complex>::Map(residual.data(), residual.size(), 1)
+                                     / params.psf_norm,
                                  residual_fits_scaled, "JY/BEAM", 1);
     stats.rms
         = utilities::standard_deviation(Image<t_complex>::Map(residual.data(), residual.size(), 1));
@@ -58,17 +58,15 @@ void AlgorithmUpdate::modify_gamma(Vector<t_complex> const &alpha) {
   // modifies gamma value in padmm
 
   // setting information for updating parameters
- if (params.run_diagnostic or (params.adapt_gamma and params.adapt_iter)){
-  stats.new_purify_gamma = alpha.cwiseAbs().maxCoeff() * params.beta;
-  stats.relative_gamma = std::abs(stats.new_purify_gamma - padmm.gamma()) / padmm.gamma();
-  std::cout << "Relative variation of step size = " << stats.relative_gamma << '\n';
-  std::cout << "Old step size = " << padmm.gamma() << '\n';
-  std::cout << "New step size = " << stats.new_purify_gamma << '\n';
- }
-  if(stats.iter < params.adapt_iter
-      and stats.relative_gamma > params.relative_gamma_adapt
-      and stats.new_purify_gamma > 0
-     and params.adapt_gamma) {
+  if(params.run_diagnostic or (params.adapt_gamma and params.adapt_iter)) {
+    stats.new_purify_gamma = alpha.cwiseAbs().maxCoeff() * params.beta;
+    stats.relative_gamma = std::abs(stats.new_purify_gamma - padmm.gamma()) / padmm.gamma();
+    std::cout << "Relative variation of step size = " << stats.relative_gamma << '\n';
+    std::cout << "Old step size = " << padmm.gamma() << '\n';
+    std::cout << "New step size = " << stats.new_purify_gamma << '\n';
+  }
+  if(stats.iter < params.adapt_iter and stats.relative_gamma > params.relative_gamma_adapt
+     and stats.new_purify_gamma > 0 and params.adapt_gamma) {
     padmm.gamma(stats.new_purify_gamma);
   }
 

@@ -13,6 +13,7 @@
 #include "purify/pfitsio.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
+#include "purify/logging.h"
 
 int main(int nargs, char const **args) {
   if(nargs != 6) {
@@ -23,6 +24,7 @@ int main(int nargs, char const **args) {
   using namespace purify;
   using namespace purify::notinstalled;
   sopt::logging::initialize();
+  purify::logging::initialize();
 
   std::string const fitsfile = image_filename("M31.fits");
 
@@ -64,8 +66,8 @@ int main(int nargs, char const **args) {
     image = measurements.grid(x);
   };
   auto measurements_transform = sopt::linear_transform<Vector<t_complex>>(
-      direct, {0, 1, static_cast<t_int>(uv_data.vis.size())}, adjoint,
-      {0, 1, static_cast<t_int>(measurements.imsizex() * measurements.imsizey())});
+      direct, {{0, 1, static_cast<t_int>(uv_data.vis.size())}}, adjoint,
+      {{0, 1, static_cast<t_int>(measurements.imsizex() * measurements.imsizey())}});
 
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
@@ -105,7 +107,9 @@ int main(int nargs, char const **args) {
   // Timing reconstruction
   Vector<t_complex> result;
   std::clock_t c_start = std::clock();
-  auto const diagonstic = sdmm(result, initial_estimate);
+  auto const diagnostic = sdmm(result, initial_estimate);
+  if(not diagnostic.good)
+    PURIFY_HIGH_LOG("SDMM did no converge");
   std::clock_t c_end = std::clock();
   Image<t_complex> image
       = Image<t_complex>::Map(result.data(), measurements.imsizey(), measurements.imsizex());

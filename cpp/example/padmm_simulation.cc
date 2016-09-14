@@ -73,8 +73,8 @@ int main(int nargs, char const **args) {
     image = measurements.grid(x);
   };
   auto measurements_transform = sopt::linear_transform<Vector<t_complex>>(
-      direct, {0, 1, static_cast<t_int>(uv_data.vis.size())}, adjoint,
-      {0, 1, static_cast<t_int>(measurements.imsizex() * measurements.imsizey())});
+      direct, {{0, 1, static_cast<t_int>(uv_data.vis.size())}}, adjoint,
+      {{0, 1, static_cast<t_int>(measurements.imsizex() * measurements.imsizey())}});
 
   std::vector<std::tuple<std::string, t_uint>> wavelets;
 	

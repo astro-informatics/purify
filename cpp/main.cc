@@ -156,8 +156,8 @@ linear_transform(MEASUREMENT_OP const &measurements, purify::utilities::vis_para
     image = measurements.grid(x);
   };
   return sopt::linear_transform<Vector<t_complex>>(
-      direct, {0, 1, static_cast<t_int>(uv_data.vis.size())}, adjoint,
-      {0, 1, static_cast<t_int>(params.width * params.height)});
+      direct, {{0, 1, static_cast<t_int>(uv_data.vis.size())}}, adjoint,
+      {{0, 1, static_cast<t_int>(params.width * params.height)}});
 }
 
 MeasurementOperator
@@ -253,7 +253,6 @@ int main(int argc, char **argv) {
                    .nu(1e0)
                    .Psi(Psi)
                    .Phi(measurements_transform);
-  std::clock_t c_start = std::clock();
 
   auto convergence_function = [](const Vector<t_complex> &x) { return true; };
   AlgorithmUpdate algo_update(params, uv_data, padmm, out_diagnostic, measurements, Psi);

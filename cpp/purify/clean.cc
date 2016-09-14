@@ -36,8 +36,6 @@ Image<t_complex> clean(MeasurementOperator &op, const utilities::vis_params &uv_
     if(mode == "steer") {
       t_real max = std::abs(res_image(max_y, max_x));
       temp_model = res_image;
-      t_complex var = 0;
-      t_complex corr = 0;
       // clipping residual map for clean model
       for(t_int i = 0; i < temp_model.size(); ++i) {
         if(std::abs(temp_model(i)) < max * clip)
@@ -89,8 +87,6 @@ Image<t_complex> model_estimate(const Image<t_complex> &dirty_image,
 
     t_real max = std::abs(res_image(max_y, max_x));
     temp_model = res_image;
-    t_complex var = 0;
-    t_complex corr = 0;
     // clipping residual map for clean model
     for(t_int i = 0; i < temp_model.size(); ++i) {
       if(std::abs(temp_model(i)) < max * clip)

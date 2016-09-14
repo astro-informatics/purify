@@ -33,11 +33,7 @@ int main(int, char **) {
   M31 = M31 * 1. / max;
   pfitsio::write2d(M31.real(), inputfile);
   // Following same formula in matlab example
-  t_real const p = 0.15;
   t_real const sigma_m = constant::pi / 3;
-  t_real const rho = 2
-                     - (boost::math::erf(constant::pi / (sigma_m * std::sqrt(2))))
-                           * (boost::math::erf(constant::pi / (sigma_m * std::sqrt(2))));
   // t_int const number_of_vis = std::floor(p * rho * M31.size());
   t_int const number_of_vis = 1e4;
   // Generating random uv(w) coverage
@@ -60,8 +56,8 @@ int main(int, char **) {
     image = measurements.grid(x);
   };
   auto measurements_transform = sopt::linear_transform<Vector<t_complex>>(
-      direct, {0, 1, static_cast<t_int>(uv_data.vis.size())}, adjoint,
-      {0, 1, static_cast<t_int>(measurements.imsizex() * measurements.imsizey())});
+      direct, {{0, 1, static_cast<t_int>(uv_data.vis.size())}}, adjoint,
+      {{0, 1, static_cast<t_int>(measurements.imsizex() * measurements.imsizey())}});
 
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),

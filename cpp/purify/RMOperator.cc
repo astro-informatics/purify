@@ -123,7 +123,6 @@ Array<t_complex> RMOperator::init_weights(const Vector<t_real> &u, const Vector<
   } else if(weighting_type == "natural") {
     out_weights = weights / mean_weights;
   } else {
-    auto step_function = [&](t_real x) { return 1; };
     t_real scale = 1. / oversample_factor; // scale for fov
     Vector<t_complex> gridded_weights = Vector<t_complex>::Zero(ftsize);
     for(t_int i = 0; i < weights.size(); ++i) {
@@ -176,8 +175,8 @@ RMOperator::RMOperator(const utilities::rm_params &rm_vis_input, const t_int &Ju
                        const std::string &kernel_name, const t_int &imsize,
                        const t_real &oversample_factor, const t_real &cell_size,
                        const std::string &weighting_type, const t_real &R, bool fft_grid_correction)
-    : imsize(imsize), ftsize(floor(oversample_factor * imsize)),
-      oversample_factor(oversample_factor) {
+    : oversample_factor(oversample_factor), imsize(imsize),
+      ftsize(floor(oversample_factor * imsize)) {
   /*
     Generates tools/operators needed for gridding and degridding.
 
