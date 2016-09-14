@@ -10,6 +10,7 @@ passon_variables(CCfits
   PATTERNS
       "CMAKE_[^_]*_R?PATH" "CMAKE_C_.*"
       "BLAS_.*" "FFTW3_.*" "TIFF_.*"
+      "CFitsIO_.*"
   ALSOADD
       "\nset(CMAKE_INSTALL_PREFIX \"${EXTERNAL_ROOT}\" CACHE STRING \"\")\n"
 )
