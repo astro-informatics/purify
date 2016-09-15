@@ -87,10 +87,8 @@ MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real> &u, const 
   t_int q;
   t_int p;
   t_int index;
-  Vector<t_real> ones = u * 0;
-  ones.setOnes();
-  Vector<t_real> k_u = MeasurementOperator::omega_to_k(u - ones * Ju * 0.5);
-  Vector<t_real> k_v = MeasurementOperator::omega_to_k(v - ones * Jv * 0.5);
+  const Vector<t_real> k_u = MeasurementOperator::omega_to_k(u - Vector<t_real>::Constant(rows, Ju *0.5));
+  const Vector<t_real> k_v = MeasurementOperator::omega_to_k(v - Vector<t_real>::Constant(rows, Jv * 0.5));
 
   Sparse<t_complex> interpolation_matrix(rows, cols);
   interpolation_matrix.reserve(Vector<t_int>::Constant(rows, Ju * Jv));
