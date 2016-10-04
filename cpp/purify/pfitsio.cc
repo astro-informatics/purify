@@ -34,8 +34,8 @@ void write2d_header(const Image<t_real> &eigen_image, const pfitsio::header_para
   pFits->pHDU().addKey("NAXIS2", static_cast<t_int>(eigen_image.rows()), "");
   pFits->pHDU().addKey("NAXIS3", 1, "");
   pFits->pHDU().addKey("NAXIS4", 1, "");
-  pFits->pHDU().addKey("CRPIX1", static_cast<t_int>(std::floor(eigen_image.cols() / 2)), "");
-  pFits->pHDU().addKey("CRPIX2", static_cast<t_int>(std::floor(eigen_image.rows() / 2)), "");
+  pFits->pHDU().addKey("CRPIX1", static_cast<t_int>(std::floor(eigen_image.cols() / 2)) + 1, "");
+  pFits->pHDU().addKey("CRPIX2", static_cast<t_int>(std::floor(eigen_image.rows() / 2)) + 1, "");
   pFits->pHDU().addKey("CRPIX3", 1, "");
   pFits->pHDU().addKey("CRPIX4", 1, "");
   pFits->pHDU().addKey("CRVAL1", header.ra * 180. / purify::constant::pi, "");
