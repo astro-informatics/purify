@@ -494,7 +494,6 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
     It does none, whiten, natural, uniform, and robust.
   */
   Vector<t_complex> out_weights(weights.size());
-  t_complex const sum_weights = weights.sum();
   if(weighting_type == "none") {
     out_weights = weights.array() * 0 + 1;
   } else if(weighting_type == "whiten") {
@@ -502,14 +501,15 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
   } else if(weighting_type == "natural") {
     out_weights = weights;
   } else {
-    t_real scale = 1. / oversample_factor; // scale for fov
+    t_real scale = 1. / oversample_factor; // scale for fov, controlling the region of sidelobe supression
     Matrix<t_complex> gridded_weights = Matrix<t_complex>::Zero(ftsizev, ftsizeu);
     for(t_int i = 0; i < weights.size(); ++i) {
       t_int q = utilities::mod(floor(u(i) * scale), ftsizeu);
       t_int p = utilities::mod(floor(v(i) * scale), ftsizev);
-      gridded_weights(p, q) += 1; // I get better results assuming all the weights are the same. I
-                                  // think miriad does this.
+      gridded_weights(p, q) += 1; // I get better results assuming all the weights are the same.
+                                  // It looks like miriad does this.
     }
+    t_complex const sum_weights = weights.sum();
     t_complex const sum_grid_weights2 = (gridded_weights.array() * gridded_weights.array()).sum();
     t_complex const robust_scale
         = sum_weights / sum_grid_weights2 * 25.
@@ -524,7 +524,6 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
         out_weights(i) = weights(i) / (1. + robust_scale * gridded_weights(p, q));
       }
     }
-    out_weights = out_weights / out_weights.sum();
   }
   return out_weights.array();
 }
