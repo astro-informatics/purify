@@ -73,7 +73,7 @@ static struct option long_options[] = {
     {"size", required_argument, 0, 'f'},
     {"beta", required_argument, 0, 'g'},
     {"noadapt", no_argument, 0, 'h'},
-    {"n_mean", required_argument, 0, 'i'},
+    {"l2_bound", required_argument, 0, 'i'},
     {"diagnostic", no_argument, 0, 'j'},
     {"power_iterations", required_argument, 0, 'k'},
     {"use_w_term", no_argument, 0, 'l'},

@@ -20,7 +20,7 @@ std::string usage() {
          "--beta: valued used to set the stepsize of PADMM\n\n"
          "--noadapt: Choose not to update the stepsize. \n\n"
          "--diagnostic: Save diagnostic information to log file.\n\n"
-         "--n_mean: Factor to multiply the l2 bound by.\n\n"
+         "--l2_bound: Factor to multiply the l2 bound by.\n\n"
          "--relative_variation: The convergence criteria on relative variation (default is 1e-3).\n\n"
          "--residual_convergence: Factor to multiply the l2 bound by for convergence. (default is 1)"
          "--relative_gamma_adapt: Relative difference criteria for adapting the stepsize gamma (default 0.01).\n\n"
@@ -153,7 +153,7 @@ Params parse_cmdl(int argc, char **argv) {
 
     case 't':
       params.sopt_logging_level = optarg;
-      break;
+break;
 
     case 'u':
       params.cellsizex = std::stod(optarg);
