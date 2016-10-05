@@ -54,8 +54,8 @@ struct Params {
   //convergence information
   t_real n_mu = 1.4; //Factor to multiply scale the l2 bound by
   t_int iter = 0; // number of iterations, 0 means unlimited
-  t_real relative_variation = 1e-3; // relative difference in model for convergence
-  t_real residual_convergence = -1; // max l2 norm reisudals can have for convergence, -1 means it will choose epsilon by default
+  t_real relative_variation = 5e-3; // relative difference in model for convergence
+  t_real residual_convergence = 1; // max l2 norm reisudals can have for convergence, -1 means it will choose epsilon by default
   t_real epsilon = 0;
 };
 

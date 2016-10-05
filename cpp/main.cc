@@ -59,13 +59,12 @@ t_real estimate_noise(purify::Params const &params) {
     auto const noise_uv_data = purify::casa::read_measurementset(
         params.noisefile, purify::casa::MeasurementSet::ChannelWrapper::polarization::V);
     Vector<t_complex> const noise_vis = noise_uv_data.weights.array() * noise_uv_data.vis.array();
-
     sigma_real = utilities::median(noise_vis.real().cwiseAbs()) / 0.6745;
     sigma_imag = utilities::median(noise_vis.imag().cwiseAbs()) / 0.6745;
   }
 
   PURIFY_MEDIUM_LOG("RMS noise of {}Jy + i{}Jy", sigma_real, sigma_real);
-  return std::sqrt(sigma_real * sigma_real + sigma_imag * sigma_imag) / std::sqrt(2);
+  return std::sqrt(sigma_real * sigma_real + sigma_imag * sigma_imag); //calculation is for combined real and imaginary sigma, factor of 1/sqrt(2) in epsilon calculation
 }
 
 purify::casa::MeasurementSet::ChannelWrapper::polarization choose_pol(std::string const & stokes){
@@ -238,7 +237,7 @@ int main(int argc, char **argv) {
   t_real const epsilon = params.n_mu * std::sqrt(2 * uv_data.vis.size()) * noise_rms / std::sqrt(2); // Calculation of l_2 bound following SARA paper
   params.epsilon = epsilon;
   params.residual_convergence
-      = (params.residual_convergence == -1) ? epsilon : params.residual_convergence * epsilon;
+      = (params.residual_convergence < 0) ? 0. : params.residual_convergence * epsilon;
   t_real purify_gamma = 0;
   std::tie(params.iter, purify_gamma) = utilities::checkpoint_log(params.name + "_diagnostic");
   if(params.iter == 0)
