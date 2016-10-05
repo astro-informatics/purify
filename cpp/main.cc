@@ -146,6 +146,7 @@ void save_final_image(std::string const &outfile_fits, std::string const &residu
                                          * uv_data.weights.array().real())
                                             .matrix())
                                   .array();
+  header.fits_name = residual_fits + ".fits";
   header.pix_units = "JY/BEAM";
   header.fits_name = residual_fits;
   pfitsio::write2d_header(residual.real(), header);
@@ -237,7 +238,7 @@ int main(int argc, char **argv) {
   t_real const epsilon = params.n_mu * std::sqrt(2 * uv_data.vis.size()) * noise_rms / std::sqrt(2); // Calculation of l_2 bound following SARA paper
   params.epsilon = epsilon;
   params.residual_convergence
-      = (params.residual_convergence == -1) ? epsilon : params.residual_convergence * std::sqrt(2 * uv_data.vis.size()) * noise_rms / std::sqrt(2);
+      = (params.residual_convergence == -1) ? epsilon : params.residual_convergence * epsilon;
   t_real purify_gamma = 0;
   std::tie(params.iter, purify_gamma) = utilities::checkpoint_log(params.name + "_diagnostic");
   if(params.iter == 0)

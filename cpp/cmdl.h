@@ -13,7 +13,7 @@ namespace purify {
 struct Params {
   std::string sopt_logging_level = "debug";
   std::string name = "";
-  std::string weighting = "whiten";
+  std::string weighting = "natural";
   std::string stokes = "I";
   purify::casa::MeasurementSet::ChannelWrapper::polarization stokes_val
       = purify::casa::MeasurementSet::ChannelWrapper::polarization::I;

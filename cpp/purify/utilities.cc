@@ -82,7 +82,7 @@ utilities::vis_params read_visibility(const std::string &vis_name, const bool w_
     imag = std::stod(entry);
     vistemp(row) = t_complex(real, imag);
     std::getline(ss, entry, ' ');
-    weightstemp(row) = 1 / (std::stod(entry) * std::stod(entry));
+    weightstemp(row) = 1 / std::stod(entry);
     ++row;
   }
   utilities::vis_params uv_vis;
@@ -113,7 +113,7 @@ void write_visibility(const utilities::vis_params &uv_vis, const std::string &fi
     if(w_term)
       out << uv_vis.w(i) << " ";
     out << std::real(uv_vis.vis(i)) << " " << std::imag(uv_vis.vis(i)) << " "
-        << 1. / std::sqrt(std::real(uv_vis.weights(i))) << std::endl;
+        << 1. / std::real(uv_vis.weights(i)) << std::endl;
   }
   out.close();
 }
@@ -496,8 +496,6 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
   Vector<t_complex> out_weights(weights.size());
   if(weighting_type == "none") {
     out_weights = weights.array() * 0 + 1;
-  } else if(weighting_type == "whiten") {
-    out_weights = weights.array().sqrt();
   } else if(weighting_type == "natural") {
     out_weights = weights;
   } else {
@@ -506,10 +504,10 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
     for(t_int i = 0; i < weights.size(); ++i) {
       t_int q = utilities::mod(floor(u(i) * scale), ftsizeu);
       t_int p = utilities::mod(floor(v(i) * scale), ftsizev);
-      gridded_weights(p, q) += 1; // I get better results assuming all the weights are the same.
-                                  // It looks like miriad does this.
+      gridded_weights(p, q) += 1 * 1; // I get better results assuming all the weights are the same.
+                                  // It looks like miriad does this as well.
     }
-    t_complex const sum_weights = weights.sum();
+    t_complex const sum_weights = (weights.array() * weights.array()).sum();
     t_complex const sum_grid_weights2 = (gridded_weights.array() * gridded_weights.array()).sum();
     t_complex const robust_scale
         = sum_weights / sum_grid_weights2 * 25.
@@ -519,9 +517,9 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
       t_int q = utilities::mod(floor(u(i) * scale), ftsizeu);
       t_int p = utilities::mod(floor(v(i) * scale), ftsizev);
       if(weighting_type == "uniform")
-        out_weights(i) = weights(i) / gridded_weights(p, q);
+        out_weights(i) = weights(i) / std::sqrt(gridded_weights(p, q));
       if(weighting_type == "robust") {
-        out_weights(i) = weights(i) / (1. + robust_scale * gridded_weights(p, q));
+        out_weights(i) = weights(i) / std::sqrt(1. + robust_scale * gridded_weights(p, q));
       }
     }
   }

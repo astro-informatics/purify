@@ -260,7 +260,7 @@ read_measurementset(std::string const &filename,
     }
     row += channel.size();
   }
-  uv_data.weights = 1. / (uv_data.weights.array() * uv_data.weights.array());
+  uv_data.weights = 1. / uv_data.weights.array();
   return uv_data;
 }
 
