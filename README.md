@@ -41,7 +41,7 @@ PURIFY was initially created by Rafael Carrillo, Jason McEwen and Yves Wiaux but
 * [Jason D. McEwen](http://www.jasonmcewen.org)
 * [Yves Wiaux](http://basp.eps.hw.ac.uk)
 * Luke Pratley
-* Mayeul d'Avezac
+* [Mayeul d'Avezac](https://github.com/mdavezac)
 
 
 ## Running the main purify executable
