@@ -18,12 +18,12 @@ endfunction()
 configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(HEADERS 
-  RMOperator.h logging.h wprojection.h FFTOperator.h kernels.h
+  RMOperator.h logging.h FFTOperator.h kernels.h
   pfitsio.h MeasurementOperator.h clean.h logging.disabled.h types.h PSFOperator.h
   logging.enabled.h utilities.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(SOURCES MeasurementOperator.cc FFTOperator.cc clean.cc utilities.cc pfitsio.cc
-  kernels.cc RMOperator.cc PSFOperator.cc wprojection.cc)
+  kernels.cc RMOperator.cc PSFOperator.cc)
 
 if(TARGET casacore::ms)
   list(APPEND SOURCES casacore.cc)

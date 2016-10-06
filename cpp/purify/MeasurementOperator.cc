@@ -263,12 +263,6 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
     fftoperator_.fftw_flag((FFTW_ESTIMATE | FFTW_PRESERVE_INPUT));
   fftoperator_.set_up_multithread();
   fftoperator_.init_plan(Matrix<t_complex>::Zero(ftsizev_, ftsizeu_));
-  if(use_w_term_) {
-    resample_factor
-        = wprojection::upsample_ratio(uv_vis_input, cell_x_, cell_y_, ftsizeu_, ftsizev_);
-    ftsizeu_ = ftsizeu_ * resample_factor;
-    ftsizev_ = ftsizev_ * resample_factor;
-  }
   utilities::vis_params uv_vis = uv_vis_input;
   if(uv_vis.units == "lambda")
     uv_vis = utilities::set_cell_size(uv_vis_input, cell_x_, cell_y_);
@@ -283,8 +277,7 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
   std::function<t_real(t_real)> kernelv;
   std::function<t_real(t_real)> ftkernelu;
   std::function<t_real(t_real)> ftkernelv;
-  if(use_w_term_)
-    PURIFY_MEDIUM_LOG("Resampling Factor: {}", resample_factor);
+
   PURIFY_MEDIUM_LOG("Kernel Name: {}", kernel_name_.c_str());
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", uv_vis.u.size());
   PURIFY_MEDIUM_LOG("Number of pixels: {} x {}", imsizex_, imsizey_);
@@ -321,11 +314,6 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
         ftkernelu, ftkernelv); // Does gridding correction using analytic formula
     G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju_, Jv_, kernelu,
                                                          kernelv);
-    if(use_w_term_) {
-      C = wprojection::create_chirp_matrix(uv_vis.w, cell_x_, cell_y_, ftsizeu_, ftsizev_,
-                                           energy_fraction_);
-      G = wprojection::convolution(G, C, ftsizeu_, ftsizev_, uv_vis.w.size());
-    }
 
     PURIFY_DEBUG("Calculating weights: W");
     W = utilities::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor_,
@@ -431,11 +419,7 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
 
   G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju_, Jv_, kernelu,
                                                        kernelv);
-  if(use_w_term_) {
-    C = wprojection::create_chirp_matrix(uv_vis.w, cell_x_, cell_y_, ftsizeu_, ftsizev_,
-                                         energy_fraction_);
-    G = wprojection::convolution(G, C, ftsizeu_, ftsizev_, uv_vis.w.size());
-  }
+
   PURIFY_DEBUG("Calculating weights: W");
   W = utilities::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor_,
                               weighting_type_, R_, ftsizeu_, ftsizev_);

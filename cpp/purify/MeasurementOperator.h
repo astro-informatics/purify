@@ -7,7 +7,6 @@
 #include "purify/kernels.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
-#include "purify/wprojection.h"
 
 #include <iostream>
 #include <string>

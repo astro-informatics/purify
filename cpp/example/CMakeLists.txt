@@ -13,9 +13,6 @@ add_example(sdmm_random_coverage LIBRARIES libpurify NOTEST)
 add_example(sdmm_vla LIBRARIES libpurify NOTEST)
 
 add_example(resample LIBRARIES libpurify)
-add_example(sparsify LIBRARIES libpurify)
-add_example(generate_chirp LIBRARIES libpurify)
-add_example(w_projection_example LIBRARIES libpurify NOTEST)
 
 add_example(sdmm_m31_simulation LIBRARIES libpurify NOTEST)
 
