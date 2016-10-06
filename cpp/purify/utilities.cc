@@ -512,14 +512,14 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
     t_complex const robust_scale
         = sum_weights / sum_grid_weights2 * 25.
           * std::pow(10, -2 * R); // Following standard formula, a bit different from miriad.
-
+    gridded_weights = gridded_weights.array().sqrt();
     for(t_int i = 0; i < weights.size(); ++i) {
       t_int q = utilities::mod(floor(u(i) * scale), ftsizeu);
       t_int p = utilities::mod(floor(v(i) * scale), ftsizev);
       if(weighting_type == "uniform")
-        out_weights(i) = weights(i) / std::sqrt(gridded_weights(p, q));
+        out_weights(i) = weights(i) / gridded_weights(p, q);
       if(weighting_type == "robust") {
-        out_weights(i) = weights(i) / std::sqrt(1. + robust_scale * gridded_weights(p, q));
+        out_weights(i) = weights(i) / std::sqrt(1. + robust_scale * gridded_weights(p, q) * gridded_weights(p, q));
       }
     }
   }
