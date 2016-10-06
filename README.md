@@ -74,7 +74,7 @@ http://basp-group.github.io/purify/
   sets. The main purify program requires this library (and its dependencies)
 - [UCL/GreatCMakeCookOff](https://github.com/UCL/GreatCMakeCookOff): Collection of cmake recipes.
   Downloaded automatically if absent.
-- [astro-informatics/sopt](https://github.com/astro-informatics/sopt): Sparse Optimization
+- [astro-informatics/sopt](https://github.com/basp-group/sopt): Sparse Optimization
   Compressed Sensing library. Downloaded automatically if absent.
 - [Eigen 3](http://eigen.tuxfamily.org/index.php?title=Main_Page): Modern C++ linear algebra.
   Downloaded automatically if absent.
@@ -137,7 +137,7 @@ directory.
 ## SUPPORT
 
 If you have any questions or comments, feel free to contact Rafael Carrillo or Jason McEwen, or add
-an issue in the [issue tracker](https://github.com/astro-informatics/sopt/issues).
+an issue in the [issue tracker](https//github.com/basp-group/sopt/issues).
 
 ## NOTES
 

@@ -59,7 +59,7 @@ if(NOT sopt_tag)
         set(sopt_tag master)
     endif()
     if(NOT current_branch STREQUAL master)
-        set(sopt_tag development-c-and-cpp)
+        set(sopt_tag v2.0)
     endif()
     set(sopt_tag ${sopt_tag} CACHE STRING "Branch/tag when downloading sopt")
 endif()
@@ -68,7 +68,7 @@ if(NOT Sopt_FOUND)
 endif()
 lookup_package(
     Sopt REQUIRED ARGUMENTS
-    GIT_REPOSITORY git@github.com:astro-informatics/sopt.git
+    GIT_REPOSITORY git@github.com:basp-group/sopt.git
     GIT_TAG ${sopt_tag})
 
 lookup_package(CFitsIO REQUIRED ARGUMENTS CHECKCASA)
