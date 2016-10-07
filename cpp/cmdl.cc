@@ -25,8 +25,6 @@ std::string usage() {
          "--residual_convergence: Factor to multiply the l2 bound by for convergence. (default is 1)"
          "--relative_gamma_adapt: Relative difference criteria for adapting the stepsize gamma (default 0.01).\n\n"
          "--power_iterations: Maximum iterations for the power method.\n\n"
-         "--use_w_term: Choose to include the w-projection method (only for small data sets).\n\n"
-         "--energy_fraction: How sparse the chirp matrix (w-projection) should be.\n\n"
          "--primary_beam: Choice of primary beam model. (none is the only option).\n\n"
          "--fft_grid_correction: Choose calculate the gridding correction using an FFT rather than "
          "analytic formula. \n\n"

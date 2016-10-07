@@ -40,7 +40,7 @@ PURIFY was initially created by Rafael Carrillo, Jason McEwen and Yves Wiaux but
 * [Rafael E. Carrillo](http://people.epfl.ch/rafael.carrill)
 * [Jason D. McEwen](http://www.jasonmcewen.org)
 * [Yves Wiaux](http://basp.eps.hw.ac.uk)
-* Luke Pratley
+* [Luke Pratley](https://about.me/luke.pratley)
 * [Mayeul d'Avezac](https://github.com/mdavezac)
 
 
