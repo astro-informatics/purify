@@ -13,12 +13,12 @@ passon_variables(CCfits
   ALSOADD
       "\nset(CMAKE_INSTALL_PREFIX \"${EXTERNAL_ROOT}\" CACHE STRING \"\")\n"
 )
-if(NOT TARGET CFitsIO)
+if(NOT TARGET CFitsIO AND NOT TARGET Lookup-CFitsIO)
   find_package(CFitsIO REQUIRED)
   get_filename_component(cfitsio_libdir "${CFitsIO_LIBRARY}" DIRECTORY)
   set(cfitsio_include_dir "${CFitsIO_INCLUDE_DIR}")
-else()
-  get_filename_component(cfitsio_libdir "${EXTERNAL_ROOT}/lib" DIRECTORY)
+elseif(TARGET Lookup-CFitsIO)
+  set(cfitsio_libdir "${EXTERNAL_ROOT}/lib" DIRECTORY)
   set(cfitsio_include_dir "${EXTERNAL_ROOT}/include")
 endif()
 ExternalProject_Add(
@@ -40,6 +40,8 @@ ExternalProject_Add(
 )
 if(TARGET CFitsIO)
   add_dependencies(Lookup-CCFits CFitsIO)
+elseif(TARGET Lookup-CFitsIO)
+  add_dependencies(Lookup-CCFits Lookup-CFitsIO)
 endif()
 add_recursive_cmake_step(Lookup-CCFits DEPENDEES install)
 set(CCFits_INCLUDE_DIR "")
