@@ -35,7 +35,8 @@ It is possible to add other options, such as limited the number of iterations to
 
 ## Contributors
 
-PURIFY was initially created by Rafael Carrillo, Jason McEwen and Yves Wiaux but major contirbutions have since been made by a number of others. The full list of contributors is as follows:
+PURIFY was initially created by Rafael Carrillo, Jason McEwen and Yves Wiaux but major contributions
+have since been made by a number of others. The full list of contributors is as follows:
 
 * [Rafael E. Carrillo](http://people.epfl.ch/rafael.carrill)
 * [Jason D. McEwen](http://www.jasonmcewen.org)
@@ -63,10 +64,6 @@ When referencing this code, please cite our related papers:
 1. L. Pratley, J. D. McEwen, M. d'Avezac, R. E. Carrillo, A. Onose, Y. Wiaux. "Robust sparse image
    reconstruction of radio interferometric observations with PURIFY". Mon. Not. Roy. Astron. Soc.,
    submitted, 2016
-
-## Webpage
-
-http://basp-group.github.io/purify/
 
 ## Installation
 
