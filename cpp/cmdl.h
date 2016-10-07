@@ -76,8 +76,6 @@ static struct option long_options[] = {
     {"l2_bound", required_argument, 0, 'i'},
     {"diagnostic", no_argument, 0, 'j'},
     {"power_iterations", required_argument, 0, 'k'},
-    {"use_w_term", no_argument, 0, 'l'},
-    {"energy_fraction", required_argument, 0, 'm'},
     {"primary_beam", required_argument, 0, 'n'},
     {"fft_grid_correction", no_argument, 0, 'o'},
     {"width", required_argument, 0, 'p'},
