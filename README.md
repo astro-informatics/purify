@@ -140,7 +140,7 @@ directory.
 ## SUPPORT
 
 If you have any questions or comments, feel free to contact Rafael Carrillo or Jason McEwen, or add
-an issue in the [issue tracker](https//github.com/basp-group/purify/issues).
+an issue in the [issue tracker](https://github.com/basp-group/purify/issues).
 
 ## NOTES
 
