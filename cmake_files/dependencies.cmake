@@ -68,7 +68,7 @@ if(NOT Sopt_FOUND)
 endif()
 lookup_package(
     Sopt REQUIRED ARGUMENTS
-    GIT_REPOSITORY git@github.com:basp-group/sopt.git
+    GIT_REPOSITORY https://www.github.com/basp-group/sopt.git
     GIT_TAG ${sopt_tag})
 
 lookup_package(CFitsIO REQUIRED ARGUMENTS CHECKCASA)
