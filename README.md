@@ -38,7 +38,7 @@ It is possible to add other options, such as limited the number of iterations to
 PURIFY was initially created by Rafael Carrillo, Jason McEwen and Yves Wiaux but major contributions
 have since been made by a number of others. The full list of contributors is as follows:
 
-* [Rafael E. Carrillo](http://people.epfl.ch/rafael.carrill)
+* [Rafael E. Carrillo](https://www.researchgate.net/profile/Rafael_Carrillo2)
 * [Jason D. McEwen](http://www.jasonmcewen.org)
 * [Yves Wiaux](http://basp.eps.hw.ac.uk)
 * [Luke Pratley](https://about.me/luke.pratley)
