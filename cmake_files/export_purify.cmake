@@ -1,5 +1,9 @@
 # Exports Purify so other packages can access it
-export(TARGETS libpurify purify FILE "${PROJECT_BINARY_DIR}/PurifyTargets.cmake")
+set(targets libpurify)
+if(TARGET purify)
+  list(APPEND targets purify)
+endif()
+export(TARGETS ${targets} FILE "${PROJECT_BINARY_DIR}/PurifyTargets.cmake")
 
 # Avoids creating an entry in the cmake registry.
 if(NOT NOEXPORT)
