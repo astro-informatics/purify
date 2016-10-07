@@ -5,8 +5,8 @@
 PURIFY is a collection of routines written in C++ that implements different tools for radio
 interferometric imaging including file handling (for both visibilities and fits files),
 implementation of the measurement operator and set-up of the different optimization problems
-used for image deconvolution. The code calls the generic Sparse OPTimization (SOPT) package to solve
-the imaging optimization problems.
+used for image deconvolution. The code calls the generic [Sparse OPTimization
+(SOPT)](http://basp-group.github.io/sopt/) package to solve the imaging optimization problems.
 
 ##Usage
 `purify` has two required arguments, `--measurement_set` and `--name`, the path of the measurement set and the prefix name of the output files.
@@ -24,7 +24,7 @@ It is possible to add other options, such as limited the number of iterations to
 * `--measurement_set` is the path to the CASA measurement set folder. `(required argument)`
 * `--name` is the prefix name used to save the output model, residual, and dirty map. `(required argument)`
 * `--diagnostic` will record variables and output images with each iteration. This is useful for testing or trial runs, but will take up some more computation in calculating and saving diagnostic updates. The update images and diagnostic file will be used as a checkpoint, in the case that purify locates the images from a previous run.
-* `--n_mean` this value can be used to scale the error on the model matching the measurements. `Default value is 1.4`.
+* `--l2_bound` this value can be used to scale the error on the model matching the measurements. `Default value is 1.4`.
 * `--power_iterations` number of iterations needed to normalize the measurement operator. This is needed to ensure that the measurement operator reconstruct a model to the correct flux scale. `Default value is 100`.
 * `--noadapt` will turn off the adapting step size.
 * `--size` the height and width of the output image in pixels (only powers of 2 supported at present).
@@ -35,7 +35,8 @@ It is possible to add other options, such as limited the number of iterations to
 
 ## Contributors
 
-PURIFY was initially created by Rafael Carrillo, Jason McEwen and Yves Wiaux but major contirbutions have since been made by a number of others. The full list of contributors is as follows:
+PURIFY was initially created by Rafael Carrillo, Jason McEwen and Yves Wiaux but major contributions
+have since been made by a number of others. The full list of contributors is as follows:
 
 * [Rafael E. Carrillo](http://people.epfl.ch/rafael.carrill)
 * [Jason D. McEwen](http://www.jasonmcewen.org)
@@ -51,16 +52,18 @@ of the installation directory.
 
 ## Reference
 
-When referencing this code, please cite our related paper:
+When referencing this code, please cite our related papers:
 
-[1] R. E. Carrillo, J. D. McEwen and Y. Wiaux.  "PURIFY: a new
-approach to radio-interferometric
-imaging". Mon. Not. Roy. Astron. Soc., 439(4):3591-3604, 2014,
-[arXiv:1307.4370](http://arxiv.org/abs/1307.4370)
-
-## Webpage
-
-http://basp-group.github.io/purify/
+1. R. E. Carrillo, J. D. McEwen and Y. Wiaux.  "PURIFY: a new approach to radio-interferometric
+   imaging". Mon. Not. Roy. Astron. Soc., 439(4):3591-3604, 2014,
+   [arXiv:1307.4370](http://arxiv.org/abs/1307.4370)
+1. A. Onose, R. E. Carrillo, A. Repetti, J. D. McEwen, J.-P. Thiran, J.-C. Pesquet, and Y. Wiaux.
+   "Scalable splitting algorithms for big-data interferometric imaging in the SKA era". Mon. Not.
+   Roy. Astron. Soc., 462(4):4314-4335, 2016,
+   [arXiv:1601.04026](http://arxiv.org/abs/arXiv:1601.04026) 
+1. L. Pratley, J. D. McEwen, M. d'Avezac, R. E. Carrillo, A. Onose, Y. Wiaux. "Robust sparse image
+   reconstruction of radio interferometric observations with PURIFY". Mon. Not. Roy. Astron. Soc.,
+   submitted, 2016
 
 ## Installation
 
@@ -74,7 +77,7 @@ http://basp-group.github.io/purify/
   sets. The main purify program requires this library (and its dependencies)
 - [UCL/GreatCMakeCookOff](https://github.com/UCL/GreatCMakeCookOff): Collection of cmake recipes.
   Downloaded automatically if absent.
-- [astro-informatics/sopt](https://github.com/basp-group/sopt): Sparse Optimization
+- [basp-group/sopt](https://github.com/basp-group/sopt): Sparse Optimization
   Compressed Sensing library. Downloaded automatically if absent.
 - [Eigen 3](http://eigen.tuxfamily.org/index.php?title=Main_Page): Modern C++ linear algebra.
   Downloaded automatically if absent.
@@ -137,7 +140,7 @@ directory.
 ## SUPPORT
 
 If you have any questions or comments, feel free to contact Rafael Carrillo or Jason McEwen, or add
-an issue in the [issue tracker](https//github.com/basp-group/sopt/issues).
+an issue in the [issue tracker](https://github.com/basp-group/purify/issues).
 
 ## NOTES
 
