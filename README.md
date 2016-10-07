@@ -5,8 +5,8 @@
 PURIFY is a collection of routines written in C++ that implements different tools for radio
 interferometric imaging including file handling (for both visibilities and fits files),
 implementation of the measurement operator and set-up of the different optimization problems
-used for image deconvolution. The code calls the generic Sparse OPTimization (SOPT) package to solve
-the imaging optimization problems.
+used for image deconvolution. The code calls the generic [Sparse OPTimization
+(SOPT)](http://basp-group.github.io/sopt/) package to solve the imaging optimization problems.
 
 ##Usage
 `purify` has two required arguments, `--measurement_set` and `--name`, the path of the measurement set and the prefix name of the output files.
