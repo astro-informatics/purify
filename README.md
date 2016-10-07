@@ -51,12 +51,18 @@ of the installation directory.
 
 ## Reference
 
-When referencing this code, please cite our related paper:
+When referencing this code, please cite our related papers:
 
-[1] R. E. Carrillo, J. D. McEwen and Y. Wiaux.  "PURIFY: a new
-approach to radio-interferometric
-imaging". Mon. Not. Roy. Astron. Soc., 439(4):3591-3604, 2014,
-[arXiv:1307.4370](http://arxiv.org/abs/1307.4370)
+1. R. E. Carrillo, J. D. McEwen and Y. Wiaux.  "PURIFY: a new approach to radio-interferometric
+   imaging". Mon. Not. Roy. Astron. Soc., 439(4):3591-3604, 2014,
+   [arXiv:1307.4370](http://arxiv.org/abs/1307.4370)
+1. A. Onose, R. E. Carrillo, A. Repetti, J. D. McEwen, J.-P. Thiran, J.-C. Pesquet, and Y. Wiaux.
+   "Scalable splitting algorithms for big-data interferometric imaging in the SKA era". Mon. Not.
+   Roy. Astron. Soc., 462(4):4314-4335, 2016,
+   [arXiv:1601.04026](http://arxiv.org/abs/arXiv:1601.04026) 
+1. L. Pratley, J. D. McEwen, M. d'Avezac, R. E. Carrillo, A. Onose, Y. Wiaux. "Robust sparse image
+   reconstruction of radio interferometric observations with PURIFY". Mon. Not. Roy. Astron. Soc.,
+   submitted, 2016
 
 ## Webpage
 
