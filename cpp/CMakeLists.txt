@@ -16,12 +16,16 @@ function(add_include_dir)
   endif()
 endfunction()
 
-add_include_dir(
-  ${EIGEN3_INCLUDE_DIR}
-  ${Boost_INCLUDE_DIR}
-  ${CFitsIO_INCLUDE_DIR}
-  ${CCFits_INCLUDE_DIR}/..
-)
+add_include_dir(${Boost_INCLUDE_DIR})
+if(EIGEN3_INCLUDE_DIR)
+  add_include_dir(${EIGEN3_INCLUDE_DIR})
+endif()
+if(CFitsIO_INCLUDE_DIR)
+  add_include_dir(${CFitsIO_INCLUDE_DIR})
+endif()
+if(CCFits_INCLUDE_DIR)
+  add_include_dir(${CCFits_INCLUDE_DIR}/..)
+endif()
 
 add_subdirectory(purify)
 if(tests OR examples)
