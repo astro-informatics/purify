@@ -8,7 +8,7 @@ function(add_include_dir)
       list(APPEND publics "${dir}")
     endif()
   endforeach() 
-  if(public)
+  if(publics)
     target_include_directories(libpurify SYSTEM PUBLIC ${publics})
   endif()
 endfunction()
@@ -40,6 +40,12 @@ target_include_directories(libpurify PUBLIC
   $<INSTALL_INTERFACE:include/>)
 
 
+add_include_dir(
+  ${EIGEN3_INCLUDE_DIR}
+  ${Boost_INCLUDE_DIR}
+  ${CFitsIO_INCLUDE_DIR}
+  ${CCFits_INCLUDE_DIR}/..
+)
 target_link_libraries(libpurify
   ${FFTW3_DOUBLE_LIBRARY} ${CCFits_LIBRARY} ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY})
 if(TARGET casacore::casa)
