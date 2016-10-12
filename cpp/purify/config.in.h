@@ -13,6 +13,9 @@
 //! Whether to do openmp
 #cmakedefine PURIFY_OPENMP
 
+//! Whether FFTW has openmp
+#cmakedefine PURIFY_OPENMP_FFTW
+
 #include <string>
 #include <tuple>
 
