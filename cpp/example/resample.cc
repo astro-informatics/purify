@@ -15,8 +15,8 @@ int main(int nargs, char const **args) {
   t_real const resample_ratio = 2.;
   auto const ft_grid = fftop.forward(M31);
   auto const new_ft_grid = utilities::re_sample_ft_grid(ft_grid, resample_ratio);
-  auto const M31_resample = fftop.inverse(new_ft_grid).real() * resample_ratio * resample_ratio;
+  Image<> const M31_resample = fftop.inverse(new_ft_grid).real() * resample_ratio * resample_ratio;
   pfitsio::write2d(M31_resample, output_filename("M31_resample.fits"));
-  auto const M31_resample_alt = utilities::re_sample_image(M31, resample_ratio).real();
+  Image<> const M31_resample_alt = utilities::re_sample_image(M31, resample_ratio).real();
   pfitsio::write2d(M31_resample_alt, output_filename("M31_resample_alt.fits"));
 }
