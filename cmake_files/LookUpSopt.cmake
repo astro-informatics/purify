@@ -46,7 +46,7 @@ ExternalProject_Add(
 )
 add_recursive_cmake_step(Lookup-Sopt DEPENDEES install)
 
-foreach(dep Eigen3 spdlog)
+foreach(dep Lookup-Eigen3 Lookup-spdlog)
   lookup_package(${dep})
   if(TARGET ${dep})
     add_dependencies(Lookup-Sopt ${dep})
