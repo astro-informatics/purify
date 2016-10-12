@@ -63,7 +63,7 @@ if(NOT Sopt_GIT_REPOSITORY)
       CACHE STRING "Location when downloading sopt")
 endif()
 if(NOT Sopt_FOUND)
-  message(STATUS "If downloading Sopt locally, then it will be branch ${sopt_tag}")
+  message(STATUS "If downloading Sopt locally, then it will be branch ${Sopt_GIT_TAG}")
 endif()
 lookup_package(
     Sopt REQUIRED ARGUMENTS
