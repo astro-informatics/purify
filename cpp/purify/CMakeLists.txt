@@ -31,7 +31,8 @@ if(TARGET casacore::ms)
 endif()
 add_library(libpurify SHARED ${SOURCES})
 set(version "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}.${Purify_VERSION_PATCH}")
-set_target_properties(libpurify PROPERTIES VERSION ${version} SOVERSION ${version})
+set(soversion "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}")
+set_target_properties(libpurify PROPERTIES VERSION ${version} SOVERSION ${soversion})
 
 target_include_directories(libpurify PUBLIC
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
