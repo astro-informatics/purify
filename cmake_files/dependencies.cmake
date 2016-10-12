@@ -58,12 +58,16 @@ endif()
 if(NOT Sopt_GIT_TAG)
   set(Sopt_GIT_TAG v2.0.0 CACHE STRING "Branch/tag when downloading sopt")
 endif()
+if(NOT Sopt_GIT_REPOSITORY)
+  set(Sopt_GIT_REPOSITORY https://www.github.com/basp-group/sopt.git
+      CACHE STRING "Location when downloading sopt")
+endif()
 if(NOT Sopt_FOUND)
   message(STATUS "If downloading Sopt locally, then it will be branch ${sopt_tag}")
 endif()
 lookup_package(
     Sopt REQUIRED ARGUMENTS
-    GIT_REPOSITORY https://www.github.com/basp-group/sopt.git
+    GIT_REPOSITORY ${Sopt_GIT_REPOSITORY}
     GIT_TAG ${Sopt_GIT_TAG})
 
 lookup_package(CFitsIO REQUIRED ARGUMENTS CHECKCASA)
