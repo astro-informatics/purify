@@ -56,14 +56,11 @@ endif()
 # Unless otherwise specified, if purify is not on master, then sopt will be
 # downloaded from development branch.
 if(NOT Sopt_GIT_TAG)
-  set(Sopt_GIT_TAG v2.0.0 CACHE STRING "Branch/tag when downloading sopt")
+  set(Sopt_GIT_TAG master CACHE STRING "Branch/tag when downloading sopt")
 endif()
 if(NOT Sopt_GIT_REPOSITORY)
   set(Sopt_GIT_REPOSITORY https://www.github.com/basp-group/sopt.git
       CACHE STRING "Location when downloading sopt")
-endif()
-if(NOT Sopt_FOUND)
-  message(STATUS "If downloading Sopt locally, then it will be branch ${Sopt_GIT_TAG}")
 endif()
 lookup_package(
     Sopt REQUIRED ARGUMENTS
