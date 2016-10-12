@@ -38,6 +38,12 @@ ExternalProject_Add(
       -C "${EXTERNAL_ROOT}/src/SoptVariables.cmake"
       -DBUILD_SHARED_LIBS=OFF
       -DCMAKE_BUILD_TYPE=${Sopt_BUILD_TYPE}
+      -Dregressions=OFF
+      -Dtests=OFF
+      -Dpython=OFF
+      -Dexamples=OFF
+      -Dbenchmarks=OFF
+      -Dlogging=${logging}
       -DNOEXPORT=TRUE
     INSTALL_DIR ${EXTERNAL_ROOT}
     LOG_DOWNLOAD ON
