@@ -17,8 +17,8 @@ function(add_include_dir)
 endfunction()
 
 add_include_dir(
-  ${EIGEN3_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
+  ${EIGEN3_INCLUDE_DIR}
   ${CFitsIO_INCLUDE_DIR}
   ${CCFits_INCLUDE_DIR}/..
 )
