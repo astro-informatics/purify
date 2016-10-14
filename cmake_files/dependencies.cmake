@@ -22,10 +22,15 @@ endif()
 if(openmp AND NOT OPENMP_FOUND)
     message(STATUS "Could not find OpenMP. Compiling without.")
 endif()
+set(PURIFY_OPENMP_FFTW FALSE)
 if(openmp AND OPENMP_FOUND)
   set(PURIFY_OPENMP TRUE)
   find_package(FFTW3 REQUIRED DOUBLE SERIAL COMPONENTS OPENMP)
-  set(FFTW3_DOUBLE_LIBRARY fftw3::double::openmp fftw3::double::serial)
+  set(FFTW3_DOUBLE_LIBRARY fftw3::double::serial)
+  if(TARGET fftw3::double::openmp)
+    list(APPEND FFTW3_DOUBLE_LIBRARY fftw3::double::openmp)
+    set(PURIFY_OPENMP_FFTW TRUE)
+  endif()
 else()
   set(PURIFY_OPENMP FALSE)
   find_package(FFTW3 REQUIRED DOUBLE)
@@ -50,26 +55,17 @@ endif()
 # Look up packages: if not found, installs them
 # Unless otherwise specified, if purify is not on master, then sopt will be
 # downloaded from development branch.
-if(NOT sopt_tag)
-    execute_process(COMMAND git branch
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-        RESULT_VARIABLE got_branch
-        OUTPUT_VARIABLE current_branch)
-    if(NOT got_branch)
-        set(sopt_tag master)
-    endif()
-    if(NOT current_branch STREQUAL master)
-        set(sopt_tag v2.0)
-    endif()
-    set(sopt_tag ${sopt_tag} CACHE STRING "Branch/tag when downloading sopt")
+if(NOT Sopt_GIT_TAG)
+  set(Sopt_GIT_TAG master CACHE STRING "Branch/tag when downloading sopt")
 endif()
-if(NOT Sopt_FOUND)
-  message(STATUS "If downloading Sopt locally, then it will be branch ${sopt_tag}")
+if(NOT Sopt_GIT_REPOSITORY)
+  set(Sopt_GIT_REPOSITORY https://www.github.com/basp-group/sopt.git
+      CACHE STRING "Location when downloading sopt")
 endif()
 lookup_package(
     Sopt REQUIRED ARGUMENTS
-    GIT_REPOSITORY https://www.github.com/basp-group/sopt.git
-    GIT_TAG ${sopt_tag})
+    GIT_REPOSITORY ${Sopt_GIT_REPOSITORY}
+    GIT_TAG ${Sopt_GIT_TAG})
 
 lookup_package(CFitsIO REQUIRED ARGUMENTS CHECKCASA)
 lookup_package(CCFits REQUIRED)

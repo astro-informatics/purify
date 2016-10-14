@@ -149,7 +149,7 @@ void FFTOperator::init_plan(const Matrix<t_complex> &input) {
 }
 void FFTOperator::set_up_multithread() {
   FFTOperator::clear_plans();
-#ifdef PURIFY_OPENMP
+#ifdef PURIFY_OPENMP_FFTW
   fftw_init_threads();
   fftw_plan_with_nthreads(omp_get_max_threads());
 #endif

@@ -1,6 +1,6 @@
 # Looks up [Sopt](http://basp-group.github.io/sopt/)
 #
-# - GIT_REPOSITORY: defaults to https://github.com/UCL/sopt.git
+# - GIT_REPOSITORY: defaults to https://github.com/basp-group/sopt.git
 # - GIT_TAG: defaults to master
 # - BUILD_TYPE: defaults to Release
 #
@@ -9,7 +9,7 @@ if(Sopt_ARGUMENTS)
         ${Sopt_ARGUMENTS})
 endif()
 if(NOT Sopt_GIT_REPOSITORY)
-    set(Sopt_GIT_REPOSITORY https://github.com/UCL/sopt.git)
+    set(Sopt_GIT_REPOSITORY https://github.com/basp-group/sopt.git)
 endif()
 if(NOT Sopt_GIT_TAG)
     set(Sopt_GIT_TAG master)
@@ -38,7 +38,14 @@ ExternalProject_Add(
       -C "${EXTERNAL_ROOT}/src/SoptVariables.cmake"
       -DBUILD_SHARED_LIBS=OFF
       -DCMAKE_BUILD_TYPE=${Sopt_BUILD_TYPE}
+      -Dregressions=OFF
+      -Dtests=OFF
+      -Dpython=OFF
+      -Dexamples=OFF
+      -Dbenchmarks=OFF
+      -Dlogging=${logging}
       -DNOEXPORT=TRUE
+      -Dopenmp=${openmp}
     INSTALL_DIR ${EXTERNAL_ROOT}
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
@@ -46,7 +53,7 @@ ExternalProject_Add(
 )
 add_recursive_cmake_step(Lookup-Sopt DEPENDEES install)
 
-foreach(dep Eigen3 spdlog)
+foreach(dep Lookup-Eigen3 Lookup-spdlog)
   lookup_package(${dep})
   if(TARGET ${dep})
     add_dependencies(Lookup-Sopt ${dep})

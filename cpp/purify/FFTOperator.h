@@ -4,7 +4,7 @@
 #include "purify/config.h"
 #include "purify/types.h"
 
-#ifdef PURIFY_OPENMP
+#ifdef PURIFY_OPENMP_FFTW
 #include <omp.h>
 #endif
 #include <fftw3.h>
