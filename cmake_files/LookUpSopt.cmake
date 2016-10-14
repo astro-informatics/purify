@@ -45,6 +45,7 @@ ExternalProject_Add(
       -Dbenchmarks=OFF
       -Dlogging=${logging}
       -DNOEXPORT=TRUE
+      -Dopenmp=${openmp}
     INSTALL_DIR ${EXTERNAL_ROOT}
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
