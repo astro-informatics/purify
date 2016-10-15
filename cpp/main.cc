@@ -1,6 +1,7 @@
 #include <array>
 #include <ctime>
 #include <random>
+#include <cstddef>
 #include <sopt/imaging_padmm.h>
 #include <sopt/positive_quadrant.h>
 #include <sopt/relative_variation.h>
@@ -211,7 +212,11 @@ int main(int argc, char **argv) {
   sopt::logging::set_level(params.sopt_logging_level);
   purify::logging::set_level(params.sopt_logging_level);
   params.stokes_val = choose_pol(params.stokes);
-  auto uv_data = purify::casa::read_measurementset(params.visfile, params.stokes_val);
+  //checking if reading measurement set or .vis file
+  std::size_t found = params.visfile.find_last_of(".");
+  std::string format =  "." + params.visfile.substr(found+1);
+  std::transform(format.begin(), format.end(), format.begin(), ::tolower);
+  auto uv_data = (format == ".ms") ? purify::casa::read_measurementset(params.visfile, params.stokes_val) : utilities::read_visibility(params.visfile, params.use_w_term);
   bandwidth_scaling(uv_data, params);
 
   // calculate weights outside of measurement operator
