@@ -32,6 +32,7 @@ ExternalProject_Add(
     ./configure --prefix=${EXTERNAL_ROOT}
          --with-cfitsio-include=${cfitsio_include_dir}
          --with-cfitsio-libdir=${cfitsio_libdir}
+         --disable-shared
     PATCH_COMMAND ${PATCH_EXECUTABLE} < ${PROJECT_SOURCE_DIR}/cmake_files/ccfits.patch
     INSTALL_DIR ${EXTERNAL_ROOT}
     LOG_DOWNLOAD ON
