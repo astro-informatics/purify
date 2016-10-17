@@ -46,7 +46,7 @@ else()
   lookup_package(Boost REQUIRED)
 endif()
 
-lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS HG_REPOSITORY "https://bitbucket.org/LukePratley/eigen" HG_TAG "3.2")
+lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS URL "https://bitbucket.org/LukePratley/eigen/get/3.2.tar.gz" MD5 "f38e33505afbf4659cda191bbc992ca9")
 
 if(logging)
   lookup_package(spdlog REQUIRED)
