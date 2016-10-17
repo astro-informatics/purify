@@ -66,7 +66,7 @@ else()
         PREFIX ${EXTERNAL_ROOT}
         URL ${CFitsIO_URL}
         BUILD_IN_SOURCE 1
-        CONFIGURE_COMMAND ./configure --prefix=${EXTERNAL_ROOT} --disable-shared
+        CONFIGURE_COMMAND ./configure --prefix=${EXTERNAL_ROOT} --disable-shared CFLAGS=-fPIC
         BUILD_COMMAND ${CMAKE_MAKE_PROGRAM}
         INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} install
         LOG_DOWNLOAD ON
