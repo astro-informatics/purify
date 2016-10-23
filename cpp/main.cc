@@ -100,7 +100,8 @@ purify::casa::MeasurementSet::ChannelWrapper::polarization choose_pol(std::strin
     stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::LR;
   if (stokes == "RL" or stokes == "rl")
     stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::RL;
-  
+  if (stokes == "P" or stokes == "p")
+    stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::P;
   return stokes_val;
 }
 t_real save_psf_and_dirty_image(
@@ -108,24 +109,29 @@ t_real save_psf_and_dirty_image(
     purify::utilities::vis_params const &uv_data, purify::Params const &params) {
   // returns psf normalisation
   purify::pfitsio::header_params header = create_new_header(uv_data, params);
-  std::string const dirty_image_fits = params.name + "_dirty_" + params.weighting + ".fits";
-  std::string const psf_fits = params.name + "_psf_" + params.weighting + ".fits";
+  std::string const dirty_image_fits = params.name + "_dirty_" + params.weighting;
+  std::string const psf_fits = params.name + "_psf_" + params.weighting;
   Vector<t_complex> const psf_image = measurements.adjoint() * (uv_data.weights.array());
   Image<t_real> psf = Image<t_complex>::Map(psf_image.data(), params.height, params.width).real();
   t_real max_val = psf.array().abs().maxCoeff();
-  PURIFY_LOW_LOG("PSF normalised by {}", max_val);
+  PURIFY_LOW_LOG("PSF peak is {}", max_val);
   psf = psf;//not normalised, so it is easy to compare scales
   header.fits_name = psf_fits;
   PURIFY_HIGH_LOG("Saving {}", header.fits_name);
   pfitsio::write2d_header(psf, header);
   Vector<t_complex> const dirty_image
       = measurements.adjoint() * (uv_data.weights.array() * uv_data.vis.array());
-  Image<t_real> dimage
-      = Image<t_complex>::Map(dirty_image.data(), params.height, params.width).real();
-  header.fits_name = dirty_image_fits;
+  Image<t_complex> dimage
+      = Image<t_complex>::Map(dirty_image.data(), params.height, params.width);
+  header.fits_name = dirty_image_fits + ".fits";
   PURIFY_HIGH_LOG("Saving {}", header.fits_name);
-  pfitsio::write2d_header(dimage/max_val, header);
-  return max_val;
+  pfitsio::write2d_header(dimage.real(), header);
+  if(params.stokes_val == purify::casa::MeasurementSet::ChannelWrapper::polarization::P){
+    header.fits_name = dirty_image_fits + "_imag.fits";
+    PURIFY_HIGH_LOG("Saving {}", header.fits_name);
+    pfitsio::write2d_header(dimage.imag(), header);
+  }
+    return max_val;
 }
 
 void save_final_image(std::string const &outfile_fits, std::string const &residual_fits,
@@ -200,6 +206,12 @@ construct_measurement_operator(utilities::vis_params const &uv_data, purify::Par
                           .fft_grid_correction(params.fft_grid_correction)
                           .fftw_plan_flag(params.fftw_plan);
   measurements.init_operator(uv_data);
+  // including gradient in measurement operator
+  t_complex I(0., -1.);
+  if (params.gradient == "x")
+    measurements.W = 1./(I * uv_data.u).array();
+  if (params.gradient == "y")
+    measurements.W = 1./(I * uv_data.v).array();
   return measurements;
 };
 }
@@ -289,6 +301,10 @@ int main(int argc, char **argv) {
   Vector<t_complex> final_model = Vector<t_complex>::Zero(params.width * params.height);
   std::string outfile_fits = "";
   std::string residual_fits = "";
+  if(params.stokes_val != purify::casa::MeasurementSet::ChannelWrapper::polarization::I)
+    padmm.l1_proximal_positivity_constraint(false);
+  if(params.stokes_val == purify::casa::MeasurementSet::ChannelWrapper::polarization::P)
+    padmm.l1_proximal_real_constraint(false);
   if(params.algo_update)
     padmm.is_converged(lambda);
   if(params.niters != 0)

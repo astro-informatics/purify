@@ -12,7 +12,8 @@ std::string usage() {
          "measurement set). \n\n"
          "--name: path of file output. (required) \n\n"
          "--niters: number of iterations. \n\n"
-         "--stokes: choice of stokes I, Q, U, or V (I is default). \n\n"
+         "--stokes: choice of stokes I, Q, U, or V (I is default). You can also choose linear"
+         " or cicular polarsiations. It is also possible to choose P.\n\n"
          "--cellsize: the dimensions of a pixel in arcseconds. \n\n"
          "--size: image size in pixels. \n\n"
          "--width: image width in pixels. \n\n"
@@ -30,6 +31,7 @@ std::string usage() {
          "analytic formula. \n\n"
          "--kernel: Type of gridding kernel to use, kb, gauss, pswf, box. (kb is default) \n\n"
          "--kernel_support: Support of kernel in grid cells. (4 is the default) \n\n"
+         "--grad: To reconstruct the gradient of x, y, or none (none is default). Should work for linear polarisation P. \n\n"
          "--logging_level: Determines the output logging level for sopt and purify. (\"debug\" is "
          "the default) \n\n";
 }
@@ -176,6 +178,10 @@ break;
 
     case '1':
       params.fftw_plan = optarg;
+      break;
+
+    case '2':
+      params.gradient = optarg;
       break;
 
     case '?':

@@ -25,23 +25,14 @@ bool AlgorithmUpdate::operator()(const Vector<t_complex> &x) {
   stats.l1_variation = std::abs(stats.l1_norm - new_l1_norm)/stats.l1_norm;
   stats.l1_norm = new_l1_norm;
   if(params.run_diagnostic) {
-    std::string const outfile_fits = params.name + "_solution_" + params.weighting + "_update.fits";
-    std::string const outfile_upsample_fits
-        = params.name + "_solution_" + params.weighting + "_update_upsample.fits";
+    std::string const outfile_fits = params.name + "_solution_" + params.weighting + "_update";
     std::string const residual_fits
-        = params.name + "_residual_" + params.weighting + "_update.fits";
-    std::string const residual_fits_scaled
-        = params.name + "_residual_" + params.weighting + "_update_scaled.fits";
+        = params.name + "_residual_" + params.weighting + "_update";
 
     auto const residual = measurements.grid(y_residual);
     AlgorithmUpdate::save_figure(x, outfile_fits, "JY/PIXEL", 1);
-    if(params.upsample_ratio != 1)
-      AlgorithmUpdate::save_figure(x, outfile_upsample_fits, "JY/PIXEL", params.upsample_ratio);
     AlgorithmUpdate::save_figure(Image<t_complex>::Map(residual.data(), residual.size(), 1),
-                                 residual_fits, "JY/BEAM", 1);
-    AlgorithmUpdate::save_figure(Image<t_complex>::Map(residual.data(), residual.size(), 1)
-                                     / params.psf_norm,
-                                 residual_fits_scaled, "JY/BEAM", 1);
+                                 residual_fits, "JY/PIXEL", 1);
     stats.rms
         = utilities::standard_deviation(Image<t_complex>::Map(residual.data(), residual.size(), 1));
     stats.dr = utilities::dynamic_range(image, residual);
@@ -102,16 +93,21 @@ void AlgorithmUpdate::save_figure(const Vector<t_complex> &image,
                                   t_real const &upsample_ratio) {
   // Saves update images to fits files, with correct headers
   auto header = AlgorithmUpdate::create_header(uv_data, params);
-  header.fits_name = output_file_name;
   header.pix_units = units;
-  std::printf("Saving %s \n", header.fits_name.c_str());
   header.cell_x /= upsample_ratio;
   header.cell_y /= upsample_ratio;
   Image<t_complex> temp_image = Image<t_complex>::Map(image.data(), params.height, params.width);
   if(upsample_ratio != 1) {
     temp_image = utilities::re_sample_image(temp_image, upsample_ratio);
   }
+  header.fits_name = output_file_name + ".fits";
+  std::printf("Saving %s \n", header.fits_name.c_str());
   pfitsio::write2d_header(temp_image.real(), header);
+  if (params.stokes_val == purify::casa::MeasurementSet::ChannelWrapper::polarization::P){
+    header.fits_name = output_file_name + "_imag.fits";
+    std::printf("Saving %s \n", header.fits_name.c_str());
+    pfitsio::write2d_header(temp_image.imag(), header);
+  }
 }
 
 pfitsio::header_params AlgorithmUpdate::create_header(purify::utilities::vis_params const &uv_data,

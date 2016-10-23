@@ -35,6 +35,7 @@ struct Params {
   std::string primary_beam = "none";
   bool fft_grid_correction = false;
   std::string fftw_plan = "measure";
+  std::string gradient = "none";
   // w_term stuff
   t_real energy_fraction = 1;
   bool use_w_term = false;
@@ -89,6 +90,7 @@ static struct option long_options[] = {
     {"relative_gamma_adapt", required_argument, 0, 'x'},
     {"adapt_iter", required_argument, 0, 'y'},
     {"fftw_plan", required_argument, 0, '1'},
+    {"grad", required_argument, 0, '2'},
     {0, 0, 0, 0}};
 
 std::string usage();
