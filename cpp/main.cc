@@ -207,11 +207,11 @@ construct_measurement_operator(utilities::vis_params const &uv_data, purify::Par
                           .fftw_plan_flag(params.fftw_plan);
   measurements.init_operator(uv_data);
   // including gradient in measurement operator
-  t_complex I(0., -1.);
+  t_complex I(0., 1.);
   if (params.gradient == "x")
-    measurements.W = 1./(I * uv_data.u).array();
+    measurements.W = 1./(-I * uv_data.u).array();
   if (params.gradient == "y")
-    measurements.W = 1./(I * uv_data.v).array();
+    measurements.W = 1./(-I * uv_data.v).array();
   return measurements;
 };
 }

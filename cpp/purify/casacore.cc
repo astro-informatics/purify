@@ -257,6 +257,14 @@ read_measurementset(std::string const &filename,
           = channel.wYY(MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
                                                                          // sigma_spectrum
       break;
+    case MeasurementSet::ChannelWrapper::polarization::P:
+      t_complex I(0., 1.);
+      uv_data.vis.segment(row, channel.size()) = channel.Q("DATA") + I * channel.U("DATA");
+      uv_data.weights.segment(row, channel.size()).real()
+          = (channel.wQ(MeasurementSet::ChannelWrapper::Sigma::OVERALL).array() * channel.wQ(MeasurementSet::ChannelWrapper::Sigma::OVERALL).array()
+              + channel.wU(MeasurementSet::ChannelWrapper::Sigma::OVERALL).array() * channel.wU(MeasurementSet::ChannelWrapper::Sigma::OVERALL).array()).sqrt(); // go for sigma rather than
+                                                                         // sigma_spectrum
+      break;
     }
     row += channel.size();
   }

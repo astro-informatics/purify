@@ -212,7 +212,7 @@ class MeasurementSet::ChannelWrapper {
 public:
   //! Possible locations for SIGMA
   enum class Sigma { OVERALL, SPECTRUM };
-  enum class polarization { I, Q, U, V, LL, RR, RL, LR, XX, YY, XY, YX };
+  enum class polarization { I, Q, U, V, LL, RR, RL, LR, XX, YY, XY, YX, P };
   ChannelWrapper(t_uint channel, MeasurementSet const &ms, std::string const &filter = "")
       : ms_(ms), filter_(filter), channel_(channel) {}
 
