@@ -116,7 +116,7 @@ t_real save_psf_and_dirty_image(
   t_real max_val = psf.array().abs().maxCoeff();
   PURIFY_LOW_LOG("PSF peak is {}", max_val);
   psf = psf;//not normalised, so it is easy to compare scales
-  header.fits_name = psf_fits;
+  header.fits_name = psf_fits + :".fits";
   PURIFY_HIGH_LOG("Saving {}", header.fits_name);
   pfitsio::write2d_header(psf, header);
   Vector<t_complex> const dirty_image
@@ -143,22 +143,26 @@ void save_final_image(std::string const &outfile_fits, std::string const &residu
       = Image<t_complex>::Map(x.data(), measurements.imsizey(), measurements.imsizex());
   // header information
   header.pix_units = "JY/PIXEL";
-  header.fits_name = outfile_fits + ".fits";
   header.niters = params.iter;
   header.epsilon = params.epsilon;
+  header.fits_name = outfile_fits + ".fits";
   pfitsio::write2d_header(image.real(), header);
+  if(params.stokes_val == purify::casa::MeasurementSet::ChannelWrapper::polarization::P){
+    header.fits_name = outfile_fits + "_imag.fits";
+    pfitsio::write2d_header(image.real(), header);
+  }
   Image<t_complex> residual = measurements
                                   .grid(((uv_data.vis - measurements.degrid(image)).array()
                                          * uv_data.weights.array().real())
                                             .matrix())
                                   .array();
+  header.pix_units = "JY/PIXEL";
   header.fits_name = residual_fits + ".fits";
-  header.pix_units = "JY/BEAM";
-  header.fits_name = residual_fits;
   pfitsio::write2d_header(residual.real(), header);
-
-  header.fits_name = residual_fits + "_scaled.fits";
-  pfitsio::write2d_header(residual.real() / params.psf_norm, header);
+  if(params.stokes_val == purify::casa::MeasurementSet::ChannelWrapper::polarization::P){
+    header.fits_name = residual_fits + "_imag.fits";
+    pfitsio::write2d_header(residual.real(), header);
+  }
 };
 
 std::tuple<Vector<t_complex>, Vector<t_complex>>
@@ -224,6 +228,7 @@ int main(int argc, char **argv) {
   sopt::logging::set_level(params.sopt_logging_level);
   purify::logging::set_level(params.sopt_logging_level);
   params.stokes_val = choose_pol(params.stokes);
+  PURIFY_HIGH_LOG("Stokes input {}", params.stokes);
   //checking if reading measurement set or .vis file
   std::size_t found = params.visfile.find_last_of(".");
   std::string format =  "." + params.visfile.substr(found+1);
