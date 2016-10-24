@@ -85,7 +85,7 @@ Params parse_cmdl(int argc, char **argv) {
       break;
     
     case 'e':
-      params.name = params.stokes;
+      params.stokes = optarg;
       break;
 
     case 'f':
