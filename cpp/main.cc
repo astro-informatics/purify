@@ -116,7 +116,7 @@ t_real save_psf_and_dirty_image(
   t_real max_val = psf.array().abs().maxCoeff();
   PURIFY_LOW_LOG("PSF peak is {}", max_val);
   psf = psf;//not normalised, so it is easy to compare scales
-  header.fits_name = psf_fits + :".fits";
+  header.fits_name = psf_fits + ".fits";
   PURIFY_HIGH_LOG("Saving {}", header.fits_name);
   pfitsio::write2d_header(psf, header);
   Vector<t_complex> const dirty_image
