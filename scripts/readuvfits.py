@@ -1,4 +1,4 @@
-import pyfits as fits
+import astropy.io.fits as fits
 import numpy as np
 
 speed_of_light = 299792458. #m/s
@@ -36,7 +36,9 @@ def readData(filename, vis_name, pol):
     print table[0,:], u[0], v[0], re[0], im[0], sigma[0]
     np.savetxt(vis_name, table, delimiter = " ")
 
-uv_fits = "/Users/luke/Radio_Data/C770/0114-476.1384.uvfits"
+names = ["0332-391", "0114-476", "1637-77", "sumss0515"]
+for i in range(len(names)):
+    uv_fits = "/Users/luke/Radio_Data/" + names[i] +".uvfits"
+    output_vis = names[i] + ".vis"
+    readData(uv_fits, output_vis, 0)
 
-output_vis = "0114-476.vis"
-readData(uv_fits, output_vis, 0)
