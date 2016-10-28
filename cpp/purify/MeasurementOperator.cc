@@ -42,7 +42,7 @@ Image<t_complex> MeasurementOperator::grid(const Vector<t_complex> &visibilities
   */
   // Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W).matrix()/norm;
   Matrix<t_complex> ft_vector
-      = utilities::sparse_multiply_matrix(G.adjoint(), (visibilities.array() * W).matrix()) / norm;
+      = utilities::sparse_multiply_matrix(G.adjoint(), (visibilities.array() * W.conjugate()).matrix()) / norm;
   ft_vector.resize(ftsizev_, ftsizeu_); // using conservativeResize does not work, it garbles the
                                         // image. Also, it is not what we want.
   ft_vector = utilities::re_sample_ft_grid(ft_vector, 1. / resample_factor);
@@ -421,9 +421,16 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
                                                        kernelv);
 
   PURIFY_DEBUG("Calculating weights: W");
+  
   W = utilities::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor_,
                               weighting_type_, R_, ftsizeu_, ftsizev_);
 
+  // including gradient in measurement operator
+  t_complex I(0., 1.);
+  if (gradient_ == "x")
+    W = 1./(-I * uv_vis.u).array();
+  if (gradient_ == "y")
+    W = 1./(-I * uv_vis.v).array();
   // It makes sense to included the primary beam at the same time the gridding correction is
   // performed.
   PURIFY_DEBUG("Calculating the primary beam: A");

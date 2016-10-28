@@ -5,7 +5,6 @@
 #include <sopt/imaging_padmm.h>
 #include <sopt/positive_quadrant.h>
 #include <sopt/relative_variation.h>
-#include <sopt/relative_variation.h>
 #include <sopt/reweighted.h>
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
@@ -208,14 +207,9 @@ construct_measurement_operator(utilities::vis_params const &uv_data, purify::Par
                           .energy_fraction(params.energy_fraction)
                           .primary_beam(params.primary_beam)
                           .fft_grid_correction(params.fft_grid_correction)
-                          .fftw_plan_flag(params.fftw_plan);
+                          .fftw_plan_flag(params.fftw_plan)
+                          .gradient(params.gradient);
   measurements.init_operator(uv_data);
-  // including gradient in measurement operator
-  t_complex I(0., 1.);
-  if (params.gradient == "x")
-    measurements.W = 1./(-I * uv_data.u).array();
-  if (params.gradient == "y")
-    measurements.W = 1./(-I * uv_data.v).array();
   return measurements;
 };
 }
@@ -306,7 +300,7 @@ int main(int argc, char **argv) {
   Vector<t_complex> final_model = Vector<t_complex>::Zero(params.width * params.height);
   std::string outfile_fits = "";
   std::string residual_fits = "";
-  if(params.stokes_val != purify::casa::MeasurementSet::ChannelWrapper::polarization::I)
+  if(params.stokes_val != purify::casa::MeasurementSet::ChannelWrapper::polarization::I or params.gradient == "x" or params.gradient == "y")
     padmm.l1_proximal_positivity_constraint(false);
   if(params.stokes_val == purify::casa::MeasurementSet::ChannelWrapper::polarization::P)
     padmm.l1_proximal_real_constraint(false);

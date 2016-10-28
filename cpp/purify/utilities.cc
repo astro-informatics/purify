@@ -496,7 +496,7 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
   Vector<t_complex> out_weights(weights.size());
   if(weighting_type == "none") {
     out_weights = weights.array() * 0 + 1;
-  } else if(weighting_type == "natural") {
+  } else if(weighting_type == "natural" or weighting_type == "whiten") {
     out_weights = weights;
   } else {
     t_real scale = 1. / oversample_factor; // scale for fov, controlling the region of sidelobe supression
