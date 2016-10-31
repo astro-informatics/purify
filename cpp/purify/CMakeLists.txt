@@ -29,6 +29,12 @@ if(TARGET casacore::ms)
   list(APPEND SOURCES casacore.cc)
   list(APPEND HEADERS casacore.h)
 endif()
+
+if(PURIFY_MPI)
+  list(APPEND SOURCES mpi_utilities.cc)
+  list(APPEND HEADERS mpi_utilities.h)
+endif()
+
 add_library(libpurify SHARED ${SOURCES})
 set(version "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}.${Purify_VERSION_PATCH}")
 set(soversion "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}")

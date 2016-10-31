@@ -8,3 +8,7 @@ add_catch_test(sparse LIBRARIES libpurify)
 if(data AND TARGET casacore::ms)
   add_catch_test(casacore LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 endif()
+
+if(PURIFY_MPI)
+  add_catch_test(mpi_utilities LIBRARIES libpurify)
+endif()
