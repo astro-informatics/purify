@@ -184,6 +184,12 @@ break;
       params.gradient = optarg;
       break;
 
+    case '3':
+      params.warmstart = true;
+      break;
+    case '4':
+      params.positive = false;
+      break;
     case '?':
       /* getopt_long already printed an error message. */
       break;

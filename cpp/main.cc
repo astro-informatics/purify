@@ -171,7 +171,7 @@ read_estimates(sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const &measu
       = measurements.adjoint() * (uv_data.weights.array() * uv_data.vis.array());
   Vector<t_complex> initial_residuals = Vector<t_complex>::Zero(uv_data.vis.size());
   // loading data from check point.
-  if(utilities::file_exists(params.name + "_diagnostic")) {
+  if(utilities::file_exists(params.name + "_diagnostic") and params.warmstart == true) {
     PURIFY_HIGH_LOG("Loading checkpoint for {}", params.name.c_str());
     std::string const outfile_fits = params.name + "_solution_" + params.weighting + "_update.fits";
     if(utilities::file_exists(outfile_fits)) {
@@ -284,7 +284,7 @@ int main(int argc, char **argv) {
                    .l1_proximal_tolerance(1e-3)
                    .l1_proximal_nu(1)
                    .l1_proximal_itermax(100)
-                   .l1_proximal_positivity_constraint(true)
+                   .l1_proximal_positivity_constraint(params.positive)
                    .l1_proximal_real_constraint(true)
                    .residual_convergence(params.residual_convergence)
                    .lagrange_update_scale(0.9)

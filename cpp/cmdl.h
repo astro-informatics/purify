@@ -44,6 +44,7 @@ struct Params {
   bool adapt_gamma = true;     // update gamma/stepsize
   bool run_diagnostic = false; // save and output diagnostic information
   bool algo_update = true;     // if to use lambda function to record/update algorithm variables
+  bool warmstart = false;     // if to use warmstart, not sure if this would work with reweighting as implimented
   bool no_reweighted = true;   // if to use reweighting
   t_real relative_gamma_adapt = 0.01;
   t_int adapt_iter = 100;
@@ -58,6 +59,7 @@ struct Params {
   t_real relative_variation = 5e-3; // relative difference in model for convergence
   t_real residual_convergence = 1; // max l2 norm reisudals can have for convergence, -1 means it will choose epsilon by default
   t_real epsilon = 0;
+  bool positive = true;
 };
 
 static struct option long_options[] = {
@@ -77,6 +79,8 @@ static struct option long_options[] = {
     {"l2_bound", required_argument, 0, 'i'},
     {"diagnostic", no_argument, 0, 'j'},
     {"power_iterations", required_argument, 0, 'k'},
+    {"use_w_term", no_argument, 0, 'l'},
+    {"energy_fraction", required_argument, 0, 'm'},
     {"primary_beam", required_argument, 0, 'n'},
     {"fft_grid_correction", no_argument, 0, 'o'},
     {"width", required_argument, 0, 'p'},
@@ -91,6 +95,8 @@ static struct option long_options[] = {
     {"adapt_iter", required_argument, 0, 'y'},
     {"fftw_plan", required_argument, 0, '1'},
     {"grad", required_argument, 0, '2'},
+    {"warmstart",no_argument, 0, '3'},
+    {"non_positive",no_argument, 0, '4'},
     {0, 0, 0, 0}};
 
 std::string usage();
