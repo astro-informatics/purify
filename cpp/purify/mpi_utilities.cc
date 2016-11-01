@@ -54,5 +54,55 @@ void regroup(vis_params &uv_params, std::vector<t_int> const &groups_) {
     ++swapper;
   }
 }
+
+vis_params regroup_and_distribute(vis_params const &params, std::vector<t_int> const &groups,
+    sopt::mpi::Communicator const &comm) {
+  if(comm.size() == 1)
+    return params;
+  if(comm.rank() != comm.root_id())
+    return distribute(comm);
+
+  std::vector<t_int> sizes(comm.size());
+  std::fill(sizes.begin(), sizes.end(), 0);
+  for(auto const &group : groups) {
+    if(group > comm.size())
+      throw std::out_of_range("groups should go from 0 to comm.size()");
+    ++sizes[group];
+  }
+
+  vis_params copy = params;
+  regroup(copy, groups);
+  return distribute(copy, sizes, comm);
+}
+
+vis_params distribute(vis_params const &params, std::vector<t_int> const &sizes,
+                      sopt::mpi::Communicator const &comm) {
+  if(comm.size() == 1)
+    return params;
+  if(comm.rank() != comm.root_id())
+    return distribute(comm);
+
+  comm.scatter_one(sizes);
+  vis_params result;
+  result.u = comm.scatterv(params.u, sizes);
+  result.v = comm.scatterv(params.v, sizes);
+  result.w = comm.scatterv(params.w, sizes);
+  result.vis = comm.scatterv(params.vis, sizes);
+  result.weights = comm.scatterv(params.weights, sizes);
+  return result;
+}
+
+vis_params distribute(sopt::mpi::Communicator const &comm) {
+  if(comm.rank() == comm.root_id())
+    throw std::runtime_error("The root node should call the *other* distribute function");
+  auto const local_size = comm.scatter_one<t_int>();
+  vis_params result;
+  result.u = comm.scatterv<typename decltype(result.u)::Scalar>(local_size);
+  result.v = comm.scatterv<typename decltype(result.v)::Scalar>(local_size);
+  result.w = comm.scatterv<typename decltype(result.w)::Scalar>(local_size);
+  result.vis = comm.scatterv<typename decltype(result.vis)::Scalar>(local_size);
+  result.weights = comm.scatterv<typename decltype(result.weights)::Scalar>(local_size);
+  return result;
+}
 }
 } // namespace purify
