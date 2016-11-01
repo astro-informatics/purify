@@ -1,9 +1,10 @@
-#include <iostream>
 #include "purify/config.h"
+#include <iostream>
 #include "purify/mpi_utilities.h"
 
 namespace purify {
-void regroup(utilities::vis_params &uv_params, std::vector<t_int> const &groups_) {
+namespace utilities {
+void regroup(vis_params &uv_params, std::vector<t_int> const &groups_) {
   std::vector<t_int> groups = groups_;
   // Figure out size of each group
   std::map<t_int, t_int> sizes;
@@ -51,7 +52,7 @@ void regroup(utilities::vis_params &uv_params, std::vector<t_int> const &groups_
     std::swap(uv_params.weights(i), uv_params.weights(swapper));
 
     ++swapper;
-    
   }
+}
 }
 } // namespace purify
