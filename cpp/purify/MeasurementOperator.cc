@@ -46,8 +46,7 @@ Image<t_complex> MeasurementOperator::grid(const Vector<t_complex> &visibilities
   ft_vector.resize(ftsizev_, ftsizeu_); // using conservativeResize does not work, it garbles the
                                         // image. Also, it is not what we want.
   ft_vector = utilities::re_sample_ft_grid(ft_vector, 1. / resample_factor);
-  Image<t_complex> padded_image = fftoperator_.inverse(
-      ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
+  Image<t_complex> padded_image = fftoperator_.inverse(ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
   t_int x_start = floor(floor(imsizex_ * oversample_factor_) * 0.5 - imsizex_ * 0.5);
   t_int y_start = floor(floor(imsizey_ * oversample_factor_) * 0.5 - imsizey_ * 0.5);
   return utilities::parallel_multiply_image(

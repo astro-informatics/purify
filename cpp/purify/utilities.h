@@ -122,11 +122,6 @@ template <class K, class L> Image<t_complex> parallel_multiply_image(const K &A,
 Matrix<t_complex> re_sample_ft_grid(const Matrix<t_complex> &input, const t_real &re_sample_factor);
 //! resamples image size
 Matrix<t_complex> re_sample_image(const Matrix<t_complex> &input, const t_real &re_sample_ratio);
-//! Distribute visiblities into groups
-std::vector<Vector<t_int>> distribute_measurements(
-    Vector<t_real> const & u, Vector<t_real> const & v,
-    Vector<t_real> const & w, t_int const number_of_nodes,
-    t_int const & grid_size, std::string const & distribution_plan ="equal_distribution");
 }
 }
 

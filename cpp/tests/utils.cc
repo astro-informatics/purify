@@ -596,18 +596,3 @@ TEST_CASE("utilities [resample]", "[resample]") {
   CHECK(image_resample(0) == image_resample_alt(0));
 }
 
-TEST_CASE("Distribute"){
-  //Test splitting up of data for separate nodes
-  auto const uv_data = utilities::read_visibility(vla_filename("at166B.3C129.c0.vis"));
-  std::printf("Creating groups\n");
-  std::vector<Vector<t_int>> groups =
-    utilities::distribute_measurements(
-        uv_data.u, uv_data.v, uv_data.w, 20, 128);
-  std::printf("Number of groups: %lu\n", groups.size());
-  //Testing number of visiblities in groups adds to total
-  t_int total_vis = 0;
-  for (t_int i = 0; i < groups.size(); i++) {
-    total_vis += groups[i].size();
-  }
-  CHECK(uv_data.u.size() == total_vis);
-}

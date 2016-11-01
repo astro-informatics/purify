@@ -629,37 +629,6 @@ Matrix<t_complex> re_sample_image(const Matrix<t_complex> &input, const t_real &
   return output;
 }
 
-std::vector<Vector<t_int>> distribute_measurements(
-  Vector<t_real> const & u, Vector<t_real> const & v,
-  Vector<t_real> const & w, t_int const number_of_nodes,
-  t_int const & grid_size, std::string const & distribution_plan){
-//distrubte visibilities from a measurement
-// return a vector of vectors of indicies for each node
-  std::vector<Vector<t_int>> patitions;
-  if (distribution_plan == "equal_distribution"){
-    t_real const max_u = std::sqrt((u.array() * u.array() + v.array() + v.array()).maxCoeff());
-    Vector<t_real> const scaled_u = (u.array() / max_u * 0.5 + 1.) * grid_size;
-    Vector<t_real> const scaled_v = (v.array() / max_u * 0.5 + 1.) * grid_size;
-    Image<t_int> histogram = Image<t_int>::Zero(grid_size, grid_size);
-    Vector<t_int> index = Vector<t_int>::LinSpaced(u.size(), 0, u.size());
-    //creating histogram grid
-    for (t_int i = 0; i < u.size(); i++) {
-      histogram(std::floor(scaled_u(i)), std::floor(scaled_v(i))) += 1;
-    }
-    std::printf("Sorting measurements\n");
-    //sorting indicies
-    std::sort(index.data(), index.data() + index.size(), [&histogram, &scaled_u, &scaled_v](int a, int b) {
-              return (histogram(std::floor(scaled_u(a)), std::floor(scaled_v(a))) < histogram(std::floor(scaled_u(b)), std::floor(scaled_v(b))));
-                  });
-    t_int const patition_size = std::ceil(static_cast<t_real>(u.size()) / static_cast<t_real>(number_of_nodes));
-    std::printf("Making partitions from %lu visibilities, with size %d\n", index.size(), patition_size);
-    //creating patitions
-    for (t_int i = 0; i < number_of_nodes; i++) {
-      patitions.push_back(index.segment(i * patition_size, std::fmin(patition_size, u.size() - i * patition_size)));
-    }
-  }
-  return patitions;
-}
 
 
 }
