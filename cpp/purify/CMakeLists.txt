@@ -18,7 +18,7 @@ endfunction()
 configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(HEADERS
-  RMOperator.h logging.h FFTOperator.h kernels.h distribute.h
+  RMOperator.h logging.h FFTOperator.h kernels.h
   pfitsio.h MeasurementOperator.h clean.h logging.disabled.h types.h PSFOperator.h
   logging.enabled.h utilities.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
@@ -30,7 +30,7 @@ if(TARGET casacore::ms)
   list(APPEND HEADERS casacore.h)
 endif()
 
-list(APPEND HEADERS mpi_utilities.h)
+list(APPEND HEADERS mpi_utilities.h distribute.h)
 if(PURIFY_MPI)
   list(APPEND SOURCES mpi_utilities.cc)
 endif()
