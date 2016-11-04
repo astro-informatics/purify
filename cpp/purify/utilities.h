@@ -21,9 +21,6 @@ struct vis_params {
   Vector<t_real> v; // v coordinates
   Vector<t_real> w;
   Vector<t_complex> vis; // complex visiblities
-  Vector<t_complex> vis1;
-  Vector<t_complex> vis2;
-  Vector<t_complex> vis3;
   Vector<t_complex> weights; // weights for visibilities
   std::string units = "lambda";
   t_real ra = 0.;  // decimal degrees

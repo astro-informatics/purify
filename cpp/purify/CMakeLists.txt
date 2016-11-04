@@ -17,7 +17,7 @@ endfunction()
 
 configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
-set(HEADERS 
+set(HEADERS
   RMOperator.h logging.h FFTOperator.h kernels.h distribute.h
   pfitsio.h MeasurementOperator.h clean.h logging.disabled.h types.h PSFOperator.h
   logging.enabled.h utilities.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
@@ -29,11 +29,22 @@ if(TARGET casacore::ms)
   list(APPEND SOURCES casacore.cc)
   list(APPEND HEADERS casacore.h)
 endif()
+
+list(APPEND HEADERS mpi_utilities.h)
+if(PURIFY_MPI)
+  list(APPEND SOURCES mpi_utilities.cc)
+endif()
+
 add_library(libpurify SHARED ${SOURCES})
 set(version "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}.${Purify_VERSION_PATCH}")
 set(soversion "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}")
 set_target_properties(libpurify PROPERTIES VERSION ${version} SOVERSION ${soversion})
 set_target_properties(libpurify PROPERTIES OUTPUT_NAME purify)
+if(PURIFY_MPI)
+	target_link_libraries(libpurify ${MPI_LIBRARIES})
+  target_include_directories(libpurify SYSTEM PUBLIC ${MPI_CXX_LIBRARIES})
+endif()
+
 
 target_include_directories(libpurify PUBLIC
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>

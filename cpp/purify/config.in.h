@@ -16,6 +16,9 @@
 //! Whether FFTW has openmp
 #cmakedefine PURIFY_OPENMP_FFTW
 
+//! Whether PURIFY is running with mpi
+#cmakedefine PURIFY_MPI
+
 #include <string>
 #include <tuple>
 

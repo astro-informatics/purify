@@ -37,6 +37,11 @@ else()
   set(FFTW3_DOUBLE_LIBRARY fftw3::double::serial)
 endif()
 
+set(PURIFY_MPI FALSE)
+if(dompi)
+  find_package(MPI REQUIRED)
+  set(PURIFY_MPI TRUE)
+endif()
 find_package(TIFF REQUIRED)
 
 
