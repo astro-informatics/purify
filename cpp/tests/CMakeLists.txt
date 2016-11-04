@@ -34,4 +34,5 @@ if(PURIFY_MPI)
 
   add_catch_test(mpi_utilities LIBRARIES libpurify)
 	add_mpi_test(parallel_mpi_utilities LIBRARIES libpurify)
+  add_mpi_test(serial_vs_parallel_padmm LIBRARIES libpurify)
 endif()
