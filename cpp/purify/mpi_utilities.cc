@@ -55,12 +55,12 @@ void regroup(vis_params &uv_params, std::vector<t_int> const &groups_) {
   }
 }
 
-vis_params regroup_and_distribute(vis_params const &params, std::vector<t_int> const &groups,
-    sopt::mpi::Communicator const &comm) {
+vis_params regroup_and_scatter(vis_params const &params, std::vector<t_int> const &groups,
+                               sopt::mpi::Communicator const &comm) {
   if(comm.size() == 1)
     return params;
   if(comm.rank() != comm.root_id())
-    return distribute(comm);
+    return scatter_visibilities(comm);
 
   std::vector<t_int> sizes(comm.size());
   std::fill(sizes.begin(), sizes.end(), 0);
@@ -72,15 +72,15 @@ vis_params regroup_and_distribute(vis_params const &params, std::vector<t_int> c
 
   vis_params copy = params;
   regroup(copy, groups);
-  return distribute(copy, sizes, comm);
+  return scatter_visibilities(copy, sizes, comm);
 }
 
-vis_params distribute(vis_params const &params, std::vector<t_int> const &sizes,
-                      sopt::mpi::Communicator const &comm) {
+vis_params scatter_visibilities(vis_params const &params, std::vector<t_int> const &sizes,
+                                sopt::mpi::Communicator const &comm) {
   if(comm.size() == 1)
     return params;
   if(comm.rank() != comm.root_id())
-    return distribute(comm);
+    return scatter_visibilities(comm);
 
   comm.scatter_one(sizes);
   vis_params result;
@@ -92,9 +92,9 @@ vis_params distribute(vis_params const &params, std::vector<t_int> const &sizes,
   return result;
 }
 
-vis_params distribute(sopt::mpi::Communicator const &comm) {
+vis_params scatter_visibilities(sopt::mpi::Communicator const &comm) {
   if(comm.rank() == comm.root_id())
-    throw std::runtime_error("The root node should call the *other* distribute function");
+    throw std::runtime_error("The root node should call the *other* scatter_visibilities function");
   auto const local_size = comm.scatter_one<t_int>();
   vis_params result;
   result.u = comm.scatterv<typename decltype(result.u)::Scalar>(local_size);
