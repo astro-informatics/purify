@@ -3,12 +3,14 @@
 #include <random>
 #include <cstddef>
 #include <sopt/imaging_padmm.h>
+#include <sopt/primal_dual.h>
 #include <sopt/positive_quadrant.h>
 #include <sopt/relative_variation.h>
 #include <sopt/reweighted.h>
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
+#include <sopt/power_method.h>
 #include "AlgorithmUpdate.h"
 #include "cmdl.h"
 #include "purify/MeasurementOperator.h"
@@ -230,6 +232,8 @@ int main(int argc, char **argv) {
   auto uv_data = (format == ".ms") ? purify::casa::read_measurementset(params.visfile, params.stokes_val) : utilities::read_visibility(params.visfile, params.use_w_term);
   bandwidth_scaling(uv_data, params);
 
+  string algorithm = "ImagingPADMM";
+  
   // calculate weights outside of measurement operator
   uv_data.weights = utilities::init_weights(
       uv_data.u, uv_data.v, uv_data.weights, params.over_sample, params.weighting, 0,
@@ -251,81 +255,166 @@ int main(int argc, char **argv) {
 
   auto const estimates = read_estimates(measurements_transform, uv_data, params);
   t_real const epsilon = params.n_mu * std::sqrt(2 * uv_data.vis.size()) * noise_rms / std::sqrt(2); // Calculation of l_2 bound following SARA paper
+  
   params.epsilon = epsilon;
   params.residual_convergence
       = (params.residual_convergence < 0) ? 0. : params.residual_convergence * epsilon;
-  t_real purify_gamma = 0;
-  std::tie(params.iter, purify_gamma) = utilities::checkpoint_log(params.name + "_diagnostic");
-  if(params.iter == 0)
-    purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint()
-                                     * (uv_data.weights.array() * uv_data.vis.array()).matrix()))
-                       .cwiseAbs()
-                       .maxCoeff()
-                   * params.beta;
 
   std::ofstream out_diagnostic;
   out_diagnostic.precision(13);
   out_diagnostic.open(params.name + "_diagnostic", std::ios_base::app);
 
-  PURIFY_HIGH_LOG("Starting sopt!");
-  PURIFY_MEDIUM_LOG("Epsilon = {}", epsilon);
-  PURIFY_MEDIUM_LOG("Convergence criteria: Relative variation is less than {}.",
-                    params.relative_variation);
-  if(params.residual_convergence > 0)
-    PURIFY_MEDIUM_LOG("Convergence criteria: Residual norm is less than {}.",
-                      params.residual_convergence);
-  PURIFY_MEDIUM_LOG("Gamma = {}", purify_gamma);
-  auto padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
-                   .gamma(purify_gamma)
-                   .relative_variation(params.relative_variation)
-                   .l2ball_proximal_epsilon(epsilon)
-                   .l2ball_proximal_weights(uv_data.weights.array().real())
-                   .tight_frame(false)
-                   .l1_proximal_tolerance(1e-3)
-                   .l1_proximal_nu(1)
-                   .l1_proximal_itermax(100)
-                   .l1_proximal_positivity_constraint(params.positive)
-                   .l1_proximal_real_constraint(true)
-                   .residual_convergence(params.residual_convergence)
-                   .lagrange_update_scale(0.9)
-                   .nu(1e0)
-                   .Psi(Psi)
-                   .Phi(measurements_transform);
-
-  auto convergence_function = [](const Vector<t_complex> &x) { return true; };
-  AlgorithmUpdate algo_update(params, uv_data, padmm, out_diagnostic, measurements, Psi);
-  auto lambda = [&convergence_function, &algo_update](Vector<t_complex> const &x) {
-    return convergence_function(x) and algo_update(x);
-  };
   Vector<t_complex> final_model = Vector<t_complex>::Zero(params.width * params.height);
   std::string outfile_fits = "";
   std::string residual_fits = "";
-  if(params.stokes_val != purify::casa::MeasurementSet::ChannelWrapper::polarization::I or params.gradient == "x" or params.gradient == "y")
-    padmm.l1_proximal_positivity_constraint(false);
-  if(params.stokes_val == purify::casa::MeasurementSet::ChannelWrapper::polarization::P)
-    padmm.l1_proximal_real_constraint(false);
-  if(params.algo_update)
-    padmm.is_converged(lambda);
-  if(params.niters != 0)
-    padmm.itermax(params.niters);
-  if(params.no_reweighted) {
-    auto const diagnostic = padmm(estimates);
-    outfile_fits = params.name + "_solution_" + params.weighting + "_final";
-    residual_fits = params.name + "_residual_" + params.weighting + "_final";
-    final_model = diagnostic.x;
-  } else {
-    auto const posq = sopt::algorithm::positive_quadrant(padmm);
-    auto const min_delta = noise_rms * std::sqrt(uv_data.vis.size())
-                           / std::sqrt(9 * measurements.imsizey() * measurements.imsizex());
-    // Sets weight after each padmm iteration.
-    // In practice, this means replacing the proximal of the l1 objective function.
-    auto const reweighted
+  
+  if(algorithm == "ImagingPADMM"){
+    t_real purify_gamma = 0;
+    std::tie(params.iter, purify_gamma) = utilities::checkpoint_log(params.name + "_diagnostic");
+    if(params.iter == 0)
+      purify_gamma = (Psi.adjoint() * (measurements_transform.adjoint()
+				       * (uv_data.weights.array() * uv_data.vis.array()).matrix()))
+	.cwiseAbs()
+	.maxCoeff()
+	* params.beta;
+    
+    
+    PURIFY_HIGH_LOG("Starting sopt!");
+    PURIFY_MEDIUM_LOG("Epsilon = {}", epsilon);
+    PURIFY_MEDIUM_LOG("Convergence criteria: Relative variation is less than {}.",
+		      params.relative_variation);
+    if(params.residual_convergence > 0)
+      PURIFY_MEDIUM_LOG("Convergence criteria: Residual norm is less than {}.",
+			params.residual_convergence);
+    PURIFY_MEDIUM_LOG("Gamma = {}", purify_gamma);
+    auto padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
+      .gamma(purify_gamma)
+      .relative_variation(params.relative_variation)
+      .l2ball_proximal_epsilon(epsilon)
+      .l2ball_proximal_weights(uv_data.weights.array().real())
+      .tight_frame(false)
+      .l1_proximal_tolerance(1e-3)
+      .l1_proximal_nu(1)
+      .l1_proximal_itermax(100)
+      .l1_proximal_positivity_constraint(params.positive)
+      .l1_proximal_real_constraint(true)
+      .residual_convergence(params.residual_convergence)
+      .lagrange_update_scale(0.9)
+      .nu(1e0)
+      .Psi(Psi)
+      .Phi(measurements_transform);
+    
+    auto convergence_function = [](const Vector<t_complex> &x) { return true; };
+    AlgorithmUpdate algo_update(params, uv_data, padmm, out_diagnostic, measurements, Psi);
+    auto lambda = [&convergence_function, &algo_update](Vector<t_complex> const &x) {
+      return convergence_function(x) and algo_update(x);
+    };
+    if(params.stokes_val != purify::casa::MeasurementSet::ChannelWrapper::polarization::I or params.gradient == "x" or params.gradient == "y")
+      padmm.l1_proximal_positivity_constraint(false);
+    if(params.stokes_val == purify::casa::MeasurementSet::ChannelWrapper::polarization::P)
+      padmm.l1_proximal_real_constraint(false);
+    if(params.algo_update)
+      padmm.is_converged(lambda);
+    if(params.niters != 0)
+      padmm.itermax(params.niters);
+    if(params.no_reweighted) {
+      auto const diagnostic = padmm(estimates);
+      outfile_fits = params.name + "_solution_" + params.weighting + "_final";
+      residual_fits = params.name + "_residual_" + params.weighting + "_final";
+      final_model = diagnostic.x;
+    } else {
+      auto const posq = sopt::algorithm::positive_quadrant(padmm);
+      auto const min_delta = noise_rms * std::sqrt(uv_data.vis.size())
+	/ std::sqrt(9 * measurements.imsizey() * measurements.imsizex());
+      // Sets weight after each padmm iteration.
+      // In practice, this means replacing the proximal of the l1 objective function.
+      auto const reweighted
         = sopt::algorithm::reweighted(padmm).itermax(10).min_delta(min_delta).is_converged(
-            sopt::RelativeVariation<std::complex<t_real>>(1e-3));
-    auto const diagnostic = reweighted();
-    outfile_fits = params.name + "_solution_" + params.weighting + "_final_reweighted";
-    residual_fits = params.name + "_residual_" + params.weighting + "_final_reweighted";
-    final_model = diagnostic.algo.x;
+											   sopt::RelativeVariation<std::complex<t_real>>(1e-3));
+      auto const diagnostic = reweighted();
+      outfile_fits = params.name + "_solution_" + params.weighting + "_final_reweighted";
+      residual_fits = params.name + "_residual_" + params.weighting + "_final_reweighted";
+      final_model = diagnostic.algo.x;
+    }
+  }else if(algorithm == "PrimalDual"){
+
+  auto const nlevels = sara.size();
+    
+  auto const tau = 0.49;
+  PURIFY_MEDIUM_LOG("tau is {} ", tau);
+
+  sopt::Vector<t_complex> rand = sopt::Vector<t_complex>::Random(measurements.imsizey() * measurements.imsizex() * nlevels);
+  PURIFY_HIGH_LOG("Setting up power method to calculate sigma values for primal dual");
+  auto const pm = sopt::algorithm::PowerMethod<sopt::t_complex>().tolerance(1e-6);
+  
+  PURIFY_HIGH_LOG("Calculating sigma1");
+  auto const nu1data = pm.AtA(Psi, rand);
+  auto const nu1 = nu1data.magnitude.real();
+  auto sigma1 = 1e0 / nu1;
+  PURIFY_MEDIUM_LOG("sigma1 is {} ", sigma1);
+  
+  rand = sopt::Vector<t_complex>::Random(measurements.imsizey() * measurements.imsizex() * (params.over_sample/2));
+  
+  PURIFY_HIGH_LOG("Calculating sigma2");  
+  auto const nu2data = pm.AtA(measurements_transform, rand);
+  auto const nu2 = nu2data.magnitude.real();
+  auto sigma2 = 1e0 / nu2;
+  PURIFY_MEDIUM_LOG("sigma2 is {} ", sigma2);
+  
+  PURIFY_HIGH_LOG("Calculating kappa");  
+  auto const kappa = ((measurements_transform.adjoint() * uv_data.vis).real().maxCoeff() * 1e-3) / nu2;  
+  PURIFY_MEDIUM_LOG("kappa is {} ", kappa);
+
+  auto convergence_function = [](const Vector<t_complex> &x) { return true; };
+
+  t_uint iters = 300;
+  if(params.niters != 0)
+    iters = params.niters;
+
+  
+  PURIFY_HIGH_LOG("Creating primal-dual Functor");
+  auto const pd = sopt::algorithm::PrimalDual<t_complex>(uv_data.vis)
+    .itermax(iters)
+    .tau(tau)
+    .kappa(kappa)
+    .sigma1(sigma1)
+    .sigma2(sigma2)
+    .levels(nlevels)
+    .l2ball_epsilon(epsilon)
+    .nu(nu2)
+    .relative_variation(1e-5)
+    .positivity_constraint(true)
+    .residual_convergence(epsilon * 1.001)
+    .Psi(Psi)
+    .Phi(measurements_transform)
+    .is_converged(convergence_function);
+  
+
+    Vector<t_complex> final_model = Vector<t_complex>::Zero(params.width * params.height);
+    std::string outfile_fits = "";
+    std::string residual_fits = "";
+    if(params.no_reweighted) {
+      auto const diagnostic = pd(estimates);
+      outfile_fits = params.name + "_solution_" + params.weighting + "_final";
+      residual_fits = params.name + "_residual_" + params.weighting + "_final";
+      final_model = diagnostic.x;
+    } else {
+      auto const posq = sopt::algorithm::positive_quadrant(pd);
+      auto const min_delta = noise_rms * std::sqrt(uv_data.vis.size())
+	/ std::sqrt(9 * measurements.imsizey() * measurements.imsizex());
+      // Sets weight after each pd iteration.
+      // In practice, this means replacing the proximal of the l1 objective function.
+      auto const reweighted
+        = sopt::algorithm::reweighted(pd).itermax(10).min_delta(min_delta).is_converged(
+											   sopt::RelativeVariation<std::complex<t_real>>(1e-3));
+      auto const diagnostic = reweighted();
+      outfile_fits = params.name + "_solution_" + params.weighting + "_final_reweighted";
+      residual_fits = params.name + "_residual_" + params.weighting + "_final_reweighted";
+      final_model = diagnostic.algo.x;
+  
+    }
+  }else{
+    PURIFY_ERROR("Incorrect algorithm chosen: {}",algorithm);
   }
   save_final_image(outfile_fits, residual_fits, final_model, uv_data, params, measurements);
   out_diagnostic.close();
