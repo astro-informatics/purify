@@ -312,18 +312,17 @@ utilities::vis_params whiten_vis(const utilities::vis_params &uv_vis) {
   return output_uv_vis;
 }
 t_real calculate_l2_radius(const Vector<t_complex> &y, const t_real &sigma, const t_real &n_sigma,
-                           const std::string distirbution) {
+                           const std::string distribution) {
   /*
                   Calculates the epsilon, the radius of the l2_ball in sopt
                   y:: vector for the l2 ball
   */
-  if(distirbution == "chi^2") {
+  if(distribution == "chi^2") {
     if(sigma == 0) {
       return std::sqrt(2 * y.size() + n_sigma * std::sqrt(4 * y.size()));
     }
     return std::sqrt(2 * y.size() + n_sigma * std::sqrt(4 * y.size())) * sigma;
-  }
-  if(distirbution == "chi") {
+  }else if(distribution == "chi") {
     auto alpha = 1. / (8 * y.size())
                  - 1. / (128 * y.size() * y.size()); // series expansion for gamma relation
     auto mean = std::sqrt(2) * std::sqrt(y.size())
@@ -334,7 +333,6 @@ t_real calculate_l2_radius(const Vector<t_complex> &y, const t_real &sigma, cons
     }
     return (mean + n_sigma * standard_deviation) * sigma;
   }
-
   return 1.;
 }
 t_real SNR_to_standard_deviation(const Vector<t_complex> &y0, const t_real &SNR) {

@@ -24,6 +24,7 @@ add_example(padmm_random_coverage LIBRARIES libpurify NOTEST)
 add_example(sara_padmm_random_coverage LIBRARIES libpurify NOTEST)
 
 add_example(primaldual_simulation LIBRARIES libpurify NOTEST)
+add_example(primaldual_reweighted_simulation LIBRARIES libpurify NOTEST)
 
 add_example(primaldual_random_coverage LIBRARIES libpurify NOTEST)
 

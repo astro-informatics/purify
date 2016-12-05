@@ -15,8 +15,6 @@
 #include "purify/utilities.h"
 #include "purify/logging.h"
 
-#include <iostream>
-
 using namespace purify;
 using namespace purify::notinstalled;
 
@@ -41,30 +39,38 @@ void pd(const std::string & name, const Image<t_complex> & M31, const std::strin
       = sopt::linear_transform<t_complex>(sara, measurements.imsizey(), measurements.imsizex());
 
   auto const nlevels = sara.size();
-  
-  //  auto const epsilon = std::real(utilities::calculate_l2_radius(uv_data.vis, sigma));
 
-  auto const epsilon = std::real(std::sqrt(2*uv_data.u.size() + 2 * std::sqrt(2*uv_data.vis.size())) * sigma);
-  std::cout << "current epsilon: " << epsilon << "\n";
+
+  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma, 2,"chi^2");
+  //  auto const epsilon = std::real(std::sqrt(2*uv_data.u.size() + 2 * std::sqrt(2*uv_data.vis.size())) * sigma);
+
+  PURIFY_MEDIUM_LOG("epsilon is {} ", epsilon);
   
   auto const tau = 0.49;
-
-  auto const kappa = 0.001 * uv_data.vis.real().maxCoeff();
+  PURIFY_MEDIUM_LOG("tau is {} ", tau);
 
   sopt::Vector<t_complex> rand = sopt::Vector<t_complex>::Random(measurements.imsizey() * measurements.imsizex() * nlevels);
-  
-  auto const pm = sopt::algorithm::PowerMethod<sopt::t_complex>().tolerance(1e-12);
+  PURIFY_HIGH_LOG("Setting up power method to calculate sigma values for primal dual");
+  auto const pm = sopt::algorithm::PowerMethod<sopt::t_complex>().tolerance(1e-6);
 
+  PURIFY_HIGH_LOG("Calculating sigma1");
   auto const nu1data = pm.AtA(Psi, rand);
   auto const nu1 = nu1data.magnitude.real();
   auto sigma1 = 1e0 / nu1;
+  PURIFY_MEDIUM_LOG("sigma1 is {} ", sigma1);
   
   rand = sopt::Vector<t_complex>::Random(measurements.imsizey() * measurements.imsizex() * (over_sample/2));
-  
+
+  PURIFY_HIGH_LOG("Calculating sigma2");  
   auto const nu2data = pm.AtA(measurements_transform, rand);
   auto const nu2 = nu2data.magnitude.real();
   auto sigma2 = 1e0 / nu2;
-    
+  PURIFY_MEDIUM_LOG("sigma2 is {} ", sigma2);
+  
+    PURIFY_HIGH_LOG("Calculating kappa");  
+  auto const kappa = ((measurements_transform.adjoint() * uv_data.vis).real().maxCoeff() * 1e-3) / nu2;  
+  PURIFY_MEDIUM_LOG("kappa is {} ", kappa);
+  
   Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   sopt::utilities::write_tiff(
@@ -74,12 +80,11 @@ void pd(const std::string & name, const Image<t_complex> & M31, const std::strin
       Image<t_real>::Map(dimage.data(), measurements.imsizey(), measurements.imsizex()),
       dirty_image_fits);
 
-  
-  std::printf("Using epsilon of %f \n", epsilon);
-  std::cout << "Starting sopt" << '\n';
+ 
+  PURIFY_HIGH_LOG("Creating primal-dual Functor");
   auto const pd
       = sopt::algorithm::PrimalDual<t_complex>(uv_data.vis)
-            .itermax(100)
+            .itermax(300)
             .tau(tau)
             .kappa(kappa)
             .sigma1(sigma1)
@@ -87,13 +92,19 @@ void pd(const std::string & name, const Image<t_complex> & M31, const std::strin
             .levels(nlevels)
             .l2ball_epsilon(epsilon)
             .nu(nu2)
-            .relative_variation(1e-3)
+            .relative_variation(1e-5)
             .positivity_constraint(true)
             .residual_convergence(epsilon * 1.001)
             .Psi(Psi)
             .Phi(measurements_transform);
 
+  PURIFY_HIGH_LOG("Starting sopt primal dual");
   auto const diagnostic = pd();
+  if(not diagnostic.good){
+    PURIFY_HIGH_LOG("primal dual did not converge in {} iterations", diagnostic.niters);
+  }else{
+    PURIFY_HIGH_LOG("primal dual returned in {} iterations", diagnostic.niters);
+  }
   assert(diagnostic.x.size() == M31.size());
   Image<t_complex> image
       = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey(), measurements.imsizex());
@@ -106,8 +117,8 @@ void pd(const std::string & name, const Image<t_complex> & M31, const std::strin
 int main(int, char **) {
   sopt::logging::initialize();
   purify::logging::initialize();
-  sopt::logging::set_level("debug");
-  purify::logging::set_level("debug");
+  sopt::logging::set_level("critical");
+  purify::logging::set_level("critical");
   const std::string & name = "30dor_256";
   const t_real snr = 30;
   std::string const fitsfile = image_filename(name + ".fits");
@@ -118,14 +129,13 @@ int main(int, char **) {
   M31 = M31 * 1. / max;
   pfitsio::write2d(M31.real(), inputfile);
   
-  t_int const number_of_pxiels = M31.size();
- t_int const number_of_vis = std::floor( number_of_pxiels * 2.);
+  t_int const number_of_pixels = M31.size();
+ t_int const number_of_vis = std::floor( number_of_pixels * 2.);
   // Generating random uv(w) coverage
   t_real const sigma_m = constant::pi / 3;
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";
-  std::cout << "Number of measurements / number of pixels: " << uv_data.u.size() * 1. / number_of_pxiels
-            << '\n';
+  PURIFY_MEDIUM_LOG("Number of measurements / number of pixels: {} ",  uv_data.u.size() * 1. / number_of_pixels);
   // uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
   MeasurementOperator sky_measurements(uv_data, 8, 8, "kb", M31.cols(), M31.rows(), 100, 2);
   uv_data.vis = sky_measurements.degrid(M31);
@@ -134,7 +144,6 @@ int main(int, char **) {
   t_real const sigma = utilities::SNR_to_standard_deviation(y0, snr);
   // adding noise to visibilities
   uv_data.vis = utilities::add_noise(y0, 0., sigma);
-  pd(name + "30", M31, "box", 1, uv_data, sigma);
   pd(name + "30", M31, "kb", 4, uv_data, sigma);
   return 0;
 }
