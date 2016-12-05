@@ -41,27 +41,25 @@ void pd(const std::string & name, const Image<t_complex> & M31, const std::strin
       = sopt::linear_transform<t_complex>(sara, measurements.imsizey(), measurements.imsizex());
 
   auto const nlevels = sara.size();
-  std::cout << "nlevels: " << nlevels << "\n";
   
-  //auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
-  auto const epsilon = std::sqrt(uv_data.u.size() + 2 * std::sqrt(uv_data.vis.size())) * sigma;
+  //  auto const epsilon = std::real(utilities::calculate_l2_radius(uv_data.vis, sigma));
 
+  auto const epsilon = std::real(std::sqrt(2*uv_data.u.size() + 2 * std::sqrt(2*uv_data.vis.size())) * sigma);
+  std::cout << "current epsilon: " << epsilon << "\n";
   
   auto const tau = 0.49;
-  auto const kappa = 0.1;
 
-  sopt::Vector<t_complex> rand = sopt::Vector<t_complex>::Random((uv_data.vis.size()*nlevels)/2);
+  auto const kappa = 0.001 * uv_data.vis.real().maxCoeff();
+
+  sopt::Vector<t_complex> rand = sopt::Vector<t_complex>::Random(measurements.imsizey() * measurements.imsizex() * nlevels);
   
   auto const pm = sopt::algorithm::PowerMethod<sopt::t_complex>().tolerance(1e-12);
 
-  std::cout << "Size " << rand.size();
   auto const nu1data = pm.AtA(Psi, rand);
   auto const nu1 = nu1data.magnitude.real();
   auto sigma1 = 1e0 / nu1;
   
-  rand = sopt::Vector<t_complex>::Random(uv_data.vis.size()/2);
-
-  std::cout << "rand size: " << rand.size() << "\n";
+  rand = sopt::Vector<t_complex>::Random(measurements.imsizey() * measurements.imsizex() * (over_sample/2));
   
   auto const nu2data = pm.AtA(measurements_transform, rand);
   auto const nu2 = nu2data.magnitude.real();
