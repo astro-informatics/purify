@@ -59,7 +59,7 @@ if(NOT Sopt_GIT_TAG)
   set(Sopt_GIT_TAG primaldual CACHE STRING "Branch/tag when downloading sopt")
 endif()
 if(NOT Sopt_GIT_REPOSITORY)
-  set(Sopt_GIT_REPOSITORY https://www.github.com/basp-group/sopt.git.ssdflkjsd
+  set(Sopt_GIT_REPOSITORY https://www.github.com/basp-group/sopt.git
     CACHE STRING "Location when downloading sopt")
 endif()
   
