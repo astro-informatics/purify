@@ -42,7 +42,6 @@ void pd(const std::string & name, const Image<t_complex> & M31, const std::strin
 
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma, 2,"chi^2");
-  //  auto const epsilon = std::real(std::sqrt(2*uv_data.u.size() + 2 * std::sqrt(2*uv_data.vis.size())) * sigma);
 
   PURIFY_MEDIUM_LOG("epsilon is {} ", epsilon);
   
