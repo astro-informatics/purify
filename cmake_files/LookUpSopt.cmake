@@ -12,12 +12,14 @@ if(NOT Sopt_GIT_REPOSITORY)
     set(Sopt_GIT_REPOSITORY https://github.com/basp-group/sopt.git)
 endif()
 if(NOT Sopt_GIT_TAG)
-    set(Sopt_GIT_TAG primaldual)
+    set(Sopt_GIT_TAG master)
 endif()
 if(NOT Sopt_BUILD_TYPE)
   set(Sopt_BUILD_TYPE Release)
 endif()
 
+# WARNING THIS IS FOR TESTING THE PRIMALDUAL BRANCH.
+# THIS SHOULD BE REMOVED BEFORE THE BRANCH IS MERGED
 set(Sopt_GIT_TAG primaldual CACHE  STRING "…" FORCE)
 
 # write subset of variables to cache for sopt to use
