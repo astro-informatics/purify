@@ -61,9 +61,9 @@ endif()
 if(NOT Sopt_GIT_REPOSITORY)
   set(Sopt_GIT_REPOSITORY https://www.github.com/basp-group/sopt.git
       CACHE STRING "Location when downloading sopt")
-  set(Sopt_GIT_TAG primaldual  CACHE STRING "Branch when downloading sopt")
-
-endif()
+  endif()
+set(Sopt_GIT_TAG primaldual  CACHE STRING "Branch when downloading sopt")
+  
 lookup_package(
     Sopt REQUIRED ARGUMENTS
     GIT_REPOSITORY ${Sopt_GIT_REPOSITORY}
