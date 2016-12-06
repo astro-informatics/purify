@@ -15,8 +15,10 @@ if(NOT Sopt_GIT_TAG)
     set(Sopt_GIT_TAG primaldual)
 endif()
 if(NOT Sopt_BUILD_TYPE)
-    set(Sopt_BUILD_TYPE Release)
+  set(Sopt_BUILD_TYPE Release)
 endif()
+
+set(Sopt_GIT_TAG primaldual CACHE  STRING "…" FORCE)
 
 # write subset of variables to cache for sopt to use
 include(PassonVariables)
