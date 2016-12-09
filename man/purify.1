@@ -1,0 +1,109 @@
+.TH PURIFY "1" "October 2016" "purify 2.0.0" "User Commands"
+.SH NAME
+purify \- Reconstruct images from radio interferometers using PADMM
+.SH SYNOPSIS
+.B
+purify
+\-\-measurement_set \fIpath\fR \-\-name \fIpath\fR [\fIoptions\fR]
+.SH DESCRIPTION
+PURIFY is a tool for radio interferometric imaging including file handling
+(for both visibilities and fits files), implementation of the measurement
+operator and set-up of the different optimization problems used for image
+deconvolution.
+.PP
+The code is given for educational purpose. The code is in beta and still under
+development.
+.SH OPTIONS
+.TP
+\fB\-\-measurement_set\fR
+Path of measurement set. (required)
+.TP
+\fB\-\-name\fR
+Path of file output. (required)
+.TP
+\fB\-\-noise\fR
+Path of measurement_set with Stokes V noise estimate.
+(Assumes Stokes V of measurement set). 
+.TP
+\fB\-\-niters\fR
+Number of iterations.
+.TP
+\fB\-\-stokes\fR
+Choice of stokes I, Q, U, or V (I is default).
+.TP
+\fB\-\-cellsize\fR
+Size of a pixel in arcseconds.
+.TP
+\fB\-\-size\fR
+Image size in pixels.
+.TP
+\fB\-\-width\fR
+Image width in pixels.
+.TP
+\fB\-\-height\fR
+Image height in pixels.
+.TP
+\fB\-\-beta\fR
+Values used to set the stepsize of PADMM
+.TP
+\fB\-\-noadapt\fR
+Choose not to update the stepsize.
+.TP
+\fB\-\-diagnostic\fR
+Save diagnostic information to log file.
+.TP
+\fB\-\-l2_bound\fR
+Factor to multiply the l2 bound by.
+.TP
+\fB\-\-relative_variation\fR
+Convergence criteria on relative variation (default is 1e\-3).
+.TP
+\fB\-\-residual_convergence\fR
+Factor to multiply the l2 bound by for convergence. (default is 1)
+.TP
+\fB\-\-relative_gamma_adapt\fR
+Relative difference criteria for adapting the stepsize gamma (default 0.01).
+.TP
+\fB\-\-power_iterations\fR
+Maximum iterations for the power method.
+.TP
+\fB\-\-primary_beam\fR
+Choice of primary beam model. (none is the only option).
+.TP
+\fB\-\-fft_grid_correction\fR
+Choose calculate the gridding correction using an FFT rather than analytic
+formula.
+.TP
+\fB\-\-kernel\fR
+Type of gridding kernel to use, kb, gauss, pswf, box. (kb is default)
+.TP
+\fB\-\-kernel_support\fR
+Support of kernel in grid cells. (4 is the default)
+.TP
+\fB\-\-logging_level\fR
+Determines the output logging level for sopt and purify. ("debug" is the
+default)
+.TP
+\fB\-\-help\fR
+Print usage information.
+.SH AUTHORS
+PURIFY was initially created by Rafael Carrillo, Jason McEwen and Yves Wiaux
+but major contributions have since been made by a number of others. The full
+list of contributors is as follows: Rafael E. Carrillo, Jason D. McEwen, Yves
+Wiaux, Luke Pratley, and Mayeul d'Avezac.
+.SH BUGS
+If you have any questions or comments, feel free to contact Rafael Carrillo or
+Jason McEwen, or add an issue in the issue tracker
+https://github.com/basp-group/purify/issues
+.SH LICENSE
+PURIFY Copyright (C) 2013 Rafael Carrillo, Jason McEwen, Yves Wiaux
+.PP
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.
+.PP
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+Public License for more details.
