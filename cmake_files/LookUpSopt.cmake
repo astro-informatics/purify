@@ -18,9 +18,9 @@ if(NOT Sopt_BUILD_TYPE)
   set(Sopt_BUILD_TYPE Release)
 endif()
 
-# WARNING THIS IS FOR TESTING THE PRIMALDUAL BRANCH.
+# WARNING THIS IS FOR TESTING THE DEVELOPMENT BRANCH.
 # THIS SHOULD BE REMOVED BEFORE THE BRANCH IS MERGED
-set(Sopt_GIT_TAG primaldual CACHE  STRING "…" FORCE)
+set(Sopt_GIT_TAG development CACHE  STRING "…" FORCE)
 
 # write subset of variables to cache for sopt to use
 include(PassonVariables)
