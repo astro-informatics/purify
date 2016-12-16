@@ -24,6 +24,7 @@ TEST_CASE("Parallel vs serial inpainting") {
   // split into serial and parallel
   auto const split_comm = world.split(world.is_root());
   if(world.size() < 2)
+    PURIFY_MEDIUM_LOG("Number of worlds: {}", world.size());
     return;
 
   using namespace purify;
@@ -36,6 +37,8 @@ TEST_CASE("Parallel vs serial inpainting") {
 
   std::string const fitsfile = image_filename("30dor_256.fits");
 
+  PURIFY_MEDIUM_LOG("Starting Purify");
+  
   auto sky_model = world.is_root() ? world.broadcast(pfitsio::read2d(fitsfile)) :
                                      world.broadcast<sopt::Image<t_complex>>();
   auto sky_model_max = sky_model.array().abs().maxCoeff();

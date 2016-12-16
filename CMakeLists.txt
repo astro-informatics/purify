@@ -13,7 +13,7 @@ option(examples       "Compile examples"                                on)
 option(data           "Download measurement set for testing"            on)
 option(openmp         "Enable OpenMP"                                   on)
 option(logging        "Enable logging"                                  on)
-option(dompi          "Enable MPI"                                     off)
+option(dompi          "Enable MPI"                                      on)
 
 # Set version and build id of this package
 include(version)
