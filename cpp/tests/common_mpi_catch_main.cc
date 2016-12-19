@@ -25,8 +25,7 @@ int main(int argc, const char **argv) {
 
   auto const result = session.run();
 
-  int finalized;
-  MPI_Finalized(&finalized);
+  MPI_Finalize();
 
   return result;
 }
