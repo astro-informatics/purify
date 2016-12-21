@@ -17,15 +17,17 @@
 #include "purify/types.h"
 #include "purify/utilities.h"
 
+
 TEST_CASE("Parallel vs serial inpainting") {
   extern std::unique_ptr<std::mt19937_64> mersenne;
   using namespace sopt;
   auto const world = mpi::Communicator::World();
   // split into serial and parallel
   auto const split_comm = world.split(world.is_root());
-  if(world.size() < 2)
-    PURIFY_MEDIUM_LOG("Number of worlds: {}", world.size());
+  if(world.size() < 2){
+    std::cout << "Number of worlds: " << world.size() << std::endl;
     return;
+  }
 
   using namespace purify;
   using namespace purify::notinstalled;
