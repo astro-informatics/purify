@@ -55,6 +55,7 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
 
   MeasurementOperator sky_measurements(uv_data, 4, 4, "kb", sky_model.cols(), sky_model.rows(), 100,
                                        over_sample);
+  sky_measurements.norm = world.broadcast(sky_measurements.norm);
   // working out value of sigma given SNR of 30
   auto const sigma = world.broadcast(utilities::SNR_to_standard_deviation(uv_data.vis, ISNR));
   // adding noise to visibilities
@@ -74,6 +75,7 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
 
   MeasurementOperator measurements(uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(), 100,
                                    over_sample);
+  measurements.norm = world.broadcast(measurements.norm);
   auto measurements_transform = linear_transform(measurements, uv_data.vis.size());
 
   sopt::wavelets::SARA const sara({std::make_tuple("DB4", 3u)});
