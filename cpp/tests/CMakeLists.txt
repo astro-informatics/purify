@@ -1,5 +1,23 @@
-include_directories("${PROJECT_SOURCE_DIR}/cpp" "${CMAKE_CURRENT_BINARY_DIR}/include/purify")
+if(logging)
+  add_library(common_catch_main_object OBJECT "common_catch_main.cc")
+  if(SPDLOG_INCLUDE_DIR)
+    target_include_directories(common_catch_main_object SYSTEM PUBLIC ${SPDLOG_INCLUDE_DIR})
+  endif()
+  if(CATCH_INCLUDE_DIR)
+    target_include_directories(common_catch_main_object SYSTEM PUBLIC ${CATCH_INCLUDE_DIR})
+  endif()
+  if(Sopt_INCLUDE_DIRS)
+    target_include_directories(common_catch_main_object SYSTEM PUBLIC ${Sopt_INCLUDE_DIRS})
+  endif()
+  target_include_directories(common_catch_main_object PUBLIC
+    "${PROJECT_BINARY_DIR}/include/"
+    "${CMAKE_CURRENT_SOURCE_DIR}/.."
+  )
+  add_dependencies(common_catch_main_object lookup_dependencies)
+endif()
+include_directories("${PROJECT_SOURCE_DIR}/cpp" "${CMAKE_CURRENT_BINARY_DIR}/include")
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/outputs")
+
 add_catch_test(measurement_operator LIBRARIES libpurify)
 add_catch_test(FFT_operator LIBRARIES libpurify)
 add_catch_test(purify_fitsio LIBRARIES libpurify)
