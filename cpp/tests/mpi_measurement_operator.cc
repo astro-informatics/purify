@@ -20,8 +20,8 @@ TEST_CASE("Serial vs Parallel") {
   uv_serial.u = world.broadcast(uv_serial.u);
   uv_serial.v = world.broadcast(uv_serial.v);
   uv_serial.w = world.broadcast(uv_serial.w);
-  uv_serial.vis = world.broadcast(uv_serial.vis);
-  uv_serial.weights = world.broadcast(uv_serial.weights);
+  uv_serial.vis = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
+  uv_serial.weights = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
 
   utilities::vis_params uv_vis = uv_serial;
   if(split_comm.is_root() and split_comm.size() > 1) {
