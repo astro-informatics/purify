@@ -67,10 +67,16 @@ if(NOT Sopt_GIT_REPOSITORY)
   set(Sopt_GIT_REPOSITORY https://www.github.com/basp-group/sopt.git
       CACHE STRING "Location when downloading sopt")
 endif()
-lookup_package(
-    Sopt REQUIRED ARGUMENTS
+if(dompi)
+  lookup_package(Sopt REQUIRED COMPONENTS mpi ARGUMENTS
+    GIT_REPOSITORY ${Sopt_GIT_REPOSITORY}
+    GIT_TAG ${Sopt_GIT_TAG}
+    MPI "TRUE")
+else()
+  lookup_package(Sopt REQUIRED ARGUMENTS
     GIT_REPOSITORY ${Sopt_GIT_REPOSITORY}
     GIT_TAG ${Sopt_GIT_TAG})
+endif()
 
 lookup_package(CFitsIO REQUIRED ARGUMENTS CHECKCASA)
 lookup_package(CCFits REQUIRED)
