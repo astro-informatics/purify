@@ -17,6 +17,7 @@ TEST_CASE("Serial vs Parallel") {
 
   auto const N = 5;
   auto uv_serial = utilities::uv_symmetry(utilities::random_sample_density(N, 0, constant::pi / 3));
+  uv_serial.units = "radians";
   uv_serial.u = world.broadcast(uv_serial.u);
   uv_serial.v = world.broadcast(uv_serial.v);
   uv_serial.w = world.broadcast(uv_serial.w);
@@ -44,7 +45,7 @@ TEST_CASE("Serial vs Parallel") {
   op.norm = world.broadcast(op.norm);
 
   SECTION("Degridding") {
-    auto const image = world.broadcast<Image<t_complex>>(Image<t_complex>::Random(10, 10));
+    auto const image = world.broadcast<Image<t_complex>>(Image<t_complex>::Random(width, height));
     auto const degridded = op.degrid(image);
     REQUIRE(degridded.size() == uv_vis.vis.size());
 
