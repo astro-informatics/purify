@@ -7,6 +7,9 @@
 #include "purify/kernels.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
+#ifdef PURIFY_MPI
+#include <sopt/mpi/communicator.h>
+#endif
 
 #include <iostream>
 #include <string>
@@ -124,5 +127,12 @@ public:
 //! \note The measurement operator must exist during the lifetime of the linear transforms.
 sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
 linear_transform(MeasurementOperator const &measurements, t_uint nvis);
+#ifdef PURIFY_MPI
+//! \brief Helper function to wrap a linear transform around a distributed measurement operator
+//! \note The measurement operator must exist during the lifetime of the linear transforms.
+sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
+linear_transform(MeasurementOperator const &measurements, t_uint nvis,
+                 sopt::mpi::Communicator const &comm);
+#endif
 }
 #endif
