@@ -1,5 +1,6 @@
 #include "purify/config.h"
 #include <iostream>
+#include <type_traits>
 #include "purify/mpi_utilities.h"
 
 namespace purify {
@@ -79,7 +80,7 @@ vis_params scatter_visibilities(vis_params const &params, std::vector<t_int> con
                                 sopt::mpi::Communicator const &comm) {
   if(comm.size() == 1)
     return params;
-  if(comm.rank() != comm.root_id())
+  if(not comm.is_root())
     return scatter_visibilities(comm);
 
   comm.scatter_one(sizes);
@@ -89,19 +90,29 @@ vis_params scatter_visibilities(vis_params const &params, std::vector<t_int> con
   result.w = comm.scatterv(params.w, sizes);
   result.vis = comm.scatterv(params.vis, sizes);
   result.weights = comm.scatterv(params.weights, sizes);
+  result.units = comm.broadcast(params.units);
+  result.ra = comm.broadcast(params.ra);
+  result.dec = comm.broadcast(params.dec);
+  result.average_frequency = comm.broadcast(params.average_frequency);
   return result;
 }
 
 vis_params scatter_visibilities(sopt::mpi::Communicator const &comm) {
-  if(comm.rank() == comm.root_id())
+  if(comm.is_root())
     throw std::runtime_error("The root node should call the *other* scatter_visibilities function");
+
   auto const local_size = comm.scatter_one<t_int>();
   vis_params result;
-  result.u = comm.scatterv<typename decltype(result.u)::Scalar>(local_size);
-  result.v = comm.scatterv<typename decltype(result.v)::Scalar>(local_size);
-  result.w = comm.scatterv<typename decltype(result.w)::Scalar>(local_size);
-  result.vis = comm.scatterv<typename decltype(result.vis)::Scalar>(local_size);
-  result.weights = comm.scatterv<typename decltype(result.weights)::Scalar>(local_size);
+  result.u = comm.scatterv<decltype(result.u)::Scalar>(local_size);
+  result.v = comm.scatterv<decltype(result.v)::Scalar>(local_size);
+  result.w = comm.scatterv<decltype(result.w)::Scalar>(local_size);
+  result.vis = comm.scatterv<decltype(result.vis)::Scalar>(local_size);
+  result.weights = comm.scatterv<decltype(result.weights)::Scalar>(local_size);
+  result.units = comm.broadcast(decltype(result.units)(""));
+  result.ra = comm.broadcast<std::remove_const<decltype(result.ra)>::type>();
+  result.dec = comm.broadcast<std::remove_const<decltype(result.dec)>::type>();
+  result.average_frequency
+      = comm.broadcast<std::remove_const<decltype(result.average_frequency)>::type>();
   return result;
 }
 }
