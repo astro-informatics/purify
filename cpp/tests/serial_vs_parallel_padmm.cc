@@ -118,8 +118,8 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   }
 
   sopt::wavelets::SARA const sara({std::make_tuple("DB4", 2u)});
-  auto const Psi
-      = sopt::linear_transform<t_complex>(sara, measurements.imsizey(), measurements.imsizex());
+  auto const Psi = sopt::linear_transform<t_complex>(sara, measurements.imsizey(),
+                                                     measurements.imsizex(), split_comm);
 
   Vector<> dimage = (Phi.adjoint() * uv_data.vis).real();
   t_real const max_val = dimage.array().abs().maxCoeff();
