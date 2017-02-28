@@ -100,17 +100,17 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
       Vector<t_complex> const degridded = Phi * image;
       REQUIRE(degridded.size() == uv_data.vis.size());
 
+      auto const just_roots = world.split(split_comm.is_root());
       if(world.is_root())
-        world.broadcast(degridded);
+        just_roots.broadcast(degridded);
       else if(split_comm.is_root() and split_comm.size() > 1) {
         utilities::vis_params serial = uv_serial;
-        serial.vis = world.broadcast<Vector<t_complex>>();
+        serial.vis = just_roots.broadcast<Vector<t_complex>>();
         auto const order
             = distribute::distribute_measurements(serial, split_comm, "distance_distribution");
         auto const from_serial = utilities::regroup_and_scatter(serial, order, split_comm);
         CHECK(from_serial.vis.isApprox(degridded));
       } else if(split_comm.size() > 1) {
-        world.broadcast<Vector<t_complex>>(); // no point to point wrappers
         auto const from_serial = utilities::scatter_visibilities(split_comm);
         CHECK(from_serial.vis.isApprox(degridded));
       }
