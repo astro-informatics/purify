@@ -96,7 +96,8 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
     }
 
     SECTION("Degridding") {
-      auto const image = world.broadcast<Image<t_complex>>(Image<t_complex>::Random(width, height));
+      auto const image
+          = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(width * height));
       Vector<t_complex> const degridded = Phi * image;
       REQUIRE(degridded.size() == uv_data.vis.size());
 
