@@ -87,7 +87,7 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   measurements.norm = world.broadcast(measurements.norm);
   auto const Phi = linear_transform(measurements, uv_data.vis.size(), split_comm);
 
-  SECTION("Linear operator parallelization") {
+  SECTION("Measurement operator parallelization") {
     SECTION("Gridding") {
       Vector<t_complex> const grid = Phi.adjoint() * uv_data.vis;
       auto const serial = world.broadcast(grid);
@@ -118,9 +118,35 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
     }
   }
 
-  sopt::wavelets::SARA const sara({std::make_tuple("DB4", 2u)});
-  auto const Psi = sopt::linear_transform<t_complex>(sara, measurements.imsizey(),
+  sopt::wavelets::SARA const sara(
+      {std::make_tuple("DB4", 2u), std::make_tuple("DB2", 2u), std::make_tuple("DB1", 2u)});
+  auto const start = [](t_uint size, t_uint ncomms, t_uint rank) {
+    return std::min(size, rank * (size / ncomms) + std::min(rank, size % ncomms));
+  };
+  auto const startw = start(sara.size(), split_comm.size(), split_comm.rank());
+  auto const endw = start(sara.size(), split_comm.size(), split_comm.rank() + 1);
+  auto const split_sara = sopt::wavelets::SARA(sara.begin() + startw, sara.begin() + endw);
+  auto const Psi = sopt::linear_transform<t_complex>(split_sara, measurements.imsizey(),
                                                      measurements.imsizex(), split_comm);
+  SECTION("Wavelet operator parallelization") {
+    auto const Nx = measurements.imsizex();
+    auto const Ny = measurements.imsizey();
+    SECTION("Signal to Coefficients") {
+      auto const signal = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(Nx * Ny));
+      Vector<t_complex> const coefficients = Psi.adjoint() * signal;
+      CHECK(world.broadcast(coefficients)
+                .segment(startw * Nx * Ny, (endw - startw) * Nx * Ny)
+                .isApprox(coefficients));
+    }
+
+    SECTION("Coefficients to Signal") {
+      auto const coefficients
+          = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(Nx * Ny * sara.size()));
+      Vector<t_complex> const signal
+          = Psi * coefficients.segment(startw * Nx * Ny, (endw - startw) * Nx * Ny);
+      CHECK(world.broadcast(signal).isApprox(signal));
+    }
+  }
 
   Vector<> dimage = (Phi.adjoint() * uv_data.vis).real();
   t_real const max_val = dimage.array().abs().maxCoeff();
@@ -130,7 +156,10 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   auto const sigma = world.broadcast(utilities::SNR_to_standard_deviation(uv_data.vis, ISNR));
   auto const epsilon = world.broadcast(utilities::calculate_l2_radius(uv_data.vis, sigma));
   auto const purify_gamma
-      = (Psi.adjoint() * (Phi.adjoint() * uv_data.vis)).real().maxCoeff() * 1e-3;
+      = world.is_root() ?
+            world.broadcast((Psi.adjoint() * (Phi.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff()
+                            * 1e-3) :
+            world.broadcast<t_real>();
   PURIFY_HIGH_LOG("Starting sopt!");
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
   PURIFY_MEDIUM_LOG("Gamma {}", purify_gamma);
