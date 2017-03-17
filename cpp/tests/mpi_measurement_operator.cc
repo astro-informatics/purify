@@ -1,5 +1,5 @@
 #include <iomanip>
-#include <sopt/mpi/Communicator.h>
+#include <sopt/mpi/communicator.h>
 #include "catch.hpp"
 #include "purify/MeasurementOperator.h"
 #include "purify/distribute.h"

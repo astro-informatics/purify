@@ -42,7 +42,7 @@ set_target_properties(libpurify PROPERTIES VERSION ${version} SOVERSION ${sovers
 set_target_properties(libpurify PROPERTIES OUTPUT_NAME purify)
 if(PURIFY_MPI)
 	target_link_libraries(libpurify ${MPI_LIBRARIES})
-  target_include_directories(libpurify SYSTEM PUBLIC ${MPI_CXX_LIBRARIES})
+  target_include_directories(libpurify SYSTEM PUBLIC ${MPI_CXX_INCLUDE_PATH})
 endif()
 
 
