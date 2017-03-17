@@ -119,5 +119,16 @@ vis_params scatter_visibilities(sopt::mpi::Communicator const &comm) {
       std::remove_const<decltype(result.average_frequency)>::type>();
   return result;
 }
+
+  utilities::vis_params distribute_paramsb(utilities::vis_params const &params,  // FIXME: added b as the overload was not confusing for compiler
+                                        sopt::mpi::Communicator const &comm) {
+  if (comm.is_root() and comm.size() > 1) {
+    auto const order = distribute::distribute_measurements(
+        params, comm, "distance_distribution");
+    return utilities::regroup_and_scatter(params, order, comm);
+  } else if (comm.size() > 1)
+    return utilities::scatter_visibilities(comm);
+  return params;
+}
 }
 } // namespace purify
