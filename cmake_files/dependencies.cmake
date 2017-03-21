@@ -13,7 +13,7 @@ endif()
 
 # Always find open-mp, since it may be used by sopt
 find_package(OpenMP)
-if(OPENMP_FOUND)
+if(OPENMP_FOUND AND NOT TARGET openmp::openmp)
   add_library(openmp::openmp INTERFACE IMPORTED GLOBAL)
   set_target_properties(openmp::openmp PROPERTIES
     INTERFACE_COMPILE_OPTIONS "${OpenMP_CXX_FLAGS}"
@@ -51,7 +51,7 @@ else()
   lookup_package(Boost REQUIRED)
 endif()
 
-lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS URL "https://bitbucket.org/LukePratley/eigen/get/3.2.tar.gz" MD5 "f38e33505afbf4659cda191bbc992ca9")
+lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS URL "https://bitbucket.org/LukePratley/eigen/get/3.2.tar.gz" MD5 "66eda8ad0cce49e539bd2755e417b653")
 
 if(logging)
   lookup_package(spdlog REQUIRED)
