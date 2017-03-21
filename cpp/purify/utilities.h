@@ -60,19 +60,19 @@ t_real mod(const t_real &x, const t_real &y);
 template <class K> typename K::Scalar mean(const K x) {
   // Calculate mean of vector x
   return x.array().mean();
-};
+}
 //! Calculate variance of vector
 template <class K> t_real variance(const K x) {
   // calculate variance of vector x
   auto q = (x.array() - x.array().mean()).matrix();
   t_real var = std::real((q.adjoint() * q)(0) / static_cast<t_real>(q.size() - 1));
   return var;
-};
+}
 //! Calculates the standard deviation of a vector
 template <class K> t_real standard_deviation(const K x) {
   // calculate standard deviation of vector x
   return std::sqrt(variance(x));
-};
+}
 //! Calculates the convolution between two images
 Image<t_complex> convolution_operator(const Image<t_complex> &a, const Image<t_complex> &b);
 //! A vector that whiten's the visibilities given the weights.
@@ -114,7 +114,7 @@ template <class K, class L> Image<t_complex> parallel_multiply_image(const K &A,
     for(t_int j = 0; j < rows; ++j)
       C(j, i) = A(j, i) * B(j, i);
   return C;
-};
+}
 //! zero pads ft grid for image up sampling and downsampling
 Matrix<t_complex> re_sample_ft_grid(const Matrix<t_complex> &input, const t_real &re_sample_factor);
 //! resamples image size
