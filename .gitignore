@@ -10,3 +10,5 @@ dist/
 casapy-*.log
 ipython-*.log
 .DS_Store
+*.h.gch
+.clang-tidy
