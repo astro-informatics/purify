@@ -28,7 +28,7 @@ vis_params scatter_visibilities(vis_params const &params,
 vis_params scatter_visibilities(sopt::mpi::Communicator const &comm);
 
 //! \brief distribute from root to all comm
-utilities::vis_params distribute_paramsb(utilities::vis_params const &params,
+utilities::vis_params distribute_params(utilities::vis_params const &params,
                                         sopt::mpi::Communicator const &comm);
 #else
 void regroup(utilities::vis_params &, std::vector<t_int> const &) {}

@@ -169,7 +169,7 @@ int main(int nargs, char const **args) {
     // adding noise to visibilities
     uv_data.vis = utilities::add_noise(y0, 0., sigma);
   };
-  padmm(name + "30", M31, "kb", 4, distribute_paramsb(uv_data, world), sigma,
+  padmm(name + "30", M31, "kb", 4, distribute_params(uv_data, world), sigma,
         world);
   return 0;
 }
