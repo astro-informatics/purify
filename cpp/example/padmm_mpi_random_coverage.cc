@@ -95,9 +95,11 @@ padmm_factory(MeasurementOperator const &measurements, sopt::wavelets::SARA cons
       .Phi(measurements_transform);
   sopt::ScalarRelativeVariation<t_complex> conv(padmm->relative_variation(),
                                                 padmm->relative_variation(), "Objective function");
-  padmm->objective_convergence([padmm, conv,
+  std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
+  padmm->objective_convergence([padmm_weak, conv,
                                 world](Vector<t_complex> const &,
                                        Vector<t_complex> const &residual) mutable -> bool {
+    auto const padmm = padmm_weak.lock();
     auto const result
         = conv(sopt::mpi::l1_norm(residual + padmm->target(), padmm->l1_proximal_weights(), world));
     return result;
@@ -136,35 +138,32 @@ int main(int nargs, char const **args) {
           std::make_tuple("DB3", 3u), std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
           std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)},
       world);
-  PURIFY_HIGH_LOG("HERE");
 
   // Create the padmm solver
   auto const padmm = padmm_factory(measurements, sara, ground_truth_image, std::get<0>(data),
                                    std::get<1>(data), world);
-
-  PURIFY_HIGH_LOG("THERE");
   // calls padmm
   auto const diagnostic = (*padmm)();
 
-  // makes sure we set things up correctly
-  assert(diagnostic.x.size() == ground_truth_image.size());
-  assert(world.broadcast(diagnostic.x).isApprox(diagnostic.x));
-
-  // then writes stuff to files
-  auto const residual_image
-      = world.all_sum_all<Vector<t_real>>(measurements.grid(diagnostic.residual).real());
-  auto const dirty_image
-      = world.all_sum_all<Vector<t_real>>(measurements.grid(std::get<0>(data).vis).real());
-  if(world.is_root()) {
-    boost::filesystem::path const path(name);
-    boost::filesystem::create_directories(path / kernel);
-    pfitsio::write2d(ground_truth_image.real(), output_filename((path / "input.fits").native()));
-    pfitsio::write2d(dirty_image, ground_truth_image.rows(), ground_truth_image.cols(),
-                     output_filename((path / "dirty.fits").native()));
-    pfitsio::write2d(diagnostic.x.real(), ground_truth_image.rows(), ground_truth_image.cols(),
-                     output_filename((path / kernel / "solution.fits").native()));
-    pfitsio::write2d(residual_image, ground_truth_image.rows(), ground_truth_image.cols(),
-                     output_filename((path / kernel / "residual.fits").native()));
-  }
+  // // makes sure we set things up correctly
+  // assert(diagnostic.x.size() == ground_truth_image.size());
+  // assert(world.broadcast(diagnostic.x).isApprox(diagnostic.x));
+  //
+  // // then writes stuff to files
+  // auto const residual_image
+  //     = world.all_sum_all<Vector<t_real>>(measurements.grid(diagnostic.residual).real());
+  // auto const dirty_image
+  //     = world.all_sum_all<Vector<t_real>>(measurements.grid(std::get<0>(data).vis).real());
+  // if(world.is_root()) {
+  //   boost::filesystem::path const path(name);
+  //   boost::filesystem::create_directories(path / kernel);
+  //   pfitsio::write2d(ground_truth_image.real(), output_filename((path / "input.fits").native()));
+  //   pfitsio::write2d(dirty_image, ground_truth_image.rows(), ground_truth_image.cols(),
+  //                    output_filename((path / "dirty.fits").native()));
+  //   pfitsio::write2d(diagnostic.x.real(), ground_truth_image.rows(), ground_truth_image.cols(),
+  //                    output_filename((path / kernel / "solution.fits").native()));
+  //   pfitsio::write2d(residual_image, ground_truth_image.rows(), ground_truth_image.cols(),
+  //                    output_filename((path / kernel / "residual.fits").native()));
+  // }
   return 0;
 }
