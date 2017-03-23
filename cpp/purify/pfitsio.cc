@@ -1,5 +1,6 @@
 #include "purify/config.h"
 #include "purify/pfitsio.h"
+#include "purify/logging.h"
 
 namespace purify {
 namespace pfitsio {
@@ -53,7 +54,7 @@ void write2d_header(const Image<t_real> &eigen_image, const pfitsio::header_para
   pFits->pHDU().addKey("BTYPE", "intensity", "");
   pFits->pHDU().addKey("EQUINOX", 2000, "");
   pFits->pHDU().addKey("PURIFY-NITERS", header.niters, "");
-  if (header.hasconverged){
+  if(header.hasconverged) {
     pFits->pHDU().addKey("PURIFY-CONVERGED", "T", "");
   } else {
     pFits->pHDU().addKey("PURIFY-CONVERGED", "F", "");
@@ -78,6 +79,7 @@ void write2d(const Image<t_real> &eigen_image, const std::string &fits_name,
     dec:: centre pixel coordinate in dec
 
   */
+  PURIFY_LOW_LOG("Writing fits file {}", fits_name);
   if(overwrite == true) {
     remove(fits_name.c_str());
   };
