@@ -47,6 +47,8 @@ find_package(TIFF REQUIRED)
 
 if(data AND tests)
   lookup_package(Boost REQUIRED COMPONENTS filesystem)
+elseif(examples AND dompi)
+  lookup_package(Boost REQUIRED COMPONENTS filesystem)
 else()
   lookup_package(Boost REQUIRED)
 endif()

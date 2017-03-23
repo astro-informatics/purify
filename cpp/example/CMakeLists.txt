@@ -21,7 +21,8 @@ add_example(padmm_reweighted_simulation LIBRARIES libpurify NOTEST)
 
 add_example(padmm_random_coverage LIBRARIES libpurify NOTEST)
 if(PURIFY_MPI)
-  add_example(padmm_mpi_random_coverage LIBRARIES libpurify NOTEST)
+  add_example(padmm_mpi_random_coverage NOTEST
+    LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 endif()
 add_example(sara_padmm_random_coverage LIBRARIES libpurify NOTEST)
 
