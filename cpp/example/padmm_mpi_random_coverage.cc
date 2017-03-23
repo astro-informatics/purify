@@ -77,7 +77,7 @@ padmm_factory(MeasurementOperator const &measurements, sopt::wavelets::SARA cons
   // shared pointer because the convergence function need access to some data that we would rather
   // not reproduce. E.g. padmm definition is self-referential.
   auto padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(uv_data.vis);
-  padmm->itermax(2)
+  padmm->itermax(50)
       .gamma(purify_gamma)
       .relative_variation(1e-3)
       .l2ball_proximal_epsilon(epsilon)
@@ -126,7 +126,7 @@ int main(int nargs, char const **args) {
 
   // determine amount of visibilities to simulate
   t_int const number_of_pixels = ground_truth_image.size();
-  t_int const number_of_vis = std::floor(number_of_pixels * 0.5);
+  t_int const number_of_vis = std::floor(number_of_pixels * 2);
 
   // Generating random uv(w) coverage
   auto const data = dirty_visibilities(ground_truth_image, number_of_vis, snr, world);
@@ -145,25 +145,25 @@ int main(int nargs, char const **args) {
   // calls padmm
   auto const diagnostic = (*padmm)();
 
-  // // makes sure we set things up correctly
-  // assert(diagnostic.x.size() == ground_truth_image.size());
-  // assert(world.broadcast(diagnostic.x).isApprox(diagnostic.x));
-  //
-  // // then writes stuff to files
-  // auto const residual_image
-  //     = world.all_sum_all<Vector<t_real>>(measurements.grid(diagnostic.residual).real());
-  // auto const dirty_image
-  //     = world.all_sum_all<Vector<t_real>>(measurements.grid(std::get<0>(data).vis).real());
-  // if(world.is_root()) {
-  //   boost::filesystem::path const path(name);
-  //   boost::filesystem::create_directories(path / kernel);
-  //   pfitsio::write2d(ground_truth_image.real(), output_filename((path / "input.fits").native()));
-  //   pfitsio::write2d(dirty_image, ground_truth_image.rows(), ground_truth_image.cols(),
-  //                    output_filename((path / "dirty.fits").native()));
-  //   pfitsio::write2d(diagnostic.x.real(), ground_truth_image.rows(), ground_truth_image.cols(),
-  //                    output_filename((path / kernel / "solution.fits").native()));
-  //   pfitsio::write2d(residual_image, ground_truth_image.rows(), ground_truth_image.cols(),
-  //                    output_filename((path / kernel / "residual.fits").native()));
-  // }
+  // makes sure we set things up correctly
+  assert(diagnostic.x.size() == ground_truth_image.size());
+  assert(world.broadcast(diagnostic.x).isApprox(diagnostic.x));
+
+  // then writes stuff to files
+  auto const residual_image
+      = world.all_sum_all<Vector<t_real>>(measurements.grid(diagnostic.residual).real());
+  auto const dirty_image
+      = world.all_sum_all<Vector<t_real>>(measurements.grid(std::get<0>(data).vis).real());
+  if(world.is_root()) {
+    boost::filesystem::path const path(output_filename(name));
+    boost::filesystem::create_directories(path / kernel);
+    pfitsio::write2d(ground_truth_image.real(), (path / "input.fits").native());
+    pfitsio::write2d(dirty_image, ground_truth_image.rows(), ground_truth_image.cols(),
+                     (path / "dirty.fits").native());
+    pfitsio::write2d(diagnostic.x.real(), ground_truth_image.rows(), ground_truth_image.cols(),
+                     (path / kernel / "solution.fits").native());
+    pfitsio::write2d(residual_image, ground_truth_image.rows(), ground_truth_image.cols(),
+                     (path / kernel / "residual.fits").native());
+  }
   return 0;
 }
