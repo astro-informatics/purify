@@ -27,7 +27,7 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, constant::pi / 3);
   uv_data.units = "radians";
   PURIFY_HIGH_LOG("Number of measurements / number of pixels: {}",
-                  uv_data.u.size() * ground_truth_image.size());
+                  uv_data.u.size() / ground_truth_image.size());
   // creating operator to generate measurements
   MeasurementOperator sky_measurements(uv_data, 8, 8, "kb", ground_truth_image.cols(),
                                        ground_truth_image.rows(), 100);
@@ -61,27 +61,30 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
 std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>>
 padmm_factory(MeasurementOperator const &measurements, sopt::wavelets::SARA const &sara,
               const Image<t_complex> &ground_truth_image, const utilities::vis_params &uv_data,
-              const t_real sigma, const sopt::mpi::Communicator &world) {
+              const t_real sigma, const sopt::mpi::Communicator &comm) {
 
-  auto measurements_transform = linear_transform(measurements, uv_data.vis.size(), world);
+  auto measurements_transform = linear_transform(measurements, uv_data.vis.size(), comm);
   auto const Psi = sopt::linear_transform<t_complex>(sara, measurements.imsizey(),
-                                                     measurements.imsizex(), world);
+                                                     measurements.imsizex(), comm);
 
-  auto const epsilon = world.broadcast(utilities::calculate_l2_radius(uv_data.vis, sigma));
-  auto const purify_gamma
+  auto const epsilon = comm.broadcast(utilities::calculate_l2_radius(uv_data.vis, sigma));
+  auto const gamma
       = (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff()
         * 1e-3;
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
-  PURIFY_MEDIUM_LOG("Gamma {}", purify_gamma);
+  PURIFY_MEDIUM_LOG("Gamma {}", gamma);
 
   // shared pointer because the convergence function need access to some data that we would rather
   // not reproduce. E.g. padmm definition is self-referential.
   auto padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(uv_data.vis);
   padmm->itermax(50)
-      .gamma(purify_gamma)
+      .gamma(comm.all_reduce(gamma, MPI_MAX))
       .relative_variation(1e-3)
       .l2ball_proximal_epsilon(epsilon)
-      .l2ball_proximal(sopt::proximal::WeightedL2Ball<t_complex>(epsilon).communicator(world))
+      // communicator ensuring l2 norm in l2ball proximal is global
+      .l2ball_proximal_communicator(comm)
+      // communicator ensuring l1 norm in l1 proximal is global
+      .l1_proximal_adjoint_space_comm(comm)
       .tight_frame(false)
       .l1_proximal_tolerance(1e-2)
       .l1_proximal_nu(1)
@@ -97,11 +100,11 @@ padmm_factory(MeasurementOperator const &measurements, sopt::wavelets::SARA cons
                                                 padmm->relative_variation(), "Objective function");
   std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
   padmm->objective_convergence([padmm_weak, conv,
-                                world](Vector<t_complex> const &,
-                                       Vector<t_complex> const &residual) mutable -> bool {
+                                comm](Vector<t_complex> const &,
+                                      Vector<t_complex> const &residual) mutable -> bool {
     auto const padmm = padmm_weak.lock();
     auto const result
-        = conv(sopt::mpi::l1_norm(residual + padmm->target(), padmm->l1_proximal_weights(), world));
+        = conv(sopt::mpi::l1_norm(residual + padmm->target(), padmm->l1_proximal_weights(), comm));
     return result;
   });
 
