@@ -56,10 +56,8 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   auto const world = sopt::mpi::Communicator::World();
   // split into serial and parallel
   auto const split_comm = world.split(world.is_root());
-  if(world.size() < 2) {
-    std::cout << "Number of worlds: " << world.size() << std::endl;
+  if(world.size() < 2)
     return;
-  }
 
   auto const nvis = 10;
   auto const width = 12;
@@ -156,8 +154,10 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   auto padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
                    .gamma(purify_gamma)
                    .relative_variation(1e-3)
-                   .l2ball_proximal(
-                       sopt::proximal::WeightedL2Ball<t_complex>(epsilon).communicator(split_comm))
+                   // communicator ensuring l2 norm in l2ball proximal is global
+                   .l2ball_proximal_communicator(split_comm)
+                   // communicator ensuring l1 norm in l1 proximal is global
+                   .l1_proximal_adjoint_space_comm(world)
                    .tight_frame(false)
                    .l1_proximal_tolerance(1e-2)
                    .l1_proximal_nu(1)
