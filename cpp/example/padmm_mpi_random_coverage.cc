@@ -67,7 +67,11 @@ padmm_factory(MeasurementOperator const &measurements, sopt::wavelets::SARA cons
   auto const Psi = sopt::linear_transform<t_complex>(sara, measurements.imsizey(),
                                                      measurements.imsizex(), comm);
 
+#if PURIFY_PADMM_ALGORITHM == 2
   auto const epsilon = comm.broadcast(utilities::calculate_l2_radius(uv_data.vis, sigma));
+#elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
+  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
+#endif
   auto const gamma
       = (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff()
         * 1e-3;
@@ -81,8 +85,10 @@ padmm_factory(MeasurementOperator const &measurements, sopt::wavelets::SARA cons
       .gamma(comm.all_reduce(gamma, MPI_MAX))
       .relative_variation(1e-3)
       .l2ball_proximal_epsilon(epsilon)
+#if PURIFY_PADMM_ALGORITHM == 2
       // communicator ensuring l2 norm in l2ball proximal is global
       .l2ball_proximal_communicator(comm)
+#endif
       // communicator ensuring l1 norm in l1 proximal is global
       .l1_proximal_adjoint_space_comm(comm)
       .tight_frame(false)
@@ -91,7 +97,7 @@ padmm_factory(MeasurementOperator const &measurements, sopt::wavelets::SARA cons
       .l1_proximal_itermax(50)
       .l1_proximal_positivity_constraint(true)
       .l1_proximal_real_constraint(true)
-      .residual_convergence(epsilon)
+      .residual_tolerance(epsilon)
       .lagrange_update_scale(0.9)
       .nu(1e0)
       .Psi(Psi)
@@ -99,13 +105,31 @@ padmm_factory(MeasurementOperator const &measurements, sopt::wavelets::SARA cons
   sopt::ScalarRelativeVariation<t_complex> conv(padmm->relative_variation(),
                                                 padmm->relative_variation(), "Objective function");
   std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
-  padmm->objective_convergence([padmm_weak, conv,
-                                comm](Vector<t_complex> const &,
-                                      Vector<t_complex> const &residual) mutable -> bool {
+  padmm->residual_convergence([padmm_weak, conv,
+                               comm](Vector<t_complex> const &x,
+                                     Vector<t_complex> const &residual) mutable -> bool {
     auto const padmm = padmm_weak.lock();
+#if PURIFY_PADMM_ALGORITHM == 2
+    auto const residual_norm = sopt::mpi::l2_norm(residual, padmm->l2ball_proximal_weights(), comm);
+    auto const result = residual_norm < padmm->residual_tolerance();
+#elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
+    auto const residual_norm = sopt::l2_norm(residual, padmm->l2ball_proximal_weights());
     auto const result
-        = conv(sopt::mpi::l1_norm(residual + padmm->target(), padmm->l1_proximal_weights(), comm));
+        = comm.all_reduce<int8_t>(residual_norm < padmm->residual_tolerance(), MPI_LAND);
+#endif
+    SOPT_LOW_LOG("    - [PADMM] Residuals: {} <? {}", residual_norm, padmm->residual_tolerance());
     return result;
+  });
+
+  padmm->objective_convergence([padmm_weak, conv, comm](Vector<t_complex> const &x,
+                                                        Vector<t_complex> const &) mutable -> bool {
+    auto const padmm = padmm_weak.lock();
+#if PURIFY_PADMM_ALGORITHM == 2
+    return conv(sopt::mpi::l1_norm(padmm->Psi().adjoint() * x, padmm->l1_proximal_weights(), comm));
+#elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
+    return comm.all_reduce<uint8_t>(
+        conv(sopt::l1_norm(padmm->Psi().adjoint() * x, padmm->l1_proximal_weights())), MPI_LAND);
+#endif
   });
 
   return padmm;
@@ -159,14 +183,21 @@ int main(int nargs, char const **args) {
       = world.all_sum_all<Vector<t_real>>(measurements.grid(std::get<0>(data).vis).real());
   if(world.is_root()) {
     boost::filesystem::path const path(output_filename(name));
-    boost::filesystem::create_directories(path / kernel);
+#if PURIFY_PADMM_ALGORITHM == 2
+    auto const pb_path = path / kernel / "local_epsilon_replicated_grids";
+#elif PURIFY_PADMM_ALGORITHM == 3
+    auto const pb_path = path / kernel / "global_epsilon_replicated_grids";
+#else
+#error Unknown or unimplemented algorithm
+#endif
+    boost::filesystem::create_directories(pb_path);
     pfitsio::write2d(ground_truth_image.real(), (path / "input.fits").native());
     pfitsio::write2d(dirty_image, ground_truth_image.rows(), ground_truth_image.cols(),
-                     (path / "dirty.fits").native());
+                     (pb_path / "dirty.fits").native());
     pfitsio::write2d(diagnostic.x.real(), ground_truth_image.rows(), ground_truth_image.cols(),
-                     (path / kernel / "solution.fits").native());
+                     (pb_path / "solution.fits").native());
     pfitsio::write2d(residual_image, ground_truth_image.rows(), ground_truth_image.cols(),
-                     (path / kernel / "residual.fits").native());
+                     (pb_path / "residual.fits").native());
   }
   return 0;
 }

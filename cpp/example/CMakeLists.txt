@@ -21,8 +21,14 @@ add_example(padmm_reweighted_simulation LIBRARIES libpurify NOTEST)
 
 add_example(padmm_random_coverage LIBRARIES libpurify NOTEST)
 if(PURIFY_MPI)
-  add_example(padmm_mpi_random_coverage NOTEST
+  add_example(global_epsilon_replicated_grids padmm_mpi_random_coverage.cc NOTEST
     LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+  target_compile_definitions(example_global_epsilon_replicated_grids
+    PRIVATE PURIFY_PADMM_ALGORITHM=2)
+  add_example(local_epsilon_replicated_grids padmm_mpi_random_coverage.cc NOTEST
+    LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+  target_compile_definitions(example_local_epsilon_replicated_grids
+    PRIVATE PURIFY_PADMM_ALGORITHM=3)
 endif()
 add_example(sara_padmm_random_coverage LIBRARIES libpurify NOTEST)
 
