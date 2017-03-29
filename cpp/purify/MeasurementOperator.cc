@@ -10,9 +10,13 @@ Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex> &eigen_imag
      eigen_image:: input image to be degridded
      st:: gridding parameters
      */
+
+  #ifdef PURIFY_MPI
+  //throw std::runtime_error("Degridding with MPI needs communicator.");
+  #endif
+  Matrix<t_complex> ft_vector(ftsizev_, ftsizeu_);
   Matrix<t_complex> padded_image = Matrix<t_complex>::Zero(floor(imsizey_ * oversample_factor_),
                                                            floor(imsizex_ * oversample_factor_));
-  Matrix<t_complex> ft_vector(ftsizev_, ftsizeu_);
   t_int x_start = floor(floor(imsizex_ * oversample_factor_) * 0.5 - imsizex_ * 0.5);
   t_int y_start = floor(floor(imsizey_ * oversample_factor_) * 0.5 - imsizey_ * 0.5);
 
@@ -41,6 +45,9 @@ Image<t_complex> MeasurementOperator::grid(const Vector<t_complex> &visibilities
      st:: gridding parameters
      */
   // Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W).matrix()/norm;
+  #ifdef PURIFY_MPI
+  //throw std::runtime_error("Gridding with MPI needs communicator.");
+  #endif
   Matrix<t_complex> ft_vector = utilities::sparse_multiply_matrix(
                                     G.adjoint(), (visibilities.array() * W.conjugate()).matrix())
                                 / norm;
@@ -189,7 +196,7 @@ t_real MeasurementOperator::power_method(const t_int &niters, const t_real &rela
      niters:: max number of iterations
      relative_difference:: percentage difference at which eigen value has converged
      */
-  t_real estimate_eigen_value = norm;
+  t_real estimate_eigen_value = 1;
   t_real old_value = 0;
   Image<t_complex> estimate_eigen_vector = Image<t_complex>::Random(imsizey_, imsizex_);
   estimate_eigen_vector = estimate_eigen_vector / estimate_eigen_vector.matrix().norm();
@@ -443,7 +450,7 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
   norm = MeasurementOperator::grid(Vector<t_complex>::Constant(uv_vis.u.size(), 1.))
              .real()
              .maxCoeff();
-  norm *= std::sqrt(MeasurementOperator::power_method(norm_iterations_));
+  norm = std::sqrt(MeasurementOperator::power_method(norm_iterations_));
   PURIFY_DEBUG("Found a norm of eta = {}", norm);
   PURIFY_HIGH_LOG("Gridding Operator Constructed: WGFSA");
 }
@@ -467,24 +474,5 @@ linear_transform(MeasurementOperator const &measurements, t_uint nvis) {
                                                    {{0, 1, static_cast<t_int>(width * height)}});
 }
 
-sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
-linear_transform(MeasurementOperator const &measurements, t_uint nvis,
-                 sopt::mpi::Communicator const &comm) {
-  auto const height = measurements.imsizey();
-  auto const width = measurements.imsizex();
-  auto direct = [&measurements, width, height](Vector<t_complex> &out, Vector<t_complex> const &x) {
-    assert(x.size() == width * height);
-    auto const image = Image<t_complex>::Map(x.data(), height, width);
-    out = measurements.degrid(image);
-  };
-  auto adjoint
-      = [&measurements, width, height, comm](Vector<t_complex> &out, Vector<t_complex> const &x) {
-          auto image = Image<t_complex>::Map(out.data(), height, width);
-          image = measurements.grid(x);
-          comm.all_sum_all(out);
-        };
-  return sopt::linear_transform<Vector<t_complex>>(direct, {{0, 1, static_cast<t_int>(nvis)}},
-                                                   adjoint,
-                                                   {{0, 1, static_cast<t_int>(width * height)}});
-}
+
 }

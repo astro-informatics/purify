@@ -24,6 +24,7 @@ typedef Eigen::Triplet<t_complex> t_tripletList;
 //! \brief A matrix of a given type
 //! \details Operates as mathematical sparse matrix.
 template <class T = t_real> using Sparse = Eigen::SparseMatrix<T, Eigen::RowMajor>;
+template <class T = t_real> using SparseVector = Eigen::SparseVector<T>;
 
 namespace constant {
 //! mathematical constant
