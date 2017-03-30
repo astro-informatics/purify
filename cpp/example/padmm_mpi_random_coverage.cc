@@ -178,9 +178,9 @@ int main(int nargs, char const **args) {
 
   // then writes stuff to files
   auto const residual_image
-      = world.all_sum_all<Vector<t_real>>(measurements.grid(diagnostic.residual).real());
+      = world.all_sum_all<Image<t_real>>(measurements.grid(diagnostic.residual).real());
   auto const dirty_image
-      = world.all_sum_all<Vector<t_real>>(measurements.grid(std::get<0>(data).vis).real());
+      = world.all_sum_all<Image<t_real>>(measurements.grid(std::get<0>(data).vis).real());
   if(world.is_root()) {
     boost::filesystem::path const path(output_filename(name));
 #if PURIFY_PADMM_ALGORITHM == 2
@@ -191,6 +191,7 @@ int main(int nargs, char const **args) {
 #error Unknown or unimplemented algorithm
 #endif
     boost::filesystem::create_directories(pb_path);
+
     pfitsio::write2d(ground_truth_image.real(), (path / "input.fits").native());
     pfitsio::write2d(dirty_image, ground_truth_image.rows(), ground_truth_image.cols(),
                      (pb_path / "dirty.fits").native());
