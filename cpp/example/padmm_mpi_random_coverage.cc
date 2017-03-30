@@ -183,9 +183,9 @@ int main(int nargs, char const **args) {
       = world.all_sum_all<Image<t_real>>(measurements.grid(std::get<0>(data).vis).real());
   if(world.is_root()) {
     boost::filesystem::path const path(output_filename(name));
-#if PURIFY_PADMM_ALGORITHM == 2
+#if PURIFY_PADMM_ALGORITHM == 3
     auto const pb_path = path / kernel / "local_epsilon_replicated_grids";
-#elif PURIFY_PADMM_ALGORITHM == 3
+#elif PURIFY_PADMM_ALGORITHM == 2
     auto const pb_path = path / kernel / "global_epsilon_replicated_grids";
 #else
 #error Unknown or unimplemented algorithm
