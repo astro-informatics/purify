@@ -447,9 +447,6 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
   auto A = MeasurementOperator::init_primary_beam(primary_beam_, cell_x_, cell_y_);
   S = S * A;
   PURIFY_DEBUG("Doing power method: eta_{i+1}x_{i + 1} = Psi^T Psi x_i");
-  norm = MeasurementOperator::grid(Vector<t_complex>::Constant(uv_vis.u.size(), 1.))
-             .real()
-             .maxCoeff();
   norm = std::sqrt(MeasurementOperator::power_method(norm_iterations_));
   PURIFY_DEBUG("Found a norm of eta = {}", norm);
   PURIFY_HIGH_LOG("Gridding Operator Constructed: WGFSA");
