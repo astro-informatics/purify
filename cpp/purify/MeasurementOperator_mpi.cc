@@ -3,7 +3,7 @@
 namespace purify {
 
   void MeasurementOperator::create_mask(const sopt::mpi::Communicator &comm) {
-    //
+
     std::set<t_int> M_local_set;
     // parallel sparse matrix multiplication with a sparse vector.
 #pragma omp parallel for
@@ -25,6 +25,8 @@ namespace purify {
   Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex> &eigen_image, 
       const sopt::mpi::Communicator &comm) const {
     // Performs degridding with mpi
+    if (M_local.size() == 0)
+      throw std::runtime_error("Have not set and distirbuted M_local before using measurement operator.");
     Vector<t_complex> ft_vector;
     if (comm.rank() == comm.root_id()) {
       Matrix<t_complex> ft_grid(ftsizev_, ftsizeu_);
@@ -56,6 +58,8 @@ namespace purify {
 
   Image<t_complex> MeasurementOperator::grid(const Vector<t_complex> &visibilities, 
       const sopt::mpi::Communicator &comm) const {
+    if (M_local.size() == 0)
+      throw std::runtime_error("Have not set and distirbuted M_local before using measurement operator.");
     Matrix<t_complex> ft_grid_local = utilities::sparse_multiply_matrix(
         G.adjoint(), (visibilities.array() * W.conjugate()).matrix())
       / norm;

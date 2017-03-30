@@ -127,7 +127,13 @@ namespace purify {
       //MPI Measurement opperator stuff
 
 #ifdef PURIFY_MPI
-
+    public:
+      //! Used to create and distribute the local mask M_local
+      void create_mask(const sopt::mpi::Communicator &comm);
+      //! Degridding operator that degrids image to visibilities with mpi
+      Vector<t_complex> degrid(const Image<t_complex> &eigen_image, const sopt::mpi::Communicator &comm) const;
+      //! Gridding operator that grids image from visibilities with mpi
+      Image<t_complex> grid(const Vector<t_complex> &visibilities, const sopt::mpi::Communicator &comm) const;
     private:
       //! global mask, containing indices for each b_i element
       Vector<t_int> M;
@@ -135,12 +141,6 @@ namespace purify {
       Vector<t_int> M_local;
       //! Used to generate the sizes of b for each node
       std::vector<t_int> sizes;
-      //! Used to create the local mask M_local
-      void create_mask(const sopt::mpi::Communicator &comm);
-      //! Degridding operator that degrids image to visibilities with mpi
-      Vector<t_complex> degrid(const Image<t_complex> &eigen_image, const sopt::mpi::Communicator &comm) const;
-      //! Gridding operator that grids image from visibilities with mpi
-      Image<t_complex> grid(const Vector<t_complex> &visibilities, const sopt::mpi::Communicator &comm) const;
 #endif
   };
 
