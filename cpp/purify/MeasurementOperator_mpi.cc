@@ -13,13 +13,8 @@ namespace purify {
       }
     auto M_local_vector = std::vector<t_int>(M_local_set.begin(), M_local_set.end());
     M_local = Eigen::Map<Vector<t_int> >(M_local_vector.data(), M_local_vector.size());
-    if (comm.rank() == comm.root_id()) {
-      sizes = comm.gather_one(static_cast<t_int>(M_local.size()));
-      M = comm.gatherv(M_local, sizes);
-    } else {
-      sizes = comm.gather_one(static_cast<t_int>(M_local.size()));
-      M = comm.gatherv(M_local, M_local.size());
-    }
+    sizes = comm.gather(static_cast<t_int>(M_local.size()));
+    M = (comm.rank() == comm.root_id()) ? comm.gather(M_local, sizes) : comm.gather(M_local);
   }
 
   Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex> &eigen_image, 
@@ -68,7 +63,7 @@ namespace purify {
     for (int i = 0; i < ft_vector_local.size(); i++)
       ft_vector_local(i) = ft_grid_local(M_local(i));
 
-    Vector<t_complex> ft_vector = comm.rank() == comm.root_id() ? comm.gatherv(ft_vector_local, sizes) : comm.gatherv(ft_vector_local);
+    Vector<t_complex> ft_vector = comm.rank() == comm.root_id() ? comm.gather(ft_vector_local, sizes) : comm.gather(ft_vector_local);
     Image<t_complex> image_out;
     if (comm.rank() == comm.root_id()) {
       Vector<t_complex> ft_grid = Vector<t_complex>::Zero(ftsizev_ * ftsizeu_);
