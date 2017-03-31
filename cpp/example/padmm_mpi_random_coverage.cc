@@ -68,7 +68,7 @@ padmm_factory(MeasurementOperator const &measurements, sopt::wavelets::SARA cons
                                                      measurements.imsizex(), comm);
 
 #if PURIFY_PADMM_ALGORITHM == 2
-  auto const epsilon = comm.broadcast(utilities::calculate_l2_radius(uv_data.vis, sigma));
+  auto const epsilon = std::sqrt(comm.all_sum_all(std::pow(utilities::calculate_l2_radius(uv_data.vis, sigma), 2)));
 #elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
 #endif
