@@ -260,6 +260,10 @@ MeasurementOperator::MeasurementOperator() {
   // Most basic constructor
 }
 
+MeasurementOperator::MeasurementOperator(const MeasurementOperator & measurements) {
+  *this = measurements;
+}
+
 void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_input) {
   // construction of linear operators in measurement operator, GFZSA
   ftsizeu_ = floor(imsizex_ * oversample_factor_);
@@ -471,5 +475,25 @@ linear_transform(MeasurementOperator const &measurements, t_uint nvis) {
                                                    {{0, 1, static_cast<t_int>(width * height)}});
 }
 
+    sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
+      linear_transform(MeasurementOperator const &measurements, t_uint nvis,
+          sopt::mpi::Communicator const &comm) {
+        auto const height = measurements.imsizey();
+        auto const width = measurements.imsizex();
+        auto direct = [&measurements, width, height](Vector<t_complex> &out, Vector<t_complex> const &x) {
+          assert(x.size() == width * height);
+          auto const image = Image<t_complex>::Map(x.data(), height, width);
+          out = measurements.degrid(image);
+        };
+        auto adjoint
+          = [&measurements, width, height, comm](Vector<t_complex> &out, Vector<t_complex> const &x) {
+            auto image = Image<t_complex>::Map(out.data(), height, width);
+            image = measurements.grid(x);
+            comm.all_sum_all(out);
+          };
+        return sopt::linear_transform<Vector<t_complex>>(direct, {{0, 1, static_cast<t_int>(nvis)}},
+            adjoint,
+            {{0, 1, static_cast<t_int>(width * height)}});
+      }
 
 }

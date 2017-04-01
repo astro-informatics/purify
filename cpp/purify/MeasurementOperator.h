@@ -9,8 +9,6 @@
 #include "purify/utilities.h"
 #ifdef PURIFY_MPI
 #include <sopt/mpi/communicator.h>
-#include <set>
-#include <vector>
 #endif
 
 #include <iostream>
@@ -29,6 +27,7 @@ namespace purify {
       t_real resample_factor = 1;
 
       MeasurementOperator();
+      MeasurementOperator(const MeasurementOperator & measurements);
       MeasurementOperator(const utilities::vis_params &uv_vis_input, const t_int &Ju, const t_int &Jv,
           const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey,
           const t_int &norm_iterations = 20, const t_real &oversample_factor = 2,
@@ -123,25 +122,6 @@ namespace purify {
     public:
       //! Estiamtes norm of operator
       t_real power_method(const t_int &niters, const t_real &relative_difference = 1e-9);
-
-      //MPI Measurement opperator stuff
-
-#ifdef PURIFY_MPI
-    public:
-      //! Used to create and distribute the local mask M_local
-      void create_mask(const sopt::mpi::Communicator &comm);
-      //! Degridding operator that degrids image to visibilities with mpi
-      Vector<t_complex> degrid(const Image<t_complex> &eigen_image, const sopt::mpi::Communicator &comm) const;
-      //! Gridding operator that grids image from visibilities with mpi
-      Image<t_complex> grid(const Vector<t_complex> &visibilities, const sopt::mpi::Communicator &comm) const;
-    private:
-      //! global mask, containing indices for each b_i element
-      Vector<t_int> M;
-      //! local ft_grid mask that determines b_i grid indices
-      Vector<t_int> M_local;
-      //! Used to generate the sizes of b for each node
-      std::vector<t_int> sizes;
-#endif
   };
 
   //! \brief Helper function to wrap a linear transform around a measurement operator
