@@ -31,10 +31,13 @@ Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex> &eigen_imag
   // kernel
   // turn into vector
   ft_vector.resize(ftsizeu_ * ftsizev_, 1); // using conservativeResize does not work, it garbles
+        std::cout << " AFTER FFT " << ft_vector.col(0).head(6).transpose() << std::endl;
   // the image. Also, it is not what we want.
   // get visibilities
   // return (G * ft_vector).array() * W/norm;
-  return utilities::sparse_multiply_matrix(G, ft_vector).array() * W / norm;
+  auto const result = utilities::sparse_multiply_matrix(G, ft_vector).array() * W / norm;
+        std::cout << " AFTER DEGRID " << result.head(6).transpose() << std::endl;
+        return result;
 }
 
 Image<t_complex> MeasurementOperator::grid(const Vector<t_complex> &visibilities) const {
@@ -196,15 +199,20 @@ t_real MeasurementOperator::power_method(const t_int &niters, const t_real &rela
      niters:: max number of iterations
      relative_difference:: percentage difference at which eigen value has converged
      */
+  if (niters == 0)
+    return 1;
   t_real estimate_eigen_value = 1;
   t_real old_value = 0;
-  Image<t_complex> estimate_eigen_vector = Image<t_complex>::Random(imsizey_, imsizex_);
+  Image<t_complex> estimate_eigen_vector = Image<t_complex>::Ones(imsizey_, imsizex_);
   estimate_eigen_vector = estimate_eigen_vector / estimate_eigen_vector.matrix().norm();
   PURIFY_DEBUG("Starting power method");
   PURIFY_DEBUG("Iteration: 0, norm = {}", estimate_eigen_value);
   for(t_int i = 0; i < niters; ++i) {
-    auto new_estimate_eigen_vector
-        = MeasurementOperator::grid(MeasurementOperator::degrid(estimate_eigen_vector));
+    std::cout << "ITER START " << estimate_eigen_vector.row(0).head(6)
+       << std::endl;
+    auto new_estimate_eigen_vector = grid(degrid(estimate_eigen_vector));
+    std::cout << "ITERATION " << new_estimate_eigen_vector.row(0).head(6)
+       << std::endl;
     estimate_eigen_value = new_estimate_eigen_vector.matrix().norm();
     estimate_eigen_vector = new_estimate_eigen_vector / estimate_eigen_value;
     PURIFY_DEBUG("Iteration: {}, norm = {}", i + 1, estimate_eigen_value);
@@ -219,7 +227,21 @@ MeasurementOperator::MeasurementOperator(
     const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey,
     const t_int &norm_iterations, const t_real &oversample_factor, const t_real &cell_x,
     const t_real &cell_y, const std::string &weighting_type, const t_real &R, bool use_w_term,
-    const t_real &energy_fraction, const std::string &primary_beam, bool fft_grid_correction) {
+    const t_real &energy_fraction, const std::string &primary_beam, bool fft_grid_correction) : Ju_(Ju)
+              , Jv_(Jv)
+              , kernel_name_(kernel_name)
+              , imsizex_(imsizex)
+              , imsizey_(imsizey)
+              , norm_iterations_(norm_iterations)
+              , oversample_factor_(oversample_factor)
+              , cell_x_(cell_x)
+              , cell_y_(cell_y)
+              , weighting_type_(weighting_type)
+              , R_(R)
+              , use_w_term_(use_w_term)
+              , energy_fraction_(energy_fraction)
+              , primary_beam_(primary_beam)
+              , fft_grid_correction_(fft_grid_correction) {
   /*
      Generates operators needed for gridding and degridding.
 
@@ -239,29 +261,8 @@ MeasurementOperator::MeasurementOperator(
 
 
 */
-  *this = MeasurementOperator::Ju(Ju)
-              .Jv(Jv)
-              .kernel_name(kernel_name)
-              .imsizex(imsizex)
-              .imsizey(imsizey)
-              .norm_iterations(norm_iterations)
-              .oversample_factor(oversample_factor)
-              .cell_x(cell_x)
-              .cell_y(cell_y)
-              .weighting_type(weighting_type)
-              .R(R)
-              .use_w_term(use_w_term)
-              .energy_fraction(energy_fraction)
-              .primary_beam(primary_beam)
-              .fft_grid_correction(fft_grid_correction);
-  MeasurementOperator::init_operator(uv_vis_input);
-}
-MeasurementOperator::MeasurementOperator() {
-  // Most basic constructor
-}
-
-MeasurementOperator::MeasurementOperator(const MeasurementOperator & measurements) {
-  *this = measurements;
+  std::cout << "wtf ?" << std::endl;
+  init_operator(uv_vis_input);
 }
 
 void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_input) {
