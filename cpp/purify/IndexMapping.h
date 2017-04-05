@@ -21,7 +21,7 @@ public:
     derived.resize(indices.size());
     typename T0::Index i(0);
     for(auto const &index : indices) {
-      assert(index >= 0 and index <= input.size());
+      assert(index >= 0 and index < input.size());
       assert(derived.size() > i);
       derived(i++) = input(index);
     }
@@ -30,13 +30,13 @@ public:
   //! Vector of size `N` where non-zero elements are chosen from input at given indices
   template <class T0, class T1>
   void adjoint(Eigen::MatrixBase<T0> const &input, Eigen::MatrixBase<T1> const &output) const {
-    assert(indices.size() <= N);
-    assert(input.size() == indices.size());
+    assert(indices.size() <= static_cast<size_t>(N));
+    assert(static_cast<size_t>(input.size()) == indices.size());
     auto &derived = output.const_cast_derived();
     derived = T1::Zero(N);
     typename T0::Index i(0);
     for(auto const &index : indices) {
-      assert(index >= 0 and index <= output.size());
+      assert(index >= 0 and index < output.size());
       derived(index) += input(i++);
     }
   }
