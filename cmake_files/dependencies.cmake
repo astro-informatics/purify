@@ -83,7 +83,9 @@ endif()
 lookup_package(CFitsIO REQUIRED ARGUMENTS CHECKCASA)
 lookup_package(CCFits REQUIRED)
 
-find_package(CasaCore OPTIONAL_COMPONENTS ms)
+if(docasa)
+  find_package(CasaCore OPTIONAL_COMPONENTS ms)
+endif()
 
 # Add script to execute to make sure libraries in the build tree can be found
 add_to_ld_path("${EXTERNAL_ROOT}/lib")
