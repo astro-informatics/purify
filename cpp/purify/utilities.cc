@@ -1,4 +1,6 @@
 #include "purify/config.h"
+#include <fstream>
+#include <random>
 #include "purify/logging.h"
 #include "purify/utilities.h"
 
@@ -527,19 +529,6 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
     }
   }
   return out_weights.array();
-}
-
-Vector<t_complex> sparse_multiply_matrix(const Sparse<t_complex> &M, const Vector<t_complex> &x) {
-  Vector<t_complex> y = Vector<t_complex>::Zero(M.rows());
-// parallel sparse matrix multiplication with vector.
-#pragma omp parallel for
-  //#pragma omp simd
-  for(t_int k = 0; k < M.outerSize(); ++k)
-    for(Sparse<t_complex>::InnerIterator it(M, k); it; ++it) {
-
-      y(k) += it.value() * x(it.index());
-    }
-  return y;
 }
 
 std::tuple<t_int, t_real> checkpoint_log(const std::string &diagnostic) {

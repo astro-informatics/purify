@@ -4,6 +4,7 @@
 #include "purify/config.h"
 #include <fstream>
 #include <string>
+#include <type_traits>
 #include "purify/FFTOperator.h"
 #include "purify/types.h"
 
@@ -94,7 +95,22 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
                               const std::string &weighting_type, const t_real &R,
                               const t_int &ftsizeu, const t_int &ftsizev);
 //! Parallel multiplication with a sparse matrix and vector
-Vector<t_complex> sparse_multiply_matrix(const Sparse<t_complex> &M, const Vector<t_complex> &x);
+template <class T0, class T1>
+typename std::enable_if<std::is_same<typename T0::Scalar, typename T1::Scalar>::value
+                            and T0::IsRowMajor,
+                        Vector<typename T0::Scalar>>::type
+sparse_multiply_matrix(const Eigen::SparseMatrixBase<T0> &M, const Eigen::MatrixBase<T1> &x) {
+  assert(M.cols() == x.size());
+  Vector<typename T0::Scalar> y = Vector<typename T0::Scalar>::Zero(M.rows());
+  auto const &derived = M.derived();
+// parallel sparse matrix multiplication with vector.
+#pragma omp parallel for
+  //#pragma omp simd
+  for(t_int k = 0; k < M.outerSize(); ++k)
+    for(typename Sparse<typename T0::Scalar>::InnerIterator it(derived, k); it; ++it)
+      y(k) += it.value() * x(it.index());
+  return y;
+}
 //! Reads a diagnostic file and updates parameters
 std::tuple<t_int, t_real> checkpoint_log(const std::string &diagnostic);
 //! Multiply images coefficient-wise using openmp
