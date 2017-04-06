@@ -26,7 +26,8 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   std::string const dirty_image_fits = output_filename(name + "_" + kernel + "_dirty.fits");
 
   t_real const over_sample = 2;
-  MeasurementOperator measurements(uv_data, J, J, kernel, M31.cols(), M31.rows(), 100, over_sample);
+  auto const measurements = std::make_shared<const MeasurementOperator>(
+      uv_data, J, J, kernel, M31.cols(), M31.rows(), 100, over_sample);
   auto measurements_transform = linear_transform(measurements, uv_data.vis.size());
 
   sopt::wavelets::SARA const sara{
@@ -35,15 +36,15 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
   auto const Psi
-      = sopt::linear_transform<t_complex>(sara, measurements.imsizey(), measurements.imsizex());
+      = sopt::linear_transform<t_complex>(sara, measurements->imsizey(), measurements->imsizex());
 
   Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   sopt::utilities::write_tiff(
-      Image<t_real>::Map(dimage.data(), measurements.imsizey(), measurements.imsizex()),
+      Image<t_real>::Map(dimage.data(), measurements->imsizey(), measurements->imsizex()),
       dirty_image);
   pfitsio::write2d(
-      Image<t_real>::Map(dimage.data(), measurements.imsizey(), measurements.imsizex()),
+      Image<t_real>::Map(dimage.data(), measurements->imsizey(), measurements->imsizex()),
       dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
@@ -69,11 +70,11 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   auto const diagnostic = padmm();
   assert(diagnostic.x.size() == M31.size());
   Image<t_complex> image
-      = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey(), measurements.imsizex());
+      = Image<t_complex>::Map(diagnostic.x.data(), measurements->imsizey(), measurements->imsizex());
   pfitsio::write2d(image.real(), outfile_fits);
-  Image<t_complex> residual = measurements.grid(uv_data.vis - measurements.degrid(image));
+  Image<t_complex> residual = measurements->grid(uv_data.vis - measurements->degrid(image));
   pfitsio::write2d(residual.real(), residual_fits);
-};
+}
 
 int main(int, char **) {
   sopt::logging::initialize();

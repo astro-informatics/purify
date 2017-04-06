@@ -58,8 +58,8 @@ int main(int nargs, char const **args) {
                                             2); // Generating simulated high quality visibilities
   uv_data.vis = simulate_measurements.degrid(sky_model);
 
-  MeasurementOperator measurements(uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(), 200,
-                                   over_sample);
+  auto const measurements = std::make_shared<MeasurementOperator const>(
+      uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(), 200, over_sample);
 
   // putting measurement operator in a form that sopt can use
   auto measurements_transform = linear_transform(measurements, uv_data.vis.size());
@@ -70,7 +70,7 @@ int main(int nargs, char const **args) {
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
   auto const Psi
-      = sopt::linear_transform<t_complex>(sara, measurements.imsizey(), measurements.imsizex());
+      = sopt::linear_transform<t_complex>(sara, measurements->imsizey(), measurements->imsizex());
 
   // working out value of sigma given SNR of 30
   t_real sigma = utilities::SNR_to_standard_deviation(uv_data.vis, ISNR);
@@ -115,8 +115,8 @@ int main(int nargs, char const **args) {
   auto const diagnostic = reweighted();
   std::clock_t c_end = std::clock();
 
-  Image<t_complex> image = Image<t_complex>::Map(diagnostic.algo.x.data(), measurements.imsizey(),
-                                                 measurements.imsizex());
+  Image<t_complex> image = Image<t_complex>::Map(diagnostic.algo.x.data(), measurements->imsizey(),
+                                                 measurements->imsizex());
 
   Vector<t_complex> original = Vector<t_complex>::Map(sky_model.data(), sky_model.size(), 1);
   Image<t_complex> res = sky_model - image;

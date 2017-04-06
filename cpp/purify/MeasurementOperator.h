@@ -2,6 +2,8 @@
 #define PURIFY_MEASUREMENT_OPERATOR_H
 
 #include "purify/config.h"
+#include <memory>
+#include <string>
 #include <sopt/linear_transform.h>
 #include "purify/FFTOperator.h"
 #include "purify/kernels.h"
@@ -10,9 +12,6 @@
 #ifdef PURIFY_MPI
 #include <sopt/mpi/communicator.h>
 #endif
-
-#include <iostream>
-#include <string>
 
 namespace purify {
 
@@ -26,7 +25,7 @@ public:
   t_real norm = 1;
   t_real resample_factor = 1;
 
-  MeasurementOperator() {};
+  MeasurementOperator(){};
   MeasurementOperator(const utilities::vis_params &uv_vis_input, const t_int &Ju = 4,
                       const t_int &Jv = 4, const std::string &kernel_name = "kb",
                       const t_int &imsizex = 256, const t_int &imsizey = 256,
@@ -128,13 +127,13 @@ public:
 //! \brief Helper function to wrap a linear transform around a measurement operator
 //! \note The measurement operator must exist during the lifetime of the linear transforms.
 sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
-linear_transform(MeasurementOperator const &measurements, t_uint nvis);
+linear_transform(std::shared_ptr<MeasurementOperator const> const &measurements, t_uint nvis);
 
 #ifdef PURIFY_MPI
 //! \brief Helper function to wrap a linear transform around a distributed measurement operator
 //! \note The measurement operator must exist during the lifetime of the linear transforms.
 sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
-linear_transform(MeasurementOperator const &measurements, t_uint nvis,
+linear_transform(std::shared_ptr<MeasurementOperator const> const &measurements, t_uint nvis,
                  sopt::mpi::Communicator const &comm);
 #endif
 }

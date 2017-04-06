@@ -19,6 +19,10 @@
 #include "purify/types.h"
 #include "purify/utilities.h"
 
+#ifndef PURIFY_PADMM_ALGORITHM
+#define PURIFY_PADMM_ALGORITHM 2
+#endif
+
 using namespace purify;
 using namespace purify::notinstalled;
 
@@ -59,16 +63,18 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
 }
 
 std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>>
-padmm_factory(MeasurementOperator const &measurements, sopt::wavelets::SARA const &sara,
-              const Image<t_complex> &ground_truth_image, const utilities::vis_params &uv_data,
-              const t_real sigma, const sopt::mpi::Communicator &comm) {
+padmm_factory(std::shared_ptr<MeasurementOperator const> const &measurements,
+              sopt::wavelets::SARA const &sara, const Image<t_complex> &ground_truth_image,
+              const utilities::vis_params &uv_data, const t_real sigma,
+              const sopt::mpi::Communicator &comm) {
 
   auto measurements_transform = linear_transform(measurements, uv_data.vis.size(), comm);
-  auto const Psi = sopt::linear_transform<t_complex>(sara, measurements.imsizey(),
-                                                     measurements.imsizex(), comm);
+  auto const Psi = sopt::linear_transform<t_complex>(sara, measurements->imsizey(),
+                                                     measurements->imsizex(), comm);
 
 #if PURIFY_PADMM_ALGORITHM == 2
-  auto const epsilon = std::sqrt(comm.all_sum_all(std::pow(utilities::calculate_l2_radius(uv_data.vis, sigma), 2)));
+  auto const epsilon = std::sqrt(
+      comm.all_sum_all(std::pow(utilities::calculate_l2_radius(uv_data.vis, sigma), 2)));
 #elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
 #endif
@@ -133,7 +139,7 @@ padmm_factory(MeasurementOperator const &measurements, sopt::wavelets::SARA cons
   });
 
   return padmm;
-};
+}
 
 int main(int nargs, char const **args) {
   sopt::logging::initialize();
@@ -157,8 +163,9 @@ int main(int nargs, char const **args) {
 
   // Generating random uv(w) coverage
   auto const data = dirty_visibilities(ground_truth_image, number_of_vis, snr, world);
-  MeasurementOperator const measurements(std::get<0>(data), 4, 4, kernel, ground_truth_image.cols(),
-                                         ground_truth_image.rows(), 100, 2);
+  auto const measurements = std::make_shared<MeasurementOperator const>(
+      std::get<0>(data), 4, 4, kernel, ground_truth_image.cols(), ground_truth_image.rows(), 100,
+      2);
   auto const sara = sopt::wavelets::distribute_sara(
       sopt::wavelets::SARA{
           std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
@@ -178,9 +185,9 @@ int main(int nargs, char const **args) {
 
   // then writes stuff to files
   auto const residual_image
-      = world.all_sum_all<Image<t_real>>(measurements.grid(diagnostic.residual).real());
+      = world.all_sum_all<Image<t_real>>(measurements->grid(diagnostic.residual).real());
   auto const dirty_image
-      = world.all_sum_all<Image<t_real>>(measurements.grid(std::get<0>(data).vis).real());
+      = world.all_sum_all<Image<t_real>>(measurements->grid(std::get<0>(data).vis).real());
   if(world.is_root()) {
     boost::filesystem::path const path(output_filename(name));
 #if PURIFY_PADMM_ALGORITHM == 3

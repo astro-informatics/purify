@@ -28,7 +28,7 @@ int main(int nargs, char const **args) {
   purify::logging::initialize();
   sopt::logging::set_level("debug");
   purify::logging::set_level("debug");
-  
+
   std::string const test_type = args[1];
   std::string const kernel = args[2];
   t_real const over_sample = std::stod(static_cast<std::string>(args[3]));
@@ -55,33 +55,33 @@ int main(int nargs, char const **args) {
   uv_data.units = "radians";
   PURIFY_MEDIUM_LOG("Number of measurements: {}", uv_data.u.size());
 
-  MeasurementOperator sky_measurements(uv_data, 8, 8, "kb", sky_model.cols(), sky_model.rows(),
-                                   100, over_sample);
+  MeasurementOperator sky_measurements(uv_data, 8, 8, "kb", sky_model.cols(), sky_model.rows(), 100,
+                                       over_sample);
   uv_data.vis = sky_measurements.degrid(sky_model);
-  MeasurementOperator measurements(uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(),
-                                   100, over_sample);
+  auto const measurements = std::make_shared<MeasurementOperator>(
+      uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(), 100, over_sample);
   auto measurements_transform = linear_transform(measurements, uv_data.vis.size());
 
   std::vector<std::tuple<std::string, t_uint>> wavelets;
-	
-  if (test_type == "clean")
-  	wavelets.push_back(std::make_tuple("Dirac" ,3u));
-  if (test_type == "ms_clean")
-  	wavelets.push_back(std::make_tuple("DB4" ,3u));
-  if (test_type == "padmm"){
-  	wavelets.push_back(std::make_tuple("Dirac" ,3u));
-  	wavelets.push_back(std::make_tuple("DB1" ,3u));
-  	wavelets.push_back(std::make_tuple("DB2" ,3u));
-  	wavelets.push_back(std::make_tuple("DB3" ,3u));
-  	wavelets.push_back(std::make_tuple("DB4" ,3u));
-  	wavelets.push_back(std::make_tuple("DB5" ,3u));
-  	wavelets.push_back(std::make_tuple("DB6" ,3u));
-  	wavelets.push_back(std::make_tuple("DB7" ,3u));
-  	wavelets.push_back(std::make_tuple("DB8" ,3u));
+
+  if(test_type == "clean")
+    wavelets.push_back(std::make_tuple("Dirac", 3u));
+  if(test_type == "ms_clean")
+    wavelets.push_back(std::make_tuple("DB4", 3u));
+  if(test_type == "padmm") {
+    wavelets.push_back(std::make_tuple("Dirac", 3u));
+    wavelets.push_back(std::make_tuple("DB1", 3u));
+    wavelets.push_back(std::make_tuple("DB2", 3u));
+    wavelets.push_back(std::make_tuple("DB3", 3u));
+    wavelets.push_back(std::make_tuple("DB4", 3u));
+    wavelets.push_back(std::make_tuple("DB5", 3u));
+    wavelets.push_back(std::make_tuple("DB6", 3u));
+    wavelets.push_back(std::make_tuple("DB7", 3u));
+    wavelets.push_back(std::make_tuple("DB8", 3u));
   }
   sopt::wavelets::SARA const sara(wavelets.begin(), wavelets.end());
   auto const Psi
-      = sopt::linear_transform<t_complex>(sara, measurements.imsizey(), measurements.imsizex());
+      = sopt::linear_transform<t_complex>(sara, measurements->imsizey(), measurements->imsizex());
 
   // working out value of sigma given SNR of 30
   t_real sigma = utilities::SNR_to_standard_deviation(uv_data.vis, ISNR);
@@ -92,14 +92,15 @@ int main(int nargs, char const **args) {
   t_real const max_val = dimage.array().abs().maxCoeff();
   dimage = dimage / max_val;
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
-  // pfitsio::write2d(Image<t_real>::Map(dimage.data(), measurements.imsizey(),
-  // measurements.imsizex()), dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
   auto const purify_gamma
       = (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).real().maxCoeff() * 1e-3;
   t_int iters = 0;
-  auto convergence_function = [&iters](const Vector<t_complex> &x) { iters = iters + 1; return true; };
+  auto convergence_function = [&iters](const Vector<t_complex> &x) {
+    iters = iters + 1;
+    return true;
+  };
   PURIFY_HIGH_LOG("Starting sopt!");
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
   PURIFY_MEDIUM_LOG("Gamma {}", purify_gamma);
@@ -117,8 +118,8 @@ int main(int nargs, char const **args) {
                          .lagrange_update_scale(0.9)
                          .nu(1e0)
                          .Psi(Psi)
-			 .itermax(100)
-			 .is_converged(convergence_function)
+                         .itermax(100)
+                         .is_converged(convergence_function)
                          .Phi(measurements_transform);
   // Timing reconstructionu
 
@@ -128,13 +129,13 @@ int main(int nargs, char const **args) {
 
   // Reading if algo has converged
   t_int converged = 0;
-  if (diagnostic.good) {
-	converged = 1;
+  if(diagnostic.good) {
+    converged = 1;
   }
   const t_uint maxiters = iters;
 
   Image<t_complex> image
-      = Image<t_complex>::Map(diagnostic.x.data(), measurements.imsizey(), measurements.imsizex());
+      = Image<t_complex>::Map(diagnostic.x.data(), measurements->imsizey(), measurements->imsizex());
 
   Vector<t_complex> original = Vector<t_complex>::Map(sky_model.data(), sky_model.size(), 1);
   Image<t_complex> res = sky_model - image;

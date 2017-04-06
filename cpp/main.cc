@@ -139,11 +139,12 @@ save_psf_and_dirty_image(sopt::LinearTransform<sopt::Vector<sopt::t_complex>> co
 
 void save_final_image(std::string const &outfile_fits, std::string const &residual_fits,
                       Vector<t_complex> const &x, utilities::vis_params const &uv_data,
-                      Params const &params, MeasurementOperator measurements) {
+                      Params const &params,
+                      std::shared_ptr<MeasurementOperator const> const &measurements) {
   //! Save final output image
   purify::pfitsio::header_params header = create_new_header(uv_data, params);
   Image<t_complex> const image
-      = Image<t_complex>::Map(x.data(), measurements.imsizey(), measurements.imsizex());
+      = Image<t_complex>::Map(x.data(), measurements->imsizey(), measurements->imsizex());
   // header information
   header.pix_units = "JY/PIXEL";
   header.niters = params.iter;
@@ -155,9 +156,9 @@ void save_final_image(std::string const &outfile_fits, std::string const &residu
     pfitsio::write2d_header(image.real(), header);
   }
   Image<t_complex> residual = measurements
-                                  .grid(((uv_data.vis - measurements.degrid(image)).array()
-                                         * uv_data.weights.array().real())
-                                            .matrix())
+                                  ->grid(((uv_data.vis - measurements->degrid(image)).array()
+                                          * uv_data.weights.array().real())
+                                             .matrix())
                                   .array();
   header.pix_units = "JY/PIXEL";
   header.fits_name = residual_fits + ".fits";
@@ -193,27 +194,27 @@ read_estimates(sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const &measu
   return estimates;
 }
 
-MeasurementOperator
+std::shared_ptr<MeasurementOperator>
 construct_measurement_operator(utilities::vis_params const &uv_data, purify::Params const &params) {
-  auto measurements = MeasurementOperator()
-                          .Ju(params.J)
-                          .Jv(params.J)
-                          .kernel_name(params.kernel)
-                          .imsizex(params.width)
-                          .imsizey(params.height)
-                          .norm_iterations(params.power_method_iterations)
-                          .oversample_factor(params.over_sample)
-                          .cell_x(params.cellsizex)
-                          .cell_y(params.cellsizey)
-                          .weighting_type("none") // weighting is done outside of the operator
-                          .R(0)
-                          .use_w_term(params.use_w_term)
-                          .energy_fraction(params.energy_fraction)
-                          .primary_beam(params.primary_beam)
-                          .fft_grid_correction(params.fft_grid_correction)
-                          .fftw_plan_flag(params.fftw_plan)
-                          .gradient(params.gradient);
-  measurements.init_operator(uv_data);
+  auto measurements = std::make_shared<MeasurementOperator>();
+  measurements->Ju(params.J)
+      .Jv(params.J)
+      .kernel_name(params.kernel)
+      .imsizex(params.width)
+      .imsizey(params.height)
+      .norm_iterations(params.power_method_iterations)
+      .oversample_factor(params.over_sample)
+      .cell_x(params.cellsizex)
+      .cell_y(params.cellsizey)
+      .weighting_type("none") // weighting is done outside of the operator
+      .R(0)
+      .use_w_term(params.use_w_term)
+      .energy_fraction(params.energy_fraction)
+      .primary_beam(params.primary_beam)
+      .fft_grid_correction(params.fft_grid_correction)
+      .fftw_plan_flag(params.fftw_plan)
+      .gradient(params.gradient);
+  measurements->init_operator(uv_data);
   return measurements;
 }
 }
@@ -242,7 +243,7 @@ int main(int argc, char **argv) {
       params.over_sample * params.width, params.over_sample * params.height);
   auto const noise_rms = estimate_noise(params);
   auto const measurements = construct_measurement_operator(uv_data, params);
-  params.norm = measurements.norm;
+  params.norm = measurements->norm;
   auto const measurements_transform = linear_transform(measurements, uv_data.vis.size());
 
   sopt::wavelets::SARA const sara{
@@ -324,7 +325,7 @@ int main(int argc, char **argv) {
   } else {
     auto const posq = sopt::algorithm::positive_quadrant(padmm);
     auto const min_delta = noise_rms * std::sqrt(uv_data.vis.size())
-                           / std::sqrt(9 * measurements.imsizey() * measurements.imsizex());
+                           / std::sqrt(9 * measurements->imsizey() * measurements->imsizex());
     // Sets weight after each padmm iteration.
     // In practice, this means replacing the proximal of the l1 objective function.
     auto const reweighted

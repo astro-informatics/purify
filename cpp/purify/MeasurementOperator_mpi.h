@@ -42,11 +42,6 @@ private:
   //! Gathers and scatters the Fourrier grid
   DistributeSparseVector distributor;
 };
-
-//! \brief Helper function to wrap a linear transform around a distributed measurement operator
-//! \note The measurement operator must exist during the lifetime of the linear transforms.
-sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
-linear_transform(MeasurementOperator const &measurements, t_uint nvis);
 }
 }
 

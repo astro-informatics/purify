@@ -53,24 +53,5 @@ Image<t_complex> MeasurementOperator::grid(const Vector<t_complex> &visibilities
   }
   return comm.broadcast(image_out);
 }
-
-sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
-linear_transform(MeasurementOperator const &measurements, t_uint nvis) {
-  auto const height = measurements.imsizey();
-  auto const width = measurements.imsizex();
-  auto direct = [&measurements, width, height](Vector<t_complex> &out, Vector<t_complex> const &x) {
-    assert(x.size() == width * height);
-    auto const image = Image<t_complex>::Map(x.data(), height, width);
-    out = measurements.degrid(image);
-  };
-  auto adjoint
-      = [&measurements, width, height](Vector<t_complex> &out, Vector<t_complex> const &x) {
-          auto image = Image<t_complex>::Map(out.data(), height, width);
-          image = measurements.grid(x);
-        };
-  return sopt::linear_transform<Vector<t_complex>>(direct, {{0, 1, static_cast<t_int>(nvis)}},
-                                                   adjoint,
-                                                   {{0, 1, static_cast<t_int>(width * height)}});
-}
 }
 }
