@@ -241,7 +241,6 @@ MeasurementOperator::MeasurementOperator(
 
 
 */
-  std::cout << "wtf ?" << std::endl;
   init_operator(uv_vis_input);
 }
 
