@@ -166,7 +166,7 @@ void save_final_image(std::string const &outfile_fits, std::string const &residu
     header.fits_name = residual_fits + "_imag.fits";
     pfitsio::write2d_header(residual.real(), header);
   }
-};
+}
 
 std::tuple<Vector<t_complex>, Vector<t_complex>>
 read_estimates(sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const &measurements,
@@ -215,7 +215,7 @@ construct_measurement_operator(utilities::vis_params const &uv_data, purify::Par
                           .gradient(params.gradient);
   measurements.init_operator(uv_data);
   return measurements;
-};
+}
 }
 
 int main(int argc, char **argv) {
