@@ -26,9 +26,10 @@ public:
   t_real norm = 1;
   t_real resample_factor = 1;
 
-  MeasurementOperator();
-  MeasurementOperator(const utilities::vis_params &uv_vis_input, const t_int &Ju, const t_int &Jv,
-                      const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey,
+  MeasurementOperator() {};
+  MeasurementOperator(const utilities::vis_params &uv_vis_input, const t_int &Ju = 4,
+                      const t_int &Jv = 4, const std::string &kernel_name = "kb",
+                      const t_int &imsizex = 256, const t_int &imsizey = 256,
                       const t_int &norm_iterations = 20, const t_real &oversample_factor = 2,
                       const t_real &cell_x = 1, const t_real &cell_y = 1,
                       const std::string &weighting_type = "none", const t_real &R = 0,
