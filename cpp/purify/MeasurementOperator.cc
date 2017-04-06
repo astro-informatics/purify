@@ -11,9 +11,6 @@ Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex> &eigen_imag
      st:: gridding parameters
      */
 
-  #ifdef PURIFY_MPI
-  //throw std::runtime_error("Degridding with MPI needs communicator.");
-  #endif
   Matrix<t_complex> ft_vector(ftsizev_, ftsizeu_);
   Matrix<t_complex> padded_image = Matrix<t_complex>::Zero(floor(imsizey_ * oversample_factor_),
                                                            floor(imsizex_ * oversample_factor_));
@@ -31,13 +28,11 @@ Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex> &eigen_imag
   // kernel
   // turn into vector
   ft_vector.resize(ftsizeu_ * ftsizev_, 1); // using conservativeResize does not work, it garbles
-        std::cout << " AFTER FFT " << ft_vector.col(0).head(6).transpose() << std::endl;
   // the image. Also, it is not what we want.
   // get visibilities
   // return (G * ft_vector).array() * W/norm;
   auto const result = utilities::sparse_multiply_matrix(G, ft_vector).array() * W / norm;
-        std::cout << " AFTER DEGRID " << result.head(6).transpose() << std::endl;
-        return result;
+  return result;
 }
 
 Image<t_complex> MeasurementOperator::grid(const Vector<t_complex> &visibilities) const {
@@ -48,12 +43,8 @@ Image<t_complex> MeasurementOperator::grid(const Vector<t_complex> &visibilities
      st:: gridding parameters
      */
   // Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W).matrix()/norm;
-  #ifdef PURIFY_MPI
-  //throw std::runtime_error("Gridding with MPI needs communicator.");
-  #endif
-  Matrix<t_complex> ft_vector = utilities::sparse_multiply_matrix(
-                                    G.adjoint(), (visibilities.array() * W.conjugate()).matrix())
-                                / norm;
+  Matrix<t_complex> ft_vector
+      = G.adjoint() * (visibilities.array() * W.conjugate()).matrix() / norm;
   ft_vector.resize(ftsizev_, ftsizeu_); // using conservativeResize does not work, it garbles the
   // image. Also, it is not what we want.
   ft_vector = utilities::re_sample_ft_grid(ft_vector, 1. / resample_factor);
@@ -199,25 +190,23 @@ t_real MeasurementOperator::power_method(const t_int &niters, const t_real &rela
      niters:: max number of iterations
      relative_difference:: percentage difference at which eigen value has converged
      */
-  if (niters == 0)
+  if(niters == 0)
     return 1;
   t_real estimate_eigen_value = 1;
   t_real old_value = 0;
-  Image<t_complex> estimate_eigen_vector = Image<t_complex>::Ones(imsizey_, imsizex_);
+  Image<t_complex> estimate_eigen_vector = Image<t_complex>::Random(imsizey_, imsizex_);
   estimate_eigen_vector = estimate_eigen_vector / estimate_eigen_vector.matrix().norm();
   PURIFY_DEBUG("Starting power method");
   PURIFY_DEBUG("Iteration: 0, norm = {}", estimate_eigen_value);
   for(t_int i = 0; i < niters; ++i) {
-    std::cout << "ITER START " << estimate_eigen_vector.row(0).head(6)
-       << std::endl;
     auto new_estimate_eigen_vector = grid(degrid(estimate_eigen_vector));
-    std::cout << "ITERATION " << new_estimate_eigen_vector.row(0).head(6)
-       << std::endl;
     estimate_eigen_value = new_estimate_eigen_vector.matrix().norm();
     estimate_eigen_vector = new_estimate_eigen_vector / estimate_eigen_value;
     PURIFY_DEBUG("Iteration: {}, norm = {}", i + 1, estimate_eigen_value);
-    if(relative_difference > std::abs(old_value - estimate_eigen_value) / old_value)
+    if(relative_difference > std::abs(old_value - estimate_eigen_value) / old_value) {
+      old_value = estimate_eigen_value;
       break;
+    }
     old_value = estimate_eigen_value;
   }
   return old_value;
@@ -227,21 +216,12 @@ MeasurementOperator::MeasurementOperator(
     const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey,
     const t_int &norm_iterations, const t_real &oversample_factor, const t_real &cell_x,
     const t_real &cell_y, const std::string &weighting_type, const t_real &R, bool use_w_term,
-    const t_real &energy_fraction, const std::string &primary_beam, bool fft_grid_correction) : Ju_(Ju)
-              , Jv_(Jv)
-              , kernel_name_(kernel_name)
-              , imsizex_(imsizex)
-              , imsizey_(imsizey)
-              , norm_iterations_(norm_iterations)
-              , oversample_factor_(oversample_factor)
-              , cell_x_(cell_x)
-              , cell_y_(cell_y)
-              , weighting_type_(weighting_type)
-              , R_(R)
-              , use_w_term_(use_w_term)
-              , energy_fraction_(energy_fraction)
-              , primary_beam_(primary_beam)
-              , fft_grid_correction_(fft_grid_correction) {
+    const t_real &energy_fraction, const std::string &primary_beam, bool fft_grid_correction)
+    : Ju_(Ju), Jv_(Jv), kernel_name_(kernel_name), imsizex_(imsizex), imsizey_(imsizey),
+      norm_iterations_(norm_iterations), oversample_factor_(oversample_factor), cell_x_(cell_x),
+      cell_y_(cell_y), weighting_type_(weighting_type), R_(R), use_w_term_(use_w_term),
+      energy_fraction_(energy_fraction), fft_grid_correction_(fft_grid_correction),
+      primary_beam_(primary_beam) {
   /*
      Generates operators needed for gridding and degridding.
 
@@ -476,25 +456,24 @@ linear_transform(MeasurementOperator const &measurements, t_uint nvis) {
                                                    {{0, 1, static_cast<t_int>(width * height)}});
 }
 
-    sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
-      linear_transform(MeasurementOperator const &measurements, t_uint nvis,
-          sopt::mpi::Communicator const &comm) {
-        auto const height = measurements.imsizey();
-        auto const width = measurements.imsizex();
-        auto direct = [&measurements, width, height](Vector<t_complex> &out, Vector<t_complex> const &x) {
-          assert(x.size() == width * height);
-          auto const image = Image<t_complex>::Map(x.data(), height, width);
-          out = measurements.degrid(image);
+sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
+linear_transform(MeasurementOperator const &measurements, t_uint nvis,
+                 sopt::mpi::Communicator const &comm) {
+  auto const height = measurements.imsizey();
+  auto const width = measurements.imsizex();
+  auto direct = [&measurements, width, height](Vector<t_complex> &out, Vector<t_complex> const &x) {
+    assert(x.size() == width * height);
+    auto const image = Image<t_complex>::Map(x.data(), height, width);
+    out = measurements.degrid(image);
+  };
+  auto adjoint
+      = [&measurements, width, height, comm](Vector<t_complex> &out, Vector<t_complex> const &x) {
+          auto image = Image<t_complex>::Map(out.data(), height, width);
+          image = measurements.grid(x);
+          comm.all_sum_all(out);
         };
-        auto adjoint
-          = [&measurements, width, height, comm](Vector<t_complex> &out, Vector<t_complex> const &x) {
-            auto image = Image<t_complex>::Map(out.data(), height, width);
-            image = measurements.grid(x);
-            comm.all_sum_all(out);
-          };
-        return sopt::linear_transform<Vector<t_complex>>(direct, {{0, 1, static_cast<t_int>(nvis)}},
-            adjoint,
-            {{0, 1, static_cast<t_int>(width * height)}});
-      }
-
+  return sopt::linear_transform<Vector<t_complex>>(direct, {{0, 1, static_cast<t_int>(nvis)}},
+                                                   adjoint,
+                                                   {{0, 1, static_cast<t_int>(width * height)}});
+}
 }
