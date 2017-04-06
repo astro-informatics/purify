@@ -86,14 +86,13 @@ t_real calc_for_pswf(const t_real &eta0, const t_int &J, const t_real &alpha) {
     auto const q_size = sizeof(q) / sizeof(q[0]) - 1;
 
     auto numerator = p[p_size];
-    for(t_int i = 1; i <= p_size; ++i) {
+    for(auto i = decltype(p_size){1}; i <= p_size; ++i)
       numerator = eta * numerator + p[p_size - i];
-    }
 
     auto denominator = q[q_size];
-    for(t_int i = 1; i <= q_size; ++i) {
+    for(auto i = decltype(q_size){1}; i <= q_size; ++i)
       denominator = eta * denominator + q[q_size - i];
-    }
+
     return numerator / denominator;
   };
   if(0 <= std::abs(eta0) and std::abs(eta0) <= 0.75)

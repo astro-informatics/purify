@@ -67,7 +67,7 @@ vis_params regroup_and_scatter(vis_params const &params, std::vector<t_int> cons
   std::vector<t_int> sizes(comm.size());
   std::fill(sizes.begin(), sizes.end(), 0);
   for(auto const &group : groups) {
-    if(group > comm.size())
+    if(group > static_cast<t_int>(comm.size()))
       throw std::out_of_range("groups should go from 0 to comm.size()");
     ++sizes[group];
   }
