@@ -34,6 +34,7 @@ if(PURIFY_MPI)
   target_include_directories(common_mpi_catch_main_object
     PUBLIC ${Sopt_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/cpp
            ${PROJECT_BINARY_DIR}/include ${MPI_CXX_INCLUDE_PATH})
+  add_dependencies(common_mpi_catch_main_object lookup_dependencies)
 
 	function(add_mpi_test testname)
 		  add_catch_test(${testname} COMMON_MAIN common_mpi_catch_main_object NOTEST ${ARGN})
