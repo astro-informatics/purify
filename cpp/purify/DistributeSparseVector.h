@@ -9,22 +9,33 @@
 #include "purify/types.h"
 
 namespace purify {
+//! \brief Gathers and scatters a vector
+//! \details Only the root node will ever have the full vector. Other nodes only get those indices
+//! they ask for.
 class DistributeSparseVector {
 
   DistributeSparseVector(const IndexMapping &_mapping, const std::vector<t_int> &_sizes,
                          const t_int _local_size, const sopt::mpi::Communicator &_comm)
       : mapping(_mapping), sizes(_sizes), local_size(_local_size), comm(_comm) {}
   DistributeSparseVector(const std::vector<t_int> &local_indices, std::vector<t_int> const &_sizes,
-                         t_int root_size, const sopt::mpi::Communicator &_comm)
-      : DistributeSparseVector(IndexMapping(_comm.gather(local_indices, sizes), root_size), _sizes,
-                               static_cast<t_int>(local_indices.size()), _comm) {}
+                         t_int global_size, const sopt::mpi::Communicator &_comm)
+      : DistributeSparseVector(IndexMapping(_comm.gather(local_indices, _sizes), global_size),
+                               _sizes, static_cast<t_int>(local_indices.size()), _comm) {}
 
 public:
-  DistributeSparseVector(const std::vector<t_int> &local_indices, t_int root_size,
+  //! Constructs a functor to distribute and gather a vector
+  //! \param[in] local_indices: indices that will be received by this process
+  //! \param[in] global_size: Size of the vector as a whole
+  //! \param[in] comm: Communicator over which to distribute the vector
+  DistributeSparseVector(const std::vector<t_int> &local_indices, t_int global_size,
                          const sopt::mpi::Communicator &_comm)
       : DistributeSparseVector(local_indices,
-                               _comm.gather(static_cast<t_int>(local_indices.size())), root_size,
+                               _comm.gather(static_cast<t_int>(local_indices.size())), global_size,
                                _comm) {}
+  DistributeSparseVector(const std::set<t_int> &local_indices, t_int global_size,
+                         const sopt::mpi::Communicator &_comm)
+      : DistributeSparseVector(std::vector<t_int>(local_indices.begin(), local_indices.end()),
+                               global_size, _comm) {}
   template <class T0>
   DistributeSparseVector(Eigen::SparseMatrixBase<T0> const &sparse,
                          const sopt::mpi::Communicator &_comm)
