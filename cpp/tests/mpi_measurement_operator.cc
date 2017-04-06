@@ -10,7 +10,7 @@ using namespace purify;
 TEST_CASE("Serial vs Parallel") {
   auto const world = sopt::mpi::Communicator::World();
   auto const split_comm = world.split(world.is_root());
-  if(world.size() < 2) {
+  if(world.size() <= 2) {
     std::cout << "Number of worlds: " << world.size() << std::endl;
     return;
   }
