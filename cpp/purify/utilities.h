@@ -3,13 +3,7 @@
 
 #include "purify/config.h"
 #include <fstream>
-#include <iostream>
-#include <random>
-#include <stdio.h>
 #include <string>
-#include <boost/math/special_functions/gamma.hpp>
-#include <boost/math/special_functions/sinc.hpp>
-#include <sys/stat.h>
 #include "purify/FFTOperator.h"
 #include "purify/types.h"
 

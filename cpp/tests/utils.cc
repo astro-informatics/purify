@@ -1,9 +1,9 @@
+#include <random>
 #include "catch.hpp"
+#include "purify/FFTOperator.h"
+#include "purify/directories.h"
 #include "purify/utilities.h"
 
-#include "purify/FFTOperator.h"
-
-#include "purify/directories.h"
 using namespace purify;
 using namespace purify::notinstalled;
 
@@ -595,4 +595,3 @@ TEST_CASE("utilities [resample]", "[resample]") {
   CHECK(image_resample.isApprox(image_resample_alt, 1e-13));
   CHECK(image_resample(0) == image_resample_alt(0));
 }
-
