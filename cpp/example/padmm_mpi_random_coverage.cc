@@ -69,7 +69,11 @@ padmm_factory(std::shared_ptr<MeasurementOperator const> const &measurements,
               const utilities::vis_params &uv_data, const t_real sigma,
               const sopt::mpi::Communicator &comm) {
 
+#if PURIFY_PADMM_ALGORITHM == 1
+  auto measurements_transform = linear_transform(measurements, uv_data.vis.size());
+#elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 2
   auto measurements_transform = linear_transform(measurements, uv_data.vis.size(), comm);
+#endif
   auto const Psi = sopt::linear_transform<t_complex>(sara, measurements->imsizey(),
                                                      measurements->imsizex(), comm);
 
