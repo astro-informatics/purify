@@ -52,7 +52,6 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   logging::set_level("debug");
   sopt::logging::set_level("debug");
 
-  extern std::unique_ptr<std::mt19937_64> mersenne;
   auto const world = sopt::mpi::Communicator::World();
   // split into serial and parallel
   auto const split_comm = world.split(world.is_root());
