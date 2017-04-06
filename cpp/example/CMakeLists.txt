@@ -29,6 +29,10 @@ if(PURIFY_MPI)
     LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
   target_compile_definitions(example_local_epsilon_replicated_grids
     PRIVATE PURIFY_PADMM_ALGORITHM=3)
+  add_example(local_epsilon_distributed_grids padmm_mpi_random_coverage.cc NOTEST
+    LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+  target_compile_definitions(example_local_epsilon_distributed_grids
+    PRIVATE PURIFY_PADMM_ALGORITHM=1)
 endif()
 add_example(sara_padmm_random_coverage LIBRARIES libpurify NOTEST)
 

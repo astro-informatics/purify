@@ -14,6 +14,7 @@
 #include "purify/directories.h"
 #include "purify/distribute.h"
 #include "purify/logging.h"
+#include "purify/MeasurementOperator_mpi.h"
 #include "purify/mpi_utilities.h"
 #include "purify/pfitsio.h"
 #include "purify/types.h"
@@ -163,9 +164,15 @@ int main(int nargs, char const **args) {
 
   // Generating random uv(w) coverage
   auto const data = dirty_visibilities(ground_truth_image, number_of_vis, snr, world);
-  auto const measurements = std::make_shared<MeasurementOperator const>(
+#if PURIFY_PADMM_ALGORITHM == 2 || PURIFY_PADMM_ALGORITHM == 3
+  auto const measurements = std::make_shared<purify::MeasurementOperator const>(
       std::get<0>(data), 4, 4, kernel, ground_truth_image.cols(), ground_truth_image.rows(), 100,
       2);
+#elif PURIFY_PADMM_ALGORITHM == 1
+  auto const measurements = std::make_shared<purify::mpi::MeasurementOperator const>(
+      world, std::get<0>(data), 4, 4, kernel, ground_truth_image.cols(), ground_truth_image.rows(),
+      100, 2);
+#endif
   auto const sara = sopt::wavelets::distribute_sara(
       sopt::wavelets::SARA{
           std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
@@ -194,6 +201,8 @@ int main(int nargs, char const **args) {
     auto const pb_path = path / kernel / "local_epsilon_replicated_grids";
 #elif PURIFY_PADMM_ALGORITHM == 2
     auto const pb_path = path / kernel / "global_epsilon_replicated_grids";
+#elif PURIFY_PADMM_ALGORITHM == 1
+    auto const pb_path = path / kernel / "global_epsilon_distributed_grids";
 #else
 #error Unknown or unimplemented algorithm
 #endif
