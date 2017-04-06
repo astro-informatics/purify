@@ -9,23 +9,21 @@ using namespace purify;
 
 TEST_CASE("Serial vs Parallel") {
   auto const world = sopt::mpi::Communicator::World();
-  auto const split_comm = world.split(world.is_root());
   if(world.size() <= 2) {
-    std::cout << "Number of worlds: " << world.size() << std::endl;
+    PURIFY_HIGH_LOG("Number of processes ({}) too low, avoiding test", world.size());
     return;
   }
+  auto const split_comm = world.split(world.is_root());
 
   auto const N = 5;
-  auto uv_serial = utilities::uv_symmetry(utilities::random_sample_density(N, 0, constant::pi /
-  3));
+  auto uv_serial = utilities::uv_symmetry(utilities::random_sample_density(N, 0, constant::pi / 3));
   uv_serial.units = "radians";
   uv_serial.u = world.broadcast(uv_serial.u);
   uv_serial.v = world.broadcast(uv_serial.v);
   uv_serial.w = world.broadcast(uv_serial.w);
-  uv_serial.vis =
-  world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
-  uv_serial.weights =
-  world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
+  uv_serial.vis = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
+  uv_serial.weights
+      = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
 
   utilities::vis_params uv_vis = uv_serial;
   if(split_comm.is_root() and split_comm.size() > 1) {
@@ -44,13 +42,11 @@ TEST_CASE("Serial vs Parallel") {
   auto const kernel = "kb_interp";
   auto const width = 10;
   auto const height = 10;
-  MeasurementOperator op(uv_vis, J, J, kernel, width, height, 5, over_sample, cellsize,
-  cellsize);
+  MeasurementOperator op(uv_vis, J, J, kernel, width, height, 5, over_sample, cellsize, cellsize);
   op.norm = world.broadcast(op.norm);
 
   SECTION("Degridding") {
-    auto const image = world.broadcast<Image<t_complex>>(Image<t_complex>::Random(width,
-    height));
+    auto const image = world.broadcast<Image<t_complex>>(Image<t_complex>::Random(width, height));
     auto const degridded = op.degrid(image);
     REQUIRE(degridded.size() == uv_vis.vis.size());
 
@@ -76,7 +72,7 @@ TEST_CASE("Serial vs Parallel") {
   }
 }
 
-TEST_CASE("Serial vs Split FT") {
+TEST_CASE("Serial vs Distributed Fourier Grid") {
   auto const world = sopt::mpi::Communicator::World();
 
   auto const N = 1000;
@@ -103,11 +99,10 @@ TEST_CASE("Serial vs Split FT") {
   auto const kernel = "kb";
   auto const width = 10;
   auto const height = 10;
-  auto const power_iters = 10;
-  MeasurementOperator op_serial(uv_serial, J, J, kernel, width, height, power_iters, over_sample,
-                                cellsize, cellsize);
-  mpi::MeasurementOperator op(world, uv_mpi, J, J, kernel, width, height, power_iters, over_sample,
-                              cellsize, cellsize);
+  MeasurementOperator op_serial(uv_serial, J, J, kernel, width, height, 100, over_sample, cellsize,
+                                cellsize);
+  mpi::MeasurementOperator op(world, uv_mpi, J, J, kernel, width, height, 0, over_sample, cellsize,
+                              cellsize);
   op.norm = world.broadcast(op_serial.norm);
 
   SECTION("Gridding") {
@@ -117,7 +112,8 @@ TEST_CASE("Serial vs Split FT") {
   }
 
   SECTION("Degridding") {
-    auto const image = world.broadcast<Image<t_complex>>(Image<t_complex>::Random(width, height));
+    auto const image = world.broadcast<Image<t_complex>>(Image<t_complex>::Random(width,
+    height));
 
     auto uv_degrid = uv_serial;
     if(world.is_root()) {

@@ -10,21 +10,21 @@
 #include <sopt/wavelets/sara.h>
 #include "purify/MeasurementOperator.h"
 #include "purify/directories.h"
+#include "purify/logging.h"
 #include "purify/pfitsio.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
-#include "purify/logging.h"
 
 int main(int nargs, char const **args) {
-  if(nargs != 6) {
-    std::cout << " Wrong number of arguments! " << '\n';
-    return 1;
-  }
-
   using namespace purify;
   using namespace purify::notinstalled;
   sopt::logging::initialize();
   purify::logging::initialize();
+
+  if(nargs != 6) {
+    PURIFY_CRITICAL(" Wrong number of arguments!");
+    return 1;
+  }
 
   std::string const fitsfile = image_filename("M31.fits");
 
@@ -46,7 +46,7 @@ int main(int nargs, char const **args) {
 
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";
-  std::cout << "Number of measurements: " << uv_data.u.size() << '\n';
+  PURIFY_MEDIUM_LOG("Number of measurements: {}", uv_data.u.size());
   MeasurementOperator simulate_measurements(uv_data, 4, 4, "kb", sky_model.cols(), sky_model.rows(),
                                             20, 5); // Generating simulated high quality visibilites
   uv_data.vis = simulate_measurements.degrid(sky_model);
@@ -78,8 +78,7 @@ int main(int nargs, char const **args) {
       dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
-  std::printf("Using epsilon of %f \n", epsilon);
-  std::cout << "Starting sopt" << '\n';
+  PURIFY_MEDIUM_LOG("Using epsilon of {}", epsilon);
   auto const sdmm
       = sopt::algorithm::SDMM<t_complex>()
             .itermax(500)

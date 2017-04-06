@@ -58,8 +58,7 @@ int main(int, char **) {
 
   auto sigma_real = utilities::median(noise_vis.real().cwiseAbs()) / 0.6745;
 
-  std::cout << "Stokes V RMS noise of " << sigma_real * 1e3 << " mJy and " << sigma_real * 1e3
-            << " mJy" << '\n';
+  PURIFY_HIGH_LOG("Stokes V RMS noise of {} mJy and {} mJy", sigma_real * 1e3, sigma_real * 1e3);
 
   auto psf_model = clean::fit_gaussian(measurements, uv_data);
   std::string const psf_model_fits

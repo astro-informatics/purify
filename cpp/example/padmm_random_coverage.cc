@@ -9,21 +9,21 @@
 #include <sopt/wavelets/sara.h>
 #include "purify/MeasurementOperator.h"
 #include "purify/directories.h"
+#include "purify/logging.h"
 #include "purify/pfitsio.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
-#include "purify/logging.h"
 
 using namespace purify;
 using namespace purify::notinstalled;
 
-void padmm(const std::string & name, const Image<t_complex> & M31, const std::string & kernel, const t_int J, const utilities::vis_params & uv_data, const t_real sigma){
+void padmm(const std::string &name, const Image<t_complex> &M31, const std::string &kernel,
+           const t_int J, const utilities::vis_params &uv_data, const t_real sigma) {
   std::string const outfile = output_filename(name + "_" + kernel + ".tiff");
-  std::string const outfile_fits = output_filename(name +  "_" + kernel + "_solution.fits");
-  std::string const residual_fits = output_filename(name +  "_" + kernel + "_residual.fits");
-  std::string const dirty_image = output_filename(name +  "_" + kernel + "_dirty.tiff");
-  std::string const dirty_image_fits = output_filename(name +  "_" + kernel + "_dirty.fits");
-
+  std::string const outfile_fits = output_filename(name + "_" + kernel + "_solution.fits");
+  std::string const residual_fits = output_filename(name + "_" + kernel + "_residual.fits");
+  std::string const dirty_image = output_filename(name + "_" + kernel + "_dirty.tiff");
+  std::string const dirty_image_fits = output_filename(name + "_" + kernel + "_dirty.fits");
 
   t_real const over_sample = 2;
   MeasurementOperator measurements(uv_data, J, J, kernel, M31.cols(), M31.rows(), 100, over_sample);
@@ -47,8 +47,7 @@ void padmm(const std::string & name, const Image<t_complex> & M31, const std::st
       dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
-  std::printf("Using epsilon of %f \n", epsilon);
-  std::cout << "Starting sopt" << '\n';
+  PURIFY_HIGH_LOG("Using epsilon of {}", epsilon);
   auto const padmm
       = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
             .itermax(100)
@@ -76,30 +75,29 @@ void padmm(const std::string & name, const Image<t_complex> & M31, const std::st
   pfitsio::write2d(residual.real(), residual_fits);
 };
 
-
 int main(int, char **) {
   sopt::logging::initialize();
   purify::logging::initialize();
   sopt::logging::set_level("debug");
   purify::logging::set_level("debug");
-  const std::string & name = "30dor_256";
+  const std::string &name = "30dor_256";
   const t_real snr = 30;
   std::string const fitsfile = image_filename(name + ".fits");
   auto M31 = pfitsio::read2d(fitsfile);
   std::string const inputfile = output_filename(name + "_" + "input.fits");
-  
+
   t_real const max = M31.array().abs().maxCoeff();
   M31 = M31 * 1. / max;
   pfitsio::write2d(M31.real(), inputfile);
-  
+
   t_int const number_of_pxiels = M31.size();
-  t_int const number_of_vis = std::floor( number_of_pxiels * 2.);
+  t_int const number_of_vis = std::floor(number_of_pxiels * 2.);
   // Generating random uv(w) coverage
   t_real const sigma_m = constant::pi / 3;
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";
-  std::cout << "Number of measurements / number of pixels: " << uv_data.u.size() * 1. / number_of_pxiels
-            << '\n';
+  PURIFY_MEDIUM_LOG("Number of measurements / number of pixels: {}",
+                    uv_data.u.size() * 1. / number_of_pxiels);
   // uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
   MeasurementOperator sky_measurements(uv_data, 8, 8, "kb", M31.cols(), M31.rows(), 100, 2);
   uv_data.vis = sky_measurements.degrid(M31);

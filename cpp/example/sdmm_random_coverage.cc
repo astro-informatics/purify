@@ -9,6 +9,7 @@
 #include <sopt/wavelets/sara.h>
 #include "purify/MeasurementOperator.h"
 #include "purify/directories.h"
+#include "purify/logging.h"
 #include "purify/pfitsio.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
@@ -17,6 +18,7 @@ int main(int, char **) {
   using namespace purify;
   using namespace purify::notinstalled;
   sopt::logging::initialize();
+  purify::logging::initialize();
 
   std::string const fitsfile = image_filename("M31.fits");
   std::string const inputfile = output_filename("M31_input.fits");
@@ -40,8 +42,8 @@ int main(int, char **) {
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = "radians";
   utilities::write_visibility(uv_data, output_vis_file);
-  std::cout << "Number of measurements / number of pixels: " << uv_data.u.size() * 1. / M31.size()
-            << '\n';
+  PURIFY_MEDIUM_LOG("Number of measurements / number of pixels: {}",
+                    uv_data.u.size() * 1. / M31.size());
   // uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
   MeasurementOperator measurements(uv_data, 4, 4, "kb", M31.cols(), M31.rows(), 20, over_sample);
   // putting measurement operator in a form that sopt can use
@@ -74,8 +76,7 @@ int main(int, char **) {
       dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
-  std::printf("Using epsilon of %f \n", epsilon);
-  std::cout << "Starting sopt" << '\n';
+  PURIFY_MEDIUM_LOG("Using epsilon of {}", epsilon);
   auto const sdmm
       = sopt::algorithm::SDMM<t_complex>()
             .itermax(500)

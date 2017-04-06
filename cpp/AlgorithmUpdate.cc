@@ -1,5 +1,6 @@
 #include "purify/config.h"
 #include "AlgorithmUpdate.h"
+#include "purify/logging.h"
 
 namespace purify {
 
@@ -8,7 +9,7 @@ AlgorithmUpdate::AlgorithmUpdate(const purify::Params &params, const utilities::
                                  std::ostream &stream, const MeasurementOperator &measurements,
                                  const sopt::LinearTransform<sopt::Vector<sopt::t_complex>> &Psi)
     : params(params), stats(read_params_to_stats(params)), uv_data(uv_data), out_diagnostic(stream),
-      padmm(padmm), c_start(std::clock()), Psi(Psi), measurements(measurements){};
+      padmm(padmm), c_start(std::clock()), Psi(Psi), measurements(measurements) {}
 
 bool AlgorithmUpdate::operator()(const Vector<t_complex> &x) {
   std::clock_t c_end = std::clock();
@@ -22,12 +23,11 @@ bool AlgorithmUpdate::operator()(const Vector<t_complex> &x) {
   // updating parameter
   AlgorithmUpdate::modify_gamma(alpha);
   auto new_l1_norm = alpha.lpNorm<1>();
-  stats.l1_variation = std::abs(stats.l1_norm - new_l1_norm)/stats.l1_norm;
+  stats.l1_variation = std::abs(stats.l1_norm - new_l1_norm) / stats.l1_norm;
   stats.l1_norm = new_l1_norm;
   if(params.run_diagnostic) {
     std::string const outfile_fits = params.name + "_solution_" + params.weighting + "_update";
-    std::string const residual_fits
-        = params.name + "_residual_" + params.weighting + "_update";
+    std::string const residual_fits = params.name + "_residual_" + params.weighting + "_update";
 
     auto const residual = measurements.grid(y_residual);
     AlgorithmUpdate::save_figure(x, outfile_fits, "JY/PIXEL", 1);
@@ -39,9 +39,13 @@ bool AlgorithmUpdate::operator()(const Vector<t_complex> &x) {
     stats.max = residual.matrix().real().maxCoeff();
     stats.min = residual.matrix().real().minCoeff();
     // printing log information to stream
-    AlgorithmUpdate::print_to_stream(out_diagnostic);
+    std::ostringstream sstr;
+    AlgorithmUpdate::print_to_stream(sstr);
+    PURIFY_MEDIUM_LOG(sstr.str());
   }
-  AlgorithmUpdate::print_to_stream(std::cout);
+  std::ostringstream sstr;
+  AlgorithmUpdate::print_to_stream(sstr);
+  PURIFY_MEDIUM_LOG(sstr.str());
   stats.iter++;
 
   return true;
@@ -54,9 +58,9 @@ void AlgorithmUpdate::modify_gamma(Vector<t_complex> const &alpha) {
   if(params.run_diagnostic or (params.adapt_gamma and params.adapt_iter)) {
     stats.new_purify_gamma = alpha.cwiseAbs().maxCoeff() * params.beta;
     stats.relative_gamma = std::abs(stats.new_purify_gamma - padmm.gamma()) / padmm.gamma();
-    std::cout << "Relative variation of step size = " << stats.relative_gamma << '\n';
-    std::cout << "Old step size = " << padmm.gamma() << '\n';
-    std::cout << "New step size = " << stats.new_purify_gamma << '\n';
+    PURIFY_MEDIUM_LOG("Relative variation of step size = {}", stats.relative_gamma);
+    PURIFY_MEDIUM_LOG("Old step size = {}", padmm.gamma());
+    PURIFY_MEDIUM_LOG("New step size = {}", stats.new_purify_gamma);
   }
   if(stats.iter < params.adapt_iter and stats.relative_gamma > params.relative_gamma_adapt
      and stats.new_purify_gamma > 0 and params.adapt_gamma) {
@@ -71,9 +75,9 @@ void AlgorithmUpdate::modify_gamma(Vector<t_complex> const &alpha) {
 
 void AlgorithmUpdate::print_to_stream(std::ostream &stream) {
   if(stats.iter == 0)
-    stream
-        << "i Gamma RelativeGamma DynamicRange RMS(Res) Max(Res) Min(Res) l1_norm l2_norm l1_variation Time(sec)"
-        << std::endl;
+    stream << "i Gamma RelativeGamma DynamicRange RMS(Res) Max(Res) Min(Res) l1_norm l2_norm "
+              "l1_variation Time(sec)"
+           << std::endl;
   stream << stats.iter << " ";
   stream << stats.new_purify_gamma << " ";
   stream << stats.relative_gamma << " ";
@@ -103,7 +107,7 @@ void AlgorithmUpdate::save_figure(const Vector<t_complex> &image,
   header.fits_name = output_file_name + ".fits";
   std::printf("Saving %s \n", header.fits_name.c_str());
   pfitsio::write2d_header(temp_image.real(), header);
-  if (params.stokes_val == purify::casa::MeasurementSet::ChannelWrapper::polarization::P){
+  if(params.stokes_val == purify::casa::MeasurementSet::ChannelWrapper::polarization::P) {
     header.fits_name = output_file_name + "_imag.fits";
     std::printf("Saving %s \n", header.fits_name.c_str());
     pfitsio::write2d_header(temp_image.imag(), header);
