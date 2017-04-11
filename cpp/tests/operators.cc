@@ -14,7 +14,7 @@ using namespace purify::notinstalled;
 TEST_CASE("Operators") {
     sopt::logging::set_level("debug");
     purify::logging::set_level("debug");
-    const t_uint M = 100;
+    const t_uint M = 1000;
     const t_real oversample_ratio = 2;
     const t_real resample_factor = 1;
     const t_uint imsizex = 128;
