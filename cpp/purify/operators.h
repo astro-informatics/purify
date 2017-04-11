@@ -6,6 +6,7 @@
 #include "sopt/chained_operators.h"
 #include "sopt/linear_transform.h"
 #include "purify/kernels.h"
+#include "purify/logging.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
 #ifdef PURIFY_MPI
