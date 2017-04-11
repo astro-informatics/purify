@@ -55,6 +55,6 @@ public:
     return *this;
   }
 };
-}
+} // namespace purify
 
 #endif

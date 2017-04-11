@@ -1,5 +1,5 @@
-#include "purify/config.h"
 #include "purify/MeasurementOperator.h"
+#include "purify/config.h"
 #include "purify/logging.h"
 
 namespace purify {
@@ -31,7 +31,8 @@ Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex> &eigen_imag
   // the image. Also, it is not what we want.
   // get visibilities
   // return (G * ft_vector).array() * W/norm;
-  Vector<t_complex> const result = utilities::sparse_multiply_matrix(G, ft_vector).array() * W / norm;
+  Vector<t_complex> const result
+      = utilities::sparse_multiply_matrix(G, ft_vector).array() * W / norm;
   assert(result.size() == G.rows());
   return result;
 }
@@ -43,9 +44,11 @@ Image<t_complex> MeasurementOperator::grid(const Vector<t_complex> &visibilities
      visibilities:: input visibilities to be gridded
      st:: gridding parameters
      */
-  Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W.conjugate()).matrix()/norm;
-  //Matrix<t_complex> ft_vector
-  //    = utilities::sparse_multiply_matrix<Sparse<t_complex>, Vector<t_complex>>(G.adjoint(), (visibilities.array() * W.conjugate()).matrix() / norm);
+  Matrix<t_complex> ft_vector
+      = G.adjoint() * (visibilities.array() * W.conjugate()).matrix() / norm;
+  // Matrix<t_complex> ft_vector
+  //    = utilities::sparse_multiply_matrix<Sparse<t_complex>, Vector<t_complex>>(G.adjoint(),
+  //    (visibilities.array() * W.conjugate()).matrix() / norm);
   ft_vector.resize(ftsizev_, ftsizeu_); // using conservativeResize does not work, it garbles the
   // image. Also, it is not what we want.
   ft_vector = utilities::re_sample_ft_grid(ft_vector, 1. / resample_factor);
@@ -255,11 +258,11 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
   PURIFY_LOW_LOG("Planning FFT operator");
   if(fftw_plan_flag_ == "measure") {
     PURIFY_LOW_LOG("Measuring...");
-  fftoperator_.fftw_flag((FFTW_MEASURE | FFTW_PRESERVE_INPUT));
+    fftoperator_.fftw_flag((FFTW_MEASURE | FFTW_PRESERVE_INPUT));
   }
-  if(fftw_plan_flag_ == "estimate"){
+  if(fftw_plan_flag_ == "estimate") {
     PURIFY_LOW_LOG("Using an estimate");
-  fftoperator_.fftw_flag((FFTW_ESTIMATE | FFTW_PRESERVE_INPUT));
+    fftoperator_.fftw_flag((FFTW_ESTIMATE | FFTW_PRESERVE_INPUT));
   }
   fftoperator_.set_up_multithread();
   fftoperator_.init_plan(Matrix<t_complex>::Zero(ftsizev_, ftsizeu_));
@@ -290,9 +293,10 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
   if(kernel_name_ == "kb_interp") {
 
     const t_real kb_interp_alpha
-        = constant::pi * std::sqrt(Ju_ * Ju_ / (oversample_factor_ * oversample_factor_)
-                                       * (oversample_factor_ - 0.5) * (oversample_factor_ - 0.5)
-                                   - 0.8);
+        = constant::pi
+          * std::sqrt(Ju_ * Ju_ / (oversample_factor_ * oversample_factor_)
+                          * (oversample_factor_ - 0.5) * (oversample_factor_ - 0.5)
+                      - 0.8);
     const t_int sample_density = 7280;
     const t_int total_samples = sample_density * Ju_;
     auto kb_general
@@ -312,7 +316,8 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
     ftkernelv = ftkb;
     S = MeasurementOperator::init_correction2d(
         ftkernelu, ftkernelv); // Does gridding correction using analytic formula
-    G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju_, Jv_, kernelu, kernelv);
+    G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju_, Jv_, kernelu,
+                                                         kernelv);
 
     PURIFY_DEBUG("Calculating weights: W");
     W = utilities::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor_,
@@ -343,13 +348,15 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
   }
   if(kernel_name_ == "kb_min") {
     const t_real kb_interp_alpha_Ju
-        = constant::pi * std::sqrt(Ju_ * Ju_ / (oversample_factor_ * oversample_factor_)
-                                       * (oversample_factor_ - 0.5) * (oversample_factor_ - 0.5)
-                                   - 0.8);
+        = constant::pi
+          * std::sqrt(Ju_ * Ju_ / (oversample_factor_ * oversample_factor_)
+                          * (oversample_factor_ - 0.5) * (oversample_factor_ - 0.5)
+                      - 0.8);
     const t_real kb_interp_alpha_Jv
-        = constant::pi * std::sqrt(Jv_ * Jv_ / (oversample_factor_ * oversample_factor_)
-                                       * (oversample_factor_ - 0.5) * (oversample_factor_ - 0.5)
-                                   - 0.8);
+        = constant::pi
+          * std::sqrt(Jv_ * Jv_ / (oversample_factor_ * oversample_factor_)
+                          * (oversample_factor_ - 0.5) * (oversample_factor_ - 0.5)
+                      - 0.8);
     auto kbu = [&](t_real x) { return kernels::kaiser_bessel_general(x, Ju_, kb_interp_alpha_Ju); };
     auto kbv = [&](t_real x) { return kernels::kaiser_bessel_general(x, Jv_, kb_interp_alpha_Jv); };
     auto ftkbu = [&](t_real x) {
@@ -479,4 +486,4 @@ linear_transform(std::shared_ptr<MeasurementOperator const> const &measurements,
                                                    adjoint,
                                                    {{0, 1, static_cast<t_int>(width * height)}});
 }
-}
+} // namespace purify

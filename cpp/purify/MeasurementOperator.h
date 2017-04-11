@@ -136,5 +136,5 @@ sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
 linear_transform(std::shared_ptr<MeasurementOperator const> const &measurements, t_uint nvis,
                  sopt::mpi::Communicator const &comm);
 #endif
-}
+} // namespace purify
 #endif
