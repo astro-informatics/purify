@@ -31,7 +31,8 @@ Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex> &eigen_imag
   // the image. Also, it is not what we want.
   // get visibilities
   // return (G * ft_vector).array() * W/norm;
-  auto const result = utilities::sparse_multiply_matrix(G, ft_vector).array() * W / norm;
+  Vector<t_complex> const result = utilities::sparse_multiply_matrix(G, ft_vector).array() * W / norm;
+  assert(result.size() == G.rows());
   return result;
 }
 
@@ -42,9 +43,9 @@ Image<t_complex> MeasurementOperator::grid(const Vector<t_complex> &visibilities
      visibilities:: input visibilities to be gridded
      st:: gridding parameters
      */
-  // Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W).matrix()/norm;
-  Matrix<t_complex> ft_vector
-      = G.adjoint() * (visibilities.array() * W.conjugate()).matrix() / norm;
+  Matrix<t_complex> ft_vector = G.adjoint() * (visibilities.array() * W.conjugate()).matrix()/norm;
+  //Matrix<t_complex> ft_vector
+  //    = utilities::sparse_multiply_matrix<Sparse<t_complex>, Vector<t_complex>>(G.adjoint(), (visibilities.array() * W.conjugate()).matrix() / norm);
   ft_vector.resize(ftsizev_, ftsizeu_); // using conservativeResize does not work, it garbles the
   // image. Also, it is not what we want.
   ft_vector = utilities::re_sample_ft_grid(ft_vector, 1. / resample_factor);
@@ -52,8 +53,11 @@ Image<t_complex> MeasurementOperator::grid(const Vector<t_complex> &visibilities
       ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
   t_int x_start = floor(floor(imsizex_ * oversample_factor_) * 0.5 - imsizex_ * 0.5);
   t_int y_start = floor(floor(imsizey_ * oversample_factor_) * 0.5 - imsizey_ * 0.5);
-  return utilities::parallel_multiply_image(
+  Image<t_complex> out = utilities::parallel_multiply_image(
       S, padded_image.block(y_start, x_start, imsizey_, imsizex_));
+  assert(out.rows() == imsizey_);
+  assert(out.cols() == imsizex_);
+  return out;
 }
 
 Vector<t_real> MeasurementOperator::omega_to_k(const Vector<t_real> &omega) {
@@ -199,7 +203,7 @@ t_real MeasurementOperator::power_method(const t_int &niters, const t_real &rela
   PURIFY_DEBUG("Starting power method");
   PURIFY_DEBUG("Iteration: 0, norm = {}", estimate_eigen_value);
   for(t_int i = 0; i < niters; ++i) {
-    auto new_estimate_eigen_vector = grid(degrid(estimate_eigen_vector));
+    auto new_estimate_eigen_vector = this->grid(this->degrid(estimate_eigen_vector));
     estimate_eigen_value = new_estimate_eigen_vector.matrix().norm();
     estimate_eigen_vector = new_estimate_eigen_vector / estimate_eigen_value;
     PURIFY_DEBUG("Iteration: {}, norm = {}", i + 1, estimate_eigen_value);
@@ -249,12 +253,14 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
   ftsizeu_ = floor(imsizex_ * oversample_factor_);
   ftsizev_ = floor(imsizey_ * oversample_factor_);
   PURIFY_LOW_LOG("Planning FFT operator");
-  if(fftw_plan_flag_ == "measure")
+  if(fftw_plan_flag_ == "measure") {
     PURIFY_LOW_LOG("Measuring...");
   fftoperator_.fftw_flag((FFTW_MEASURE | FFTW_PRESERVE_INPUT));
-  if(fftw_plan_flag_ == "estimate")
+  }
+  if(fftw_plan_flag_ == "estimate"){
     PURIFY_LOW_LOG("Using an estimate");
   fftoperator_.fftw_flag((FFTW_ESTIMATE | FFTW_PRESERVE_INPUT));
+  }
   fftoperator_.set_up_multithread();
   fftoperator_.init_plan(Matrix<t_complex>::Zero(ftsizev_, ftsizeu_));
   utilities::vis_params uv_vis = uv_vis_input;
@@ -306,8 +312,7 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
     ftkernelv = ftkb;
     S = MeasurementOperator::init_correction2d(
         ftkernelu, ftkernelv); // Does gridding correction using analytic formula
-    G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju_, Jv_, kernelu,
-                                                         kernelv);
+    G = MeasurementOperator::init_interpolation_matrix2d(uv_vis.u, uv_vis.v, Ju_, Jv_, kernelu, kernelv);
 
     PURIFY_DEBUG("Calculating weights: W");
     W = utilities::init_weights(uv_vis.u, uv_vis.v, uv_vis.weights, oversample_factor_,

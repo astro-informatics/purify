@@ -1,6 +1,7 @@
 #include "purify/config.h"
 #include <fstream>
 #include <random>
+#include <sys/stat.h>
 #include "purify/logging.h"
 #include "purify/utilities.h"
 
