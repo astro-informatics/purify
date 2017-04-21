@@ -1,9 +1,9 @@
+#include "purify/utilities.h"
 #include "purify/config.h"
 #include <fstream>
 #include <random>
 #include <sys/stat.h>
 #include "purify/logging.h"
-#include "purify/utilities.h"
 
 namespace purify {
 namespace utilities {
@@ -496,12 +496,12 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
     Calculate the weights to be applied to the visibilities in the measurement operator.
     It does none, whiten, natural, uniform, and robust.
   */
+  if(weighting_type == "none")
+    return weights.array() * 0 + 1.;
+  if(weighting_type == "natural" or weighting_type == "whiten")
+    return weights;
   Vector<t_complex> out_weights(weights.size());
-  if(weighting_type == "none") {
-    out_weights = weights.array() * 0 + 1;
-  } else if(weighting_type == "natural" or weighting_type == "whiten") {
-    out_weights = weights;
-  } else {
+  if((weighting_type == "uniform") or (weighting_type == "robust")) {
     t_real scale
         = 1. / oversample_factor; // scale for fov, controlling the region of sidelobe supression
     Matrix<t_complex> gridded_weights = Matrix<t_complex>::Zero(ftsizev, ftsizeu);
@@ -528,8 +528,9 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
               / std::sqrt(1. + robust_scale * gridded_weights(p, q) * gridded_weights(p, q));
       }
     }
-  }
-  return out_weights.array();
+  } else
+    throw std::runtime_error("Wrong weighting type, " + weighting_type + " not recognised.");
+  return out_weights;
 }
 
 std::tuple<t_int, t_real> checkpoint_log(const std::string &diagnostic) {
@@ -621,5 +622,5 @@ Matrix<t_complex> re_sample_image(const Matrix<t_complex> &input, const t_real &
   auto const output = fftop.inverse(new_ft_grid) * re_sample_ratio * re_sample_ratio;
   return output;
 }
-}
-}
+} // namespace utilities
+} // namespace purify
