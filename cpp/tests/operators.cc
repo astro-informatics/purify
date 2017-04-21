@@ -12,8 +12,8 @@ using namespace purify;
 using namespace purify::notinstalled;
 
 TEST_CASE("Operators") {
-  sopt::logging::set_level("debug");
-  purify::logging::set_level("debug");
+  // sopt::logging::set_level("debug");
+  // purify::logging::set_level("debug");
   const t_uint M = 1000;
   const t_real oversample_ratio = 2;
   const t_real resample_factor = 1;
@@ -68,6 +68,8 @@ TEST_CASE("Operators") {
     CHECK(imsizey == S.rows());
     CHECK(S.cols() == expected_op.S.cols());
     CHECK(S.rows() == expected_op.S.rows());
+    INFO(S(0) / expected_op.S(0));
+    INFO(S(5) / expected_op.S(5));
     REQUIRE(S.isApprox(expected_op.S, 1e-4));
     sopt::OperatorFunction<Vector<t_complex>> directZ, indirectZ;
     std::tie(directZ, indirectZ)
@@ -101,10 +103,10 @@ TEST_CASE("Operators") {
   }
   SECTION("Weights") {
     MeasurementOperator weighted_expected_op(uv_vis, Ju, Jv, kernel, imsizex, imsizey, power_iters,
-                                             oversample_ratio, 1, 1, weighting_type, R);
+                                             oversample_ratio, 1, 1, "natural", 0);
     sopt::OperatorFunction<Vector<t_complex>> directW, indirectW;
-    std::tie(directW, indirectW) = purify::operators::init_weights_<Vector<t_complex>>(
-        uv_vis.weights, weighting_type, R, imsizex, imsizey, oversample_ratio, uv_vis.u, uv_vis.v);
+    std::tie(directW, indirectW)
+        = purify::operators::init_weights_<Vector<t_complex>>(uv_vis.weights);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(M);
     Vector<t_complex> direct_output;
     directW(direct_output, direct_input);
@@ -120,9 +122,10 @@ TEST_CASE("Operators") {
     CHECK(expected_indirect.isApprox(indirect_output, 1e-4));
   }
   SECTION("Create Measurement Operator") {
-    const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, imsizey, imsizex, oversample_ratio, power_iters, power_tol,
-        resample_factor, kernel, Ju, Jv, ft_plan);
+    const sopt::LinearTransform<Vector<t_complex>> measure_op
+        = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+            uv_vis.u, uv_vis.v, imsizey, imsizex, oversample_ratio, power_iters, power_tol, kernel,
+            Ju, Jv, ft_plan, resample_factor);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
     const Vector<t_complex> direct_output = measure_op * direct_input;
     CHECK(direct_output.size() == M);
@@ -153,11 +156,11 @@ TEST_CASE("Operators") {
   }
   SECTION("Create Weighted Measurement Operator") {
     MeasurementOperator weighted_expected_op(uv_vis, Ju, Jv, kernel, imsizex, imsizey, power_iters,
-                                             oversample_ratio, 1, 1, weighting_type, R);
+                                             oversample_ratio, 1, 1, "natural");
     const auto measure_op
         = measurementoperator::init_degrid_weighted_operator_2d<Vector<t_complex>>(
             uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
-            power_tol, resample_factor, kernel, Ju, Jv, ft_plan, weighting_type, R);
+            power_tol, kernel, Ju, Jv, ft_plan, resample_factor);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
     const Vector<t_complex> direct_output = measure_op * direct_input;
     CHECK(direct_output.size() == M);
