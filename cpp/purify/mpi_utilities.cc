@@ -1,8 +1,8 @@
+#include "purify/mpi_utilities.h"
 #include "purify/config.h"
 #include <iostream>
 #include <type_traits>
 #include "purify/distribute.h"
-#include "purify/mpi_utilities.h"
 
 namespace purify {
 namespace utilities {
@@ -126,5 +126,5 @@ distribute_params(utilities::vis_params const &params, sopt::mpi::Communicator c
     return utilities::scatter_visibilities(comm);
   return params;
 }
-}
+} // namespace utilities
 } // namespace purify

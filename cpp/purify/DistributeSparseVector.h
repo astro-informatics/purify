@@ -79,6 +79,6 @@ private:
   t_int local_size;
   sopt::mpi::Communicator comm;
 };
-}
+} // namespace purify
 #endif
 #endif
