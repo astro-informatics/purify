@@ -10,12 +10,11 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include "purify/MeasurementOperator.h"
 #include "purify/directories.h"
 #include "purify/distribute.h"
 #include "purify/logging.h"
-#include "purify/MeasurementOperator_mpi.h"
 #include "purify/mpi_utilities.h"
+#include "purify/operators.h"
 #include "purify/pfitsio.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
@@ -34,10 +33,13 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
   PURIFY_HIGH_LOG("Number of measurements / number of pixels: {}",
                   uv_data.u.size() / ground_truth_image.size());
   // creating operator to generate measurements
-  MeasurementOperator sky_measurements(uv_data, 8, 8, "kb", ground_truth_image.cols(),
-                                       ground_truth_image.rows(), 100);
+  auto const sky_measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
+      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data, ground_truth_image.rows(), ground_truth_image.cols(), 1., 1., 2, 100, 1e-4, "kb",
+          8, 8));
   // Generates measurements from image
-  uv_data.vis = sky_measurements.degrid(ground_truth_image);
+  uv_data.vis = (*sky_measurements)
+                * Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);
 
   // working out value of signal given SNR of 30
   auto const sigma = utilities::SNR_to_standard_deviation(uv_data.vis, snr);
@@ -64,18 +66,13 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
 }
 
 std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>>
-padmm_factory(std::shared_ptr<MeasurementOperator const> const &measurements,
-              sopt::wavelets::SARA const &sara, const Image<t_complex> &ground_truth_image,
+padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> const &measurements,
+              const sopt::wavelets::SARA &sara, const Image<t_complex> &ground_truth_image,
               const utilities::vis_params &uv_data, const t_real sigma,
               const sopt::mpi::Communicator &comm) {
 
-#if PURIFY_PADMM_ALGORITHM == 1
-  auto measurements_transform = linear_transform(measurements, uv_data.vis.size());
-#elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 2
-  auto measurements_transform = linear_transform(measurements, uv_data.vis.size(), comm);
-#endif
-  auto const Psi = sopt::linear_transform<t_complex>(sara, measurements->imsizey(),
-                                                     measurements->imsizex(), comm);
+  auto const Psi = sopt::linear_transform<t_complex>(sara, ground_truth_image.rows(),
+                                                     ground_truth_image.cols(), comm);
 
 #if PURIFY_PADMM_ALGORITHM == 2
   auto const epsilon = std::sqrt(
@@ -84,8 +81,7 @@ padmm_factory(std::shared_ptr<MeasurementOperator const> const &measurements,
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
 #endif
   auto const gamma
-      = (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff()
-        * 1e-3;
+      = (Psi.adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3;
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
   PURIFY_MEDIUM_LOG("Gamma {}", gamma);
 
@@ -112,7 +108,7 @@ padmm_factory(std::shared_ptr<MeasurementOperator const> const &measurements,
       .lagrange_update_scale(0.9)
       .nu(1e0)
       .Psi(Psi)
-      .Phi(measurements_transform);
+      .Phi(*measurements);
   sopt::ScalarRelativeVariation<t_complex> conv(padmm->relative_variation(),
                                                 padmm->relative_variation(), "Objective function");
   std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
@@ -169,13 +165,13 @@ int main(int nargs, char const **args) {
   // Generating random uv(w) coverage
   auto const data = dirty_visibilities(ground_truth_image, number_of_vis, snr, world);
 #if PURIFY_PADMM_ALGORITHM == 2 || PURIFY_PADMM_ALGORITHM == 3
-  auto const measurements = std::make_shared<purify::MeasurementOperator const>(
-      std::get<0>(data), 4, 4, kernel, ground_truth_image.cols(), ground_truth_image.rows(), 100,
-      2);
+  auto const measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
+      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), 1., 1.));
 #elif PURIFY_PADMM_ALGORITHM == 1
-  auto const measurements = std::make_shared<purify::mpi::MeasurementOperator const>(
-      world, std::get<0>(data), 4, 4, kernel, ground_truth_image.cols(), ground_truth_image.rows(),
-      100, 2);
+  auto const measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
+      measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), 1., 1.));
 #endif
   auto const sara = sopt::wavelets::distribute_sara(
       sopt::wavelets::SARA{
@@ -195,10 +191,8 @@ int main(int nargs, char const **args) {
   assert(world.broadcast(diagnostic.x).isApprox(diagnostic.x));
 
   // then writes stuff to files
-  auto const residual_image
-      = world.all_sum_all<Image<t_real>>(measurements->grid(diagnostic.residual).real());
-  auto const dirty_image
-      = world.all_sum_all<Image<t_real>>(measurements->grid(std::get<0>(data).vis).real());
+  auto const residual_image = (measurements->adjoint() * diagnostic.residual).real();
+  auto const dirty_image = (measurements->adjoint() * std::get<0>(data).vis).real();
   if(world.is_root()) {
     boost::filesystem::path const path(output_filename(name));
 #if PURIFY_PADMM_ALGORITHM == 3
