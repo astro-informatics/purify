@@ -20,7 +20,7 @@ configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 set(HEADERS
   RMOperator.h logging.h FFTOperator.h kernels.h
   pfitsio.h MeasurementOperator.h clean.h logging.disabled.h types.h PSFOperator.h
-  IndexMapping.h logging.enabled.h utilities.h
+  IndexMapping.h logging.enabled.h utilities.h operators.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(SOURCES MeasurementOperator.cc MeasurementOperator_mpi.cc FFTOperator.cc clean.cc utilities.cc pfitsio.cc
