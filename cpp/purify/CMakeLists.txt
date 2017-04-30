@@ -7,7 +7,7 @@ function(add_include_dir)
     if("${rel}" MATCHES "^\\.\\./")
       list(APPEND publics "${dir}")
     endif()
-  endforeach() 
+  endforeach()
   if(publics)
     target_include_directories(libpurify SYSTEM PUBLIC ${publics})
   endif()
@@ -20,7 +20,7 @@ configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 set(HEADERS
   RMOperator.h logging.h FFTOperator.h kernels.h
   pfitsio.h MeasurementOperator.h clean.h logging.disabled.h types.h PSFOperator.h
-  IndexMapping.h logging.enabled.h utilities.h operators.h
+  IndexMapping.h logging.enabled.h utilities.h operators.h operators_gpu.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(SOURCES MeasurementOperator.cc MeasurementOperator_mpi.cc FFTOperator.cc clean.cc utilities.cc pfitsio.cc
@@ -42,10 +42,14 @@ set(soversion "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}")
 set_target_properties(libpurify PROPERTIES VERSION ${version} SOVERSION ${soversion})
 set_target_properties(libpurify PROPERTIES OUTPUT_NAME purify)
 if(PURIFY_MPI)
-	target_link_libraries(libpurify ${MPI_LIBRARIES})
+  target_link_libraries(libpurify ${MPI_LIBRARIES})
   target_include_directories(libpurify SYSTEM PUBLIC ${MPI_CXX_INCLUDE_PATH})
 endif()
 
+if(PURIFY_ARRAYFIRE)
+  target_link_libraries(libpurify ${ArrayFire_LIBRARIES})
+  target_include_directories(libpurify SYSTEM PUBLIC ${ArrayFire_INCLUDE_DIRS})
+endif()
 
 target_include_directories(libpurify PUBLIC
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
@@ -58,7 +62,7 @@ add_include_dir(
   ${Boost_INCLUDE_DIR}
   ${CFitsIO_INCLUDE_DIR}
   ${CCFits_INCLUDE_DIR}/..
-)
+  )
 target_link_libraries(libpurify
   ${FFTW3_DOUBLE_LIBRARY} ${CCFits_LIBRARY} ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY})
 if(TARGET casacore::casa)
@@ -78,4 +82,4 @@ install(TARGETS libpurify
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
   INCLUDES DESTINATION include
-)
+  )

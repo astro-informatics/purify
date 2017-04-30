@@ -21,8 +21,8 @@ namespace details {
 //! Construct gridding matrix
 Sparse<t_complex>
 init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const t_uint &imsizey_,
-                        const t_uint &imsizex_, const t_uint oversample_ratio,
-                        const t_uint resample_factor, const std::function<t_real(t_real)> kernelu,
+                        const t_uint &imsizex_, const t_real oversample_ratio,
+                        const t_real resample_factor, const std::function<t_real(t_real)> kernelu,
                         const std::function<t_real(t_real)> kernelv, const t_uint Ju = 4,
                         const t_uint Jv = 4) {
   const t_uint ftsizev_ = std::floor(std::floor(imsizey_ * oversample_ratio) * resample_factor);
@@ -117,7 +117,7 @@ template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
 init_gridding_matrix_2d(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
                         const Vector<t_real> &v, const t_uint &imsizey_, const t_uint &imsizex_,
-                        const t_uint oversample_ratio, const t_uint resample_factor,
+                        const t_real oversample_ratio, const t_real resample_factor,
                         const std::function<t_real(t_real)> kernelu,
                         const std::function<t_real(t_real)> kernelv, const t_uint Ju = 4,
                         const t_uint Jv = 4) {

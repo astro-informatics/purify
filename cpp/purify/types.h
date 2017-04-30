@@ -18,6 +18,7 @@ using sopt::Matrix;
 using sopt::Array;
 using sopt::Image;
 
+typedef std::complex<float> t_complexf;
 //! Root of the type hierarchy for triplet lists
 typedef Eigen::Triplet<t_complex> t_tripletList;
 
@@ -31,6 +32,6 @@ namespace constant {
 const t_real pi = 3.14159265358979323846;
 //! speed of light in vacuum
 const t_real c = 299792458.0;
-}
-}
+} // namespace constant
+} // namespace purify
 #endif

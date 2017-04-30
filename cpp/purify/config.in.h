@@ -19,6 +19,9 @@
 //! Whether PURIFY is running with mpi
 #cmakedefine PURIFY_MPI
 
+//! Whether PURIFY is running with arrayfire
+#cmakedefine PURIFY_ARRAYFIRE
+
 #include <string>
 #include <tuple>
 
@@ -44,6 +47,6 @@ inline constexpr bool color_logger() {
   return @PURIFY_COLOR_LOGGING@;
   // clang-format on
 }
-}
+} // namespace purify
 
 #endif
