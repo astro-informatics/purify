@@ -38,43 +38,6 @@ af::array init_af_G_2d(const Sparse<t_complex> &G) {
                     c32);
 }
 
-namespace operators {
-template <class T>
-std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
-init_af_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const t_uint &imsizey_,
-                           const t_uint &imsizex_, const t_real oversample_ratio,
-                           const t_real resample_factor,
-                           const std::function<t_real(t_real)> kernelu,
-                           const std::function<t_real(t_real)> kernelv, const t_uint Ju = 4,
-                           const t_uint Jv = 4) {
-  const Sparse<t_complex> interpolation_matrix = details::init_gridding_matrix_2d(
-      u, v, imsizey_, imsizex_, oversample_ratio, resample_factor, kernelu, kernelv, Ju, Jv);
-  const Sparse<t_complex> adjoint = interpolation_matrix.adjoint();
-  const af::array G = gpu::init_af_G_2d(interpolation_matrix);
-  const af::array G_adjoint = gpu::init_af_G_2d(adjoint);
-  auto direct = [G](T &output, const T &input) { output = af::matmul(G, input); };
-  auto indirect = [G_adjoint](T &output, const T &input) { output = af::matmul(G_adjoint, input); };
-  // af_print(G);
-  return std::make_tuple(direct, indirect);
-}
-template <class T>
-std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
-init_af_FFT_2d(const t_uint &imsizey_, const t_uint &imsizex_, const t_real &oversample_factor_,
-               const t_real &resample_factor_) {
-  auto const ftsizeu_ = std::floor(imsizex_ * oversample_factor_);
-  auto const ftsizev_ = std::floor(imsizey_ * oversample_factor_);
-  auto direct = [=](T &output, const T &input) {
-    output = af::moddims(input, ftsizev_, ftsizeu_);
-    output = af::fft2(output, ftsizev_, ftsizeu_);
-    output = af::moddims(output, ftsizev_ * ftsizeu_, 1);
-  };
-  auto indirect = [=](T &output, const T &input) {
-    output = af::moddims(input, ftsizev_, ftsizeu_);
-    output = af::ifft2(output, ftsizev_, ftsizeu_);
-    output = af::moddims(output, ftsizev_ * ftsizeu_, 1);
-  };
-  return std::make_tuple(direct, indirect);
-}
 sopt::OperatorFunction<Vector<t_complexf>>
 host_wrapper_float(const sopt::OperatorFunction<af::array> &gpu_operator, const t_uint &input_size,
                    const t_uint &output_size) {
@@ -101,8 +64,222 @@ host_wrapper(const sopt::OperatorFunction<af::array> &gpu_operator, const t_uint
     output = output_float.cast<t_complex>();
   };
 }
+namespace operators {
+template <class T>
+std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
+init_af_zero_padding_2d(const Image<float> &S, const t_real &oversample_ratio) {
+  const t_uint imsizex_ = S.cols();
+  const t_uint imsizey_ = S.rows();
+  const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
+  const t_uint ftsizev_ = std::floor(imsizey_ * oversample_ratio);
+  const t_uint x_start = std::floor(ftsizeu_ * 0.5 - imsizex_ * 0.5);
+  const t_uint y_start = std::floor(ftsizev_ * 0.5 - imsizey_ * 0.5);
+  const af::array correction = af::array(imsizey_, imsizex_, S.data());
+  auto direct = [=](T &output, const T &x) {
+    output = af::constant(0., ftsizev_, ftsizeu_, c32);
+    output(af::seq(y_start, y_start + imsizey_ - 1), af::seq(x_start, x_start + imsizex_ - 1))
+        = correction * af::moddims(x, imsizey_, imsizex_);
+    output = af::moddims(output, ftsizev_ * ftsizeu_);
+  };
+  auto indirect = [=](T &output, const T &x) {
+    output = correction
+             * af::moddims(x, ftsizev_, ftsizeu_)(af::seq(y_start, y_start + imsizey_ - 1),
+                                                  af::seq(x_start, x_start + imsizex_ - 1));
+    output = af::moddims(output, imsizex_ * imsizey_);
+  };
+  return std::make_tuple(direct, indirect);
+}
+template <class T>
+std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
+init_af_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v,
+                           const Vector<t_complex> weights, const t_uint &imsizey_,
+                           const t_uint &imsizex_, const t_real oversample_ratio,
+                           const t_real resample_factor,
+                           const std::function<t_real(t_real)> kernelu,
+                           const std::function<t_real(t_real)> kernelv, const t_uint Ju = 4,
+                           const t_uint Jv = 4) {
+  const Sparse<t_complex> interpolation_matrix
+      = details::init_gridding_matrix_2d(u, v, weights, imsizey_, imsizex_, oversample_ratio,
+                                         resample_factor, kernelu, kernelv, Ju, Jv);
+  const Sparse<t_complex> adjoint = interpolation_matrix.adjoint();
+  const af::array G = gpu::init_af_G_2d(interpolation_matrix);
+  const af::array G_adjoint = gpu::init_af_G_2d(adjoint);
+  auto direct = [G](T &output, const T &input) { output = af::matmul(G, input); };
+  auto indirect = [G_adjoint](T &output, const T &input) { output = af::matmul(G_adjoint, input); };
+  return std::make_tuple(direct, indirect);
+}
+#ifdef PURIFY_MPI
+//! Constructs degridding operator with mpi and arrayfire
+std::tuple<sopt::OperatorFunction<Vector<t_complex>>, sopt::OperatorFunction<Vector<t_complex>>>
+init_af_gridding_matrix_2d(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
+                           const Vector<t_real> &v, const Vector<t_complex> &weights,
+                           const t_uint &imsizey_, const t_uint &imsizex_,
+                           const t_real oversample_ratio, const t_real resample_factor,
+                           const std::function<t_real(t_real)> kernelu,
+                           const std::function<t_real(t_real)> kernelv, const t_uint Ju = 4,
+                           const t_uint Jv = 4) {
+
+  PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
+  PURIFY_LOW_LOG("Constructing MPI Gridding Operator: G");
+  Sparse<t_complex> interpolation_matrix
+      = details::init_gridding_matrix_2d(u, v, weights, imsizey_, imsizex_, oversample_ratio,
+                                         resample_factor, kernelu, kernelv, Ju, Jv);
+  const DistributeSparseVector distributor(interpolation_matrix, comm);
+  interpolation_matrix = purify::compress_outer(interpolation_matrix);
+  const Sparse<t_complex> adjoint = interpolation_matrix.adjoint();
+  const af::array G = gpu::init_af_G_2d(interpolation_matrix);
+  const af::array G_adjoint = gpu::init_af_G_2d(adjoint);
+  auto directGgpu
+      = [G](af::array &output, const af::array &input) { output = af::matmul(G, input); };
+  auto indirectGgpu = [G_adjoint](af::array &output, const af::array &input) {
+    output = af::matmul(G_adjoint, input);
+  };
+  auto directGhost
+      = gpu::host_wrapper(directGgpu, interpolation_matrix.cols(), interpolation_matrix.rows());
+  auto indirectGhost
+      = gpu::host_wrapper(indirectGgpu, interpolation_matrix.rows(), interpolation_matrix.cols());
+  return std::make_tuple(
+      [=](Vector<t_complex> &output, const Vector<t_complex> &input) {
+        if(comm.is_root()) {
+          assert(input.size() > 0);
+          distributor.scatter(input, output);
+        } else {
+          distributor.scatter(output);
+        }
+        auto const dist_input = output;
+        directGhost(output, dist_input);
+      },
+      [=](Vector<t_complex> &output, const Vector<t_complex> &input) {
+        if(not comm.is_root()) {
+          Vector<t_complex> dist_output;
+          indirectGhost(dist_output, input);
+          distributor.gather(dist_output);
+        } else {
+          Vector<t_complex> dist_output;
+          indirectGhost(dist_output, input);
+          distributor.gather(dist_output, output);
+        }
+      });
+}
+#endif
+template <class T>
+std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
+init_af_FFT_2d(const t_uint &imsizey_, const t_uint &imsizex_, const t_real &oversample_factor_,
+               const t_real &resample_factor_) {
+  auto const ftsizeu_ = std::floor(imsizex_ * oversample_factor_);
+  auto const ftsizev_ = std::floor(imsizey_ * oversample_factor_);
+  auto direct = [=](T &output, const T &input) {
+    output = af::moddims(input, ftsizev_, ftsizeu_);
+    output = af::fft2(output, ftsizev_, ftsizeu_);
+    output = af::moddims(output, ftsizev_ * ftsizeu_, 1);
+  };
+  auto indirect = [=](T &output, const T &input) {
+    output = af::moddims(input, ftsizev_, ftsizeu_);
+    output = af::ifft2(output, ftsizev_, ftsizeu_);
+    output = af::moddims(output, ftsizev_ * ftsizeu_, 1);
+  };
+  return std::make_tuple(direct, indirect);
+}
+
+std::tuple<sopt::OperatorFunction<Vector<t_complex>>, sopt::OperatorFunction<Vector<t_complex>>>
+base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
+                        const Vector<t_complex> &weights, const t_uint &imsizey,
+                        const t_uint &imsizex, const t_real oversample_ratio = 2,
+                        const std::string &kernel = "kb", const t_uint Ju = 4, const t_uint Jv = 4,
+                        const t_real resample_factor = 1.) {
+  std::function<t_real(t_real)> kernelu, kernelv, ftkernelu, ftkernelv;
+  std::tie(kernelu, kernelv, ftkernelu, ftkernelv)
+      = purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
+  sopt::OperatorFunction<af::array> directZ, indirectZ;
+  sopt::OperatorFunction<af::array> directFFT, indirectFFT;
+  sopt::OperatorFunction<af::array> directG, indirectG;
+  const Image<t_real> S = purify::details::init_correction2d(oversample_ratio, imsizey, imsizex,
+                                                             ftkernelu, ftkernelv);
+  std::tie(directZ, indirectZ) = purify::gpu::operators::init_af_zero_padding_2d<af::array>(
+      S.cast<float>(), oversample_ratio);
+  std::tie(directFFT, indirectFFT) = purify::gpu::operators::init_af_FFT_2d<af::array>(
+      imsizey, imsizex, oversample_ratio, resample_factor);
+  std::tie(directG, indirectG) = purify::gpu::operators::init_af_gridding_matrix_2d<af::array>(
+      u, v, weights, imsizey, imsizex, oversample_ratio, resample_factor, kernelv, kernelu, Ju, Jv);
+  auto direct = gpu::host_wrapper(sopt::chained_operators<af::array>(directG, directFFT, directZ),
+                                  imsizey * imsizex, u.size());
+  auto indirect
+      = gpu::host_wrapper(sopt::chained_operators<af::array>(indirectZ, indirectFFT, indirectG),
+                          u.size(), imsizex * imsizey);
+  return std::make_tuple(direct, indirect);
+}
+
+#ifdef PURIFY_MPI
+std::tuple<sopt::OperatorFunction<Vector<t_complex>>, sopt::OperatorFunction<Vector<t_complex>>>
+base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
+                            const Vector<t_real> &v, const Vector<t_complex> &weights,
+                            const t_uint &imsizey, const t_uint &imsizex,
+                            const t_real oversample_ratio = 2, const std::string &kernel = "kb",
+                            const t_uint Ju = 4, const t_uint Jv = 4,
+                            const t_real resample_factor = 1.) {
+  std::function<t_real(t_real)> kernelu, kernelv, ftkernelu, ftkernelv;
+  std::tie(kernelu, kernelv, ftkernelu, ftkernelv)
+      = purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
+  sopt::OperatorFunction<af::array> directZ, indirectZ;
+  sopt::OperatorFunction<af::array> directFFT, indirectFFT;
+  sopt::OperatorFunction<Vector<t_complex>> directG, indirectG;
+  const Image<t_real> S = purify::details::init_correction2d(oversample_ratio, imsizey, imsizex,
+                                                             ftkernelu, ftkernelv);
+  std::tie(directZ, indirectZ) = purify::gpu::operators::init_af_zero_padding_2d<af::array>(
+      S.cast<float>(), oversample_ratio);
+  std::tie(directFFT, indirectFFT) = purify::gpu::operators::init_af_FFT_2d<af::array>(
+      imsizey, imsizex, oversample_ratio, resample_factor);
+  std::tie(directG, indirectG) = operators::init_af_gridding_matrix_2d(
+      comm, u, v, weights, imsizey, imsizex, oversample_ratio, resample_factor, kernelv, kernelu,
+      Ju, Jv);
+  auto direct
+      = gpu::host_wrapper(sopt::chained_operators<af::array>(directFFT, directZ), imsizey * imsizex,
+                          std::floor(imsizex * imsizey * oversample_ratio * oversample_ratio));
+  auto indirect = gpu::host_wrapper(
+      sopt::chained_operators<af::array>(indirectZ, indirectFFT),
+      std::floor(imsizex * imsizey * oversample_ratio * oversample_ratio), imsizex * imsizey);
+  direct = sopt::chained_operators<Vector<t_complex>>(directG, direct);
+  indirect = sopt::chained_operators<Vector<t_complex>>(indirect, indirectG);
+  return std::make_tuple(direct, indirect);
+}
+#endif
 } // namespace operators
+
+namespace measurementoperator {
+
+sopt::LinearTransform<Vector<t_complex>>
+init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
+                        const Vector<t_complex> &weights, const t_uint &imsizey,
+                        const t_uint &imsizex, const t_real oversample_ratio = 2,
+                        const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
+                        const std::string &kernel = "kb", const t_uint Ju = 4, const t_uint Jv = 4,
+                        const t_real resample_factor = 1.) {
+  /*
+   *  Returns linear transform that is the standard degridding operator
+   */
+
+  const t_int M = u.size();
+  const t_int N = imsizey * imsizex;
+  sopt::OperatorFunction<Vector<t_complex>> directDegrid, indirectDegrid;
+  std::tie(directDegrid, indirectDegrid) = purify::gpu::operators::base_degrid_operator_2d(
+      u, v, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, resample_factor);
+  auto direct = directDegrid;
+  auto indirect = indirectDegrid;
+  const t_real op_norm = details::power_method<Vector<t_complex>>(
+      {direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
+      Vector<t_complex>::Random(imsizex * imsizey));
+  auto operator_norm = purify::operators::init_normalise<Vector<t_complex>>(op_norm);
+  direct = sopt::chained_operators<Vector<t_complex>>(direct, operator_norm);
+  indirect = sopt::chained_operators<Vector<t_complex>>(operator_norm, indirect);
+  return {direct, {0, 1, M}, indirect, {0, 1, N}};
+}
+
+} // namespace measurementoperator
+
 } // namespace gpu
+
+namespace operators {}
+
 }; // namespace purify
 #endif
 #endif

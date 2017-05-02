@@ -19,12 +19,13 @@ namespace purify {
 
 namespace details {
 //! Construct gridding matrix
-Sparse<t_complex>
-init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const t_uint &imsizey_,
-                        const t_uint &imsizex_, const t_real oversample_ratio,
-                        const t_real resample_factor, const std::function<t_real(t_real)> kernelu,
-                        const std::function<t_real(t_real)> kernelv, const t_uint Ju = 4,
-                        const t_uint Jv = 4) {
+Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v,
+                                          const Vector<t_complex> &weights, const t_uint &imsizey_,
+                                          const t_uint &imsizex_, const t_real oversample_ratio,
+                                          const t_real resample_factor,
+                                          const std::function<t_real(t_real)> kernelu,
+                                          const std::function<t_real(t_real)> kernelv,
+                                          const t_uint Ju = 4, const t_uint Jv = 4) {
   const t_uint ftsizev_ = std::floor(std::floor(imsizey_ * oversample_ratio) * resample_factor);
   const t_uint ftsizeu_ = std::floor(std::floor(imsizex_ * oversample_ratio) * resample_factor);
   const t_uint rows = u.size();
@@ -51,13 +52,12 @@ init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
         const t_complex I(0, 1);
         interpolation_matrix.coeffRef(m, index)
             += std::exp(-2 * constant::pi * I * ((k_u(m) + ju) * 0.5 + (k_v(m) + jv) * 0.5))
-               * kernelu(u(m) - (k_u(m) + ju)) * kernelv(v(m) - (k_v(m) + jv));
+               * kernelu(u(m) - (k_u(m) + ju)) * kernelv(v(m) - (k_v(m) + jv)) * weights(m);
       }
     }
   }
   return interpolation_matrix;
 }
-//! Construsts gridding correction operator
 Image<t_real> init_correction2d(const t_real &oversample_ratio, const t_uint &imsizey_,
                                 const t_uint imsizex_,
                                 const std::function<t_real(t_real)> ftkernelu,
@@ -116,7 +116,8 @@ namespace operators {
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
 init_gridding_matrix_2d(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
-                        const Vector<t_real> &v, const t_uint &imsizey_, const t_uint &imsizex_,
+                        const Vector<t_real> &v, const Vector<t_complex> &weights,
+                        const t_uint &imsizey_, const t_uint &imsizex_,
                         const t_real oversample_ratio, const t_real resample_factor,
                         const std::function<t_real(t_real)> kernelu,
                         const std::function<t_real(t_real)> kernelv, const t_uint Ju = 4,
@@ -124,8 +125,9 @@ init_gridding_matrix_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
 
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   PURIFY_LOW_LOG("Constructing MPI Gridding Operator: G");
-  Sparse<t_complex> interpolation_matrix = details::init_gridding_matrix_2d(
-      u, v, imsizey_, imsizex_, oversample_ratio, resample_factor, kernelu, kernelv, Ju, Jv);
+  Sparse<t_complex> interpolation_matrix
+      = details::init_gridding_matrix_2d(u, v, weights, imsizey_, imsizex_, oversample_ratio,
+                                         resample_factor, kernelu, kernelv, Ju, Jv);
   const DistributeSparseVector distributor(interpolation_matrix, comm);
   interpolation_matrix = purify::compress_outer(interpolation_matrix);
   const Sparse<t_complex> adjoint = interpolation_matrix.adjoint();
@@ -160,7 +162,8 @@ template <class T> sopt::OperatorFunction<T> init_all_sum_all(const sopt::mpi::C
 //! Constructs degridding operator with mpi
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
-init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const t_uint &imsizey_,
+init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v,
+                        const Vector<t_complex> &weights, const t_uint &imsizey_,
                         const t_uint &imsizex_, const t_uint oversample_ratio,
                         const t_uint resample_factor, const std::function<t_real(t_real)> kernelu,
                         const std::function<t_real(t_real)> kernelv, const t_uint Ju = 4,
@@ -168,8 +171,9 @@ init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
 
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   PURIFY_LOW_LOG("Constructing Gridding Operator: G");
-  const Sparse<t_complex> interpolation_matrix = details::init_gridding_matrix_2d(
-      u, v, imsizey_, imsizex_, oversample_ratio, resample_factor, kernelu, kernelv, Ju, Jv);
+  const Sparse<t_complex> interpolation_matrix
+      = details::init_gridding_matrix_2d(u, v, weights, imsizey_, imsizex_, oversample_ratio,
+                                         resample_factor, kernelu, kernelv, Ju, Jv);
   const Sparse<t_complex> adjoint = interpolation_matrix.adjoint();
 
   return std::make_tuple(
@@ -284,7 +288,8 @@ init_FFT_2d(const t_uint &imsizey_, const t_uint &imsizex_, const t_real &oversa
 
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
-base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const t_uint &imsizey,
+base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
+                        const Vector<t_complex> &weights, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real oversample_ratio = 2,
                         const std::string &kernel = "kb", const t_uint Ju = 4, const t_uint Jv = 4,
                         const std::string &ft_plan = "measure", const t_real resample_factor = 1.) {
@@ -300,17 +305,28 @@ base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
   std::tie(directFFT, indirectFFT) = purify::operators::init_FFT_2d<T>(
       imsizey, imsizex, oversample_ratio, resample_factor, ft_plan);
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
-      u, v, imsizey, imsizex, oversample_ratio, resample_factor, kernelv, kernelu, Ju, Jv);
+      u, v, weights, imsizey, imsizex, oversample_ratio, resample_factor, kernelv, kernelu, Ju, Jv);
   auto direct = sopt::chained_operators<T>(directG, directFFT, directZ);
   auto indirect = sopt::chained_operators<T>(indirectZ, indirectFFT, indirectG);
   return std::make_tuple(direct, indirect);
 }
 
+template <class T>
+std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
+base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const t_uint &imsizey,
+                        const t_uint &imsizex, const t_real oversample_ratio = 2,
+                        const std::string &kernel = "kb", const t_uint Ju = 4, const t_uint Jv = 4,
+                        const std::string &ft_plan = "measure", const t_real resample_factor = 1.) {
+  return base_degrid_operator_2d<T>(u, v, Vector<t_complex>::Constant(u.size(), 1.), imsizey,
+                                    imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan,
+                                    resample_factor);
+}
 #ifdef PURIFY_MPI
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
 base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
-                            const Vector<t_real> &v, const t_uint &imsizey, const t_uint &imsizex,
+                            const Vector<t_real> &v, const Vector<t_complex> &weights,
+                            const t_uint &imsizey, const t_uint &imsizex,
                             const t_real oversample_ratio = 2, const std::string &kernel = "kb",
                             const t_uint Ju = 4, const t_uint Jv = 4,
                             const std::string &ft_plan = "measure",
@@ -327,13 +343,25 @@ base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_
   std::tie(directFFT, indirectFFT) = purify::operators::init_FFT_2d<T>(
       imsizey, imsizex, oversample_ratio, resample_factor, ft_plan);
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
-      comm, u, v, imsizey, imsizex, oversample_ratio, resample_factor, kernelv, kernelu, Ju, Jv);
+      comm, u, v, weights, imsizey, imsizex, oversample_ratio, resample_factor, kernelv, kernelu,
+      Ju, Jv);
   auto direct = sopt::chained_operators<T>(directG, directFFT, directZ);
   auto indirect = sopt::chained_operators<T>(indirectZ, indirectFFT, indirectG);
   if(comm.is_root())
     return std::make_tuple(direct, indirect);
   else
     return std::make_tuple(directG, indirectG);
+}
+template <class T>
+std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
+base_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
+                        const Vector<t_real> &v, const t_uint &imsizey, const t_uint &imsizex,
+                        const t_real oversample_ratio = 2, const std::string &kernel = "kb",
+                        const t_uint Ju = 4, const t_uint Jv = 4,
+                        const std::string &ft_plan = "measure", const t_real resample_factor = 1.) {
+  return base_degrid_operator_2d<T>(comm, u, v, Vector<t_complex>::Constant(u.size(), 1.), imsizey,
+                                    imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan,
+                                    resample_factor);
 }
 #endif
 }
@@ -402,11 +430,9 @@ init_degrid_weighted_operator_2d(const Vector<t_real> &u, const Vector<t_real> &
   const t_int N = imsizey * imsizex;
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_2d<T>(
-      u, v, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, resample_factor);
-  sopt::OperatorFunction<T> directW, indirectW;
-  std::tie(directW, indirectW) = purify::operators::init_weights_<T>(weights);
-  auto direct = sopt::chained_operators<T>(directW, directDegrid);
-  auto indirect = sopt::chained_operators<T>(indirectDegrid, indirectW);
+      u, v, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, resample_factor);
+  auto direct = directDegrid;
+  auto indirect = indirectDegrid;
   const t_real op_norm
       = details::power_method<T>({direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
                                  T::Random(imsizex * imsizey));
@@ -499,12 +525,10 @@ init_degrid_weighted_operator_2d(const sopt::mpi::Communicator &comm, const Vect
   const t_int N = imsizey * imsizex;
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_2d<T>(
-      u, v, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, resample_factor);
-  sopt::OperatorFunction<T> directW, indirectW;
-  std::tie(directW, indirectW) = purify::operators::init_weights_<T>(weights);
+      u, v, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, resample_factor);
   const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
-  auto direct = sopt::chained_operators<T>(directW, directDegrid);
-  auto indirect = sopt::chained_operators<T>(indirectDegrid, indirectW);
+  auto direct = sopt::chained_operators<T>(directDegrid);
+  auto indirect = sopt::chained_operators<T>(indirectDegrid);
   const t_real op_norm
       = details::power_method<T>({direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
                                  comm.broadcast<T>(T::Random(imsizex * imsizey)));
@@ -553,7 +577,8 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_
   auto Broadcast = purify::operators::init_broadcaster<T>(comm);
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_mpi_degrid_operator_2d<T>(
-      comm, u, v, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, resample_factor);
+      comm, u, v, Vector<t_complex>::Constant(u.size(), 1.), imsizey, imsizex, oversample_ratio,
+      kernel, Ju, Jv, ft_plan, resample_factor);
   auto direct = directDegrid;
   auto indirect = sopt::chained_operators<T>(Broadcast, indirectDegrid);
   const t_real op_norm
@@ -603,13 +628,12 @@ init_degrid_weighted_operator_2d_mpi(const sopt::mpi::Communicator &comm, const 
   const t_int M = u.size();
   const t_int N = imsizey * imsizex;
   auto Broadcast = purify::operators::init_broadcaster<T>(comm);
-  sopt::OperatorFunction<T> directW, indirectW;
-  std::tie(directW, indirectW) = purify::operators::init_weights_<Vector<t_complex>>(weights);
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_mpi_degrid_operator_2d<T>(
-      comm, u, v, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, resample_factor);
-  auto direct = sopt::chained_operators<T>(directW, directDegrid);
-  auto indirect = sopt::chained_operators<T>(Broadcast, indirectDegrid, indirectW);
+      comm, u, v, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan,
+      resample_factor);
+  auto direct = directDegrid;
+  auto indirect = sopt::chained_operators<T>(Broadcast, indirectDegrid);
   const t_real op_norm
       = details::power_method<T>({direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
                                  comm.broadcast<T>(T::Random(imsizex * imsizey)));

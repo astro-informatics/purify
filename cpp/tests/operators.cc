@@ -46,7 +46,8 @@ TEST_CASE("Operators") {
   SECTION("Gridding") {
     sopt::OperatorFunction<Vector<t_complex>> directG, indirectG;
     std::tie(directG, indirectG) = operators::init_gridding_matrix_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, imsizey, imsizex, oversample_ratio, resample_factor, kbv, kbu, Ju, Jv);
+        uv_vis.u, uv_vis.v, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex, oversample_ratio,
+        resample_factor, kbv, kbu, Ju, Jv);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     Vector<t_complex> direct_output;
     directG(direct_output, direct_input);

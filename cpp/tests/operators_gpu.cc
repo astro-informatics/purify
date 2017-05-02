@@ -50,9 +50,9 @@ TEST_CASE("GPU Operators") {
     std::tie(direct_gpu_fft, indirect_gpu_fft) = gpu::operators::init_af_FFT_2d<af::array>(
         imsizey, imsizex, oversample_ratio, resample_factor);
     sopt::OperatorFunction<Vector<t_complex>> fft
-        = gpu::operators::host_wrapper(direct_gpu_fft, input.size(), input.size());
+        = gpu::host_wrapper(direct_gpu_fft, input.size(), input.size());
     sopt::OperatorFunction<Vector<t_complex>> ifft
-        = gpu::operators::host_wrapper(indirect_gpu_fft, input.size(), input.size());
+        = gpu::host_wrapper(indirect_gpu_fft, input.size(), input.size());
     fft(output, input);
     ifft(new_input, output);
     CHECK(input.isApprox(new_input, 1e-6));
@@ -73,14 +73,16 @@ TEST_CASE("GPU Operators") {
   SECTION("Gridding") {
     sopt::OperatorFunction<af::array> direct_gpu_G, indirect_gpu_G;
     std::tie(direct_gpu_G, indirect_gpu_G) = gpu::operators::init_af_gridding_matrix_2d<af::array>(
-        uv_vis.u, uv_vis.v, imsizey, imsizex, oversample_ratio, resample_factor, kbu, kbv, Ju, Jv);
+        uv_vis.u, uv_vis.v, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex, oversample_ratio,
+        resample_factor, kbu, kbv, Ju, Jv);
     const sopt::OperatorFunction<Vector<t_complex>> gpu_direct_G
-        = gpu::operators::host_wrapper(direct_gpu_G, ftsizeu * ftsizev, M);
+        = gpu::host_wrapper(direct_gpu_G, ftsizeu * ftsizev, M);
     const sopt::OperatorFunction<Vector<t_complex>> gpu_indirect_G
-        = gpu::operators::host_wrapper(indirect_gpu_G, M, ftsizeu * ftsizev);
+        = gpu::host_wrapper(indirect_gpu_G, M, ftsizeu * ftsizev);
     sopt::OperatorFunction<Vector<t_complex>> direct_G, indirect_G;
     std::tie(direct_G, indirect_G) = operators::init_gridding_matrix_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, imsizey, imsizex, oversample_ratio, resample_factor, kbv, kbu, Ju, Jv);
+        uv_vis.u, uv_vis.v, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex, oversample_ratio,
+        resample_factor, kbv, kbu, Ju, Jv);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     const Vector<t_complex> indirect_input = Vector<t_complex>::Random(M);
     Vector<t_complex> output_new;
@@ -92,4 +94,69 @@ TEST_CASE("GPU Operators") {
     indirect_G(output_old, indirect_input);
     CHECK(output_new.isApprox(output_old, 1e-6));
   }
+  SECTION("Zero Padding") {
+    const Image<t_real> S
+        = details::init_correction2d(oversample_ratio, imsizey, imsizex, ftkbu, ftkbv);
+    CHECK(imsizex == S.cols());
+    CHECK(imsizey == S.rows());
+    sopt::OperatorFunction<Vector<t_complex>> directZ, indirectZ;
+    std::tie(directZ, indirectZ)
+        = operators::init_zero_padding_2d<Vector<t_complex>>(S, oversample_ratio);
+    sopt::OperatorFunction<af::array> directZgpu, indirectZgpu;
+    std::tie(directZgpu, indirectZgpu)
+        = gpu::operators::init_af_zero_padding_2d<af::array>(S.cast<float>(), oversample_ratio);
+    sopt::OperatorFunction<Vector<t_complex>> directZ_gpu
+        = gpu::host_wrapper(directZgpu, imsizex * imsizey, ftsizeu * ftsizev);
+    sopt::OperatorFunction<Vector<t_complex>> indirectZ_gpu
+        = gpu::host_wrapper(indirectZgpu, ftsizeu * ftsizev, imsizex * imsizey);
+    const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
+    Vector<t_complex> direct_output_old;
+    Vector<t_complex> direct_output_new;
+    directZ(direct_output_old, direct_input);
+    directZ_gpu(direct_output_new, direct_input);
+    CHECK(direct_output_new.size() == ftsizeu * ftsizev);
+    CHECK(direct_output_old.isApprox(direct_output_new, 1e-6));
+    const Vector<t_complex> indirect_input = Vector<t_complex>::Random(ftsizeu * ftsizev);
+    Vector<t_complex> indirect_output_old;
+    Vector<t_complex> indirect_output_new;
+    indirectZ(indirect_output_old, indirect_input);
+    indirectZ_gpu(indirect_output_new, indirect_input);
+    CHECK(indirect_output_new.size() == imsizex * imsizey);
+    CHECK(indirect_output_old.isApprox(indirect_output_new, 1e-6));
+  }
+  SECTION("Serial Operator") {
+    const auto measure_op
+        = measurementoperator::init_degrid_weighted_operator_2d<Vector<t_complex>>(
+            uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
+            power_tol, kernel, Ju, Jv, ft_plan, resample_factor);
+
+    const auto measure_op_gpu = gpu::measurementoperator::init_degrid_operator_2d(
+        uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
+        power_tol, kernel, Ju, Jv, resample_factor);
+    const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
+    const Vector<t_complex> direct_output = measure_op_gpu * direct_input;
+    CHECK(direct_output.size() == M);
+    const Vector<t_complex> indirect_input = Vector<t_complex>::Random(M);
+    const Vector<t_complex> indirect_output = measure_op_gpu.adjoint() * indirect_input;
+    CHECK(indirect_output.size() == imsizex * imsizey);
+    SECTION("Power Method") {
+      auto op_norm = details::power_method<Vector<t_complex>>(
+          measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
+      CHECK(std::abs(op_norm - 1.) < power_tol);
+    }
+    SECTION("Degrid") {
+      const Vector<t_complex> input = Vector<t_complex>::Random(imsizex * imsizey);
+      const Vector<t_complex> expected_output = measure_op * input;
+      const Vector<t_complex> actual_output = measure_op_gpu * input;
+      CHECK(expected_output.size() == actual_output.size());
+      CHECK(actual_output.isApprox(expected_output, 1e-4));
+    }
+    SECTION("Grid") {
+      const Vector<t_complex> input = Vector<t_complex>::Random(M);
+      const Vector<t_complex> expected_output = measure_op.adjoint() * input;
+      const Vector<t_complex> actual_output = measure_op_gpu.adjoint() * input;
+      CHECK(expected_output.size() == actual_output.size());
+      CHECK(actual_output.isApprox(expected_output, 1e-4));
+    }
+  };
 }
