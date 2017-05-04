@@ -125,10 +125,9 @@ TEST_CASE("GPU Operators") {
     CHECK(indirect_output_old.isApprox(indirect_output_new, 1e-6));
   }
   SECTION("Serial Operator") {
-    const auto measure_op
-        = measurementoperator::init_degrid_weighted_operator_2d<Vector<t_complex>>(
-            uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
-            power_tol, kernel, Ju, Jv, ft_plan, resample_factor);
+    const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+        uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
+        power_tol, kernel, Ju, Jv, ft_plan, resample_factor);
 
     const auto measure_op_gpu = gpu::measurementoperator::init_degrid_operator_2d(
         uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,

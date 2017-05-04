@@ -367,22 +367,24 @@ base_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
 }
 
 namespace measurementoperator {
+
 template <class T>
 sopt::LinearTransform<T>
-init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const t_uint &imsizey,
+init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
+                        const Vector<t_complex> &weights, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real oversample_ratio = 2,
                         const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
                         const std::string &kernel = "kb", const t_uint Ju = 4, const t_uint Jv = 4,
-                        const std::string &ft_plan = "measure", const t_real resample_factor = 1.) {
+                        const std::string &ft_plan = "measure",
+                        const t_real &resample_factor = 1.) {
   /*
    *  Returns linear transform that is the standard degridding operator
    */
-
   const t_int M = u.size();
   const t_int N = imsizey * imsizex;
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_2d<T>(
-      u, v, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, resample_factor);
+      u, v, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, resample_factor);
   auto direct = directDegrid;
   auto indirect = indirectDegrid;
   const t_real op_norm
@@ -401,122 +403,26 @@ init_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_uint 
                         const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
                         const t_uint Ju = 4, const t_uint Jv = 4,
                         const std::string &ft_plan = "measure", const t_real resample_factor = 1.) {
-
-  utilities::vis_params uv_vis = uv_vis_input;
-  if(uv_vis.units == "lambda")
-    uv_vis = utilities::set_cell_size(uv_vis, cell_x, cell_y);
-  if(uv_vis.units == "radians")
-    uv_vis = utilities::uv_scale(uv_vis, floor(oversample_ratio * imsizex),
-                                 floor(oversample_ratio * imsizey));
-  return init_degrid_operator_2d<T>(uv_vis.u, uv_vis.v, imsizey, imsizex, oversample_ratio,
-                                    power_iters, power_tol, kernel, Ju, Jv, ft_plan,
-                                    resample_factor);
-}
-
-template <class T>
-sopt::LinearTransform<T>
-init_degrid_weighted_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
-                                 const Vector<t_complex> &weights, const t_uint &imsizey,
-                                 const t_uint &imsizex, const t_real oversample_ratio = 2,
-                                 const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
-                                 const std::string &kernel = "kb", const t_uint Ju = 4,
-                                 const t_uint Jv = 4, const std::string &ft_plan = "measure",
-                                 const t_real &resample_factor = 1.) {
-  /*
-   *  Returns linear transform that is the standard degridding operator
-   */
-
-  const t_int M = u.size();
-  const t_int N = imsizey * imsizex;
-  sopt::OperatorFunction<T> directDegrid, indirectDegrid;
-  std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_2d<T>(
-      u, v, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, resample_factor);
-  auto direct = directDegrid;
-  auto indirect = indirectDegrid;
-  const t_real op_norm
-      = details::power_method<T>({direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
-                                 T::Random(imsizex * imsizey));
-  auto operator_norm = purify::operators::init_normalise<T>(op_norm);
-  direct = sopt::chained_operators<T>(direct, operator_norm);
-  indirect = sopt::chained_operators<T>(operator_norm, indirect);
-  return {direct, {0, 1, M}, indirect, {0, 1, N}};
-}
-template <class T>
-sopt::LinearTransform<T>
-init_degrid_weighted_operator_2d(const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
-                                 const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
-                                 const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
-                                 const t_real &power_tol = 1e-4, const t_real resample_factor = 1.,
-                                 const std::string &kernel = "kb", const t_uint Ju = 4,
-                                 const t_uint Jv = 4, const std::string &ft_plan = "measure") {
   auto uv_vis = uv_vis_input;
   if(uv_vis.units == "lambda")
     uv_vis = utilities::set_cell_size(uv_vis, cell_x, cell_y);
   if(uv_vis.units == "radians")
     uv_vis = utilities::uv_scale(uv_vis, floor(oversample_ratio * imsizex),
                                  floor(oversample_ratio * imsizey));
-  return init_degrid_weighted_operator_2d<T>(uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex,
-                                             oversample_ratio, power_iters, power_tol, kernel, Ju,
-                                             Jv, ft_plan, resample_factor);
+  return init_degrid_operator_2d<T>(uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex,
+                                    oversample_ratio, power_iters, power_tol, kernel, Ju, Jv,
+                                    ft_plan, resample_factor);
 }
 #ifdef PURIFY_MPI
 template <class T>
 sopt::LinearTransform<T>
 init_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
-                        const Vector<t_real> &v, const t_uint &imsizey, const t_uint &imsizex,
+                        const Vector<t_real> &v, const Vector<t_complex> &weights,
+                        const t_uint &imsizey, const t_uint &imsizex,
                         const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
                         const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
                         const t_uint Ju = 4, const t_uint Jv = 4,
                         const std::string &ft_plan = "measure", const t_real resample_factor = 1.) {
-  /*
-   *  Returns linear transform that is the standard degridding operator with mpi all sum all
-   */
-
-  const t_int M = u.size();
-  const t_int N = imsizey * imsizex;
-  const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
-  sopt::OperatorFunction<T> directDegrid, indirectDegrid;
-  std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_2d<T>(
-      u, v, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, resample_factor);
-  auto direct = directDegrid;
-  auto indirect = sopt::chained_operators<T>(allsumall, indirectDegrid);
-  const t_real op_norm
-      = details::power_method<T>({direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
-                                 comm.broadcast<T>(T::Random(imsizex * imsizey)));
-  auto operator_norm = purify::operators::init_normalise<T>(op_norm);
-  direct = sopt::chained_operators<T>(direct, operator_norm);
-  indirect = sopt::chained_operators<T>(operator_norm, indirect);
-  return {direct, {0, 1, M}, indirect, {0, 1, N}};
-}
-template <class T>
-sopt::LinearTransform<T>
-init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
-                        const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
-                        const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
-                        const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
-                        const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
-                        const t_uint Ju = 4, const t_uint Jv = 4,
-                        const std::string &ft_plan = "measure", const t_real resample_factor = 1.) {
-  auto uv_vis = uv_vis_input;
-  if(uv_vis.units == "lambda")
-    uv_vis = utilities::set_cell_size(uv_vis, cell_x, cell_y);
-  if(uv_vis.units == "radians")
-    uv_vis = utilities::uv_scale(uv_vis, floor(oversample_ratio * imsizex),
-                                 floor(oversample_ratio * imsizey));
-  return init_degrid_operator_2d<T>(comm, uv_vis.u, uv_vis.v, imsizey, imsizex, oversample_ratio,
-                                    power_iters, power_tol, kernel, Ju, Jv, ft_plan,
-                                    resample_factor);
-}
-template <class T>
-sopt::LinearTransform<T>
-init_degrid_weighted_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
-                                 const Vector<t_real> &v, const Vector<t_complex> &weights,
-                                 const t_uint &imsizey, const t_uint &imsizex,
-                                 const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
-                                 const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
-                                 const t_uint Ju = 4, const t_uint Jv = 4,
-                                 const std::string &ft_plan = "measure",
-                                 const t_real resample_factor = 1.) {
   /*
    *  Returns linear transform that is the weighted degridding operator with mpi all sum all
    */
@@ -539,14 +445,13 @@ init_degrid_weighted_operator_2d(const sopt::mpi::Communicator &comm, const Vect
 }
 template <class T>
 sopt::LinearTransform<T>
-init_degrid_weighted_operator_2d(const sopt::mpi::Communicator &comm,
-                                 const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
-                                 const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
-                                 const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
-                                 const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
-                                 const t_uint Ju = 4, const t_uint Jv = 4,
-                                 const std::string &ft_plan = "measure",
-                                 const t_real resample_factor = 1.) {
+init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
+                        const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
+                        const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
+                        const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
+                        const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
+                        const t_uint Ju = 4, const t_uint Jv = 4,
+                        const std::string &ft_plan = "measure", const t_real resample_factor = 1.) {
 
   auto uv_vis = uv_vis_input;
   if(uv_vis.units == "lambda")
@@ -554,21 +459,22 @@ init_degrid_weighted_operator_2d(const sopt::mpi::Communicator &comm,
   if(uv_vis.units == "radians")
     uv_vis = utilities::uv_scale(uv_vis, floor(oversample_ratio * imsizex),
                                  floor(oversample_ratio * imsizey));
-  return init_degrid_weighted_operator_2d<T>(comm, uv_vis.u, uv_vis.v, uv_vis.weights, imsizey,
-                                             imsizex, oversample_ratio, power_iters, power_tol,
-                                             kernel, Ju, Jv, ft_plan, resample_factor);
+  return init_degrid_operator_2d<T>(comm, uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex,
+                                    oversample_ratio, power_iters, power_tol, kernel, Ju, Jv,
+                                    ft_plan, resample_factor);
 }
 template <class T>
 sopt::LinearTransform<T>
 init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
-                            const Vector<t_real> &v, const t_uint &imsizey, const t_uint &imsizex,
+                            const Vector<t_real> &v, const Vector<t_complex> &weights,
+                            const t_uint &imsizey, const t_uint &imsizex,
                             const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
                             const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
                             const t_uint Ju = 4, const t_uint Jv = 4,
                             const std::string &ft_plan = "measure",
                             const t_real resample_factor = 1.) {
   /*
-   *  Returns linear transform that is the standard degridding operator with distributed Fourier
+   *  Returns linear transform that is the weighted degridding operator with a distributed Fourier
    * grid
    */
 
@@ -577,8 +483,8 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_
   auto Broadcast = purify::operators::init_broadcaster<T>(comm);
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_mpi_degrid_operator_2d<T>(
-      comm, u, v, Vector<t_complex>::Constant(u.size(), 1.), imsizey, imsizex, oversample_ratio,
-      kernel, Ju, Jv, ft_plan, resample_factor);
+      comm, u, v, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan,
+      resample_factor);
   auto direct = directDegrid;
   auto indirect = sopt::chained_operators<T>(Broadcast, indirectDegrid);
   const t_real op_norm
@@ -605,60 +511,9 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
   if(uv_vis.units == "radians")
     uv_vis = utilities::uv_scale(uv_vis, floor(oversample_ratio * imsizex),
                                  floor(oversample_ratio * imsizey));
-  return init_degrid_operator_2d_mpi<T>(comm, uv_vis.u, uv_vis.v, imsizey, imsizex,
+  return init_degrid_operator_2d_mpi<T>(comm, uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex,
                                         oversample_ratio, power_iters, power_tol, kernel, Ju, Jv,
                                         ft_plan, resample_factor);
-}
-template <class T>
-sopt::LinearTransform<T>
-init_degrid_weighted_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
-                                     const Vector<t_real> &v, const Vector<t_complex> &weights,
-                                     const t_uint &imsizey, const t_uint &imsizex,
-                                     const t_real oversample_ratio = 2,
-                                     const t_uint &power_iters = 100,
-                                     const t_real &power_tol = 1e-4,
-                                     const std::string &kernel = "kb", const t_uint Ju = 4,
-                                     const t_uint Jv = 4, const std::string &ft_plan = "measure",
-                                     const t_real resample_factor = 1.) {
-  /*
-   *  Returns linear transform that is the weighted degridding operator with a distributed Fourier
-   * grid
-   */
-
-  const t_int M = u.size();
-  const t_int N = imsizey * imsizex;
-  auto Broadcast = purify::operators::init_broadcaster<T>(comm);
-  sopt::OperatorFunction<T> directDegrid, indirectDegrid;
-  std::tie(directDegrid, indirectDegrid) = purify::operators::base_mpi_degrid_operator_2d<T>(
-      comm, u, v, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan,
-      resample_factor);
-  auto direct = directDegrid;
-  auto indirect = sopt::chained_operators<T>(Broadcast, indirectDegrid);
-  const t_real op_norm
-      = details::power_method<T>({direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
-                                 comm.broadcast<T>(T::Random(imsizex * imsizey)));
-  auto operator_norm = purify::operators::init_normalise<T>(op_norm);
-  direct = sopt::chained_operators<T>(direct, operator_norm);
-  indirect = sopt::chained_operators<T>(operator_norm, indirect);
-  return {direct, {0, 1, M}, indirect, {0, 1, N}};
-}
-template <class T>
-sopt::LinearTransform<T> init_degrid_weighted_operator_2d_mpi(
-    const sopt::mpi::Communicator &comm, const utilities::vis_params &uv_vis_input,
-    const t_uint &imsizey, const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
-    const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
-    const t_real &power_tol = 1e-4, const std::string &kernel = "kb", const t_uint Ju = 4,
-    const t_uint Jv = 4, const std::string &ft_plan = "measure",
-    const t_real resample_factor = 1.) {
-  auto uv_vis = uv_vis_input;
-  if(uv_vis.units == "lambda")
-    uv_vis = utilities::set_cell_size(uv_vis, cell_x, cell_y);
-  if(uv_vis.units == "radians")
-    uv_vis = utilities::uv_scale(uv_vis, floor(oversample_ratio * imsizex),
-                                 floor(oversample_ratio * imsizey));
-  return init_degrid_weighted_operator_2d_mpi<T>(comm, uv_vis.u, uv_vis.v, uv_vis.weights, imsizey,
-                                                 imsizex, oversample_ratio, power_iters, power_tol,
-                                                 kernel, Ju, Jv, ft_plan, resample_factor);
 }
 #endif
 } // namespace measurementoperator

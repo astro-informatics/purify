@@ -162,11 +162,11 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator") {
   auto const height = 128;
   const sopt::LinearTransform<Vector<t_complex>> op_serial
       = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_serial.u, uv_serial.v, height, width, over_sample, 100);
+          uv_serial.u, uv_serial.v, uv_serial.weights, height, width, over_sample, 100);
 
   const sopt::LinearTransform<Vector<t_complex>> op
       = purify::measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-          world, uv_mpi.u, uv_mpi.v, height, width, over_sample, 100);
+          world, uv_mpi.u, uv_mpi.v, uv_mpi.weights, height, width, over_sample, 100);
 
   if(uv_serial.u.size() == uv_mpi.u.size()) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
@@ -226,10 +226,10 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator weighted") {
   auto const width = 128;
   auto const height = 128;
   const sopt::LinearTransform<Vector<t_complex>> op_serial
-      = purify::measurementoperator::init_degrid_weighted_operator_2d<Vector<t_complex>>(
+      = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_serial.u, uv_serial.v, uv_serial.weights, height, width, over_sample, 100);
   const sopt::LinearTransform<Vector<t_complex>> op
-      = purify::measurementoperator::init_degrid_weighted_operator_2d_mpi<Vector<t_complex>>(
+      = purify::measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
           world, uv_mpi.u, uv_mpi.v, uv_mpi.weights, height, width, over_sample, 100);
 
   if(world.size() == 1) {
@@ -289,7 +289,7 @@ TEST_CASE("Serial vs Distributed GPU Fourier Grid Operator weighted") {
   auto const width = 128;
   auto const height = 128;
   const sopt::LinearTransform<Vector<t_complex>> op_serial
-      = purify::measurementoperator::init_degrid_weighted_operator_2d<Vector<t_complex>>(
+      = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_serial.u, uv_serial.v, uv_serial.weights, height, width, over_sample, 100);
   const sopt::LinearTransform<Vector<t_complex>> op
       = purify::gpu::measurementoperator::init_degrid_operator_2d_mpi(
