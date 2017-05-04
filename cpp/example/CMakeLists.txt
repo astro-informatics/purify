@@ -19,7 +19,7 @@ add_example(padmm_simulation LIBRARIES libpurify NOTEST)
 add_example(padmm_reweighted_simulation LIBRARIES libpurify NOTEST)
 
 add_example(padmm_random_coverage LIBRARIES libpurify NOTEST )
-target_compile_definitions(example_padmm_random_coverage PRIVATE PURIFY_GPU=0)
+target_compile_definitions(example_padmm_random_coverage PRIVATE PURIFY_GPU)
 if(PURIFY_ARRAYFIRE)
   add_example(padmm_random_coverage_gpu padmm_random_coverage.cc LIBRARIES libpurify NOTEST )
   target_compile_definitions(example_padmm_random_coverage_gpu PRIVATE PURIFY_GPU=1)
@@ -37,6 +37,20 @@ if(PURIFY_MPI)
     LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
   target_compile_definitions(example_local_epsilon_distributed_grids
     PRIVATE PURIFY_PADMM_ALGORITHM=1)
+endif()
+if(PURIFY_MPI AND PURIFY_ARRAYFIRE)
+  add_example(global_epsilon_replicated_grids_gpu padmm_mpi_random_coverage.cc NOTEST
+    LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+  target_compile_definitions(example_global_epsilon_replicated_grids_gpu
+    PRIVATE PURIFY_PADMM_ALGORITHM=2 PURIFY_GPU)
+  add_example(local_epsilon_replicated_grids_gpu padmm_mpi_random_coverage.cc NOTEST
+    LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+  target_compile_definitions(example_local_epsilon_replicated_grids_gpu
+    PRIVATE PURIFY_PADMM_ALGORITHM=3 PURIFY_GPU)
+  add_example(local_epsilon_distributed_grids_gpu padmm_mpi_random_coverage.cc NOTEST
+    LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+  target_compile_definitions(example_local_epsilon_distributed_grids_gpu
+    PRIVATE PURIFY_PADMM_ALGORITHM=1 PURIFY_GPU)
 endif()
 add_example(sara_padmm_random_coverage LIBRARIES libpurify NOTEST)
 

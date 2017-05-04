@@ -30,7 +30,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   t_real const over_sample = 2;
   t_uint const imsizey = M31.rows();
   t_uint const imsizex = M31.cols();
-#if PURIFY_GPU == 0
+#ifdef PURIFY_GPU
   auto const measurements_transform = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, imsizey, imsizex, 1, 1, over_sample, 100, 0.0001, kernel, J, J, "measure"));
@@ -105,7 +105,7 @@ int main(int, char **) {
   uv_data.units = "radians";
   PURIFY_MEDIUM_LOG("Number of measurements / number of pixels: {}",
                     uv_data.u.size() * 1. / number_of_pxiels);
-#if PURIFY_GPU == 0
+#ifdef PURIFY_GPU
   auto const sky_measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, M31.rows(), M31.cols(), 1, 1, 2, 100, 0.0001, "kb", 8, 8, "measure"));
