@@ -13,13 +13,13 @@ using namespace purify::notinstalled;
 TEST_CASE("GPU Operators") {
   af::setDevice(0);
   af::info();
-  sopt::logging::set_level("debug");
-  purify::logging::set_level("debug");
-  const t_uint M = 4;
+  // sopt::logging::set_level("debug");
+  // purify::logging::set_level("debug");
+  const t_uint M = 1000;
   const t_real oversample_ratio = 2;
   const t_real resample_factor = 1;
-  const t_uint imsizex = 2;
-  const t_uint imsizey = 2;
+  const t_uint imsizex = 128;
+  const t_uint imsizey = 128;
   const t_uint ftsizev = std::floor(imsizey * oversample_ratio);
   const t_uint ftsizeu = std::floor(imsizex * oversample_ratio);
   const t_uint Ju = 4;

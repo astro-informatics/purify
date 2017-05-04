@@ -135,8 +135,8 @@ TEST_CASE("Operators") {
     CHECK(indirect_output.size() == imsizex * imsizey);
     SECTION("Power Method") {
       auto op_norm = details::power_method<Vector<t_complex>>(
-          measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
-      CHECK(std::abs(op_norm - 1.) < power_tol);
+          measure_op, 100, 1e-4, Vector<t_complex>::Random(imsizex * imsizey));
+      CHECK(std::abs(op_norm - 1.) < 1e-4);
     }
     SECTION("Degrid") {
       const Vector<t_complex> input = Vector<t_complex>::Random(imsizex * imsizey);
