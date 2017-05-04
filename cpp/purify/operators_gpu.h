@@ -338,6 +338,70 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_
   indirect = sopt::chained_operators<Vector<t_complex>>(operator_norm, indirect);
   return {direct, {0, 1, M}, indirect, {0, 1, N}};
 }
+sopt::LinearTransform<Vector<t_complex>>
+init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
+                            const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
+                            const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
+                            const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
+                            const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
+                            const t_uint Ju = 4, const t_uint Jv = 4,
+                            const t_real resample_factor = 1.) {
+  auto uv_vis = uv_vis_input;
+  if(uv_vis.units == "lambda")
+    uv_vis = utilities::set_cell_size(uv_vis, cell_x, cell_y);
+  if(uv_vis.units == "radians")
+    uv_vis = utilities::uv_scale(uv_vis, floor(oversample_ratio * imsizex),
+                                 floor(oversample_ratio * imsizey));
+  return gpu::measurementoperator::init_degrid_operator_2d_mpi(
+      comm, uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
+      power_tol, kernel, Ju, Jv, resample_factor);
+}
+sopt::LinearTransform<Vector<t_complex>>
+init_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
+                        const Vector<t_real> &v, const Vector<t_complex> &weights,
+                        const t_uint &imsizey, const t_uint &imsizex,
+                        const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
+                        const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
+                        const t_uint Ju = 4, const t_uint Jv = 4,
+                        const t_real resample_factor = 1.) {
+  /*
+   *  Returns linear transform that is the standard degridding operator
+   */
+
+  const t_int M = u.size();
+  const t_int N = imsizey * imsizex;
+  sopt::OperatorFunction<Vector<t_complex>> directDegrid, indirectDegrid;
+  std::tie(directDegrid, indirectDegrid) = purify::gpu::operators::base_degrid_operator_2d(
+      u, v, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, resample_factor);
+  const auto allsumall = purify::operators::init_all_sum_all<Vector<t_complex>>(comm);
+  auto direct = directDegrid;
+  auto indirect = sopt::chained_operators<Vector<t_complex>>(allsumall, indirectDegrid);
+  const t_real op_norm = details::power_method<Vector<t_complex>>(
+      {direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
+      Vector<t_complex>::Random(imsizex * imsizey));
+  auto operator_norm = purify::operators::init_normalise<Vector<t_complex>>(op_norm);
+  direct = sopt::chained_operators<Vector<t_complex>>(direct, operator_norm);
+  indirect = sopt::chained_operators<Vector<t_complex>>(operator_norm, indirect);
+  return {direct, {0, 1, M}, indirect, {0, 1, N}};
+}
+sopt::LinearTransform<Vector<t_complex>>
+init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
+                        const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
+                        const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
+                        const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
+                        const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
+                        const t_uint Ju = 4, const t_uint Jv = 4,
+                        const t_real resample_factor = 1.) {
+  auto uv_vis = uv_vis_input;
+  if(uv_vis.units == "lambda")
+    uv_vis = utilities::set_cell_size(uv_vis, cell_x, cell_y);
+  if(uv_vis.units == "radians")
+    uv_vis = utilities::uv_scale(uv_vis, floor(oversample_ratio * imsizex),
+                                 floor(oversample_ratio * imsizey));
+  return gpu::measurementoperator::init_degrid_operator_2d(
+      comm, uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
+      power_tol, kernel, Ju, Jv, resample_factor);
+}
 #endif
 } // namespace measurementoperator
 } // namespace gpu

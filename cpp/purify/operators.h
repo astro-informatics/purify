@@ -440,7 +440,7 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
       u, v, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, resample_factor);
   const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
   auto direct = directDegrid;
-  auto indirect = indirectDegrid;
+  auto indirect = sopt::chained_operators<T>(allsumall, indirectDegrid);
   const t_real op_norm
       = details::power_method<T>({direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
                                  comm.broadcast<T>(T::Random(imsizex * imsizey)));
