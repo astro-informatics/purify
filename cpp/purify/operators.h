@@ -96,6 +96,8 @@ t_real power_method(const sopt::LinearTransform<T> &op, const t_uint &niters,
   for(t_int i = 0; i < niters; ++i) {
     estimate_eigen_vector = op.adjoint() * (op * estimate_eigen_vector);
     estimate_eigen_value = estimate_eigen_vector.matrix().norm();
+    if(estimate_eigen_value != estimate_eigen_value)
+      throw std::runtime_error("Error in measurement operator or data corrupted.");
     estimate_eigen_vector = estimate_eigen_vector / estimate_eigen_value;
     PURIFY_DEBUG("Iteration: {}, norm = {}", i + 1, estimate_eigen_value);
     if(relative_difference * relative_difference
@@ -213,7 +215,7 @@ init_zero_padding_2d(const Image<t_real> &S, const t_real &oversample_ratio, boo
   };
   auto indirect = [=](T &output, const T &x) {
     assert(x.size() == ftsizeu_ * ftsizev_);
-    output = Vector<t_complex>::Zero(imsizey_ * imsizex_);
+    output = T::Zero(imsizey_ * imsizex_);
 #pragma omp simd collapse(2)
     for(t_uint j = 0; j < imsizey_; j++) {
       for(t_uint i = 0; i < imsizex_; i++) {
@@ -317,9 +319,8 @@ base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
                         const t_uint &imsizex, const t_real oversample_ratio = 2,
                         const std::string &kernel = "kb", const t_uint Ju = 4, const t_uint Jv = 4,
                         const std::string &ft_plan = "measure", const t_real resample_factor = 1.) {
-  return base_degrid_operator_2d<T>(u, v, Vector<t_complex>::Constant(u.size(), 1.), imsizey,
-                                    imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan,
-                                    resample_factor);
+  return base_degrid_operator_2d<T>(u, v, T::Constant(u.size(), 1.), imsizey, imsizex,
+                                    oversample_ratio, kernel, Ju, Jv, ft_plan, resample_factor);
 }
 #ifdef PURIFY_MPI
 template <class T>
@@ -359,9 +360,8 @@ base_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
                         const t_real oversample_ratio = 2, const std::string &kernel = "kb",
                         const t_uint Ju = 4, const t_uint Jv = 4,
                         const std::string &ft_plan = "measure", const t_real resample_factor = 1.) {
-  return base_degrid_operator_2d<T>(comm, u, v, Vector<t_complex>::Constant(u.size(), 1.), imsizey,
-                                    imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan,
-                                    resample_factor);
+  return base_degrid_operator_2d<T>(comm, u, v, T::Constant(u.size(), 1.), imsizey, imsizex,
+                                    oversample_ratio, kernel, Ju, Jv, ft_plan, resample_factor);
 }
 #endif
 }
@@ -527,8 +527,8 @@ init_degrid_weighted_operator_2d(const sopt::mpi::Communicator &comm, const Vect
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_2d<T>(
       u, v, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, resample_factor);
   const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
-  auto direct = sopt::chained_operators<T>(directDegrid);
-  auto indirect = sopt::chained_operators<T>(indirectDegrid);
+  auto direct = directDegrid;
+  auto indirect = indirectDegrid;
   const t_real op_norm
       = details::power_method<T>({direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
                                  comm.broadcast<T>(T::Random(imsizex * imsizey)));
