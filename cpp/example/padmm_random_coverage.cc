@@ -10,6 +10,9 @@
 #include "purify/directories.h"
 #include "purify/logging.h"
 #include "purify/operators.h"
+#ifdef PURIFY_ARRAYFIRE
+#include "purify/operators_gpu.h"
+#endif
 #include "purify/pfitsio.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
@@ -27,9 +30,16 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   t_real const over_sample = 2;
   t_uint const imsizey = M31.rows();
   t_uint const imsizex = M31.cols();
-  auto measurements_transform = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_data, imsizey, imsizex, 1, 1, over_sample, 100, 0.0001, kernel, J, J, "measure");
-
+#if PURIFY_GPU == 0
+  auto const measurements_transform = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
+      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data, imsizey, imsizex, 1, 1, over_sample, 100, 0.0001, kernel, J, J, "measure"));
+#else
+  af::setDevice(0);
+  auto const measurements_transform = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
+      gpu::measurementoperator::init_degrid_operator_2d(uv_data, imsizey, imsizex, 1, 1,
+                                                        over_sample, 100, 0.0001, kernel, J, J));
+#endif
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -37,7 +47,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, imsizey, imsizex);
 
-  Vector<> dimage = (measurements_transform.adjoint() * uv_data.vis).real();
+  Vector<> dimage = (measurements_transform->adjoint() * uv_data.vis).real();
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   sopt::utilities::write_tiff(Image<t_real>::Map(dimage.data(), imsizey, imsizex), dirty_image);
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), imsizey, imsizex), dirty_image_fits);
@@ -47,7 +57,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   auto const padmm
       = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
             .itermax(100)
-            .gamma((measurements_transform.adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
+            .gamma((measurements_transform->adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
             .relative_variation(1e-3)
             .l2ball_proximal_epsilon(epsilon)
             .tight_frame(false)
@@ -60,14 +70,14 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
             .lagrange_update_scale(0.9)
             .nu(1e0)
             .Psi(Psi)
-            .Phi(measurements_transform);
+            .Phi(*measurements_transform);
 
   auto const diagnostic = padmm();
   assert(diagnostic.x.size() == M31.size());
   Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
   pfitsio::write2d(image.real(), outfile_fits);
-  Vector<t_complex> residuals
-      = measurements_transform.adjoint() * (uv_data.vis - (measurements_transform * diagnostic.x));
+  Vector<t_complex> residuals = measurements_transform->adjoint()
+                                * (uv_data.vis - ((*measurements_transform) * diagnostic.x));
   Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
   pfitsio::write2d(residual_image.real(), residual_fits);
 }
@@ -95,10 +105,16 @@ int main(int, char **) {
   uv_data.units = "radians";
   PURIFY_MEDIUM_LOG("Number of measurements / number of pixels: {}",
                     uv_data.u.size() * 1. / number_of_pxiels);
-  // uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
-  auto sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_data, M31.rows(), M31.cols(), 1, 1, 2, 100, 0.0001, "kb", 8, 8, "measure");
-  uv_data.vis = sky_measurements * Image<t_complex>::Map(M31.data(), M31.size(), 1);
+#if PURIFY_GPU == 0
+  auto const sky_measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
+      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data, M31.rows(), M31.cols(), 1, 1, 2, 100, 0.0001, "kb", 8, 8, "measure"));
+#else
+  auto const sky_measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
+      gpu::measurementoperator::init_degrid_operator_2d(uv_data, M31.rows(), M31.cols(), 1, 1, 2,
+                                                        100, 0.0001, "kb", 8, 8));
+#endif
+  uv_data.vis = (*sky_measurements) * Image<t_complex>::Map(M31.data(), M31.size(), 1);
   Vector<t_complex> const y0 = uv_data.vis;
   // working out value of signal given SNR of 30
   t_real const sigma = utilities::SNR_to_standard_deviation(y0, snr);
