@@ -125,8 +125,6 @@ init_gridding_matrix_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
                         const std::function<t_real(t_real)> kernelv, const t_uint Ju = 4,
                         const t_uint Jv = 4) {
 
-  PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
-  PURIFY_LOW_LOG("Constructing MPI Gridding Operator: G");
   Sparse<t_complex> interpolation_matrix
       = details::init_gridding_matrix_2d(u, v, weights, imsizey_, imsizex_, oversample_ratio,
                                          resample_factor, kernelu, kernelv, Ju, Jv);
@@ -171,8 +169,6 @@ init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v,
                         const std::function<t_real(t_real)> kernelv, const t_uint Ju = 4,
                         const t_uint Jv = 4) {
 
-  PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
-  PURIFY_LOW_LOG("Constructing Gridding Operator: G");
   const Sparse<t_complex> interpolation_matrix
       = details::init_gridding_matrix_2d(u, v, weights, imsizey_, imsizex_, oversample_ratio,
                                          resample_factor, kernelu, kernelv, Ju, Jv);
@@ -189,11 +185,7 @@ init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v,
 //! Construsts zero padding operator
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
-init_zero_padding_2d(const Image<t_real> &S, const t_real &oversample_ratio, bool silent = false) {
-  if(not silent) {
-    PURIFY_LOW_LOG("Constructing Zero Padding Operator: Z");
-    PURIFY_MEDIUM_LOG("Oversampling Factor: {}", oversample_ratio);
-  }
+init_zero_padding_2d(const Image<t_real> &S, const t_real &oversample_ratio) {
   const t_uint imsizex_ = S.cols();
   const t_uint imsizey_ = S.rows();
   const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
@@ -257,12 +249,9 @@ init_FFT_2d(const t_uint &imsizey_, const t_uint &imsizex_, const t_real &oversa
       = std::make_shared<FFTOperator>(FFTOperator::FFTOperator());
   auto const ftsizeu_ = std::floor(imsizex_ * oversample_factor_);
   auto const ftsizev_ = std::floor(imsizey_ * oversample_factor_);
-  PURIFY_LOW_LOG("Planning FFT operator");
   if(fftw_plan_flag_ == "measure") {
-    PURIFY_LOW_LOG("Measuring...");
     fftop->fftw_flag((FFTW_MEASURE | FFTW_PRESERVE_INPUT));
   } else {
-    PURIFY_LOW_LOG("Using an estimate");
     fftop->fftw_flag((FFTW_ESTIMATE | FFTW_PRESERVE_INPUT));
   }
   fftop->set_up_multithread();
@@ -303,9 +292,22 @@ base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
   sopt::OperatorFunction<T> directG, indirectG;
   const Image<t_real> S = purify::details::init_correction2d(oversample_ratio, imsizey, imsizex,
                                                              ftkernelu, ftkernelv);
+  PURIFY_LOW_LOG("Building Measurement Operator: WGFZDB");
+  PURIFY_LOW_LOG("Constructing Zero Padding and Correction Operator: ZDB");
+  PURIFY_MEDIUM_LOG("Image size (width, height): {} x {}", imsizex, imsizey);
+  PURIFY_MEDIUM_LOG("Oversampling Factor: {}", oversample_ratio);
   std::tie(directZ, indirectZ) = purify::operators::init_zero_padding_2d<T>(S, oversample_ratio);
+  PURIFY_LOW_LOG("Constructing FFT operator: F");
+  if(ft_plan == "measure") {
+    PURIFY_LOW_LOG("Measuring...");
+  } else {
+    PURIFY_LOW_LOG("Using an estimate");
+  }
   std::tie(directFFT, indirectFFT) = purify::operators::init_FFT_2d<T>(
       imsizey, imsizex, oversample_ratio, resample_factor, ft_plan);
+  PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
+  PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
+  PURIFY_MEDIUM_LOG("Kernel Support: {} x {}", Ju, Jv);
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
       u, v, weights, imsizey, imsizex, oversample_ratio, resample_factor, kernelv, kernelu, Ju, Jv);
   auto direct = sopt::chained_operators<T>(directG, directFFT, directZ);
@@ -313,15 +315,6 @@ base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
   return std::make_tuple(direct, indirect);
 }
 
-template <class T>
-std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
-base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const t_uint &imsizey,
-                        const t_uint &imsizex, const t_real oversample_ratio = 2,
-                        const std::string &kernel = "kb", const t_uint Ju = 4, const t_uint Jv = 4,
-                        const std::string &ft_plan = "measure", const t_real resample_factor = 1.) {
-  return base_degrid_operator_2d<T>(u, v, T::Constant(u.size(), 1.), imsizey, imsizex,
-                                    oversample_ratio, kernel, Ju, Jv, ft_plan, resample_factor);
-}
 #ifdef PURIFY_MPI
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
@@ -340,9 +333,22 @@ base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_
   sopt::OperatorFunction<T> directG, indirectG;
   const Image<t_real> S = purify::details::init_correction2d(oversample_ratio, imsizey, imsizex,
                                                              ftkernelu, ftkernelv);
+  PURIFY_LOW_LOG("Building Measurement Operator: WGFZDB");
+  PURIFY_LOW_LOG("Constructing Zero Padding and Correction Operators: ZDB");
+  PURIFY_MEDIUM_LOG("Image size (width, height): {} x {}", imsizex, imsizey);
+  PURIFY_MEDIUM_LOG("Oversampling Factor: {}", oversample_ratio);
   std::tie(directZ, indirectZ) = purify::operators::init_zero_padding_2d<T>(S, oversample_ratio);
+  PURIFY_LOW_LOG("Constructing FFT operator: F");
+  if(ft_plan == "measure") {
+    PURIFY_LOW_LOG("Measuring...");
+  } else {
+    PURIFY_LOW_LOG("Using an estimate");
+  }
   std::tie(directFFT, indirectFFT) = purify::operators::init_FFT_2d<T>(
       imsizey, imsizex, oversample_ratio, resample_factor, ft_plan);
+  PURIFY_LOW_LOG("Constructing Weighting and MPI Gridding Operators: WG");
+  PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
+  PURIFY_MEDIUM_LOG("Kernel Support: {} x {}", Ju, Jv);
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
       comm, u, v, weights, imsizey, imsizex, oversample_ratio, resample_factor, kernelv, kernelu,
       Ju, Jv);

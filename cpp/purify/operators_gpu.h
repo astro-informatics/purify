@@ -194,10 +194,18 @@ base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
   sopt::OperatorFunction<af::array> directG, indirectG;
   const Image<t_real> S = purify::details::init_correction2d(oversample_ratio, imsizey, imsizex,
                                                              ftkernelu, ftkernelv);
+  PURIFY_LOW_LOG("Building GPU Measurement Operator: WGFZDB");
+  PURIFY_LOW_LOG("Constructing Zero Padding and Correction Operator: ZDB");
+  PURIFY_MEDIUM_LOG("Image size (width, height): {} x {}", imsizex, imsizey);
+  PURIFY_MEDIUM_LOG("Oversampling Factor: {}", oversample_ratio);
   std::tie(directZ, indirectZ) = purify::gpu::operators::init_af_zero_padding_2d<af::array>(
       S.cast<float>(), oversample_ratio);
+  PURIFY_LOW_LOG("Constructing FFT operator: F");
   std::tie(directFFT, indirectFFT) = purify::gpu::operators::init_af_FFT_2d<af::array>(
       imsizey, imsizex, oversample_ratio, resample_factor);
+  PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
+  PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
+  PURIFY_MEDIUM_LOG("Kernel Support: {} x {}", Ju, Jv);
   std::tie(directG, indirectG) = purify::gpu::operators::init_af_gridding_matrix_2d<af::array>(
       u, v, weights, imsizey, imsizex, oversample_ratio, resample_factor, kernelv, kernelu, Ju, Jv);
   auto direct = gpu::host_wrapper(sopt::chained_operators<af::array>(directG, directFFT, directZ),
@@ -224,10 +232,18 @@ base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_
   sopt::OperatorFunction<Vector<t_complex>> directG, indirectG;
   const Image<t_real> S = purify::details::init_correction2d(oversample_ratio, imsizey, imsizex,
                                                              ftkernelu, ftkernelv);
+  PURIFY_LOW_LOG("Building GPU Measurement Operator: WGFZDB");
+  PURIFY_LOW_LOG("Constructing Zero Padding and Correction Operator: ZDB");
+  PURIFY_MEDIUM_LOG("Image size (width, height): {} x {}", imsizex, imsizey);
+  PURIFY_MEDIUM_LOG("Oversampling Factor: {}", oversample_ratio);
   std::tie(directZ, indirectZ) = purify::gpu::operators::init_af_zero_padding_2d<af::array>(
       S.cast<float>(), oversample_ratio);
+  PURIFY_LOW_LOG("Constructing FFT operator: F");
   std::tie(directFFT, indirectFFT) = purify::gpu::operators::init_af_FFT_2d<af::array>(
       imsizey, imsizex, oversample_ratio, resample_factor);
+  PURIFY_LOW_LOG("Constructing Weighting and MPI Gridding Operators: WG");
+  PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
+  PURIFY_MEDIUM_LOG("Kernel Support: {} x {}", Ju, Jv);
   std::tie(directG, indirectG) = operators::init_af_gridding_matrix_2d(
       comm, u, v, weights, imsizey, imsizex, oversample_ratio, resample_factor, kernelv, kernelu,
       Ju, Jv);
@@ -274,6 +290,23 @@ init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
   direct = sopt::chained_operators<Vector<t_complex>>(direct, operator_norm);
   indirect = sopt::chained_operators<Vector<t_complex>>(operator_norm, indirect);
   return {direct, {0, 1, M}, indirect, {0, 1, N}};
+}
+sopt::LinearTransform<Vector<t_complex>>
+init_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
+                        const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
+                        const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
+                        const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
+                        const t_uint Ju = 4, const t_uint Jv = 4,
+                        const t_real resample_factor = 1.) {
+  auto uv_vis = uv_vis_input;
+  if(uv_vis.units == "lambda")
+    uv_vis = utilities::set_cell_size(uv_vis, cell_x, cell_y);
+  if(uv_vis.units == "radians")
+    uv_vis = utilities::uv_scale(uv_vis, floor(oversample_ratio * imsizex),
+                                 floor(oversample_ratio * imsizey));
+  return gpu::measurementoperator::init_degrid_operator_2d(
+      uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
+      power_tol, kernel, Ju, Jv, resample_factor);
 }
 
 #ifdef PURIFY_MPI
