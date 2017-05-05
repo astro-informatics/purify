@@ -14,6 +14,7 @@
 #include <sopt/mpi/communicator.h>
 #include "purify/DistributeSparseVector.h"
 #include "purify/IndexMapping.h"
+#include "purify/mpi_utilities.h"
 #endif
 namespace purify {
 
@@ -460,17 +461,8 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                         const std::string &ft_plan = "measure", const t_real resample_factor = 1.) {
 
   auto uv_vis = uv_vis_input;
-  if(uv_vis.units == "lambda") {
-    const auto max_u_vector
-        = comm.gather<t_real>(std::sqrt((uv_vis.u.array() * uv_vis.u.array()).maxCoeff()));
-    const auto max_v_vector
-        = comm.gather<t_real>(std::sqrt((uv_vis.v.array() * uv_vis.v.array()).maxCoeff()));
-    const t_real max_u
-        = comm.broadcast(*(std::max_element(max_u_vector.begin(), max_u_vector.end())));
-    const t_real max_v
-        = comm.broadcast(*(std::max_element(max_v_vector.begin(), max_v_vector.end())));
-    uv_vis = utilities::set_cell_size(uv_vis, max_u, max_v, cell_x, cell_y);
-  }
+  if(uv_vis.units == "lambda")
+    uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
   if(uv_vis.units == "radians")
     uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
                                  std::floor(oversample_ratio * imsizey));
@@ -521,17 +513,8 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
                             const std::string &ft_plan = "measure",
                             const t_real resample_factor = 1.) {
   auto uv_vis = uv_vis_input;
-  if(uv_vis.units == "lambda") {
-    const auto max_u_vector
-        = comm.gather<t_real>(std::sqrt((uv_vis.u.array() * uv_vis.u.array()).maxCoeff()));
-    const auto max_v_vector
-        = comm.gather<t_real>(std::sqrt((uv_vis.v.array() * uv_vis.v.array()).maxCoeff()));
-    const t_real max_u
-        = comm.broadcast(*(std::max_element(max_u_vector.begin(), max_u_vector.end())));
-    const t_real max_v
-        = comm.broadcast(*(std::max_element(max_v_vector.begin(), max_v_vector.end())));
-    uv_vis = utilities::set_cell_size(uv_vis, max_u, max_v, cell_x, cell_y);
-  }
+  if(uv_vis.units == "lambda")
+    uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
   if(uv_vis.units == "radians")
     uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
                                  std::floor(oversample_ratio * imsizey));
