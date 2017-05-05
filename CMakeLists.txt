@@ -14,6 +14,7 @@ option(data           "Download measurement set for testing"            on)
 option(openmp         "Enable OpenMP"                                   on)
 option(logging        "Enable logging"                                  on)
 option(dompi          "Enable MPI"                                      on)
+option(doaf          "Enable ArrayFire"                                on)
 option(docasa         "Enable CASA"                                     on)
 
 # Set version and build id of this package
@@ -32,12 +33,12 @@ include(logging)
 include(dependencies)
 
 if(tests AND data)
-    include(data_dependencies)
+  include(data_dependencies)
 endif()
 
 if(tests)  # Adds ctest
-    enable_testing()
-    include(AddCatchTest)
+  enable_testing()
+  include(AddCatchTest)
 endif()
 
 add_subdirectory(cpp)
