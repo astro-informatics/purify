@@ -121,8 +121,9 @@ void write_visibility(const utilities::vis_params &uv_vis, const std::string &fi
   out.close();
 }
 
-utilities::vis_params
-set_cell_size(const utilities::vis_params &uv_vis, t_real cell_size_u, t_real cell_size_v) {
+utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t_real &max_u,
+                                    const t_real &max_v, const t_real &input_cell_size_u,
+                                    const t_real &input_cell_size_v) {
   /*
     Converts the units of visibilities to units of 2 * pi, while scaling for the size of a pixel
     (cell_size)
@@ -132,16 +133,13 @@ set_cell_size(const utilities::vis_params &uv_vis, t_real cell_size_u, t_real ce
   */
 
   utilities::vis_params scaled_vis;
-
+  t_real cell_size_u = input_cell_size_u;
+  t_real cell_size_v = input_cell_size_v;
   if(cell_size_u == 0 and cell_size_v == 0) {
-    Vector<t_real> u_dist = uv_vis.u.array() * uv_vis.u.array();
-    t_real max_u = std::sqrt(u_dist.maxCoeff());
     cell_size_u = (180 * 3600) / max_u / constant::pi / 3; // Calculate cell size if not given one
 
-    Vector<t_real> v_dist = uv_vis.v.array() * uv_vis.v.array();
-    t_real max_v = std::sqrt(v_dist.maxCoeff());
     cell_size_v = (180 * 3600) / max_v / constant::pi / 3; // Calculate cell size if not given one
-    PURIFY_MEDIUM_LOG("PSF has a FWHM of {} by {} arcseconds", cell_size_u * 3, cell_size_v * 3);
+    // PURIFY_MEDIUM_LOG("PSF has a FWHM of {} by {} arcseconds", cell_size_u * 3, cell_size_v * 3);
   }
   if(cell_size_v == 0) {
     cell_size_v = cell_size_u;
@@ -170,6 +168,12 @@ set_cell_size(const utilities::vis_params &uv_vis, t_real cell_size_u, t_real ce
   scaled_vis.dec = uv_vis.dec;
   scaled_vis.average_frequency = uv_vis.average_frequency;
   return scaled_vis;
+}
+utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t_real &cell_size_u,
+                                    const t_real &cell_size_v) {
+  const t_real max_u = std::sqrt((uv_vis.u.array() * uv_vis.u.array()).maxCoeff());
+  const t_real max_v = std::sqrt((uv_vis.v.array() * uv_vis.v.array()).maxCoeff());
+  return set_cell_size(uv_vis, max_u, max_v, cell_size_u, cell_size_v);
 }
 
 utilities::vis_params

@@ -302,8 +302,8 @@ init_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_uint 
   if(uv_vis.units == "lambda")
     uv_vis = utilities::set_cell_size(uv_vis, cell_x, cell_y);
   if(uv_vis.units == "radians")
-    uv_vis = utilities::uv_scale(uv_vis, floor(oversample_ratio * imsizex),
-                                 floor(oversample_ratio * imsizey));
+    uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
+                                 std::floor(oversample_ratio * imsizey));
   return gpu::measurementoperator::init_degrid_operator_2d(
       uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
       power_tol, kernel, Ju, Jv, resample_factor);
@@ -347,11 +347,20 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
                             const t_uint Ju = 4, const t_uint Jv = 4,
                             const t_real resample_factor = 1.) {
   auto uv_vis = uv_vis_input;
-  if(uv_vis.units == "lambda")
-    uv_vis = utilities::set_cell_size(uv_vis, cell_x, cell_y);
+  if(uv_vis.units == "lambda") {
+    const auto max_u_vector
+        = comm.gather<t_real>(std::sqrt((uv_vis.u.array() * uv_vis.u.array()).maxCoeff()));
+    const auto max_v_vector
+        = comm.gather<t_real>(std::sqrt((uv_vis.v.array() * uv_vis.v.array()).maxCoeff()));
+    const t_real max_u
+        = comm.broadcast(*(std::max_element(max_u_vector.begin(), max_u_vector.end())));
+    const t_real max_v
+        = comm.broadcast(*(std::max_element(max_v_vector.begin(), max_v_vector.end())));
+    uv_vis = utilities::set_cell_size(uv_vis, max_u, max_v, cell_x, cell_y);
+  }
   if(uv_vis.units == "radians")
-    uv_vis = utilities::uv_scale(uv_vis, floor(oversample_ratio * imsizex),
-                                 floor(oversample_ratio * imsizey));
+    uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
+                                 std::floor(oversample_ratio * imsizey));
   return gpu::measurementoperator::init_degrid_operator_2d_mpi(
       comm, uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
       power_tol, kernel, Ju, Jv, resample_factor);
@@ -393,11 +402,20 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                         const t_uint Ju = 4, const t_uint Jv = 4,
                         const t_real resample_factor = 1.) {
   auto uv_vis = uv_vis_input;
-  if(uv_vis.units == "lambda")
-    uv_vis = utilities::set_cell_size(uv_vis, cell_x, cell_y);
+  if(uv_vis.units == "lambda") {
+    const auto max_u_vector
+        = comm.gather<t_real>(std::sqrt((uv_vis.u.array() * uv_vis.u.array()).maxCoeff()));
+    const auto max_v_vector
+        = comm.gather<t_real>(std::sqrt((uv_vis.v.array() * uv_vis.v.array()).maxCoeff()));
+    const t_real max_u
+        = comm.broadcast(*(std::max_element(max_u_vector.begin(), max_u_vector.end())));
+    const t_real max_v
+        = comm.broadcast(*(std::max_element(max_v_vector.begin(), max_v_vector.end())));
+    uv_vis = utilities::set_cell_size(uv_vis, max_u, max_v, cell_x, cell_y);
+  }
   if(uv_vis.units == "radians")
-    uv_vis = utilities::uv_scale(uv_vis, floor(oversample_ratio * imsizex),
-                                 floor(oversample_ratio * imsizey));
+    uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
+                                 std::floor(oversample_ratio * imsizey));
   return gpu::measurementoperator::init_degrid_operator_2d(
       comm, uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
       power_tol, kernel, Ju, Jv, resample_factor);

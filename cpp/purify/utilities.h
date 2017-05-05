@@ -38,8 +38,11 @@ utilities::vis_params read_visibility(const std::string &vis_name, const bool w_
 void write_visibility(const utilities::vis_params &uv_vis, const std::string &file_name,
                       const bool w_term = false);
 //! Scales visibilities to a given pixel size in arcseconds
-utilities::vis_params
-set_cell_size(const utilities::vis_params &uv_vis, t_real cell_size_u = 0, t_real cell_size_v = 0);
+utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis,
+                                    const t_real &cell_size_u = 0, const t_real &cell_size_v = 0);
+utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t_real &max_u,
+                                    const t_real &max_v, const t_real &cell_size_u,
+                                    const t_real &cell_size_v);
 //! scales the visibilities to units of pixels
 utilities::vis_params
 uv_scale(const utilities::vis_params &uv_vis, const t_int &ftsizeu, const t_int &ftsizev);
@@ -129,7 +132,7 @@ template <class K, class L> Image<t_complex> parallel_multiply_image(const K &A,
 Matrix<t_complex> re_sample_ft_grid(const Matrix<t_complex> &input, const t_real &re_sample_factor);
 //! resamples image size
 Matrix<t_complex> re_sample_image(const Matrix<t_complex> &input, const t_real &re_sample_ratio);
-}
-}
+} // namespace utilities
+} // namespace purify
 
 #endif
