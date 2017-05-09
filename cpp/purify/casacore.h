@@ -199,7 +199,7 @@ Matrix<T> table_column(::casacore::Table const &table, std::string const &column
   throw std::runtime_error("Array type is not handled");
   return Matrix<T>::Zero(0, 1);
 }
-}
+} // namespace details
 
 template <class T>
 Matrix<T>
@@ -375,7 +375,7 @@ inline MeasurementSet::const_iterator operator-(MeasurementSet::const_iterator::
                                                 MeasurementSet::const_iterator const &c) {
   return c.operator-(n);
 }
-}
-}
+} // namespace casa
+} // namespace purify
 
 #endif

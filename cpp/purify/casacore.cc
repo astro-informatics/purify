@@ -1,8 +1,8 @@
+#include "purify/casacore.h"
 #include "purify/config.h"
 #include <sstream>
 #include <casacore/casa/Arrays/IPosition.h>
 #include <casacore/tables/TaQL/ExprNode.h>
-#include "purify/casacore.h"
 #include "purify/logging.h"
 #include "purify/types.h"
 
@@ -112,14 +112,21 @@ MeasurementSet::direction(t_real tolerance, std::string const &filter) const {
     assert(field_ids_raw(i) < source_ids_raw.size());
     source_ids.insert(source_ids_raw(field_ids_raw(i)));
   }
-  if(source_ids.size() == 0)
+  if(source_ids.size() == 0 and source_ids_raw.size() > 0) {
+    PURIFY_DEBUG("Could not find sources. Try different filter, no matching data in channel. "
+                 "Currently using filter: "
+                 + filter);
+    Vector<t_real> original(2);
+    original(0) = 0.;
+    original(1) = 0.;
+    return original;
+  } else if(source_ids_raw.size() == 0)
     throw std::runtime_error("Could not find sources. Cannot determine direction");
   auto const directions = table_column<::casacore::Double>(table("SOURCE"), "DIRECTION");
   auto const original = directions.row(*source_ids.begin());
   for(auto const other : source_ids)
     if(not directions.row(other).isApprox(original, tolerance))
       throw std::runtime_error("Found more than one direction");
-
   return original;
 }
 
@@ -144,14 +151,22 @@ utilities::vis_params
 read_measurementset(std::string const &filename,
                     const MeasurementSet::ChannelWrapper::polarization polarization,
                     const std::vector<t_int> &channels_input, std::string const &filter) {
-
   auto const ms_file = purify::casa::MeasurementSet(filename);
+  return read_measurementset(ms_file, polarization, channels_input, filter);
+};
+utilities::vis_params
+read_measurementset(MeasurementSet const &ms_file,
+                    const MeasurementSet::ChannelWrapper::polarization polarization,
+                    const std::vector<t_int> &channels_input, std::string const &filter) {
+
   utilities::vis_params uv_data;
   t_uint rows = 0;
   std::vector<t_int> channels = channels_input;
   if(channels.empty()) {
     PURIFY_LOW_LOG("All Channels = {}", ms_file.size());
-    Vector<t_int> temp_vector = Vector<t_int>::Zero(ms_file.size());
+    Vector<t_int> temp_vector = Vector<t_int>::LinSpaced(ms_file.size(), 0, ms_file.size());
+    if(temp_vector.size() == 1) // fixing unwanted behavior of LinSpaced when ms_file.size() = 1
+      temp_vector(0) = 0;
     channels = std::vector<t_int>(temp_vector.data(), temp_vector.data() + temp_vector.size());
   }
 
@@ -175,102 +190,133 @@ read_measurementset(std::string const &filename,
   t_uint row = 0;
 
   for(auto channel_number : channels) {
-
-    auto const channel = ms_file[channel_number];
-    if(uv_data.ra != channel.right_ascension() or uv_data.dec != channel.declination())
-      throw std::runtime_error("Channels contain multiple pointings.");
-
-    uv_data.u.segment(row, channel.size()) = channel.lambda_u();
-    uv_data.v.segment(row, channel.size()) = -channel.lambda_v();
-    uv_data.w.segment(row, channel.size()) = channel.lambda_w();
-    t_real const the_casa_factor = std::sqrt(2) * 2;
-    switch(polarization) {
-    case MeasurementSet::ChannelWrapper::polarization::I:
-      uv_data.vis.segment(row, channel.size()) = channel.I("DATA");
-      uv_data.weights.segment(row, channel.size()).real()
-          = channel.wI(MeasurementSet::ChannelWrapper::Sigma::OVERALL)
-            * the_casa_factor; // go for sigma rather than sigma_spectrum
-      break;
-    case MeasurementSet::ChannelWrapper::polarization::Q:
-      uv_data.vis.segment(row, channel.size()) = channel.Q("DATA");
-      uv_data.weights.segment(row, channel.size()).real()
-          = channel.wQ(MeasurementSet::ChannelWrapper::Sigma::OVERALL)
-            * the_casa_factor; // go for sigma rather than sigma_spectrum
-      break;
-    case MeasurementSet::ChannelWrapper::polarization::U:
-      uv_data.vis.segment(row, channel.size()) = channel.U("DATA");
-      uv_data.weights.segment(row, channel.size()).real()
-          = channel.wU(MeasurementSet::ChannelWrapper::Sigma::OVERALL)
-            * the_casa_factor; // go for sigma rather than sigma_spectrum
-      break;
-    case MeasurementSet::ChannelWrapper::polarization::V:
-      uv_data.vis.segment(row, channel.size()) = channel.V("DATA");
-      uv_data.weights.segment(row, channel.size()).real()
-          = channel.wV(MeasurementSet::ChannelWrapper::Sigma::OVERALL)
-            * the_casa_factor; // go for sigma rather than sigma_spectrum
-      break;
-    case MeasurementSet::ChannelWrapper::polarization::LL:
-      uv_data.vis.segment(row, channel.size()) = channel.LL("DATA");
-      uv_data.weights.segment(row, channel.size()).real()
-          = channel.wLL(MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
-                                                                         // sigma_spectrum
-      break;
-    case MeasurementSet::ChannelWrapper::polarization::LR:
-      uv_data.vis.segment(row, channel.size()) = channel.LR("DATA");
-      uv_data.weights.segment(row, channel.size()).real()
-          = channel.wRL(MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
-                                                                         // sigma_spectrum
-      break;
-    case MeasurementSet::ChannelWrapper::polarization::RL:
-      uv_data.vis.segment(row, channel.size()) = channel.RL("DATA");
-      uv_data.weights.segment(row, channel.size()).real()
-          = channel.wRL(MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
-                                                                         // sigma_spectrum
-      break;
-    case MeasurementSet::ChannelWrapper::polarization::RR:
-      uv_data.vis.segment(row, channel.size()) = channel.RR("DATA");
-      uv_data.weights.segment(row, channel.size()).real()
-          = channel.wRR(MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
-                                                                         // sigma_spectrum
-      break;
-    case MeasurementSet::ChannelWrapper::polarization::XX:
-      uv_data.vis.segment(row, channel.size()) = channel.XX("DATA");
-      uv_data.weights.segment(row, channel.size()).real()
-          = channel.wXX(MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
-                                                                         // sigma_spectrum
-      break;
-    case MeasurementSet::ChannelWrapper::polarization::XY:
-      uv_data.vis.segment(row, channel.size()) = channel.XY("DATA");
-      uv_data.weights.segment(row, channel.size()).real()
-          = channel.wXY(MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
-                                                                         // sigma_spectrum
-      break;
-    case MeasurementSet::ChannelWrapper::polarization::YX:
-      uv_data.vis.segment(row, channel.size()) = channel.YX("DATA");
-      uv_data.weights.segment(row, channel.size()).real()
-          = channel.wYX(MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
-                                                                         // sigma_spectrum
-      break;
-    case MeasurementSet::ChannelWrapper::polarization::YY:
-      uv_data.vis.segment(row, channel.size()) = channel.YY("DATA");
-      uv_data.weights.segment(row, channel.size()).real()
-          = channel.wYY(MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
-                                                                         // sigma_spectrum
-      break;
-    case MeasurementSet::ChannelWrapper::polarization::P:
-      t_complex I(0., 1.);
-      uv_data.vis.segment(row, channel.size()) = channel.Q("DATA") + I * channel.U("DATA");
-      uv_data.weights.segment(row, channel.size()).real()
-          = (channel.wQ(MeasurementSet::ChannelWrapper::Sigma::OVERALL).array() * channel.wQ(MeasurementSet::ChannelWrapper::Sigma::OVERALL).array()
-              + channel.wU(MeasurementSet::ChannelWrapper::Sigma::OVERALL).array() * channel.wU(MeasurementSet::ChannelWrapper::Sigma::OVERALL).array()).sqrt(); // go for sigma rather than
-                                                                         // sigma_spectrum
-      break;
+    PURIFY_DEBUG("Adding channel {} to plane...", channel_number);
+    if(channel_number < ms_file.size()) {
+      auto const channel = ms_file[channel_number];
+      if(channel.size() > 0) {
+        if(uv_data.ra != channel.right_ascension() or uv_data.dec != channel.declination())
+          throw std::runtime_error("Channels contain multiple pointings.");
+        Vector<t_real> const frequencies = channel.frequencies();
+        uv_data.u.segment(row, channel.size()) = channel.lambda_u();
+        uv_data.v.segment(row, channel.size()) = -channel.lambda_v();
+        uv_data.w.segment(row, channel.size()) = channel.lambda_w();
+        t_real const the_casa_factor = 2;
+        switch(polarization) {
+        case MeasurementSet::ChannelWrapper::polarization::I:
+          uv_data.vis.segment(row, channel.size()) = channel.I("DATA") * 0.5;
+          uv_data.weights.segment(row, channel.size()).real()
+              = channel.wI(MeasurementSet::ChannelWrapper::Sigma::OVERALL)
+                * the_casa_factor; // go for sigma rather than sigma_spectrum
+          break;
+        case MeasurementSet::ChannelWrapper::polarization::Q:
+          uv_data.vis.segment(row, channel.size()) = channel.Q("DATA") * 0.5;
+          uv_data.weights.segment(row, channel.size()).real()
+              = channel.wQ(MeasurementSet::ChannelWrapper::Sigma::OVERALL)
+                * the_casa_factor; // go for sigma rather than sigma_spectrum
+          break;
+        case MeasurementSet::ChannelWrapper::polarization::U:
+          uv_data.vis.segment(row, channel.size()) = channel.U("DATA") * 0.5;
+          uv_data.weights.segment(row, channel.size()).real()
+              = channel.wU(MeasurementSet::ChannelWrapper::Sigma::OVERALL)
+                * the_casa_factor; // go for sigma rather than sigma_spectrum
+          break;
+        case MeasurementSet::ChannelWrapper::polarization::V:
+          uv_data.vis.segment(row, channel.size()) = channel.V("DATA") * 0.5;
+          uv_data.weights.segment(row, channel.size()).real()
+              = channel.wV(MeasurementSet::ChannelWrapper::Sigma::OVERALL)
+                * the_casa_factor; // go for sigma rather than sigma_spectrum
+          break;
+        case MeasurementSet::ChannelWrapper::polarization::LL:
+          uv_data.vis.segment(row, channel.size()) = channel.LL("DATA");
+          uv_data.weights.segment(row, channel.size()).real() = channel.wLL(
+              MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
+          // sigma_spectrum
+          break;
+        case MeasurementSet::ChannelWrapper::polarization::LR:
+          uv_data.vis.segment(row, channel.size()) = channel.LR("DATA");
+          uv_data.weights.segment(row, channel.size()).real() = channel.wRL(
+              MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
+          // sigma_spectrum
+          break;
+        case MeasurementSet::ChannelWrapper::polarization::RL:
+          uv_data.vis.segment(row, channel.size()) = channel.RL("DATA");
+          uv_data.weights.segment(row, channel.size()).real() = channel.wRL(
+              MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
+          // sigma_spectrum
+          break;
+        case MeasurementSet::ChannelWrapper::polarization::RR:
+          uv_data.vis.segment(row, channel.size()) = channel.RR("DATA");
+          uv_data.weights.segment(row, channel.size()).real() = channel.wRR(
+              MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
+          // sigma_spectrum
+          break;
+        case MeasurementSet::ChannelWrapper::polarization::XX:
+          uv_data.vis.segment(row, channel.size()) = channel.XX("DATA");
+          uv_data.weights.segment(row, channel.size()).real() = channel.wXX(
+              MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
+          // sigma_spectrum
+          break;
+        case MeasurementSet::ChannelWrapper::polarization::XY:
+          uv_data.vis.segment(row, channel.size()) = channel.XY("DATA");
+          uv_data.weights.segment(row, channel.size()).real() = channel.wXY(
+              MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
+          // sigma_spectrum
+          break;
+        case MeasurementSet::ChannelWrapper::polarization::YX:
+          uv_data.vis.segment(row, channel.size()) = channel.YX("DATA");
+          uv_data.weights.segment(row, channel.size()).real() = channel.wYX(
+              MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
+          // sigma_spectrum
+          break;
+        case MeasurementSet::ChannelWrapper::polarization::YY:
+          uv_data.vis.segment(row, channel.size()) = channel.YY("DATA");
+          uv_data.weights.segment(row, channel.size()).real() = channel.wYY(
+              MeasurementSet::ChannelWrapper::Sigma::OVERALL); // go for sigma rather than
+          // sigma_spectrum
+          break;
+        case MeasurementSet::ChannelWrapper::polarization::P:
+          t_complex I(0., 1.);
+          uv_data.vis.segment(row, channel.size()) = channel.Q("DATA") + I * channel.U("DATA");
+          uv_data.weights.segment(row, channel.size()).real()
+              = (channel.wQ(MeasurementSet::ChannelWrapper::Sigma::OVERALL).array()
+                     * channel.wQ(MeasurementSet::ChannelWrapper::Sigma::OVERALL).array()
+                 + channel.wU(MeasurementSet::ChannelWrapper::Sigma::OVERALL).array()
+                       * channel.wU(MeasurementSet::ChannelWrapper::Sigma::OVERALL).array())
+                    .sqrt(); // go for sigma rather than
+          // sigma_spectrum
+          break;
+        }
+        row += channel.size();
+      }
     }
-    row += channel.size();
   }
+  // make consistent with vis file format exported from casa
   uv_data.weights = 1. / uv_data.weights.array();
+  uv_data.units = "lambda";
   return uv_data;
 }
+
+std::vector<utilities::vis_params>
+read_measurementset_channels(std::string const &filename,
+                             const MeasurementSet::ChannelWrapper::polarization pol,
+                             const t_int &channel_width, std::string const &filter) {
+  // Read and average the channels into a vector of vis_params
+  std::vector<utilities::vis_params> channels_vis;
+  auto const ms_file = purify::casa::MeasurementSet(filename);
+  t_int const total_channels = ms_file.size();
+  t_int const planes = (channel_width == 0) ? 1 : std::floor(total_channels / channel_width);
+  PURIFY_DEBUG("Number of planes {} ...", planes);
+  for(int i = 0; i < planes; i++) {
+    PURIFY_DEBUG("Reading plane {} ...", i);
+    t_int const end = std::min((i + 1) * channel_width, total_channels);
+    Vector<t_int> temp_block = Vector<t_int>::LinSpaced(channel_width, i * channel_width, end);
+    if(channel_width == 1 or total_channels == i)
+      temp_block(0) = i;
+    auto const block = std::vector<t_int>(temp_block.data(), temp_block.data() + temp_block.size());
+    channels_vis.push_back(read_measurementset(ms_file, pol, block, filter));
+  }
+  return channels_vis;
+};
 
 t_real average_frequency(const purify::casa::MeasurementSet &ms_file, std::string const &filter,
                          const std::vector<t_int> &channels) {
@@ -317,5 +363,5 @@ bool MeasurementSet::const_iterator::operator>=(const_iterator const &c) const {
     throw std::runtime_error("Iterators are not over the same measurement set");
   return channel_ >= c.channel_;
 }
-}
-}
+} // namespace casa
+} // namespace purify
