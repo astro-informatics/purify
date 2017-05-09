@@ -253,7 +253,7 @@ t_int sub2ind(const t_int &row, const t_int &col, const t_int &rows, const t_int
   return row * cols + col;
 }
 
-Vector<t_int> ind2sub(const t_int &sub, const t_int &cols, const t_int &rows) {
+std::tuple<t_int, t_int> ind2sub(const t_int &sub, const t_int &cols, const t_int &rows) {
   /*
     Converts index of a matrix to (row, column). This does the same as the matlab funciton sub2ind,
     converts subscript to index.
@@ -265,10 +265,7 @@ Vector<t_int> ind2sub(const t_int &sub, const t_int &cols, const t_int &rows) {
     col:: output column of matrix
 
    */
-  Vector<t_int> row_col(2);
-  row_col(1) = sub % cols;
-  row_col(0) = floor((sub - row_col(1)) / cols);
-  return row_col;
+  return std::make_tuple<t_int, t_int>(std::floor((sub - (sub % cols)) / cols), sub % cols);
 }
 
 t_real mod(const t_real &x, const t_real &y) {

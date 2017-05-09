@@ -51,7 +51,7 @@ utilities::vis_params uv_symmetry(const utilities::vis_params &uv_vis);
 //! Converts from subscript to index for matrix.
 t_int sub2ind(const t_int &row, const t_int &col, const t_int &rows, const t_int &cols);
 //! Converts from index to subscript for matrix.
-Vector<t_int> ind2sub(const t_int &sub, const t_int &cols, const t_int &rows);
+std::tuple<t_int, t_int> ind2sub(const t_int &sub, const t_int &cols, const t_int &rows);
 //! Mod function modified to wrap circularly for negative numbers
 t_real mod(const t_real &x, const t_real &y);
 //! Calculate mean of vector
