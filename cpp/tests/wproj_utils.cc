@@ -8,6 +8,16 @@
 using namespace purify;
 using namespace purify::notinstalled;
 
+TEST_CASE("Calcuate Chirp Image") {
+  const t_int imsizex = 128;
+  const t_int imsizey = 128;
+  SECTION("w is zero") {
+    const t_real w_rate = 0;
+    const auto chirp_image = wproj_utilities::generate_chirp(w_rate, 1, 1, imsizex, imsizey);
+    CHECK((chirp_image.array().cwiseAbs() - 1. / (imsizex * imsizey)).matrix().norm() < 1e-12);
+  }
+}
+
 TEST_CASE("Calculate Threshold") {
   SECTION("None") {
     const t_real expected_sparse_total_energy = 1;
@@ -50,8 +60,8 @@ TEST_CASE("wprojection_matrix") {
   purify::logging::set_level("debug");
   const Vector<t_real> w_components = Vector<t_real>::Random(12);
   const Vector<t_real> w_components_zero = w_components * 0;
-  const t_int Nx = 128;
-  const t_int Ny = 128;
+  const t_int Nx = 10;
+  const t_int Ny = 10;
   const t_real cellx = 1.;
   const t_real celly = 1.;
   const t_int rows = w_components.size();
@@ -73,7 +83,7 @@ TEST_CASE("wprojection_matrix") {
   // std::cout << G << std::endl;
   for(t_int k = 0; k < G.outerSize(); ++k)
     for(Sparse<t_complex>::InnerIterator it(G_id, k); it; ++it) {
-      CHECK(it.value() == 1.);
+      CHECK(std::abs(it.value() - 1.) < 1e-12);
       CHECK(it.row() == it.col()); // row index
     }
 }
