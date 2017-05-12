@@ -31,7 +31,8 @@ using namespace purify;
 using namespace purify::notinstalled;
 
 std::tuple<utilities::vis_params, t_real>
-dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr) {
+dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
+                   const bool w_term) {
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, constant::pi / 3);
   uv_data.units = "radians";
   PURIFY_HIGH_LOG("Number of measurements / number of pixels: {}",
@@ -40,7 +41,7 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
   auto const sky_measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, ground_truth_image.rows(), ground_truth_image.cols(), 1., 1., 2, 100, 1e-4, "kb",
-          8, 8));
+          8, 8, "measure", w_term));
   // Generates measurements from image
   uv_data.vis = (*sky_measurements)
                 * Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);
@@ -54,11 +55,11 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
 
 std::tuple<utilities::vis_params, t_real>
 dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
-                   sopt::mpi::Communicator const &comm) {
+                   const bool w_term, sopt::mpi::Communicator const &comm) {
   if(comm.size() == 1)
-    return dirty_visibilities(ground_truth_image, number_of_vis, snr);
+    return dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term);
   if(comm.is_root()) {
-    auto result = dirty_visibilities(ground_truth_image, number_of_vis, snr);
+    auto result = dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term);
     comm.broadcast(std::get<1>(result));
     auto const order
         = distribute::distribute_measurements(std::get<0>(result), comm, "distance_distribution");
@@ -157,7 +158,7 @@ int main(int nargs, char const **args) {
   const std::string name = "M31";
   const t_real snr = 30;
   auto const kernel = "kb";
-
+  const bool w_term = true;
   // string of fits file of image to reconstruct
   auto ground_truth_image = pfitsio::read2d(image_filename(name + ".fits"));
   ground_truth_image /= ground_truth_image.array().abs().maxCoeff();
@@ -167,28 +168,36 @@ int main(int nargs, char const **args) {
   t_int const number_of_vis = std::floor(number_of_pixels * 2);
 
   // Generating random uv(w) coverage
-  auto const data = dirty_visibilities(ground_truth_image, number_of_vis, snr, world);
+  auto const data = dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term, world);
 #if PURIFY_PADMM_ALGORITHM == 2 || PURIFY_PADMM_ALGORITHM == 3
 #ifndef PURIFY_GPU
   auto const measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), 1., 1.));
+          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), 1., 1., 2,
+          100, 1e-4, kernel, 4, 4, "measure", w_term));
+
 #else
   af::setDevice(0);
   auto const measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
       gpu::measurementoperator::init_degrid_operator_2d(
-          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), 1., 1.));
+          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), 1., 1., 2,
+          100, 1e-4, kernel, 8, 8, w_term));
+
 #endif
 #elif PURIFY_PADMM_ALGORITHM == 1
 #ifndef PURIFY_GPU
   auto const measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
       measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), 1., 1.));
+          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), 1., 1., 2,
+          100, 1e-4, kernel, 8, 8, "measure", w_term));
+
 #else
   af::setDevice(0);
   auto const measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
       gpu::measurementoperator::init_degrid_operator_2d_mpi(
-          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), 1., 1.));
+          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), 1., 1., 2,
+          100, 1e-4, kernel, 8, 8, w_term));
+
 #endif
 #endif
   auto const sara = sopt::wavelets::distribute_sara(

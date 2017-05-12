@@ -20,7 +20,8 @@ using namespace purify;
 using namespace purify::notinstalled;
 
 void padmm(const std::string &name, const Image<t_complex> &M31, const std::string &kernel,
-           const t_int J, const utilities::vis_params &uv_data, const t_real sigma) {
+           const t_int J, const utilities::vis_params &uv_data, const t_real sigma,
+           const bool w_term) {
   std::string const outfile = output_filename(name + "_" + kernel + ".tiff");
   std::string const outfile_fits = output_filename(name + "_" + kernel + "_solution.fits");
   std::string const residual_fits = output_filename(name + "_" + kernel + "_residual.fits");
@@ -33,12 +34,13 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
 #ifdef PURIFY_GPU
   auto const measurements_transform = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data, imsizey, imsizex, 1, 1, over_sample, 100, 0.0001, kernel, J, J, "measure"));
+          uv_data, imsizey, imsizex, 1, 1, over_sample, 100, 0.0001, kernel, J, J, "measure",
+          w_term));
 #else
   af::setDevice(0);
   auto const measurements_transform = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
-      gpu::measurementoperator::init_degrid_operator_2d(uv_data, imsizey, imsizex, 1, 1,
-                                                        over_sample, 100, 0.0001, kernel, J, J));
+      gpu::measurementoperator::init_degrid_operator_2d(
+          uv_data, imsizey, imsizex, 1, 1, over_sample, 100, 0.0001, kernel, J, J, w_term));
 #endif
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
@@ -89,6 +91,7 @@ int main(int, char **) {
   purify::logging::set_level("debug");
   const std::string &name = "30dor_256";
   const t_real snr = 30;
+  const bool w_term = true;
   std::string const fitsfile = image_filename(name + ".fits");
   auto M31 = pfitsio::read2d(fitsfile);
   std::string const inputfile = output_filename(name + "_" + "input.fits");
@@ -98,21 +101,23 @@ int main(int, char **) {
   pfitsio::write2d(M31.real(), inputfile);
 
   t_int const number_of_pxiels = M31.size();
-  t_int const number_of_vis = std::floor(number_of_pxiels * 2.);
+  t_int const number_of_vis = std::floor(number_of_pxiels * 0.1);
   // Generating random uv(w) coverage
   t_real const sigma_m = constant::pi / 3;
-  auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
+  const t_real max_w = 0.01;
+  auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, max_w);
+  uv_data.w = uv_data.w * 0.5;
   uv_data.units = "radians";
   PURIFY_MEDIUM_LOG("Number of measurements / number of pixels: {}",
                     uv_data.u.size() * 1. / number_of_pxiels);
 #ifdef PURIFY_GPU
   auto const sky_measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data, M31.rows(), M31.cols(), 1, 1, 2, 100, 0.0001, "kb", 8, 8, "measure"));
+          uv_data, M31.rows(), M31.cols(), 1, 1, 2, 100, 0.0001, "kb", 8, 8, "measure", w_term));
 #else
   auto const sky_measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
       gpu::measurementoperator::init_degrid_operator_2d(uv_data, M31.rows(), M31.cols(), 1, 1, 2,
-                                                        100, 0.0001, "kb", 8, 8));
+                                                        100, 0.0001, "kb", 8, 8, w_term));
 #endif
   uv_data.vis = (*sky_measurements) * Image<t_complex>::Map(M31.data(), M31.size(), 1);
   Vector<t_complex> const y0 = uv_data.vis;
@@ -120,7 +125,7 @@ int main(int, char **) {
   t_real const sigma = utilities::SNR_to_standard_deviation(y0, snr);
   // adding noise to visibilities
   uv_data.vis = utilities::add_noise(y0, 0., sigma);
-  padmm(name + "30", M31, "box", 1, uv_data, sigma);
-  padmm(name + "30", M31, "kb", 4, uv_data, sigma);
+  padmm(name + "30", M31, "box", 1, uv_data, sigma, w_term);
+  padmm(name + "30", M31, "kb", 4, uv_data, sigma, w_term);
   return 0;
 }

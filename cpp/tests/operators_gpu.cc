@@ -17,7 +17,6 @@ TEST_CASE("GPU Operators") {
   // purify::logging::set_level("debug");
   const t_uint M = 1000;
   const t_real oversample_ratio = 2;
-  const t_real resample_factor = 1;
   const t_uint imsizex = 128;
   const t_uint imsizey = 128;
   const t_uint ftsizev = std::floor(imsizey * oversample_ratio);
@@ -47,8 +46,8 @@ TEST_CASE("GPU Operators") {
     Vector<t_complex> output;
     Vector<t_complex> new_input;
     sopt::OperatorFunction<af::array> direct_gpu_fft, indirect_gpu_fft;
-    std::tie(direct_gpu_fft, indirect_gpu_fft) = gpu::operators::init_af_FFT_2d<af::array>(
-        imsizey, imsizex, oversample_ratio, resample_factor);
+    std::tie(direct_gpu_fft, indirect_gpu_fft)
+        = gpu::operators::init_af_FFT_2d<af::array>(imsizey, imsizex, oversample_ratio);
     sopt::OperatorFunction<Vector<t_complex>> fft
         = gpu::host_wrapper(direct_gpu_fft, input.size(), input.size());
     sopt::OperatorFunction<Vector<t_complex>> ifft
@@ -57,8 +56,8 @@ TEST_CASE("GPU Operators") {
     ifft(new_input, output);
     CHECK(input.isApprox(new_input, 1e-6));
     sopt::OperatorFunction<Vector<t_complex>> direct_fft, indirect_fft;
-    std::tie(direct_fft, indirect_fft) = operators::init_FFT_2d<Vector<t_complex>>(
-        imsizey, imsizex, oversample_ratio, resample_factor, ft_plan);
+    std::tie(direct_fft, indirect_fft)
+        = operators::init_FFT_2d<Vector<t_complex>>(imsizey, imsizex, oversample_ratio, ft_plan);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     const Vector<t_complex> indirect_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     Vector<t_complex> output_new;
@@ -73,16 +72,16 @@ TEST_CASE("GPU Operators") {
   SECTION("Gridding") {
     sopt::OperatorFunction<af::array> direct_gpu_G, indirect_gpu_G;
     std::tie(direct_gpu_G, indirect_gpu_G) = gpu::operators::init_af_gridding_matrix_2d<af::array>(
-        uv_vis.u, uv_vis.v, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex, oversample_ratio,
-        resample_factor, kbu, kbv, Ju, Jv);
+        uv_vis.u, uv_vis.v, uv_vis.w, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex,
+        oversample_ratio, kbu, kbv, Ju, Jv);
     const sopt::OperatorFunction<Vector<t_complex>> gpu_direct_G
         = gpu::host_wrapper(direct_gpu_G, ftsizeu * ftsizev, M);
     const sopt::OperatorFunction<Vector<t_complex>> gpu_indirect_G
         = gpu::host_wrapper(indirect_gpu_G, M, ftsizeu * ftsizev);
     sopt::OperatorFunction<Vector<t_complex>> direct_G, indirect_G;
     std::tie(direct_G, indirect_G) = operators::init_gridding_matrix_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex, oversample_ratio,
-        resample_factor, kbv, kbu, Ju, Jv);
+        uv_vis.u, uv_vis.v, uv_vis.w, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex,
+        oversample_ratio, kbv, kbu, Ju, Jv);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     const Vector<t_complex> indirect_input = Vector<t_complex>::Random(M);
     Vector<t_complex> output_new;
@@ -126,12 +125,12 @@ TEST_CASE("GPU Operators") {
   }
   SECTION("Serial Operator") {
     const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
-        power_tol, kernel, Ju, Jv, ft_plan, resample_factor);
+        uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
+        power_iters, power_tol, kernel, Ju, Jv, ft_plan);
 
     const auto measure_op_gpu = gpu::measurementoperator::init_degrid_operator_2d(
-        uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
-        power_tol, kernel, Ju, Jv, resample_factor);
+        uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
+        power_iters, power_tol, kernel, Ju, Jv);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
     const Vector<t_complex> direct_output = measure_op_gpu * direct_input;
     CHECK(direct_output.size() == M);

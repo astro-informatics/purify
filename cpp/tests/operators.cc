@@ -16,7 +16,6 @@ TEST_CASE("Operators") {
   // purify::logging::set_level("debug");
   const t_uint M = 1000;
   const t_real oversample_ratio = 2;
-  const t_real resample_factor = 1;
   const t_uint imsizex = 128;
   const t_uint imsizey = 128;
   const t_uint ftsizev = std::floor(imsizey * oversample_ratio);
@@ -46,8 +45,8 @@ TEST_CASE("Operators") {
   SECTION("Gridding") {
     sopt::OperatorFunction<Vector<t_complex>> directG, indirectG;
     std::tie(directG, indirectG) = operators::init_gridding_matrix_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex, oversample_ratio,
-        resample_factor, kbv, kbu, Ju, Jv);
+        uv_vis.u, uv_vis.v, uv_vis.w, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex,
+        oversample_ratio, kbv, kbu, Ju, Jv);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     Vector<t_complex> direct_output;
     directG(direct_output, direct_input);
@@ -86,8 +85,8 @@ TEST_CASE("Operators") {
   }
   SECTION("FFT") {
     sopt::OperatorFunction<Vector<t_complex>> directFFT, indirectFFT;
-    std::tie(directFFT, indirectFFT) = operators::init_FFT_2d<Vector<t_complex>>(
-        imsizey, imsizex, oversample_ratio, resample_factor, ft_plan);
+    std::tie(directFFT, indirectFFT)
+        = operators::init_FFT_2d<Vector<t_complex>>(imsizey, imsizex, oversample_ratio, ft_plan);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     Vector<t_complex> direct_output;
     directFFT(direct_output, direct_input);
@@ -126,8 +125,8 @@ TEST_CASE("Operators") {
     MeasurementOperator weighted_expected_op(uv_vis, Ju, Jv, kernel, imsizex, imsizey, power_iters,
                                              oversample_ratio, 1, 1, "natural");
     const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
-        power_tol, kernel, Ju, Jv, ft_plan, resample_factor);
+        uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
+        power_iters, power_tol, kernel, Ju, Jv, ft_plan);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
     const Vector<t_complex> direct_output = measure_op * direct_input;
     CHECK(direct_output.size() == M);
