@@ -7,8 +7,8 @@
 
 namespace purify {
 namespace utilities {
-utilities::vis_params
-random_sample_density(const t_int &vis_num, const t_real &mean, const t_real &standard_deviation) {
+utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &mean,
+                                            const t_real &standard_deviation, const t_real &max_w) {
   /*
           Generates a random sampling density for visibility coverage
           vis_num:: number of visibilities
@@ -33,6 +33,7 @@ random_sample_density(const t_int &vis_num, const t_real &mean, const t_real &st
   uv_vis.u = Vector<t_real>::Zero(vis_num).unaryExpr(sample);
   uv_vis.v = Vector<t_real>::Zero(vis_num).unaryExpr(sample);
   uv_vis.w = Vector<t_real>::Zero(vis_num).unaryExpr(sample);
+  uv_vis.w = uv_vis.w / uv_vis.w.maxCoeff() * max_w;
   uv_vis.weights = Vector<t_complex>::Constant(vis_num, 1);
   uv_vis.vis = Vector<t_complex>::Constant(vis_num, 1);
   uv_vis.ra = 0;

@@ -30,8 +30,9 @@ struct rm_params {
 };
 
 //! Generates a random visibility coverage
-utilities::vis_params
-random_sample_density(const t_int &vis_num, const t_real &mean, const t_real &standard_deviation);
+utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &mean,
+                                            const t_real &standard_deviation,
+                                            const t_real &max_w = 0);
 //! Reads in visibility file
 utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term = false);
 //! Writes visibilities to txt

@@ -37,10 +37,10 @@ template <class T>
 Sparse<t_complex> row_wise_convolution(const Sparse<t_complex> &Grid_, const Sparse<T> &chirp_,
                                        const t_int &Nx, const t_int &Ny);
 //! Produce Gridding matrix convovled with chirp matrix for wprojection
-Sparse<t_complex>
-wprojection_matrix(const Sparse<t_complex> &Grid, const t_int &Nx, const t_int &Ny,
-                   const Vector<t_real> &w_components, const t_real &cell_x, const t_real &cell_y,
-                   const t_real &energy_fraction_chirp, const t_real &energy_fraction_wproj);
+Sparse<t_complex> wprojection_matrix(const Sparse<t_complex> &G, const t_int &Nx, const t_int &Ny,
+                                     const Vector<t_real> &w_components, const t_real &cell_x,
+                                     const t_real &cell_y, const t_real &energy_fraction_chirp,
+                                     const t_real &energy_fraction_wproj);
 //! SNR calculation
 t_real snr_metric(const Image<t_real> &model, const Image<t_real> &solution);
 //! MR calculation
@@ -153,53 +153,35 @@ Sparse<t_complex> row_wise_convolution(const Sparse<t_complex> &Grid_, const Spa
 
   assert((Grid_.nonZeros() > 0) and (chirp_.nonZeros() > 0));
   Vector<t_complex> output_row = Vector<t_complex>::Zero(Nx * Ny);
-
-  const t_int Nx2 = std::floor(Nx * 0.5);
-  const t_int Ny2 = std::floor(Ny * 0.5);
-  //#pragma omp parallel for
-  for(t_int k = 0; k < Nx * Ny; ++k) {
-    t_int i = 0;
-    t_int j = 0;
-    std::tie(i, j) = utilities::ind2sub(k, Nx, Ny);
-    t_complex temp(0, 0);
+  const t_int Nxc = std::ceil(Nx * 0.5);
+  const t_int Nyc = std::ceil(Ny * 0.5);
+  for(t_int k = 0; k < output_row.size(); ++k) {
+    // shifting indicies to workout linear convolution
+    t_int i_shift_W = 0;
+    t_int j_shift_W = 0;
+    std::tie(j_shift_W, i_shift_W) = utilities::ind2sub(k, Ny, Nx);
+    const t_int i_W = utilities::mod(i_shift_W + Nxc, Nx);
+    const t_int j_W = utilities::mod(j_shift_W + Nyc, Ny);
     for(t_uint pix = 0; pix < Grid_.nonZeros(); pix++) {
-      t_int ii = 0;
-      t_int jj = 0;
-      std::tie(ii, jj) = utilities::ind2sub(*(Grid_.innerIndexPtr() + pix), Nx, Ny);
-
-      t_int oldpixi = ii - i;
-      if(ii < Nx2)
-        oldpixi += Nx; // fftshift
-      if((oldpixi >= 0 and oldpixi < Nx)) {
-        t_int oldpixj = jj - j;
-        if(jj < Ny2)
-          oldpixj += Ny; // fftshift
-        if((oldpixj >= 0 and oldpixj < Ny)) {
-          const t_int pos = oldpixi * Ny + oldpixj;
-          if(std::abs(chirp_.coeff(pos, 0)) > 1e-15)
-            temp += *(Grid_.valuePtr() + pix) * chirp_.coeff(pos, 0);
-        }
+      t_int i_shift_G = 0;
+      t_int j_shift_G = 0;
+      std::tie(j_shift_G, i_shift_G) = utilities::ind2sub(*(Grid_.innerIndexPtr() + pix), Ny, Nx);
+      const t_int i_G = utilities::mod(i_shift_G + Nxc, Nx);
+      const t_int j_G = utilities::mod(j_shift_G + Nyc, Ny);
+      const t_int i_C = i_W - i_G;
+      const t_int j_C = j_W - j_G;
+      // Checking that convolution result is going to be within bounds
+      if(-Nxc <= i_C and i_C <= Nxc and -Nyc <= j_C and j_C <= Nyc) {
+        // FFTshift of result to go into gridding matrix
+        const t_int i_shift_C = utilities::mod(i_C + Nxc, Nx);
+        const t_int j_shift_C = utilities::mod(j_C + Nxc, Ny);
+        const t_int pos = utilities::sub2ind(j_shift_C, i_shift_C, Ny, Nx);
+        assert(0 <= pos and pos < Nx * Ny);
+        output_row(k) += *(Grid_.valuePtr() + pix) * chirp_.coeff(pos, 0);
       }
-    }
-
-    if(std::abs(temp) > 1e-16) {
-      t_int iii, jjj;
-      if(i < Nx2)
-        iii = i + Nx2;
-      else {
-        iii = i - Nx2;
-      }
-      if(j < Ny2)
-        jjj = j + Ny2;
-      else {
-        jjj = j - Ny2;
-      }
-      const t_int pos = utilities::sub2ind(iii, jjj, Nx, Ny);
-#pragma omp critical(load1)
-      output_row(pos) = temp;
     }
   }
-  return output_row.sparseView(1, 1e-12);
+  return output_row.sparseView(output_row.cwiseAbs().maxCoeff(), 1e-10);
 }
 } // namespace wproj_utilities
 } // namespace purify

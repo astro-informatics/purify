@@ -25,23 +25,15 @@ Matrix<t_complex> generate_chirp(const t_real &w_rate, const t_real &cell_x, con
   const t_real delt_x = 1 * L / x_size;
   const t_real delt_y = 1 * M / y_size;
   Image<t_complex> chirp(y_size, x_size);
-  t_complex I(0, 1);
-  t_real nz = ((t_real)y_size * x_size * 1.0);
+  const t_complex I(0, 1);
+  const t_real nz = y_size * x_size;
 
-#pragma omp parallel for collapse(2)
   for(t_int l = 0; l < x_size; ++l) {
     for(t_int m = 0; m < y_size; ++m) {
-      t_real x = (l + 0.5 - x_size * 0.5) * delt_x;
-      t_real y = (m + 0.5 - y_size * 0.5) * delt_y;
-      t_complex val = (std::exp(1 * pi * I * w_rate * (x * x + y * y)))
-                      * std::exp(-2 * pi * I * (l * 0.5 + m * 0.5)) / nz;
-      if(std::abs(val) > 1e-16) {
-        if(std::abs(val.imag()) < 1e-10)
-          val = val.real() + I * 0.0;
-        chirp(l, m) = val;
-      } else {
-        chirp(l, m) = 0.0;
-      }
+      const t_real x = (l + 0.5 - x_size * 0.5) * delt_x;
+      const t_real y = (m + 0.5 - y_size * 0.5) * delt_y;
+      chirp(l, m) = (std::exp(1 * pi * I * w_rate * (x * x + y * y)))
+                    * std::exp(-2 * pi * I * (l * 0.5 + m * 0.5)) / nz;
     }
   }
 
@@ -62,18 +54,20 @@ Sparse<t_complex> create_chirp_row(const t_real &w_rate, const t_real &cell_x, c
   const t_real thres = wproj_utilities::sparsify_row_dense_thres(rowC, energy_fraction);
   t_int sp = 0;
   for(t_int kk; kk < Npix; kk++) {
-    if(std::abs(rowC(kk)) < thres) {
+    if(std::abs(rowC(kk)) > thres) {
       sp++;
       rowC(kk, 0) = 0;
     }
   }
-  return rowC.sparseView(1, 1e-12);
+  assert(rowC.norm() > 0);
+  const t_real row_max = rowC.cwiseAbs().maxCoeff();
+  return rowC.sparseView(row_max, 1e-10);
 }
 
-Sparse<t_complex>
-wprojection_matrix(const Sparse<t_complex> &Grid, const t_int &Nx, const t_int &Ny,
-                   const Vector<t_real> &w_components, const t_real &cell_x, const t_real &cell_y,
-                   const t_real &energy_fraction_chirp, const t_real &energy_fraction_wproj) {
+Sparse<t_complex> wprojection_matrix(const Sparse<t_complex> &G, const t_int &Nx, const t_int &Ny,
+                                     const Vector<t_real> &w_components, const t_real &cell_x,
+                                     const t_real &cell_y, const t_real &energy_fraction_chirp,
+                                     const t_real &energy_fraction_wproj) {
 
   const t_int Npix = Nx * Ny;
   const t_int Nvis = w_components.size();
@@ -84,55 +78,38 @@ wprojection_matrix(const Sparse<t_complex> &Grid, const t_int &Nx, const t_int &
   const t_int fft_flag = (FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
   const std::shared_ptr<FFTOperator> fftop_
       = std::make_shared<FFTOperator>(purify::FFTOperator().fftw_flag(fft_flag));
-  Sparse<t_complex> Gmat(Nvis, Npix);
-  Gmat.reserve(std::floor(Npix * Nvis * 0.2));
-#pragma omp parallel for
-  for(t_int m = 0; m < Grid.outerSize(); ++m) {
-    PURIFY_DEBUG("CURRENT WPROJ - Kernel index [{}]", m);
+  Sparse<t_complex> GW(Nvis, Npix);
+  t_uint counts = 0;
+  //#pragma omp parallel for
+  for(t_int m = 0; m < G.outerSize(); ++m) {
+    PURIFY_DEBUG("CURRENT WPROJ - Kernel index [{}], w = {}", m, w_components(m));
     const Sparse<t_complex> chirp
         = create_chirp_row(w_components(m), cell_x, cell_y, Nx, Ny, energy_fraction_chirp, fftop_);
-    Sparse<t_complex> kernel = row_wise_convolution(Grid.row(m), chirp, Nx, Ny);
+    Sparse<t_complex> kernel = row_wise_convolution(G.row(m), chirp, Nx, Ny);
+    assert(kernel.nonZeros() > 0);
     const t_real thres = sparsify_row_thres(kernel, energy_fraction_wproj);
     kernel.prune([&](const t_uint &i, const t_uint &j, const t_complex &value) {
       return std::abs(value) > thres;
     });
 
+    assert(kernel.rows() > 0);
+    assert(kernel.cols() == 0);
     assert(kernel.nonZeros() > 0);
-    assert(kernel.rows() > 1);
-    Gmat.row(m) = kernel.transpose();
-    PURIFY_DEBUG("DONE - Kernel index [{}]", m);
+#pragma omp critical
+    GW.row(m) = kernel.transpose();
+#pragma omp critical
+    counts++;
+    PURIFY_DEBUG("Row {} of {}", counts, GW.rows());
+    PURIFY_DEBUG("With {} entries non zero, which is {} entries per a row.", GW.nonZeros(),
+                 static_cast<t_real>(GW.nonZeros()) / counts);
   }
-  assert(Gmat.nonZeros() > 0);
-  PURIFY_DEBUG("\nBuilding the rows of G.. DONE!\n");
-  return Gmat;
+  assert(GW.nonZeros() > 0);
+  PURIFY_DEBUG("\nBuilding the rows of GW.. DONE!\n");
+  PURIFY_DEBUG("DONE - With {} entries non zero, which is {} entries per a row.", GW.nonZeros(),
+               static_cast<t_real>(GW.nonZeros()) / GW.rows());
+  return GW;
 } // namespace wproj_utilities
 
-t_real sparsity_sp(const Sparse<t_complex> &Gmat) {
-
-  const t_int Nvis = Gmat.rows();
-  const t_int Npix = Gmat.cols();
-  t_real val = Gmat.nonZeros() / static_cast<t_real>(Nvis * Npix);
-
-  PURIFY_DEBUG(" Sparsity perc:  {}", val);
-  return val;
-}
-t_real sparsity_im(const Image<t_complex> &Cmat) {
-  /*
-     returs  nber on non zero elts/ total nber of elts in Image
-     */
-  const t_int Nvis = Cmat.rows();
-  const t_int Npix = Cmat.cols();
-  t_real sparsity = 0;
-  for(t_int m = 0; m < Nvis; m++) {
-    for(t_int n = 0; n < Npix; n++) {
-      if(std::abs(Cmat(m, n)) > 1e-16)
-        sparsity++;
-    }
-  }
-  t_real val = (sparsity / (t_real)(Nvis * Npix));
-  PURIFY_DEBUG(" Sparsity perc:  {}", val);
-  return val;
-}
 t_real snr_metric(const Image<t_real> &model, const Image<t_real> &solution) {
   /*
      Returns SNR of the estimated model image
@@ -190,42 +167,5 @@ generate_vect(const t_int &x_size, const t_int &y_size, const t_real &sigma, con
   return chirp_;
 }
 
-t_real upsample_ratio_sim(const utilities::vis_params &uv_vis, const t_real &L, const t_real &M,
-                          const t_int &x_size, const t_int &y_size, const t_int &multipleOf) {
-  /*
-     returns the upsampling (in Fourier domain) ratio
-     */
-  const Vector<t_real> &u = uv_vis.u.cwiseAbs();
-  const Vector<t_real> &v = uv_vis.v.cwiseAbs();
-  const Vector<t_real> &w = uv_vis.w.cwiseAbs();
-  Vector<t_real> uvdist = (u.array() * u.array() + v.array() * v.array()).sqrt();
-  t_real bandwidth = 2 * uvdist.maxCoeff();
-  // std::cout<<"\nDEBUG: bandwidth "<<bandwidth;
-  Vector<t_real> bandwidth_up_vector = 2 * (uvdist + w * L * 0.5);
-  t_real bandwidth_up = bandwidth_up_vector.maxCoeff();
-  t_real ratio = bandwidth_up / bandwidth;
-  // std::cout<<"\nDEBUG: bandwidthUP "<<bandwidth_up;
-
-  // std::cout<<"DEBUG:Initially calculated Upsampling ratio:"<<ratio <<"\n";
-
-  // sets up dimensions for new image - even size
-  t_int new_x = std::floor(x_size * ratio) + utilities::mod(floor(x_size * ratio), 2);
-  t_int new_y = std::floor(y_size * ratio) + utilities::mod(floor(y_size * ratio), 2);
-  if(utilities::mod(new_x, multipleOf) != 0)
-    new_x = multipleOf * floor((t_real)new_x / multipleOf) + multipleOf;
-  if(utilities::mod(new_y, multipleOf) != 0)
-    new_y = multipleOf * floor((t_real)new_y / multipleOf) + multipleOf;
-  // if (mod(new_y,multipleOf) !=0) std::cout <<"\nDEBUG: (in upsample_ratio_sim) ERROR!!!!!!  ---
-  // IMAGE SIZE y\n "; if (mod(new_x,multipleOf) !=0) std::cout <<"\nDEBUG: (in upsample_ratio_sim)
-  // ERROR!!!!!!  --- IMAGE SIZE x\n ";
-
-  // !!!!!!! assuming same ratio on x and y for now !!!!!!!
-  ratio = ((t_real)new_x) / ((t_real)x_size);
-
-  // std::cout<<"DEBUG: (in upsample_ratio_sim) new image size"<< new_x<<" old image size "<<
-  // x_size<<"\n";
-
-  return ratio;
-}
 } // namespace wproj_utilities
 } // namespace purify
