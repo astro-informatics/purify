@@ -87,6 +87,17 @@ TEST_CASE("wprojection_matrix") {
       CHECK(it.row() == it.col()); // row index
     }
 }
+TEST_CASE("convolution") {
+  const t_uint Nx = 12;
+  const t_uint Ny = 12;
+  const Sparse<t_complex> G_row = Vector<t_complex>::Random(Nx * Ny).sparseView(1e-4);
+  const Sparse<t_complex> C_row = Vector<t_complex>::Random(Nx * Ny).sparseView(1e-4);
+  const Sparse<t_complex> kernel = wproj_utilities::row_wise_convolution(G_row, C_row, Nx, Ny);
+  const Sparse<t_complex> test_kernel
+      = wproj_utilities::row_wise_sparse_convolution(G_row, C_row, Nx, Ny);
+  CHECK(test_kernel.nonZeros() == kernel.nonZeros());
+  CHECK(test_kernel.isApprox(kernel, 1e-12));
+}
 /*
 TEST_CASE("convolution") {
 

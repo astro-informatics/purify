@@ -80,13 +80,13 @@ Sparse<t_complex> wprojection_matrix(const Sparse<t_complex> &G, const t_int &Nx
       = std::make_shared<FFTOperator>(purify::FFTOperator().fftw_flag(fft_flag));
   Sparse<t_complex> GW(Nvis, Npix);
   t_uint counts = 0;
-  //#pragma omp parallel for
-  for(t_int m = 0; m < G.outerSize(); ++m) {
-    PURIFY_DEBUG("CURRENT WPROJ - Kernel index [{}], w = {}", m, w_components(m));
+#pragma omp parallel for
+  for(t_int m = 0; m < G.outerSize(); m++) {
+    // PURIFY_DEBUG("CURRENT WPROJ - Kernel index [{}], w = {}", m, w_components(m));
     const Sparse<t_complex> chirp
         = create_chirp_row(w_components(m), cell_x, cell_y, Nx, Ny, energy_fraction_chirp, fftop_);
-    Sparse<t_complex> kernel = row_wise_convolution(G.row(m), chirp, Nx, Ny);
-    assert(kernel.nonZeros() > 0);
+    Sparse<t_complex> kernel = row_wise_sparse_convolution(G.row(m), chirp, Nx, Ny);
+    assert(kernel.nonZeros() > G.row(m).nonZeros());
     const t_real thres = sparsify_row_thres(kernel, energy_fraction_wproj);
     kernel.prune([&](const t_uint &i, const t_uint &j, const t_complex &value) {
       return std::abs(value) > thres;
@@ -99,9 +99,11 @@ Sparse<t_complex> wprojection_matrix(const Sparse<t_complex> &G, const t_int &Nx
     GW.row(m) = kernel.transpose();
 #pragma omp critical
     counts++;
-    PURIFY_DEBUG("Row {} of {}", counts, GW.rows());
-    PURIFY_DEBUG("With {} entries non zero, which is {} entries per a row.", GW.nonZeros(),
-                 static_cast<t_real>(GW.nonZeros()) / counts);
+    if(counts % 100 == 0) {
+      PURIFY_DEBUG("Row {} of {}", counts, GW.rows());
+      PURIFY_DEBUG("With {} entries non zero, which is {} entries per a row.", GW.nonZeros(),
+                   static_cast<t_real>(GW.nonZeros()) / counts);
+    }
   }
   assert(GW.nonZeros() > 0);
   PURIFY_DEBUG("\nBuilding the rows of GW.. DONE!\n");
