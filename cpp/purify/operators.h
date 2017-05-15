@@ -320,6 +320,8 @@ base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
   PURIFY_LOW_LOG("Constructing Zero Padding and Correction Operator: ZDB");
   PURIFY_MEDIUM_LOG("Image size (width, height): {} x {}", imsizex, imsizey);
   PURIFY_MEDIUM_LOG("Oversampling Factor: {}", oversample_ratio);
+  PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
+                    imsizey * celly / (60. * 60.));
   std::tie(directZ, indirectZ) = purify::operators::init_zero_padding_2d<T>(S, oversample_ratio);
   PURIFY_LOW_LOG("Constructing FFT operator: F");
   if(ft_plan == "measure") {
@@ -365,6 +367,8 @@ base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_
   PURIFY_LOW_LOG("Constructing Zero Padding and Correction Operators: ZDB");
   PURIFY_MEDIUM_LOG("Image size (width, height): {} x {}", imsizex, imsizey);
   PURIFY_MEDIUM_LOG("Oversampling Factor: {}", oversample_ratio);
+  PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
+                    imsizey * celly / (60. * 60.));
   std::tie(directZ, indirectZ) = purify::operators::init_zero_padding_2d<T>(S, oversample_ratio);
   PURIFY_LOW_LOG("Constructing FFT operator: F");
   if(ft_plan == "measure") {

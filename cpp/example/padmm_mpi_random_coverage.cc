@@ -32,8 +32,9 @@ using namespace purify::notinstalled;
 
 std::tuple<utilities::vis_params, t_real>
 dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
-                   const std::tuple<bool, t_real> w_term) {
-  auto uv_data = utilities::random_sample_density(number_of_vis, 0, constant::pi / 3);
+                   const std::tuple<bool, t_real> &w_term) {
+  auto uv_data
+      = utilities::random_sample_density(number_of_vis, 0, constant::pi / 3, std::get<0>(w_term));
   uv_data.units = "radians";
   PURIFY_HIGH_LOG("Number of measurements / number of pixels: {}",
                   uv_data.u.size() / ground_truth_image.size());
@@ -55,7 +56,7 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
 
 std::tuple<utilities::vis_params, t_real>
 dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
-                   const std::tuple<bool, t_real> w_term, sopt::mpi::Communicator const &comm) {
+                   const std::tuple<bool, t_real> &w_term, sopt::mpi::Communicator const &comm) {
   if(comm.size() == 1)
     return dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term);
   if(comm.is_root()) {
@@ -168,7 +169,7 @@ int main(int nargs, char const **args) {
   const t_real cellsize = FoV / ground_truth_image.cols() * 60. * 60.;
   // determine amount of visibilities to simulate
   t_int const number_of_pixels = ground_truth_image.size();
-  t_int const number_of_vis = std::floor(number_of_pixels * 2);
+  t_int const number_of_vis = std::floor(number_of_pixels * 0.1);
 
   // Generating random uv(w) coverage
   auto const data = dirty_visibilities(ground_truth_image, number_of_vis, snr,

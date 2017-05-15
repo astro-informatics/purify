@@ -91,8 +91,8 @@ int main(int, char **) {
   sopt::logging::set_level("debug");
   purify::logging::set_level("debug");
   const std::string &name = "30dor_256";
-  const t_real FoV = 1;     // deg
-  const t_real max_w = 100; // lambda
+  const t_real FoV = 1;      // deg
+  const t_real max_w = 100.; // lambda
   const t_real snr = 30;
   const bool w_term = true;
   std::string const fitsfile = image_filename(name + ".fits");
