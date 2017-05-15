@@ -46,22 +46,22 @@ Sparse<t_complex> create_chirp_row(const t_real &w_rate, const t_real &cell_x, c
                                    const std::shared_ptr<FFTOperator> &fftop_) {
 
   const t_int Npix = ftsizeu * ftsizev;
-  auto chirp_image = wproj_utilities::generate_chirp(w_rate, cell_x, cell_y, ftsizeu, ftsizev);
-  Matrix<t_complex> rowC;
+  Matrix<t_complex> chirp
+      = wproj_utilities::generate_chirp(w_rate, cell_x, cell_y, ftsizeu, ftsizev);
 #pragma omp critical(fft)
-  rowC = fftop_->forward(chirp_image);
-  rowC.resize(Npix, 1);
-  const t_real thres = wproj_utilities::sparsify_row_dense_thres(rowC, energy_fraction);
+  chirp = fftop_->forward(chirp);
+  chirp.resize(Npix, 1);
+  const t_real thres = wproj_utilities::sparsify_row_dense_thres(chirp, energy_fraction);
   t_int sp = 0;
   for(t_int kk; kk < Npix; kk++) {
-    if(std::abs(rowC(kk)) > thres) {
+    if(std::abs(chirp(kk, 0)) > thres) {
       sp++;
-      rowC(kk, 0) = 0;
+      chirp(kk, 0) = 0;
     }
   }
-  assert(rowC.norm() > 0);
-  const t_real row_max = rowC.cwiseAbs().maxCoeff();
-  return rowC.sparseView(row_max, 1e-10);
+  assert(chirp.norm() > 0);
+  const t_real row_max = chirp.cwiseAbs().maxCoeff();
+  return chirp.sparseView(row_max, 1e-10);
 }
 
 Sparse<t_complex> wprojection_matrix(const Sparse<t_complex> &G, const t_int &Nx, const t_int &Ny,
