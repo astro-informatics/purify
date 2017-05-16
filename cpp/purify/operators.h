@@ -272,7 +272,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
 init_FFT_2d(const t_uint &imsizey_, const t_uint &imsizex_, const t_real &oversample_factor_,
             const std::string &fftw_plan_flag_ = "measure") {
   const std::shared_ptr<FFTOperator> fftop
-      = std::make_shared<FFTOperator>(FFTOperator::FFTOperator());
+      = std::make_shared<FFTOperator>();
   auto const ftsizeu_ = std::floor(imsizex_ * oversample_factor_);
   auto const ftsizev_ = std::floor(imsizey_ * oversample_factor_);
   if(fftw_plan_flag_ == "measure") {
