@@ -2,6 +2,8 @@
 include(EnvironmentScript)
 # Look up packages: if not found, installs them
 include(PackageLookup)
+# Get the yaml reader
+lookup_package(Yamlcpp REQUIRED)
 
 # Look for external software
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
