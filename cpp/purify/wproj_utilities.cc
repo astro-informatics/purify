@@ -86,14 +86,14 @@ Sparse<t_complex> wprojection_matrix(const Sparse<t_complex> &G, const t_int &Nx
     const Sparse<t_complex> chirp
         = create_chirp_row(w_components(m), cell_x, cell_y, Nx, Ny, energy_fraction_chirp, fftop_);
     Sparse<t_complex> kernel = row_wise_sparse_convolution(G.row(m), chirp, Nx, Ny);
-    assert(kernel.nonZeros() > G.row(m).nonZeros());
+    assert(kernel.nonZeros() >= G.row(m).nonZeros());
     const t_real thres = sparsify_row_thres(kernel, energy_fraction_wproj);
     kernel.prune([&](const t_uint &i, const t_uint &j, const t_complex &value) {
       return std::abs(value) > thres;
     });
 
     assert(kernel.rows() > 0);
-    assert(kernel.cols() == 0);
+    assert(kernel.cols() == 1);
     assert(kernel.nonZeros() > 0);
 #pragma omp critical
     GW.row(m) = kernel.transpose();
