@@ -48,13 +48,13 @@ protected:
   t_int fftw_flag_ = (FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
 
 public:
-  t_int const &fftw_flag() { return fftw_flag_; };
+  t_int const &fftw_flag() { return fftw_flag_; }
 
   FFTOperator &fftw_flag(t_int const &fftw_flag) {
     fftw_flag_ = fftw_flag;
     return *this;
   }
 };
-}
+} // namespace purify
 
 #endif

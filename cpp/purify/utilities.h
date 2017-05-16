@@ -3,13 +3,8 @@
 
 #include "purify/config.h"
 #include <fstream>
-#include <iostream>
-#include <random>
-#include <stdio.h>
 #include <string>
-#include <boost/math/special_functions/gamma.hpp>
-#include <boost/math/special_functions/sinc.hpp>
-#include <sys/stat.h>
+#include <type_traits>
 #include "purify/FFTOperator.h"
 #include "purify/types.h"
 
@@ -20,10 +15,7 @@ struct vis_params {
   Vector<t_real> u; // u coordinates
   Vector<t_real> v; // v coordinates
   Vector<t_real> w;
-  Vector<t_complex> vis; // complex visiblities
-  Vector<t_complex> vis1;
-  Vector<t_complex> vis2;
-  Vector<t_complex> vis3;
+  Vector<t_complex> vis;     // complex visiblities
   Vector<t_complex> weights; // weights for visibilities
   std::string units = "lambda";
   t_real ra = 0.;  // decimal degrees
@@ -38,16 +30,20 @@ struct rm_params {
 };
 
 //! Generates a random visibility coverage
-utilities::vis_params
-random_sample_density(const t_int &vis_num, const t_real &mean, const t_real &standard_deviation);
+utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &mean,
+                                            const t_real &standard_deviation,
+                                            const t_real &max_w = 0);
 //! Reads in visibility file
 utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term = false);
 //! Writes visibilities to txt
 void write_visibility(const utilities::vis_params &uv_vis, const std::string &file_name,
                       const bool w_term = false);
 //! Scales visibilities to a given pixel size in arcseconds
-utilities::vis_params
-set_cell_size(const utilities::vis_params &uv_vis, t_real cell_size_u = 0, t_real cell_size_v = 0);
+utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis,
+                                    const t_real &cell_size_u = 0, const t_real &cell_size_v = 0);
+utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t_real &max_u,
+                                    const t_real &max_v, const t_real &cell_size_u,
+                                    const t_real &cell_size_v);
 //! scales the visibilities to units of pixels
 utilities::vis_params
 uv_scale(const utilities::vis_params &uv_vis, const t_int &ftsizeu, const t_int &ftsizev);
@@ -56,26 +52,26 @@ utilities::vis_params uv_symmetry(const utilities::vis_params &uv_vis);
 //! Converts from subscript to index for matrix.
 t_int sub2ind(const t_int &row, const t_int &col, const t_int &rows, const t_int &cols);
 //! Converts from index to subscript for matrix.
-Vector<t_int> ind2sub(const t_int &sub, const t_int &cols, const t_int &rows);
+std::tuple<t_int, t_int> ind2sub(const t_int &sub, const t_int &cols, const t_int &rows);
 //! Mod function modified to wrap circularly for negative numbers
 t_real mod(const t_real &x, const t_real &y);
 //! Calculate mean of vector
 template <class K> typename K::Scalar mean(const K x) {
   // Calculate mean of vector x
   return x.array().mean();
-};
+}
 //! Calculate variance of vector
 template <class K> t_real variance(const K x) {
   // calculate variance of vector x
   auto q = (x.array() - x.array().mean()).matrix();
   t_real var = std::real((q.adjoint() * q)(0) / static_cast<t_real>(q.size() - 1));
   return var;
-};
+}
 //! Calculates the standard deviation of a vector
 template <class K> t_real standard_deviation(const K x) {
   // calculate standard deviation of vector x
   return std::sqrt(variance(x));
-};
+}
 //! Calculates the convolution between two images
 Image<t_complex> convolution_operator(const Image<t_complex> &a, const Image<t_complex> &b);
 //! A vector that whiten's the visibilities given the weights.
@@ -103,7 +99,22 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
                               const std::string &weighting_type, const t_real &R,
                               const t_int &ftsizeu, const t_int &ftsizev);
 //! Parallel multiplication with a sparse matrix and vector
-Vector<t_complex> sparse_multiply_matrix(const Sparse<t_complex> &M, const Vector<t_complex> &x);
+template <class T0, class T1>
+typename std::enable_if<std::is_same<typename T0::Scalar, typename T1::Scalar>::value
+                            and T0::IsRowMajor,
+                        Vector<typename T0::Scalar>>::type
+sparse_multiply_matrix(const Eigen::SparseMatrixBase<T0> &M, const Eigen::MatrixBase<T1> &x) {
+  assert(M.cols() == x.size());
+  Vector<typename T0::Scalar> y = Vector<typename T0::Scalar>::Zero(M.rows());
+  auto const &derived = M.derived();
+// parallel sparse matrix multiplication with vector.
+#pragma omp parallel for
+  //#pragma omp simd
+  for(t_int k = 0; k < M.outerSize(); ++k)
+    for(typename Sparse<typename T0::Scalar>::InnerIterator it(derived, k); it; ++it)
+      y(k) += it.value() * x(it.index());
+  return y;
+}
 //! Reads a diagnostic file and updates parameters
 std::tuple<t_int, t_real> checkpoint_log(const std::string &diagnostic);
 //! Multiply images coefficient-wise using openmp
@@ -117,12 +128,12 @@ template <class K, class L> Image<t_complex> parallel_multiply_image(const K &A,
     for(t_int j = 0; j < rows; ++j)
       C(j, i) = A(j, i) * B(j, i);
   return C;
-};
+}
 //! zero pads ft grid for image up sampling and downsampling
 Matrix<t_complex> re_sample_ft_grid(const Matrix<t_complex> &input, const t_real &re_sample_factor);
 //! resamples image size
 Matrix<t_complex> re_sample_image(const Matrix<t_complex> &input, const t_real &re_sample_ratio);
-}
-}
+} // namespace utilities
+} // namespace purify
 
 #endif

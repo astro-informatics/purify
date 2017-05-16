@@ -1,5 +1,5 @@
-#include "purify/config.h"
 #include "purify/FFTOperator.h"
+#include "purify/config.h"
 
 namespace purify {
 Vector<t_complex> Fft2d::fftshift_1d(const Vector<t_complex> input) {
@@ -154,4 +154,4 @@ void FFTOperator::set_up_multithread() {
   fftw_plan_with_nthreads(omp_get_max_threads());
 #endif
 }
-}
+} // namespace purify

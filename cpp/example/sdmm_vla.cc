@@ -8,6 +8,7 @@
 #include <sopt/wavelets/sara.h>
 #include "purify/MeasurementOperator.h"
 #include "purify/directories.h"
+#include "purify/logging.h"
 #include "purify/pfitsio.h"
 #include "purify/types.h"
 
@@ -15,6 +16,7 @@ int main(int, char **) {
   using namespace purify;
   using namespace purify::notinstalled;
   sopt::logging::initialize();
+  purify::logging::initialize();
 
   std::string const visfile = vla_filename("at166B.3C129.c0.vis");
   std::string const outfile = output_filename("vla.tiff");
@@ -33,8 +35,8 @@ int main(int, char **) {
   t_int width = 512;
   t_int height = 512;
   uv_data = utilities::uv_symmetry(uv_data);
-  MeasurementOperator measurements(uv_data, 4, 4, "kb_interp", width, height, 20, over_sample,
-                                   cellsize, cellsize, "whiten");
+  auto const measurements = std::make_shared<MeasurementOperator const>(
+      uv_data, 4, 4, "kb_interp", width, height, 20, over_sample, cellsize, cellsize, "whiten");
   // putting measurement operator in a form that sopt can use
   auto measurements_transform = linear_transform(measurements, uv_data.vis.size());
 
@@ -56,21 +58,20 @@ int main(int, char **) {
 
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), height, width), dirty_image_fits);
 
-  const Vector<t_complex> &weighted_data = (uv_data.vis.array() * measurements.W).matrix();
+  const Vector<t_complex> &weighted_data = (uv_data.vis.array() * measurements->W).matrix();
   t_real noise_variance = utilities::variance(weighted_data) / 2;
   t_real const noise_rms = std::sqrt(noise_variance);
-  std::cout << "Calculated RMS noise of " << noise_rms * 1e3 << " mJy" << '\n';
+  PURIFY_MEDIUM_LOG("Calculated RMS noise of {} mJy", noise_rms * 1e3);
 
-  t_real epsilon = utilities::calculate_l2_radius(
-      uv_data.vis, 1.); // Calculation of l_2 bound following SARA paper
+  // Calculation of l_2 bound following SARA paper
+  t_real epsilon = utilities::calculate_l2_radius(uv_data.vis, 1.);
   auto purify_gamma
       = (Psi.adjoint() * (measurements_transform.adjoint() * (input.array()).matrix()))
             .real()
             .maxCoeff()
         * beta;
 
-  std::cout << "Starting sopt!" << '\n';
-  std::cout << "Epsilon = " << epsilon << '\n';
+  PURIFY_HIGH_LOG("Using epsilon of {}", epsilon);
   auto const sdmm = sopt::algorithm::SDMM<t_complex>()
                         .itermax(niters)
                         .gamma(purify_gamma) // l_1 bound
@@ -84,12 +85,12 @@ int main(int, char **) {
   Vector<t_complex> result;
   auto const diagonstic = sdmm(result);
   Image<t_complex> image
-      = Image<t_complex>::Map(result.data(), measurements.imsizey(), measurements.imsizex());
+      = Image<t_complex>::Map(result.data(), measurements->imsizey(), measurements->imsizex());
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
   sopt::utilities::write_tiff(image.real(), outfile);
   pfitsio::write2d(image.real(), outfile_fits);
-  Image<t_complex> residual = measurements.grid(input - measurements.degrid(image));
+  Image<t_complex> residual = measurements->grid(input - measurements->degrid(image));
   pfitsio::write2d(residual.real(), residual_fits);
   return 0;
 }

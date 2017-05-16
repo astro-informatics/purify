@@ -1,11 +1,14 @@
-#include "purify/config.h"
-#include "purify/logging.h"
 #include "purify/utilities.h"
+#include "purify/config.h"
+#include <fstream>
+#include <random>
+#include <sys/stat.h>
+#include "purify/logging.h"
 
 namespace purify {
 namespace utilities {
-utilities::vis_params
-random_sample_density(const t_int &vis_num, const t_real &mean, const t_real &standard_deviation) {
+utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &mean,
+                                            const t_real &standard_deviation, const t_real &max_w) {
   /*
           Generates a random sampling density for visibility coverage
           vis_num:: number of visibilities
@@ -30,6 +33,7 @@ random_sample_density(const t_int &vis_num, const t_real &mean, const t_real &st
   uv_vis.u = Vector<t_real>::Zero(vis_num).unaryExpr(sample);
   uv_vis.v = Vector<t_real>::Zero(vis_num).unaryExpr(sample);
   uv_vis.w = Vector<t_real>::Zero(vis_num).unaryExpr(sample);
+  uv_vis.w = uv_vis.w / uv_vis.w.maxCoeff() * max_w;
   uv_vis.weights = Vector<t_complex>::Constant(vis_num, 1);
   uv_vis.vis = Vector<t_complex>::Constant(vis_num, 1);
   uv_vis.ra = 0;
@@ -118,8 +122,9 @@ void write_visibility(const utilities::vis_params &uv_vis, const std::string &fi
   out.close();
 }
 
-utilities::vis_params
-set_cell_size(const utilities::vis_params &uv_vis, t_real cell_size_u, t_real cell_size_v) {
+utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t_real &max_u,
+                                    const t_real &max_v, const t_real &input_cell_size_u,
+                                    const t_real &input_cell_size_v) {
   /*
     Converts the units of visibilities to units of 2 * pi, while scaling for the size of a pixel
     (cell_size)
@@ -129,16 +134,13 @@ set_cell_size(const utilities::vis_params &uv_vis, t_real cell_size_u, t_real ce
   */
 
   utilities::vis_params scaled_vis;
-
+  t_real cell_size_u = input_cell_size_u;
+  t_real cell_size_v = input_cell_size_v;
   if(cell_size_u == 0 and cell_size_v == 0) {
-    Vector<t_real> u_dist = uv_vis.u.array() * uv_vis.u.array();
-    t_real max_u = std::sqrt(u_dist.maxCoeff());
     cell_size_u = (180 * 3600) / max_u / constant::pi / 3; // Calculate cell size if not given one
 
-    Vector<t_real> v_dist = uv_vis.v.array() * uv_vis.v.array();
-    t_real max_v = std::sqrt(v_dist.maxCoeff());
     cell_size_v = (180 * 3600) / max_v / constant::pi / 3; // Calculate cell size if not given one
-    PURIFY_MEDIUM_LOG("PSF has a FWHM of {} by {} arcseconds", cell_size_u * 3, cell_size_v * 3);
+    // PURIFY_MEDIUM_LOG("PSF has a FWHM of {} by {} arcseconds", cell_size_u * 3, cell_size_v * 3);
   }
   if(cell_size_v == 0) {
     cell_size_v = cell_size_u;
@@ -167,6 +169,12 @@ set_cell_size(const utilities::vis_params &uv_vis, t_real cell_size_u, t_real ce
   scaled_vis.dec = uv_vis.dec;
   scaled_vis.average_frequency = uv_vis.average_frequency;
   return scaled_vis;
+}
+utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t_real &cell_size_u,
+                                    const t_real &cell_size_v) {
+  const t_real max_u = std::sqrt((uv_vis.u.array() * uv_vis.u.array()).maxCoeff());
+  const t_real max_v = std::sqrt((uv_vis.v.array() * uv_vis.v.array()).maxCoeff());
+  return set_cell_size(uv_vis, max_u, max_v, cell_size_u, cell_size_v);
 }
 
 utilities::vis_params
@@ -246,7 +254,7 @@ t_int sub2ind(const t_int &row, const t_int &col, const t_int &rows, const t_int
   return row * cols + col;
 }
 
-Vector<t_int> ind2sub(const t_int &sub, const t_int &cols, const t_int &rows) {
+std::tuple<t_int, t_int> ind2sub(const t_int &sub, const t_int &cols, const t_int &rows) {
   /*
     Converts index of a matrix to (row, column). This does the same as the matlab funciton sub2ind,
     converts subscript to index.
@@ -258,10 +266,7 @@ Vector<t_int> ind2sub(const t_int &sub, const t_int &cols, const t_int &rows) {
     col:: output column of matrix
 
    */
-  Vector<t_int> row_col(2);
-  row_col(1) = sub % cols;
-  row_col(0) = floor((sub - row_col(1)) / cols);
-  return row_col;
+  return std::make_tuple<t_int, t_int>(std::floor((sub - (sub % cols)) / cols), sub % cols);
 }
 
 t_real mod(const t_real &x, const t_real &y) {
@@ -493,19 +498,20 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
     Calculate the weights to be applied to the visibilities in the measurement operator.
     It does none, whiten, natural, uniform, and robust.
   */
+  if(weighting_type == "none")
+    return weights.array() * 0 + 1.;
+  if(weighting_type == "natural" or weighting_type == "whiten")
+    return weights;
   Vector<t_complex> out_weights(weights.size());
-  if(weighting_type == "none") {
-    out_weights = weights.array() * 0 + 1;
-  } else if(weighting_type == "natural" or weighting_type == "whiten") {
-    out_weights = weights;
-  } else {
-    t_real scale = 1. / oversample_factor; // scale for fov, controlling the region of sidelobe supression
+  if((weighting_type == "uniform") or (weighting_type == "robust")) {
+    t_real scale
+        = 1. / oversample_factor; // scale for fov, controlling the region of sidelobe supression
     Matrix<t_complex> gridded_weights = Matrix<t_complex>::Zero(ftsizev, ftsizeu);
     for(t_int i = 0; i < weights.size(); ++i) {
       t_int q = utilities::mod(floor(u(i) * scale), ftsizeu);
       t_int p = utilities::mod(floor(v(i) * scale), ftsizev);
       gridded_weights(p, q) += 1 * 1; // I get better results assuming all the weights are the same.
-                                  // It looks like miriad does this as well.
+                                      // It looks like miriad does this as well.
     }
     t_complex const sum_weights = (weights.array() * weights.array()).sum();
     t_complex const sum_grid_weights2 = (gridded_weights.array() * gridded_weights.array()).sum();
@@ -519,24 +525,14 @@ Array<t_complex> init_weights(const Vector<t_real> &u, const Vector<t_real> &v,
       if(weighting_type == "uniform")
         out_weights(i) = weights(i) / gridded_weights(p, q);
       if(weighting_type == "robust") {
-        out_weights(i) = weights(i) / std::sqrt(1. + robust_scale * gridded_weights(p, q) * gridded_weights(p, q));
+        out_weights(i)
+            = weights(i)
+              / std::sqrt(1. + robust_scale * gridded_weights(p, q) * gridded_weights(p, q));
       }
     }
-  }
-  return out_weights.array();
-}
-
-Vector<t_complex> sparse_multiply_matrix(const Sparse<t_complex> &M, const Vector<t_complex> &x) {
-  Vector<t_complex> y = Vector<t_complex>::Zero(M.rows());
-// parallel sparse matrix multiplication with vector.
-#pragma omp parallel for
-  //#pragma omp simd
-  for(t_int k = 0; k < M.outerSize(); ++k)
-    for(Sparse<t_complex>::InnerIterator it(M, k); it; ++it) {
-
-      y(k) += it.value() * x(it.index());
-    }
-  return y;
+  } else
+    throw std::runtime_error("Wrong weighting type, " + weighting_type + " not recognised.");
+  return out_weights;
 }
 
 std::tuple<t_int, t_real> checkpoint_log(const std::string &diagnostic) {
@@ -628,5 +624,5 @@ Matrix<t_complex> re_sample_image(const Matrix<t_complex> &input, const t_real &
   auto const output = fftop.inverse(new_ft_grid) * re_sample_ratio * re_sample_ratio;
   return output;
 }
-}
-}
+} // namespace utilities
+} // namespace purify

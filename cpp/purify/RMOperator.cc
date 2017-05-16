@@ -12,7 +12,7 @@ Vector<t_complex> RMOperator::degrid(const Vector<t_complex> &eigen_image) {
   */
   Vector<t_complex> padded_image = Vector<t_complex>::Zero(ftsize);
   Vector<t_complex> ft_vector(ftsize);
-  const t_int x_start = floor(ftsize * 0.5 - imsize * 0.5);
+  const t_int x_start(std::floor(ftsize * 0.5 - imsize * 0.5));
 
   // zero padding and gridding correction
   padded_image.segment(x_start, imsize) = S * eigen_image.array();
@@ -33,7 +33,7 @@ Vector<t_complex> RMOperator::grid(const Vector<t_complex> &visibilities) {
   fft.inv(
       padded_image,
       ft_vector); // the fftshift is not needed because of the phase shift in the gridding kernel
-  t_int x_start = floor(ftsize * 0.5 - imsize * 0.5);
+  t_int x_start = std::floor(ftsize * 0.5 - imsize * 0.5);
   return S * padded_image.segment(x_start, imsize).array() / norm;
 }
 
@@ -88,7 +88,7 @@ Array<t_real> RMOperator::init_correction1d(const std::function<t_real(t_real)> 
     correction.
 
   */
-  t_int x_start = floor(ftsize * 0.5 - imsize * 0.5);
+  t_int x_start = std::floor(ftsize * 0.5 - imsize * 0.5);
   Array<t_real> range;
   range.setLinSpaced(ftsize, 0.5, ftsize - 0.5);
   return 1e0 / range.segment(x_start, imsize).unaryExpr(ftkernelu);
@@ -106,13 +106,13 @@ RMOperator::init_correction1d_fft(const std::function<t_real(t_real)> kernelu, c
     const t_complex I(0, 1);
     K(n) = kernelu(i - Ju / 2) * std::exp(-2 * constant::pi * I * (i - Ju / 2.) * 0.5);
   }
-  t_int x_start = floor(ftsize * 0.5 - imsize * 0.5);
-  Array<t_real> S = fft.inv(K).real().segment(x_start, imsize); // probably really slow!
-  return 1 / S;
+  t_int x_start = std::floor(ftsize * 0.5 - imsize * 0.5);
+  Array<t_real> result = fft.inv(K).real().segment(x_start, imsize); // probably really slow!
+  return 1 / result;
 }
 
 Array<t_complex> RMOperator::init_weights(const Vector<t_real> &u, const Vector<t_complex> &weights,
-                                          const t_real &oversample_factor,
+                                          const t_real &oversampling_factor,
                                           const std::string &weighting_type, const t_real &R) {
   Vector<t_complex> out_weights(weights.size());
   t_complex mean_weights = weights.sum();
@@ -123,10 +123,10 @@ Array<t_complex> RMOperator::init_weights(const Vector<t_real> &u, const Vector<
   } else if(weighting_type == "natural") {
     out_weights = weights / mean_weights;
   } else {
-    t_real scale = 1. / oversample_factor; // scale for fov
+    t_real scale = 1. / oversampling_factor; // scale for fov
     Vector<t_complex> gridded_weights = Vector<t_complex>::Zero(ftsize);
     for(t_int i = 0; i < weights.size(); ++i) {
-      t_int q = utilities::mod(floor(u(i) * scale), ftsize);
+      t_int q = utilities::mod(std::floor(u(i) * scale), ftsize);
       gridded_weights(q) += weights(i);
     }
     t_complex mean_gridded_weights = (gridded_weights.array() * gridded_weights.array()).sum();
@@ -134,7 +134,7 @@ Array<t_complex> RMOperator::init_weights(const Vector<t_real> &u, const Vector<
                              * std::pow(10, -2 * R); // Need to check formula
 
     for(t_int i = 0; i < weights.size(); ++i) {
-      t_int q = utilities::mod(floor(u(i) * scale), ftsize);
+      t_int q = utilities::mod(std::floor(u(i) * scale), ftsize);
       if(weighting_type == "uniform")
         out_weights(i) = weights(i) / gridded_weights(q);
       if(weighting_type == "robust") {
@@ -172,11 +172,11 @@ Vector<t_complex> RMOperator::covariance_calculation(const Vector<t_complex> &ve
 }
 
 RMOperator::RMOperator(const utilities::rm_params &rm_vis_input, const t_int &Ju,
-                       const std::string &kernel_name, const t_int &imsize,
-                       const t_real &oversample_factor, const t_real &cell_size,
+                       const std::string &kernel_name, const t_int &imsize_,
+                       const t_real &oversampling_factor, const t_real &cell_size,
                        const std::string &weighting_type, const t_real &R, bool fft_grid_correction)
-    : oversample_factor(oversample_factor), imsize(imsize),
-      ftsize(floor(oversample_factor * imsize)) {
+    : oversample_factor(oversampling_factor), imsize(imsize_),
+      ftsize(std::floor(oversampling_factor * imsize_)) {
   /*
     Generates tools/operators needed for gridding and degridding.
 

@@ -3,6 +3,7 @@
 
 #include "purify/config.h"
 #include <array>
+#include <tuple>
 #include <boost/math/special_functions/bessel.hpp>
 #include <boost/math/special_functions/sinc.hpp>
 #include "purify/types.h"
@@ -49,7 +50,11 @@ t_real ft_pill_box(const t_real &x, const t_int &J);
 t_real gaussian_general(const t_real &x, const t_int &J, const t_real &sigma);
 //! Fourier transform of general Gaussian kernel
 t_real ft_gaussian_general(const t_real &x, const t_int &J, const t_real &sigma);
-}
-}
+} // namespace kernels
+std::tuple<std::function<t_real(t_real)>, std::function<t_real(t_real)>,
+           std::function<t_real(t_real)>, std::function<t_real(t_real)>>
+create_kernels(const std::string &kernel_name_, const t_uint &Ju_, const t_uint &Jv_,
+               const t_uint &ftsizeu_, const t_uint &ftsizev_, const t_real &oversample_ratio);
+} // namespace purify
 
 #endif

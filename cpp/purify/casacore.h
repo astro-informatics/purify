@@ -199,7 +199,7 @@ Matrix<T> table_column(::casacore::Table const &table, std::string const &column
   throw std::runtime_error("Array type is not handled");
   return Matrix<T>::Zero(0, 1);
 }
-}
+} // namespace details
 
 template <class T>
 Matrix<T>
@@ -363,9 +363,21 @@ utilities::vis_params read_measurementset(std::string const &filename,
                                           = MeasurementSet::ChannelWrapper::polarization::I,
                                           const std::vector<t_int> &channels = std::vector<t_int>(),
                                           std::string const &filter = "");
+//! Read measurement set object into vis_params structure
+utilities::vis_params read_measurementset(MeasurementSet const &ms_file,
+                                          const MeasurementSet::ChannelWrapper::polarization pol
+                                          = MeasurementSet::ChannelWrapper::polarization::I,
+                                          const std::vector<t_int> &channels = std::vector<t_int>(),
+                                          std::string const &filter = "");
 //! Return average frequency over channels
 t_real average_frequency(const purify::casa::MeasurementSet &ms_file, std::string const &filter,
                          const std::vector<t_int> &channels);
+//! Read meassurement set into a vector of vis_params
+std::vector<utilities::vis_params>
+read_measurementset_channels(std::string const &filename,
+                             const MeasurementSet::ChannelWrapper::polarization pol
+                             = MeasurementSet::ChannelWrapper::polarization::I,
+                             const t_int &channel_width = 1, std::string const &filter = "");
 
 inline MeasurementSet::const_iterator operator+(MeasurementSet::const_iterator::difference_type n,
                                                 MeasurementSet::const_iterator const &c) {
@@ -375,7 +387,7 @@ inline MeasurementSet::const_iterator operator-(MeasurementSet::const_iterator::
                                                 MeasurementSet::const_iterator const &c) {
   return c.operator-(n);
 }
-}
-}
+} // namespace casa
+} // namespace purify
 
 #endif

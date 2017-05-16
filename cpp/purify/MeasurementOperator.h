@@ -2,14 +2,16 @@
 #define PURIFY_MEASUREMENT_OPERATOR_H
 
 #include "purify/config.h"
+#include <memory>
+#include <string>
 #include <sopt/linear_transform.h>
 #include "purify/FFTOperator.h"
 #include "purify/kernels.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
-
-#include <iostream>
-#include <string>
+#ifdef PURIFY_MPI
+#include <sopt/mpi/communicator.h>
+#endif
 
 namespace purify {
 
@@ -23,14 +25,16 @@ public:
   t_real norm = 1;
   t_real resample_factor = 1;
 
-  MeasurementOperator();
-  MeasurementOperator(const utilities::vis_params &uv_vis_input, const t_int &Ju, const t_int &Jv,
-                      const std::string &kernel_name, const t_int &imsizex, const t_int &imsizey,
+  MeasurementOperator(){};
+  MeasurementOperator(const utilities::vis_params &uv_vis_input, const t_int &Ju = 4,
+                      const t_int &Jv = 4, const std::string &kernel_name = "kb",
+                      const t_int &imsizex = 256, const t_int &imsizey = 256,
                       const t_int &norm_iterations = 20, const t_real &oversample_factor = 2,
                       const t_real &cell_x = 1, const t_real &cell_y = 1,
                       const std::string &weighting_type = "none", const t_real &R = 0,
                       bool use_w_term = false, const t_real &energy_fraction = 1,
                       const std::string &primary_beam = "none", bool fft_grid_correction = false);
+  virtual ~MeasurementOperator() {}
 
 #define PURIFY_MACRO(NAME, TYPE, VALUE)                                                            \
 protected:                                                                                         \
@@ -41,7 +45,7 @@ public:                                                                         
   MeasurementOperator &NAME(TYPE const &NAME) {                                                    \
     NAME##_ = NAME;                                                                                \
     return *this;                                                                                  \
-  };
+  }
 
   PURIFY_MACRO(Ju, t_int, 4);
   PURIFY_MACRO(Jv, t_int, 4);
@@ -68,8 +72,7 @@ public:                                                                         
 
   // writing definiton of fftoperator so that it is mutable.
 protected:
-  mutable FFTOperator fftoperator_
-      = purify::FFTOperator();
+  mutable FFTOperator fftoperator_ = purify::FFTOperator();
 
 public:
   FFTOperator &fftoperator() { return fftoperator_; };
@@ -85,9 +88,9 @@ protected:
 
 public:
   //! Degridding operator that degrids image to visibilities
-  Vector<t_complex> degrid(const Image<t_complex> &eigen_image) const;
+  virtual Vector<t_complex> degrid(const Image<t_complex> &eigen_image) const;
   //! Gridding operator that grids image from visibilities
-  Image<t_complex> grid(const Vector<t_complex> &visibilities) const;
+  virtual Image<t_complex> grid(const Vector<t_complex> &visibilities) const;
 
 protected:
   //! Match uv coordinates to grid
@@ -121,8 +124,17 @@ public:
   t_real power_method(const t_int &niters, const t_real &relative_difference = 1e-9);
 };
 
-//! Helper function to create a linear transform from a measurement operator
+//! \brief Helper function to wrap a linear transform around a measurement operator
+//! \note The measurement operator must exist during the lifetime of the linear transforms.
 sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
-linear_transform(MeasurementOperator const &measurements, t_uint nvis);
-}
+linear_transform(std::shared_ptr<MeasurementOperator const> const &measurements, t_uint nvis);
+
+#ifdef PURIFY_MPI
+//! \brief Helper function to wrap a linear transform around a distributed measurement operator
+//! \note The measurement operator must exist during the lifetime of the linear transforms.
+sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
+linear_transform(std::shared_ptr<MeasurementOperator const> const &measurements, t_uint nvis,
+                 sopt::mpi::Communicator const &comm);
+#endif
+} // namespace purify
 #endif

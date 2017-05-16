@@ -2,6 +2,8 @@
 include(EnvironmentScript)
 # Look up packages: if not found, installs them
 include(PackageLookup)
+# Get the yaml reader
+lookup_package(Yamlcpp REQUIRED)
 
 # Look for external software
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -13,14 +15,14 @@ endif()
 
 # Always find open-mp, since it may be used by sopt
 find_package(OpenMP)
-if(OPENMP_FOUND)
+if(OPENMP_FOUND AND NOT TARGET openmp::openmp)
   add_library(openmp::openmp INTERFACE IMPORTED GLOBAL)
   set_target_properties(openmp::openmp PROPERTIES
     INTERFACE_COMPILE_OPTIONS "${OpenMP_CXX_FLAGS}"
     INTERFACE_LINK_LIBRARIES  "${OpenMP_CXX_FLAGS}")
 endif()
 if(openmp AND NOT OPENMP_FOUND)
-    message(STATUS "Could not find OpenMP. Compiling without.")
+  message(STATUS "Could not find OpenMP. Compiling without.")
 endif()
 set(PURIFY_OPENMP_FFTW FALSE)
 if(openmp AND OPENMP_FOUND)
@@ -37,16 +39,30 @@ else()
   set(FFTW3_DOUBLE_LIBRARY fftw3::double::serial)
 endif()
 
+set(PURIFY_MPI FALSE)
+if(dompi)
+  find_package(MPI REQUIRED)
+  set(PURIFY_MPI TRUE)
+endif()
 find_package(TIFF REQUIRED)
 
 
 if(data AND tests)
   lookup_package(Boost REQUIRED COMPONENTS filesystem)
+elseif(examples AND dompi)
+  lookup_package(Boost REQUIRED COMPONENTS filesystem)
 else()
   lookup_package(Boost REQUIRED)
 endif()
 
-lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS URL "https://bitbucket.org/LukePratley/eigen/get/3.2.tar.gz" MD5 "f38e33505afbf4659cda191bbc992ca9")
+lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS URL "https://bitbucket.org/LukePratley/eigen/get/3.2.tar.gz" MD5 "66eda8ad0cce49e539bd2755e417b653")
+
+set(PURIFY_ARRAYFIRE FALSE)
+if(doaf)
+  lookup_package(ArrayFire REQUIRED)
+  FIND_PACKAGE(ArrayFire REQUIRED)
+  set(PURIFY_ARRAYFIRE TRUE)
+endif()
 
 if(logging)
   lookup_package(spdlog REQUIRED)
@@ -60,17 +76,25 @@ if(NOT Sopt_GIT_TAG)
 endif()
 if(NOT Sopt_GIT_REPOSITORY)
   set(Sopt_GIT_REPOSITORY https://www.github.com/basp-group/sopt.git
-      CACHE STRING "Location when downloading sopt")
+    CACHE STRING "Location when downloading sopt")
 endif()
-lookup_package(
-    Sopt REQUIRED ARGUMENTS
+if(dompi)
+  lookup_package(Sopt REQUIRED COMPONENTS mpi ARGUMENTS
+    GIT_REPOSITORY ${Sopt_GIT_REPOSITORY}
+    GIT_TAG ${Sopt_GIT_TAG}
+    MPI "TRUE")
+else()
+  lookup_package(Sopt REQUIRED ARGUMENTS
     GIT_REPOSITORY ${Sopt_GIT_REPOSITORY}
     GIT_TAG ${Sopt_GIT_TAG})
+endif()
 
 lookup_package(CFitsIO REQUIRED ARGUMENTS CHECKCASA)
 lookup_package(CCFits REQUIRED)
 
-find_package(CasaCore OPTIONAL_COMPONENTS ms)
+if(docasa)
+  find_package(CasaCore OPTIONAL_COMPONENTS ms)
+endif()
 
 # Add script to execute to make sure libraries in the build tree can be found
 add_to_ld_path("${EXTERNAL_ROOT}/lib")

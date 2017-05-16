@@ -45,7 +45,7 @@ Image<t_complex> clean(MeasurementOperator &op, const utilities::vis_params &uv_
       auto dirty_model = op.grid(op.degrid(temp_model));
       t_complex eta = (res_image * dirty_model.conjugate()).sum()
                       / (dirty_model * dirty_model.conjugate()).sum();
-      if(0 < std::abs(eta) < 0.02)
+      if(0 < std::abs(eta) and std::abs(eta) < 0.02)
         eta = 0.02 * eta
               / std::abs(eta); // imperical way to stop a semi-infinite loop, following miriad
 
@@ -97,7 +97,7 @@ Image<t_complex> model_estimate(const Image<t_complex> &dirty_image,
     // need to write in correction factor for beam volume, eta
     t_complex eta = (res_image * dirty_model.conjugate()).sum()
                     / (dirty_model * dirty_model.conjugate()).sum();
-    if(0 < std::abs(eta) < 0.02)
+    if(0 < std::abs(eta) and std::abs(eta) < 0.02)
       eta = 0.02 * eta
             / std::abs(eta); // empirical way to stop a semi-infinite loop, following miriad
 

@@ -25,7 +25,7 @@ struct header_params {
   t_real channels_total = 1;
   t_real channel_width = 8; // in MHz
   t_real polarsiation = 1;
-  t_int niters = 0; // number of iterations
+  t_int niters = 0;          // number of iterations
   bool hasconverged = false; // stating if model has converged
   t_real relative_variation = 0;
   t_real residual_convergence = 0;
@@ -37,6 +37,13 @@ void write2d_header(const Image<t_real> &image, const pfitsio::header_params &he
 //! Write image to fits file
 void write2d(const Image<t_real> &image, const std::string &fits_name,
              const std::string &pix_units = "Jy/Beam", const bool &overwrite = true);
+
+template <class DERIVED>
+void write2d(const Eigen::EigenBase<DERIVED> &input, int nx, int ny, const std::string &fits_name,
+             const std::string &pix_units = "Jy/Beam", const bool &overwrite = true) {
+  Image<t_real> const data = input.derived().real().template cast<t_real>();
+  write2d(Image<t_real>::Map(data.data(), nx, ny), fits_name, pix_units, overwrite);
+}
 //! Read image from fits file
 Image<t_complex> read2d(const std::string &fits_name);
 }
