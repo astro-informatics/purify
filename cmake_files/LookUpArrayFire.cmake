@@ -22,23 +22,13 @@ endif()
 if(NOT ArrayFire_OPENCL)
   set(ArrayFire_OPENCL ON)
 endif()
-include(PassonVariables)
-passon_variables(CCfits
-  FILENAME "${EXTERNAL_ROOT}/src/ArrayFireVariables.cmake"
-  PATTERNS
-  "CMAKE_[^_]*_R?PATH" "CMAKE_C_.*"
-  "BLAS_.*" "FFTW3_.*" "TIFF_.*"
-  ALSOADD
-  "\nset(CMAKE_INSTALL_PREFIX \"${EXTERNAL_ROOT}\" CACHE STRING \"\")\n"
-  )
 ExternalProject_Add(
   Lookup-ArrayFire
   PREFIX ${EXTERNAL_ROOT}
   GIT_REPOSITORY ${ArrayFire_GIT_REPOSITORY}
   GIT_TAG ${ArrayFire_GIT_TAG}
-  BUILD_IN_SOURCE 1
-  SOURCE_DIR ${EXTERNAL_ROOT}/src/ArrayFire
   CMAKE_ARGS
+  -DCMAKE_INSTALL_PREFIX=${EXTERNAL_ROOT}
   -DBUILD_CUDA=${ArrayFire_CUDA}
   -DBUILD_OPENCL=${ArrayFire_OPENCL}
   -DBUILD_TEST=OFF

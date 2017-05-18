@@ -48,7 +48,6 @@ endif()
 
 if(PURIFY_ARRAYFIRE)
   target_link_libraries(libpurify ${ArrayFire_LIBRARIES})
-  target_include_directories(libpurify SYSTEM PUBLIC ${ArrayFire_INCLUDE_DIRS})
 endif()
 
 target_include_directories(libpurify PUBLIC
