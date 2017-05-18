@@ -59,8 +59,7 @@ lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS URL "https://bitbuc
 
 set(PURIFY_ARRAYFIRE FALSE)
 if(doaf)
-  lookup_package(ArrayFire REQUIRED)
-  FIND_PACKAGE(ArrayFire REQUIRED)
+  lookup_package(ArrayFire REQUIRED DOWNLOAD_BY_DEFAULT)
   set(PURIFY_ARRAYFIRE TRUE)
 endif()
 
