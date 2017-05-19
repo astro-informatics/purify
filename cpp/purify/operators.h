@@ -10,12 +10,12 @@
 #include "purify/logging.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
+#include "purify/wproj_utilities.h"
 #ifdef PURIFY_MPI
 #include <sopt/mpi/communicator.h>
 #include "purify/DistributeSparseVector.h"
 #include "purify/IndexMapping.h"
 #include "purify/mpi_utilities.h"
-#include "purify/wproj_utilities.h"
 #endif
 namespace purify {
 

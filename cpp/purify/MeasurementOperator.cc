@@ -466,6 +466,7 @@ linear_transform(std::shared_ptr<MeasurementOperator const> const &measurements,
                                                    {{0, 1, static_cast<t_int>(width * height)}});
 }
 
+#ifdef PURIFY_MPI
 sopt::LinearTransform<sopt::Vector<sopt::t_complex>>
 linear_transform(std::shared_ptr<MeasurementOperator const> const &measurements, t_uint nvis,
                  sopt::mpi::Communicator const &comm) {
@@ -486,4 +487,5 @@ linear_transform(std::shared_ptr<MeasurementOperator const> const &measurements,
                                                    adjoint,
                                                    {{0, 1, static_cast<t_int>(width * height)}});
 }
+#endif
 } // namespace purify

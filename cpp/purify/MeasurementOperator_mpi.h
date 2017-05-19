@@ -11,7 +11,7 @@
 namespace purify {
 
 namespace mpi {
-
+#ifdef PURIFY_MPI
 class MeasurementOperator : public purify::MeasurementOperator {
 public:
   //! Constructor
@@ -42,7 +42,8 @@ private:
   //! Gathers and scatters the Fourrier grid
   DistributeSparseVector distributor;
 };
+#endif
 }
-}
+} // namespace purify
 
 #endif

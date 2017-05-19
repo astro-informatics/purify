@@ -3,6 +3,7 @@
 namespace purify {
 namespace mpi {
 
+#ifdef PURIFY_MPI
 Vector<t_complex> MeasurementOperator::degrid(const Image<t_complex> &eigen_image) const {
   Vector<t_complex> local_vector;
   if(comm.is_root()) {
@@ -53,5 +54,7 @@ Image<t_complex> MeasurementOperator::grid(const Vector<t_complex> &visibilities
   }
   return comm.broadcast(image_out);
 }
+
+#endif
 }
-}
+} // namespace purify
