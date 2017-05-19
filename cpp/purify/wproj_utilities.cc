@@ -52,16 +52,9 @@ Sparse<t_complex> create_chirp_row(const t_real &w_rate, const t_real &cell_x, c
   chirp = fftop_->forward(chirp);
   chirp.resize(Npix, 1);
   const t_real thres = wproj_utilities::sparsify_row_dense_thres(chirp, energy_fraction);
-  t_int sp = 0;
-  for(t_int kk; kk < Npix; kk++) {
-    if(std::abs(chirp(kk, 0)) > thres) {
-      sp++;
-      chirp(kk, 0) = 0;
-    }
-  }
   assert(chirp.norm() > 0);
   const t_real row_max = chirp.cwiseAbs().maxCoeff();
-  return chirp.sparseView(row_max, 1e-10);
+  return chirp.sparseView(std::max(row_max * 1e-10, thres), 1);
 }
 
 Sparse<t_complex> wprojection_matrix(const Sparse<t_complex> &G, const t_int &Nx, const t_int &Ny,
