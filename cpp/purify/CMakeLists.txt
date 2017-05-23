@@ -47,6 +47,11 @@ if(PURIFY_MPI)
   target_include_directories(libpurify SYSTEM PUBLIC ${MPI_CXX_INCLUDE_PATH})
 endif()
 
+if(Yamlcpp_FOUND)
+  message(STATUS "yamlcpp is ${Yamlcpp_LIBRARY}")
+  target_link_libraries(libpurify ${Yamlcpp_LIBRARY})
+endif()
+
 if(PURIFY_ARRAYFIRE)
   target_link_libraries(libpurify ${ArrayFire_LIBRARIES})
 endif()

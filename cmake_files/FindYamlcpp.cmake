@@ -1,8 +1,16 @@
 find_path(Yamlcpp_INCLUDE_DIR NAMES yaml.h PATH_SUFFIXES yaml-cpp)
-find_library(Yamlcpp_LIBRARY NAMES yaml-cpp)
+
+set(CMAKE_REQUIRED_INCLUDES ${YAMLCPP_INCLUDE_DIR})
+set(CMAKE_REQUIRED_QUIET True)
+
+if(Yamlcpp_STATIC_LIBRARY)
+    set(Yamlcpp_STATIC libyaml-cpp.a)
+endif()
+
+# find the yaml-cpp library
+find_library(Yamlcpp_LIBRARY NAMES ${Yamlcpp_STATIC} yaml-cpp)
 
 include(FindPackageHandleStandardArgs)
-# handle the QUIETLY and REQUIRED arguments and set LIBXML2_FOUND to TRUE
-# if all listed variables are TRUE
-find_package_handle_standard_args(
-  Yamlcpp  DEFAULT_MSG Yamlcpp_INCLUDE_DIR Yamlcpp_LIBRARY)
+find_package_handle_standard_args(Yamlcpp DEFAULT_MSG Yamlcpp_INCLUDE_DIR Yamlcpp_LIBRARY)
+mark_as_advanced(Yamlcpp_INCLUDE_DIR Yamlcpp_LIBRARY)
+
