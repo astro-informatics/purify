@@ -19,10 +19,9 @@ add_example(padmm_simulation LIBRARIES libpurify NOTEST)
 add_example(padmm_reweighted_simulation LIBRARIES libpurify NOTEST)
 
 add_example(padmm_random_coverage LIBRARIES libpurify NOTEST )
-target_compile_definitions(example_padmm_random_coverage PRIVATE PURIFY_GPU)
 if(PURIFY_ARRAYFIRE)
   add_example(padmm_random_coverage_gpu padmm_random_coverage.cc LIBRARIES libpurify NOTEST )
-  target_compile_definitions(example_padmm_random_coverage_gpu PRIVATE PURIFY_GPU=1)
+  target_compile_definitions(example_padmm_random_coverage_gpu PRIVATE PURIFY_GPU)
 endif()
 if(PURIFY_MPI)
   add_example(global_epsilon_replicated_grids padmm_mpi_random_coverage.cc NOTEST

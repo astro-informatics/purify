@@ -10,7 +10,7 @@
 #include "purify/directories.h"
 #include "purify/logging.h"
 #include "purify/operators.h"
-#ifdef PURIFY_ARRAYFIRE
+#ifdef PURIFY_GPU
 #include "purify/operators_gpu.h"
 #endif
 #include "purify/pfitsio.h"
@@ -31,7 +31,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   t_real const over_sample = 2;
   t_uint const imsizey = M31.rows();
   t_uint const imsizex = M31.cols();
-#ifdef PURIFY_GPU
+#ifndef PURIFY_GPU
   auto const measurements_transform = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 100,
@@ -112,7 +112,7 @@ int main(int, char **) {
   uv_data.units = "radians";
   PURIFY_MEDIUM_LOG("Number of measurements / number of pixels: {}",
                     uv_data.u.size() * 1. / number_of_pxiels);
-#ifdef PURIFY_GPU
+#ifndef PURIFY_GPU
   auto const sky_measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 100, 0.0001, "kb", 8, 8,
