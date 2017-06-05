@@ -24,7 +24,7 @@ add_include_dir(
 )
 
 add_subdirectory(purify)
-if(tests OR examples)
+if(tests OR examples OR benchmarks)
   configure_file(tests/directories.in.h "${PROJECT_BINARY_DIR}/include/purify/directories.h")
 endif()
 if(examples)
@@ -32,6 +32,9 @@ if(examples)
 endif()
 if(tests)
   add_subdirectory(tests)
+endif()
+if(benchmarks)
+  add_subdirectory(benchmarks)
 endif()
 
 if(TARGET casacore::ms)
