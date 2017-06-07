@@ -1,0 +1,58 @@
+### Config file for Purify
+
+inputouput:
+  - input:
+      - measurements: # path to the measurement set
+      - polarization_measurement: I # one from I Q V XX LL # 
+      - noise_estimate: # path to the noise measurement set
+      - polarization_noise: I # one from I Q V XX LL # 
+  - output_prefix: purified # result will be called as input with this prefix
+  - skymodel:  # model of the sky, if not set created. # File
+
+### Execution parameters
+logging: debug # How much logging you want (debug, critical, ..)# FIXME: add the options, compile?
+iterations: 100 # number of iterations (>= 0)
+epsilonScaling: 1 # RMS noise (> 0)
+gamma: default # Stepsize, choose value between: default, variable, 100, x
+## modelImage:  # If none epsilonL2 * RealImage # FIXME - maybe to delete
+
+########## Measure Operators ##########
+pixelSize:
+  - Dx: 1
+  - Dy: 1
+imageSize: # for the moment: power of two
+  - x: 1024 
+  - y: 1024
+J: # Interpolation pixels (default 4x4). Input either a value or pair
+  - Jx: 4
+  - Jy: 4
+Jweights: kb # kernel, choose between: kb, Gauss, box
+wProjection: False # Wide field effect: True | False
+wProjection_options:
+  - chirp_fraction: 1 # Range between (0, 1]
+  - kernel_fraction: 1 # Range between (0, 1]
+oversampling: 2 # value > 1
+powMethod_iter: 100 # value > 0
+powMethod_tolerance: 1e-4 # value > 0
+# TODO: Add others like weighting. (at the moment natural)
+
+########## SARA ##########
+# wavelet bases, to choose from: Dirac, DB1, ..., DBn (where n=0 is dirac, and 1 <= n <= 35 is DB basis)
+wavelet_dict: 0..8 # sequence of desired basis: 0,23,31 or 0,12..16,20
+wavelet_levels: 4 # value for all
+
+algorithm: padmm # will just read the options of that one.
+########## PADMM ##########
+padmm:
+  - epsilonConvergenceScaling: 1 # Default 1 (>0)
+  - realValueConstraint: True # Boolean
+  - positiveValueConstraint: True #boolean
+  # Following is only accepted when MPI is used
+  - mpiAlgorithm:  fully-distributed # 1,2 or 3 - from the list of the possible algorithms - NOTE this changes the MO.; FIXME: Names as in paper
+    #  (1) fully-distributed, (2) serial-equivalent, (3) partially-distributed
+  # Be careful changing the following unless you know what you are doing
+  - relVarianceConvergence: 1e-3 # (>0)
+
+pd: # this is ignored if not chosen in algorithm.
+  - param1: # something
+  - param2: # something else
