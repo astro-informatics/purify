@@ -1,5 +1,5 @@
-#include "purify/config.h"
 #include "cmdl.h"
+#include "purify/config.h"
 
 namespace purify {
 
@@ -22,16 +22,19 @@ std::string usage() {
          "--noadapt: Choose not to update the stepsize. \n\n"
          "--diagnostic: Save diagnostic information to log file.\n\n"
          "--l2_bound: Factor to multiply the l2 bound by.\n\n"
-         "--relative_variation: The convergence criteria on relative variation (default is 1e-3).\n\n"
-         "--residual_convergence: Factor to multiply the l2 bound by for convergence. (default is 1)"
-         "--relative_gamma_adapt: Relative difference criteria for adapting the stepsize gamma (default 0.01).\n\n"
+         "--relative_variation: The convergence criteria on relative variation (default is "
+         "1e-3).\n\n"
+         "--residual_convergence: Factor to multiply the l2 bound by for convergence. (default is "
+         "1)"
+         "--relative_gamma_adapt: Relative difference criteria for adapting the stepsize gamma "
+         "(default 0.01).\n\n"
          "--power_iterations: Maximum iterations for the power method.\n\n"
          "--primary_beam: Choice of primary beam model. (none is the only option).\n\n"
          "--fft_grid_correction: Choose calculate the gridding correction using an FFT rather than "
          "analytic formula. \n\n"
          "--kernel: Type of gridding kernel to use, kb, gauss, pswf, box. (kb is default) \n\n"
          "--kernel_support: Support of kernel in grid cells. (4 is the default) \n\n"
-         "--grad: To reconstruct the gradient of x, y, or none (none is default). Should work for linear polarisation P. \n\n"
+         "--gpu: To use ArrayFire and GPU to perform gridding. \n\n"
          "--logging_level: Determines the output logging level for sopt and purify. (\"debug\" is "
          "the default) \n\n";
 }
@@ -83,7 +86,7 @@ Params parse_cmdl(int argc, char **argv) {
     case 'd':
       params.niters = std::stoi(optarg);
       break;
-    
+
     case 'e':
       params.stokes = optarg;
       break;
@@ -153,7 +156,7 @@ Params parse_cmdl(int argc, char **argv) {
 
     case 't':
       params.sopt_logging_level = optarg;
-break;
+      break;
 
     case 'u':
       params.cellsizex = std::stod(optarg);
@@ -190,6 +193,9 @@ break;
     case '4':
       params.positive = false;
       break;
+    case '5':
+      params.gpu = true;
+      break;
     case '?':
       /* getopt_long already printed an error message. */
       break;
@@ -200,4 +206,4 @@ break;
   }
   return params;
 }
-};
+}; // namespace purify
