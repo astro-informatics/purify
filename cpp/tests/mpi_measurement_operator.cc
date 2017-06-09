@@ -160,14 +160,11 @@ TEST_CASE("Serial vs Distributed Operator") {
   auto const kernel = "kb";
   auto const width = 128;
   auto const height = 128;
-  const sopt::LinearTransform<Vector<t_complex>> op_serial
-      = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample,
-          100);
+  const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
 
-  const sopt::LinearTransform<Vector<t_complex>> op
-      = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          world, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
+  const auto op = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      world, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
 
   if(uv_serial.u.size() == uv_mpi.u.size()) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
@@ -180,19 +177,19 @@ TEST_CASE("Serial vs Distributed Operator") {
 
     auto uv_degrid = uv_serial;
     if(world.is_root()) {
-      uv_degrid.vis = op_serial * image;
+      uv_degrid.vis = *op_serial * image;
       auto const order
           = distribute::distribute_measurements(uv_degrid, world, "distance_distribution");
       uv_degrid = utilities::regroup_and_scatter(uv_degrid, order, world);
     } else
       uv_degrid = utilities::scatter_visibilities(world);
-    Vector<t_complex> const degridded = op * image;
+    Vector<t_complex> const degridded = *op * image;
     REQUIRE(degridded.size() == uv_degrid.vis.size());
     REQUIRE(degridded.isApprox(uv_degrid.vis, 1e-4));
   }
   SECTION("Gridding") {
-    Vector<t_complex> const gridded = op.adjoint() * uv_mpi.vis;
-    Vector<t_complex> const gridded_serial = op_serial.adjoint() * uv_serial.vis;
+    Vector<t_complex> const gridded = op->adjoint() * uv_mpi.vis;
+    Vector<t_complex> const gridded_serial = op_serial->adjoint() * uv_serial.vis;
     REQUIRE(gridded.size() == gridded_serial.size());
     REQUIRE(gridded.isApprox(gridded_serial, 1e-4));
   }
@@ -223,14 +220,11 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator") {
   auto const kernel = "kb";
   auto const width = 128;
   auto const height = 128;
-  const sopt::LinearTransform<Vector<t_complex>> op_serial
-      = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample,
-          100);
+  const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
 
-  const sopt::LinearTransform<Vector<t_complex>> op
-      = purify::measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-          world, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
+  const auto op = purify::measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+      world, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
 
   if(uv_serial.u.size() == uv_mpi.u.size()) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
@@ -243,19 +237,19 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator") {
 
     auto uv_degrid = uv_serial;
     if(world.is_root()) {
-      uv_degrid.vis = op_serial * image;
+      uv_degrid.vis = *op_serial * image;
       auto const order
           = distribute::distribute_measurements(uv_degrid, world, "distance_distribution");
       uv_degrid = utilities::regroup_and_scatter(uv_degrid, order, world);
     } else
       uv_degrid = utilities::scatter_visibilities(world);
-    Vector<t_complex> const degridded = op * image;
+    Vector<t_complex> const degridded = *op * image;
     REQUIRE(degridded.size() == uv_degrid.vis.size());
     REQUIRE(degridded.isApprox(uv_degrid.vis, 1e-4));
   }
   SECTION("Gridding") {
-    Vector<t_complex> const gridded = op.adjoint() * uv_mpi.vis;
-    Vector<t_complex> const gridded_serial = op_serial.adjoint() * uv_serial.vis;
+    Vector<t_complex> const gridded = op->adjoint() * uv_mpi.vis;
+    Vector<t_complex> const gridded_serial = op_serial->adjoint() * uv_serial.vis;
     REQUIRE(gridded.size() == gridded_serial.size());
     REQUIRE(gridded.isApprox(gridded_serial, 1e-4));
   }
@@ -289,13 +283,10 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator weighted") {
   auto const kernel = "kb";
   auto const width = 128;
   auto const height = 128;
-  const sopt::LinearTransform<Vector<t_complex>> op_serial
-      = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample,
-          100);
-  const sopt::LinearTransform<Vector<t_complex>> op
-      = purify::measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-          world, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
+  const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
+  const auto op = purify::measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+      world, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
 
   if(world.size() == 1) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
@@ -308,19 +299,19 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator weighted") {
 
     auto uv_degrid = uv_serial;
     if(world.is_root()) {
-      uv_degrid.vis = op_serial * image;
+      uv_degrid.vis = *op_serial * image;
       auto const order
           = distribute::distribute_measurements(uv_degrid, world, "distance_distribution");
       uv_degrid = utilities::regroup_and_scatter(uv_degrid, order, world);
     } else
       uv_degrid = utilities::scatter_visibilities(world);
-    Vector<t_complex> const degridded = op * image;
+    Vector<t_complex> const degridded = *op * image;
     REQUIRE(degridded.size() == uv_degrid.vis.size());
     REQUIRE(degridded.isApprox(uv_degrid.vis, 1e-4));
   }
   SECTION("Gridding") {
-    Vector<t_complex> const gridded = op.adjoint() * uv_mpi.vis;
-    Vector<t_complex> const gridded_serial = op_serial.adjoint() * uv_serial.vis;
+    Vector<t_complex> const gridded = op->adjoint() * uv_mpi.vis;
+    Vector<t_complex> const gridded_serial = op_serial->adjoint() * uv_serial.vis;
     REQUIRE(gridded.size() == gridded_serial.size());
     REQUIRE(gridded.isApprox(gridded_serial, 1e-4));
   }
@@ -354,13 +345,10 @@ TEST_CASE("Serial vs Distributed GPU Fourier Grid Operator weighted") {
   auto const kernel = "kb";
   auto const width = 128;
   auto const height = 128;
-  const sopt::LinearTransform<Vector<t_complex>> op_serial
-      = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample,
-          100);
-  const sopt::LinearTransform<Vector<t_complex>> op
-      = purify::gpu::measurementoperator::init_degrid_operator_2d_mpi(
-          world, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
+  const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
+  const auto op = purify::gpu::measurementoperator::init_degrid_operator_2d_mpi(
+      world, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
 
   if(world.size() == 1) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
@@ -369,10 +357,10 @@ TEST_CASE("Serial vs Distributed GPU Fourier Grid Operator weighted") {
   }
   SECTION("Power Method") {
     auto op_norm = details::power_method<Vector<t_complex>>(
-        op, 100, 1e-4, Vector<t_complex>::Random(width * height));
+        *op, 100, 1e-4, Vector<t_complex>::Random(width * height));
     CHECK(std::abs(op_norm - 1.) < 1e-4);
     auto op_norm_old = details::power_method<Vector<t_complex>>(
-        op_serial, 100, 1e-4, Vector<t_complex>::Random(width * height));
+        *op_serial, 100, 1e-4, Vector<t_complex>::Random(width * height));
     CHECK(std::abs(op_norm_old - 1.) < 1e-4);
   }
   SECTION("Degridding") {
@@ -381,19 +369,19 @@ TEST_CASE("Serial vs Distributed GPU Fourier Grid Operator weighted") {
 
     auto uv_degrid = uv_serial;
     if(world.is_root()) {
-      uv_degrid.vis = op_serial * image;
+      uv_degrid.vis = *op_serial * image;
       auto const order
           = distribute::distribute_measurements(uv_degrid, world, "distance_distribution");
       uv_degrid = utilities::regroup_and_scatter(uv_degrid, order, world);
     } else
       uv_degrid = utilities::scatter_visibilities(world);
-    Vector<t_complex> const degridded = op * image;
+    Vector<t_complex> const degridded = *op * image;
     REQUIRE(degridded.size() == uv_degrid.vis.size());
     REQUIRE(degridded.isApprox(uv_degrid.vis, 1e-4));
   }
   SECTION("Gridding") {
-    Vector<t_complex> const gridded = op.adjoint() * uv_mpi.vis;
-    Vector<t_complex> const gridded_serial = op_serial.adjoint() * uv_serial.vis;
+    Vector<t_complex> const gridded = op->adjoint() * uv_mpi.vis;
+    Vector<t_complex> const gridded_serial = op_serial->adjoint() * uv_serial.vis;
     REQUIRE(gridded.size() == gridded_serial.size());
     REQUIRE(gridded.isApprox(gridded_serial, 1e-4));
   }
@@ -426,13 +414,10 @@ TEST_CASE("Serial vs Distributed GPU Operator weighted") {
   auto const kernel = "kb";
   auto const width = 128;
   auto const height = 128;
-  const sopt::LinearTransform<Vector<t_complex>> op_serial
-      = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample,
-          100);
-  const sopt::LinearTransform<Vector<t_complex>> op
-      = purify::gpu::measurementoperator::init_degrid_operator_2d(
-          world, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
+  const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
+  const auto op = purify::gpu::measurementoperator::init_degrid_operator_2d(
+      world, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
 
   if(world.size() == 1) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
@@ -441,10 +426,10 @@ TEST_CASE("Serial vs Distributed GPU Operator weighted") {
   }
   SECTION("Power Method") {
     auto op_norm = details::power_method<Vector<t_complex>>(
-        op, 100, 1e-4, Vector<t_complex>::Random(width * height));
+        *op, 100, 1e-4, Vector<t_complex>::Random(width * height));
     CHECK(std::abs(op_norm - 1.) < 1e-4);
     auto op_norm_old = details::power_method<Vector<t_complex>>(
-        op_serial, 100, 1e-4, Vector<t_complex>::Random(width * height));
+        *op_serial, 100, 1e-4, Vector<t_complex>::Random(width * height));
     CHECK(std::abs(op_norm_old - 1.) < 1e-4);
   }
   SECTION("Degridding") {
@@ -453,19 +438,19 @@ TEST_CASE("Serial vs Distributed GPU Operator weighted") {
 
     auto uv_degrid = uv_serial;
     if(world.is_root()) {
-      uv_degrid.vis = op_serial * image;
+      uv_degrid.vis = *op_serial * image;
       auto const order
           = distribute::distribute_measurements(uv_degrid, world, "distance_distribution");
       uv_degrid = utilities::regroup_and_scatter(uv_degrid, order, world);
     } else
       uv_degrid = utilities::scatter_visibilities(world);
-    Vector<t_complex> const degridded = op * image;
+    Vector<t_complex> const degridded = *op * image;
     REQUIRE(degridded.size() == uv_degrid.vis.size());
     REQUIRE(degridded.isApprox(uv_degrid.vis, 1e-4));
   }
   SECTION("Gridding") {
-    Vector<t_complex> const gridded = op.adjoint() * uv_mpi.vis;
-    Vector<t_complex> const gridded_serial = op_serial.adjoint() * uv_serial.vis;
+    Vector<t_complex> const gridded = op->adjoint() * uv_mpi.vis;
+    Vector<t_complex> const gridded_serial = op_serial->adjoint() * uv_serial.vis;
     REQUIRE(gridded.size() == gridded_serial.size());
     REQUIRE(gridded.isApprox(gridded_serial, 1e-4));
   }

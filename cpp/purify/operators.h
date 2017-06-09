@@ -271,8 +271,7 @@ template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
 init_FFT_2d(const t_uint &imsizey_, const t_uint &imsizex_, const t_real &oversample_factor_,
             const std::string &fftw_plan_flag_ = "measure") {
-  const std::shared_ptr<FFTOperator> fftop
-      = std::make_shared<FFTOperator>();
+  const std::shared_ptr<FFTOperator> fftop = std::make_shared<FFTOperator>();
   auto const ftsizeu_ = std::floor(imsizex_ * oversample_factor_);
   auto const ftsizev_ = std::floor(imsizey_ * oversample_factor_);
   if(fftw_plan_flag_ == "measure") {
@@ -397,7 +396,7 @@ base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_
 namespace measurementoperator {
 
 template <class T>
-sopt::LinearTransform<T>
+std::shared_ptr<sopt::LinearTransform<T> const>
 init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
                         const Vector<t_complex> &weights, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real &oversample_ratio = 2,
@@ -411,24 +410,23 @@ init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
   /*
    *  Returns linear transform that is the standard degridding operator
    */
-  const t_int M = u.size();
-  const t_int N = imsizey * imsizex;
+  std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
+  std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_2d<T>(
       u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, w_term, cellx,
       celly, energy_chirp_fraction, energy_kernel_fraction);
   auto direct = directDegrid;
   auto indirect = indirectDegrid;
-  const t_real op_norm
-      = details::power_method<T>({direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
-                                 T::Random(imsizex * imsizey));
+  const t_real op_norm = details::power_method<T>({direct, M, indirect, N}, power_iters, power_tol,
+                                                  T::Random(imsizex * imsizey));
   auto operator_norm = purify::operators::init_normalise<T>(op_norm);
   direct = sopt::chained_operators<T>(direct, operator_norm);
   indirect = sopt::chained_operators<T>(operator_norm, indirect);
-  return {direct, {0, 1, M}, indirect, {0, 1, N}};
+  return std::make_shared<sopt::LinearTransform<T> const>(direct, M, indirect, N);
 }
 template <class T>
-sopt::LinearTransform<T>
+std::shared_ptr<sopt::LinearTransform<T> const>
 init_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
                         const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
@@ -451,7 +449,7 @@ init_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_uint 
 }
 #ifdef PURIFY_MPI
 template <class T>
-sopt::LinearTransform<T>
+std::shared_ptr<sopt::LinearTransform<T> const>
 init_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
                         const Vector<t_real> &v, const Vector<t_real> &w,
                         const Vector<t_complex> &weights, const t_uint &imsizey,
@@ -466,8 +464,8 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
    *  Returns linear transform that is the weighted degridding operator with mpi all sum all
    */
 
-  const t_int M = u.size();
-  const t_int N = imsizey * imsizex;
+  std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
+  std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_2d<T>(
       u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, w_term, cellx,
@@ -475,16 +473,15 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
   const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
   auto direct = directDegrid;
   auto indirect = sopt::chained_operators<T>(allsumall, indirectDegrid);
-  const t_real op_norm
-      = details::power_method<T>({direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
-                                 comm.broadcast<T>(T::Random(imsizex * imsizey)));
+  const t_real op_norm = details::power_method<T>({direct, M, indirect, N}, power_iters, power_tol,
+                                                  comm.broadcast<T>(T::Random(imsizex * imsizey)));
   auto const operator_norm = purify::operators::init_normalise<T>(op_norm);
   direct = sopt::chained_operators<T>(direct, operator_norm);
   indirect = sopt::chained_operators<T>(operator_norm, indirect);
-  return {direct, {0, 1, M}, indirect, {0, 1, N}};
-} // namespace measurementoperator
+  return std::make_shared<sopt::LinearTransform<T> const>(direct, M, indirect, N);
+}
 template <class T>
-sopt::LinearTransform<T>
+std::shared_ptr<sopt::LinearTransform<T> const>
 init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                         const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
@@ -508,7 +505,7 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
 
 } // namespace measurementoperator
 template <class T>
-sopt::LinearTransform<T>
+std::shared_ptr<sopt::LinearTransform<T> const>
 init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
                             const Vector<t_real> &v, const Vector<t_real> &w,
                             const Vector<t_complex> &weights, const t_uint &imsizey,
@@ -524,8 +521,8 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_
    * grid
    */
 
-  const t_int M = u.size();
-  const t_int N = imsizey * imsizex;
+  std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
+  std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
   auto Broadcast = purify::operators::init_broadcaster<T>(comm);
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_mpi_degrid_operator_2d<T>(
@@ -534,16 +531,15 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_
 
   auto direct = directDegrid;
   auto indirect = sopt::chained_operators<T>(Broadcast, indirectDegrid);
-  const t_real op_norm
-      = details::power_method<T>({direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
-                                 comm.broadcast<T>(T::Random(imsizex * imsizey)));
+  const t_real op_norm = details::power_method<T>({direct, M, indirect, N}, power_iters, power_tol,
+                                                  comm.broadcast<T>(T::Random(imsizex * imsizey)));
   auto operator_norm = purify::operators::init_normalise<T>(op_norm);
   direct = sopt::chained_operators<T>(direct, operator_norm);
   indirect = sopt::chained_operators<T>(operator_norm, indirect);
-  return {direct, {0, 1, M}, indirect, {0, 1, N}};
-} // namespace purify
+  return std::make_shared<sopt::LinearTransform<T> const>(direct, M, indirect, N);
+}
 template <class T>
-sopt::LinearTransform<T>
+std::shared_ptr<sopt::LinearTransform<T> const>
 init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
                             const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
                             const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,

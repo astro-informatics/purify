@@ -280,7 +280,7 @@ base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_
 
 namespace measurementoperator {
 
-sopt::LinearTransform<Vector<t_complex>>
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const>
 init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
                         const Vector<t_complex> &weights, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real &oversample_ratio = 2,
@@ -294,23 +294,23 @@ init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
    *  Returns linear transform that is the standard degridding operator
    */
 
-  const t_int M = u.size();
-  const t_int N = imsizey * imsizex;
+  std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
+  std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
   sopt::OperatorFunction<Vector<t_complex>> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::gpu::operators::base_degrid_operator_2d(
       u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, w_term,
       energy_chirp_fraction, energy_kernel_fraction);
   auto direct = directDegrid;
   auto indirect = indirectDegrid;
-  const t_real op_norm = details::power_method<Vector<t_complex>>(
-      {direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
-      Vector<t_complex>::Random(imsizex * imsizey));
+  const t_real op_norm
+      = details::power_method<Vector<t_complex>>({direct, M, indirect, N}, power_iters, power_tol,
+                                                 Vector<t_complex>::Random(imsizex * imsizey));
   auto operator_norm = purify::operators::init_normalise<Vector<t_complex>>(op_norm);
   direct = sopt::chained_operators<Vector<t_complex>>(direct, operator_norm);
   indirect = sopt::chained_operators<Vector<t_complex>>(operator_norm, indirect);
-  return {direct, {0, 1, M}, indirect, {0, 1, N}};
+  return std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(direct, M, indirect, N);
 }
-sopt::LinearTransform<Vector<t_complex>>
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const>
 init_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
                         const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
@@ -332,7 +332,7 @@ init_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_uint 
 }
 
 #ifdef PURIFY_MPI
-sopt::LinearTransform<Vector<t_complex>> init_degrid_operator_2d_mpi(
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> init_degrid_operator_2d_mpi(
     const sopt::mpi::Communicator &comm, const Vector<t_real> &u, const Vector<t_real> &v,
     const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint &imsizey,
     const t_uint &imsizex, const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
@@ -344,8 +344,8 @@ sopt::LinearTransform<Vector<t_complex>> init_degrid_operator_2d_mpi(
    *  Returns linear transform that is the standard degridding operator
    */
 
-  const t_int M = u.size();
-  const t_int N = imsizey * imsizex;
+  std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
+  std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
   sopt::OperatorFunction<Vector<t_complex>> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::gpu::operators::base_mpi_degrid_operator_2d(
       comm, u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, w_term,
@@ -354,14 +354,14 @@ sopt::LinearTransform<Vector<t_complex>> init_degrid_operator_2d_mpi(
   auto direct = directDegrid;
   auto indirect = sopt::chained_operators<Vector<t_complex>>(Broadcast, indirectDegrid);
   const t_real op_norm = details::power_method<Vector<t_complex>>(
-      {direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
+      {direct, M, indirect, N}, power_iters, power_tol,
       comm.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(imsizex * imsizey)));
   auto operator_norm = purify::operators::init_normalise<Vector<t_complex>>(op_norm);
   direct = sopt::chained_operators<Vector<t_complex>>(direct, operator_norm);
   indirect = sopt::chained_operators<Vector<t_complex>>(operator_norm, indirect);
-  return {direct, {0, 1, M}, indirect, {0, 1, N}};
+  return std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(direct, M, indirect, N);
 }
-sopt::LinearTransform<Vector<t_complex>>
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const>
 init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
                             const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
                             const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
@@ -382,7 +382,7 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
       power_iters, power_tol, kernel, Ju, Jv, w_term, cell_x, cell_y, energy_chirp_fraction,
       energy_kernel_fraction);
 }
-sopt::LinearTransform<Vector<t_complex>> init_degrid_operator_2d(
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> init_degrid_operator_2d(
     const sopt::mpi::Communicator &comm, const Vector<t_real> &u, const Vector<t_real> &v,
     const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint &imsizey,
     const t_uint &imsizex, const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
@@ -394,8 +394,8 @@ sopt::LinearTransform<Vector<t_complex>> init_degrid_operator_2d(
    *  Returns linear transform that is the standard degridding operator
    */
 
-  const t_int M = u.size();
-  const t_int N = imsizey * imsizex;
+  std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
+  std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
   sopt::OperatorFunction<Vector<t_complex>> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::gpu::operators::base_degrid_operator_2d(
       u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, w_term, cellx, celly,
@@ -403,15 +403,15 @@ sopt::LinearTransform<Vector<t_complex>> init_degrid_operator_2d(
   const auto allsumall = purify::operators::init_all_sum_all<Vector<t_complex>>(comm);
   auto direct = directDegrid;
   auto indirect = sopt::chained_operators<Vector<t_complex>>(allsumall, indirectDegrid);
-  const t_real op_norm = details::power_method<Vector<t_complex>>(
-      {direct, {0, 1, M}, indirect, {0, 1, N}}, power_iters, power_tol,
-      Vector<t_complex>::Random(imsizex * imsizey));
+  const t_real op_norm
+      = details::power_method<Vector<t_complex>>({direct, M, indirect, N}, power_iters, power_tol,
+                                                 Vector<t_complex>::Random(imsizex * imsizey));
   auto operator_norm = purify::operators::init_normalise<Vector<t_complex>>(op_norm);
   direct = sopt::chained_operators<Vector<t_complex>>(direct, operator_norm);
   indirect = sopt::chained_operators<Vector<t_complex>>(operator_norm, indirect);
-  return {direct, {0, 1, M}, indirect, {0, 1, N}};
+  return std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(direct, M, indirect, N);
 }
-sopt::LinearTransform<Vector<t_complex>>
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const>
 init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                         const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,

@@ -128,21 +128,21 @@ TEST_CASE("Operators") {
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
         power_iters, power_tol, kernel, Ju, Jv, ft_plan);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
-    const Vector<t_complex> direct_output = measure_op * direct_input;
+    const Vector<t_complex> direct_output = *measure_op * direct_input;
     CHECK(direct_output.size() == M);
     const Vector<t_complex> indirect_input = Vector<t_complex>::Random(M);
-    const Vector<t_complex> indirect_output = measure_op.adjoint() * indirect_input;
+    const Vector<t_complex> indirect_output = measure_op->adjoint() * indirect_input;
     CHECK(indirect_output.size() == imsizex * imsizey);
     SECTION("Power Method") {
       auto op_norm = details::power_method<Vector<t_complex>>(
-          measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
+          *measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
       CHECK(std::abs(op_norm - 1.) < power_tol);
     }
     SECTION("Degrid") {
       const Vector<t_complex> input = Vector<t_complex>::Random(imsizex * imsizey);
       const Image<t_complex> input_image = Image<t_complex>::Map(input.data(), imsizey, imsizex);
       const Vector<t_complex> expected_output = weighted_expected_op.degrid(input_image);
-      const Vector<t_complex> actual_output = measure_op * input;
+      const Vector<t_complex> actual_output = *measure_op * input;
       CHECK(expected_output.size() == actual_output.size());
       CHECK(actual_output.isApprox(expected_output, 1e-4));
     }
@@ -150,7 +150,7 @@ TEST_CASE("Operators") {
       const Vector<t_complex> input = Vector<t_complex>::Random(M);
       const Vector<t_complex> expected_output
           = Image<t_complex>::Map(weighted_expected_op.grid(input).data(), imsizex * imsizey, 1);
-      const Vector<t_complex> actual_output = measure_op.adjoint() * input;
+      const Vector<t_complex> actual_output = measure_op->adjoint() * input;
       CHECK(expected_output.size() == actual_output.size());
       CHECK(actual_output.isApprox(expected_output, 1e-4));
     }
