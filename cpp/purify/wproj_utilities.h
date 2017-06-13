@@ -154,8 +154,8 @@ Sparse<t_complex> row_wise_convolution(const Sparse<t_complex> &Grid_, const Spa
 
   assert((Grid_.nonZeros() > 0) and (chirp_.nonZeros() > 0));
   Vector<t_complex> output_row = Vector<t_complex>::Zero(Nx * Ny);
-  const t_int Nxc = std::ceil(Nx * 0.5);
-  const t_int Nyc = std::ceil(Ny * 0.5);
+  const t_int Nxc = std::floor(Nx * 0.5);
+  const t_int Nyc = std::floor(Ny * 0.5);
   for(t_int k = 0; k < output_row.size(); k++) {
     // shifting indicies to workout linear convolution
     t_int i_shift_W = 0;
@@ -166,16 +166,16 @@ Sparse<t_complex> row_wise_convolution(const Sparse<t_complex> &Grid_, const Spa
     for(t_uint pix = 0; pix < Grid_.nonZeros(); pix++) {
       t_int i_shift_G = 0;
       t_int j_shift_G = 0;
-      std::tie(j_shift_G, i_shift_G) = utilities::ind2sub(*(Grid_.innerIndexPtr() + pix), Ny, Nx);
+      std::tie(j_shift_G, i_shift_G) = utilities::ind2sub(*(Grid_.outerIndexPtr() + pix), Ny, Nx);
       const t_int i_G = utilities::mod(i_shift_G + Nxc, Nx);
       const t_int j_G = utilities::mod(j_shift_G + Nyc, Ny);
       const t_int i_C = i_W - i_G;
       const t_int j_C = j_W - j_G;
       // Checking that convolution result is going to be within bounds
-      if(-Nxc <= i_C and i_C <= Nxc and -Nyc <= j_C and j_C <= Nyc) {
+      if(-Nxc <= i_C and i_C < std::ceil(Nx * 0.5) and -Nyc <= j_C and j_C < std::ceil(Ny * 0.5)) {
         // FFTshift of result to go into gridding matrix
-        const t_int i_shift_C = utilities::mod(i_C + Nxc, Nx);
-        const t_int j_shift_C = utilities::mod(j_C + Nyc, Ny);
+        const t_int i_shift_C = utilities::mod(i_C, Nx);
+        const t_int j_shift_C = utilities::mod(j_C, Ny);
         const t_int pos = utilities::sub2ind(j_shift_C, i_shift_C, Ny, Nx);
         assert(0 <= pos and pos < Nx * Ny);
         output_row(k) += *(Grid_.valuePtr() + pix) * chirp_.coeff(pos, 0);
@@ -188,7 +188,6 @@ template <class T>
 Sparse<t_complex>
 row_wise_sparse_convolution(const Sparse<t_complex> &Grid_, const Sparse<T> &chirp_,
                             const t_int &Nx, const t_int &Ny) {
-
   assert((Grid_.nonZeros() > 0) and (chirp_.nonZeros() > 0));
   const t_int Nxc = std::ceil(Nx * 0.5);
   const t_int Nyc = std::ceil(Ny * 0.5);
@@ -203,7 +202,7 @@ row_wise_sparse_convolution(const Sparse<t_complex> &Grid_, const Sparse<T> &chi
     for(t_uint pix = 0; pix < Grid_.nonZeros(); pix++) {
       t_int i_shift_G = 0;
       t_int j_shift_G = 0;
-      std::tie(j_shift_G, i_shift_G) = utilities::ind2sub(*(Grid_.innerIndexPtr() + pix), Ny, Nx);
+      std::tie(j_shift_G, i_shift_G) = utilities::ind2sub(*(Grid_.outerIndexPtr() + pix), Ny, Nx);
       const t_int i_G = utilities::mod(i_shift_G + Nxc, Nx);
       const t_int j_G = utilities::mod(j_shift_G + Nyc, Ny);
       const t_int i_W = i_G + i_C - Nx;
@@ -211,6 +210,8 @@ row_wise_sparse_convolution(const Sparse<t_complex> &Grid_, const Sparse<T> &chi
       if(-Nxc <= i_W and i_W <= Nxc and -Nyc <= j_W and j_W <= Nyc) {
         const t_int i_shift_W = utilities::mod(i_W, Nx);
         const t_int j_shift_W = utilities::mod(j_W, Ny);
+        if(i_shift_C < 0 or j_shift_C < 0)
+          throw std::runtime_error("Out of bounds in row convolution.");
         non_zero_W.insert(utilities::sub2ind(j_shift_W, i_shift_W, Ny, Nx));
       }
     }
@@ -229,7 +230,7 @@ row_wise_sparse_convolution(const Sparse<t_complex> &Grid_, const Sparse<T> &chi
     for(t_uint pix = 0; pix < Grid_.nonZeros(); pix++) {
       t_int i_shift_G = 0;
       t_int j_shift_G = 0;
-      std::tie(j_shift_G, i_shift_G) = utilities::ind2sub(*(Grid_.innerIndexPtr() + pix), Ny, Nx);
+      std::tie(j_shift_G, i_shift_G) = utilities::ind2sub(*(Grid_.outerIndexPtr() + pix), Ny, Nx);
       const t_int i_G = utilities::mod(i_shift_G + Nxc, Nx);
       const t_int j_G = utilities::mod(j_shift_G + Nyc, Ny);
       const t_int i_C = i_W - i_G;
