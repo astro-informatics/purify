@@ -55,24 +55,34 @@ TEST_CASE("Calculate Threshold") {
   }
 }
 
+TEST_CASE("simple convolution") {
+  const t_uint Nx = 12;
+  const t_uint Ny = 12;
+  const Sparse<t_complex> G_row = Matrix<t_complex>::Random(1, Nx * Ny).sparseView(1e-2);
+  const Sparse<t_complex> C_row = Matrix<t_complex>::Random(1, Nx * Ny).sparseView(1e-2);
+  const Sparse<t_complex> kernel = wproj_utilities::row_wise_convolution(G_row, C_row, Nx, Ny);
+  const Sparse<t_complex> test_kernel
+      = wproj_utilities::row_wise_sparse_convolution(G_row, C_row, Nx, Ny);
+  CHECK(test_kernel.nonZeros() == kernel.nonZeros());
+  REQUIRE(test_kernel.isApprox(kernel, 1e-12));
+}
+
 TEST_CASE("wprojection_matrix") {
   //! test if convolution is identity
   purify::logging::set_level("debug");
   const Vector<t_real> w_components = Vector<t_real>::Random(12);
   const Vector<t_real> w_components_zero = w_components * 0;
-  const t_int Nx = 10;
-  const t_int Ny = 10;
+  const t_int Nx = 12;
+  const t_int Ny = 12;
   const t_real cellx = 1.;
   const t_real celly = 1.;
   const t_int rows = w_components.size();
   const t_int cols = Nx * Ny;
 
   Sparse<t_complex> I(rows, cols);
-  I.reserve(Vector<t_int>::Constant(rows, 1));
-  for(t_int i = 0; i < std::min(rows, cols); i++) {
-    I.coeffRef(i, i) = 1;
-  }
-
+  I.reserve(rows);
+  for(t_int i = 0; i < std::min(rows, cols); i++)
+    I.coeffRef(i, i) = 1.;
   Sparse<t_complex> const G_id
       = wproj_utilities::wprojection_matrix(I, Nx, Ny, w_components_zero, cellx, celly, 1, 1);
   Sparse<t_complex> const G
@@ -80,35 +90,25 @@ TEST_CASE("wprojection_matrix") {
   // Testing if G_id == I
   CHECK(G_id.nonZeros() == I.nonZeros());
   CHECK(G.nonZeros() >= I.nonZeros());
-  // std::cout << G << std::endl;
-  for(t_int k = 0; k < G.outerSize(); ++k)
+  for(t_int k = 0; k < G_id.outerSize(); ++k)
     for(Sparse<t_complex>::InnerIterator it(G_id, k); it; ++it) {
       CHECK(std::abs(it.value() - 1.) < 1e-12);
-      CHECK(it.row() == it.col()); // row index
+      CHECK(it.row() == k); // row index
+      CHECK(it.col() == k); // col index
     }
-}
-TEST_CASE("simple convolution") {
-  const t_uint Nx = 12;
-  const t_uint Ny = 12;
-  const Sparse<t_complex> G_row = Vector<t_complex>::Random(Nx * Ny).sparseView(1e-4);
-  const Sparse<t_complex> C_row = Vector<t_complex>::Random(Nx * Ny).sparseView(1e-4);
-  const Sparse<t_complex> kernel = wproj_utilities::row_wise_convolution(G_row, C_row, Nx, Ny);
-  const Sparse<t_complex> test_kernel
-      = wproj_utilities::row_wise_sparse_convolution(G_row, C_row, Nx, Ny);
-  CHECK(test_kernel.nonZeros() == kernel.nonZeros());
-  CHECK(test_kernel.isApprox(kernel, 1e-12));
 }
 TEST_CASE("convolution even") {
   const t_uint Nx = 4;
   const t_uint Ny = 4;
-  Vector<t_complex> G_data(Nx * Ny);
-  Vector<t_complex> C_data(Nx * Ny);
-  Vector<t_complex> K_data(Nx * Ny);
+  Matrix<t_complex> G_data(1, Nx * Ny);
+  Matrix<t_complex> C_data(1, Nx * Ny);
+  Matrix<t_complex> K_data(1, Nx * Ny);
   SECTION("dirac") {
-    G_data = Vector<t_complex>::Random(Nx * Ny);
-    C_data = Vector<t_complex>::Zero(Nx * Ny);
-    C_data(0) = 1;
-    K_data = G_data;
+    G_data = Matrix<t_complex>::Zero(1, Nx * Ny);
+    C_data = Matrix<t_complex>::Zero(1, Nx * Ny);
+    G_data(0, 0) = 1;
+    C_data(0, 5) = 1;
+    K_data = C_data;
     const Sparse<t_complex> G_row = G_data.sparseView(1e-10);
     const Sparse<t_complex> C_row = C_data.sparseView(1e-10);
     const Sparse<t_complex> K_row = K_data.sparseView(1e-10);
@@ -136,12 +136,12 @@ TEST_CASE("convolution even") {
 TEST_CASE("convolution odd") {
   const t_uint Nx = 5;
   const t_uint Ny = 5;
-  Vector<t_complex> G_data(Nx * Ny);
-  Vector<t_complex> C_data(Nx * Ny);
-  Vector<t_complex> K_data(Nx * Ny);
+  Matrix<t_complex> G_data(1, Nx * Ny);
+  Matrix<t_complex> C_data(1, Nx * Ny);
+  Matrix<t_complex> K_data(1, Nx * Ny);
   SECTION("dirac") {
-    G_data = Vector<t_complex>::Random(Nx * Ny);
-    C_data = Vector<t_complex>::Zero(Nx * Ny);
+    G_data = Matrix<t_complex>::Random(1, Nx * Ny);
+    C_data = Matrix<t_complex>::Zero(1, Nx * Ny);
     C_data(0) = 1;
     K_data = G_data;
     const Sparse<t_complex> G_row = G_data.sparseView(1e-10);
