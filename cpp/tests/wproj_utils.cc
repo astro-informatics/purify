@@ -69,7 +69,7 @@ TEST_CASE("simple convolution") {
 
 TEST_CASE("wprojection_matrix") {
   //! test if convolution is identity
-  purify::logging::set_level("debug");
+  // purify::logging::set_level("debug");
   const Vector<t_real> w_components = Vector<t_real>::Random(12);
   const Vector<t_real> w_components_zero = w_components * 0;
   const t_int Nx = 12;
