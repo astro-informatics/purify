@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 
@@ -31,6 +32,8 @@ std::vector<int> Parse_Yaml::getWavelets(std::string values_str)
   // Logic to extract the values as vectors
   std::vector<int> wavelets;
   std::string value2add;
+  values_str.erase(std::remove_if(values_str.begin(), values_str.end(),
+                                  [](char x){return std::isspace(x);}), values_str.end());
   int final_value;
   // NOTE Maybe a while reststring and using find is better?
   for (int i=0; i <= values_str.size(); i++) {
@@ -41,7 +44,6 @@ std::vector<int> Parse_Yaml::getWavelets(std::string values_str)
       // TODO throw exception if open ended: 9..
       // TODO throw if at the begining
       // TODO throw if 3 digits on side
-      // TODO what happen with spaces?
       int n = values_str[i+3] == ',' ? 2 : 3;
       std::string final_value = values_str.substr(i+2, n);
       // TODO throw if final_value < start value
