@@ -2,6 +2,7 @@
 #define PARSE_YAML_H_
 #include <string>
 #include <yaml-cpp/yaml.h>
+#include "parameters.h"
 
 class Parse_Yaml{
   //private:
@@ -17,6 +18,8 @@ class Parse_Yaml{
   ~Parse_Yaml();
 
   // access methods
+  purify::Parameters config_parameters;
+  purify::Parameters getParameters(); // Why I had that for? (const std::string);
   std::vector<int> getWavelets(std::string);
   // mutator methods
 

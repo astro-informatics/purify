@@ -1,8 +1,5 @@
 #include "parse_yaml.h"
-
 #include <yaml-cpp/yaml.h>
-#include <iostream>
-#include <fstream>
 #include <string>
 #include <algorithm>
 
@@ -11,6 +8,7 @@ using namespace std;
 Parse_Yaml::Parse_Yaml()
 {
   // string input_file = "config.yaml";
+  config_parameters.config_file = "myconfig.yaml";
 }
 
 Parse_Yaml::Parse_Yaml(string infile)
@@ -49,7 +47,7 @@ std::vector<int> Parse_Yaml::getWavelets(std::string values_str)
       // TODO throw if final_value < start value
       for (int j=std::stoi(value2add); j <= std::stoi(final_value); j++ )
         wavelets.push_back(j);
-      i = i + n + 1;
+      i += (n + 1);
       value2add = "";
     } else {
       value2add = value2add + values_str[i];
@@ -57,6 +55,8 @@ std::vector<int> Parse_Yaml::getWavelets(std::string values_str)
   }
 
   return wavelets;
-
-
 }
+
+purify::Parameters Parse_Yaml::getParameters(){
+  return config_parameters;
+};
