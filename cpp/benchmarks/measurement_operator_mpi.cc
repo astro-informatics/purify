@@ -72,6 +72,39 @@ BENCHMARK(degrid_operator_ctor_distr)
 ->UseManualTime()
 ->Unit(benchmark::kMillisecond);
 
+// TODO: this is copy-pasting code. Fixtire didn't work with communicator, have to fix this!
+void degrid_operator_ctor_mpi(benchmark::State &state) {
+
+  // Generating random uv(w) coverage
+  t_int const rows = state.range(0);
+  t_int const cols = state.range(0);
+  t_int const number_of_vis = state.range(1);
+  auto const world = sopt::mpi::Communicator::World();
+  auto uv_data = random_measurements(number_of_vis,world);
+
+  const t_real FoV = 1;      // deg
+  const t_real cellsize = FoV / cols * 60. * 60.;
+  const bool w_term = false;
+  // benchmark the creation of the distributed measurement operator
+  double max_elapsed_second;
+  while(state.KeepRunning()) {
+    auto start = std::chrono::high_resolution_clock::now();
+    auto const sky_measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+        world, uv_data, rows, cols, cellsize, cellsize, 2, 100, 0.0001, "kb", state.range(2), state.range(2),
+        "measure", w_term);
+    auto end = std::chrono::high_resolution_clock::now();
+
+    state.SetIterationTime(b_utilities::duration(start,end,world));
+  }
+
+  state.SetBytesProcessed(int64_t(state.iterations()) * (number_of_vis + rows * cols) * sizeof(t_complex));
+}
+
+BENCHMARK(degrid_operator_ctor_mpi)
+->Apply(b_utilities::Arguments)
+->UseManualTime()
+->Unit(benchmark::kMillisecond);
+
 /*
 // ----------------- Application benchmark - with fixture -----------------------//
 
