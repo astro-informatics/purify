@@ -72,7 +72,7 @@ BENCHMARK(degrid_operator_ctor_distr)
 ->UseManualTime()
 ->Unit(benchmark::kMillisecond);
 
-// TODO: this is copy-pasting code. Fixtire didn't work with communicator, have to fix this!
+// TODO: this is copy-pasting code. Fixture didn't work with communicator, have to fix this!
 void degrid_operator_ctor_mpi(benchmark::State &state) {
 
   // Generating random uv(w) coverage
@@ -105,10 +105,10 @@ BENCHMARK(degrid_operator_ctor_mpi)
 ->UseManualTime()
 ->Unit(benchmark::kMillisecond);
 
-/*
+
 // ----------------- Application benchmark - with fixture -----------------------//
 
-class DegridOperatorFixture : public ::benchmark::Fixture
+class DegridOperatorFixtureMPI : public ::benchmark::Fixture
 {
 public:
   void SetUp(const ::benchmark::State& state) {
@@ -120,19 +120,12 @@ public:
     m_imsizey = m_image.rows();
     t_real const max = m_image.array().abs().maxCoeff();
     m_image = m_image * 1. / max;
-    
-    // Generating random uv(w) coverage
-    t_int const number_of_vis = state.range(1);
-    m_uv_data = random_measurements(number_of_vis);
-    
-    // Create measurement operator
+
+    // Data needed for the creation of the measurement operator
+    m_number_of_vis = state.range(1);
     const t_real FoV = 1;      // deg
-    const t_real cellsize = FoV / m_imsizex * 60. * 60.;
-    const bool w_term = false;
-    m_degridOperator = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
-      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 100, 0.0001, "kb", state.range(2), state.range(2),
-          "measure", w_term));
+    m_cellsize = FoV / m_imsizex * 60. * 60.;
+    m_w_term = false;
   }
 
   void TearDown(const ::benchmark::State& state) {
@@ -141,36 +134,65 @@ public:
   Image<t_complex> m_image;
   t_uint m_imsizex;
   t_uint m_imsizey;
-  utilities::vis_params m_uv_data;
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> m_degridOperator;
+  t_int m_number_of_vis;
+  t_real m_cellsize;
+  bool m_w_term;
 };
 
 
-  BENCHMARK_DEFINE_F(DegridOperatorFixture, Direct)(benchmark::State &state) {
-    // Benchmark the application of the operator
+  BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectDistr)(benchmark::State &state) {
+    // Generating random uv(w) coverage
+    auto const world = sopt::mpi::Communicator::World();
+    auto uv_data = random_measurements(m_number_of_vis,world);
+
+    // Create the distributed operator
+    std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>>  degridOperator =
+      std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
+      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      world, uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 100, 0.0001, "kb", state.range(2), state.range(2),
+      "measure", m_w_term));
+
+    // Benchmark the application of the distributed operator
     while(state.KeepRunning()) {
-      m_uv_data.vis = (*m_degridOperator) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
+      auto start = std::chrono::high_resolution_clock::now();
+      uv_data.vis = (*degridOperator) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
+      auto end = std::chrono::high_resolution_clock::now();
+      
+      state.SetIterationTime(b_utilities::duration(start,end,world));
     }
     
-    state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizey * m_imsizex) * sizeof(t_complex));
+    state.SetBytesProcessed(int64_t(state.iterations()) * (m_number_of_vis + m_imsizey * m_imsizex) * sizeof(t_complex));
   }
 
-  BENCHMARK_DEFINE_F(DegridOperatorFixture, Adjoint)(benchmark::State &state) {
-    // Benchmark the application of the adjoint operator
+  BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointDistr)(benchmark::State &state) {
+    // Generating random uv(w) coverage
+    auto const world = sopt::mpi::Communicator::World();
+    auto uv_data = random_measurements(m_number_of_vis,world);
+
+    // Create the distributed operator
+    std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>>  degridOperator =
+      std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
+      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      world, uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 100, 0.0001, "kb", state.range(2), state.range(2),
+      "measure", m_w_term));
+
+    // Benchmark the application of the adjoint distributed operator
     Vector<t_complex> theImage(m_image.size());
     while(state.KeepRunning()) {
-      theImage = m_degridOperator->adjoint() * m_uv_data.vis;
+      auto start = std::chrono::high_resolution_clock::now();
+      theImage = degridOperator->adjoint() * uv_data.vis;
+      auto end = std::chrono::high_resolution_clock::now();
+      
+      state.SetIterationTime(b_utilities::duration(start,end,world));
     }
     
-    state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizey * m_imsizex) * sizeof(t_complex));
+    state.SetBytesProcessed(int64_t(state.iterations()) * (m_number_of_vis + m_imsizey * m_imsizex) * sizeof(t_complex));
   }
 
-BENCHMARK_REGISTER_F(DegridOperatorFixture, Direct)->Apply(Arguments)
+BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, DirectDistr)->Apply(b_utilities::Arguments)
+->UseManualTime()
 ->Unit(benchmark::kMicrosecond);
 
-BENCHMARK_REGISTER_F(DegridOperatorFixture, Adjoint)->Apply(Arguments)
+BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, AdjointDistr)->Apply(b_utilities::Arguments)
+->UseManualTime()
 ->Unit(benchmark::kMicrosecond);
-
-
-
-BENCHMARK_MAIN();*/
