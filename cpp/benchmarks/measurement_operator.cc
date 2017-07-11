@@ -7,6 +7,7 @@
 #include "purify/utilities.h"
 #include "purify/directories.h"
 #include "purify/pfitsio.h"
+#include "benchmarks/utilities.h"
 
 using namespace purify;
 using namespace purify::notinstalled;
@@ -20,16 +21,6 @@ utilities::vis_params random_measurements(t_int size) {
   uv_data.units = "radians";
 
   return uv_data;
-}
-
-void Arguments(benchmark::internal::Benchmark* b) {
-  int uv_size_max = 256; // 4096
-  int im_size_max = 1000; // 1M, 10M, 100M
-  int kernel_max = 4; // 16
-  for (int i=128; i<=uv_size_max; i*=2)
-    for (int j=1000; j<=im_size_max; j*=10)
-      for (int k=2; k<=kernel_max; k*=2)
-        b->Args({i,j,k});
 }
 
 
@@ -48,22 +39,23 @@ void degrid_operator_ctor(benchmark::State &state) {
   const bool w_term = false;
   // benchmark the creation of measurement operator
   while(state.KeepRunning()) {
-    //auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
     auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         uv_data, rows, cols, cellsize, cellsize, 2, 100, 0.0001, "kb", state.range(2), state.range(2),
         "measure", w_term);
-    //auto end   = std::chrono::high_resolution_clock::now();
+    auto end   = std::chrono::high_resolution_clock::now();
 
-    //auto elapsed_seconds =
-    //std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
-    //state.SetIterationTime(elapsed_seconds.count());
+    auto elapsed_seconds =
+    std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+    state.SetIterationTime(elapsed_seconds.count());
   }
 
   state.SetBytesProcessed(int64_t(state.iterations()) * (number_of_vis + rows * cols) * sizeof(t_complex));
 }
 
 BENCHMARK(degrid_operator_ctor)
-->Apply(Arguments)
+->Apply(b_utilities::Arguments)
+->UseManualTime()
 ->Unit(benchmark::kMillisecond);
 
 
@@ -126,11 +118,11 @@ public:
     state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizey * m_imsizex) * sizeof(t_complex));
   }
 
-BENCHMARK_REGISTER_F(DegridOperatorFixture, Direct)->Apply(Arguments)
-->Unit(benchmark::kMicrosecond);
+//BENCHMARK_REGISTER_F(DegridOperatorFixture, Direct)->Apply(b_utilities::Arguments)
+//->Unit(benchmark::kMicrosecond);
 
-BENCHMARK_REGISTER_F(DegridOperatorFixture, Adjoint)->Apply(Arguments)
-->Unit(benchmark::kMicrosecond);
+//BENCHMARK_REGISTER_F(DegridOperatorFixture, Adjoint)->Apply(b_utilities::Arguments)
+//->Unit(benchmark::kMicrosecond);
 
 
 

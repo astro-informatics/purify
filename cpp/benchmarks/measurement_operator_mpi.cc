@@ -6,51 +6,18 @@
 #include <sopt/imaging_padmm.h>
 #include <sopt/wavelets.h>
 #include "purify/operators.h"
-#include "purify/utilities.h"
+#include "purify/distribute.h"
+#include "purify/mpi_utilities.h"
 #include "purify/directories.h"
 #include "purify/pfitsio.h"
-
-#include <thread>
+#include "benchmarks/utilities.h"
 
 using namespace purify;
 using namespace purify::notinstalled;
 
-namespace {
-// The unit of code we want to benchmark
-void i_am_sleepy(int macsleepface) {
-  // Pretend to work ...
-  std::this_thread::sleep_for(std::chrono::milliseconds(macsleepface));
-  // ... as a team
-  MPI_Barrier(MPI_COMM_WORLD);
-}
-
-void mpi_benchmark(benchmark::State &state) {
-  double max_elapsed_second;
-  int rank;
-  auto const world = sopt::mpi::Communicator::World();
-  rank = world.rank();
-  while(state.KeepRunning()) {
-    // Do the work and time it on each proc
-    auto start = std::chrono::high_resolution_clock::now();
-    i_am_sleepy(rank % 5);
-    auto end = std::chrono::high_resolution_clock::now();
-    // Now get the max time across all procs:
-    // for better or for worse, the slowest processor is the one that is
-    // holding back the others in the benchmark.
-    auto const duration = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
-    auto elapsed_seconds = duration.count();
-    max_elapsed_second = world.all_reduce(elapsed_seconds, MPI_MAX);
-    state.SetIterationTime(max_elapsed_second);
-  }
-}
-}
-
-BENCHMARK(mpi_benchmark)->UseManualTime();
-
-
 
 // -------------- Helper functions ----------------------------//
-/*
+
 utilities::vis_params random_measurements(t_int size, sopt::mpi::Communicator const &comm) {
   if(comm.is_root()) {
     // Generate random measurements
@@ -58,6 +25,8 @@ utilities::vis_params random_measurements(t_int size, sopt::mpi::Communicator co
     const t_real max_w = 100.; // lambda
     auto uv_data = utilities::random_sample_density(size, 0, sigma_m, max_w);
     uv_data.units = "radians";
+    if(comm.size() == 1)
+      return uv_data;
     
     // Distribute them
     auto const order
@@ -68,20 +37,10 @@ utilities::vis_params random_measurements(t_int size, sopt::mpi::Communicator co
   return utilities::scatter_visibilities(comm);
 }
 
-void Arguments(benchmark::internal::Benchmark* b) {
-  int uv_size_max = 256; // 4096
-  int im_size_max = 1000; // 1M, 10M, 100M
-  int kernel_max = 4; // 16
-  for (int i=128; i<=uv_size_max; i*=2)
-    for (int j=1000; j<=im_size_max; j*=10)
-      for (int k=2; k<=kernel_max; k*=2)
-        b->Args({i,j,k});
-}
-
 
 // -------------- Constructor benchmark -------------------------//
 
-void degrid_operator_ctor(benchmark::State &state) {
+void degrid_operator_ctor_distr(benchmark::State &state) {
 
   // Generating random uv(w) coverage
   t_int const rows = state.range(0);
@@ -93,24 +52,28 @@ void degrid_operator_ctor(benchmark::State &state) {
   const t_real FoV = 1;      // deg
   const t_real cellsize = FoV / cols * 60. * 60.;
   const bool w_term = false;
-  // benchmark the creation of measurement operator
+  // benchmark the creation of the distributed measurement operator
+  double max_elapsed_second;
   while(state.KeepRunning()) {
-    //auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
     auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         world, uv_data, rows, cols, cellsize, cellsize, 2, 100, 0.0001, "kb", state.range(2), state.range(2),
         "measure", w_term);
-    //auto end   = std::chrono::high_resolution_clock::now();
-
-    //auto elapsed_seconds =
-    //std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
-    //state.SetIterationTime(elapsed_seconds.count());
+    auto end = std::chrono::high_resolution_clock::now();
+    auto const duration = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+    auto elapsed_seconds = duration.count();
+    // Now get the max time across all procs: the slowest processor is the one that is
+    // holding back the others in the benchmark.
+    max_elapsed_second = world.all_reduce(elapsed_seconds, MPI_MAX);
+    state.SetIterationTime(max_elapsed_second);
   }
 
   state.SetBytesProcessed(int64_t(state.iterations()) * (number_of_vis + rows * cols) * sizeof(t_complex));
 }
 
-BENCHMARK(degrid_operator_ctor)
-->Apply(Arguments)
+BENCHMARK(degrid_operator_ctor_distr)
+->Apply(b_utilities::Arguments)
+->UseManualTime()
 ->Unit(benchmark::kMillisecond);
 
 /*
