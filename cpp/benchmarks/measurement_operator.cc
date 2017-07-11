@@ -45,9 +45,7 @@ void degrid_operator_ctor(benchmark::State &state) {
         "measure", w_term);
     auto end   = std::chrono::high_resolution_clock::now();
 
-    auto elapsed_seconds =
-    std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
-    state.SetIterationTime(elapsed_seconds.count());
+    state.SetIterationTime(b_utilities::duration(start,end));
   }
 
   state.SetBytesProcessed(int64_t(state.iterations()) * (number_of_vis + rows * cols) * sizeof(t_complex));

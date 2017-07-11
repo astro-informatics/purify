@@ -60,12 +60,8 @@ void degrid_operator_ctor_distr(benchmark::State &state) {
         world, uv_data, rows, cols, cellsize, cellsize, 2, 100, 0.0001, "kb", state.range(2), state.range(2),
         "measure", w_term);
     auto end = std::chrono::high_resolution_clock::now();
-    auto const duration = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
-    auto elapsed_seconds = duration.count();
-    // Now get the max time across all procs: the slowest processor is the one that is
-    // holding back the others in the benchmark.
-    max_elapsed_second = world.all_reduce(elapsed_seconds, MPI_MAX);
-    state.SetIterationTime(max_elapsed_second);
+
+    state.SetIterationTime(b_utilities::duration(start,end,world));
   }
 
   state.SetBytesProcessed(int64_t(state.iterations()) * (number_of_vis + rows * cols) * sizeof(t_complex));

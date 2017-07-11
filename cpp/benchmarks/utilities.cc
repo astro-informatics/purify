@@ -12,4 +12,17 @@ namespace b_utilities {
           b->Args({i,j,k});
   }
 
+  double duration(std::chrono::high_resolution_clock::time_point start, std::chrono::high_resolution_clock::time_point end){
+    auto elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+    return elapsed_seconds.count();
+  }
+
+  double duration(std::chrono::high_resolution_clock::time_point start, std::chrono::high_resolution_clock::time_point end,
+                  sopt::mpi::Communicator const &comm) {
+    auto elapsed_seconds = duration(start,end);
+    // Now get the max time across all procs: the slowest processor is the one that is
+    // holding back the others in the benchmark.
+    return comm.all_reduce(elapsed_seconds, MPI_MAX);
+  }
+  
 }
