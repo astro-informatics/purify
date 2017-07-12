@@ -57,7 +57,7 @@ BENCHMARK(degrid_operator_ctor)
 ->Unit(benchmark::kMillisecond);
 
 
-// ----------------- Application benchmark - with fixture -----------------------//
+// ----------------- Application benchmarks -----------------------//
 
 class DegridOperatorFixture : public ::benchmark::Fixture
 {
@@ -97,30 +97,40 @@ public:
 };
 
 
-  BENCHMARK_DEFINE_F(DegridOperatorFixture, Direct)(benchmark::State &state) {
-    // Benchmark the application of the operator
-    while(state.KeepRunning()) {
-      m_uv_data.vis = (*m_degridOperator) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
-    }
-    
-    state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizey * m_imsizex) * sizeof(t_complex));
+BENCHMARK_DEFINE_F(DegridOperatorFixture, Direct)(benchmark::State &state) {
+  // Benchmark the application of the operator
+  while(state.KeepRunning()) {
+    auto start = std::chrono::high_resolution_clock::now();
+    m_uv_data.vis = (*m_degridOperator) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
+    auto end   = std::chrono::high_resolution_clock::now();
+
+    state.SetIterationTime(b_utilities::duration(start,end));
   }
+  
+  state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizey * m_imsizex) * sizeof(t_complex));
+}
 
-  BENCHMARK_DEFINE_F(DegridOperatorFixture, Adjoint)(benchmark::State &state) {
-    // Benchmark the application of the adjoint operator
-    Vector<t_complex> theImage(m_image.size());
-    while(state.KeepRunning()) {
-      theImage = m_degridOperator->adjoint() * m_uv_data.vis;
-    }
+BENCHMARK_DEFINE_F(DegridOperatorFixture, Adjoint)(benchmark::State &state) {
+  // Benchmark the application of the adjoint operator
+  Vector<t_complex> theImage(m_image.size());
+  while(state.KeepRunning()) {
+    auto start = std::chrono::high_resolution_clock::now();
+    theImage = m_degridOperator->adjoint() * m_uv_data.vis;
+    auto end   = std::chrono::high_resolution_clock::now();
     
-    state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizey * m_imsizex) * sizeof(t_complex));
+    state.SetIterationTime(b_utilities::duration(start,end));
   }
+  
+  state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizey * m_imsizex) * sizeof(t_complex));
+}
 
-//BENCHMARK_REGISTER_F(DegridOperatorFixture, Direct)->Apply(b_utilities::Arguments)
-//->Unit(benchmark::kMicrosecond);
+BENCHMARK_REGISTER_F(DegridOperatorFixture, Direct)->Apply(b_utilities::Arguments)
+->UseManualTime()
+->Unit(benchmark::kMicrosecond);
 
-//BENCHMARK_REGISTER_F(DegridOperatorFixture, Adjoint)->Apply(b_utilities::Arguments)
-//->Unit(benchmark::kMicrosecond);
+BENCHMARK_REGISTER_F(DegridOperatorFixture, Adjoint)->Apply(b_utilities::Arguments)
+->UseManualTime()
+->Unit(benchmark::kMicrosecond);
 
 
 

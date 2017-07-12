@@ -76,7 +76,7 @@ public:
 };
 
 
-// -------------- Constructor benchmark -------------------------//
+// -------------- Constructor benchmarks -------------------------//
 
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, CtorDistr)(benchmark::State &state) {
   // Generating random uv(w) coverage
@@ -127,7 +127,7 @@ BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, CtorMPI)
 ->Unit(benchmark::kMillisecond);
 
 
-// ----------------- Application benchmark -----------------------//
+// ----------------- Application benchmarks -----------------------//
 
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectDistr)(benchmark::State &state) {
   // Generating random uv(w) coverage
@@ -183,5 +183,62 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointDistr)(benchmark::State &sta
 }
 
 BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, AdjointDistr)->Apply(b_utilities::Arguments)
+->UseManualTime()
+->Unit(benchmark::kMicrosecond);
+
+BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectMPI)(benchmark::State &state) {
+  // Generating random uv(w) coverage
+  auto const world = sopt::mpi::Communicator::World();
+  auto uv_data = random_measurements(m_number_of_vis,world);
+  
+  // Create the distributed MPI operator
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>>  degridOperator =
+    std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
+      measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+      world, uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 100, 0.0001, "kb", state.range(2), state.range(2),
+      "measure", m_w_term));
+
+  // Benchmark the application of the distributed MPI operator
+  while(state.KeepRunning()) {
+    auto start = std::chrono::high_resolution_clock::now();
+    uv_data.vis = (*degridOperator) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
+    auto end = std::chrono::high_resolution_clock::now();
+    
+    state.SetIterationTime(b_utilities::duration(start,end,world));
+  }
+  
+  state.SetBytesProcessed(int64_t(state.iterations()) * (m_number_of_vis + m_imsizey * m_imsizex) * sizeof(t_complex));
+}
+
+BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, DirectMPI)->Apply(b_utilities::Arguments)
+->UseManualTime()
+->Unit(benchmark::kMicrosecond);
+
+BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointMPI)(benchmark::State &state) {
+  // Generating random uv(w) coverage
+  auto const world = sopt::mpi::Communicator::World();
+  auto uv_data = random_measurements(m_number_of_vis,world);
+  
+  // Create the distributed MPI operator
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>>  degridOperator =
+    std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
+      measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+      world, uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 100, 0.0001, "kb", state.range(2), state.range(2),
+      "measure", m_w_term));
+  
+  // Benchmark the application of the adjoint distributed MPI operator
+  Vector<t_complex> theImage(m_image.size());
+  while(state.KeepRunning()) {
+    auto start = std::chrono::high_resolution_clock::now();
+    theImage = degridOperator->adjoint() * uv_data.vis;
+    auto end = std::chrono::high_resolution_clock::now();
+    
+    state.SetIterationTime(b_utilities::duration(start,end,world));
+  }
+  
+  state.SetBytesProcessed(int64_t(state.iterations()) * (m_number_of_vis + m_imsizey * m_imsizex) * sizeof(t_complex));
+}
+
+BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, AdjointMPI)->Apply(b_utilities::Arguments)
 ->UseManualTime()
 ->Unit(benchmark::kMicrosecond);
