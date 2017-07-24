@@ -1,0 +1,16 @@
+--------------------------------------------------------------------------------------------
+Benchmark                                                     Time           CPU Iterations
+--------------------------------------------------------------------------------------------
+[0;32mdegrid_operator_ctor/128/1000/2/manual_time          [m[0;33m       561 ms        561 ms [m[0;36m         1[m   484.033kB/s[m
+[m[0;32mdegrid_operator_ctor/128/1000/4/manual_time          [m[0;33m       555 ms        555 ms [m[0;36m         1[m   489.614kB/s[m
+[m[0;32mdegrid_operator_ctor/256/1000/2/manual_time          [m[0;33m      2938 ms       2938 ms [m[0;36m         1[m   353.843kB/s[m
+[m[0;32mdegrid_operator_ctor/256/1000/4/manual_time          [m[0;33m      2054 ms       2055 ms [m[0;36m         1[m   506.024kB/s[m
+[m[0;32mDegridOperatorFixture/Direct/128/1000/2/manual_time  [m[0;33m      1929 us       1929 us [m[0;36m       359[m   137.492MB/s[m
+[m[0;32mDegridOperatorFixture/Direct/128/1000/4/manual_time  [m[0;33m      2113 us       2113 us [m[0;36m       346[m   125.557MB/s[m
+[m[0;32mDegridOperatorFixture/Direct/256/1000/2/manual_time  [m[0;33m      9006 us       9007 us [m[0;36m        77[m   112.725MB/s[m
+[m[0;32mDegridOperatorFixture/Direct/256/1000/4/manual_time  [m[0;33m      9139 us       9139 us [m[0;36m        75[m   111.096MB/s[m
+[m[0;32mDegridOperatorFixture/Adjoint/128/1000/2/manual_time [m[0;33m      2291 us       2291 us [m[0;36m       308[m   115.765MB/s[m
+[m[0;32mDegridOperatorFixture/Adjoint/128/1000/4/manual_time [m[0;33m      2572 us       2573 us [m[0;36m       272[m   103.123MB/s[m
+[m[0;32mDegridOperatorFixture/Adjoint/256/1000/2/manual_time [m[0;33m     16249 us      16249 us [m[0;36m        43[m   62.4804MB/s[m
+[m[0;32mDegridOperatorFixture/Adjoint/256/1000/4/manual_time [m[0;33m     16835 us      16836 us [m[0;36m        42[m   60.3067MB/s[m
+[m
