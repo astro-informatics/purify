@@ -97,11 +97,6 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, CtorDistr)(benchmark::State &state)
   state.SetBytesProcessed(int64_t(state.iterations()) * (m_number_of_vis + m_rows * m_cols) * sizeof(t_complex));
 }
 
-BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, CtorDistr)
-->Apply(b_utilities::Arguments)
-->UseManualTime()
-->Unit(benchmark::kMillisecond);
-
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, CtorMPI)(benchmark::State &state) {
   // Generating random uv(w) coverage
   auto const world = sopt::mpi::Communicator::World();
@@ -120,11 +115,6 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, CtorMPI)(benchmark::State &state) {
 
   state.SetBytesProcessed(int64_t(state.iterations()) * (m_number_of_vis + m_rows * m_cols) * sizeof(t_complex));
 }
-
-BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, CtorMPI)
-->Apply(b_utilities::Arguments)
-->UseManualTime()
-->Unit(benchmark::kMillisecond);
 
 
 // ----------------- Application benchmarks -----------------------//
@@ -153,10 +143,6 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectDistr)(benchmark::State &stat
   state.SetBytesProcessed(int64_t(state.iterations()) * (m_number_of_vis + m_imsizey * m_imsizex) * sizeof(t_complex));
 }
 
-BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, DirectDistr)->Apply(b_utilities::Arguments)
-->UseManualTime()
-->Unit(benchmark::kMicrosecond);
-
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointDistr)(benchmark::State &state) {
   // Generating random uv(w) coverage
   auto const world = sopt::mpi::Communicator::World();
@@ -182,10 +168,6 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointDistr)(benchmark::State &sta
   state.SetBytesProcessed(int64_t(state.iterations()) * (m_number_of_vis + m_imsizey * m_imsizex) * sizeof(t_complex));
 }
 
-BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, AdjointDistr)->Apply(b_utilities::Arguments)
-->UseManualTime()
-->Unit(benchmark::kMicrosecond);
-
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectMPI)(benchmark::State &state) {
   // Generating random uv(w) coverage
   auto const world = sopt::mpi::Communicator::World();
@@ -209,10 +191,6 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectMPI)(benchmark::State &state)
   
   state.SetBytesProcessed(int64_t(state.iterations()) * (m_number_of_vis + m_imsizey * m_imsizex) * sizeof(t_complex));
 }
-
-BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, DirectMPI)->Apply(b_utilities::Arguments)
-->UseManualTime()
-->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointMPI)(benchmark::State &state) {
   // Generating random uv(w) coverage
@@ -238,6 +216,31 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointMPI)(benchmark::State &state
   
   state.SetBytesProcessed(int64_t(state.iterations()) * (m_number_of_vis + m_imsizey * m_imsizex) * sizeof(t_complex));
 }
+
+
+// -------------- Register benchmarks -------------------------//
+
+BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, CtorDistr)
+->Apply(b_utilities::Arguments)
+->UseManualTime()
+->Unit(benchmark::kMillisecond);
+
+BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, DirectDistr)->Apply(b_utilities::Arguments)
+->UseManualTime()
+->Unit(benchmark::kMicrosecond);
+
+BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, AdjointDistr)->Apply(b_utilities::Arguments)
+->UseManualTime()
+->Unit(benchmark::kMicrosecond);
+
+BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, CtorMPI)
+->Apply(b_utilities::Arguments)
+->UseManualTime()
+->Unit(benchmark::kMillisecond);
+
+BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, DirectMPI)->Apply(b_utilities::Arguments)
+->UseManualTime()
+->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, AdjointMPI)->Apply(b_utilities::Arguments)
 ->UseManualTime()
