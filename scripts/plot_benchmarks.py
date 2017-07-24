@@ -3,14 +3,18 @@ import string
 import numpy as np
 import matplotlib.pyplot as plt
 
-def parse_file(filename):
+def parse_file(filename, what):
     timeslist = []
     with open(filename) as f:
         for line in f:
             linelist = line.split()
             if len(linelist)>4:
-                timeslist.append(int(linelist[2]))
-    #print(np.array(timeslist))
+                temp = int(linelist[2])
+                if what!="time":
+                    temp = float(linelist[8].split('B/s')[0][:-1])
+                    if linelist[8].split('B/s')[0][-1:]=='k':
+                        temp = temp/1000.
+                timeslist.append(temp)
     return np.array(timeslist)
 
 def prep_arrays(serial_times, parallel_times, index_s, index_p, N):
@@ -21,8 +25,16 @@ def prep_arrays(serial_times, parallel_times, index_s, index_p, N):
 
 if __name__ == "__main__":
      import sys
-     serial_times = parse_file(sys.argv[1])
-     parallel_times = parse_file(sys.argv[2])
+     # Plot walltime or data processing rate
+     what = sys.argv[8]
+     ylabel = ""
+     if what=="time":
+         ylabel = "Time (ms or us)"
+     else:
+         ylabel = "Data rate (MB/s)"
+     # File names
+     serial_times = parse_file(sys.argv[1], what)
+     parallel_times = parse_file(sys.argv[2], what)
      # number of benchmarking parameters
      n1 = int(sys.argv[3])
      n2 = int(sys.argv[4])
@@ -65,7 +77,7 @@ if __name__ == "__main__":
          plt.setp(ax.get_xticklabels(), visible=True)
          plt.xticks(range(nconf), x_name)
          plt.xlabel("number of cores")
-         plt.ylabel("time (ms or us)")
+         plt.ylabel(ylabel)
          ax = fig.add_subplot(1,2,2)
          for par in range(0,npar):
              index = bm*npar + N + par
