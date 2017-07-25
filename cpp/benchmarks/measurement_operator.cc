@@ -1,4 +1,5 @@
 #include <sstream>
+#include <fstream>
 #include <chrono>
 #include <benchmark/benchmark.h>
 #include <sopt/imaging_padmm.h>
@@ -15,12 +16,22 @@ using namespace purify::notinstalled;
 // -------------- Helper functions ----------------------------//
 
 utilities::vis_params random_measurements(t_int size) {
-  t_real const sigma_m = constant::pi / 3;
-  const t_real max_w = 100.; // lambda
-  auto uv_data = utilities::random_sample_density(size, 0, sigma_m, max_w);
-  uv_data.units = "radians";
+  std::stringstream filename;
+  filename << "random_" << size << ".vis";
+  std::string const vis_file = visibility_filename(filename.str());
+  std::ifstream vis_file_str(vis_file);
 
-  return uv_data;
+  if (vis_file_str.good()) {
+    return utilities::read_visibility(vis_file, false);
+  }
+  else {
+    t_real const sigma_m = constant::pi / 3;
+    const t_real max_w = 100.; // lambda
+    auto uv_data = utilities::random_sample_density(size, 0, sigma_m, max_w);
+    uv_data.units = "radians";
+    utilities::write_visibility(uv_data, vis_file);
+    return uv_data;
+  }
 }
 
 

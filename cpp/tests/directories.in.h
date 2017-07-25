@@ -15,6 +15,10 @@ inline std::string data_filename(std::string const &filename) {
 inline std::string image_filename(std::string const &filename) {
   return data_filename("images/" + filename);
 }
+//! Visibility filename
+inline std::string visibility_filename(std::string const &filename) {
+  return data_filename("visibilities/" + filename);
+}
 //! Specific vla data
 inline std::string vla_filename(std::string const &filename) {
   return data_filename("vla/" + filename);
