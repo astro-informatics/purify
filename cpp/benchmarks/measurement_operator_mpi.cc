@@ -6,36 +6,12 @@
 #include <sopt/imaging_padmm.h>
 #include <sopt/wavelets.h>
 #include "purify/operators.h"
-#include "purify/distribute.h"
-#include "purify/mpi_utilities.h"
 #include "purify/directories.h"
 #include "purify/pfitsio.h"
 #include "benchmarks/utilities.h"
 
 using namespace purify;
 using namespace purify::notinstalled;
-
-
-// -------------- Helper functions ----------------------------//
-
-utilities::vis_params random_measurements(t_int size, sopt::mpi::Communicator const &comm) {
-  if(comm.is_root()) {
-    // Generate random measurements
-    t_real const sigma_m = constant::pi / 3;
-    const t_real max_w = 100.; // lambda
-    auto uv_data = utilities::random_sample_density(size, 0, sigma_m, max_w);
-    uv_data.units = "radians";
-    if(comm.size() == 1)
-      return uv_data;
-    
-    // Distribute them
-    auto const order
-      = distribute::distribute_measurements(uv_data, comm, "distance_distribution");
-    uv_data = utilities::regroup_and_scatter(uv_data, order, comm);
-    return uv_data;
-  }
-  return utilities::scatter_visibilities(comm);
-}
 
 
 // ----------------- Degrid operator benchmark fixture -----------------------//
@@ -81,7 +57,7 @@ public:
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, CtorDistr)(benchmark::State &state) {
   // Generating random uv(w) coverage
   auto const world = sopt::mpi::Communicator::World();
-  auto uv_data = random_measurements(m_number_of_vis,world);
+  auto uv_data = b_utilities::random_measurements(m_number_of_vis,world);
 
   // benchmark the creation of the distributed measurement operator
   while(state.KeepRunning()) {
@@ -100,7 +76,7 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, CtorDistr)(benchmark::State &state)
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, CtorMPI)(benchmark::State &state) {
   // Generating random uv(w) coverage
   auto const world = sopt::mpi::Communicator::World();
-  auto uv_data = random_measurements(m_number_of_vis,world);
+  auto uv_data = b_utilities::random_measurements(m_number_of_vis,world);
 
   // benchmark the creation of the distributed MPI measurement operator
   while(state.KeepRunning()) {
@@ -122,7 +98,7 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, CtorMPI)(benchmark::State &state) {
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectDistr)(benchmark::State &state) {
   // Generating random uv(w) coverage
   auto const world = sopt::mpi::Communicator::World();
-  auto uv_data = random_measurements(m_number_of_vis,world);
+  auto uv_data = b_utilities::random_measurements(m_number_of_vis,world);
   
   // Create the distributed operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>>  degridOperator =
@@ -146,7 +122,7 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectDistr)(benchmark::State &stat
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointDistr)(benchmark::State &state) {
   // Generating random uv(w) coverage
   auto const world = sopt::mpi::Communicator::World();
-  auto uv_data = random_measurements(m_number_of_vis,world);
+  auto uv_data = b_utilities::random_measurements(m_number_of_vis,world);
   
   // Create the distributed operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>>  degridOperator =
@@ -171,7 +147,7 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointDistr)(benchmark::State &sta
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectMPI)(benchmark::State &state) {
   // Generating random uv(w) coverage
   auto const world = sopt::mpi::Communicator::World();
-  auto uv_data = random_measurements(m_number_of_vis,world);
+  auto uv_data = b_utilities::random_measurements(m_number_of_vis,world);
   
   // Create the distributed MPI operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>>  degridOperator =
@@ -195,7 +171,7 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectMPI)(benchmark::State &state)
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointMPI)(benchmark::State &state) {
   // Generating random uv(w) coverage
   auto const world = sopt::mpi::Communicator::World();
-  auto uv_data = random_measurements(m_number_of_vis,world);
+  auto uv_data = b_utilities::random_measurements(m_number_of_vis,world);
   
   // Create the distributed MPI operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>>  degridOperator =

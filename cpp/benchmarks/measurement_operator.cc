@@ -1,38 +1,14 @@
-#include <sstream>
-#include <fstream>
 #include <chrono>
 #include <benchmark/benchmark.h>
 #include <sopt/imaging_padmm.h>
 #include <sopt/wavelets.h>
 #include "purify/operators.h"
-#include "purify/utilities.h"
 #include "purify/directories.h"
 #include "purify/pfitsio.h"
 #include "benchmarks/utilities.h"
 
 using namespace purify;
 using namespace purify::notinstalled;
-
-// -------------- Helper functions ----------------------------//
-
-utilities::vis_params random_measurements(t_int size) {
-  std::stringstream filename;
-  filename << "random_" << size << ".vis";
-  std::string const vis_file = visibility_filename(filename.str());
-  std::ifstream vis_file_str(vis_file);
-
-  if (vis_file_str.good()) {
-    return utilities::read_visibility(vis_file, false);
-  }
-  else {
-    t_real const sigma_m = constant::pi / 3;
-    const t_real max_w = 100.; // lambda
-    auto uv_data = utilities::random_sample_density(size, 0, sigma_m, max_w);
-    uv_data.units = "radians";
-    utilities::write_visibility(uv_data, vis_file);
-    return uv_data;
-  }
-}
 
 
 // -------------- Constructor benchmark -------------------------//
@@ -43,7 +19,7 @@ void degrid_operator_ctor(benchmark::State &state) {
   t_int const rows = state.range(0);
   t_int const cols = state.range(0);
   t_int const number_of_vis = state.range(1);
-  auto uv_data = random_measurements(number_of_vis);
+  auto uv_data = b_utilities::random_measurements(number_of_vis);
 
   const t_real FoV = 1;      // deg
   const t_real cellsize = FoV / cols * 60. * 60.;
@@ -85,7 +61,7 @@ public:
     
     // Generating random uv(w) coverage
     t_int const number_of_vis = state.range(1);
-    m_uv_data = random_measurements(number_of_vis);
+    m_uv_data = b_utilities::random_measurements(number_of_vis);
     
     // Create measurement operator
     const t_real FoV = 1;      // deg
