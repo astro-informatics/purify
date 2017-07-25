@@ -41,17 +41,19 @@ namespace b_utilities {
     std::string const vis_file = visibility_filename(filename.str());
     std::ifstream vis_file_str(vis_file);
 
+    utilities::vis_params uv_data;
     if (vis_file_str.good()) {
-      return utilities::read_visibility(vis_file, false);
+      uv_data = utilities::read_visibility(vis_file, false);
+      uv_data.units = "radians";
     }
     else {
       t_real const sigma_m = constant::pi / 3;
       const t_real max_w = 100.; // lambda
-      auto uv_data = utilities::random_sample_density(size, 0, sigma_m, max_w);
+      uv_data = utilities::random_sample_density(size, 0, sigma_m, max_w);
       uv_data.units = "radians";
       utilities::write_visibility(uv_data, vis_file);
-      return uv_data;
     }
+    return uv_data;
   }
 
   utilities::vis_params random_measurements(t_int size, sopt::mpi::Communicator const &comm) {
