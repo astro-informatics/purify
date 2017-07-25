@@ -199,25 +199,31 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointMPI)(benchmark::State &state
 BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, CtorDistr)
 ->Apply(b_utilities::Arguments)
 ->UseManualTime()
+->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, DirectDistr)->Apply(b_utilities::Arguments)
 ->UseManualTime()
+->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, AdjointDistr)->Apply(b_utilities::Arguments)
 ->UseManualTime()
+->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, CtorMPI)
 ->Apply(b_utilities::Arguments)
 ->UseManualTime()
+->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, DirectMPI)->Apply(b_utilities::Arguments)
 ->UseManualTime()
+->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, AdjointMPI)->Apply(b_utilities::Arguments)
 ->UseManualTime()
+->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMicrosecond);

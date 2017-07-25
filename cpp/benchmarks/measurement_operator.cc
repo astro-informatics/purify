@@ -41,6 +41,7 @@ void degrid_operator_ctor(benchmark::State &state) {
 BENCHMARK(degrid_operator_ctor)
 ->Apply(b_utilities::Arguments)
 ->UseManualTime()
+->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMillisecond);
 
 
@@ -113,10 +114,12 @@ BENCHMARK_DEFINE_F(DegridOperatorFixture, Adjoint)(benchmark::State &state) {
 
 BENCHMARK_REGISTER_F(DegridOperatorFixture, Direct)->Apply(b_utilities::Arguments)
 ->UseManualTime()
+->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorFixture, Adjoint)->Apply(b_utilities::Arguments)
 ->UseManualTime()
+->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMicrosecond);
 
 
