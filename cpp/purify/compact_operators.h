@@ -40,7 +40,10 @@ namespace purify {
             cellx, celly, energy_chirp_fraction, energy_kernel_fraction);
         const DistributeSparseVector distributor(interpolation_matrix, comm);
         interpolation_matrix = purify::compress_outer(interpolation_matrix);
-        const Sparse<t_complex> GTG = interpolation_matrix.adjoint() * interpolation_matrix;
+        Sparse<t_complex> GTG = interpolation_matrix.adjoint() * interpolation_matrix;
+        GTG.prune([&](const t_uint &i, const t_uint &j, const t_complex &value) {
+            return std::abs(value) > 1e-12;
+            });
 
         return [=](T &output, const T &input) {
           if(comm.is_root()) {
@@ -104,8 +107,11 @@ namespace purify {
         const Sparse<t_complex> interpolation_matrix = details::init_gridding_matrix_2d(
             u, v, w, weights, imsizey_, imsizex_, oversample_ratio, kernelu, kernelv, Ju, Jv, w_term,
             cellx, celly, energy_chirp_fraction, energy_kernel_fraction);
-        const Sparse<t_complex> GTG = interpolation_matrix.adjoint() * interpolation_matrix;
+        Sparse<t_complex> GTG = interpolation_matrix.adjoint() * interpolation_matrix;
 
+        GTG.prune([&](const t_uint &i, const t_uint &j, const t_complex &value) {
+            return std::abs(value) > 1e-12;
+            });
         return [=](T &output, const T &input) { output = utilities::sparse_multiply_matrix(GTG, input); };
       }
 

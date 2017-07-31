@@ -31,7 +31,10 @@ namespace purify {
           const Sparse<t_complex> interpolation_matrix = purify::details::init_gridding_matrix_2d(
               u, v, w, weights, imsizey_, imsizex_, oversample_ratio, kernelu, kernelv, Ju, Jv, w_term,
               cellx, celly, energy_chirp_fraction, energy_kernel_fraction);
-          const Sparse<t_complex> gtg = interpolation_matrix.adjoint() * interpolation_matrix;
+          Sparse<t_complex> gtg = interpolation_matrix.adjoint() * interpolation_matrix;
+          gtg.prune([&](const t_uint &i, const t_uint &j, const t_complex &value) {
+              return std::abs(value) > 1e-12;
+              });
           const af::array GTG = gpu::init_af_G_2d(gtg);
           return [GTG](af::array &output, const af::array &input) { output = af::matmul(GTG, input); };
         }
@@ -55,7 +58,10 @@ namespace purify {
               cellx, celly, energy_chirp_fraction, energy_kernel_fraction);
           const DistributeSparseVector distributor(interpolation_matrix, comm);
           interpolation_matrix = purify::compress_outer(interpolation_matrix);
-          const Sparse<t_complex> gTg = interpolation_matrix.adjoint() * interpolation_matrix;
+          Sparse<t_complex> gTg = interpolation_matrix.adjoint() * interpolation_matrix;
+          gTg.prune([&](const t_uint &i, const t_uint &j, const t_complex &value) {
+              return std::abs(value) > 1e-12;
+              });
           const af::array GTG = gpu::init_af_G_2d(gTg);
           const sopt::OperatorFunction<af::array> directGgpu
             = [GTG](af::array &output, const af::array &input) { output = af::matmul(GTG, input); };
