@@ -63,7 +63,7 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, CtorDistr)(benchmark::State &state)
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        world, uv_data, m_rows, m_cols, m_cellsize, m_cellsize, 2, 100, 0.0001, "kb", state.range(2), state.range(2),
+        world, uv_data, m_rows, m_cols, m_cellsize, m_cellsize, 2, 0, 0.0001, "kb", state.range(2), state.range(2),
         "measure", m_w_term);
     auto end = std::chrono::high_resolution_clock::now();
 
@@ -82,7 +82,7 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, CtorMPI)(benchmark::State &state) {
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     auto const sky_measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-        world, uv_data, m_rows, m_cols, m_cellsize, m_cellsize, 2, 100, 0.0001, "kb", state.range(2), state.range(2),
+        world, uv_data, m_rows, m_cols, m_cellsize, m_cellsize, 2, 0, 0.0001, "kb", state.range(2), state.range(2),
         "measure", m_w_term);
     auto end = std::chrono::high_resolution_clock::now();
 
@@ -104,7 +104,7 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectDistr)(benchmark::State &stat
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>>  degridOperator =
     std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      world, uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 100, 0.0001, "kb", state.range(2), state.range(2),
+      world, uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 0, 0.0001, "kb", state.range(2), state.range(2),
       "measure", m_w_term));
 
   // Benchmark the application of the distributed operator
@@ -128,7 +128,7 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointDistr)(benchmark::State &sta
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>>  degridOperator =
     std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      world, uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 100, 0.0001, "kb", state.range(2), state.range(2),
+      world, uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 0, 0.0001, "kb", state.range(2), state.range(2),
       "measure", m_w_term));
   
   // Benchmark the application of the adjoint distributed operator
@@ -153,7 +153,7 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectMPI)(benchmark::State &state)
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>>  degridOperator =
     std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
       measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-      world, uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 100, 0.0001, "kb", state.range(2), state.range(2),
+      world, uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 0, 0.0001, "kb", state.range(2), state.range(2),
       "measure", m_w_term));
 
   // Benchmark the application of the distributed MPI operator
@@ -177,7 +177,7 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointMPI)(benchmark::State &state
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>>  degridOperator =
     std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
       measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-      world, uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 100, 0.0001, "kb", state.range(2), state.range(2),
+      world, uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 0, 0.0001, "kb", state.range(2), state.range(2),
       "measure", m_w_term));
   
   // Benchmark the application of the adjoint distributed MPI operator

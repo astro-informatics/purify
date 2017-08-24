@@ -1,6 +1,6 @@
 #!/bin/bash -l
 #$ -S /bin/bash
-#$ -l h_rt=0:10:0
+#$ -l h_rt=12:0:0
 #$ -l mem=1G
 
 # Run jobs on XYZ nodes reserved only for this job, so that we can compare benchmark results.
