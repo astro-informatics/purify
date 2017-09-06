@@ -10,6 +10,9 @@
 # Request TMPDIR space (default is 10 GB)
 #$ -l tmpfs=1G
 
+# Select 12 threads - for XYZ nodes
+#$ -pe smp 12
+
 # Set the working directory to somewhere in your scratch space.  This is
 # a necessary step as compute nodes cannot write to $HOME.
 #$ -wd /home/cceaiac/Scratch/purify

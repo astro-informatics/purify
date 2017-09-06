@@ -43,7 +43,7 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
   Sparse<t_complex> interpolation_matrix(rows, cols);
   interpolation_matrix.reserve(Vector<t_int>::Constant(rows, Ju * Jv));
 
-#pragma omp simd collapse(3)
+#pragma omp parallel for collapse(3)
   for(t_int m = 0; m < rows; ++m) {
     for(t_int ju = 1; ju <= Ju; ++ju) {
       for(t_int jv = 1; jv <= Jv; ++jv) {
@@ -221,7 +221,7 @@ init_zero_padding_2d(const Image<t_real> &S, const t_real &oversample_ratio) {
   auto direct = [=](T &output, const T &x) {
     assert(x.size() == imsizex_ * imsizey_);
     output = Vector<t_complex>::Zero(ftsizeu_ * ftsizev_);
-#pragma omp simd collapse(2)
+#pragma omp parallel for collapse(2)
     for(t_uint j = 0; j < imsizey_; j++) {
       for(t_uint i = 0; i < imsizex_; i++) {
         const t_uint input_index = utilities::sub2ind(j, i, imsizey_, imsizex_);
@@ -234,7 +234,7 @@ init_zero_padding_2d(const Image<t_real> &S, const t_real &oversample_ratio) {
   auto indirect = [=](T &output, const T &x) {
     assert(x.size() == ftsizeu_ * ftsizev_);
     output = T::Zero(imsizey_ * imsizex_);
-#pragma omp simd collapse(2)
+#pragma omp parallel for collapse(2)
     for(t_uint j = 0; j < imsizey_; j++) {
       for(t_uint i = 0; i < imsizex_; i++) {
         const t_uint output_index = utilities::sub2ind(j, i, imsizey_, imsizex_);
