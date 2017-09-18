@@ -30,8 +30,6 @@ public:
     m_image = m_image * 1. / max;
 
     // Data needed for the creation of the measurement operator
-    m_rows = state.range(0);
-    m_cols = state.range(0);
     m_number_of_vis = state.range(1);
     const t_real FoV = 1;      // deg
     m_cellsize = FoV / m_imsizex * 60. * 60.;
@@ -44,8 +42,6 @@ public:
   Image<t_complex> m_image;
   t_uint m_imsizex;
   t_uint m_imsizey;
-  t_int m_rows;
-  t_int m_cols;
   t_int m_number_of_vis;
   t_real m_cellsize;
   bool m_w_term;
@@ -63,14 +59,14 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, CtorDistr)(benchmark::State &state)
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        world, uv_data, m_rows, m_cols, m_cellsize, m_cellsize, 2, 0, 0.0001, "kb", state.range(2), state.range(2),
+        world, uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 0, 0.0001, "kb", state.range(2), state.range(2),
         "measure", m_w_term);
     auto end = std::chrono::high_resolution_clock::now();
 
     state.SetIterationTime(b_utilities::duration(start,end,world));
   }
 
-  state.SetBytesProcessed(int64_t(state.iterations()) * (m_number_of_vis + m_rows * m_cols) * sizeof(t_complex));
+  state.SetBytesProcessed(int64_t(state.iterations()) * (m_number_of_vis + m_imsizex * m_imsizey) * sizeof(t_complex));
 }
 
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, CtorMPI)(benchmark::State &state) {
@@ -82,14 +78,14 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, CtorMPI)(benchmark::State &state) {
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     auto const sky_measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-        world, uv_data, m_rows, m_cols, m_cellsize, m_cellsize, 2, 0, 0.0001, "kb", state.range(2), state.range(2),
+        world, uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 0, 0.0001, "kb", state.range(2), state.range(2),
         "measure", m_w_term);
     auto end = std::chrono::high_resolution_clock::now();
 
     state.SetIterationTime(b_utilities::duration(start,end,world));
   }
 
-  state.SetBytesProcessed(int64_t(state.iterations()) * (m_number_of_vis + m_rows * m_cols) * sizeof(t_complex));
+  state.SetBytesProcessed(int64_t(state.iterations()) * (m_number_of_vis + m_imsizex * m_imsizey) * sizeof(t_complex));
 }
 
 
@@ -197,33 +193,43 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointMPI)(benchmark::State &state
 // -------------- Register benchmarks -------------------------//
 
 BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, CtorDistr)
-->Apply(b_utilities::Arguments)
+//->Apply(b_utilities::Arguments)
+->Args({1024,1000000,4})->Args({1024,10000000,4})
 ->UseManualTime()
-->Repetitions(10)->ReportAggregatesOnly(true)
+->Repetitions(10)//->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMillisecond);
 
-BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, DirectDistr)->Apply(b_utilities::Arguments)
+BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, DirectDistr)
+//->Apply(b_utilities::Arguments)
+->Args({1024,1000000,4})->Args({1024,10000000,4})
 ->UseManualTime()
-->Repetitions(10)->ReportAggregatesOnly(true)
-->Unit(benchmark::kMicrosecond);
+->Repetitions(10)//->ReportAggregatesOnly(true)
+->Unit(benchmark::kMillisecond);
 
-BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, AdjointDistr)->Apply(b_utilities::Arguments)
+BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, AdjointDistr)
+//->Apply(b_utilities::Arguments)
+->Args({1024,1000000,4})->Args({1024,10000000,4})
 ->UseManualTime()
-->Repetitions(10)->ReportAggregatesOnly(true)
-->Unit(benchmark::kMicrosecond);
+->Repetitions(10)//->ReportAggregatesOnly(true)
+->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, CtorMPI)
-->Apply(b_utilities::Arguments)
+//->Apply(b_utilities::Arguments)
+->Args({1024,1000000,4})->Args({1024,10000000,4})
 ->UseManualTime()
 ->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMillisecond);
 
-BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, DirectMPI)->Apply(b_utilities::Arguments)
+BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, DirectMPI)
+//->Apply(b_utilities::Arguments)
+->Args({1024,1000000,4})->Args({1024,10000000,4})
 ->UseManualTime()
-->Repetitions(10)->ReportAggregatesOnly(true)
-->Unit(benchmark::kMicrosecond);
+->Repetitions(10)//->ReportAggregatesOnly(true)
+->Unit(benchmark::kMillisecond);
 
-BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, AdjointMPI)->Apply(b_utilities::Arguments)
+BENCHMARK_REGISTER_F(DegridOperatorFixtureMPI, AdjointMPI)
+//->Apply(b_utilities::Arguments)
+->Args({1024,1000000,4})->Args({1024,10000000,4})
 ->UseManualTime()
-->Repetitions(10)->ReportAggregatesOnly(true)
-->Unit(benchmark::kMicrosecond);
+->Repetitions(10)//->ReportAggregatesOnly(true)
+->Unit(benchmark::kMillisecond);

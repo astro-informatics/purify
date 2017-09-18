@@ -39,7 +39,8 @@ void degrid_operator_ctor(benchmark::State &state) {
 }
 
 BENCHMARK(degrid_operator_ctor)
-->Apply(b_utilities::Arguments)
+//->Apply(b_utilities::Arguments)
+->Args({1024,1000000,4})->Args({1024,10000000,4})
 ->UseManualTime()
 ->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMillisecond);
@@ -51,27 +52,37 @@ class DegridOperatorFixture : public ::benchmark::Fixture
 {
 public:
   void SetUp(const ::benchmark::State& state) {
+    bool newImage = m_imsizex!=state.range(0);
+    bool newMeasurements = m_uv_data.vis.size()!=state.range(1);
+    bool newKernel = m_kernel!=state.range(2);
+    
     // Reading image from file
-    const std::string &name = "M31_"+std::to_string(state.range(0));
-    std::string const fitsfile = image_filename(name + ".fits");
-    m_image = pfitsio::read2d(fitsfile);
-    m_imsizex = m_image.cols();
-    m_imsizey = m_image.rows();
-    t_real const max = m_image.array().abs().maxCoeff();
-    m_image = m_image * 1. / max;
+    if (newImage) {
+      const std::string &name = "M31_"+std::to_string(state.range(0));
+      std::string const fitsfile = image_filename(name + ".fits");
+      m_image = pfitsio::read2d(fitsfile);
+      m_imsizex = m_image.cols();
+      m_imsizey = m_image.rows();
+      t_real const max = m_image.array().abs().maxCoeff();
+      m_image = m_image * 1. / max;
+    }
     
     // Generating random uv(w) coverage
-    t_int const number_of_vis = state.range(1);
-    m_uv_data = b_utilities::random_measurements(number_of_vis);
+    if (newMeasurements) {
+      m_uv_data = b_utilities::random_measurements(state.range(1));
+    }
     
     // Create measurement operator
-    const t_real FoV = 1;      // deg
-    const t_real cellsize = FoV / m_imsizex * 60. * 60.;
-    const bool w_term = false;
-    m_degridOperator = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
-      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, "kb", state.range(2), state.range(2),
+    if (newImage || newMeasurements || newKernel) {
+      const t_real FoV = 1;      // deg
+      const t_real cellsize = FoV / m_imsizex * 60. * 60.;
+      const bool w_term = false;
+      m_kernel = state.range(2);
+      m_degridOperator = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
+          measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+	  m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, "kb", m_kernel, m_kernel,
           "measure", w_term));
+	  }
   }
 
   void TearDown(const ::benchmark::State& state) {
@@ -81,17 +92,20 @@ public:
   t_uint m_imsizex;
   t_uint m_imsizey;
   utilities::vis_params m_uv_data;
+  t_uint m_kernel;
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> m_degridOperator;
 };
 
 
 BENCHMARK_DEFINE_F(DegridOperatorFixture, Direct)(benchmark::State &state) {
   // Benchmark the application of the operator
+  utilities::vis_params theMeasurement;
+  theMeasurement.vis = (*m_degridOperator) *  Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
+
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
-    m_uv_data.vis = (*m_degridOperator) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
+    theMeasurement.vis = (*m_degridOperator) *  Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
     auto end   = std::chrono::high_resolution_clock::now();
-
     state.SetIterationTime(b_utilities::duration(start,end));
   }
   
@@ -101,26 +115,31 @@ BENCHMARK_DEFINE_F(DegridOperatorFixture, Direct)(benchmark::State &state) {
 BENCHMARK_DEFINE_F(DegridOperatorFixture, Adjoint)(benchmark::State &state) {
   // Benchmark the application of the adjoint operator
   Vector<t_complex> theImage(m_image.size());
-  while(state.KeepRunning()) {
+  theImage = m_degridOperator->adjoint() * m_uv_data.vis;
+  
+   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     theImage = m_degridOperator->adjoint() * m_uv_data.vis;
-    auto end   = std::chrono::high_resolution_clock::now();
-    
+    auto end   = std::chrono::high_resolution_clock::now();   
     state.SetIterationTime(b_utilities::duration(start,end));
   }
   
   state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizey * m_imsizex) * sizeof(t_complex));
 }
 
-BENCHMARK_REGISTER_F(DegridOperatorFixture, Direct)->Apply(b_utilities::Arguments)
+BENCHMARK_REGISTER_F(DegridOperatorFixture, Direct)
+//->Apply(b_utilities::Arguments)
+->Args({1024,1000000,4})->Args({1024,10000000,4})
 ->UseManualTime()
 ->Repetitions(10)->ReportAggregatesOnly(true)
-->Unit(benchmark::kMicrosecond);
+->Unit(benchmark::kMillisecond);
 
-BENCHMARK_REGISTER_F(DegridOperatorFixture, Adjoint)->Apply(b_utilities::Arguments)
+BENCHMARK_REGISTER_F(DegridOperatorFixture, Adjoint)
+//->Apply(b_utilities::Arguments)
+->Args({1024,1000000,4})->Args({1024,10000000,4})
 ->UseManualTime()
 ->Repetitions(10)->ReportAggregatesOnly(true)
-->Unit(benchmark::kMicrosecond);
+->Unit(benchmark::kMillisecond);
 
 
 
