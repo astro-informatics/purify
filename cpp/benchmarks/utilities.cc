@@ -51,7 +51,7 @@ namespace b_utilities {
   }
 
   bool updateTempImage(t_uint newSize, Vector<t_complex>& image) {
-    if (image.size()==newSize) {
+    if (image.size()==newSize*newSize) {
       return false;
     }
     image.resize(newSize*newSize);

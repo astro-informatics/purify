@@ -85,6 +85,9 @@ class DegridOperatorFixtureMPI : public ::benchmark::Fixture
 {
 public:
   void SetUp(const ::benchmark::State& state) {
+    // Keep count of the benchmark repetitions
+    m_counter++;
+
     // Reading image from file and create temporary image
     bool newImage = b_utilities::updateImage(state.range(0), m_image, m_imsizex, m_imsizey);
     newImage = b_utilities::updateTempImage(state.range(0), m_temp_image);
@@ -114,6 +117,7 @@ public:
   void TearDown(const ::benchmark::State& state) {
   }
 
+  t_uint m_counter;
   sopt::mpi::Communicator m_world;
   t_uint m_kernel;
 
@@ -134,7 +138,9 @@ public:
 
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectDistr)(benchmark::State &state) {
   // Benchmark the application of the distributed operator
-  m_temp_uv_data.vis = (*m_degridOperatorDistr) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
+  if ((m_counter%10)==1) {
+    m_temp_uv_data.vis = (*m_degridOperatorDistr) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
+  }
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     m_temp_uv_data.vis = (*m_degridOperatorDistr) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
@@ -147,7 +153,9 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectDistr)(benchmark::State &stat
 
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointDistr)(benchmark::State &state) {
   // Benchmark the application of the adjoint distributed operator
-  m_temp_image = m_degridOperatorDistr->adjoint() * m_uv_data.vis;
+  if ((m_counter%10)==1) {
+    m_temp_image = m_degridOperatorDistr->adjoint() * m_uv_data.vis;
+  }
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     m_temp_image = m_degridOperatorDistr->adjoint() * m_uv_data.vis;
@@ -160,7 +168,9 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointDistr)(benchmark::State &sta
 
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectMPI)(benchmark::State &state) {
   // Benchmark the application of the distributed MPI operator
-  m_temp_uv_data.vis = (*m_degridOperatorMPI) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
+  if ((m_counter%10)==1) {
+    m_temp_uv_data.vis = (*m_degridOperatorMPI) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
+  }
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     m_temp_uv_data.vis = (*m_degridOperatorMPI) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
@@ -173,7 +183,9 @@ BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, DirectMPI)(benchmark::State &state)
 
 BENCHMARK_DEFINE_F(DegridOperatorFixtureMPI, AdjointMPI)(benchmark::State &state) {
   // Benchmark the application of the adjoint distributed MPI operator
-  m_temp_image = m_degridOperatorMPI->adjoint() * m_uv_data.vis;
+  if ((m_counter%10)==1) {
+    m_temp_image = m_degridOperatorMPI->adjoint() * m_uv_data.vis;
+  }
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     m_temp_image = m_degridOperatorMPI->adjoint() * m_uv_data.vis;
