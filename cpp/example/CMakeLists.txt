@@ -1,6 +1,6 @@
 include(AddExample)
 
-include_directorieS(SYSTEM ${Sopt_INCLUDE_DIRS})
+include_directories(SYSTEM ${Sopt_INCLUDE_DIRS})
 include_directories("${PROJECT_SOURCE_DIR}/cpp")
 
 add_example(gridding LIBRARIES libpurify)
@@ -13,16 +13,21 @@ add_example(sdmm_vla LIBRARIES libpurify NOTEST)
 
 add_example(resample LIBRARIES libpurify)
 
+add_example(show_image LIBRARIES libpurify)
 add_example(sdmm_m31_simulation LIBRARIES libpurify NOTEST)
 
 add_example(padmm_simulation LIBRARIES libpurify NOTEST)
 add_example(padmm_reweighted_simulation LIBRARIES libpurify NOTEST)
 
 add_example(padmm_random_coverage LIBRARIES libpurify NOTEST )
-target_compile_definitions(example_padmm_random_coverage PRIVATE PURIFY_GPU)
+target_compile_definitions(example_padmm_random_coverage PRIVATE PURIFY_GPU=0)
+add_example(fb_random_coverage LIBRARIES libpurify NOTEST )
+target_compile_definitions(example_fb_random_coverage PRIVATE PURIFY_GPU=0)
 if(PURIFY_ARRAYFIRE)
-  add_example(padmm_random_coverage_gpu padmm_random_coverage.cc LIBRARIES libpurify NOTEST )
+  add_example(padmm_random_coverage_gpu padmm_random_coverage.cc LIBRARIES libpurify NOTEST)
   target_compile_definitions(example_padmm_random_coverage_gpu PRIVATE PURIFY_GPU=1)
+  add_example(fb_random_coverage_gpu fb_random_coverage.cc LIBRARIES libpurify NOTEST)
+  target_compile_definitions(example_fb_random_coverage_gpu PRIVATE PURIFY_GPU=1)
 endif()
 if(PURIFY_MPI)
   add_example(global_epsilon_replicated_grids padmm_mpi_random_coverage.cc NOTEST
