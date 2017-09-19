@@ -17,6 +17,11 @@ namespace b_utilities {
   double duration(std::chrono::high_resolution_clock::time_point start, std::chrono::high_resolution_clock::time_point end,
                   sopt::mpi::Communicator const &comm);
 
+  bool updateImage(t_uint newSize, Image<t_complex>& image, t_uint& sizex, t_uint& sizey);
+  bool updateTempImage(t_uint newSize, Vector<t_complex>& image);
+  bool updateMeasurements(t_uint newSize, utilities::vis_params& data);
+  bool updateMeasurements(t_uint newSize, utilities::vis_params& data, sopt::mpi::Communicator& comm);
+  
   utilities::vis_params random_measurements(t_int size);
   utilities::vis_params random_measurements(t_int size, sopt::mpi::Communicator const &comm);
 

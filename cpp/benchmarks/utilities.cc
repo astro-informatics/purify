@@ -1,6 +1,7 @@
 #include <sstream>
 #include <fstream>
 #include "purify/directories.h"
+#include "purify/pfitsio.h"
 #include "purify/distribute.h"
 #include "purify/mpi_utilities.h"
 #include <benchmarks/utilities.h>
@@ -32,6 +33,46 @@ namespace b_utilities {
     // Now get the max time across all procs: the slowest processor is the one that is
     // holding back the others in the benchmark.
     return comm.all_reduce(elapsed_seconds, MPI_MAX);
+  }
+
+
+  bool updateImage(t_uint newSize, Image<t_complex>& image, t_uint& sizex, t_uint& sizey) {
+    if (sizex==newSize) {
+      return false;
+    }
+    const std::string &name = "M31_"+std::to_string(newSize);
+    std::string const fitsfile = image_filename(name + ".fits");
+    image = pfitsio::read2d(fitsfile);
+    sizex = image.cols();
+    sizey = image.rows();
+    t_real const max = image.array().abs().maxCoeff();
+    image = image * 1. / max;
+    return true;
+  }
+
+  bool updateTempImage(t_uint newSize, Vector<t_complex>& image) {
+    if (image.size()==newSize) {
+      return false;
+    }
+    image.resize(newSize*newSize);
+    return true;
+  }
+
+  bool updateMeasurements(t_uint newSize, utilities::vis_params& data) {
+    if (data.vis.size()==newSize) {
+      return false;
+    }
+    data = b_utilities::random_measurements(newSize);
+    return true;
+  }
+
+  bool updateMeasurements(t_uint newSize, utilities::vis_params& data, sopt::mpi::Communicator& comm) {
+    if (data.vis.size()==newSize) {
+      return false;
+    }
+    comm = sopt::mpi::Communicator::World();
+    data = b_utilities::random_measurements(newSize,comm);
+    return true;
   }
 
 
