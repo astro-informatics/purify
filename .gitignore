@@ -14,3 +14,4 @@ ipython-*.log
 .clang-tidy
 *.png
 *.pdf
+*~

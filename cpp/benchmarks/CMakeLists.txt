@@ -1,6 +1,7 @@
 include_directories("${PROJECT_SOURCE_DIR}/cpp" "${CMAKE_CURRENT_BINARY_DIR}/include")
 
 add_benchmark(measurement_operator utilities.cc LIBRARIES libpurify)
+add_benchmark(padmm utilities.cc LIBRARIES libpurify)
 
 if(dompi)
   add_executable(mpi_benchmarks main.cc utilities.cc measurement_operator_mpi.cc)

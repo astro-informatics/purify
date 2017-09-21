@@ -104,7 +104,7 @@ MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real> &u, const 
   Sparse<t_complex> interpolation_matrix(rows, cols);
   interpolation_matrix.reserve(Vector<t_int>::Constant(rows, Ju * Jv));
 
-#pragma omp simd collapse(3)
+#pragma omp parallel for collapse(3)
   for(t_int m = 0; m < rows; ++m) {
     // I should write this as a tensor product! It would reduce the number of calculations of
     // kernelu and kernelv.
