@@ -118,10 +118,12 @@ t_real power_method(const sopt::LinearTransform<T> &op, const t_uint &niters,
   for(t_int i = 0; i < niters; ++i) {
     estimate_eigen_vector = op.adjoint() * (op * estimate_eigen_vector);
     estimate_eigen_value = estimate_eigen_vector.matrix().norm();
-    if(estimate_eigen_value != estimate_eigen_value)
-      throw std::runtime_error("Error in measurement operator or data corrupted.");
-    estimate_eigen_vector = estimate_eigen_vector / estimate_eigen_value;
     PURIFY_DEBUG("Iteration: {}, norm = {}", i + 1, estimate_eigen_value);
+    if(estimate_eigen_value <= 0)
+      throw std::runtime_error("Error in operator.");
+    if(estimate_eigen_value != estimate_eigen_value)
+      throw std::runtime_error("Error in operator or data corrupted.");
+    estimate_eigen_vector = estimate_eigen_vector / estimate_eigen_value;
     if(relative_difference * relative_difference
        > std::abs(old_value - estimate_eigen_value) / old_value) {
       old_value = estimate_eigen_value;
@@ -568,6 +570,70 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
                                         energy_chirp_fraction, energy_kernel_fraction);
 }
 #endif
+
+template <class T, class... ARGS>
+std::shared_ptr<sopt::LinearTransform<T> const>
+init_combine_operators(const std::vector<std::shared_ptr<sopt::LinearTransform<T>>> &measure_op,
+                       const std::vector<std::tuple<t_uint, t_uint>> seg) {
+  const auto direct = [=](T &output, const T &input) {
+    for(t_uint i = 0; i < measure_op.size(); i++)
+      output.segment(std::get<0>(seg.at(i)), std::get<1>(seg.at(i))) = *(measure_op.at(i)) * input;
+  };
+  const auto indirect = [=](T &output, const T &input) {
+    for(t_uint i = 0; i < measure_op.size(); i++)
+      output += measure_op.at(i)->adjoint()
+                * input.segment(std::get<0>(seg.at(i)), std::get<1>(seg.at(i)));
+  };
+  return std::make_shared<sopt::LinearTransform<T> const>(direct, indirect);
+}
+//! combines different uv_data sets and creates a super measurement operator out of multiple
+//! measurement operators
+template <class T, class... ARGS>
+std::shared_ptr<sopt::LinearTransform<T> const> init_super_operator(
+    const std::function<std::shared_ptr<sopt::LinearTransform<T> const>> &create_operator,
+    const std::vector<utilities::vis_params const> &uv_vis_data, ARGS &&... args) {
+  std::vector<std::shared_ptr<sopt::LinearTransform<T>>> measure_ops[uv_vis_data.size()];
+  std::vector<std::tuple<t_uint, t_uint>> seg(uv_vis_data.size());
+  t_uint total_measure = 0;
+  for(t_int i = 0; i < measure_ops.size(); i++) {
+    measure_ops[i] = create_operator(uv_vis_data.at(i), std::forward<ARGS>(args)...);
+    seg.emplace_back(total_measure, uv_vis_data.at(i).vis.size());
+    total_measure += uv_vis_data.at(i).vis.size();
+  }
+  return init_combine_operators(measure_ops, seg);
+}
+
+template <class T, class... ARGS>
+std::shared_ptr<sopt::LinearTransform<T> const> init_super_operator(
+    const std::function<std::shared_ptr<sopt::LinearTransform<T> const>> &create_operator,
+    const std::vector<std::tuple<t_uint, t_uint>> &seg, const utilities::vis_params &uv_vis_data,
+    ARGS &&... args) {
+  std::vector<utilities::vis_params const> uv_vis_datas(seg.size());
+  for(t_uint i = 0; i < seg.size(); i++) {
+    uv_vis_datas.emplace_back(uv_vis_data.segment(std::get<0>(seg.at(i)), std::get<1>(seg.at(i))));
+  }
+  return init_super_operator(create_operator, uv_vis_datas, std::forward<ARGS>(args)...);
+}
+template <class T, class... ARGS>
+std::shared_ptr<sopt::LinearTransform<T> const> init_super_operator(
+    const std::function<std::shared_ptr<sopt::LinearTransform<T> const>> &create_operator,
+    const utilities::vis_params &uv_vis_data, const t_uint &seg_num, ARGS &&... args) {
+  if(seg_num == 0)
+    throw std::runtime_error("Number of segments = 0");
+  std::vector<std::tuple<t_uint, t_uint>> seg(seg_num);
+  const t_uint segment
+      = std::floor(static_cast<t_real>(uv_vis_data.size()) / static_cast<t_real>(seg_num));
+  t_uint total = 0;
+  for(t_uint i = 0; i < seg_num; i++) {
+    const t_uint delta = (i == (seg_num - 1)) ? (uv_vis_data.size() - total) : segment;
+    seg.emplace_back(total, delta);
+    total += delta;
+  }
+  if(total != uv_vis_data.size())
+    throw std::runtime_error("Segments do not sum to the total");
+  return init_super_operator(create_operator, uv_vis_data, seg, std::forward<ARGS>(args)...);
+}
+
 } // namespace measurementoperator
 }; // namespace purify
 #endif

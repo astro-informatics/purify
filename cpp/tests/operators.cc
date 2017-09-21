@@ -193,7 +193,6 @@ TEST_CASE("Operators") {
     const auto id = [](Vector<t_complex> &out, const Vector<t_complex> &in) { out = in; };
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
     auto const phiTphi_op = sopt::LinearTransform<Vector<t_complex>>({phiTphi, id});
-    PURIFY_LOW_LOG("Here... rrr");
     SECTION("Power Method") {
       auto op_norm = details::power_method<Vector<t_complex>>(
           phiTphi_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
