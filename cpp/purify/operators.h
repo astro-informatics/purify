@@ -149,12 +149,15 @@ init_gridding_matrix_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
                         const t_real &celly = 1, const t_real &energy_chirp_fraction = 1,
                         const t_real &energy_kernel_fraction = 1) {
 
-  Sparse<t_complex> interpolation_matrix = details::init_gridding_matrix_2d(
+  Sparse<t_complex> interpolation_matrix_original = details::init_gridding_matrix_2d(
       u, v, w, weights, imsizey_, imsizex_, oversample_ratio, kernelu, kernelv, Ju, Jv, w_term,
       cellx, celly, energy_chirp_fraction, energy_kernel_fraction);
-  const DistributeSparseVector distributor(interpolation_matrix, comm);
-  interpolation_matrix = purify::compress_outer(interpolation_matrix);
-  const Sparse<t_complex> adjoint = interpolation_matrix.adjoint();
+  const DistributeSparseVector distributor(interpolation_matrix_original, comm);
+  const std::shared_ptr<const Sparse<t_complex>> interpolation_matrix
+      = std::make_shared<const Sparse<t_complex>>(
+          purify::compress_outer(interpolation_matrix_original));
+  const std::shared_ptr<const Sparse<t_complex>> adjoint
+      = std::make_shared<const Sparse<t_complex>>(interpolation_matrix->adjoint());
 
   return std::make_tuple(
       [=](T &output, const T &input) {
@@ -164,13 +167,13 @@ init_gridding_matrix_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
         } else {
           distributor.scatter(output);
         }
-        output = utilities::sparse_multiply_matrix(interpolation_matrix, output);
+        output = utilities::sparse_multiply_matrix(*interpolation_matrix, output);
       },
       [=](T &output, const T &input) {
         if(not comm.is_root()) {
-          distributor.gather(utilities::sparse_multiply_matrix(adjoint, input));
+          distributor.gather(utilities::sparse_multiply_matrix(*adjoint, input));
         } else {
-          distributor.gather(utilities::sparse_multiply_matrix(adjoint, input), output);
+          distributor.gather(utilities::sparse_multiply_matrix(*adjoint, input), output);
         }
       });
 }
@@ -195,17 +198,19 @@ init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
                         const t_real &celly = 1, const t_real &energy_chirp_fraction = 1,
                         const t_real &energy_kernel_fraction = 1) {
 
-  const Sparse<t_complex> interpolation_matrix = details::init_gridding_matrix_2d(
-      u, v, w, weights, imsizey_, imsizex_, oversample_ratio, kernelu, kernelv, Ju, Jv, w_term,
-      cellx, celly, energy_chirp_fraction, energy_kernel_fraction);
-  const Sparse<t_complex> adjoint = interpolation_matrix.adjoint();
+  const std::shared_ptr<const Sparse<t_complex>> interpolation_matrix
+      = std::make_shared<const Sparse<t_complex>>(details::init_gridding_matrix_2d(
+          u, v, w, weights, imsizey_, imsizex_, oversample_ratio, kernelu, kernelv, Ju, Jv, w_term,
+          cellx, celly, energy_chirp_fraction, energy_kernel_fraction));
+  const std::shared_ptr<const Sparse<t_complex>> adjoint
+      = std::make_shared<const Sparse<t_complex>>(interpolation_matrix->adjoint());
 
   return std::make_tuple(
       [=](T &output, const T &input) {
-        output = utilities::sparse_multiply_matrix(interpolation_matrix, input);
+        output = utilities::sparse_multiply_matrix(*interpolation_matrix, input);
       },
       [=](T &output, const T &input) {
-        output = utilities::sparse_multiply_matrix(adjoint, input);
+        output = utilities::sparse_multiply_matrix(*adjoint, input);
       });
 }
 //! Construsts zero padding operator
@@ -342,16 +347,17 @@ base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
   std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(ftkernelu, ftkernelv, imsizey,
                                                               imsizex, oversample_ratio, ft_plan);
   sopt::OperatorFunction<T> directG, indirectG;
-  PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
-                    imsizey * celly / (60. * 60.));
+  if(w_term == true)
+    PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
+                      imsizey * celly / (60. * 60.));
   PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
-  PURIFY_MEDIUM_LOG("Kernel Support: {} x {}", Ju, Jv);
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
       u, v, w, weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv, w_term, cellx,
       celly, energy_chirp_fraction, energy_kernel_fraction);
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
+  PURIFY_LOW_LOG("Finished consturction of Φ.");
   return std::make_tuple(direct, indirect);
 }
 
@@ -375,16 +381,17 @@ base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_
   std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(ftkernelu, ftkernelv, imsizey,
                                                               imsizex, oversample_ratio, ft_plan);
   sopt::OperatorFunction<T> directG, indirectG;
-  PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
-                    imsizey * celly / (60. * 60.));
+  if(w_term == true)
+    PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
+                      imsizey * celly / (60. * 60.));
   PURIFY_LOW_LOG("Constructing Weighting and MPI Gridding Operators: WG");
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
-  PURIFY_MEDIUM_LOG("Kernel Support: {} x {}", Ju, Jv);
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
       comm, u, v, w, weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv, w_term,
       cellx, celly, energy_chirp_fraction, energy_kernel_fraction);
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
+  PURIFY_LOW_LOG("Finished consturction of Φ.");
   if(comm.is_root())
     return std::make_tuple(direct, indirect);
   else

@@ -103,11 +103,13 @@ init_af_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v,
       u, v, w, weights, imsizey_, imsizex_, oversample_ratio, kernelu, kernelv, Ju, Jv, w_term,
       cellx, celly, energy_chirp_fraction, energy_kernel_fraction);
   const Sparse<t_complex> adjoint = interpolation_matrix.adjoint();
-  const af::array G = gpu::init_af_G_2d(interpolation_matrix);
-  const af::array G_adjoint = gpu::init_af_G_2d(adjoint);
-  auto direct = [G](af::array &output, const af::array &input) { output = af::matmul(G, input); };
+  const std::shared_ptr<const af::array> G
+      = std::make_shared<const af::array>(gpu::init_af_G_2d(interpolation_matrix));
+  const std::shared_ptr<const af::array> G_adjoint
+      = std::make_shared<const af::array>(gpu::init_af_G_2d(adjoint));
+  auto direct = [G](af::array &output, const af::array &input) { output = af::matmul(*G, input); };
   auto indirect = [G_adjoint](af::array &output, const af::array &input) {
-    output = af::matmul(G_adjoint, input);
+    output = af::matmul(*G_adjoint, input);
   };
   return std::make_tuple(direct, indirect);
 }
@@ -132,13 +134,15 @@ init_af_gridding_matrix_2d(const sopt::mpi::Communicator &comm, const Vector<t_r
   const DistributeSparseVector distributor(interpolation_matrix, comm);
   interpolation_matrix = purify::compress_outer(interpolation_matrix);
   const Sparse<t_complex> adjoint = interpolation_matrix.adjoint();
-  const af::array G = gpu::init_af_G_2d(interpolation_matrix);
-  const af::array G_adjoint = gpu::init_af_G_2d(adjoint);
+  const std::shared_ptr<const af::array> G
+      = std::make_shared<const af::array>(gpu::init_af_G_2d(interpolation_matrix));
+  const std::shared_ptr<const af::array> G_adjoint
+      = std::make_shared<const af::array>(gpu::init_af_G_2d(adjoint));
   const sopt::OperatorFunction<af::array> directGgpu
-      = [G](af::array &output, const af::array &input) { output = af::matmul(G, input); };
+      = [G](af::array &output, const af::array &input) { output = af::matmul(*G, input); };
   const sopt::OperatorFunction<af::array> indirectGgpu
       = [G_adjoint](af::array &output, const af::array &input) {
-          output = af::matmul(G_adjoint, input);
+          output = af::matmul(*G_adjoint, input);
         };
   const sopt::OperatorFunction<Vector<t_complex>> directGhost
       = gpu::host_wrapper(directGgpu, interpolation_matrix.cols(), interpolation_matrix.rows());
