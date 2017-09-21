@@ -10,7 +10,7 @@ function(add_include_dir)
     if(NOT "${rel}" MATCHES "^\\.\\./")
       list(APPEND privates "${dir}")
     endif()
-  endforeach() 
+  endforeach()
   if(privates)
     include_directories(SYSTEM ${privates})
   endif()
@@ -21,7 +21,8 @@ add_include_dir(
   ${EIGEN3_INCLUDE_DIR}
   ${CFitsIO_INCLUDE_DIR}
   ${CCFits_INCLUDE_DIR}/..
-)
+  ${CImg_INCLUDE_DIR}
+  )
 
 add_subdirectory(purify)
 if(tests OR examples)
@@ -43,5 +44,5 @@ if(TARGET casacore::ms)
     EXPORT PurifyTargets
     DESTINATION share/cmake/Purify
     RUNTIME DESTINATION bin
-  )
+    )
 endif()
