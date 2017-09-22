@@ -7,7 +7,6 @@
 #include <sopt/mpi/communicator.h>
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 namespace b_utilities {
 
@@ -18,10 +17,17 @@ namespace b_utilities {
                   sopt::mpi::Communicator const &comm);
 
   bool updateImage(t_uint newSize, Image<t_complex>& image, t_uint& sizex, t_uint& sizey);
-  bool updateTempImage(t_uint newSize, Vector<t_complex>& image);
+  bool updateEmptyImage(t_uint newSize, Vector<t_complex>& image, t_uint& sizex, t_uint& sizey);
   bool updateMeasurements(t_uint newSize, utilities::vis_params& data);
   bool updateMeasurements(t_uint newSize, utilities::vis_params& data, sopt::mpi::Communicator& comm);
   
+  /*std::tuple<utilities::vis_params, t_real>
+    dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
+		       const std::tuple<bool, t_real> &w_term);
+  std::tuple<utilities::vis_params, t_real>
+    dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
+    const std::tuple<bool, t_real> &w_term, sopt::mpi::Communicator const &comm);*/
+
   utilities::vis_params random_measurements(t_int size);
   utilities::vis_params random_measurements(t_int size, sopt::mpi::Communicator const &comm);
 

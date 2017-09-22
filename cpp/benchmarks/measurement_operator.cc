@@ -1,14 +1,9 @@
 #include <chrono>
 #include <benchmark/benchmark.h>
-#include <sopt/imaging_padmm.h>
-#include <sopt/wavelets.h>
 #include "purify/operators.h"
-#include "purify/directories.h"
-#include "purify/pfitsio.h"
 #include "benchmarks/utilities.h"
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 
 // -------------- Constructor benchmark -------------------------//
@@ -57,7 +52,7 @@ public:
 
     // Reading image from file and create temporary image
     bool newImage = b_utilities::updateImage(state.range(0), m_image, m_imsizex, m_imsizey);
-    newImage = b_utilities::updateTempImage(state.range(0), m_temp_image);
+    newImage = b_utilities::updateEmptyImage(state.range(0), m_temp_image, m_imsizex, m_imsizey);
     
     // Generating random uv(w) coverage
     bool newMeasurements = b_utilities::updateMeasurements(state.range(1), m_uv_data);
@@ -72,7 +67,7 @@ public:
       m_kernel = state.range(2);
       m_degridOperator = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
           measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-	        m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, "kb", m_kernel, m_kernel,
+	  m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, "kb", m_kernel, m_kernel,
           "measure", w_term));
 	  }
   }
