@@ -1,4 +1,5 @@
 #include "purify/operators.h"
+#include "purify/compact_operators.h"
 #include "purify/config.h"
 #include <iostream>
 #include "catch.hpp"
@@ -38,10 +39,10 @@ TEST_CASE("Operators") {
   uv_vis.vis = Vector<t_complex>::Random(M);
   uv_vis.units = "pixel";
   MeasurementOperator expected_op(uv_vis, Ju, Jv, kernel, imsizex, imsizey, power_iters,
-                                  oversample_ratio);
+      oversample_ratio);
   std::function<t_real(t_real)> kbu, kbv, ftkbu, ftkbv;
   std::tie(kbu, kbv, ftkbu, ftkbv)
-      = create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
+    = create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
   SECTION("Gridding") {
     sopt::OperatorFunction<Vector<t_complex>> directG, indirectG;
     std::tie(directG, indirectG) = operators::init_gridding_matrix_2d<Vector<t_complex>>(
@@ -63,7 +64,7 @@ TEST_CASE("Operators") {
   }
   SECTION("Zero Padding") {
     const Image<t_real> S
-        = details::init_correction2d(oversample_ratio, imsizey, imsizex, ftkbu, ftkbv);
+      = details::init_correction2d(oversample_ratio, imsizey, imsizex, ftkbu, ftkbv);
     CHECK(imsizex == S.cols());
     CHECK(imsizey == S.rows());
     CHECK(S.cols() == expected_op.S.cols());
@@ -73,7 +74,7 @@ TEST_CASE("Operators") {
     REQUIRE(S.isApprox(expected_op.S, 1e-4));
     sopt::OperatorFunction<Vector<t_complex>> directZ, indirectZ;
     std::tie(directZ, indirectZ)
-        = operators::init_zero_padding_2d<Vector<t_complex>>(S, oversample_ratio);
+      = operators::init_zero_padding_2d<Vector<t_complex>>(S, oversample_ratio);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
     Vector<t_complex> direct_output;
     directZ(direct_output, direct_input);
@@ -86,7 +87,7 @@ TEST_CASE("Operators") {
   SECTION("FFT") {
     sopt::OperatorFunction<Vector<t_complex>> directFFT, indirectFFT;
     std::tie(directFFT, indirectFFT)
-        = operators::init_FFT_2d<Vector<t_complex>>(imsizey, imsizex, oversample_ratio, ft_plan);
+      = operators::init_FFT_2d<Vector<t_complex>>(imsizey, imsizex, oversample_ratio, ft_plan);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     Vector<t_complex> direct_output;
     directFFT(direct_output, direct_input);
@@ -103,10 +104,10 @@ TEST_CASE("Operators") {
   }
   SECTION("Weights") {
     MeasurementOperator weighted_expected_op(uv_vis, Ju, Jv, kernel, imsizex, imsizey, power_iters,
-                                             oversample_ratio, 1, 1, "natural", 0);
+        oversample_ratio, 1, 1, "natural", 0);
     sopt::OperatorFunction<Vector<t_complex>> directW, indirectW;
     std::tie(directW, indirectW)
-        = purify::operators::init_weights_<Vector<t_complex>>(uv_vis.weights);
+      = purify::operators::init_weights_<Vector<t_complex>>(uv_vis.weights);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(M);
     Vector<t_complex> direct_output;
     directW(direct_output, direct_input);
@@ -118,41 +119,69 @@ TEST_CASE("Operators") {
     indirectW(indirect_output, indirect_input);
     CHECK(indirect_output.size() == M);
     const Vector<t_complex> expected_indirect
-        = weighted_expected_op.W.conjugate().array() * indirect_input.array();
+      = weighted_expected_op.W.conjugate().array() * indirect_input.array();
     CHECK(expected_indirect.isApprox(indirect_output, 1e-4));
   }
   SECTION("Create Weighted Measurement Operator") {
     MeasurementOperator weighted_expected_op(uv_vis, Ju, Jv, kernel, imsizex, imsizey, power_iters,
-                                             oversample_ratio, 1, 1, "natural");
+        oversample_ratio, 1, 1, "natural");
     const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
         power_iters, power_tol, kernel, Ju, Jv, ft_plan);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
-    const Vector<t_complex> direct_output = measure_op * direct_input;
+    const Vector<t_complex> direct_output = *measure_op * direct_input;
     CHECK(direct_output.size() == M);
     const Vector<t_complex> indirect_input = Vector<t_complex>::Random(M);
-    const Vector<t_complex> indirect_output = measure_op.adjoint() * indirect_input;
+    const Vector<t_complex> indirect_output = measure_op->adjoint() * indirect_input;
     CHECK(indirect_output.size() == imsizex * imsizey);
     SECTION("Power Method") {
       auto op_norm = details::power_method<Vector<t_complex>>(
-          measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
+          *measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
       CHECK(std::abs(op_norm - 1.) < power_tol);
     }
     SECTION("Degrid") {
       const Vector<t_complex> input = Vector<t_complex>::Random(imsizex * imsizey);
       const Image<t_complex> input_image = Image<t_complex>::Map(input.data(), imsizey, imsizex);
       const Vector<t_complex> expected_output = weighted_expected_op.degrid(input_image);
-      const Vector<t_complex> actual_output = measure_op * input;
+      const Vector<t_complex> actual_output = *measure_op * input;
       CHECK(expected_output.size() == actual_output.size());
       CHECK(actual_output.isApprox(expected_output, 1e-4));
     }
     SECTION("Grid") {
       const Vector<t_complex> input = Vector<t_complex>::Random(M);
       const Vector<t_complex> expected_output
-          = Image<t_complex>::Map(weighted_expected_op.grid(input).data(), imsizex * imsizey, 1);
-      const Vector<t_complex> actual_output = measure_op.adjoint() * input;
+        = Image<t_complex>::Map(weighted_expected_op.grid(input).data(), imsizex * imsizey, 1);
+      const Vector<t_complex> actual_output = measure_op->adjoint() * input;
       CHECK(expected_output.size() == actual_output.size());
       CHECK(actual_output.isApprox(expected_output, 1e-4));
     }
+  }
+
+  SECTION("Create Weighted Compact Measurement Operator") {
+    const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+        uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
+        power_iters, power_tol, kernel, Ju, Jv, ft_plan);
+    const auto phiTphi = operators::init_grid_degrid_operator_2d<Vector<t_complex>>(
+        uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
+        power_iters, power_tol, kernel, Ju, Jv, ft_plan);
+    const auto id = [](Vector<t_complex> &out, const Vector<t_complex> & in){out = in;};
+    const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
+    const Vector<t_complex> direct_output = measure_op->adjoint()(*measure_op * direct_input);
+    auto const phiTphi_op = sopt::LinearTransform<Vector<t_complex>>({*phiTphi, id});
+    CHECK(direct_output.size() == imsizex * imsizey);
+    SECTION("Power Method") {
+      auto op_norm = details::power_method<Vector<t_complex>>(
+          phiTphi_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
+      CHECK(std::abs(op_norm - 1.) < power_tol);
+    }
+    SECTION("operation") {
+      const Vector<t_complex> input = Vector<t_complex>::Random(imsizex * imsizey);
+      const Vector<t_complex> expected_output = measure_op->adjoint()(*measure_op * direct_input);
+      const Vector<t_complex> actual_output = phiTphi_op * direct_input;
+
+      CHECK(expected_output.size() == actual_output.size());
+      CHECK(actual_output.isApprox(expected_output, 1e-4));
+    }
+
   }
 }

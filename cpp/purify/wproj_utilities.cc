@@ -32,8 +32,7 @@ Matrix<t_complex> generate_chirp(const t_real &w_rate, const t_real &cell_x, con
     for(t_int m = 0; m < y_size; ++m) {
       const t_real x = (l + 0.5 - x_size * 0.5) * delt_x;
       const t_real y = (m + 0.5 - y_size * 0.5) * delt_y;
-      chirp(l, m) = (std::exp(1 * pi * I * w_rate * (x * x + y * y)))
-                    * std::exp(-2 * pi * I * (l * 0.5 + m * 0.5)) / nz;
+      chirp(l, m) = (std::exp(1 * pi * I * w_rate * (x * x + y * y))) / nz;
     }
   }
 
@@ -50,11 +49,11 @@ Sparse<t_complex> create_chirp_row(const t_real &w_rate, const t_real &cell_x, c
       = wproj_utilities::generate_chirp(w_rate, cell_x, cell_y, ftsizeu, ftsizev);
 #pragma omp critical(fft)
   chirp = fftop_->forward(chirp);
-  chirp.resize(Npix, 1);
+  chirp.resize(1, Npix);
   const t_real thres = wproj_utilities::sparsify_row_dense_thres(chirp, energy_fraction);
   assert(chirp.norm() > 0);
   const t_real row_max = chirp.cwiseAbs().maxCoeff();
-  return chirp.sparseView(std::max(row_max * 1e-10, thres), 1);
+  return convert_sparse(chirp, thres);
 }
 
 Sparse<t_complex> wprojection_matrix(const Sparse<t_complex> &G, const t_int &Nx, const t_int &Ny,
@@ -73,29 +72,35 @@ Sparse<t_complex> wprojection_matrix(const Sparse<t_complex> &G, const t_int &Nx
       = std::make_shared<FFTOperator>(purify::FFTOperator().fftw_flag(fft_flag));
   Sparse<t_complex> GW(Nvis, Npix);
   t_uint counts = 0;
+  t_uint total_non_zero = 0;
 #pragma omp parallel for
-  for(t_int m = 0; m < G.outerSize(); m++) {
-    // PURIFY_DEBUG("CURRENT WPROJ - Kernel index [{}], w = {}", m, w_components(m));
+  for(t_int m = 0; m < G.rows(); m++) {
+    Sparse<t_complex> row(1, G.cols());
+    row.reserve(G.row(m).nonZeros());
+    for(Sparse<t_complex>::InnerIterator it(G, m); it; ++it)
+      row.coeffRef(0, it.index()) = it.value();
     const Sparse<t_complex> chirp
         = create_chirp_row(w_components(m), cell_x, cell_y, Nx, Ny, energy_fraction_chirp, fftop_);
-    Sparse<t_complex> kernel = row_wise_sparse_convolution(G.row(m), chirp, Nx, Ny);
-    assert(kernel.nonZeros() >= G.row(m).nonZeros());
+    Sparse<t_complex> kernel = row_wise_sparse_convolution(row, chirp, Nx, Ny);
+    //#pragma omp critical
+    //    assert(kernel.nonZeros() >= row.nonZeros());
     const t_real thres = sparsify_row_thres(kernel, energy_fraction_wproj);
     kernel.prune([&](const t_uint &i, const t_uint &j, const t_complex &value) {
       return std::abs(value) > thres;
     });
-
-    assert(kernel.rows() > 0);
-    assert(kernel.cols() == 1);
-    assert(kernel.nonZeros() > 0);
+    assert(kernel.cols() > 0);
+    assert(kernel.rows() == 1);
+    assert(kernel.nonZeros() >= row.nonZeros());
 #pragma omp critical
-    GW.row(m) = kernel.transpose();
+    GW.row(m) = kernel;
 #pragma omp critical
     counts++;
+#pragma omp critical
+    total_non_zero += kernel.nonZeros();
     if(counts % 100 == 0) {
       PURIFY_DEBUG("Row {} of {}", counts, GW.rows());
-      PURIFY_DEBUG("With {} entries non zero, which is {} entries per a row.", GW.nonZeros(),
-                   static_cast<t_real>(GW.nonZeros()) / counts);
+      PURIFY_DEBUG("With {} entries non zero, which is {} entries per a row.", total_non_zero,
+                   static_cast<t_real>(total_non_zero) / counts);
     }
   }
   assert(GW.nonZeros() > 0);

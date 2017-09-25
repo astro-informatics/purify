@@ -22,6 +22,15 @@ endif()
 if(NOT ArrayFire_OPENCL)
   set(ArrayFire_OPENCL ON)
 endif()
+include(PassonVariables)
+passon_variables(CCfits
+  FILENAME "${EXTERNAL_ROOT}/src/ArrayFireVariables.cmake"
+  PATTERNS
+  "CMAKE_[^_]*_R?PATH" "CMAKE_C_.*"
+  "BLAS_.*" "FFTW3_.*" "TIFF_.*"
+  ALSOADD
+  "\nset(CMAKE_INSTALL_PREFIX \"${EXTERNAL_ROOT}\" CACHE STRING \"\")\n"
+  )
 ExternalProject_Add(
   Lookup-ArrayFire
   PREFIX ${EXTERNAL_ROOT}

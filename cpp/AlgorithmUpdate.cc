@@ -1,14 +1,14 @@
-#include "purify/config.h"
 #include "AlgorithmUpdate.h"
+#include "purify/config.h"
 #include "purify/logging.h"
 
 namespace purify {
 
-AlgorithmUpdate::AlgorithmUpdate(const purify::Params &params, const utilities::vis_params &uv_data,
-                                 sopt::algorithm::ImagingProximalADMM<t_complex> &padmm,
-                                 std::ostream &stream,
-                                 std::shared_ptr<const MeasurementOperator> const &measurements,
-                                 const sopt::LinearTransform<sopt::Vector<sopt::t_complex>> &Psi)
+AlgorithmUpdate::AlgorithmUpdate(
+    const purify::Params &params, const utilities::vis_params &uv_data,
+    sopt::algorithm::ImagingProximalADMM<t_complex> &padmm, std::ostream &stream,
+    const std::shared_ptr<sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const> &measurements,
+    const sopt::LinearTransform<sopt::Vector<sopt::t_complex>> &Psi)
     : params(params), stats(read_params_to_stats(params)), uv_data(uv_data), out_diagnostic(stream),
       padmm(padmm), c_start(std::clock()), Psi(Psi), measurements(measurements) {}
 
@@ -16,9 +16,7 @@ bool AlgorithmUpdate::operator()(const Vector<t_complex> &x) {
   std::clock_t c_end = std::clock();
   stats.total_time = (c_end - c_start) / CLOCKS_PER_SEC; // total time for solver to run in seconds
   // Getting things ready for l1 and l2 norm calculation
-  Image<t_complex> const image = Image<t_complex>::Map(x.data(), params.height, params.width);
-  Vector<t_complex> const y_residual
-      = ((uv_data.vis - measurements->degrid(image)).array() * uv_data.weights.array().real());
+  Vector<t_complex> const y_residual = (uv_data.vis - *measurements * x);
   stats.l2_norm = y_residual.stableNorm();
   Vector<t_complex> const alpha = Psi.adjoint() * x;
   // updating parameter
@@ -30,13 +28,13 @@ bool AlgorithmUpdate::operator()(const Vector<t_complex> &x) {
     std::string const outfile_fits = params.name + "_solution_" + params.weighting + "_update";
     std::string const residual_fits = params.name + "_residual_" + params.weighting + "_update";
 
-    auto const residual = measurements->grid(y_residual);
+    Vector<t_complex> const residual = measurements->adjoint() * y_residual;
     AlgorithmUpdate::save_figure(x, outfile_fits, "JY/PIXEL", 1);
-    AlgorithmUpdate::save_figure(Image<t_complex>::Map(residual.data(), residual.size(), 1),
-                                 residual_fits, "JY/PIXEL", 1);
-    stats.rms
-        = utilities::standard_deviation(Image<t_complex>::Map(residual.data(), residual.size(), 1));
-    stats.dr = utilities::dynamic_range(image, residual);
+    AlgorithmUpdate::save_figure(residual, residual_fits, "JY/PIXEL", 1);
+    stats.rms = utilities::standard_deviation(residual);
+    stats.dr = utilities::dynamic_range(
+        Image<t_complex>::Map(x.data(), params.height, params.width),
+        Image<t_complex>::Map(residual.data(), params.height, params.width));
     stats.max = residual.matrix().real().maxCoeff();
     stats.min = residual.matrix().real().minCoeff();
     // printing log information to stream
@@ -131,4 +129,4 @@ pfitsio::header_params AlgorithmUpdate::create_header(purify::utilities::vis_par
   header.epsilon = params.epsilon;
   return header;
 }
-}
+} // namespace purify

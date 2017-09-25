@@ -3,23 +3,23 @@
 
 #include "purify/config.h"
 #include <sopt/imaging_padmm.h>
+#include <sopt/linear_transform.h>
 #include <sopt/relative_variation.h>
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
 #include "cmdl.h"
-#include "purify/MeasurementOperator.h"
 #include "purify/pfitsio.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
-
 namespace purify {
 class AlgorithmUpdate {
   // update function that saves information in algorithm
 public:
   AlgorithmUpdate(const purify::Params &params, const utilities::vis_params &uv_data,
                   sopt::algorithm::ImagingProximalADMM<t_complex> &padmm, std::ostream &stream,
-                  const std::shared_ptr<const MeasurementOperator> &measurements,
+                  const std::shared_ptr<sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const>
+                      &measurements,
                   const sopt::LinearTransform<sopt::Vector<sopt::t_complex>> &Psi);
 
   bool operator()(Vector<t_complex> const &x);
@@ -46,7 +46,7 @@ private:
   sopt::algorithm::ImagingProximalADMM<t_complex> &padmm;
   std::clock_t const c_start;
   const sopt::LinearTransform<sopt::Vector<sopt::t_complex>> &Psi;
-  std::shared_ptr<const MeasurementOperator> measurements;
+  const std::shared_ptr<sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const> &measurements;
 
 private:
   //! Method to modify gamma
@@ -66,5 +66,5 @@ private:
     return stats;
   }
 };
-}
+} // namespace purify
 #endif
