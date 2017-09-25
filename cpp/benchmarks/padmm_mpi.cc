@@ -1,5 +1,4 @@
 #include <array>
-//#include <memory>
 #include <random>
 #include <sopt/imaging_padmm.h>
 #include <sopt/mpi/communicator.h>
@@ -19,80 +18,39 @@
 
 using namespace purify;
 
-std::tuple<utilities::vis_params, t_real>
-  dirty_visibilities(Image<t_complex> &ground_truth_image, t_uint number_of_vis, t_real snr,
-		     const std::tuple<bool, t_real> &w_term) {
-    auto uv_data
-      = utilities::random_sample_density(number_of_vis, 0, constant::pi / 3, std::get<0>(w_term));
-    uv_data.units = "radians";
-    // creating operator to generate measurements
-    auto sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data, ground_truth_image.rows(), ground_truth_image.cols(), std::get<1>(w_term),
-          std::get<1>(w_term), 2, 100, 1e-4, "kb", 8, 8, "measure", std::get<0>(w_term));
-  // Generates measurements from image
-  uv_data.vis = (*sky_measurements)
-                * Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);
-
-  // working out value of signal given SNR of 30
-  auto const sigma = utilities::SNR_to_standard_deviation(uv_data.vis, snr);
-  // adding noise to visibilities
-  uv_data.vis = utilities::add_noise(uv_data.vis, 0., sigma);
-  return std::make_tuple(uv_data, sigma);
-  }
-
-std::tuple<utilities::vis_params, t_real>
-dirty_visibilities(Image<t_complex> &ground_truth_image, t_uint number_of_vis, t_real snr,
-                   const std::tuple<bool, t_real> &w_term, sopt::mpi::Communicator const &comm) {
-  if(comm.size() == 1)
-    //return b_utilities::dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term);
-    return dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term);
-  if(comm.is_root()) {
-    //auto result = b_utilities::dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term);
-    auto result = dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term);
-    comm.broadcast(std::get<1>(result));
-    auto const order
-        = distribute::distribute_measurements(std::get<0>(result), comm, "distance_distribution");
-    std::get<0>(result) = utilities::regroup_and_scatter(std::get<0>(result), order, comm);
-    return result;
-  }
-  auto const sigma = comm.broadcast<t_real>();
-  return std::make_tuple(utilities::scatter_visibilities(comm), sigma);
-}
-
-
 class PadmmFixtureMPI : public ::benchmark::Fixture
 {
 public:
   void SetUp(const ::benchmark::State& state) {
     // Reading image from file and update related quantities
     bool newImage = b_utilities::updateImage(state.range(0), m_image, m_imsizex, m_imsizey);
-
-   // Generating random uv(w) coverage and update related quantities
+    
+    // Generating random uv(w) coverage and update related quantities
     //bool newMeasurements = b_utilities::updateMeasurements(state.range(1), m_uv_data, m_world);
-
+    
     m_world = sopt::mpi::Communicator::World();
-      const t_real FoV = 1;      // deg
-      const t_real cellsize = FoV / m_imsizex * 60. * 60.;
-      const bool w_term = false;
-      std::tuple<utilities::vis_params, t_real> temp = dirty_visibilities(m_image, state.range(1), 30., std::make_tuple(w_term,cellsize), m_world);
-   m_uv_data = std::get<0>(temp);
-   t_real sigma =  std::get<1>(temp);
-
-       m_kernel = state.range(2);
-   // algorithm 1
-     m_measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+    const t_real FoV = 1;      // deg
+    const t_real cellsize = FoV / m_imsizex * 60. * 60.;
+    const bool w_term = false;
+    std::tuple<utilities::vis_params, t_real> temp =
+      b_utilities::dirty_measurements(m_image, state.range(1), 30., cellsize, m_world);
+    m_uv_data = std::get<0>(temp);
+    t_real sigma =  std::get<1>(temp);
+    
+    m_kernel = state.range(2);
+    // algorithm 1
+    m_measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
           m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize,
           cellsize, 2, 100, 1e-4, "kb", m_kernel, m_kernel, "measure", w_term);
 
-     sopt::wavelets::SARA saraDistr = sopt::wavelets::distribute_sara(m_sara, m_world);
-     auto const Psi = sopt::linear_transform<t_complex>(saraDistr, m_image.rows(), m_image.cols(), m_world);
-     m_epsilon = utilities::calculate_l2_radius(m_uv_data.vis, sigma);
-     m_gamma
-       = (Psi.adjoint() * (m_measurements->adjoint() * m_uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3;
-     m_gamma = m_world.all_reduce(m_gamma, MPI_MAX);
-
-     m_padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(m_uv_data.vis);
-     m_padmm->itermax(50)
+    sopt::wavelets::SARA saraDistr = sopt::wavelets::distribute_sara(m_sara, m_world);
+    auto const Psi = sopt::linear_transform<t_complex>(saraDistr, m_image.rows(), m_image.cols(), m_world);
+    m_epsilon = utilities::calculate_l2_radius(m_uv_data.vis, sigma);
+    m_gamma = (Psi.adjoint() * (m_measurements->adjoint() * m_uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3;
+    m_gamma = m_world.all_reduce(m_gamma, MPI_MAX);
+    
+    m_padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(m_uv_data.vis);
+    m_padmm->itermax(50)
       .gamma(m_gamma)
       .relative_variation(1e-3)
       .l2ball_proximal_epsilon(m_epsilon)
@@ -119,14 +77,14 @@ public:
       std::make_tuple("DB3", 3u), std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
       std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
   sopt::mpi::Communicator m_world;
-
- Image<t_complex> m_image;
+  
+  Image<t_complex> m_image;
   t_uint m_imsizex;
   t_uint m_imsizey;
  
   utilities::vis_params m_uv_data;
   t_real m_epsilon;
-
+  
   t_uint m_kernel;
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_measurements;
   t_real m_gamma;

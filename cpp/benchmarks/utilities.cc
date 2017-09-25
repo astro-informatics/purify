@@ -5,7 +5,7 @@
 #include "purify/pfitsio.h"
 #include "purify/distribute.h"
 #include "purify/mpi_utilities.h"
-//#include "purify/operators.h"
+#include "purify/operators.h"
 #include <benchmarks/utilities.h>
 
 using namespace purify;
@@ -80,45 +80,42 @@ namespace b_utilities {
     return true;
   }
 
-
-  /*std::tuple<utilities::vis_params, t_real>
-  dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
-		     const std::tuple<bool, t_real> &w_term) {
-    auto uv_data
-      = utilities::random_sample_density(number_of_vis, 0, constant::pi / 3, std::get<0>(w_term));
-    uv_data.units = "radians";
+  
+  std::tuple<utilities::vis_params, t_real>
+  dirty_measurements(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
+		     const t_real &cellsize) {
+    auto uv_data = random_measurements(number_of_vis);
     // creating operator to generate measurements
-    auto const sky_measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
-      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data, ground_truth_image.rows(), ground_truth_image.cols(), std::get<1>(w_term),
-          std::get<1>(w_term), 2, 100, 1e-4, "kb", 8, 8, "measure", std::get<0>(w_term)));
-  // Generates measurements from image
-  uv_data.vis = (*sky_measurements)
-                * Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);
+    auto measurement_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+	  uv_data, ground_truth_image.rows(), ground_truth_image.cols(), cellsize, cellsize,
+          2, 0, 1e-4, "kb", 8, 8, "measure", false);
+    // Generates measurements from image
+    uv_data.vis = (*measurement_op)
+      * Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);
 
-  // working out value of signal given SNR of 30
-  auto const sigma = utilities::SNR_to_standard_deviation(uv_data.vis, snr);
-  // adding noise to visibilities
-  uv_data.vis = utilities::add_noise(uv_data.vis, 0., sigma);
-  return std::make_tuple(uv_data, sigma);
+    // working out value of signal given SNR
+    auto const sigma = utilities::SNR_to_standard_deviation(uv_data.vis, snr);
+    // adding noise to visibilities
+    uv_data.vis = utilities::add_noise(uv_data.vis, 0., sigma);
+    return std::make_tuple(uv_data, sigma);
 }
 
-  /*std::tuple<utilities::vis_params, t_real>
-dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
-                   const std::tuple<bool, t_real> &w_term, sopt::mpi::Communicator const &comm) {
-  if(comm.size() == 1)
-    return dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term);
-  if(comm.is_root()) {
-    auto result = dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term);
-    comm.broadcast(std::get<1>(result));
-    auto const order
+  std::tuple<utilities::vis_params, t_real>
+  dirty_measurements(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
+		     const t_real &cellsize, sopt::mpi::Communicator const &comm) {
+    if(comm.size() == 1)
+      return dirty_measurements(ground_truth_image, number_of_vis, snr, cellsize);
+    if(comm.is_root()) {
+      auto result = dirty_measurements(ground_truth_image, number_of_vis, snr, cellsize);
+      comm.broadcast(std::get<1>(result));
+      auto const order
         = distribute::distribute_measurements(std::get<0>(result), comm, "distance_distribution");
-    std::get<0>(result) = utilities::regroup_and_scatter(std::get<0>(result), order, comm);
-    return result;
+      std::get<0>(result) = utilities::regroup_and_scatter(std::get<0>(result), order, comm);
+      return result;
+    }
+    auto const sigma = comm.broadcast<t_real>();
+    return std::make_tuple(utilities::scatter_visibilities(comm), sigma);
   }
-  auto const sigma = comm.broadcast<t_real>();
-  return std::make_tuple(utilities::scatter_visibilities(comm), sigma);
-  }*/
 
 
   utilities::vis_params random_measurements(t_int size) {

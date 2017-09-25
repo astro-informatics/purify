@@ -21,12 +21,12 @@ namespace b_utilities {
   bool updateMeasurements(t_uint newSize, utilities::vis_params& data);
   bool updateMeasurements(t_uint newSize, utilities::vis_params& data, sopt::mpi::Communicator& comm);
   
-  /*std::tuple<utilities::vis_params, t_real>
-    dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
-		       const std::tuple<bool, t_real> &w_term);
   std::tuple<utilities::vis_params, t_real>
-    dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
-    const std::tuple<bool, t_real> &w_term, sopt::mpi::Communicator const &comm);*/
+    dirty_measurements(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
+		       const t_real &cellsize);
+  std::tuple<utilities::vis_params, t_real>
+    dirty_measurements(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
+		       const t_real &cellsize, sopt::mpi::Communicator const &comm);
 
   utilities::vis_params random_measurements(t_int size);
   utilities::vis_params random_measurements(t_int size, sopt::mpi::Communicator const &comm);
