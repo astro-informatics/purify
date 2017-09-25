@@ -22,7 +22,7 @@ void degrid_operator_ctor(benchmark::State &state) {
   // benchmark the creation of measurement operator
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
-    auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+    auto sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         uv_data, rows, cols, cellsize, cellsize, 2, 0, 0.0001, "kb", state.range(2), state.range(2),
         "measure", w_term);
     auto end   = std::chrono::high_resolution_clock::now();
@@ -65,10 +65,9 @@ public:
       const t_real cellsize = FoV / m_imsizex * 60. * 60.;
       const bool w_term = false;
       m_kernel = state.range(2);
-      m_degridOperator = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
-          measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      m_degridOperator = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
 	  m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, "kb", m_kernel, m_kernel,
-          "measure", w_term));
+          "measure", w_term);
 	  }
   }
 
@@ -86,7 +85,7 @@ public:
   utilities::vis_params m_temp_uv_data;
 
   t_uint m_kernel;
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> m_degridOperator;
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_degridOperator;
 };
 
 

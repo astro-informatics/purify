@@ -36,10 +36,9 @@ public:
       const t_real cellsize = FoV / m_imsizex * 60. * 60.;
       const bool w_term = false;
       m_kernel = state.range(2);
-      m_measurements_transform = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
-        measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      m_measurements_transform = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 100, 0.0001, "kb",  m_kernel, m_kernel,
-	"measure", w_term));
+	"measure", w_term);
       m_gamma = (m_measurements_transform->adjoint() * m_uv_data.vis).real().maxCoeff() * 1e-3;
     }
 
@@ -65,7 +64,7 @@ public:
   t_real m_epsilon;
 
   t_uint m_kernel;
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> m_measurements_transform;
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_measurements_transform;
   t_real m_gamma;
 };
 

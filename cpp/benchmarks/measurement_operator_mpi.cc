@@ -54,7 +54,7 @@ BENCHMARK_DEFINE_F(DegridOperatorCtorFixtureMPI, CtorDistr)(benchmark::State &st
   // benchmark the creation of the distributed measurement operator
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
-    auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+    auto sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         m_world, m_uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 0, 0.0001, "kb", state.range(2), state.range(2),
         "measure", m_w_term);
     auto end = std::chrono::high_resolution_clock::now();
@@ -68,7 +68,7 @@ BENCHMARK_DEFINE_F(DegridOperatorCtorFixtureMPI, CtorMPI)(benchmark::State &stat
   // benchmark the creation of the distributed MPI measurement operator
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
-    auto const sky_measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+    auto sky_measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
         m_world, m_uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 0, 0.0001, "kb", state.range(2), state.range(2),
         "measure", m_w_term);
     auto end = std::chrono::high_resolution_clock::now();
@@ -101,14 +101,12 @@ public:
       const t_real cellsize = FoV / m_imsizex * 60. * 60.;
       const bool w_term = false;
       m_kernel = state.range(2);
-      m_degridOperatorDistr = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
-          measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-	        m_world, m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, "kb", m_kernel, m_kernel,
-          "measure", w_term));
-      m_degridOperatorMPI = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
-          measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-	        m_world, m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, "kb", m_kernel, m_kernel,
-          "measure", w_term));
+      m_degridOperatorDistr = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+	  m_world, m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, "kb", m_kernel, m_kernel,
+          "measure", w_term);
+      m_degridOperatorMPI = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+	  m_world, m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, "kb", m_kernel, m_kernel,
+          "measure", w_term);
     }
   }
   
@@ -125,8 +123,8 @@ public:
 
   utilities::vis_params m_uv_data;
 
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> m_degridOperatorDistr;
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> m_degridOperatorMPI;
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_degridOperatorDistr;
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_degridOperatorMPI;
 };
 
 class DegridOperatorAdjointFixtureMPI : public ::benchmark::Fixture
@@ -149,14 +147,12 @@ public:
       const t_real cellsize = FoV / m_imsizex * 60. * 60.;
       const bool w_term = false;
       m_kernel = state.range(2);
-      m_degridOperatorDistr = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
-          measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      m_degridOperatorDistr = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
 	        m_world, m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, "kb", m_kernel, m_kernel,
-          "measure", w_term));
-      m_degridOperatorMPI = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
-          measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+          "measure", w_term);
+      m_degridOperatorMPI = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
 	        m_world, m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, "kb", m_kernel, m_kernel,
-          "measure", w_term));
+          "measure", w_term);
 	  }
   }
 
@@ -173,8 +169,8 @@ public:
 
   utilities::vis_params m_uv_data;
 
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> m_degridOperatorDistr;
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> m_degridOperatorMPI;
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_degridOperatorDistr;
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_degridOperatorMPI;
 };
 
 

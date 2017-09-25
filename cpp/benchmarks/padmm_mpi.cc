@@ -26,10 +26,9 @@ std::tuple<utilities::vis_params, t_real>
       = utilities::random_sample_density(number_of_vis, 0, constant::pi / 3, std::get<0>(w_term));
     uv_data.units = "radians";
     // creating operator to generate measurements
-    auto const sky_measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
-      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+    auto sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, ground_truth_image.rows(), ground_truth_image.cols(), std::get<1>(w_term),
-          std::get<1>(w_term), 2, 100, 1e-4, "kb", 8, 8, "measure", std::get<0>(w_term)));
+          std::get<1>(w_term), 2, 100, 1e-4, "kb", 8, 8, "measure", std::get<0>(w_term));
   // Generates measurements from image
   uv_data.vis = (*sky_measurements)
                 * Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);
@@ -81,10 +80,9 @@ public:
 
        m_kernel = state.range(2);
    // algorithm 1
-     m_measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
-      measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+     m_measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
           m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize,
-          cellsize, 2, 100, 1e-4, "kb", m_kernel, m_kernel, "measure", w_term));
+          cellsize, 2, 100, 1e-4, "kb", m_kernel, m_kernel, "measure", w_term);
 
      sopt::wavelets::SARA saraDistr = sopt::wavelets::distribute_sara(m_sara, m_world);
      auto const Psi = sopt::linear_transform<t_complex>(saraDistr, m_image.rows(), m_image.cols(), m_world);
@@ -130,7 +128,7 @@ public:
   t_real m_epsilon;
 
   t_uint m_kernel;
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> m_measurements;
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_measurements;
   t_real m_gamma;
 
   std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> m_padmm;
