@@ -18,8 +18,12 @@ namespace b_utilities {
 
   bool updateImage(t_uint newSize, Image<t_complex>& image, t_uint& sizex, t_uint& sizey);
   bool updateEmptyImage(t_uint newSize, Vector<t_complex>& image, t_uint& sizex, t_uint& sizey);
+  
   bool updateMeasurements(t_uint newSize, utilities::vis_params& data);
+  bool updateMeasurements(t_uint newSize, utilities::vis_params& data, t_real& epsilon, bool newImage, Image<t_complex>& image);
   bool updateMeasurements(t_uint newSize, utilities::vis_params& data, sopt::mpi::Communicator& comm);
+  bool updateMeasurements(t_uint newSize, utilities::vis_params& data, t_real& epsilon, bool newImage, Image<t_complex>& image,
+			  sopt::mpi::Communicator& comm);
   
   std::tuple<utilities::vis_params, t_real>
     dirty_measurements(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,

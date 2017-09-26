@@ -71,6 +71,20 @@ namespace b_utilities {
     return true;
   }
 
+  bool updateMeasurements(t_uint newSize, utilities::vis_params& data, t_real& epsilon, bool newImage, Image<t_complex>& image) {
+    if (data.vis.size()==newSize && !newImage) {
+      return false;
+    }
+    const t_real FoV = 1;      // deg
+    const t_real cellsize = FoV / image.size() * 60. * 60.;
+    std::tuple<utilities::vis_params, t_real> temp =
+      b_utilities::dirty_measurements(image, newSize, 30., cellsize);
+    data = std::get<0>(temp);
+    epsilon = utilities::calculate_l2_radius(data.vis,  std::get<1>(temp));
+   
+    return true;
+  }
+
   bool updateMeasurements(t_uint newSize, utilities::vis_params& data, sopt::mpi::Communicator& comm) {
     if (data.vis.size()==newSize) {
       return false;
@@ -80,7 +94,23 @@ namespace b_utilities {
     return true;
   }
 
+  bool updateMeasurements(t_uint newSize, utilities::vis_params& data, t_real& epsilon, bool newImage, Image<t_complex>& image,
+			  sopt::mpi::Communicator& comm) {
+    if (data.vis.size()==newSize && !newImage) {
+      return false;
+    }
+    comm = sopt::mpi::Communicator::World();
+    const t_real FoV = 1;      // deg
+    const t_real cellsize = FoV / image.size() * 60. * 60.;
+    std::tuple<utilities::vis_params, t_real> temp =
+      b_utilities::dirty_measurements(image, newSize, 30., cellsize, comm);
+    data = std::get<0>(temp);
+    epsilon = utilities::calculate_l2_radius(data.vis,  std::get<1>(temp));
+    
+    return true;
+  }
   
+ 
   std::tuple<utilities::vis_params, t_real>
   dirty_measurements(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
 		     const t_real &cellsize) {

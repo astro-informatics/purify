@@ -51,12 +51,10 @@ public:
     m_counter++;
 
     // Reading image from file and create temporary image
-    bool newImage = b_utilities::updateImage(state.range(0), m_image, m_imsizex, m_imsizey);
-    newImage = b_utilities::updateEmptyImage(state.range(0), m_temp_image, m_imsizex, m_imsizey);
+    bool newImage = updateImage(state.range(0));
     
     // Generating random uv(w) coverage
     bool newMeasurements = b_utilities::updateMeasurements(state.range(1), m_uv_data);
-    newMeasurements = b_utilities::updateMeasurements(state.range(1), m_temp_uv_data);
     
    // Create measurement operator
     bool newKernel = m_kernel!=state.range(2);
@@ -74,29 +72,48 @@ public:
   void TearDown(const ::benchmark::State& state) {
   }
 
+  virtual bool updateImage(t_uint newSize) = 0;
+  
   t_uint m_counter;
 
-  Image<t_complex> m_image;
   t_uint m_imsizex;
   t_uint m_imsizey;
-  Vector<t_complex> m_temp_image;
 
   utilities::vis_params m_uv_data;
-  utilities::vis_params m_temp_uv_data;
 
   t_uint m_kernel;
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_degridOperator;
 };
 
+class DegridOperatorDirectFixture : public DegridOperatorFixture
+{
+public:
+  virtual bool updateImage(t_uint newSize) {
+    return b_utilities::updateImage(newSize, m_image, m_imsizex, m_imsizey);
+  }
+  
+  Image<t_complex> m_image;
+};
 
-BENCHMARK_DEFINE_F(DegridOperatorFixture, Direct)(benchmark::State &state) {
+class DegridOperatorAdjointFixture : public DegridOperatorFixture
+{
+public:
+  virtual bool updateImage(t_uint newSize) {
+    return b_utilities::updateEmptyImage(newSize, m_image, m_imsizex, m_imsizey);
+  }
+  
+  Vector<t_complex> m_image;
+};
+
+  
+BENCHMARK_DEFINE_F(DegridOperatorDirectFixture, Apply)(benchmark::State &state) {
   // Benchmark the application of the operator
   if ((m_counter%10)==1) {
-    m_temp_uv_data.vis = (*m_degridOperator) *  Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
+    m_uv_data.vis = (*m_degridOperator) *  Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
   }
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
-    m_temp_uv_data.vis = (*m_degridOperator) *  Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
+    m_uv_data.vis = (*m_degridOperator) *  Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
     auto end   = std::chrono::high_resolution_clock::now();
     state.SetIterationTime(b_utilities::duration(start,end));
   }
@@ -104,14 +121,14 @@ BENCHMARK_DEFINE_F(DegridOperatorFixture, Direct)(benchmark::State &state) {
   state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizey * m_imsizex) * sizeof(t_complex));
 }
 
-BENCHMARK_DEFINE_F(DegridOperatorFixture, Adjoint)(benchmark::State &state) {
+BENCHMARK_DEFINE_F(DegridOperatorAdjointFixture, Apply)(benchmark::State &state) {
   // Benchmark the application of the adjoint operator
   if ((m_counter%10)==1) {
-    m_temp_image = m_degridOperator->adjoint() * m_uv_data.vis;
+    m_image = m_degridOperator->adjoint() * m_uv_data.vis;
   }
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
-    m_temp_image = m_degridOperator->adjoint() * m_uv_data.vis;
+    m_image = m_degridOperator->adjoint() * m_uv_data.vis;
     auto end   = std::chrono::high_resolution_clock::now();   
     state.SetIterationTime(b_utilities::duration(start,end));
   }
@@ -119,14 +136,15 @@ BENCHMARK_DEFINE_F(DegridOperatorFixture, Adjoint)(benchmark::State &state) {
   state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizey * m_imsizex) * sizeof(t_complex));
 }
 
-BENCHMARK_REGISTER_F(DegridOperatorFixture, Direct)
+
+BENCHMARK_REGISTER_F(DegridOperatorDirectFixture, Apply)
 //->Apply(b_utilities::Arguments)
 ->Args({1024,1000000,4})->Args({1024,10000000,4})
 ->UseManualTime()
 ->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMillisecond);
 
-BENCHMARK_REGISTER_F(DegridOperatorFixture, Adjoint)
+BENCHMARK_REGISTER_F(DegridOperatorAdjointFixture, Apply)
 //->Apply(b_utilities::Arguments)
 ->Args({1024,1000000,4})->Args({1024,10000000,4})
 ->UseManualTime()
