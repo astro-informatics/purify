@@ -7,6 +7,8 @@
 #include <benchmarks/utilities.h>
 
 using namespace purify;
+using namespace purify::notinstalled;
+
 
 namespace b_utilities {
 
