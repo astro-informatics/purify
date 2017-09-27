@@ -39,10 +39,9 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
   PURIFY_HIGH_LOG("Number of measurements / number of pixels: {}",
                   uv_data.u.size() / ground_truth_image.size());
   // creating operator to generate measurements
-  auto const sky_measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
-      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data, ground_truth_image.rows(), ground_truth_image.cols(), std::get<1>(w_term),
-          std::get<1>(w_term), 2, 100, 1e-4, "kb", 8, 8, "measure", std::get<0>(w_term)));
+  auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      uv_data, ground_truth_image.rows(), ground_truth_image.cols(), std::get<1>(w_term),
+      std::get<1>(w_term), 2, 100, 1e-4, "kb", 8, 8, "measure", std::get<0>(w_term));
   // Generates measurements from image
   uv_data.vis = (*sky_measurements)
                 * Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);
@@ -176,32 +175,28 @@ int main(int nargs, char const **args) {
                                        std::make_tuple(w_term, cellsize), world);
 #if PURIFY_PADMM_ALGORITHM == 2 || PURIFY_PADMM_ALGORITHM == 3
 #ifndef PURIFY_GPU
-  auto const measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
-      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-          cellsize, 2, 100, 1e-4, kernel, 4, 4, "measure", w_term));
+  auto const measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
+      cellsize, 2, 100, 1e-4, kernel, 4, 4, "measure", w_term);
 
 #else
   af::setDevice(0);
-  auto const measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
-      gpu::measurementoperator::init_degrid_operator_2d(
-          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-          cellsize, 2, 100, 1e-4, kernel, 8, 8, w_term));
+  auto const measurements = gpu::measurementoperator::init_degrid_operator_2d(
+      world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
+      cellsize, 2, 100, 1e-4, kernel, 8, 8, w_term);
 
 #endif
 #elif PURIFY_PADMM_ALGORITHM == 1
 #ifndef PURIFY_GPU
-  auto const measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
-      measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-          cellsize, 2, 100, 1e-4, kernel, 8, 8, "measure", w_term));
+  auto const measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+      world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
+      cellsize, 2, 100, 1e-4, kernel, 8, 8, "measure", w_term);
 
 #else
   af::setDevice(0);
-  auto const measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
-      gpu::measurementoperator::init_degrid_operator_2d_mpi(
-          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-          cellsize, 2, 100, 1e-4, kernel, 8, 8, w_term));
+  auto const measurements = gpu::measurementoperator::init_degrid_operator_2d_mpi(
+      world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
+      cellsize, 2, 100, 1e-4, kernel, 8, 8, w_term);
 
 #endif
 #endif

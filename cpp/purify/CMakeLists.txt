@@ -24,7 +24,7 @@ set(HEADERS
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(SOURCES MeasurementOperator.cc MeasurementOperator_mpi.cc FFTOperator.cc clean.cc utilities.cc pfitsio.cc
-  kernels.cc RMOperator.cc PSFOperator.cc distribute.cc wproj_utilities.cc)
+  kernels.cc RMOperator.cc PSFOperator.cc distribute.cc wproj_utilities.cc operators.cc)
 
 if(TARGET casacore::ms)
   list(APPEND SOURCES casacore.cc)

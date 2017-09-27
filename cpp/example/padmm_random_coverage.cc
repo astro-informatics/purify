@@ -32,16 +32,15 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   t_uint const imsizey = M31.rows();
   t_uint const imsizex = M31.cols();
 #ifndef PURIFY_GPU
-  auto const measurements_transform = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
-      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+  auto const measurements_transform
+      = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 100,
-          0.0001, kernel, J, J, "measure", std::get<0>(w_term)));
+          0.0001, kernel, J, J, "measure", std::get<0>(w_term));
 #else
   af::setDevice(0);
-  auto const measurements_transform = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
-      gpu::measurementoperator::init_degrid_operator_2d(
-          uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 100,
-          0.0001, kernel, J, J, std::get<0>(w_term)));
+  auto const measurements_transform = gpu::measurementoperator::init_degrid_operator_2d(
+      uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 100, 0.0001,
+      kernel, J, J, std::get<0>(w_term));
 #endif
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
@@ -113,14 +112,12 @@ int main(int, char **) {
   PURIFY_MEDIUM_LOG("Number of measurements / number of pixels: {}",
                     uv_data.u.size() * 1. / number_of_pxiels);
 #ifndef PURIFY_GPU
-  auto const sky_measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
-      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 100, 0.0001, "kb", 8, 8,
-          "measure", w_term));
+  auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 100, 0.0001, "kb", 8, 8, "measure",
+      w_term);
 #else
-  auto const sky_measurements = std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(
-      gpu::measurementoperator::init_degrid_operator_2d(
-          uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 100, 0.0001, "kb", 8, 8, w_term));
+  auto const sky_measurements = gpu::measurementoperator::init_degrid_operator_2d(
+      uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 100, 0.0001, "kb", 8, 8, w_term);
 #endif
   uv_data.vis = (*sky_measurements) * Image<t_complex>::Map(M31.data(), M31.size(), 1);
   Vector<t_complex> const y0 = uv_data.vis;
