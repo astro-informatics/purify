@@ -1,6 +1,6 @@
 #!/bin/bash -l
 #$ -S /bin/bash
-#$ -l h_rt=1:0:0
+#$ -l h_rt=12:0:0
 #$ -l mem=1G
 
 # Run jobs on specific nodes reserved only for this job, so that we can compare benchmark results.
@@ -27,4 +27,5 @@
 # Your work *must* be done in $TMPDIR 
 cd $TMPDIR
 
-$HOME/purify/build/cpp/benchmarks/measurement_operator > $HOME/Scratch/purify/serialBenchmark.$JOB_ID.out
+## $HOME/purify/build/cpp/benchmarks/measurement_operator > $HOME/Scratch/purify/serialBenchmarkMO.$JOB_ID.out
+$HOME/purify/build/cpp/benchmarks/padmm > $HOME/Scratch/purify/serialBenchmarkPADMM.$JOB_ID.out
