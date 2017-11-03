@@ -3,7 +3,7 @@
 # - URL: Defaults to ftp://heasarc.gsfc.nasa.gov/software/fitsio/c/cfitsio_latest.tar.gz
 #
 if(CFitsIO_ARGUMENTS)
-    cmake_parse_arguments(CFitsIO "CHECKCASA" "URL" ""
+    cmake_parse_arguments(CFitsIO "CHECKCASA" "URL" "ftp://heasarc.gsfc.nasa.gov/software/fitsio/c/cfitsio3410.tar.gz"
         ${CFitsIO_ARGUMENTS})
 endif()
 # Figures out this is a casa install from existence of CASAPATH environment
@@ -16,7 +16,7 @@ endif()
 
 if(NOT CFitsIO_URL AND NOT using_casa)
     set(CFitsIO_URL
-        ftp://heasarc.gsfc.nasa.gov/software/fitsio/c/cfitsio_latest.tar.gz)
+        ftp://heasarc.gsfc.nasa.gov/software/fitsio/c/cfitsio3410.tar.gz)
 elseif(NOT CFistIO_URL)
     set(CFitsIO_URL
         https://svn.cv.nrao.edu/casa/devel/cfitsio+patch.tar.gz)
