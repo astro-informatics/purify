@@ -71,15 +71,19 @@ Sparse<typename T0::Scalar> compress_outer(Eigen::SparseMatrixBase<T0> const &ma
   for(auto const &index : indices)
     mapping[index] = i++;
 
-  Sparse<typename T0::Scalar> result(matrix.rows(), indices.size());
-  result.reserve(matrix.nonZeros());
-  for(typename T0::StorageIndex k = 0; k < matrix.derived().outerSize(); ++k)
-    for(typename T0::InnerIterator it(matrix.derived(), k); it; ++it) {
-      assert(it.col() >= 0 and it.col() < static_cast<t_int>(mapping.size()));
-      assert(mapping[it.col()] >= 0 and mapping[it.col()] < result.cols());
-      result.coeffRef(it.row(), mapping[it.col()]) = it.value();
+  std::vector<t_int> rows(G.rows() + 1);
+  std::vector<t_int> cols(G.nonZeros());
+  rows(G.rows()) = G.nonZeros();
+  t_int index = 0;
+  for(t_int k = 0; k < G.outerSize(); ++k) {
+    rows[k] = index;
+    for(Sparse<t_complex>::InnerIterator it(G, k); it; ++it) {
+      cols[index] = mapping[it.col()];
+      index++;
     }
-  return result;
+  }
+  return Map<typename T0::Derived>(matrix.rows(), indices.size(), matrix.nonZeros(), rows.data(),
+                                   cols.data(), matrix.derived().valuePtr());
 }
-}
+} // namespace purify
 #endif
