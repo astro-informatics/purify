@@ -82,7 +82,7 @@ Sparse<typename T0::Scalar> compress_outer(Eigen::SparseMatrixBase<T0> const &ma
       index++;
     }
   }
-  return Eigen::MappedSparseMatrix<typename T0::Scalar, 1>(
+  return Eigen::MappedSparseMatrix<typename T0::Scalar, Eigen::RowMajor>(
       matrix.rows(), indices.size(), matrix.nonZeros(), rows.data(), cols.data(),
       const_cast<typename T0::Scalar *>(matrix.derived().valuePtr()));
 }
