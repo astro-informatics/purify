@@ -3,7 +3,7 @@ include(AddExample)
 include_directories(SYSTEM ${Sopt_INCLUDE_DIRS})
 include_directories("${PROJECT_SOURCE_DIR}/cpp")
 
-add_example(gridding LIBRARIES libpurify)
+add_example(gridding LIBRARIES libpurify NOTEST)
 add_example(rm_gridding_example LIBRARIES libpurify NOTEST)
 add_example(generate_vis_data LIBRARIES libpurify NOTEST)
 
@@ -13,7 +13,7 @@ add_example(sdmm_vla LIBRARIES libpurify NOTEST)
 
 add_example(resample LIBRARIES libpurify)
 
-add_example(show_image LIBRARIES libpurify)
+add_example(show_image LIBRARIES libpurify NOTEST)
 add_example(sdmm_m31_simulation LIBRARIES libpurify NOTEST)
 
 add_example(padmm_simulation LIBRARIES libpurify NOTEST)
