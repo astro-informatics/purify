@@ -591,14 +591,18 @@ init_combine_operators(const std::vector<std::shared_ptr<sopt::LinearTransform<T
 template <class T, class... ARGS>
 std::shared_ptr<sopt::LinearTransform<T> const> init_super_operator(
     const std::function<std::shared_ptr<sopt::LinearTransform<T> const>> &create_operator,
-    const std::vector<utilities::vis_params const> &uv_vis_data, ARGS &&... args) {
-  std::vector<std::shared_ptr<sopt::LinearTransform<T>>> measure_ops[uv_vis_data.size()];
-  std::vector<std::tuple<t_uint, t_uint>> seg(uv_vis_data.size());
+    const std::vector<utilities::vis_params> &uv_vis_data, ARGS &&... args) {
+  const t_uint blocks = uv_vis_data.size();
+  std::vector<std::shared_ptr<sopt::LinearTransform<T>>> measure_ops;
+  std::vector<std::tuple<t_uint, t_uint>> seg(blocks);
   t_uint total_measure = 0;
-  for(t_int i = 0; i < measure_ops.size(); i++) {
-    measure_ops[i] = create_operator(uv_vis_data.at(i), std::forward<ARGS>(args)...);
+  for(t_int i = 0; i < uv_vis_data.size(); i++) {
+    measure_ops.push_back(create_operator(uv_vis_data.at(i), std::forward<ARGS>(args)...));
     seg.emplace_back(total_measure, uv_vis_data.at(i).vis.size());
     total_measure += uv_vis_data.at(i).vis.size();
+  }
+  if (measure_ops.size() != uv_vis_data.size()) {
+    throw std::runtime_error("Numer of groups and measurement operators does not match.");
   }
   return init_combine_operators(measure_ops, seg);
 }
@@ -608,7 +612,7 @@ std::shared_ptr<sopt::LinearTransform<T> const> init_super_operator(
     const std::function<std::shared_ptr<sopt::LinearTransform<T> const>> &create_operator,
     const std::vector<std::tuple<t_uint, t_uint>> &seg, const utilities::vis_params &uv_vis_data,
     ARGS &&... args) {
-  std::vector<utilities::vis_params const> uv_vis_datas(seg.size());
+  std::vector<utilities::vis_params> uv_vis_datas(seg.size());
   for(t_uint i = 0; i < seg.size(); i++) {
     uv_vis_datas.emplace_back(uv_vis_data.segment(std::get<0>(seg.at(i)), std::get<1>(seg.at(i))));
   }

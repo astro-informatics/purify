@@ -14,6 +14,9 @@
 #ifdef None
 #undef None
 #endif
+#ifdef Status
+#undef Status
+#endif
 #include "purify/config.h"
 #include <complex>
 #include <Eigen/Core>
