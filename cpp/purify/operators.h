@@ -31,9 +31,6 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
   const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
   const t_uint rows = u.size();
   const t_uint cols = ftsizeu_ * ftsizev_;
-  t_uint q;
-  t_uint p;
-  t_uint index;
   auto omega_to_k = [](const Vector<t_real> &omega) {
     return omega.unaryExpr(std::ptr_fun<double, double>(std::floor));
   };
@@ -43,14 +40,14 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
   Sparse<t_complex> interpolation_matrix(rows, cols);
   interpolation_matrix.reserve(Vector<t_int>::Constant(rows, Ju * Jv));
 
+  const t_complex I(0, 1);
 #pragma omp simd collapse(3)
   for(t_int m = 0; m < rows; ++m) {
     for(t_int ju = 1; ju <= Ju; ++ju) {
       for(t_int jv = 1; jv <= Jv; ++jv) {
-        q = utilities::mod(k_u(m) + ju, ftsizeu_);
-        p = utilities::mod(k_v(m) + jv, ftsizev_);
-        index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
-        const t_complex I(0, 1);
+        const t_uint q = utilities::mod(k_u(m) + ju, ftsizeu_);
+        const t_uint p = utilities::mod(k_v(m) + jv, ftsizev_);
+        const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
         interpolation_matrix.coeffRef(m, index)
             += std::exp(-2 * constant::pi * I * ((k_u(m) + ju) * 0.5 + (k_v(m) + jv) * 0.5))
                * kernelu(u(m) - (k_u(m) + ju)) * kernelv(v(m) - (k_v(m) + jv)) * weights(m);
@@ -601,7 +598,7 @@ std::shared_ptr<sopt::LinearTransform<T> const> init_super_operator(
     seg.emplace_back(total_measure, uv_vis_data.at(i).vis.size());
     total_measure += uv_vis_data.at(i).vis.size();
   }
-  if (measure_ops.size() != uv_vis_data.size()) {
+  if(measure_ops.size() != uv_vis_data.size()) {
     throw std::runtime_error("Numer of groups and measurement operators does not match.");
   }
   return init_combine_operators(measure_ops, seg);
