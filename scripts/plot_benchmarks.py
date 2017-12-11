@@ -3,18 +3,18 @@ import string
 import numpy as np
 import matplotlib.pyplot as plt
 
-def parse_file(filename, what):
+def parse_file(filename):
     timeslist = []
+    meanlist = []
+    stddevlist = []
     with open(filename) as f:
         for line in f:
             linelist = line.split()
-            if len(linelist)>4:
-                temp = int(linelist[2])
-                if what!="time":
-                    temp = float(linelist[8].split('B/s')[0][:-1])
-                    if linelist[8].split('B/s')[0][-1:]=='k':
-                        temp = temp/1000.
+            temp = int(linelist[1])
+            if linelist[0].split('/')[-1]=='manual_time'
                 timeslist.append(temp)
+            if linelist[0].split('/')[-1]=='manual_time_mean'
+                meanlist.append(temp)
     return np.array(timeslist)
 
 def prep_arrays(serial_times, parallel_times, index_s, index_p, N):
