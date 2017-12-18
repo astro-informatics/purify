@@ -73,8 +73,16 @@ endif()
 
 add_dependencies(libpurify lookup_dependencies)
 
+add_library(degrid SHARED FFTOperator.cc utilities.cc kernels.cc distribute.cc wproj_utilities.cc operators.cc)
+
+
+target_link_libraries(degrid ${FFTW3_DOUBLE_LIBRARY} ${Sopt_CPP_LIBRARY})
+target_include_directories(degrid PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/cpp>
+  $<INSTALL_INTERFACE:include/>)
 install(FILES ${HEADERS} DESTINATION include/purify)
-install(TARGETS libpurify
+install(TARGETS libpurify degrid
   EXPORT PurifyTargets
   DESTINATION share/cmake/Purify
   RUNTIME DESTINATION bin

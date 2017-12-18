@@ -70,6 +70,7 @@ void forward_backward(const std::string &name, const Image<t_complex> &M31,
   sopt::t_real const mu = 1e-5 * dimage.size();
   sopt::t_real const beta = 0.5 / static_cast<sopt::t_real>(dimage.size());
   PURIFY_HIGH_LOG("Wavelet Coefficients: {}", static_cast<t_int>(dimage_wavelet.size()));
+#ifdef PURIFY_CImg
   auto const canvas
       = std::make_shared<CDisplay>(cimg::make_display(Vector<t_real>::Zero(1024 * 512), 1024, 512));
   auto const show_image = [&](const Vector<t_complex> &x) -> bool {
@@ -84,6 +85,7 @@ void forward_backward(const std::string &name, const Image<t_complex> &M31,
     }
     return true;
   };
+#endif
   auto const fb = sopt::algorithm::ImagingForwardBackward<t_complex>(dimage)
                       .itermax(500)
                       .mu(mu)
@@ -97,7 +99,9 @@ void forward_backward(const std::string &name, const Image<t_complex> &M31,
                       .l1_proximal_itermax(50)
                       .l1_proximal_positivity_constraint(true)
                       .l1_proximal_real_constraint(true)
+#ifdef PURIFY_CImg
                       .is_converged(show_image)
+#endif
                       .Psi(Psi)
                       .PhiTPhi(measurements_transform);
   auto const diagnostic = fb();
@@ -109,6 +113,7 @@ void forward_backward(const std::string &name, const Image<t_complex> &M31,
   residuals = dimage - residuals;
   const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
   pfitsio::write2d(residual_image.real(), residual_fits);
+#ifdef PURIFY_CImg
   const auto results = CImageList<t_real>(
       cimg::make_image(diagnostic.x.real().eval(), imsizey, imsizex).get_resize(512, 512),
       cimg::make_image(residuals.real().eval(), imsizey, imsizex).get_resize(512, 512));
@@ -117,6 +122,7 @@ void forward_backward(const std::string &name, const Image<t_complex> &M31,
   cimg::make_image(residuals.real().eval(), imsizey, imsizex)
       .histogram(256)
       .display_graph("Residual Histogram", 2);
+#endif
   Image<t_real> lower_error, upper_error, mean_solution;
   const t_real alpha = 0.99;
   const std::tuple<t_uint, t_uint> grid_pixel_size = std::make_tuple(imsizey / 4, imsizex / 4);
@@ -125,6 +131,7 @@ void forward_backward(const std::string &name, const Image<t_complex> &M31,
   std::tie(lower_error, mean_solution, upper_error)
       = sopt::credible_region::credible_interval<Vector<t_complex>, t_real>(
           diagnostic.x, imsizey, imsizex, grid_pixel_size, obj_function, alpha);
+#ifdef PURIFY_CImg
   const auto credible_interval
       = CImageList<t_real>(cimg::make_image(lower_error).get_resize(512, 512),
                            cimg::make_image(mean_solution).get_resize(512, 512),
@@ -135,6 +142,7 @@ void forward_backward(const std::string &name, const Image<t_complex> &M31,
   new_canvas->resize(1536, 512, true);
   while(!canvas->is_closed() or !new_canvas->is_closed())
     canvas->wait();
+#endif
 }
 
 int main(int, char **) {

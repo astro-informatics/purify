@@ -58,6 +58,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
   PURIFY_HIGH_LOG("Using epsilon of {}", epsilon);
+#ifdef PURIFY_CImg
   auto const canvas
       = std::make_shared<CDisplay>(cimg::make_display(Vector<t_real>::Zero(1024 * 512), 1024, 512));
   canvas->resize(true);
@@ -77,6 +78,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
     }
     return true;
   };
+#endif
   auto const padmm
       = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
             .itermax(500)
@@ -91,7 +93,9 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
             .l1_proximal_real_constraint(true)
             .residual_convergence(epsilon * 1.001)
             .lagrange_update_scale(0.9)
+#ifdef PURIFY_CImg
             .is_converged(show_image)
+#endif
             .nu(1e0)
             .Psi(Psi)
             .Phi(*measurements_transform);
@@ -104,6 +108,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
                                 * (uv_data.vis - ((*measurements_transform) * diagnostic.x));
   Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
   pfitsio::write2d(residual_image.real(), residual_fits);
+#ifdef PURIFY_CImg
   const auto results = CImageList<t_real>(
       cimg::make_image(diagnostic.x.real().eval(), imsizey, imsizex).get_resize(512, 512),
       cimg::make_image(residuals.real().eval(), imsizey, imsizex).get_resize(512, 512));
@@ -113,6 +118,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
       .display_graph("Residual Histogram", 2);
   while(!canvas->is_closed())
     canvas->wait();
+#endif
 }
 
 int main(int, char **) {

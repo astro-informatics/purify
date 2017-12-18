@@ -22,6 +22,9 @@
 //! Whether PURIFY is running with arrayfire
 #cmakedefine PURIFY_ARRAYFIRE
 
+//! Whether PURIFY is running with arrayfire
+#cmakedefine PURIFY_CImg
+
 #include <string>
 #include <tuple>
 

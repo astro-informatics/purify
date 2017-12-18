@@ -1,5 +1,6 @@
 #ifndef PURIFY_CIMG_H
 #define PURIFY_CIMG_H
+#ifdef PURIFY_CImg
 #include "purify/config.h"
 #include "purify/types.h"
 
@@ -55,5 +56,7 @@ template <class T> CDisplay make_display(const Eigen::DenseBase<T> &x, const std
 
 } // namespace cimg
 } // namespace purify
+
+#endif
 
 #endif

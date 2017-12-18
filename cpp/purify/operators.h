@@ -78,6 +78,18 @@ t_real power_method(const sopt::LinearTransform<T> &op, const t_uint &niters,
   }
   return std::sqrt(old_value);
 }
+//! Construct gridding matrix with mixing
+template <class T, class... ARGS>
+Sparse<t_complex> init_gridding_matrix_2d(const Sparse<T> &mixing_matrix, ARGS &&... args) {
+
+  if(mixing_matrix.rows() * mixing_matrix.cols() < 2)
+    return init_gridding_matrix_2d(std::forward<ARGS>(args)...);
+  const Sparse<t_complex> G = init_gridding_matrix_2d(std::forward<ARGS>(args)...);
+  if(mixing_matrix.cols() != G.rows())
+    throw std::runtime_error(
+        "The columns of the mixing matrix do not match the number of visibilities");
+  return mixing_matrix * init_gridding_matrix_2d(std::forward<ARGS>(args)...);
+};
 } // namespace details
 namespace operators {
 #ifdef PURIFY_MPI
@@ -158,6 +170,7 @@ init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
         output = utilities::sparse_multiply_matrix(*adjoint, input);
       });
 }
+
 //! Construsts zero padding operator
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
