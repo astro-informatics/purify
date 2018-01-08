@@ -29,8 +29,8 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
                                           const t_uint &imsizex_, const t_real &oversample_ratio,
                                           const std::function<t_real(t_real)> kernelu,
                                           const std::function<t_real(t_real)> kernelv,
-                                          const t_uint Ju = 4, const t_uint Jv = 4);
- 
+                                          const t_uint Ju = 4, const t_uint Jv = 4); 
+
 //! Construct gridding matrix with w projection
 Sparse<t_complex>
 init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
@@ -48,10 +48,7 @@ Image<t_real> init_correction2d(const t_real &oversample_ratio, const t_uint &im
                                 const t_uint imsizex_,
                                 const std::function<t_real(t_real)> ftkernelu,
                                 const std::function<t_real(t_real)> ftkernelv);
- 
-//! Attempt at coding the power method, returns thesqrt of the largest eigen value of a linear
-//! operator composed with its adjoint niters:: max number of iterations relative_difference::
-//! percentage difference at which eigen value has converged
+
 template <class T>
 t_real power_method(const sopt::LinearTransform<T> &op, const t_uint &niters,
                     const t_real &relative_difference, const T &initial_vector) {
@@ -83,8 +80,20 @@ t_real power_method(const sopt::LinearTransform<T> &op, const t_uint &niters,
     old_value = estimate_eigen_value;
   }
   return std::sqrt(old_value);
- }
+}
  
+//! Construct gridding matrix with mixing
+template <class T, class... ARGS>
+Sparse<t_complex> init_gridding_matrix_2d(const Sparse<T> &mixing_matrix, ARGS &&... args) {
+
+  if(mixing_matrix.rows() * mixing_matrix.cols() < 2)
+    return init_gridding_matrix_2d(std::forward<ARGS>(args)...);
+  const Sparse<t_complex> G = init_gridding_matrix_2d(std::forward<ARGS>(args)...);
+  if(mixing_matrix.cols() != G.rows())
+    throw std::runtime_error(
+        "The columns of the mixing matrix do not match the number of visibilities");
+  return mixing_matrix * init_gridding_matrix_2d(std::forward<ARGS>(args)...);
+};
 } // namespace details
 
  
@@ -169,8 +178,8 @@ init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
       [=](T &output, const T &input) {
         output = utilities::sparse_multiply_matrix(*adjoint, input);
       });
- }
- 
+}
+
 //! Construsts zero padding operator
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>

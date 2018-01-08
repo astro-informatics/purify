@@ -18,13 +18,13 @@ endfunction()
 configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(HEADERS
-  RMOperator.h logging.h FFTOperator.h kernels.h
+  logging.h FFTOperator.h kernels.h
   pfitsio.h MeasurementOperator.h clean.h logging.disabled.h types.h PSFOperator.h
   IndexMapping.h logging.enabled.h utilities.h operators.h operators_gpu.h wproj_utilities.h cimg.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(SOURCES MeasurementOperator.cc MeasurementOperator_mpi.cc FFTOperator.cc clean.cc utilities.cc pfitsio.cc
-  kernels.cc RMOperator.cc PSFOperator.cc distribute.cc wproj_utilities.cc operators.cc)
+  kernels.cc PSFOperator.cc distribute.cc wproj_utilities.cc operators.cc)
 
 if(TARGET casacore::ms)
   list(APPEND SOURCES casacore.cc)
@@ -73,8 +73,16 @@ endif()
 
 add_dependencies(libpurify lookup_dependencies)
 
+add_library(degrid SHARED FFTOperator.cc utilities.cc kernels.cc distribute.cc wproj_utilities.cc operators.cc)
+
+
+target_link_libraries(degrid ${FFTW3_DOUBLE_LIBRARY} ${Sopt_CPP_LIBRARY})
+target_include_directories(degrid PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/cpp>
+  $<INSTALL_INTERFACE:include/>)
 install(FILES ${HEADERS} DESTINATION include/purify)
-install(TARGETS libpurify
+install(TARGETS libpurify degrid
   EXPORT PurifyTargets
   DESTINATION share/cmake/Purify
   RUNTIME DESTINATION bin

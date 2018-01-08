@@ -16,6 +16,7 @@ option(openmp         "Enable OpenMP"                                   on)
 option(logging        "Enable logging"                                  on)
 option(dompi          "Enable MPI"                                      on)
 option(doaf           "Enable ArrayFire"                                on)
+option(docimg         "Enable CImg"                                     off)
 option(docasa         "Enable CASA"                                     on)
 
 # Set version and build id of this package

@@ -1,6 +1,7 @@
 #ifndef PURIFY_TYPES_H
 #define PURIFY_TYPES_H
 
+#ifdef PURIFY_CImg
 #include <CImg.h>
 #ifdef Success
 #undef Success
@@ -17,6 +18,8 @@
 #ifdef Status
 #undef Status
 #endif
+#endif
+
 #include "purify/config.h"
 #include <complex>
 #include <Eigen/Core>
@@ -25,14 +28,14 @@
 #include <sopt/types.h>
 
 namespace purify {
-using sopt::t_int;
-using sopt::t_uint;
-using sopt::t_real;
-using sopt::t_complex;
-using sopt::Vector;
-using sopt::Matrix;
 using sopt::Array;
 using sopt::Image;
+using sopt::Matrix;
+using sopt::Vector;
+using sopt::t_complex;
+using sopt::t_int;
+using sopt::t_real;
+using sopt::t_uint;
 
 typedef std::complex<float> t_complexf;
 //! Root of the type hierarchy for triplet lists
@@ -43,11 +46,13 @@ typedef Eigen::Triplet<t_complex> t_tripletList;
 template <class T = t_real> using Sparse = Eigen::SparseMatrix<T, Eigen::RowMajor>;
 template <class T = t_real> using SparseVector = Eigen::SparseVector<T>;
 
+#ifdef PURIFY_CImg
 //! Image type of CImg library
 template <class T = t_real> using CImage = cimg_library::CImg<T>;
 template <class T = t_real> using CImageList = cimg_library::CImgList<T>;
 //! Display used to display CImg images
 typedef cimg_library::CImgDisplay CDisplay;
+#endif
 
 namespace constant {
 //! mathematical constant

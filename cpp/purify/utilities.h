@@ -42,17 +42,17 @@ struct vis_params {
   //! return number of measurements
   t_uint size() const { return this->vis.size(); };
 };
-struct rm_params {
-  Vector<t_real> frequency;              // u coordinates
-  Vector<t_complex> linear_polarisation; // complex linear polarisation
-  Vector<t_complex> weights;             // weights for visibilities
-  std::string units = "MHz";
-};
 
 //! Generates a random visibility coverage
 utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &mean,
                                             const t_real &standard_deviation,
                                             const t_real &max_w = 0);
+//! Generate guassianly distributed (sigma = pi) antenna positions
+Matrix<t_real> generate_antennas(const t_uint N);
+//! Using guassianly distributed (sigma = pi) antenna positions generate a coverage
+utilities::vis_params antenna_to_coverage(const t_uint N);
+//! Provided antenna positions generate a coverage
+utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B);
 //! Reads in visibility file
 utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term = false);
 //! Writes visibilities to txt
