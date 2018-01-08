@@ -21,6 +21,26 @@ struct vis_params {
   t_real ra = 0.;  // decimal degrees
   t_real dec = 0.; // decimal degrees
   t_real average_frequency = 0.;
+  t_real phase_centre_x = 0.; // phase centre
+  t_real phase_centre_y = 0.; // phase centre
+  //! return subset of measurements
+  vis_params segment(const t_uint pos, const t_uint length) const {
+    return vis_params(this->u.segment(pos, length), this->v.segment(pos, length),
+                      this->w.segment(pos, length), this->vis.segment(pos, length),
+                      this->weights.segment(pos, length), this->units, this->ra, this->dec,
+                      this->average_frequency);
+  };
+  //! default constructor
+  vis_params(){};
+  //! constructor
+  vis_params(const Vector<t_real> &u_, const Vector<t_real> &v_, const Vector<t_real> &w_,
+             const Vector<t_complex> &vis_, const Vector<t_complex> &weights_,
+             const std::string &units_ = "lambda", const t_real &ra_ = 0, const t_real &dec_ = 0,
+             const t_real &average_frequency_ = 0)
+      : u(u_), v(v_), w(w_), vis(vis_), weights(weights_), ra(ra_), dec(dec_), units(units_),
+        average_frequency(average_frequency_){};
+  //! return number of measurements
+  t_uint size() const { return this->vis.size(); };
 };
 struct rm_params {
   Vector<t_real> frequency;              // u coordinates
@@ -133,6 +153,7 @@ template <class K, class L> Image<t_complex> parallel_multiply_image(const K &A,
 Matrix<t_complex> re_sample_ft_grid(const Matrix<t_complex> &input, const t_real &re_sample_factor);
 //! resamples image size
 Matrix<t_complex> re_sample_image(const Matrix<t_complex> &input, const t_real &re_sample_ratio);
+
 } // namespace utilities
 } // namespace purify
 

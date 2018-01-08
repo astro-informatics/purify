@@ -2,6 +2,7 @@
 #include <memory>
 #include <random>
 #include <boost/math/special_functions/erf.hpp>
+#include <sopt/credible_region.h>
 #include <sopt/imaging_padmm.h>
 #include <sopt/relative_variation.h>
 #include <sopt/utilities.h>
@@ -13,6 +14,7 @@
 #ifdef PURIFY_GPU
 #include "purify/operators_gpu.h"
 #endif
+#include "purify/cimg.h"
 #include "purify/pfitsio.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
@@ -31,6 +33,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   t_real const over_sample = 2;
   t_uint const imsizey = M31.rows();
   t_uint const imsizex = M31.cols();
+
 #ifndef PURIFY_GPU
   auto const measurements_transform
       = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
@@ -48,28 +51,48 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, imsizey, imsizex);
-
   Vector<> dimage = (measurements_transform->adjoint() * uv_data.vis).real();
+  assert(dimage.size() == M31.size());
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   sopt::utilities::write_tiff(Image<t_real>::Map(dimage.data(), imsizey, imsizex), dirty_image);
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), imsizey, imsizex), dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
   PURIFY_HIGH_LOG("Using epsilon of {}", epsilon);
+  auto const canvas
+      = std::make_shared<CDisplay>(cimg::make_display(Vector<t_real>::Zero(1024 * 512), 1024, 512));
+  canvas->resize(true);
+  auto const show_image = [&, measurements_transform](const Vector<t_complex> &x) -> bool {
+    if(!canvas->is_closed()) {
+      const Vector<t_complex> res
+          = (measurements_transform->adjoint() * (uv_data.vis - (*measurements_transform * x)));
+      const auto img1 = cimg::make_image(x.real().eval(), imsizey, imsizex)
+                            .get_normalize(0, 1)
+                            .get_resize(512, 512);
+      const auto img2 = cimg::make_image(res.real().eval(), imsizey, imsizex)
+                            .get_normalize(0, 1)
+                            .get_resize(512, 512);
+      const auto results = CImageList<t_real>(img1, img2);
+      canvas->display(results);
+      canvas->resize(true);
+    }
+    return true;
+  };
   auto const padmm
       = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
-            .itermax(100)
+            .itermax(500)
             .gamma((measurements_transform->adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
             .relative_variation(1e-3)
             .l2ball_proximal_epsilon(epsilon)
             .tight_frame(false)
             .l1_proximal_tolerance(1e-2)
-            .l1_proximal_nu(1)
+            .l1_proximal_nu(1.)
             .l1_proximal_itermax(50)
             .l1_proximal_positivity_constraint(true)
             .l1_proximal_real_constraint(true)
             .residual_convergence(epsilon * 1.001)
             .lagrange_update_scale(0.9)
+            .is_converged(show_image)
             .nu(1e0)
             .Psi(Psi)
             .Phi(*measurements_transform);
@@ -82,6 +105,15 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
                                 * (uv_data.vis - ((*measurements_transform) * diagnostic.x));
   Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
   pfitsio::write2d(residual_image.real(), residual_fits);
+  const auto results = CImageList<t_real>(
+      cimg::make_image(diagnostic.x.real().eval(), imsizey, imsizex).get_resize(512, 512),
+      cimg::make_image(residuals.real().eval(), imsizey, imsizex).get_resize(512, 512));
+  canvas->display(results);
+  cimg::make_image(residuals.real().eval(), imsizey, imsizex)
+      .histogram(256)
+      .display_graph("Residual Histogram", 2);
+  while(!canvas->is_closed())
+    canvas->wait();
 }
 
 int main(int, char **) {
@@ -89,11 +121,11 @@ int main(int, char **) {
   purify::logging::initialize();
   sopt::logging::set_level("debug");
   purify::logging::set_level("debug");
-  const std::string &name = "30dor_256";
+  const std::string &name = "M31";
   const t_real FoV = 1;      // deg
   const t_real max_w = 100.; // lambda
-  const t_real snr = 30;
-  const bool w_term = true;
+  const t_real snr = 10;
+  const bool w_term = false;
   std::string const fitsfile = image_filename(name + ".fits");
   auto M31 = pfitsio::read2d(fitsfile);
   const t_real cellsize = FoV / M31.cols() * 60. * 60.;
@@ -104,13 +136,14 @@ int main(int, char **) {
   pfitsio::write2d(M31.real(), inputfile);
 
   t_int const number_of_pxiels = M31.size();
-  t_int const number_of_vis = std::floor(number_of_pxiels * 0.1);
+  t_int const number_of_vis = std::floor(number_of_pxiels * 0.2);
   // Generating random uv(w) coverage
   t_real const sigma_m = constant::pi / 3;
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, max_w);
   uv_data.units = "radians";
   PURIFY_MEDIUM_LOG("Number of measurements / number of pixels: {}",
                     uv_data.u.size() * 1. / number_of_pxiels);
+
 #ifndef PURIFY_GPU
   auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 100, 0.0001, "kb", 8, 8, "measure",

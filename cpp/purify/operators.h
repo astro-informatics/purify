@@ -67,10 +67,12 @@ t_real power_method(const sopt::LinearTransform<T> &op, const t_uint &niters,
   for(t_int i = 0; i < niters; ++i) {
     estimate_eigen_vector = op.adjoint() * (op * estimate_eigen_vector);
     estimate_eigen_value = estimate_eigen_vector.matrix().norm();
-    if(estimate_eigen_value != estimate_eigen_value)
-      throw std::runtime_error("Error in measurement operator or data corrupted.");
-    estimate_eigen_vector = estimate_eigen_vector / estimate_eigen_value;
     PURIFY_DEBUG("Iteration: {}, norm = {}", i + 1, estimate_eigen_value);
+    if(estimate_eigen_value <= 0)
+      throw std::runtime_error("Error in operator.");
+    if(estimate_eigen_value != estimate_eigen_value)
+      throw std::runtime_error("Error in operator or data corrupted.");
+    estimate_eigen_vector = estimate_eigen_vector / estimate_eigen_value;
     if(relative_difference * relative_difference
        > std::abs(old_value - estimate_eigen_value) / old_value) {
       old_value = estimate_eigen_value;
@@ -102,12 +104,15 @@ init_gridding_matrix_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
                         const t_real &celly = 1, const t_real &energy_chirp_fraction = 1,
                         const t_real &energy_kernel_fraction = 1) {
 
-  Sparse<t_complex> interpolation_matrix = details::init_gridding_matrix_2d(
+  Sparse<t_complex> interpolation_matrix_original = details::init_gridding_matrix_2d(
       u, v, w, weights, imsizey_, imsizex_, oversample_ratio, kernelu, kernelv, Ju, Jv, w_term,
       cellx, celly, energy_chirp_fraction, energy_kernel_fraction);
-  const DistributeSparseVector distributor(interpolation_matrix, comm);
-  interpolation_matrix = purify::compress_outer(interpolation_matrix);
-  const Sparse<t_complex> adjoint = interpolation_matrix.adjoint();
+  const DistributeSparseVector distributor(interpolation_matrix_original, comm);
+  const std::shared_ptr<const Sparse<t_complex>> interpolation_matrix
+      = std::make_shared<const Sparse<t_complex>>(
+          purify::compress_outer(interpolation_matrix_original));
+  const std::shared_ptr<const Sparse<t_complex>> adjoint
+      = std::make_shared<const Sparse<t_complex>>(interpolation_matrix->adjoint());
 
   return std::make_tuple(
       [=](T &output, const T &input) {
@@ -117,13 +122,13 @@ init_gridding_matrix_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
         } else {
           distributor.scatter(output);
         }
-        output = utilities::sparse_multiply_matrix(interpolation_matrix, output);
+        output = utilities::sparse_multiply_matrix(*interpolation_matrix, output);
       },
       [=](T &output, const T &input) {
         if(not comm.is_root()) {
-          distributor.gather(utilities::sparse_multiply_matrix(adjoint, input));
+          distributor.gather(utilities::sparse_multiply_matrix(*adjoint, input));
         } else {
-          distributor.gather(utilities::sparse_multiply_matrix(adjoint, input), output);
+          distributor.gather(utilities::sparse_multiply_matrix(*adjoint, input), output);
         }
       });
 }
@@ -150,17 +155,19 @@ init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
                         const t_real &celly = 1, const t_real &energy_chirp_fraction = 1,
                         const t_real &energy_kernel_fraction = 1) {
 
-  const Sparse<t_complex> interpolation_matrix = details::init_gridding_matrix_2d(
-      u, v, w, weights, imsizey_, imsizex_, oversample_ratio, kernelu, kernelv, Ju, Jv, w_term,
-      cellx, celly, energy_chirp_fraction, energy_kernel_fraction);
-  const Sparse<t_complex> adjoint = interpolation_matrix.adjoint();
+  const std::shared_ptr<const Sparse<t_complex>> interpolation_matrix
+      = std::make_shared<const Sparse<t_complex>>(details::init_gridding_matrix_2d(
+          u, v, w, weights, imsizey_, imsizex_, oversample_ratio, kernelu, kernelv, Ju, Jv, w_term,
+          cellx, celly, energy_chirp_fraction, energy_kernel_fraction));
+  const std::shared_ptr<const Sparse<t_complex>> adjoint
+      = std::make_shared<const Sparse<t_complex>>(interpolation_matrix->adjoint());
 
   return std::make_tuple(
       [=](T &output, const T &input) {
-        output = utilities::sparse_multiply_matrix(interpolation_matrix, input);
+        output = utilities::sparse_multiply_matrix(*interpolation_matrix, input);
       },
       [=](T &output, const T &input) {
-        output = utilities::sparse_multiply_matrix(adjoint, input);
+        output = utilities::sparse_multiply_matrix(*adjoint, input);
       });
  }
  
@@ -300,16 +307,17 @@ base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
   std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(ftkernelu, ftkernelv, imsizey,
                                                               imsizex, oversample_ratio, ft_plan);
   sopt::OperatorFunction<T> directG, indirectG;
-  PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
-                    imsizey * celly / (60. * 60.));
+  if(w_term == true)
+    PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
+                      imsizey * celly / (60. * 60.));
   PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
-  PURIFY_MEDIUM_LOG("Kernel Support: {} x {}", Ju, Jv);
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
       u, v, w, weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv, w_term, cellx,
       celly, energy_chirp_fraction, energy_kernel_fraction);
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
+  PURIFY_LOW_LOG("Finished consturction of Φ.");
   return std::make_tuple(direct, indirect);
 }
 
@@ -333,16 +341,17 @@ base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_
   std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(ftkernelu, ftkernelv, imsizey,
                                                               imsizex, oversample_ratio, ft_plan);
   sopt::OperatorFunction<T> directG, indirectG;
-  PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
-                    imsizey * celly / (60. * 60.));
+  if(w_term == true)
+    PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
+                      imsizey * celly / (60. * 60.));
   PURIFY_LOW_LOG("Constructing Weighting and MPI Gridding Operators: WG");
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
-  PURIFY_MEDIUM_LOG("Kernel Support: {} x {}", Ju, Jv);
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
       comm, u, v, w, weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv, w_term,
       cellx, celly, energy_chirp_fraction, energy_kernel_fraction);
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
+  PURIFY_LOW_LOG("Finished consturction of Φ.");
   if(comm.is_root())
     return std::make_tuple(direct, indirect);
   else
@@ -520,7 +529,76 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
                                         energy_chirp_fraction, energy_kernel_fraction);
 }
 #endif
+
+template <class T, class... ARGS>
+std::shared_ptr<sopt::LinearTransform<T> const>
+init_combine_operators(const std::vector<std::shared_ptr<sopt::LinearTransform<T>>> &measure_op,
+                       const std::vector<std::tuple<t_uint, t_uint>> seg) {
+  const auto direct = [=](T &output, const T &input) {
+    for(t_uint i = 0; i < measure_op.size(); i++)
+      output.segment(std::get<0>(seg.at(i)), std::get<1>(seg.at(i))) = *(measure_op.at(i)) * input;
+  };
+  const auto indirect = [=](T &output, const T &input) {
+    for(t_uint i = 0; i < measure_op.size(); i++)
+      output += measure_op.at(i)->adjoint()
+                * input.segment(std::get<0>(seg.at(i)), std::get<1>(seg.at(i)));
+  };
+  return std::make_shared<sopt::LinearTransform<T> const>(direct, indirect);
+}
  
+//! combines different uv_data sets and creates a super measurement operator out of multiple
+//! measurement operators
+template <class T, class... ARGS>
+std::shared_ptr<sopt::LinearTransform<T> const> init_super_operator(
+    const std::function<std::shared_ptr<sopt::LinearTransform<T> const>> &create_operator,
+    const std::vector<utilities::vis_params> &uv_vis_data, ARGS &&... args) {
+  const t_uint blocks = uv_vis_data.size();
+  std::vector<std::shared_ptr<sopt::LinearTransform<T>>> measure_ops;
+  std::vector<std::tuple<t_uint, t_uint>> seg(blocks);
+  t_uint total_measure = 0;
+  for(t_int i = 0; i < uv_vis_data.size(); i++) {
+    measure_ops.push_back(create_operator(uv_vis_data.at(i), std::forward<ARGS>(args)...));
+    seg.emplace_back(total_measure, uv_vis_data.at(i).vis.size());
+    total_measure += uv_vis_data.at(i).vis.size();
+  }
+  if(measure_ops.size() != uv_vis_data.size()) {
+    throw std::runtime_error("Numer of groups and measurement operators does not match.");
+  }
+  return init_combine_operators(measure_ops, seg);
+}
+
+template <class T, class... ARGS>
+std::shared_ptr<sopt::LinearTransform<T> const> init_super_operator(
+    const std::function<std::shared_ptr<sopt::LinearTransform<T> const>> &create_operator,
+    const std::vector<std::tuple<t_uint, t_uint>> &seg, const utilities::vis_params &uv_vis_data,
+    ARGS &&... args) {
+  std::vector<utilities::vis_params> uv_vis_datas(seg.size());
+  for(t_uint i = 0; i < seg.size(); i++) {
+    uv_vis_datas.emplace_back(uv_vis_data.segment(std::get<0>(seg.at(i)), std::get<1>(seg.at(i))));
+  }
+  return init_super_operator(create_operator, uv_vis_datas, std::forward<ARGS>(args)...);
+}
+ 
+template <class T, class... ARGS>
+std::shared_ptr<sopt::LinearTransform<T> const> init_super_operator(
+    const std::function<std::shared_ptr<sopt::LinearTransform<T> const>> &create_operator,
+    const utilities::vis_params &uv_vis_data, const t_uint &seg_num, ARGS &&... args) {
+  if(seg_num == 0)
+    throw std::runtime_error("Number of segments = 0");
+  std::vector<std::tuple<t_uint, t_uint>> seg(seg_num);
+  const t_uint segment
+      = std::floor(static_cast<t_real>(uv_vis_data.size()) / static_cast<t_real>(seg_num));
+  t_uint total = 0;
+  for(t_uint i = 0; i < seg_num; i++) {
+    const t_uint delta = (i == (seg_num - 1)) ? (uv_vis_data.size() - total) : segment;
+    seg.emplace_back(total, delta);
+    total += delta;
+  }
+  if(total != uv_vis_data.size())
+    throw std::runtime_error("Segments do not sum to the total");
+  return init_super_operator(create_operator, uv_vis_data, seg, std::forward<ARGS>(args)...);
+}
+
 } // namespace measurementoperator
  
 }; // namespace purify

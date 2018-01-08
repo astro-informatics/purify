@@ -15,7 +15,7 @@ utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &
           mean:: mean of distribution
           standard_deviation:: standard deviation of distirbution
   */
-  auto sample = [&mean, &standard_deviation](t_real x) {
+  auto sample = [&mean, &standard_deviation]() {
     std::random_device rd;
     std::mt19937_64 rng(rd());
     t_real output = 4 * standard_deviation + mean;
@@ -30,9 +30,15 @@ utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &
   };
 
   utilities::vis_params uv_vis;
-  uv_vis.u = Vector<t_real>::Zero(vis_num).unaryExpr(sample);
-  uv_vis.v = Vector<t_real>::Zero(vis_num).unaryExpr(sample);
-  uv_vis.w = Vector<t_real>::Zero(vis_num).unaryExpr(sample);
+  uv_vis.u = Vector<t_real>::Zero(vis_num);
+  uv_vis.v = Vector<t_real>::Zero(vis_num);
+  uv_vis.w = Vector<t_real>::Zero(vis_num);
+  //#pragma omp parallel for
+  for(t_uint i = 0; i < vis_num; i++) {
+    uv_vis.u(i) = sample();
+    uv_vis.v(i) = sample();
+    uv_vis.w(i) = sample();
+  }
   uv_vis.w = uv_vis.w / uv_vis.w.maxCoeff() * max_w;
   uv_vis.weights = Vector<t_complex>::Constant(vis_num, 1);
   uv_vis.vis = Vector<t_complex>::Constant(vis_num, 1);

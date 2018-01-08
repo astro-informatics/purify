@@ -59,14 +59,13 @@ lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS URL "https://bitbuc
 
 set(PURIFY_ARRAYFIRE FALSE)
 if(doaf)
-  lookup_package(ArrayFire REQUIRED DOWNLOAD_BY_DEFAULT)
+  lookup_package(ArrayFire REQUIRED)
   set(PURIFY_ARRAYFIRE TRUE)
 endif()
 
 if(logging)
   lookup_package(spdlog REQUIRED)
 endif()
-
 # Look up packages: if not found, installs them
 # Unless otherwise specified, if purify is not on master, then sopt will be
 # downloaded from development branch.
@@ -90,7 +89,8 @@ endif()
 
 lookup_package(CFitsIO REQUIRED 3.41 EXACT ARGUMENTS CHECKCASA URL "ftp://heasarc.gsfc.nasa.gov/software/fitsio/c/cfitsio3410.tar.gz")
 lookup_package(CCFits REQUIRED)
-
+find_package(X11)
+lookup_package(CImg REQUIRED)
 if(docasa)
   find_package(CasaCore OPTIONAL_COMPONENTS ms)
 endif()
