@@ -62,7 +62,7 @@ template <class T0> std::set<t_int> non_empty_outers(Eigen::SparseMatrixBase<T0>
 
 //! Indices of non empty outer indices
 template <class T0>
-Sparse<typename T0::Scalar> compress_outer(Eigen::SparseMatrixBase<T0> const &matrix) {
+Sparse<typename T0::Scalar> compress_outer(T0 const &matrix) {
   static_assert(T0::IsRowMajor, "Not tested for col major");
   auto const indices = non_empty_outers(matrix);
 

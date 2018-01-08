@@ -24,10 +24,12 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
   interpolation_matrix.reserve(Vector<t_int>::Constant(rows, Ju * Jv));
 
   const t_complex I(0, 1);
-#pragma omp simd collapse(3)
+  const t_int ju_max = std::min(Ju + 1, ftsizeu_ + 1);
+  const t_int jv_max = std::min(Jv + 1, ftsizev_ + 1);
+#pragma omp parallel for collapse(3)
   for(t_int m = 0; m < rows; ++m) {
-    for(t_int ju = 1; ju < std::min(Ju + 1, ftsizeu_ + 1); ++ju) {
-      for(t_int jv = 1; jv < std::min(Jv + 1, ftsizev_ + 1); ++jv) {
+    for(t_int ju = 1; ju < ju_max; ++ju) {
+      for(t_int jv = 1; jv < jv_max; ++jv) {
         const t_uint q = utilities::mod(k_u(m) + ju, ftsizeu_);
         const t_uint p = utilities::mod(k_v(m) + jv, ftsizev_);
         const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
