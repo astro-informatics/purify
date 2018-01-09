@@ -78,8 +78,10 @@ if __name__ == "__main__":
              index = bm*npar + par
              # For the degrid operator parallel benchmarks, there are 2 sets of plots distr+MPI
              y = prep_arrays(serial_means, parallel_means, index, index, 2*N)
+             err = prep_arrays(serial_stddevs, parallel_stddevs, index, index, 2*N)
+             print(y, err) 
              group = par_name[par]
-             ax.scatter(x, y, c=colors[par%4], s=200, marker=markers[par%4], label=group)
+             ax.errorbar(x, y, yerr=err, c=colors[par%4], fmt='o', label=group)
              plt.title('Distributed')
          plt.setp(ax.get_xticklabels(), visible=True)
          plt.xticks(range(nconf), x_name)
@@ -90,8 +92,9 @@ if __name__ == "__main__":
              index = bm*npar + N + par
              # For the degrid operator parallel benchmarks, there are 2 sets of plots distr+MPI
              y = prep_arrays(serial_means, parallel_means, index-N, index, 2*N)
+             err = prep_arrays(serial_stddevs, parallel_stddevs, index-N, index, 2*N)
              group = par_name[par]
-             ax.scatter(x, y, c=colors[par%4], s=200, marker=markers[par%4], label=group)
+             ax.errorbar(x, y, yerr=err, c=colors[par%4], fmt='o', label=group)
              plt.title('MPI')
          plt.setp(ax.get_xticklabels(), visible=True)
          plt.xticks(range(nconf), x_name)
