@@ -73,7 +73,7 @@ if(NOT Sopt_GIT_TAG)
   set(Sopt_GIT_TAG master CACHE STRING "Branch/tag when downloading sopt")
 endif()
 if(NOT Sopt_GIT_REPOSITORY)
-  set(Sopt_GIT_REPOSITORY https://github.com/astro-informatics/sopt.git
+  set(Sopt_GIT_REPOSITORY https://www.github.com/basp-group/sopt.git
     CACHE STRING "Location when downloading sopt")
 endif()
 if(dompi)
