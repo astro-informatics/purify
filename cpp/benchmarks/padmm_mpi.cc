@@ -121,7 +121,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, Apply)(benchmark::State &state) {
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, Apply)
 //->Apply(b_utilities::Arguments)
 //->Args({1024,1000000,4})->Args({1024,10000000,4})
-->Args({1024,10000,4})
+->Args({1024,1000,4})
 ->UseManualTime()
 ->Repetitions(5)//->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMillisecond);
