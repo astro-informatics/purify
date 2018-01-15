@@ -19,7 +19,7 @@
 
 # Set the working directory to somewhere in your scratch space.  This is
 # a necessary step as compute nodes cannot write to $HOME.
-#$ -wd /home/cceaiac/Scratch/purify
+#$ -wd /home/ucapgui/Scratch/purify
 
 # Set the name of the job.
 #$ -N purifySBenchmark
@@ -28,4 +28,4 @@
 cd $TMPDIR
 
 ## $HOME/purify/build/cpp/benchmarks/measurement_operator > $HOME/Scratch/purify/serialBenchmarkMO.$JOB_ID.out
-$HOME/purify/build/cpp/benchmarks/padmm > $HOME/Scratch/purify/serialBenchmarkPADMM.$JOB_ID.out
+$HOME/BICO/purify/build/cpp/benchmarks/wavelet_operator > $HOME/Scratch/purify/serialBenchmarkWLO.$JOB_ID.out
