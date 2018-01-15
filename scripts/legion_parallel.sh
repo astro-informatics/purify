@@ -16,18 +16,22 @@
 
 # Set the working directory to somewhere in your scratch space.  This is
 # a necessary step as compute nodes cannot write to $HOME.
-#$ -wd /home/cceaiac/Scratch/purify
+#$ -wd /home/ucapgui/Scratch/purify
 
 # Set the name of the job.
-#$ -N purifyPBenchmark
+#$ -N purify_WLO_benchmark
 
 # Select the MPI parallel environment and number of cores.
 # Has to be multiple of 12 for XYZ nodes, 16 for U nodes
-#$ -pe mpi 16
+# To request MPI processes simply run multiples of the number
+# of threads per nodes i.e. here each node supports 16 threads
+# therefore requesting 32 threads will run on two MPI processes
+# hence two nodes
+#$ -pe mpi 144
 
 #Automatically set threads to processes per node: eg. if on X nodes = 12 OMP threads
 export OMP_NUM_THREADS=$(ppn)
 
 #Run our MPI job with the default modules. Gerun is a wrapper script for mpirun. 
 ## gerun $HOME/purify/build/cpp/benchmarks/mpi_benchmark_MO > $HOME/Scratch/purify/parallelBenchmarkMO.01.$JOB_ID.out
-gerun $HOME/purify/build/cpp/benchmarks/mpi_benchmark_PADMM > $HOME/Scratch/purify/parallelBenchmarkPADMM.01.$JOB_ID.out
+gerun $HOME/BICO/purify/build/cpp/benchmarks/mpi_benchmark_WLO > $HOME/Scratch/purify/parallelBenchmarkWLO.09.$JOB_ID.out
