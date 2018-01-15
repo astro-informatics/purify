@@ -1,26 +1,37 @@
-
-#include "purify/MeasurementOperator.h"
-#include "purify/directories.h"
-#include "purify/pfitsio.h"
+#include "purify/logging.h"
+#include "purify/operators.h"
+#include "purify/types.h"
 #include "purify/utilities.h"
 
 using namespace purify;
 
 int main(int nargs, char const **args) {
-  auto const vis_file = notinstalled::vla_filename("at166B.3C129.c0.vis");
-
+  purify::logging::initialize();
+  purify::logging::set_level("debug");
   // Gridding example
-  auto const cellsize = 0.3;
-  auto const over_sample = 2;
-  auto const J = 4;
-  auto const uv_vis = utilities::read_visibility(vis_file); // visibility data being read in
-  auto const width = 1024;
-  auto const height = 1024;
+  auto const oversample_ratio = 2;
+  auto const power_iters = 0;
+  auto const power_tol = 1e-4;
+  std::string ft_plan = "measure";
+  auto const Ju = 4;
+  auto const Jv = 4;
+  auto const imsizex = 256;
+  auto const imsizey = 256;
 
   auto const kernel = "kb";
-  MeasurementOperator op(uv_vis, J, J, kernel, width, height, 20, over_sample, cellsize, cellsize,
-                         "none", 0); // Generating gridding matrix
 
-  Image<t_real> kb_img = op.grid(uv_vis.vis).real();
-  pfitsio::write2d(kb_img.real(), "grid_image.fits");
+  t_uint const number_of_pixels = imsizex * imsizey;
+  t_uint const number_of_vis = 4e6; // std::floor(number_of_pixels * 2);
+  // Generating random uv(w) coverage
+  t_real const sigma_m = constant::pi / 3;
+  auto uv_vis = utilities::random_sample_density(number_of_vis, 0, sigma_m);
+  uv_vis.units = "radians";
+  const Vector<t_complex> image = Vector<t_complex>::Random(number_of_pixels);
+  const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
+      power_tol, kernel, Ju, Jv, ft_plan);
+  for(t_uint i = 0; i < 100; i++) {
+    PURIFY_LOW_LOG("Iteration: {}", i);
+    Vector<t_complex> const measurements = *measure_op * image;
+  }
 }

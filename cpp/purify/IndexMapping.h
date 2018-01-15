@@ -62,7 +62,7 @@ template <class T0> std::set<t_int> non_empty_outers(Eigen::SparseMatrixBase<T0>
 
 //! Indices of non empty outer indices
 template <class T0>
-Sparse<typename T0::Scalar> compress_outer(Eigen::SparseMatrixBase<T0> const &matrix) {
+Sparse<typename T0::Scalar> compress_outer(T0 const &matrix) {
   static_assert(T0::IsRowMajor, "Not tested for col major");
   auto const indices = non_empty_outers(matrix);
 
@@ -71,15 +71,20 @@ Sparse<typename T0::Scalar> compress_outer(Eigen::SparseMatrixBase<T0> const &ma
   for(auto const &index : indices)
     mapping[index] = i++;
 
-  Sparse<typename T0::Scalar> result(matrix.rows(), indices.size());
-  result.reserve(matrix.nonZeros());
-  for(typename T0::StorageIndex k = 0; k < matrix.derived().outerSize(); ++k)
-    for(typename T0::InnerIterator it(matrix.derived(), k); it; ++it) {
-      assert(it.col() >= 0 and it.col() < static_cast<t_int>(mapping.size()));
-      assert(mapping[it.col()] >= 0 and mapping[it.col()] < result.cols());
-      result.coeffRef(it.row(), mapping[it.col()]) = it.value();
+  std::vector<t_int> rows(matrix.rows() + 1, 0);
+  std::vector<t_int> cols(matrix.nonZeros(), 0);
+  rows[matrix.rows()] = matrix.nonZeros();
+  t_int index = 0;
+  for(t_int k = 0; k < matrix.outerSize(); ++k) {
+    rows[k] = index;
+    for(typename Sparse<typename T0::Scalar>::InnerIterator it(matrix, k); it; ++it) {
+      cols[index] = mapping[it.col()];
+      index++;
     }
-  return result;
+  }
+  return Eigen::MappedSparseMatrix<typename T0::Scalar, Eigen::RowMajor>(
+      matrix.rows(), indices.size(), matrix.nonZeros(), rows.data(), cols.data(),
+      const_cast<typename T0::Scalar *>(matrix.derived().valuePtr()));
 }
-}
+} // namespace purify
 #endif
