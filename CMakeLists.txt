@@ -8,14 +8,14 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_files)
 # It contains a number of cmake recipes
 include(LookUp-GreatCMakeCookOff)
 
-option(tests          "Enable testing"                                  on)
-option(examples       "Compile examples"                                on)
-option(benchmarks     "Enable benchmarking"                             off)
-option(data           "Download measurement set for testing"            on)
+option(tests          "Enable testing"                                  off)
+option(examples       "Compile examples"                                off)
+option(benchmarks     "Enable benchmarking"                             on)
+option(data           "Download measurement set for testing"            off)
 option(openmp         "Enable OpenMP"                                   on)
 option(logging        "Enable logging"                                  on)
 option(dompi          "Enable MPI"                                      on)
-option(doaf           "Enable ArrayFire"                                on)
+option(doaf           "Enable ArrayFire"                                off)
 option(docasa         "Enable CASA"                                     on)
 
 # Set version and build id of this package
@@ -47,6 +47,7 @@ if(benchmarks)
 endif()
 
 add_subdirectory(cpp)
+
 
 # Exports Purify so other packages can access it
 include(export_purify)
