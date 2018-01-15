@@ -139,14 +139,14 @@ BENCHMARK_DEFINE_F(DegridOperatorAdjointFixture, Apply)(benchmark::State &state)
 
 BENCHMARK_REGISTER_F(DegridOperatorDirectFixture, Apply)
 //->Apply(b_utilities::Arguments)
-->Args({1024,1000000,4})->Args({1024,10000000,4})
+->Args({1024,1000,4})//->Args({1024,1000,4})
 ->UseManualTime()
 ->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorAdjointFixture, Apply)
 //->Apply(b_utilities::Arguments)
-->Args({1024,1000000,4})->Args({1024,10000000,4})
+->Args({1024,1000,4})//->Args({1024,1000,4})
 ->UseManualTime()
 ->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMillisecond);
