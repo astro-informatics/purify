@@ -21,7 +21,7 @@ def parse_file(filename):
 def prep_arrays(serial_times, parallel_times, index_s, index_p, N):
     times = [x for x in parallel_times[index_p::N]]
     times.insert(0, serial_times[index_s])
-    #print(times)
+    # print(times)
     return np.array(times)
 
 if __name__ == "__main__":
@@ -39,8 +39,10 @@ if __name__ == "__main__":
      n03 = int(sys.argv[8]) # index of first kernel size
      # number of benchmarked functions (eg. [ctor, direct, adjoint]=3)
      nb = int(sys.argv[9])
+     # number of benchmarked algorithms (eg. for the measurement operator, [distr, MPI]=2)
+     na = int(sys.argv[10])
      # number of benchmarked ncore configurations, serial included
-     nconf = int(sys.argv[10])
+     nconf = int(sys.argv[11])
 
      ylabel = "Time (ms or us)"
 
@@ -60,6 +62,7 @@ if __name__ == "__main__":
      colors = ['black', 'red', 'green', 'blue']
      markers = ['o', '^', 's', 'x']
      bm_name = ['Constructor', 'Apply Direct', 'Apply Adjoint']
+     al_name = ['Distributed', 'MPI']
      npar = 0
      par_name = []
      for im in range(n01,n01+n1):
@@ -73,31 +76,21 @@ if __name__ == "__main__":
      for bm in range(0,nb):
          fig = plt.figure()
          fig.suptitle(bm_name[bm], fontsize=16)
-         ax = fig.add_subplot(1,2,1)
-         for par in range(0,npar):
-             index = bm*npar + par
-             # For the degrid operator parallel benchmarks, there are 2 sets of plots distr+MPI
-             y = prep_arrays(serial_means, parallel_means, index, index, 2*N)
-             err = prep_arrays(serial_stddevs, parallel_stddevs, index, index, 2*N)
-             print(y, err) 
-             group = par_name[par]
-             ax.errorbar(x, y, yerr=err, c=colors[par%4], fmt='o', label=group)
-             plt.title('Distributed')
-         plt.setp(ax.get_xticklabels(), visible=True)
-         plt.xticks(range(nconf), x_name)
-         plt.xlabel("# nodes (with 16 threads per node)")
-         plt.ylabel(ylabel)
-         ax = fig.add_subplot(1,2,2)
-         for par in range(0,npar):
-             index = bm*npar + N + par
-             # For the degrid operator parallel benchmarks, there are 2 sets of plots distr+MPI
-             y = prep_arrays(serial_means, parallel_means, index-N, index, 2*N)
-             err = prep_arrays(serial_stddevs, parallel_stddevs, index-N, index, 2*N)
-             group = par_name[par]
-             ax.errorbar(x, y, yerr=err, c=colors[par%4], fmt='o', label=group)
-             plt.title('MPI')
-         plt.setp(ax.get_xticklabels(), visible=True)
-         plt.xticks(range(nconf), x_name)
-         plt.xlabel("# nodes (with 16 threads per node)")
+
+         for al in range(1,na+1):
+             print(al,na)
+             ax = fig.add_subplot(1,na,al)
+             for par in range(0,npar):
+                 index = bm*npar + (al-1)*N + par
+                 y = prep_arrays(serial_means, parallel_means, index-(al-1)*N, index, na*N)
+                 err = prep_arrays(serial_stddevs, parallel_stddevs, index-(al-1)*N, index, na*N)
+                 print(x, y, err) 
+                 group = par_name[par]
+                 ax.errorbar(x, y, yerr=err, c=colors[par%4], fmt='o', label=group)
+                 plt.title(al_name[al-1])
+             plt.setp(ax.get_xticklabels(), visible=True)
+             plt.xticks(range(nconf), x_name)
+             plt.xlabel("# nodes (with 16 threads per node)")
+             plt.ylabel(ylabel)
          plt.legend()
          plt.show()
