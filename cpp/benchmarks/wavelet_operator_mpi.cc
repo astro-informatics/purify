@@ -67,7 +67,7 @@ BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Apply)(benchmark::State &state) {
   t_uint m_imsizex = state.range(0);
   t_uint m_imsizey = state.range(0);
   // MPI communicator
-  sopt::mpi::Communicator m_world;
+  sopt::mpi::Communicator m_world = sopt::mpi::Communicator::World();
 
   sopt::wavelets::SARA m_sara{std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -99,9 +99,9 @@ BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Apply)(benchmark::State &state) {
 BENCHMARK_REGISTER_F(WaveletOperatorMPIFixture, Apply)
 // //->Apply(b_utilities::Arguments)
 //->Args({1024})
-->RangeMultiplier(2)->Range(1024, 1024<<4)
+->RangeMultiplier(2)->Range(128, 128<<3)
 ->UseManualTime()
-->Repetitions(10)->ReportAggregatesOnly(true)
+->Repetitions(5)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMillisecond);
 
 // BENCHMARK_MAIN();
