@@ -93,9 +93,6 @@ MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real> &u, const 
 
   t_int rows = u.size();
   t_int cols = ftsizeu_ * ftsizev_;
-  t_int q;
-  t_int p;
-  t_int index;
   const Vector<t_real> k_u
       = MeasurementOperator::omega_to_k(u - Vector<t_real>::Constant(rows, Ju * 0.5));
   const Vector<t_real> k_v
@@ -110,12 +107,12 @@ MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real> &u, const 
     // kernelu and kernelv.
     for(t_int ju = 1; ju <= Ju; ++ju) {
       for(t_int jv = 1; jv <= Jv; ++jv) {
-        q = utilities::mod(k_u(m) + ju, ftsizeu_);
-        p = utilities::mod(k_v(m) + jv, ftsizev_);
-        index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
+        const t_int q = utilities::mod(k_u(m) + ju, ftsizeu_);
+        const t_int p = utilities::mod(k_v(m) + jv, ftsizev_);
+        const t_int index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
         const t_complex I(0, 1);
         interpolation_matrix.coeffRef(m, index)
-            += std::exp(-2 * constant::pi * I * ((k_u(m) + ju) * 0.5 + (k_v(m) + jv) * 0.5))
+            = std::exp(-2 * constant::pi * I * ((k_u(m) + ju) * 0.5 + (k_v(m) + jv) * 0.5))
                * kernelu(u(m) - (k_u(m) + ju)) * kernelv(v(m) - (k_v(m) + jv));
       }
     }

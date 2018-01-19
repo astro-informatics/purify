@@ -23,10 +23,11 @@
 
 # Select the MPI parallel environment and number of cores.
 # Has to be multiple of 12 for XYZ nodes, 16 for U nodes
-#$ -pe mpi 32
+#$ -pe mpi 16
 
 #Automatically set threads to processes per node: eg. if on X nodes = 12 OMP threads
 export OMP_NUM_THREADS=$(ppn)
 
 #Run our MPI job with the default modules. Gerun is a wrapper script for mpirun. 
-gerun $HOME/purify/build/cpp/benchmarks/mpi_benchmarks > $HOME/Scratch/purify/parallelBenchmark.02.$JOB_ID.out
+## gerun $HOME/purify/build/cpp/benchmarks/mpi_benchmark_MO > $HOME/Scratch/purify/parallelBenchmarkMO.01.$JOB_ID.out
+gerun $HOME/purify/build/cpp/benchmarks/mpi_benchmark_PADMM > $HOME/Scratch/purify/parallelBenchmarkPADMM.01.$JOB_ID.out

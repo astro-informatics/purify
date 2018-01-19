@@ -67,7 +67,7 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
     return result;
   }
   auto const sigma = comm.broadcast<t_real>();
-  return {utilities::scatter_visibilities(comm), sigma};
+  return std::make_tuple(utilities::scatter_visibilities(comm), sigma);
 }
 
 std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>>

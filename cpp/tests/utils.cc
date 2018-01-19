@@ -595,3 +595,41 @@ TEST_CASE("utilities [resample]", "[resample]") {
   CHECK(image_resample.isApprox(image_resample_alt, 1e-13));
   CHECK(image_resample(0) == image_resample_alt(0));
 }
+
+TEST_CASE("generate_baseline") {
+  // testing if randomly generating a uvcoverage from baseline configuration works
+  const Matrix<t_real> B = utilities::generate_antennas(4);
+  CHECK(B.allFinite());
+  CHECK(B.rows() == 4);
+  CHECK(B.cols() == 3);
+  CAPTURE(B);
+  const utilities::vis_params test_coverage = utilities::antenna_to_coverage(B);
+  CHECK(test_coverage.u.allFinite());
+  CHECK(test_coverage.v.allFinite());
+  CHECK(test_coverage.w.allFinite());
+  CHECK(test_coverage.size() == 2 * 3);
+  const Vector<t_real> R0 = B.row(0) - B.row(1);
+  const Vector<t_real> R1 = B.row(0) - B.row(2);
+  const Vector<t_real> R2 = B.row(0) - B.row(3);
+  const Vector<t_real> R3 = B.row(1) - B.row(2);
+  const Vector<t_real> R4 = B.row(1) - B.row(3);
+  const Vector<t_real> R5 = B.row(2) - B.row(3);
+  CHECK(R0(0) == test_coverage.u(0));
+  CHECK(R0(1) == test_coverage.v(0));
+  CHECK(R0(2) == test_coverage.w(0));
+  CHECK(R1(0) == test_coverage.u(1));
+  CHECK(R1(1) == test_coverage.v(1));
+  CHECK(R1(2) == test_coverage.w(1));
+  CHECK(R2(0) == test_coverage.u(2));
+  CHECK(R2(1) == test_coverage.v(2));
+  CHECK(R2(2) == test_coverage.w(2));
+  CHECK(R3(0) == test_coverage.u(3));
+  CHECK(R3(1) == test_coverage.v(3));
+  CHECK(R3(2) == test_coverage.w(3));
+  CHECK(R4(0) == test_coverage.u(4));
+  CHECK(R4(1) == test_coverage.v(4));
+  CHECK(R4(2) == test_coverage.w(4));
+  CHECK(R5(0) == test_coverage.u(5));
+  CHECK(R5(1) == test_coverage.v(5));
+  CHECK(R5(2) == test_coverage.w(5));
+}
