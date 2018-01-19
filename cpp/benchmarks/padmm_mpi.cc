@@ -38,7 +38,7 @@ public:
       // algorithm 1
       m_measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
           m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize,
-          cellsize, 2, 100, 1e-4, "kb", m_kernel, m_kernel, "measure", w_term);
+          cellsize, 2, 0, 1e-4, "kb", m_kernel, m_kernel, "measure", w_term);
     }
   }
   
@@ -72,7 +72,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, Apply)(benchmark::State &state) {
   
   std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm =
     std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(m_uv_data.vis);
-  padmm->itermax(50)
+  padmm->itermax(2)
     .gamma(gamma)
     .relative_variation(1e-3)
     .l2ball_proximal_epsilon(m_epsilon)
@@ -81,7 +81,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, Apply)(benchmark::State &state) {
     .tight_frame(false)
     .l1_proximal_tolerance(1e-2)
     .l1_proximal_nu(1)
-    .l1_proximal_itermax(50)
+    .l1_proximal_itermax(2)
     .l1_proximal_positivity_constraint(true)
     .l1_proximal_real_constraint(true)
     .residual_tolerance(m_epsilon)
@@ -112,8 +112,9 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, Apply)(benchmark::State &state) {
   // Benchmark the application of the algorithm
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
-    (*padmm)();
+    auto result = (*padmm)();
     auto end   = std::chrono::high_resolution_clock::now();
+    //std::cout << "Converged? " << result.good << " , niters = " << result.niters << std::endl;
     state.SetIterationTime(b_utilities::duration(start,end,m_world));
   }
 }
@@ -122,5 +123,5 @@ BENCHMARK_REGISTER_F(PadmmFixtureMPI, Apply)
 //->Apply(b_utilities::Arguments)
 ->Args({1024,1000000,4})->Args({1024,10000000,4})
 ->UseManualTime()
-->Repetitions(10)->ReportAggregatesOnly(true)
+->Repetitions(10)//->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMillisecond);

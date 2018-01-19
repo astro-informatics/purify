@@ -30,21 +30,21 @@ public:
       const t_real cellsize = FoV / m_imsizex * 60. * 60.;
       const bool w_term = false;
       m_measurements_transform = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 100, 0.0001, "kb",  m_kernel, m_kernel,
+        m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, "kb",  m_kernel, m_kernel,
 	"measure", w_term);
       m_gamma = (m_measurements_transform->adjoint() * m_uv_data.vis).real().maxCoeff() * 1e-3;
 
       // create the padmm algorithm
       sopt::LinearTransform<Vector<t_complex>> Psi = sopt::linear_transform<t_complex>(m_sara, m_imsizey, m_imsizex);
       m_padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(m_uv_data.vis);
-      m_padmm->itermax(100)
+      m_padmm->itermax(2)
 	.gamma(m_gamma)
 	.relative_variation(1e-3)
 	.l2ball_proximal_epsilon(m_epsilon)
 	.tight_frame(false)
 	.l1_proximal_tolerance(1e-2)
 	.l1_proximal_nu(1)
-	.l1_proximal_itermax(50)
+	.l1_proximal_itermax(2)
 	.l1_proximal_positivity_constraint(true)
 	.l1_proximal_real_constraint(true)
 	.residual_convergence(m_epsilon * 1.001)
@@ -93,7 +93,7 @@ BENCHMARK_REGISTER_F(PadmmFixture, Apply)
 //->Apply(b_utilities::Arguments)
 ->Args({1024,1000000,4})->Args({1024,10000000,4})
 ->UseManualTime()
-->Repetitions(10)->ReportAggregatesOnly(true)
+->Repetitions(10)//->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();
