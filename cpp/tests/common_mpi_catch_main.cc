@@ -44,7 +44,7 @@ int main(int argc, const char **argv) {
   std::transform(arguments.begin(), arguments.end(), cargs.begin(),
                  [](std::string const &c) { return c.c_str(); });
 
-  int returnCode = session.applyCommandLine(cargs.size(), const_cast<char **>(cargs.data()));
+  int returnCode = session.applyCommandLine(cargs.size(), const_cast<char**>(cargs.data()));
   if(returnCode != 0) // Indicates a command line error
     return returnCode;
   mersenne.reset(new std::mt19937_64(session.configData().rngSeed));

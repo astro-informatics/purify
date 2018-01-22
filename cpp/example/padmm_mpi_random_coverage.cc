@@ -19,7 +19,7 @@
 #include "purify/types.h"
 #include "purify/utilities.h"
 
-#ifdef PURIFY_ARRAYFIRE
+#ifdef PURIFY_GPU
 #include "purify/operators_gpu.h"
 #endif
 

@@ -93,16 +93,16 @@ TEST_CASE("Vector-shrinked matrix multiplication") {
   extern std::unique_ptr<std::mt19937_64> mersenne;
   std::uniform_int_distribution<sopt::t_int> uniform_dist(0, N - 1);
   Matrix<t_int> matrix = (Image<uint8_t>::Random(N, N) < uint8_t(64))
-                             .matrix()
-                             .select(Matrix<uint8_t>::Random(N, N), Matrix<uint8_t>::Zero(N, N))
-                             .cast<t_int>();
+    .matrix()
+    .select(Matrix<uint8_t>::Random(N, N), Matrix<uint8_t>::Zero(N, N))
+    .cast<t_int>();
 
   matrix.row(uniform_dist(*mersenne)).fill(0);
   matrix.row(uniform_dist(*mersenne)).fill(0);
   Sparse<t_int> const sparse = matrix.sparseView();
   Vector<t_int> const input = Vector<uint8_t>::Random(N).cast<t_int>();
 
-  auto const compressed = compress_outer(sparse);
+  Sparse<t_int> const compressed = compress_outer(sparse);
   auto const mapper = IndexMapping(non_empty_outers(sparse), input.size());
   Vector<t_int> comp_input;
   mapper(input, comp_input);

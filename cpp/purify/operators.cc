@@ -9,7 +9,7 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
                                           const t_uint &imsizex_, const t_real &oversample_ratio,
                                           const std::function<t_real(t_real)> kernelu,
                                           const std::function<t_real(t_real)> kernelv,
-                                          const t_uint Ju, const t_uint Jv) {
+                                          const t_uint Ju /*= 4*/, const t_uint Jv /*= 4*/) {
   const t_uint ftsizev_ = std::floor(imsizey_ * oversample_ratio);
   const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
   const t_uint rows = u.size();
@@ -24,10 +24,12 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
   interpolation_matrix.reserve(Vector<t_int>::Constant(rows, Ju * Jv));
 
   const t_complex I(0, 1);
-#pragma omp simd collapse(3)
+  const t_int ju_max = std::min(Ju + 1, ftsizeu_ + 1);
+  const t_int jv_max = std::min(Jv + 1, ftsizev_ + 1);
+#pragma omp parallel for collapse(3)
   for(t_int m = 0; m < rows; ++m) {
-    for(t_int ju = 1; ju < std::min(Ju + 1, ftsizeu_ + 1); ++ju) {
-      for(t_int jv = 1; jv < std::min(Jv + 1, ftsizev_ + 1); ++jv) {
+    for(t_int ju = 1; ju < ju_max; ++ju) {
+      for(t_int jv = 1; jv < jv_max; ++jv) {
         const t_uint q = utilities::mod(k_u(m) + ju, ftsizeu_);
         const t_uint p = utilities::mod(k_v(m) + jv, ftsizev_);
         const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
@@ -39,16 +41,17 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
   }
   return interpolation_matrix;
 }
+ 
 //! Construct gridding matrix with w projection
 Sparse<t_complex>
 init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
                         const Vector<t_complex> &weights, const t_uint &imsizey_,
                         const t_uint &imsizex_, const t_real oversample_ratio,
                         const std::function<t_real(t_real)> kernelu,
-                        const std::function<t_real(t_real)> kernelv, const t_uint Ju,
-                        const t_uint Jv, const bool w_term, const t_real &cellx,
-                        const t_real &celly, const t_real &energy_chirp_fraction,
-                        const t_real &energy_kernel_fraction) {
+                        const std::function<t_real(t_real)> kernelv, const t_uint Ju /*= 4*/,
+                        const t_uint Jv /*= 4*/, const bool w_term /*= false*/, const t_real &cellx /*= 1*/,
+                        const t_real &celly /*= 1*/, const t_real &energy_chirp_fraction /*= 1*/,
+                        const t_real &energy_kernel_fraction /*= 1*/) {
 
   const Sparse<t_complex> G = init_gridding_matrix_2d(u, v, weights, imsizey_, imsizex_,
                                                       oversample_ratio, kernelu, kernelv, Ju, Jv);
@@ -64,11 +67,7 @@ Image<t_real> init_correction2d(const t_real &oversample_ratio, const t_uint &im
                                 const t_uint imsizex_,
                                 const std::function<t_real(t_real)> ftkernelu,
                                 const std::function<t_real(t_real)> ftkernelv) {
-  /*
-     Given the Fourier transform of a gridding kernel, creates the scaling image for gridding
-     correction.
 
-*/
   const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
   const t_uint ftsizev_ = std::floor(imsizey_ * oversample_ratio);
   const t_uint x_start = std::floor(ftsizeu_ * 0.5 - imsizex_ * 0.5);

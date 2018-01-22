@@ -1,0 +1,13 @@
+include_directories("${PROJECT_SOURCE_DIR}/cpp" "${CMAKE_CURRENT_BINARY_DIR}/include")
+
+add_benchmark(measurement_operator utilities.cc LIBRARIES libpurify)
+add_benchmark(padmm utilities.cc LIBRARIES libpurify)
+
+if(dompi)
+  add_executable(mpi_benchmark_MO main.cc utilities.cc measurement_operator_mpi.cc)
+  target_link_libraries(mpi_benchmark_MO ${MPI_LIBRARIES} gbenchmark libpurify)
+  target_include_directories(mpi_benchmark_MO PUBLIC "${PROJECT_SOURCE_DIR}/cpp" "${CMAKE_CURRENT_BINARY_DIR}/include")
+  add_executable(mpi_benchmark_PADMM main.cc utilities.cc padmm_mpi.cc)
+  target_link_libraries(mpi_benchmark_PADMM ${MPI_LIBRARIES} gbenchmark libpurify)
+  target_include_directories(mpi_benchmark_PADMM PUBLIC "${PROJECT_SOURCE_DIR}/cpp" "${CMAKE_CURRENT_BINARY_DIR}/include")
+endif()

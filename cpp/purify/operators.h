@@ -17,16 +17,20 @@
 #include "purify/IndexMapping.h"
 #include "purify/mpi_utilities.h"
 #endif
-namespace purify {
 
+
+namespace purify {
+  
 namespace details {
+  
 //! Construct gridding matrix
 Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v,
                                           const Vector<t_complex> &weights, const t_uint &imsizey_,
                                           const t_uint &imsizex_, const t_real &oversample_ratio,
                                           const std::function<t_real(t_real)> kernelu,
                                           const std::function<t_real(t_real)> kernelv,
-                                          const t_uint Ju = 4, const t_uint Jv = 4);
+                                          const t_uint Ju = 4, const t_uint Jv = 4); 
+
 //! Construct gridding matrix with w projection
 Sparse<t_complex>
 init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
@@ -38,18 +42,17 @@ init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
                         const t_real &celly = 1, const t_real &energy_chirp_fraction = 1,
                         const t_real &energy_kernel_fraction = 1);
 
+//! Given the Fourier transform of a gridding kernel, creates the scaling image for gridding
+//! correction.
 Image<t_real> init_correction2d(const t_real &oversample_ratio, const t_uint &imsizey_,
                                 const t_uint imsizex_,
                                 const std::function<t_real(t_real)> ftkernelu,
                                 const std::function<t_real(t_real)> ftkernelv);
+
 template <class T>
 t_real power_method(const sopt::LinearTransform<T> &op, const t_uint &niters,
                     const t_real &relative_difference, const T &initial_vector) {
-  /*
-     Attempt at coding the power method, returns thesqrt of the largest eigen value of a linear
-     operator composed with its adjoint niters:: max number of iterations relative_difference::
-     percentage difference at which eigen value has converged
-     */
+
   if(niters <= 0)
     return 1;
   t_real estimate_eigen_value = 1;
@@ -78,6 +81,7 @@ t_real power_method(const sopt::LinearTransform<T> &op, const t_uint &niters,
   }
   return std::sqrt(old_value);
 }
+ 
 //! Construct gridding matrix with mixing
 template <class T, class... ARGS>
 Sparse<t_complex> init_gridding_matrix_2d(const Sparse<T> &mixing_matrix, ARGS &&... args) {
@@ -91,7 +95,10 @@ Sparse<t_complex> init_gridding_matrix_2d(const Sparse<T> &mixing_matrix, ARGS &
   return mixing_matrix * init_gridding_matrix_2d(std::forward<ARGS>(args)...);
 };
 } // namespace details
+
+ 
 namespace operators {
+  
 #ifdef PURIFY_MPI
 //! Constructs degridding operator using MPI
 template <class T>
@@ -134,10 +141,12 @@ init_gridding_matrix_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
         }
       });
 }
+ 
 //! Construct MPI broadcast operator
 template <class T> sopt::OperatorFunction<T> init_broadcaster(const sopt::mpi::Communicator &comm) {
   return [=](T &output, const T &input) { output = comm.broadcast<T>(input); };
 }
+ 
 //! Construct MPI all sum all operator
 template <class T> sopt::OperatorFunction<T> init_all_sum_all(const sopt::mpi::Communicator &comm) {
   return [=](T &output, const T &input) { output = comm.all_sum_all<T>(input); };
@@ -184,7 +193,7 @@ init_zero_padding_2d(const Image<t_real> &S, const t_real &oversample_ratio) {
   auto direct = [=](T &output, const T &x) {
     assert(x.size() == imsizex_ * imsizey_);
     output = Vector<t_complex>::Zero(ftsizeu_ * ftsizev_);
-#pragma omp simd collapse(2)
+#pragma omp parallel for collapse(2)
     for(t_uint j = 0; j < imsizey_; j++) {
       for(t_uint i = 0; i < imsizex_; i++) {
         const t_uint input_index = utilities::sub2ind(j, i, imsizey_, imsizex_);
@@ -197,7 +206,7 @@ init_zero_padding_2d(const Image<t_real> &S, const t_real &oversample_ratio) {
   auto indirect = [=](T &output, const T &x) {
     assert(x.size() == ftsizeu_ * ftsizev_);
     output = T::Zero(imsizey_ * imsizex_);
-#pragma omp simd collapse(2)
+#pragma omp parallel for collapse(2)
     for(t_uint j = 0; j < imsizey_; j++) {
       for(t_uint i = 0; i < imsizex_; i++) {
         const t_uint output_index = utilities::sub2ind(j, i, imsizey_, imsizex_);
@@ -207,12 +216,14 @@ init_zero_padding_2d(const Image<t_real> &S, const t_real &oversample_ratio) {
     }
   };
   return std::make_tuple(direct, indirect);
-}
+ }
+ 
 template <class T> sopt::OperatorFunction<T> init_normalise(const t_real &op_norm) {
   if(not(op_norm > 0))
     throw std::runtime_error("Operator norm is not greater than zero.");
   return [=](T &output, const T &x) { output = x / op_norm; };
 }
+ 
 //! Construsts zero padding operator
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
@@ -356,10 +367,13 @@ base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_
     return std::make_tuple(directG, indirectG);
 }
 #endif
-}
+ 
+} // namespace operators
 
+ 
 namespace measurementoperator {
 
+//! Returns linear transform that is the standard degridding operator
 template <class T>
 std::shared_ptr<sopt::LinearTransform<T> const>
 init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
@@ -372,9 +386,6 @@ init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
                         const t_real &energy_chirp_fraction = 1,
                         const t_real &energy_kernel_fraction = 1) {
 
-  /*
-   *  Returns linear transform that is the standard degridding operator
-   */
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
@@ -390,6 +401,7 @@ init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
   indirect = sopt::chained_operators<T>(operator_norm, indirect);
   return std::make_shared<sopt::LinearTransform<T> const>(direct, M, indirect, N);
 }
+
 template <class T>
 std::shared_ptr<sopt::LinearTransform<T> const>
 init_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
@@ -412,7 +424,9 @@ init_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_uint 
                                     ft_plan, w_term, cell_x, cell_y, energy_chirp_fraction,
                                     energy_kernel_fraction);
 }
+
 #ifdef PURIFY_MPI
+//! Returns linear transform that is the weighted degridding operator with mpi all sum all
 template <class T>
 std::shared_ptr<sopt::LinearTransform<T> const>
 init_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
@@ -425,9 +439,6 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
                         const t_real &cellx = 1, const t_real &celly = 1,
                         const t_real &energy_chirp_fraction = 1,
                         const t_real &energy_kernel_fraction = 1) {
-  /*
-   *  Returns linear transform that is the weighted degridding operator with mpi all sum all
-   */
 
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
@@ -445,6 +456,7 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
   indirect = sopt::chained_operators<T>(operator_norm, indirect);
   return std::make_shared<sopt::LinearTransform<T> const>(direct, M, indirect, N);
 }
+ 
 template <class T>
 std::shared_ptr<sopt::LinearTransform<T> const>
 init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
@@ -468,7 +480,10 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                                     Jv, ft_plan, w_term, cell_x, cell_y, energy_chirp_fraction,
                                     energy_kernel_fraction);
 
-} // namespace measurementoperator
+ }
+ 
+//! Returns linear transform that is the weighted degridding operator with a distributed Fourier
+//! grid
 template <class T>
 std::shared_ptr<sopt::LinearTransform<T> const>
 init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
@@ -481,10 +496,6 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_
                             const bool w_term = false, const t_real &cellx = 1,
                             const t_real &celly = 1, const t_real &energy_chirp_fraction = 1,
                             const t_real &energy_kernel_fraction = 1) {
-  /*
-   *  Returns linear transform that is the weighted degridding operator with a distributed Fourier
-   * grid
-   */
 
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
@@ -503,6 +514,7 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_
   indirect = sopt::chained_operators<T>(operator_norm, indirect);
   return std::make_shared<sopt::LinearTransform<T> const>(direct, M, indirect, N);
 }
+ 
 template <class T>
 std::shared_ptr<sopt::LinearTransform<T> const>
 init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
@@ -542,6 +554,7 @@ init_combine_operators(const std::vector<std::shared_ptr<sopt::LinearTransform<T
   };
   return std::make_shared<sopt::LinearTransform<T> const>(direct, indirect);
 }
+ 
 //! combines different uv_data sets and creates a super measurement operator out of multiple
 //! measurement operators
 template <class T, class... ARGS>
@@ -574,6 +587,7 @@ std::shared_ptr<sopt::LinearTransform<T> const> init_super_operator(
   }
   return init_super_operator(create_operator, uv_vis_datas, std::forward<ARGS>(args)...);
 }
+ 
 template <class T, class... ARGS>
 std::shared_ptr<sopt::LinearTransform<T> const> init_super_operator(
     const std::function<std::shared_ptr<sopt::LinearTransform<T> const>> &create_operator,
@@ -595,5 +609,6 @@ std::shared_ptr<sopt::LinearTransform<T> const> init_super_operator(
 }
 
 } // namespace measurementoperator
+ 
 }; // namespace purify
 #endif

@@ -12,3 +12,6 @@ ipython-*.log
 .DS_Store
 *.h.gch
 .clang-tidy
+*.png
+*.pdf
+*~

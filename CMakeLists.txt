@@ -10,13 +10,14 @@ include(LookUp-GreatCMakeCookOff)
 
 option(tests          "Enable testing"                                  on)
 option(examples       "Compile examples"                                on)
-option(data           "Download measurement set for testing"            on)
+option(benchmarks     "Enable benchmarking"                             on)
+option(data           "Download measurement set for testing"            off)
 option(openmp         "Enable OpenMP"                                   on)
 option(logging        "Enable logging"                                  on)
 option(dompi          "Enable MPI"                                      on)
-option(doaf           "Enable ArrayFire"                                on)
+option(doaf           "Enable ArrayFire"                                off)
 option(docimg         "Enable CImg"                                     off)
-option(docasa         "Enable CASA"                                     on)
+option(docasa         "Enable CASA"                                     off)
 
 # Set version and build id of this package
 include(version)
@@ -40,6 +41,10 @@ endif()
 if(tests)  # Adds ctest
   enable_testing()
   include(AddCatchTest)
+endif()
+
+if(benchmarks)
+  include(AddBenchmark)
 endif()
 
 add_subdirectory(cpp)
