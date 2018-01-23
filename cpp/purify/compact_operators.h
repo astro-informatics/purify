@@ -70,7 +70,8 @@ base_mpi_grid_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vect
                                  const Vector<t_complex> &weights, const t_uint &imsizey,
                                  const t_uint &imsizex, const t_real oversample_ratio = 2,
                                  const std::string &kernel = "kb", const t_uint Ju = 4,
-                                 const t_uint Jv = 4, const std::string &ft_plan = "measure",
+                                 const t_uint Jv = 4,
+                                 const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                                  const bool w_term = false, const t_real &cellx = 1,
                                  const t_real &celly = 1, const t_real &energy_chirp_fraction = 1,
                                  const t_real &energy_kernel_fraction = 1) {
@@ -126,9 +127,9 @@ base_grid_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
                              const t_uint &imsizey, const t_uint &imsizex,
                              const t_real &oversample_ratio = 2, const std::string &kernel = "kb",
                              const t_uint Ju = 4, const t_uint Jv = 4,
-                             const std::string &ft_plan = "measure", const bool w_term = false,
-                             const t_real &cellx = 1, const t_real &celly = 1,
-                             const t_real &energy_chirp_fraction = 1,
+                             const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
+                             const bool w_term = false, const t_real &cellx = 1,
+                             const t_real &celly = 1, const t_real &energy_chirp_fraction = 1,
                              const t_real &energy_kernel_fraction = 1) {
 
   std::function<t_real(t_real)> kernelu, kernelv, ftkernelu, ftkernelv;
@@ -157,9 +158,9 @@ init_grid_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
                              const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
                              const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
                              const t_uint Ju = 4, const t_uint Jv = 4,
-                             const std::string &ft_plan = "measure", const bool w_term = false,
-                             const t_real &cellx = 1, const t_real &celly = 1,
-                             const t_real &energy_chirp_fraction = 1,
+                             const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
+                             const bool w_term = false, const t_real &cellx = 1,
+                             const t_real &celly = 1, const t_real &energy_chirp_fraction = 1,
                              const t_real &energy_kernel_fraction = 1) {
 
   /*
@@ -184,8 +185,8 @@ init_grid_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_
                              const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
                              const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
                              const t_uint Ju = 4, const t_uint Jv = 4,
-                             const std::string &ft_plan = "measure", const bool w_term = false,
-                             const t_real &energy_chirp_fraction = 1,
+                             const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
+                             const bool w_term = false, const t_real &energy_chirp_fraction = 1,
                              const t_real &energy_kernel_fraction = 1) {
 
   auto uv_vis = uv_vis_input;
@@ -201,17 +202,14 @@ init_grid_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_
 }
 #ifdef PURIFY_MPI
 template <class T>
-sopt::OperatorFunction<T>
-init_grid_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
-                             const Vector<t_real> &v, const Vector<t_real> &w,
-                             const Vector<t_complex> &weights, const t_uint &imsizey,
-                             const t_uint &imsizex, const t_real &oversample_ratio = 2,
-                             const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
-                             const std::string &kernel = "kb", const t_uint Ju = 4,
-                             const t_uint Jv = 4, const std::string &ft_plan = "measure",
-                             const bool w_term = false, const t_real &cellx = 1,
-                             const t_real &celly = 1, const t_real &energy_chirp_fraction = 1,
-                             const t_real &energy_kernel_fraction = 1) {
+sopt::OperatorFunction<T> init_grid_degrid_operator_2d(
+    const sopt::mpi::Communicator &comm, const Vector<t_real> &u, const Vector<t_real> &v,
+    const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint &imsizey,
+    const t_uint &imsizex, const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
+    const t_real &power_tol = 1e-4, const std::string &kernel = "kb", const t_uint Ju = 4,
+    const t_uint Jv = 4, const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
+    const bool w_term = false, const t_real &cellx = 1, const t_real &celly = 1,
+    const t_real &energy_chirp_fraction = 1, const t_real &energy_kernel_fraction = 1) {
   /*
    *  Returns linear transform that is the weighted degridding operator with mpi all sum all
    */
@@ -238,8 +236,8 @@ init_grid_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                              const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
                              const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
                              const t_uint Ju = 4, const t_uint Jv = 4,
-                             const std::string &ft_plan = "measure", const bool w_term = false,
-                             const t_real &energy_chirp_fraction = 1,
+                             const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
+                             const bool w_term = false, const t_real &energy_chirp_fraction = 1,
                              const t_real &energy_kernel_fraction = 1) {
 
   auto uv_vis = uv_vis_input;
@@ -254,17 +252,14 @@ init_grid_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                                          energy_chirp_fraction, energy_kernel_fraction);
 }
 template <class T>
-sopt::OperatorFunction<T>
-init_grid_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
-                                 const Vector<t_real> &v, const Vector<t_real> &w,
-                                 const Vector<t_complex> &weights, const t_uint &imsizey,
-                                 const t_uint &imsizex, const t_real &oversample_ratio = 2,
-                                 const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
-                                 const std::string &kernel = "kb", const t_uint Ju = 4,
-                                 const t_uint Jv = 4, const std::string &ft_plan = "measure",
-                                 const bool w_term = false, const t_real &cellx = 1,
-                                 const t_real &celly = 1, const t_real &energy_chirp_fraction = 1,
-                                 const t_real &energy_kernel_fraction = 1) {
+sopt::OperatorFunction<T> init_grid_degrid_operator_2d_mpi(
+    const sopt::mpi::Communicator &comm, const Vector<t_real> &u, const Vector<t_real> &v,
+    const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint &imsizey,
+    const t_uint &imsizex, const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
+    const t_real &power_tol = 1e-4, const std::string &kernel = "kb", const t_uint Ju = 4,
+    const t_uint Jv = 4, const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
+    const bool w_term = false, const t_real &cellx = 1, const t_real &celly = 1,
+    const t_real &energy_chirp_fraction = 1, const t_real &energy_kernel_fraction = 1) {
   /*
    *  Returns linear transform that is the weighted degridding operator with a distributed Fourier
    * grid
@@ -293,8 +288,8 @@ init_grid_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
                                  const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
                                  const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
                                  const t_uint Ju = 4, const t_uint Jv = 4,
-                                 const std::string &ft_plan = "measure", const bool w_term = false,
-                                 const t_real &energy_chirp_fraction = 1,
+                                 const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
+                                 const bool w_term = false, const t_real &energy_chirp_fraction = 1,
                                  const t_real &energy_kernel_fraction = 1) {
   auto uv_vis = uv_vis_input;
   if(uv_vis.units == "lambda")
@@ -321,7 +316,8 @@ init_psf_convolve_2d(const std::shared_ptr<sopt::LinearTransform<T> const> &degr
   delta(index) = 1.;
   const T psf = degrid_grid->adjoint() * (*degrid_grid * delta);
   sopt::OperatorFunction<T> fftop, ifftop;
-  std::tie(fftop, ifftop) = operators::init_FFT_2d<T>(imsizey, imsizex, 1, "estimate");
+  std::tie(fftop, ifftop)
+      = operators::init_FFT_2d<T>(imsizey, imsizex, 1, operators::fftw_plan::estimate);
   T ft_psf = T::Zero(imsizey * imsizex);
   fftop(ft_psf, psf);
   assert(ft_psf.size() == psf.size());
@@ -345,7 +341,7 @@ init_psf_convolve_2d(const utilities::vis_params &uv_vis_input, const t_uint &im
                      const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
                      const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
                      const t_uint Ju = 4, const t_uint Jv = 4,
-                     const std::string &ft_plan = "measure") {
+                     const operators::fftw_plan ft_plan = operators::fftw_plan::measure) {
   /*
    *  Returns operator conolves image with direction independent point spread function
    */

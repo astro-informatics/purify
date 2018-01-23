@@ -12,7 +12,7 @@ int main(int nargs, char const **args) {
   auto const oversample_ratio = 2;
   auto const power_iters = 0;
   auto const power_tol = 1e-4;
-  std::string ft_plan = "measure";
+  auto const ft_plan = operators::fftw_plan::measure;
   auto const Ju = 4;
   auto const Jv = 4;
   auto const imsizex = 256;

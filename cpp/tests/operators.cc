@@ -26,7 +26,7 @@ TEST_CASE("Operators") {
   const t_uint power_iters = 100;
   const t_real power_tol = 1e-9;
   const std::string &kernel = "kb";
-  const std::string &ft_plan = "measure";
+  const auto ft_plan = operators::fftw_plan::measure;
   const std::string &weighting_type = "natural";
   const t_real R = 0;
   auto u = Vector<t_real>::Random(M);
