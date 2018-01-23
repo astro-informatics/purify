@@ -16,8 +16,7 @@ option(openmp         "Enable OpenMP"                                   on)
 option(logging        "Enable logging"                                  on)
 option(dompi          "Enable MPI"                                      on)
 option(doaf           "Enable ArrayFire"                                off)
-option(docimg         "Enable CImg"                                     off)
-option(docasa         "Enable CASA"                                     off)
+option(docasa         "Enable CASA"                                     on)
 
 # Set version and build id of this package
 include(version)
@@ -48,6 +47,7 @@ if(benchmarks)
 endif()
 
 add_subdirectory(cpp)
+
 
 # Exports Purify so other packages can access it
 include(export_purify)

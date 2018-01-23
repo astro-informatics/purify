@@ -13,8 +13,8 @@ using namespace purify;
 void wavelet_operator_constructor(benchmark::State &state) {
 
   // Image size
-  t_uint m_imsizex = 1024;
-  t_uint m_imsizey = 1024;
+  t_uint m_imsizex = state.range(0);
+  t_uint m_imsizey = state.range(0);
 
   // benchmark the creation of measurement operator
   while(state.KeepRunning()) {
@@ -35,9 +35,10 @@ void wavelet_operator_constructor(benchmark::State &state) {
 
 BENCHMARK(wavelet_operator_constructor)
 //->Apply(b_utilities::Arguments)
-->Args({1024,1000,4})//->Args({1024,1000,4})
+//->Args({1024})
+->RangeMultiplier(2)->Range(1024, 1024<<10)
 ->UseManualTime()
-->Repetitions(1)->ReportAggregatesOnly(true)
+->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMillisecond);
 
 // ----------------- Application benchmarks -----------------------//
@@ -53,14 +54,13 @@ public:
 
   // A bunch of useful variables
   t_uint m_counter;
-  t_uint m_imsizex = 1024;
-  t_uint m_imsizey = 1024;
-
 };
 
 
 BENCHMARK_DEFINE_F(WaveletOperatorFixture, Apply)(benchmark::State &state) {
 
+  t_uint m_imsizex = state.range(0);
+  t_uint m_imsizey = state.range(0);
   sopt::wavelets::SARA m_sara{std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
@@ -94,9 +94,9 @@ BENCHMARK_DEFINE_F(WaveletOperatorFixture, Apply)(benchmark::State &state) {
 
 BENCHMARK_REGISTER_F(WaveletOperatorFixture, Apply)
 //->Apply(b_utilities::Arguments)
-->Args({1024,1000,4})//->Args({1024,1000,4})
+->RangeMultiplier(2)->Range(1024, 1024<<10)
 ->UseManualTime()
-->Repetitions(1)->ReportAggregatesOnly(true)
+->Repetitions(10)->ReportAggregatesOnly(true)
 ->Unit(benchmark::kMillisecond);
 
 

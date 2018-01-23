@@ -66,6 +66,8 @@ BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Apply)(benchmark::State &state) {
   // Image size
   t_uint m_imsizex = state.range(0);
   t_uint m_imsizey = state.range(0);
+  Image<t_complex> image = Image<t_complex>::Zero(m_imsizey, m_imsizex);
+
   // MPI communicator
   sopt::mpi::Communicator m_world = sopt::mpi::Communicator::World();
 
@@ -73,9 +75,10 @@ BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Apply)(benchmark::State &state) {
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
-  sopt::wavelets::SARA saraDistr = sopt::wavelets::distribute_sara(m_sara, m_world);
+  sopt::wavelets::SARA const saraDistr = sopt::wavelets::distribute_sara(m_sara, m_world);
 
-  sopt::LinearTransform<Vector<t_complex>> m_Psi = sopt::linear_transform<t_complex>(saraDistr, m_imsizey, m_imsizex, m_world);
+  // sopt::LinearTransform<Vector<t_complex>> m_Psi = sopt::linear_transform<t_complex>(saraDistr, m_imsizey, m_imsizex, m_world);
+  sopt::LinearTransform<Vector<t_complex>> m_Psi = sopt::linear_transform<t_complex>(saraDistr, image.rows(), image.cols(), m_world);
 
   // Benchmark the application of the operator
 
@@ -89,7 +92,7 @@ BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Apply)(benchmark::State &state) {
   while(state.KeepRunning()) {
 
     auto start = std::chrono::high_resolution_clock::now();
-    image = m_Psi * wavelet_coeff;
+    Vector<t_complex> image = m_Psi * wavelet_coeff;
     auto end   = std::chrono::high_resolution_clock::now();
     state.SetIterationTime(b_utilities::duration(start,end));
 
