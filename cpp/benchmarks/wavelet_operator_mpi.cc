@@ -66,7 +66,7 @@ BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Apply)(benchmark::State &state) {
   // Image size
   t_uint m_imsizex = state.range(0);
   t_uint m_imsizey = state.range(0);
-  Image<t_complex> image = Image<t_complex>::Zero(m_imsizey, m_imsizex);
+  Vector<t_complex> image = Vector<t_complex>::Random(m_imsizey * m_imsizex);
 
   // MPI communicator
   sopt::mpi::Communicator m_world = sopt::mpi::Communicator::World();
@@ -77,22 +77,24 @@ BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Apply)(benchmark::State &state) {
 
   sopt::wavelets::SARA const saraDistr = sopt::wavelets::distribute_sara(m_sara, m_world);
 
-  // sopt::LinearTransform<Vector<t_complex>> m_Psi = sopt::linear_transform<t_complex>(saraDistr, m_imsizey, m_imsizex, m_world);
-  sopt::LinearTransform<Vector<t_complex>> m_Psi = sopt::linear_transform<t_complex>(saraDistr, image.rows(), image.cols(), m_world);
+  sopt::LinearTransform<Vector<t_complex>> m_Psi = sopt::linear_transform<t_complex>(saraDistr, m_imsizey, m_imsizex, m_world);
+  // sopt::LinearTransform<Vector<t_complex>> m_Psi = sopt::linear_transform<t_complex>(saraDistr, image.rows(), image.cols(), m_world);
 
   // Benchmark the application of the operator
 
   // Get the number of wavelet coefs
+  // t_uint const n_wave_coeff = saraDistr.size() * m_imsizey * m_imsizex;
   t_uint const n_wave_coeff = saraDistr.size() * m_imsizey * m_imsizex;
 
+  
   // Apply Psi to a temporary vector
-  Vector<t_complex> image = Vector<t_complex>::Zero(m_imsizey * m_imsizex);
-  Vector<t_complex> const wavelet_coeff = Vector<t_complex>::Random(n_wave_coeff);
+  // Vector<t_complex> image = Vector<t_complex>::Zero(m_imsizey * m_imsizex);
+  Vector<t_complex> const wavelet_coeff = Vector<t_complex>::Ones(n_wave_coeff);
 
   while(state.KeepRunning()) {
 
     auto start = std::chrono::high_resolution_clock::now();
-    Vector<t_complex> image = m_Psi * wavelet_coeff;
+    image = m_Psi * wavelet_coeff;
     auto end   = std::chrono::high_resolution_clock::now();
     state.SetIterationTime(b_utilities::duration(start,end));
 
