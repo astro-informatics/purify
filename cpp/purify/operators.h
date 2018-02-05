@@ -245,8 +245,8 @@ template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
 init_FFT_2d(const t_uint &imsizey_, const t_uint &imsizex_, const t_real &oversample_factor_,
             const fftw_plan fftw_plan_flag_ = fftw_plan::measure) {
-  auto const ftsizeu_ = std::floor(imsizex_ * oversample_factor_);
-  auto const ftsizev_ = std::floor(imsizey_ * oversample_factor_);
+  t_int const ftsizeu_ = std::floor(imsizex_ * oversample_factor_);
+  t_int const ftsizev_ = std::floor(imsizey_ * oversample_factor_);
   t_int plan_flag = (FFTW_MEASURE | FFTW_PRESERVE_INPUT);
   switch(fftw_plan_flag_) {
   case(fftw_plan::measure):
@@ -265,7 +265,7 @@ init_FFT_2d(const t_uint &imsizey_, const t_uint &imsizex_, const t_real &oversa
   Vector<typename T::Scalar> src = Vector<t_complex>::Zero(ftsizev_ * ftsizeu_);
   Vector<typename T::Scalar> dst = Vector<t_complex>::Zero(ftsizev_ * ftsizeu_);
   // creating plans
-  auto del = [](fftw_plan_s *plan) { fftw_destroy_plan(plan); };
+  const auto del = [](fftw_plan_s *plan) { fftw_destroy_plan(plan); };
   const std::shared_ptr<fftw_plan_s> m_plan_forward(
       fftw_plan_dft_2d(ftsizev_, ftsizeu_, reinterpret_cast<fftw_complex *>(src.data()),
                        reinterpret_cast<fftw_complex *>(dst.data()), FFTW_FORWARD, plan_flag),
@@ -274,16 +274,16 @@ init_FFT_2d(const t_uint &imsizey_, const t_uint &imsizex_, const t_real &oversa
       fftw_plan_dft_2d(ftsizev_, ftsizeu_, reinterpret_cast<fftw_complex *>(src.data()),
                        reinterpret_cast<fftw_complex *>(dst.data()), FFTW_BACKWARD, plan_flag),
       del);
-  auto const direct = [=](T &output, const T &input) {
+  auto const direct = [m_plan_forward, ftsizeu_, ftsizev_](T &output, const T &input) {
     assert(input.size() == ftsizev_ * ftsizeu_);
-    output = Matrix<typename T::Scalar>::Zero(output.rows(), output.cols());
+    output = Matrix<typename T::Scalar>::Zero(input.rows(), input.cols());
     fftw_execute_dft(
         m_plan_forward.get(),
         const_cast<fftw_complex *>(reinterpret_cast<const fftw_complex *>(input.data())),
         reinterpret_cast<fftw_complex *>(output.data()));
     output /= std::sqrt(output.size());
   };
-  auto const indirect = [=](T &output, const T &input) {
+  auto const indirect = [m_plan_inverse, ftsizeu_, ftsizev_](T &output, const T &input) {
     assert(input.size() == ftsizev_ * ftsizeu_);
     output = Matrix<typename T::Scalar>::Zero(input.rows(), input.cols());
     fftw_execute_dft(

@@ -145,8 +145,9 @@ TEST_CASE("Operators") {
       const Vector<t_complex> expected_output = weighted_expected_op.degrid(input_image);
       const Vector<t_complex> actual_output = *measure_op * input;
       CHECK(expected_output.size() == actual_output.size());
-      CHECK(actual_output.isApprox(expected_output/std::sqrt(imsizex * imsizey
-              * oversample_ratio * oversample_ratio), 1e-4));
+      CHECK(actual_output.isApprox(
+          expected_output / std::sqrt(imsizex * imsizey * oversample_ratio * oversample_ratio),
+          1e-4));
     }
     SECTION("Grid") {
       const Vector<t_complex> input = Vector<t_complex>::Random(M);
@@ -154,7 +155,9 @@ TEST_CASE("Operators") {
           = Image<t_complex>::Map(weighted_expected_op.grid(input).data(), imsizex * imsizey, 1);
       const Vector<t_complex> actual_output = measure_op->adjoint() * input;
       CHECK(expected_output.size() == actual_output.size());
-      CHECK(actual_output.isApprox(expected_output, 1e-4));
+      CHECK(actual_output.isApprox(
+          expected_output * std::sqrt(imsizex * imsizey * oversample_ratio * oversample_ratio),
+          1e-4));
     }
   }
 
