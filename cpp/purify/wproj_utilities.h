@@ -44,10 +44,10 @@ template <class T>
 Sparse<t_complex> row_wise_convolution(const Sparse<t_complex> &Grid_, const Sparse<T> &chirp_,
                                        const t_int &Nx, const t_int &Ny);
 //! Produce Gridding matrix convovled with chirp matrix for wprojection
-Sparse<t_complex> wprojection_matrix(const Sparse<t_complex> &G, const t_int &Nx, const t_int &Ny,
-                                     const Vector<t_real> &w_components, const t_real &cell_x,
-                                     const t_real &cell_y, const t_real &energy_fraction_chirp,
-                                     const t_real &energy_fraction_wproj);
+Sparse<t_complex>
+wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uint &y_size,
+                   const Vector<t_real> &w_components, const t_real &cell_x, const t_real &cell_y,
+                   const t_real &energy_fraction_chirp, const t_real &energy_fraction_wproj);
 //! SNR calculation
 t_real snr_metric(const Image<t_real> &model, const Image<t_real> &solution);
 //! MR calculation
