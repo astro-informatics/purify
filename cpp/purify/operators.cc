@@ -19,6 +19,8 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
   };
   const Vector<t_real> k_u = omega_to_k(u - Vector<t_real>::Constant(rows, Ju * 0.5));
   const Vector<t_real> k_v = omega_to_k(v - Vector<t_real>::Constant(rows, Jv * 0.5));
+      if (u.size() != v.size())
+        throw std::runtime_error("Size of u and v vectors are not the same for creating gridding matrix.");
 
   Sparse<t_complex> interpolation_matrix(rows, cols);
   interpolation_matrix.reserve(Vector<t_int>::Constant(rows, Ju * Jv));

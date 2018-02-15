@@ -4,6 +4,7 @@
 #include "purify/config.h"
 #include <iostream>
 #include <tuple>
+#include <type_traits>
 #include "sopt/chained_operators.h"
 #include "sopt/linear_transform.h"
 #include "purify/kernels.h"
@@ -18,18 +19,17 @@
 #include "purify/mpi_utilities.h"
 #endif
 
-
 namespace purify {
-  
+
 namespace details {
-  
+
 //! Construct gridding matrix
 Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v,
                                           const Vector<t_complex> &weights, const t_uint &imsizey_,
                                           const t_uint &imsizex_, const t_real &oversample_ratio,
                                           const std::function<t_real(t_real)> kernelu,
                                           const std::function<t_real(t_real)> kernelv,
-                                          const t_uint Ju = 4, const t_uint Jv = 4); 
+                                          const t_uint Ju = 4, const t_uint Jv = 4);
 
 //! Construct gridding matrix with w projection
 Sparse<t_complex>
@@ -81,7 +81,7 @@ t_real power_method(const sopt::LinearTransform<T> &op, const t_uint &niters,
   }
   return std::sqrt(old_value);
 }
- 
+
 //! Construct gridding matrix with mixing
 template <class T, class... ARGS>
 Sparse<t_complex> init_gridding_matrix_2d(const Sparse<T> &mixing_matrix, ARGS &&... args) {
@@ -96,9 +96,8 @@ Sparse<t_complex> init_gridding_matrix_2d(const Sparse<T> &mixing_matrix, ARGS &
 };
 } // namespace details
 
- 
 namespace operators {
-  
+
 #ifdef PURIFY_MPI
 //! Constructs degridding operator using MPI
 template <class T>
@@ -141,12 +140,12 @@ init_gridding_matrix_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
         }
       });
 }
- 
+
 //! Construct MPI broadcast operator
 template <class T> sopt::OperatorFunction<T> init_broadcaster(const sopt::mpi::Communicator &comm) {
   return [=](T &output, const T &input) { output = comm.broadcast<T>(input); };
 }
- 
+
 //! Construct MPI all sum all operator
 template <class T> sopt::OperatorFunction<T> init_all_sum_all(const sopt::mpi::Communicator &comm) {
   return [=](T &output, const T &input) { output = comm.all_sum_all<T>(input); };
@@ -216,14 +215,14 @@ init_zero_padding_2d(const Image<t_real> &S, const t_real &oversample_ratio) {
     }
   };
   return std::make_tuple(direct, indirect);
- }
- 
+}
+
 template <class T> sopt::OperatorFunction<T> init_normalise(const t_real &op_norm) {
   if(not(op_norm > 0))
     throw std::runtime_error("Operator norm is not greater than zero.");
   return [=](T &output, const T &x) { output = x / op_norm; };
 }
- 
+
 //! Construsts zero padding operator
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
@@ -239,33 +238,59 @@ init_weights_(const Vector<t_complex> &weights) {
   };
   return std::make_tuple(direct, indirect);
 }
-
+//! enum for fftw plans
+enum class fftw_plan { estimate, measure };
 //! Construsts FFT operator
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
 init_FFT_2d(const t_uint &imsizey_, const t_uint &imsizex_, const t_real &oversample_factor_,
-            const std::string &fftw_plan_flag_ = "measure") {
-  const std::shared_ptr<FFTOperator> fftop = std::make_shared<FFTOperator>();
-  auto const ftsizeu_ = std::floor(imsizex_ * oversample_factor_);
-  auto const ftsizev_ = std::floor(imsizey_ * oversample_factor_);
-  if(fftw_plan_flag_ == "measure") {
-    fftop->fftw_flag((FFTW_MEASURE | FFTW_PRESERVE_INPUT));
-  } else {
-    fftop->fftw_flag((FFTW_ESTIMATE | FFTW_PRESERVE_INPUT));
+            const fftw_plan fftw_plan_flag_ = fftw_plan::measure) {
+  t_int const ftsizeu_ = std::floor(imsizex_ * oversample_factor_);
+  t_int const ftsizev_ = std::floor(imsizey_ * oversample_factor_);
+  t_int plan_flag = (FFTW_MEASURE | FFTW_PRESERVE_INPUT);
+  switch(fftw_plan_flag_) {
+  case(fftw_plan::measure):
+    plan_flag = (FFTW_MEASURE | FFTW_PRESERVE_INPUT);
+    break;
+  case(fftw_plan::estimate):
+    plan_flag = (FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
+    break;
   }
-  fftop->set_up_multithread();
 
-  auto direct = [=](T &output, const T &input) {
+#ifdef PURIFY_OPENMP_FFTW
+  PURIFY_LOW_LOG("Using OpenMP threading with FFTW.");
+  fftw_init_threads();
+  fftw_plan_with_nthreads(omp_get_max_threads());
+#endif
+  Vector<typename T::Scalar> src = Vector<t_complex>::Zero(ftsizev_ * ftsizeu_);
+  Vector<typename T::Scalar> dst = Vector<t_complex>::Zero(ftsizev_ * ftsizeu_);
+  // creating plans
+  const auto del = [](fftw_plan_s *plan) { fftw_destroy_plan(plan); };
+  const std::shared_ptr<fftw_plan_s> m_plan_forward(
+      fftw_plan_dft_2d(ftsizev_, ftsizeu_, reinterpret_cast<fftw_complex *>(src.data()),
+                       reinterpret_cast<fftw_complex *>(dst.data()), FFTW_FORWARD, plan_flag),
+      del);
+  const std::shared_ptr<fftw_plan_s> m_plan_inverse(
+      fftw_plan_dft_2d(ftsizev_, ftsizeu_, reinterpret_cast<fftw_complex *>(src.data()),
+                       reinterpret_cast<fftw_complex *>(dst.data()), FFTW_BACKWARD, plan_flag),
+      del);
+  auto const direct = [m_plan_forward, ftsizeu_, ftsizev_](T &output, const T &input) {
     assert(input.size() == ftsizev_ * ftsizeu_);
-    Matrix<t_complex> output_image = Image<t_complex>::Map(input.data(), ftsizev_, ftsizeu_);
-    output_image = fftop->forward(output_image);
-    output = Image<t_complex>::Map(output_image.data(), output_image.size(), 1);
+    output = Matrix<typename T::Scalar>::Zero(input.rows(), input.cols());
+    fftw_execute_dft(
+        m_plan_forward.get(),
+        const_cast<fftw_complex *>(reinterpret_cast<const fftw_complex *>(input.data())),
+        reinterpret_cast<fftw_complex *>(output.data()));
+    output /= std::sqrt(output.size());
   };
-  auto indirect = [=](T &output, const T &input) {
-    Matrix<t_complex> output_image = Image<t_complex>::Map(input.data(), ftsizev_, ftsizeu_);
-    output_image = fftop->inverse(output_image);
-    output = Image<t_complex>::Map(output_image.data(), output_image.size(), 1);
-    assert(output.size() == ftsizev_ * ftsizeu_);
+  auto const indirect = [m_plan_inverse, ftsizeu_, ftsizev_](T &output, const T &input) {
+    assert(input.size() == ftsizev_ * ftsizeu_);
+    output = Matrix<typename T::Scalar>::Zero(input.rows(), input.cols());
+    fftw_execute_dft(
+        m_plan_inverse.get(),
+        const_cast<fftw_complex *>(reinterpret_cast<const fftw_complex *>(input.data())),
+        reinterpret_cast<fftw_complex *>(output.data()));
+    output /= std::sqrt(output.size());
   };
   return std::make_tuple(direct, indirect);
 }
@@ -275,7 +300,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
 base_padding_and_FFT_2d(const std::function<t_real(t_real)> &ftkernelu,
                         const std::function<t_real(t_real)> &ftkernelv, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real &oversample_ratio = 2,
-                        const std::string &ft_plan = "measure") {
+                        const fftw_plan &ft_plan = fftw_plan::measure) {
   sopt::OperatorFunction<T> directZ, indirectZ;
   sopt::OperatorFunction<T> directFFT, indirectFFT;
   const Image<t_real> S = purify::details::init_correction2d(oversample_ratio, imsizey, imsizex,
@@ -286,10 +311,13 @@ base_padding_and_FFT_2d(const std::function<t_real(t_real)> &ftkernelu,
   PURIFY_MEDIUM_LOG("Oversampling Factor: {}", oversample_ratio);
   std::tie(directZ, indirectZ) = purify::operators::init_zero_padding_2d<T>(S, oversample_ratio);
   PURIFY_LOW_LOG("Constructing FFT operator: F");
-  if(ft_plan == "measure") {
-    PURIFY_LOW_LOG("Measuring...");
-  } else {
-    PURIFY_LOW_LOG("Using an estimate");
+  switch(ft_plan) {
+  case fftw_plan::measure:
+    PURIFY_MEDIUM_LOG("Measuring Plans...");
+    break;
+  case fftw_plan::estimate:
+    PURIFY_MEDIUM_LOG("Estimating Plans...");
+    break;
   }
   std::tie(directFFT, indirectFFT)
       = purify::operators::init_FFT_2d<T>(imsizey, imsizex, oversample_ratio, ft_plan);
@@ -304,7 +332,7 @@ base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
                         const Vector<t_complex> &weights, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real &oversample_ratio = 2,
                         const std::string &kernel = "kb", const t_uint Ju = 4, const t_uint Jv = 4,
-                        const std::string &ft_plan = "measure", const bool w_term = false,
+                        const fftw_plan &ft_plan = fftw_plan::measure, const bool w_term = false,
                         const t_real &cellx = 1, const t_real &celly = 1,
                         const t_real &energy_chirp_fraction = 1,
                         const t_real &energy_kernel_fraction = 1) {
@@ -338,7 +366,8 @@ base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_
                             const Vector<t_complex> &weights, const t_uint &imsizey,
                             const t_uint &imsizex, const t_real oversample_ratio = 2,
                             const std::string &kernel = "kb", const t_uint Ju = 4,
-                            const t_uint Jv = 4, const std::string &ft_plan = "measure",
+                            const t_uint Jv = 4,
+                            const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                             const bool w_term = false, const t_real &cellx = 1,
                             const t_real &celly = 1, const t_real &energy_chirp_fraction = 1,
                             const t_real &energy_kernel_fraction = 1) {
@@ -367,10 +396,9 @@ base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_
     return std::make_tuple(directG, indirectG);
 }
 #endif
- 
+
 } // namespace operators
 
- 
 namespace measurementoperator {
 
 //! Returns linear transform that is the standard degridding operator
@@ -381,8 +409,8 @@ init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
                         const t_uint &imsizex, const t_real &oversample_ratio = 2,
                         const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
                         const std::string &kernel = "kb", const t_uint Ju = 4, const t_uint Jv = 4,
-                        const std::string &ft_plan = "measure", const bool w_term = false,
-                        const t_real &cellx = 1, const t_real &celly = 1,
+                        const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
+                        const bool w_term = false, const t_real &cellx = 1, const t_real &celly = 1,
                         const t_real &energy_chirp_fraction = 1,
                         const t_real &energy_kernel_fraction = 1) {
 
@@ -409,8 +437,8 @@ init_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_uint 
                         const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
                         const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
                         const t_uint Ju = 4, const t_uint Jv = 4,
-                        const std::string &ft_plan = "measure", const bool w_term = false,
-                        const t_real &energy_chirp_fraction = 1,
+                        const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
+                        const bool w_term = false, const t_real &energy_chirp_fraction = 1,
                         const t_real &energy_kernel_fraction = 1) {
 
   auto uv_vis = uv_vis_input;
@@ -435,8 +463,8 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
                         const t_uint &imsizex, const t_real &oversample_ratio = 2,
                         const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
                         const std::string &kernel = "kb", const t_uint Ju = 4, const t_uint Jv = 4,
-                        const std::string &ft_plan = "measure", const bool w_term = false,
-                        const t_real &cellx = 1, const t_real &celly = 1,
+                        const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
+                        const bool w_term = false, const t_real &cellx = 1, const t_real &celly = 1,
                         const t_real &energy_chirp_fraction = 1,
                         const t_real &energy_kernel_fraction = 1) {
 
@@ -456,7 +484,7 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
   indirect = sopt::chained_operators<T>(operator_norm, indirect);
   return std::make_shared<sopt::LinearTransform<T> const>(direct, M, indirect, N);
 }
- 
+
 template <class T>
 std::shared_ptr<sopt::LinearTransform<T> const>
 init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
@@ -465,8 +493,8 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                         const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
                         const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
                         const t_uint Ju = 4, const t_uint Jv = 4,
-                        const std::string &ft_plan = "measure", const bool w_term = false,
-                        const t_real &energy_chirp_fraction = 1,
+                        const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
+                        const bool w_term = false, const t_real &energy_chirp_fraction = 1,
                         const t_real &energy_kernel_fraction = 1) {
 
   auto uv_vis = uv_vis_input;
@@ -479,23 +507,19 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                                     imsizex, oversample_ratio, power_iters, power_tol, kernel, Ju,
                                     Jv, ft_plan, w_term, cell_x, cell_y, energy_chirp_fraction,
                                     energy_kernel_fraction);
+}
 
- }
- 
 //! Returns linear transform that is the weighted degridding operator with a distributed Fourier
 //! grid
 template <class T>
-std::shared_ptr<sopt::LinearTransform<T> const>
-init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
-                            const Vector<t_real> &v, const Vector<t_real> &w,
-                            const Vector<t_complex> &weights, const t_uint &imsizey,
-                            const t_uint &imsizex, const t_real &oversample_ratio = 2,
-                            const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
-                            const std::string &kernel = "kb", const t_uint Ju = 4,
-                            const t_uint Jv = 4, const std::string &ft_plan = "measure",
-                            const bool w_term = false, const t_real &cellx = 1,
-                            const t_real &celly = 1, const t_real &energy_chirp_fraction = 1,
-                            const t_real &energy_kernel_fraction = 1) {
+std::shared_ptr<sopt::LinearTransform<T> const> init_degrid_operator_2d_mpi(
+    const sopt::mpi::Communicator &comm, const Vector<t_real> &u, const Vector<t_real> &v,
+    const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint &imsizey,
+    const t_uint &imsizex, const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
+    const t_real &power_tol = 1e-4, const std::string &kernel = "kb", const t_uint Ju = 4,
+    const t_uint Jv = 4, const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
+    const bool w_term = false, const t_real &cellx = 1, const t_real &celly = 1,
+    const t_real &energy_chirp_fraction = 1, const t_real &energy_kernel_fraction = 1) {
 
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
@@ -514,7 +538,7 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_
   indirect = sopt::chained_operators<T>(operator_norm, indirect);
   return std::make_shared<sopt::LinearTransform<T> const>(direct, M, indirect, N);
 }
- 
+
 template <class T>
 std::shared_ptr<sopt::LinearTransform<T> const>
 init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
@@ -523,8 +547,8 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
                             const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
                             const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
                             const t_uint Ju = 4, const t_uint Jv = 4,
-                            const std::string &ft_plan = "measure", const bool w_term = false,
-                            const t_real &energy_chirp_fraction = 1,
+                            const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
+                            const bool w_term = false, const t_real &energy_chirp_fraction = 1,
                             const t_real &energy_kernel_fraction = 1) {
   auto uv_vis = uv_vis_input;
   if(uv_vis.units == "lambda")
@@ -554,7 +578,7 @@ init_combine_operators(const std::vector<std::shared_ptr<sopt::LinearTransform<T
   };
   return std::make_shared<sopt::LinearTransform<T> const>(direct, indirect);
 }
- 
+
 //! combines different uv_data sets and creates a super measurement operator out of multiple
 //! measurement operators
 template <class T, class... ARGS>
@@ -587,7 +611,7 @@ std::shared_ptr<sopt::LinearTransform<T> const> init_super_operator(
   }
   return init_super_operator(create_operator, uv_vis_datas, std::forward<ARGS>(args)...);
 }
- 
+
 template <class T, class... ARGS>
 std::shared_ptr<sopt::LinearTransform<T> const> init_super_operator(
     const std::function<std::shared_ptr<sopt::LinearTransform<T> const>> &create_operator,
@@ -609,6 +633,6 @@ std::shared_ptr<sopt::LinearTransform<T> const> init_super_operator(
 }
 
 } // namespace measurementoperator
- 
+
 }; // namespace purify
 #endif

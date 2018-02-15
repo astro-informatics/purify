@@ -38,7 +38,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   auto const measurements_transform
       = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 100,
-          0.0001, kernel, J, J, "measure", std::get<0>(w_term));
+          0.0001, kernel, J, J, operators::fftw_plan::measure, std::get<0>(w_term));
 #else
   af::setDevice(0);
   auto const measurements_transform = gpu::measurementoperator::init_degrid_operator_2d(
@@ -152,8 +152,8 @@ int main(int, char **) {
 
 #ifndef PURIFY_GPU
   auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 100, 0.0001, "kb", 8, 8, "measure",
-      w_term);
+      uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 100, 0.0001, "kb", 8, 8,
+      operators::fftw_plan::measure, w_term);
 #else
   auto const sky_measurements = gpu::measurementoperator::init_degrid_operator_2d(
       uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 100, 0.0001, "kb", 8, 8, w_term);
