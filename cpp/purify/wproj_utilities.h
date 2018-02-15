@@ -12,8 +12,8 @@
 #include <time.h>
 #include <Eigen/Sparse>
 #include <sys/stat.h>
-#include "purify/FFTOperator.h"
 #include "purify/logging.h"
+#include "purify/operators.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
 
@@ -28,6 +28,9 @@ Matrix<t_complex> generate_chirp(const t_real &w_rate, const t_real &cell_x, con
 //! Generates row of chirp matrix from image of chirp
 Sparse<t_complex> create_chirp_row(const t_real &w_rate, const t_real &cell_x, const t_real &cell_y,
                                    const t_uint &ftsizev, const t_uint &ftsizeu,
+                                   const t_real &energy_fraction,
+                                   const sopt::OperatorFunction<Vector<t_complex>> &fftop);
+Sparse<t_complex> create_chirp_row(const Vector<t_complex> &chirp_image,
                                    const t_real &energy_fraction,
                                    const sopt::OperatorFunction<Vector<t_complex>> &fftop);
 //! Returns threshold to keep a fraction of energy in the sparse row
