@@ -13,7 +13,8 @@ TEST_CASE("Calcuate Chirp Image") {
   const t_int imsizey = 128;
   SECTION("w is zero") {
     const t_real w_rate = 0;
-    const auto chirp_image = wproj_utilities::generate_chirp(w_rate, 1, 1, imsizex, imsizey);
+    const Image<t_complex> chirp_image
+        = wproj_utilities::generate_chirp(w_rate, 1, 1, imsizex, imsizey);
     CHECK((chirp_image.array().cwiseAbs() - 1. / (imsizex * imsizey)).matrix().norm() < 1e-12);
   }
 }
@@ -56,8 +57,8 @@ TEST_CASE("Calculate Threshold") {
 }
 
 TEST_CASE("simple convolution") {
-  const t_uint Nx = 12;
-  const t_uint Ny = 12;
+  const t_int Nx = 12;
+  const t_int Ny = 12;
   const Sparse<t_complex> G_row = Matrix<t_complex>::Random(1, Nx * Ny).sparseView(1e-2);
   const Sparse<t_complex> C_row = Matrix<t_complex>::Random(1, Nx * Ny).sparseView(1e-2);
   const Sparse<t_complex> kernel = wproj_utilities::row_wise_convolution(G_row, C_row, Nx, Ny);
@@ -92,14 +93,15 @@ TEST_CASE("wprojection_matrix") {
   CHECK(G.nonZeros() >= I.nonZeros());
   for(t_int k = 0; k < G_id.outerSize(); ++k)
     for(Sparse<t_complex>::InnerIterator it(G_id, k); it; ++it) {
+      CAPTURE(it.value() * static_cast<t_real>(Nx));
       CHECK(std::abs(it.value() - 1.) < 1e-12);
       CHECK(it.row() == k); // row index
       CHECK(it.col() == k); // col index
     }
 }
 TEST_CASE("convolution even") {
-  const t_uint Nx = 4;
-  const t_uint Ny = 4;
+  const t_int Nx = 4;
+  const t_int Ny = 4;
   Matrix<t_complex> G_data(1, Nx * Ny);
   Matrix<t_complex> C_data(1, Nx * Ny);
   Matrix<t_complex> K_data(1, Nx * Ny);
@@ -134,8 +136,8 @@ TEST_CASE("convolution even") {
 }
 
 TEST_CASE("convolution odd") {
-  const t_uint Nx = 5;
-  const t_uint Ny = 5;
+  const t_int Nx = 5;
+  const t_int Ny = 5;
   Matrix<t_complex> G_data(1, Nx * Ny);
   Matrix<t_complex> C_data(1, Nx * Ny);
   Matrix<t_complex> K_data(1, Nx * Ny);

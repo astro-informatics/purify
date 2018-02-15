@@ -40,36 +40,42 @@ Matrix<t_complex> generate_chirp(const t_real &w_rate, const t_real &cell_x, con
 }
 
 Sparse<t_complex> create_chirp_row(const t_real &w_rate, const t_real &cell_x, const t_real &cell_y,
-                                   const t_real &ftsizev, const t_real &ftsizeu,
+                                   const t_uint &ftsizev, const t_uint &ftsizeu,
                                    const t_real &energy_fraction,
-                                   const std::shared_ptr<FFTOperator> &fftop_) {
+                                   const sopt::OperatorFunction<Vector<t_complex>> &fftop) {
 
-  const t_int Npix = ftsizeu * ftsizev;
-  Matrix<t_complex> chirp
+  const Matrix<t_complex> chirp
       = wproj_utilities::generate_chirp(w_rate, cell_x, cell_y, ftsizeu, ftsizev);
+  return create_chirp_row(Vector<t_complex>::Map(chirp.data(), chirp.size()), energy_fraction,
+                          fftop);
+}
+Sparse<t_complex> create_chirp_row(const Vector<t_complex> &chirp_image,
+                                   const t_real &energy_fraction,
+                                   const sopt::OperatorFunction<Vector<t_complex>> &fftop) {
+  Vector<t_complex> chirp;
 #pragma omp critical(fft)
-  chirp = fftop_->forward(chirp);
-  chirp.resize(1, Npix);
+  fftop(chirp, chirp_image);
+  chirp *= std::sqrt(chirp.size());
   const t_real thres = wproj_utilities::sparsify_row_dense_thres(chirp, energy_fraction);
   assert(chirp.norm() > 0);
   const t_real row_max = chirp.cwiseAbs().maxCoeff();
-  return convert_sparse(chirp, thres);
+  return convert_sparse(chirp, thres).transpose();
 }
 
-Sparse<t_complex> wprojection_matrix(const Sparse<t_complex> &G, const t_int &Nx, const t_int &Ny,
-                                     const Vector<t_real> &w_components, const t_real &cell_x,
-                                     const t_real &cell_y, const t_real &energy_fraction_chirp,
-                                     const t_real &energy_fraction_wproj) {
 
-  const t_int Npix = Nx * Ny;
-  const t_int Nvis = w_components.size();
+Sparse<t_complex>
+wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uint &y_size,
+                   const Vector<t_real> &w_components, const t_real &cell_x, const t_real &cell_y,
+                   const t_real &energy_fraction_chirp, const t_real &energy_fraction_wproj) {
+
+  const t_uint Npix = x_size * y_size;
+  const t_uint Nvis = w_components.size();
 
   PURIFY_HIGH_LOG("Hard-thresholding of the Chirp kernels: energy [{}] ", energy_fraction_chirp);
   PURIFY_HIGH_LOG("Hard-thresholding of the rows of G: energy [{}]  ", energy_fraction_wproj);
 
-  const t_int fft_flag = (FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
-  const std::shared_ptr<FFTOperator> fftop_
-      = std::make_shared<FFTOperator>(purify::FFTOperator().fftw_flag(fft_flag));
+  const auto ft_plan = operators::fftw_plan::measure;
+  const auto fftop_ = operators::init_FFT_2d<Vector<t_complex>>(y_size, x_size, 1., ft_plan);
   Sparse<t_complex> GW(Nvis, Npix);
   t_uint counts = 0;
   t_uint total_non_zero = 0;
@@ -80,8 +86,9 @@ Sparse<t_complex> wprojection_matrix(const Sparse<t_complex> &G, const t_int &Nx
     for(Sparse<t_complex>::InnerIterator it(G, m); it; ++it)
       row.coeffRef(0, it.index()) = it.value();
     const Sparse<t_complex> chirp
-        = create_chirp_row(w_components(m), cell_x, cell_y, Nx, Ny, energy_fraction_chirp, fftop_);
-    Sparse<t_complex> kernel = row_wise_sparse_convolution(row, chirp, Nx, Ny);
+        = create_chirp_row(w_components(m), cell_x, cell_y, x_size, y_size, energy_fraction_chirp,
+                           std::get<0>(fftop_));
+    Sparse<t_complex> kernel = row_wise_sparse_convolution(row, chirp, x_size, y_size);
     //#pragma omp critical
     //    assert(kernel.nonZeros() >= row.nonZeros());
     const t_real thres = sparsify_row_thres(kernel, energy_fraction_wproj);

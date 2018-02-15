@@ -27,9 +27,9 @@ Matrix<t_complex> generate_chirp(const t_real &w_rate, const t_real &cell_x, con
                                  const t_int &x_size, const t_int &y_size);
 //! Generates row of chirp matrix from image of chirp
 Sparse<t_complex> create_chirp_row(const t_real &w_rate, const t_real &cell_x, const t_real &cell_y,
-                                   const t_real &ftsizev, const t_real &ftsizeu,
+                                   const t_uint &ftsizev, const t_uint &ftsizeu,
                                    const t_real &energy_fraction,
-                                   const std::shared_ptr<FFTOperator> &fftop_);
+                                   const sopt::OperatorFunction<Vector<t_complex>> &fftop);
 //! Returns threshold to keep a fraction of energy in the sparse row
 template <typename T>
 t_real sparsify_row_thres(const Eigen::SparseMatrixBase<T> &row, const t_real &energy);
