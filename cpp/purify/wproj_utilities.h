@@ -19,12 +19,30 @@
 
 namespace purify {
 namespace wproj_utilities {
+//! Work out coordinates for w grid from image parameters
+Vector<t_real> w_range(const t_real &w_cell, const t_real &w_max);
+//! Returns rows needed for w grid given the w degridder
+std::vector<t_uint> w_rows(const Sparse<t_complex> &w_degrider);
+//! Work out max L and M directional cosines from image parameters
+std::tuple<t_real, t_real>
+fov_cosines(t_real const &cell_x, t_real const &cell_y, t_uint const &x_size, t_uint const &y_size);
+//! gridding correction for w gridding
+t_complex ft_kernel(const t_real &y, const t_real &x, const t_real &n_max, const t_uint &J);
+//! Scale w coordinates from lambda to radians
+Vector<t_real> scale_w(Vector<t_real> const &w, const t_real &n_max);
 //! Convert from dense to sparse
 template <typename T>
 Sparse<t_complex> convert_sparse(const Eigen::MatrixBase<T> &M, const t_real &threshold = 0.);
+//! Generate image of DDE for A or W projection
+Matrix<t_complex> generate_dde(const std::function<t_complex(t_real, t_real)> &dde,
+                               const t_real &cell_x, const t_real &cell_y, const t_uint &x_size,
+                               const t_uint &y_size);
 //! Generates image of chirp
 Matrix<t_complex> generate_chirp(const t_real &w_rate, const t_real &cell_x, const t_real &cell_y,
-                                 const t_int &x_size, const t_int &y_size);
+                                 const t_uint &x_size, const t_uint &y_size);
+Matrix<t_complex> generate_chirp(const std::function<t_complex(t_real, t_real)> &dde,
+                                 const t_real &w_rate, const t_real &cell_x, const t_real &cell_y,
+                                 const t_uint &x_size, const t_uint &y_size);
 //! Generates row of chirp matrix from image of chirp
 Sparse<t_complex> create_chirp_row(const t_real &w_rate, const t_real &cell_x, const t_real &cell_y,
                                    const t_uint &ftsizev, const t_uint &ftsizeu,
@@ -33,6 +51,14 @@ Sparse<t_complex> create_chirp_row(const t_real &w_rate, const t_real &cell_x, c
 Sparse<t_complex> create_chirp_row(const Vector<t_complex> &chirp_image,
                                    const t_real &energy_fraction,
                                    const sopt::OperatorFunction<Vector<t_complex>> &fftop);
+//! Return sparse W plane grid
+Sparse<t_complex> w_plane_grid(const t_uint &x_size, const t_uint &y_size, const t_real &cell_x,
+                               const t_real &cell_y, const t_real &energy_fraction_chirp,
+                               const t_uint &J, const std::vector<t_uint> &w_rows,
+                               const t_real &w_cell, const t_real &w_max);
+//! Return sparse matrix to degrid W plane
+Sparse<t_complex> w_plane_degrid_matrix(const Vector<t_real> &w_range,
+                                        const Vector<t_real> &w_components, const t_uint &J);
 //! Returns threshold to keep a fraction of energy in the sparse row
 template <typename T>
 t_real sparsify_row_thres(const Eigen::SparseMatrixBase<T> &row, const t_real &energy);
@@ -42,7 +68,7 @@ t_real sparsify_row_dense_thres(const Eigen::MatrixBase<T> &row, const t_real &e
 //! Perform convolution with gridding matrix row and chirp matrix row
 template <class T>
 Sparse<t_complex> row_wise_convolution(const Sparse<t_complex> &Grid_, const Sparse<T> &chirp_,
-                                       const t_int &Nx, const t_int &Ny);
+                                       const t_uint &x_size, const t_uint &y_size);
 //! Produce Gridding matrix convovled with chirp matrix for wprojection
 Sparse<t_complex>
 wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uint &y_size,
@@ -58,7 +84,7 @@ t_real sparsity_sp(const Sparse<t_complex> &Gmat);
 t_real sparsity_im(const Image<t_complex> &Cmat);
 //! Genereates an image of a Gaussian as a sparse matrice
 Sparse<t_complex>
-generate_vect(const t_int &x_size, const t_int &y_size, const t_real &sigma, const t_real &mean);
+generate_vect(const t_uint &x_size, const t_uint &y_size, const t_real &sigma, const t_real &mean);
 //! Calculate upsample ratio from bandwidth (only needed for simulations)
 t_real upsample_ratio_sim(const utilities::vis_params &uv_vis, const t_real &L, const t_real &M,
                           const t_int &x_size, const t_int &y_size, const t_int &multipleOf);
@@ -168,33 +194,34 @@ t_real sparsify_row_dense_thres(const Eigen::MatrixBase<T> &row, const t_real &e
 }
 template <class T>
 Sparse<t_complex> row_wise_convolution(const Sparse<t_complex> &Grid_, const Sparse<T> &chirp_,
-                                       const t_int &Nx, const t_int &Ny) {
+                                       const t_uint &x_size, const t_uint &y_size) {
   assert((Grid_.nonZeros() > 0) and (chirp_.nonZeros() > 0));
-  Matrix<t_complex> output_row = Matrix<t_complex>::Zero(1, Nx * Ny);
-  const t_int Nxc = std::floor(Nx * 0.5);
-  const t_int Nyc = std::floor(Ny * 0.5);
+  Matrix<t_complex> output_row = Matrix<t_complex>::Zero(1, x_size * y_size);
+  const t_int x_sizec = std::floor(x_size * 0.5);
+  const t_int y_sizec = std::floor(y_size * 0.5);
   for(t_int k = 0; k < output_row.size(); k++) {
     // shifting indicies to workout linear convolution
     t_int i_shift_W = 0;
     t_int j_shift_W = 0;
-    std::tie(j_shift_W, i_shift_W) = utilities::ind2sub(k, Ny, Nx);
-    const t_int i_W = utilities::mod(i_shift_W + Nxc, Nx);
-    const t_int j_W = utilities::mod(j_shift_W + Nyc, Ny);
+    std::tie(j_shift_W, i_shift_W) = utilities::ind2sub(k, y_size, x_size);
+    const t_int i_W = utilities::mod(i_shift_W + x_sizec, x_size);
+    const t_int j_W = utilities::mod(j_shift_W + y_sizec, y_size);
     for(Sparse<t_complex>::InnerIterator it(Grid_, 0); it; ++it) {
       t_int i_shift_G = 0;
       t_int j_shift_G = 0;
-      std::tie(j_shift_G, i_shift_G) = utilities::ind2sub(it.index(), Ny, Nx);
-      const t_int i_G = utilities::mod(i_shift_G + Nxc, Nx);
-      const t_int j_G = utilities::mod(j_shift_G + Nyc, Ny);
+      std::tie(j_shift_G, i_shift_G) = utilities::ind2sub(it.index(), y_size, x_size);
+      const t_int i_G = utilities::mod(i_shift_G + x_sizec, x_size);
+      const t_int j_G = utilities::mod(j_shift_G + y_sizec, y_size);
       const t_int i_C = i_W - i_G;
       const t_int j_C = j_W - j_G;
       // Checking that convolution result is going to be within bounds
-      if(-Nxc <= i_C and i_C < std::ceil(Nx * 0.5) and -Nyc <= j_C and j_C < std::ceil(Ny * 0.5)) {
+      if(-x_sizec <= i_C and i_C < std::ceil(x_size * 0.5) and -y_sizec <= j_C
+         and j_C < std::ceil(y_size * 0.5)) {
         // FFTshift of result to go into gridding matrix
-        const t_int i_shift_C = utilities::mod(i_C, Nx);
-        const t_int j_shift_C = utilities::mod(j_C, Ny);
-        const t_int pos = utilities::sub2ind(j_shift_C, i_shift_C, Ny, Nx);
-        assert(0 <= pos and pos < Nx * Ny);
+        const t_int i_shift_C = utilities::mod(i_C, x_size);
+        const t_int j_shift_C = utilities::mod(j_C, y_size);
+        const t_int pos = utilities::sub2ind(j_shift_C, i_shift_C, y_size, x_size);
+        assert(0 <= pos and pos < x_size * y_size);
         output_row(0, k) += it.value() * chirp_.coeff(0, pos);
       }
     }
@@ -204,61 +231,63 @@ Sparse<t_complex> row_wise_convolution(const Sparse<t_complex> &Grid_, const Spa
 template <class T>
 Sparse<t_complex>
 row_wise_sparse_convolution(const Sparse<t_complex> &Grid_, const Sparse<T> &chirp_,
-                            const t_int &Nx, const t_int &Ny) {
+                            const t_uint &x_size, const t_uint &y_size) {
   assert((Grid_.nonZeros() > 0) and (chirp_.nonZeros() > 0));
-  const t_int Nxc = std::floor(Nx * 0.5);
-  const t_int Nyc = std::floor(Ny * 0.5);
+  const t_int x_sizec = std::floor(x_size * 0.5);
+  const t_int y_sizec = std::floor(y_size * 0.5);
   std::set<t_int> non_zero_W;
   for(Sparse<t_complex>::InnerIterator jt(chirp_, 0); jt; ++jt) {
     // shifting indicies to workout linear convolution
     t_int i_shift_C = 0;
     t_int j_shift_C = 0;
-    std::tie(j_shift_C, i_shift_C) = utilities::ind2sub(jt.index(), Ny, Nx);
-    const t_int i_C = utilities::mod(i_shift_C + Nxc, Nx) - Nxc;
-    const t_int j_C = utilities::mod(j_shift_C + Nyc, Ny) - Nyc;
+    std::tie(j_shift_C, i_shift_C) = utilities::ind2sub(jt.index(), y_size, x_size);
+    const t_int i_C = utilities::mod(i_shift_C + x_sizec, x_size) - x_sizec;
+    const t_int j_C = utilities::mod(j_shift_C + y_sizec, y_size) - y_sizec;
     for(Sparse<t_complex>::InnerIterator it(Grid_, 0); it; ++it) {
       t_int i_shift_G = 0;
       t_int j_shift_G = 0;
-      std::tie(j_shift_G, i_shift_G) = utilities::ind2sub(it.index(), Ny, Nx);
-      const t_int i_G = utilities::mod(i_shift_G + Nxc, Nx) - Nxc;
-      const t_int j_G = utilities::mod(j_shift_G + Nyc, Ny) - Nyc;
+      std::tie(j_shift_G, i_shift_G) = utilities::ind2sub(it.index(), y_size, x_size);
+      const t_int i_G = utilities::mod(i_shift_G + x_sizec, x_size) - x_sizec;
+      const t_int j_G = utilities::mod(j_shift_G + y_sizec, y_size) - y_sizec;
       const t_int i_W = i_G + i_C;
       const t_int j_W = j_G + j_C;
-      if(-Nxc <= i_W and i_W < std::ceil(Nx * 0.5) and -Nyc <= j_W and j_W < std::ceil(Ny * 0.5)) {
-        const t_int i_shift_W = utilities::mod(i_W, Nx);
-        const t_int j_shift_W = utilities::mod(j_W, Ny);
-        const t_real pos = utilities::sub2ind(j_shift_W, i_shift_W, Ny, Nx);
+      if(-x_sizec <= i_W and i_W < std::ceil(x_size * 0.5) and -y_sizec <= j_W
+         and j_W < std::ceil(y_size * 0.5)) {
+        const t_int i_shift_W = utilities::mod(i_W, x_size);
+        const t_int j_shift_W = utilities::mod(j_W, y_size);
+        const t_real pos = utilities::sub2ind(j_shift_W, i_shift_W, y_size, x_size);
         non_zero_W.insert(pos);
       }
     }
   }
   if(non_zero_W.size() < std::min(Grid_.nonZeros(), chirp_.nonZeros()))
     throw std::runtime_error("Gridding kernel or chirp kernel is zero.");
-  Sparse<t_complex> output_row(1, Nx * Ny);
+  Sparse<t_complex> output_row(1, x_size * y_size);
   output_row.reserve(non_zero_W.size());
 
   for(t_int k = 0; k < output_row.size(); k++) {
     // shifting indicies to workout linear convolution
     t_int i_shift_W = 0;
     t_int j_shift_W = 0;
-    std::tie(j_shift_W, i_shift_W) = utilities::ind2sub(k, Ny, Nx);
-    const t_int i_W = utilities::mod(i_shift_W + Nxc, Nx);
-    const t_int j_W = utilities::mod(j_shift_W + Nyc, Ny);
+    std::tie(j_shift_W, i_shift_W) = utilities::ind2sub(k, y_size, x_size);
+    const t_int i_W = utilities::mod(i_shift_W + x_sizec, x_size);
+    const t_int j_W = utilities::mod(j_shift_W + y_sizec, y_size);
     for(Sparse<t_complex>::InnerIterator it(Grid_, 0); it; ++it) {
       t_int i_shift_G = 0;
       t_int j_shift_G = 0;
-      std::tie(j_shift_G, i_shift_G) = utilities::ind2sub(it.index(), Ny, Nx);
-      const t_int i_G = utilities::mod(i_shift_G + Nxc, Nx);
-      const t_int j_G = utilities::mod(j_shift_G + Nyc, Ny);
+      std::tie(j_shift_G, i_shift_G) = utilities::ind2sub(it.index(), y_size, x_size);
+      const t_int i_G = utilities::mod(i_shift_G + x_sizec, x_size);
+      const t_int j_G = utilities::mod(j_shift_G + y_sizec, y_size);
       const t_int i_C = i_W - i_G;
       const t_int j_C = j_W - j_G;
       // Checking that convolution result is going to be within bounds
-      if(-Nxc <= i_C and i_C < std::ceil(Nx * 0.5) and -Nyc <= j_C and j_C < std::ceil(Ny * 0.5)) {
+      if(-x_sizec <= i_C and i_C < std::ceil(x_size * 0.5) and -y_sizec <= j_C
+         and j_C < std::ceil(y_size * 0.5)) {
         // FFTshift of result to go into gridding matrix
-        const t_int i_shift_C = utilities::mod(i_C, Nx);
-        const t_int j_shift_C = utilities::mod(j_C, Ny);
-        const t_int pos = utilities::sub2ind(j_shift_C, i_shift_C, Ny, Nx);
-        assert(0 <= pos and pos < Nx * Ny);
+        const t_int i_shift_C = utilities::mod(i_C, x_size);
+        const t_int j_shift_C = utilities::mod(j_C, y_size);
+        const t_int pos = utilities::sub2ind(j_shift_C, i_shift_C, y_size, x_size);
+        assert(0 <= pos and pos < x_size * y_size);
         output_row.coeffRef(0, k) += it.value() * chirp_.coeff(0, pos);
       }
     }
