@@ -1,6 +1,7 @@
 
 #include "purify/directories.h"
 #include "purify/pfitsio.h"
+#include "purify/wproj_grid.h"
 #include "purify/wproj_utilities.h"
 
 using namespace purify;

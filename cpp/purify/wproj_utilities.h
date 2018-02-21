@@ -19,17 +19,9 @@
 
 namespace purify {
 namespace wproj_utilities {
-//! Work out coordinates for w grid from image parameters
-Vector<t_real> w_range(const t_real &w_cell, const t_real &w_max);
-//! Returns rows needed for w grid given the w degridder
-std::vector<t_uint> w_rows(const Sparse<t_complex> &w_degrider);
 //! Work out max L and M directional cosines from image parameters
 std::tuple<t_real, t_real>
 fov_cosines(t_real const &cell_x, t_real const &cell_y, t_uint const &x_size, t_uint const &y_size);
-//! gridding correction for w gridding
-t_complex ft_kernel(const t_real &y, const t_real &x, const t_real &n_max, const t_uint &J);
-//! Scale w coordinates from lambda to radians
-Vector<t_real> scale_w(Vector<t_real> const &w, const t_real &n_max);
 //! Convert from dense to sparse
 template <typename T>
 Sparse<t_complex> convert_sparse(const Eigen::MatrixBase<T> &M, const t_real &threshold = 0.);
@@ -51,14 +43,6 @@ Sparse<t_complex> create_chirp_row(const t_real &w_rate, const t_real &cell_x, c
 Sparse<t_complex> create_chirp_row(const Vector<t_complex> &chirp_image,
                                    const t_real &energy_fraction,
                                    const sopt::OperatorFunction<Vector<t_complex>> &fftop);
-//! Return sparse W plane grid
-Sparse<t_complex> w_plane_grid(const t_uint &x_size, const t_uint &y_size, const t_real &cell_x,
-                               const t_real &cell_y, const t_real &energy_fraction_chirp,
-                               const t_uint &J, const std::vector<t_uint> &w_rows,
-                               const t_real &w_cell, const t_real &w_max);
-//! Return sparse matrix to degrid W plane
-Sparse<t_complex> w_plane_degrid_matrix(const Vector<t_real> &w_range,
-                                        const Vector<t_real> &w_components, const t_uint &J);
 //! Returns threshold to keep a fraction of energy in the sparse row
 template <typename T>
 t_real sparsify_row_thres(const Eigen::SparseMatrixBase<T> &row, const t_real &energy);
