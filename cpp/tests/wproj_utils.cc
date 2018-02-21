@@ -19,62 +19,6 @@ TEST_CASE("Calcuate Chirp Image") {
     CHECK((chirp_image.array().cwiseAbs() - 1. / (imsizex * imsizey)).matrix().norm() < 1e-12);
   }
 }
-TEST_CASE("W_degridding") {
-  std::srand((unsigned int)std::time(0));
-  const t_real fov = 10; // degrees
-  const t_int imsizex = 128;
-  const t_int imsizey = imsizex;
-  const t_real cell_x = fov / imsizex * 60 * 60;
-  const t_real cell_y = fov / imsizey * 60 * 60;
-  const t_uint J = 4;
-  const t_uint M = 4;
-  auto const LM = wproj_utilities::fov_cosines(cell_x, cell_y, imsizex, imsizey);
-
-  const t_real cL = std::get<0>(LM) * 0.5;
-  const t_real cM = std::get<1>(LM) * 0.5;
-  const t_real n_max = (1 - std::sqrt(1 - cL * cL - cM * cM));
-  // const t_real w_cell = 1.88 / (constant::pi * n_max) / 2;
-  const t_real w_cell = constant::pi * 1e-4;
-  const t_real w_max = w_cell * imsizex;
-  const Vector<t_real> w_grid_coords = wproj_utilities::w_range(w_cell, w_max);
-  const Vector<t_real> w_components = Vector<t_real>::Random(M) * w_max;
-  const Sparse<t_complex> w_degrider
-      = wproj_utilities::w_plane_degrid_matrix(w_grid_coords, w_components, J);
-
-  std::vector<t_uint> w_rows = wproj_utilities::w_rows(w_degrider);
-
-  const Sparse<t_complex> w_grid = wproj_utilities::w_plane_grid(imsizex, imsizey, cell_x, cell_y,
-                                                                 1., J, w_rows, w_cell, w_max);
-
-  const Sparse<t_complex> W = w_degrider * w_grid;
-  const auto ft_plan = operators::fftw_plan::measure;
-  const auto fftop_ = operators::init_FFT_2d<Vector<t_complex>>(imsizex, imsizey, 1., ft_plan);
-  /*
-  for(t_uint i = 0; i < W.rows(); i++) {
-    CAPTURE(i);
-    CAPTURE(w_degrider.row(i));
-    CAPTURE(w_components(i));
-    Matrix<t_complex> chirp = Matrix<t_complex>(wproj_utilities::create_chirp_row(
-        Vector<t_complex>::Map(
-            wproj_utilities::generate_chirp(w_components(i), cell_x, cell_y, imsizex, imsizey)
-                .data(),
-            imsizex * imsizey),
-        1., std::get<0>(fftop_)));
-    Matrix<t_complex> row = Matrix<t_complex>(W.row(i));
-    row = row / row.cwiseAbs().maxCoeff();
-    chirp = chirp / chirp.cwiseAbs().maxCoeff();
-    //   CHECK(row(0) / chirp(0) == row(1) / chirp(1));
-    CAPTURE(row.block(0, 0, 1, 12));
-    CAPTURE(chirp.block(0, 0, 1, 12));
-    // check amp difference
-    CHECK((row.cwiseAbs() - chirp.cwiseAbs()).cwiseAbs().maxCoeff() < 1e-4);
-    // check phase difference
-    CHECK((row - chirp).cwiseAbs().maxCoeff() < 1e-4);
-    // CHECK(row.isApprox(chirp, 1e-4));
-    // CHECK(row.isApprox(chirp, 1e-4));
-  }
-  */
-}
 TEST_CASE("W_expansion") {
   std::srand((unsigned int)std::time(0));
   const t_real fov = 15; // degrees
