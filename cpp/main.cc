@@ -223,7 +223,9 @@ int main(int argc, char **argv) {
     measurements_transform = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         uv_data, params.height, params.width, params.cellsizey, params.cellsizex,
         params.over_sample, params.power_method_iterations, 1e-4, params.kernel, params.J, params.J,
-        params.fftw_plan, params.use_w_term, params.energy_fraction, params.energy_fraction);
+        (params.fftw_plan == "measure") ? operators::fftw_plan::measure :
+                                          operators::fftw_plan::estimate,
+        params.use_w_term, params.energy_fraction, params.energy_fraction);
   else {
 #ifdef PURIFY_ARRAYFIRE
     measurements_transform = gpu::measurementoperator::init_degrid_operator_2d(
