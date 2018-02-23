@@ -117,7 +117,9 @@ Sparse<t_complex> create_chirp_row(const Vector<t_complex> &chirp_image,
 Sparse<t_complex>
 wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uint &y_size,
                    const Vector<t_real> &w_components, const t_real &cell_x, const t_real &cell_y,
-                   const t_real &energy_fraction_chirp, const t_real &energy_fraction_wproj) {
+                   const t_real &energy_fraction_chirp, const t_real &energy_fraction_wproj,
+                   const expansions::series series, const t_uint order,
+                   const t_real &interpolation_error) {
 
   const t_uint Npix = x_size * y_size;
   const t_uint Nvis = w_components.size();
@@ -128,6 +130,43 @@ wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uin
   const auto ft_plan = operators::fftw_plan::measure;
   const auto fftop_ = operators::init_FFT_2d<Vector<t_complex>>(y_size, x_size, 1., ft_plan);
   Sparse<t_complex> GW(Nvis, Npix);
+
+  auto const LM = wproj_utilities::fov_cosines(cell_x, cell_y, x_size, y_size);
+
+  const t_real cL = std::get<0>(LM) * 0.5;
+  const t_real cM = std::get<1>(LM) * 0.5;
+  const t_real n_max = (1 - std::sqrt(1 - cL * cL - cM * cM));
+  const t_real xi = std::pow(interpolation_error / std::exp(1), 1. / order);
+  const t_real w_cell = xi / (2 * constant::pi * n_max);
+  const t_real w_max = std::sqrt(x_size * x_size + y_size * y_size) / std::sqrt(2) * w_cell;
+  const Vector<t_real> w_grid_coords
+      = (series != expansions::series::none) ? w_range(w_cell, w_max) : Vector<t_real>();
+  const std::vector<t_uint> w_rows = (series != expansions::series::none) ?
+                                         wproj_utilities::w_rows(w_components, w_grid_coords) :
+                                         std::vector<t_uint>();
+  std::tuple<std::vector<std::function<t_complex(t_real, t_real)>>,
+             std::vector<std::function<t_complex(t_real)>>>
+      coeff_choice;
+  switch(series) {
+  case(expansions::series::none):
+    break;
+  case(expansions::series::taylor):
+    coeff_choice = expansions::taylor(order, cell_x, cell_y, x_size, y_size);
+    break;
+  case(expansions::series::chebyshev):
+    coeff_choice = expansions::chebyshev(order, cell_x, cell_y, x_size, y_size);
+    break;
+  }
+
+  const std::tuple<std::vector<std::function<t_complex(t_real, t_real)>>,
+                   std::vector<std::function<t_complex(t_real)>>> &coeff
+      = coeff_choice;
+  const std::vector<Sparse<t_complex>> w_expan
+      = (series != expansions::series::none) ?
+            w_expansion(x_size, y_size, cell_x, cell_y, energy_fraction_chirp, w_rows,
+                        w_grid_coords, std::get<0>(coeff)) :
+            std::vector<Sparse<t_complex>>();
+
   t_uint counts = 0;
   t_uint total_non_zero = 0;
 #pragma omp parallel for
@@ -137,11 +176,13 @@ wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uin
     for(Sparse<t_complex>::InnerIterator it(G, m); it; ++it)
       row.coeffRef(0, it.index()) = it.value();
     const Sparse<t_complex> chirp
-        = create_chirp_row(w_components(m), cell_x, cell_y, x_size, y_size, energy_fraction_chirp,
-                           std::get<0>(fftop_));
+        = (series == expansions::series::none) ?
+              create_chirp_row(w_components(m), cell_x, cell_y, x_size, y_size,
+                               energy_fraction_chirp, std::get<0>(fftop_)) :
+              wproj_utilities::w_projection_expansion(w_expan, w_components(m), w_grid_coords,
+                                                      w_rows.at(m), std::get<1>(coeff));
+
     Sparse<t_complex> kernel = row_wise_sparse_convolution(row, chirp, x_size, y_size);
-    //#pragma omp critical
-    //    assert(kernel.nonZeros() >= row.nonZeros());
     const t_real thres = sparsify_row_thres(kernel, energy_fraction_wproj);
     kernel.prune([&](const t_uint &i, const t_uint &j, const t_complex &value) {
       return std::abs(value) > thres;
@@ -166,7 +207,7 @@ wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uin
   PURIFY_DEBUG("DONE - With {} entries non zero, which is {} entries per a row.", GW.nonZeros(),
                static_cast<t_real>(GW.nonZeros()) / GW.rows());
   return GW;
-} // namespace wproj_utilities
+}
 
 t_real snr_metric(const Image<t_real> &model, const Image<t_real> &solution) {
   /*

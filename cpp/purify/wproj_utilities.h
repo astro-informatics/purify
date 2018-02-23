@@ -17,8 +17,14 @@
 #include "purify/types.h"
 #include "purify/utilities.h"
 
+#include "purify/wproj_grid.h"
+
 namespace purify {
 namespace wproj_utilities {
+namespace expansions {
+//! Type of series approximation
+enum class series { none, taylor, chebyshev };
+} // namespace expansions
 //! Work out max L and M directional cosines from image parameters
 std::tuple<t_real, t_real>
 fov_cosines(t_real const &cell_x, t_real const &cell_y, t_uint const &x_size, t_uint const &y_size);
@@ -57,7 +63,9 @@ Sparse<t_complex> row_wise_convolution(const Sparse<t_complex> &Grid_, const Spa
 Sparse<t_complex>
 wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uint &y_size,
                    const Vector<t_real> &w_components, const t_real &cell_x, const t_real &cell_y,
-                   const t_real &energy_fraction_chirp, const t_real &energy_fraction_wproj);
+                   const t_real &energy_fraction_chirp, const t_real &energy_fraction_wproj,
+                   const expansions::series series = expansions::series::none,
+                   const t_uint order = 1, const t_real &interpolation_error = 1e-2);
 //! SNR calculation
 t_real snr_metric(const Image<t_real> &model, const Image<t_real> &solution);
 //! MR calculation
