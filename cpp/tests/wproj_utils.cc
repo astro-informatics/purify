@@ -37,48 +37,57 @@ TEST_CASE("W_expansion") {
   // const t_real w_cell = constant::pi * 1e-4;
   const t_real w_max = w_cell * imsizex;
   const Vector<t_real> w_grid_coords = wproj_utilities::w_range(w_cell, w_max);
-  // const Vector<t_real> w_components = Vector<t_real>::Random(M) * w_max;
-  for(t_real w_c = -w_max; w_c < w_max; w_c += 2 * w_cell) {
-    for(t_uint p = 0; p < 10; p++) {
-      const Vector<t_real> w_components = wproj_utilities::w_range(0.1, w_cell * 0.5).array() + w_c;
-      const std::vector<t_uint> w_rows = wproj_utilities::w_rows(w_components, w_grid_coords);
-      CHECK(w_components.size() == w_rows.size());
-      const auto series = wproj_utilities::expansions::taylor(p, cell_x, cell_y, imsizex, imsizey);
-      CHECK(std::get<0>(series).size() == std::get<1>(series).size());
-      CHECK(std::get<0>(series).size() == p + 1);
-      CHECK(std::get<1>(series).at(0)(10) == 1.);
-      CHECK(std::get<1>(series).at(0)(0) == 1.);
-      CHECK(std::get<0>(series).at(0)(0, 0) == t_complex(1., 0.));
-      const std::vector<Sparse<t_complex>> w_expan = wproj_utilities::w_expansion(
-          imsizex, imsizey, cell_x, cell_y, 1., w_rows, w_grid_coords, std::get<0>(series));
-      CHECK(w_expan.size() == p + 1);
-      for(auto w : w_expan)
-        CHECK(w.nonZeros() > 0);
-      const Sparse<t_complex> W = wproj_utilities::w_projection_expansion(
-          w_expan, w_components, w_grid_coords, w_rows, std::get<1>(series));
-      const auto ft_plan = operators::fftw_plan::measure;
-      const auto fftop_ = operators::init_FFT_2d<Vector<t_complex>>(imsizex, imsizey, 1., ft_plan);
+  for(auto expansion : {wproj_utilities::expansions::series::taylor
+                        /*,wproj_utilities::expansions::series::chebyshev */}) {
+    for(t_real w_c = -w_max; w_c < w_max; w_c += 2 * w_cell) {
+      for(t_uint p = 0; p < 10; p++) {
+        const Vector<t_real> w_components
+            = wproj_utilities::w_range(0.1, w_cell * 0.5).array() + w_c;
+        const std::vector<t_uint> w_rows = wproj_utilities::w_rows(w_components, w_grid_coords);
+        CHECK(w_components.size() == w_rows.size());
+        const auto series
+            = (expansion == wproj_utilities::expansions::series::taylor) ?
+                  wproj_utilities::expansions::taylor(p, cell_x, cell_y, imsizex, imsizey) :
+                  wproj_utilities::expansions::chebyshev(p, cell_x, cell_y, imsizex, imsizey,
+                                                         w_cell);
+        CHECK(std::get<0>(series).size() == std::get<1>(series).size());
+        CHECK(std::get<0>(series).size() == p + 1);
+        CHECK(std::get<1>(series).at(0)(0.1) == 1.);
+        CHECK(std::get<1>(series).at(0)(0) == 1.);
+        CHECK(std::get<0>(series).at(0)(0, 0) == t_complex(1., 0.));
+        const std::vector<Sparse<t_complex>> w_expan = wproj_utilities::w_expansion(
+            imsizex, imsizey, cell_x, cell_y, 1., w_rows, w_grid_coords, std::get<0>(series));
+        CHECK(w_expan.size() == p + 1);
+        for(auto w : w_expan)
+          CHECK(w.nonZeros() > 0);
+        const Sparse<t_complex> W = wproj_utilities::w_projection_expansion(
+            w_expan, w_components, w_grid_coords, w_rows, std::get<1>(series));
+        const auto ft_plan = operators::fftw_plan::measure;
+        const auto fftop_
+            = operators::init_FFT_2d<Vector<t_complex>>(imsizex, imsizey, 1., ft_plan);
 
-      t_real const error = std::pow(xi, p + 1) * std::exp(xi);
+        t_real const error = std::pow(xi, p + 1) * std::exp(xi);
 
-      for(t_uint i = 0; i < W.rows(); i++) {
-        CAPTURE(i);
-        CAPTURE(p);
-        CAPTURE(error);
-        CAPTURE(w_components(i));
-        Matrix<t_complex> chirp = Matrix<t_complex>(wproj_utilities::create_chirp_row(
-            Vector<t_complex>::Map(
-                wproj_utilities::generate_chirp(w_components(i), cell_x, cell_y, imsizex, imsizey)
-                    .data(),
-                imsizex * imsizey),
-            1., std::get<0>(fftop_)));
-        Matrix<t_complex> row = Matrix<t_complex>(W.row(i));
-        CAPTURE(row.block(0, 0, 1, 12));
-        CAPTURE(chirp.block(0, 0, 1, 12));
-        // check amp difference
-        CHECK((row.cwiseAbs() - chirp.cwiseAbs()).cwiseAbs().maxCoeff() < error);
-        // check phase difference
-        CHECK((row - chirp).cwiseAbs().maxCoeff() < error);
+        for(t_uint i = 0; i < W.rows(); i++) {
+          CAPTURE(i);
+          CAPTURE(expansion);
+          CAPTURE(p);
+          CAPTURE(error);
+          CAPTURE(w_components(i));
+          Matrix<t_complex> chirp = Matrix<t_complex>(wproj_utilities::create_chirp_row(
+              Vector<t_complex>::Map(
+                  wproj_utilities::generate_chirp(w_components(i), cell_x, cell_y, imsizex, imsizey)
+                      .data(),
+                  imsizex * imsizey),
+              1., std::get<0>(fftop_)));
+          Matrix<t_complex> row = Matrix<t_complex>(W.row(i));
+          CAPTURE(row.block(0, 0, 1, 12));
+          CAPTURE(chirp.block(0, 0, 1, 12));
+          // check amp difference
+          CHECK((row.cwiseAbs() - chirp.cwiseAbs()).cwiseAbs().maxCoeff() < error);
+          // check phase difference
+          CHECK((row - chirp).cwiseAbs().maxCoeff() < error);
+        }
       }
     }
   }
