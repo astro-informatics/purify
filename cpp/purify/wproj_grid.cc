@@ -1,5 +1,6 @@
 #include "purify/wproj_grid.h"
 #include <set>
+
 #include "purify/wproj_utilities.h"
 
 namespace purify {
@@ -92,7 +93,7 @@ Sparse<t_complex> w_projection_expansion(const std::vector<Sparse<t_complex>> &p
                                          const Vector<t_real> &w_grid_coords, const t_uint &w_row,
                                          const std::vector<std::function<t_complex(t_real)>> &f_w) {
   const t_real w_delta = (w_component - w_grid_coords(w_row));
-  if((w_grid_coords(1) - w_grid_coords(0)) < std::abs(w_delta)) {
+  if((w_grid_coords(1) - w_grid_coords(0)) < std::abs(w_delta) / 2) {
 #pragma omp critical
     std::cout << w_delta << " > " << (w_grid_coords(1) - w_grid_coords(0)) << std::endl;
     throw std::runtime_error("w_delta size is larger than w cell size!");
@@ -212,12 +213,8 @@ taylor(const t_uint order, const t_real &cell_x, const t_real &cell_y, const t_u
 std::tuple<std::vector<std::function<t_complex(t_real, t_real)>>,
            std::vector<std::function<t_complex(t_real)>>>
 chebyshev(const t_uint order, const t_real &cell_x, const t_real &cell_y, const t_uint &x_size,
-          const t_uint &y_size) {
-  throw std::runtime_error("Need to impliment.");
-  // celly:: size of y pixel in arcseconds
-  // cellx:: size of x pixel in arcseconds
-  // x_size:: number of pixels along x-axis
-  // y_size:: number of pixels along y-axis
+          const t_uint &y_size, const t_real &w_cell) {
+  throw std::runtime_error("Chebyshev interpolation not working, needs more work.");
   auto const LM = fov_cosines(cell_x, cell_y, x_size, y_size);
 
   const t_real L = std::get<0>(LM);
@@ -228,14 +225,49 @@ chebyshev(const t_uint order, const t_real &cell_x, const t_real &cell_y, const 
   std::vector<std::function<t_complex(t_real, t_real)>> a_n;
   std::vector<std::function<t_complex(t_real)>> f_w;
   const t_complex I(0, 1);
-  for(int i = 0; i < order + 1; i++) {
-    a_n.push_back([=](const t_real &y, const t_real &x) -> t_complex { return 1.; });
-    f_w.push_back([=](const t_real &w) -> t_complex { return 1.; });
+  for(t_int i = 0; i < order + 1; i++) {
+    std::shared_ptr<Image<t_complex>> a_image
+        = std::make_shared<Image<t_complex>>(Image<t_complex>::Zero(y_size, x_size));
+    std::vector<t_complex> c(order + 1);
+    for(t_int p = 0; p < order + 1; p++) {
+      c[p] = (std::abs<t_int>(p - i) % 2 == 0) ?
+                 4. * std::pow(I, p)
+                     * boost::math::cyl_bessel_j<t_int, t_real>((i - p) / 2,
+                                                                -w_cell * constant::pi / 4)
+                     * boost::math::cyl_bessel_j<t_int, t_real>((p + i) / 2,
+                                                                -w_cell * constant::pi / 4) :
+                 0.;
+      if(i == 0)
+        c[p] *= 0.5;
+      if(p == 0)
+        c[p] *= 0.5;
+    }
+    for(t_int k = 0; k < y_size; k++) {
+      for(t_int l = 0; l < x_size; l++) {
+        const t_real x = (l + 0.5 - x_size * 0.5) * delt_x;
+        const t_real y = (k + 0.5 - y_size * 0.5) * delt_y;
+        const t_real n = std::sqrt(1 - x * x - y * y);
+        for(t_int p = 0; p < order + 1; p++) {
+          (*a_image)(k, l) += c[p] * boost::math::chebyshev_t(p, 2 * n - 3);
+        }
+      }
+    }
+    a_n.push_back([=](const t_real &y, const t_real &x) -> t_complex {
+      // There may be a faster way to calculate the factorials...
+      const t_uint l = std::floor(x / delt_x - 0.5 + x_size * 0.5);
+      const t_uint m = std::floor(y / delt_y - 0.5 + y_size * 0.5);
+      if((l >= x_size) or (m >= y_size))
+        throw std::runtime_error("Out of bounds of precomuted taylor term.");
+      return (*a_image)(m, l);
+    });
+    f_w.push_back([=](const t_real &w) -> t_complex {
+      if(std::abs(2 * w / w_cell) > 1)
+        throw std::runtime_error("Chebyshev expansion out of bounds.");
+      return std::exp(I * constant::pi * w) * boost::math::chebyshev_t(i, 2 * w / w_cell);
+    });
   }
   return std::make_tuple(a_n, f_w);
 }
-
 } // namespace expansions
-
 } // namespace wproj_utilities
 } // namespace purify

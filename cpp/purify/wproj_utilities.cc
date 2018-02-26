@@ -154,7 +154,7 @@ wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uin
     coeff_choice = expansions::taylor(order, cell_x, cell_y, x_size, y_size);
     break;
   case(expansions::series::chebyshev):
-    coeff_choice = expansions::chebyshev(order, cell_x, cell_y, x_size, y_size);
+    coeff_choice = expansions::chebyshev(order, cell_x, cell_y, x_size, y_size, w_cell);
     break;
   }
 

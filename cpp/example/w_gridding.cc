@@ -30,9 +30,11 @@ int main(int nargs, char const **args) {
   // const Vector<t_real> w_components = Vector<t_real>::Random(M) * w_max;
   const Vector<t_real> w_components = wproj_utilities::w_range(0.005, w_max);
   const std::vector<t_uint> w_rows = wproj_utilities::w_rows(w_components, w_grid_coords);
-  const auto series = wproj_utilities::expansions::taylor(p, cell_x, cell_y, imsizex, imsizey);
+  const std::tuple<std::vector<std::function<t_complex(t_real, t_real)>>,
+                   std::vector<std::function<t_complex(t_real)>>>
+      series = wproj_utilities::expansions::taylor(p, cell_x, cell_y, imsizex, imsizey);
   const std::vector<Sparse<t_complex>> w_expan = wproj_utilities::w_expansion(
-      imsizex, imsizey, cell_x, cell_y, 1., w_rows, w_cell, w_max, std::get<0>(series));
+      imsizex, imsizey, cell_x, cell_y, 1., w_rows, w_grid_coords, std::get<0>(series));
   const Sparse<t_complex> W = wproj_utilities::w_projection_expansion(
       w_expan, w_components, w_grid_coords, w_rows, std::get<1>(series));
   const auto ft_plan = operators::fftw_plan::measure;

@@ -8,7 +8,10 @@
 #include <stdio.h>
 #include <string>
 #include <time.h>
+#include <boost/math/special_functions/bessel.hpp>
+#include <boost/math/special_functions/chebyshev.hpp>
 #include <sys/stat.h>
+
 #include "purify/logging.h"
 #include "purify/operators.h"
 #include "purify/types.h"
@@ -50,7 +53,7 @@ taylor(const t_uint order, const t_real &cell_x, const t_real &cell_y, const t_u
 std::tuple<std::vector<std::function<t_complex(t_real, t_real)>>,
            std::vector<std::function<t_complex(t_real)>>>
 chebyshev(const t_uint order, const t_real &cell_x, const t_real &cell_y, const t_uint &x_size,
-          const t_uint &y_size);
+          const t_uint &y_size, const t_real &w_cell);
 } // namespace expansions
 } // namespace wproj_utilities
 
