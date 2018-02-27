@@ -53,7 +53,13 @@ template <class T = t_real> using CImageList = cimg_library::CImgList<T>;
 //! Display used to display CImg images
 typedef cimg_library::CImgDisplay CDisplay;
 #endif
+namespace wproj_utilities {
+namespace expansions {
+//! Type of series approximation
+enum class series { none, taylor, chebyshev };
+} // namespace expansions
 
+} // namespace wproj_utilities
 namespace constant {
 //! mathematical constant
 const t_real pi = 3.14159265358979323846;

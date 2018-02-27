@@ -4,6 +4,7 @@
 #include "purify/directories.h"
 #include "purify/logging.h"
 #include "purify/types.h"
+#include "purify/wproj_grid.h"
 #include "purify/wproj_utilities.h"
 using namespace purify;
 using namespace purify::notinstalled;
@@ -16,6 +17,79 @@ TEST_CASE("Calcuate Chirp Image") {
     const Image<t_complex> chirp_image
         = wproj_utilities::generate_chirp(w_rate, 1, 1, imsizex, imsizey);
     CHECK((chirp_image.array().cwiseAbs() - 1. / (imsizex * imsizey)).matrix().norm() < 1e-12);
+  }
+}
+TEST_CASE("W_expansion") {
+  std::srand((unsigned int)std::time(0));
+  const t_real fov = 15; // degrees
+  const t_int imsizex = 32;
+  const t_int imsizey = imsizex;
+  const t_real cell_x = fov / imsizex * 60 * 60;
+  const t_real cell_y = fov / imsizey * 60 * 60;
+  const t_uint M = 1e2;
+  auto const LM = wproj_utilities::fov_cosines(cell_x, cell_y, imsizex, imsizey);
+
+  const t_real cL = std::get<0>(LM) * 0.5;
+  const t_real cM = std::get<1>(LM) * 0.5;
+  const t_real n_max = (1 - std::sqrt(1 - cL * cL - cM * cM));
+  const t_real xi = 1e-1;
+  const t_real w_cell = xi / (2 * constant::pi * n_max);
+  // const t_real w_cell = constant::pi * 1e-4;
+  const t_real w_max = w_cell * imsizex;
+  const Vector<t_real> w_grid_coords = wproj_utilities::w_range(w_cell, w_max);
+  for(auto expansion : {wproj_utilities::expansions::series::taylor
+                        /*,wproj_utilities::expansions::series::chebyshev */}) {
+    for(t_real w_c = -w_max; w_c < w_max; w_c += 2 * w_cell) {
+      for(t_uint p = 0; p < 10; p++) {
+        const Vector<t_real> w_components
+            = wproj_utilities::w_range(0.1, w_cell * 0.5).array() + w_c;
+        const std::vector<t_uint> w_rows = wproj_utilities::w_rows(w_components, w_grid_coords);
+        CHECK(w_components.size() == w_rows.size());
+        const auto series
+            = (expansion == wproj_utilities::expansions::series::taylor) ?
+                  wproj_utilities::expansions::taylor(p, cell_x, cell_y, imsizex, imsizey) :
+                  wproj_utilities::expansions::chebyshev(p, cell_x, cell_y, imsizex, imsizey,
+                                                         w_cell);
+        CHECK(std::get<0>(series).size() == std::get<1>(series).size());
+        CHECK(std::get<0>(series).size() == p + 1);
+        CHECK(std::get<1>(series).at(0)(0.1) == 1.);
+        CHECK(std::get<1>(series).at(0)(0) == 1.);
+        CHECK(std::get<0>(series).at(0)(0, 0) == t_complex(1., 0.));
+        const std::vector<Sparse<t_complex>> w_expan = wproj_utilities::w_expansion(
+            imsizex, imsizey, cell_x, cell_y, 1., w_rows, w_grid_coords, std::get<0>(series));
+        CHECK(w_expan.size() == p + 1);
+        for(auto w : w_expan)
+          CHECK(w.nonZeros() > 0);
+        const Sparse<t_complex> W = wproj_utilities::w_projection_expansion(
+            w_expan, w_components, w_grid_coords, w_rows, std::get<1>(series));
+        const auto ft_plan = operators::fftw_plan::measure;
+        const auto fftop_
+            = operators::init_FFT_2d<Vector<t_complex>>(imsizex, imsizey, 1., ft_plan);
+
+        t_real const error = std::pow(xi, p + 1) * std::exp(xi);
+
+        for(t_uint i = 0; i < W.rows(); i++) {
+          CAPTURE(i);
+          CAPTURE(expansion);
+          CAPTURE(p);
+          CAPTURE(error);
+          CAPTURE(w_components(i));
+          Matrix<t_complex> chirp = Matrix<t_complex>(wproj_utilities::create_chirp_row(
+              Vector<t_complex>::Map(
+                  wproj_utilities::generate_chirp(w_components(i), cell_x, cell_y, imsizex, imsizey)
+                      .data(),
+                  imsizex * imsizey),
+              1., std::get<0>(fftop_)));
+          Matrix<t_complex> row = Matrix<t_complex>(W.row(i));
+          CAPTURE(row.block(0, 0, 1, 12));
+          CAPTURE(chirp.block(0, 0, 1, 12));
+          // check amp difference
+          CHECK((row.cwiseAbs() - chirp.cwiseAbs()).cwiseAbs().maxCoeff() < error);
+          // check phase difference
+          CHECK((row - chirp).cwiseAbs().maxCoeff() < error);
+        }
+      }
+    }
   }
 }
 
@@ -73,10 +147,10 @@ TEST_CASE("wprojection_matrix") {
   // purify::logging::set_level("debug");
   const Vector<t_real> w_components = Vector<t_real>::Random(12);
   const Vector<t_real> w_components_zero = w_components * 0;
-  const t_int Nx = 12;
-  const t_int Ny = 12;
-  const t_real cellx = 1.;
-  const t_real celly = 1.;
+  const t_int Nx = 32;
+  const t_int Ny = 32;
+  const t_real cellx = 60;
+  const t_real celly = 60;
   const t_int rows = w_components.size();
   const t_int cols = Nx * Ny;
 
@@ -88,6 +162,8 @@ TEST_CASE("wprojection_matrix") {
       = wproj_utilities::wprojection_matrix(I, Nx, Ny, w_components_zero, cellx, celly, 1, 1);
   Sparse<t_complex> const G
       = wproj_utilities::wprojection_matrix(I, Nx, Ny, w_components, cellx, celly, 1, 1);
+  Sparse<t_complex> const G_taylor = wproj_utilities::wprojection_matrix(
+      I, Nx, Ny, w_components, cellx, celly, 1, 1, wproj_utilities::expansions::series::taylor, 2);
   // Testing if G_id == I
   CHECK(G_id.nonZeros() == I.nonZeros());
   CHECK(G.nonZeros() >= I.nonZeros());
