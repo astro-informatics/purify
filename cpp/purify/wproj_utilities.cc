@@ -1,4 +1,5 @@
 #include "purify/wproj_utilities.h"
+#include "purify/wproj_grid.h"
 
 namespace purify {
 namespace wproj_utilities {

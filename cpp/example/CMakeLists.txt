@@ -68,18 +68,20 @@ if(PURIFY_MPI AND PURIFY_ARRAYFIRE)
     LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
   target_compile_definitions(example_local_epsilon_distributed_grids_gpu
     PRIVATE PURIFY_PADMM_ALGORITHM=1 PURIFY_GPU)
-  add_example(global_epsilon_replicated_grids_real_data_gpu padmm_mpi_real_data.cc NOTEST
-    LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
-  target_compile_definitions(example_global_epsilon_replicated_grids_real_data_gpu
-    PRIVATE PURIFY_PADMM_ALGORITHM=2 PURIFY_GPU)
-  add_example(local_epsilon_replicated_grids_real_data_gpu padmm_mpi_real_data.cc NOTEST
-    LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
-  target_compile_definitions(example_local_epsilon_replicated_grids_real_data_gpu
-    PRIVATE PURIFY_PADMM_ALGORITHM=3 PURIFY_GPU)
-  add_example(local_epsilon_distributed_grids_real_data_gpu padmm_mpi_real_data.cc NOTEST
-    LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
-  target_compile_definitions(example_local_epsilon_distributed_grids_real_data_gpu
-    PRIVATE PURIFY_PADMM_ALGORITHM=1 PURIFY_GPU)
+  if(TARGET casacore::ms)
+    add_example(global_epsilon_replicated_grids_real_data_gpu padmm_mpi_real_data.cc NOTEST
+      LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+    target_compile_definitions(example_global_epsilon_replicated_grids_real_data_gpu
+      PRIVATE PURIFY_PADMM_ALGORITHM=2 PURIFY_GPU)
+    add_example(local_epsilon_replicated_grids_real_data_gpu padmm_mpi_real_data.cc NOTEST
+      LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+    target_compile_definitions(example_local_epsilon_replicated_grids_real_data_gpu
+      PRIVATE PURIFY_PADMM_ALGORITHM=3 PURIFY_GPU)
+    add_example(local_epsilon_distributed_grids_real_data_gpu padmm_mpi_real_data.cc NOTEST
+      LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+    target_compile_definitions(example_local_epsilon_distributed_grids_real_data_gpu
+      PRIVATE PURIFY_PADMM_ALGORITHM=1 PURIFY_GPU)
+  endif()
 endif()
 add_example(sara_padmm_random_coverage LIBRARIES libpurify NOTEST)
 

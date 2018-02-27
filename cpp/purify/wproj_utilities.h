@@ -17,14 +17,8 @@
 #include "purify/types.h"
 #include "purify/utilities.h"
 
-#include "purify/wproj_grid.h"
-
 namespace purify {
 namespace wproj_utilities {
-namespace expansions {
-//! Type of series approximation
-enum class series { none, taylor, chebyshev };
-} // namespace expansions
 //! Work out max L and M directional cosines from image parameters
 std::tuple<t_real, t_real>
 fov_cosines(t_real const &cell_x, t_real const &cell_y, t_uint const &x_size, t_uint const &y_size);

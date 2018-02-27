@@ -19,8 +19,9 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
   };
   const Vector<t_real> k_u = omega_to_k(u - Vector<t_real>::Constant(rows, Ju * 0.5));
   const Vector<t_real> k_v = omega_to_k(v - Vector<t_real>::Constant(rows, Jv * 0.5));
-      if (u.size() != v.size())
-        throw std::runtime_error("Size of u and v vectors are not the same for creating gridding matrix.");
+  if(u.size() != v.size())
+    throw std::runtime_error(
+        "Size of u and v vectors are not the same for creating gridding matrix.");
 
   Sparse<t_complex> interpolation_matrix(rows, cols);
   interpolation_matrix.reserve(Vector<t_int>::Constant(rows, Ju * Jv));
@@ -43,24 +44,26 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
   }
   return interpolation_matrix;
 }
- 
+
 //! Construct gridding matrix with w projection
-Sparse<t_complex>
-init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
-                        const Vector<t_complex> &weights, const t_uint &imsizey_,
-                        const t_uint &imsizex_, const t_real oversample_ratio,
-                        const std::function<t_real(t_real)> kernelu,
-                        const std::function<t_real(t_real)> kernelv, const t_uint Ju /*= 4*/,
-                        const t_uint Jv /*= 4*/, const bool w_term /*= false*/, const t_real &cellx /*= 1*/,
-                        const t_real &celly /*= 1*/, const t_real &energy_chirp_fraction /*= 1*/,
-                        const t_real &energy_kernel_fraction /*= 1*/) {
+Sparse<t_complex> init_gridding_matrix_2d(
+    const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
+    const Vector<t_complex> &weights, const t_uint &imsizey_, const t_uint &imsizex_,
+    const t_real oversample_ratio, const std::function<t_real(t_real)> kernelu,
+    const std::function<t_real(t_real)> kernelv, const t_uint Ju /*= 4*/, const t_uint Jv /*= 4*/,
+    const bool w_term /*= false*/, const t_real &cellx /*= 1*/, const t_real &celly /*= 1*/,
+    const t_real &energy_chirp_fraction /*= 1*/, const t_real &energy_kernel_fraction /*= 1*/,
+    const wproj_utilities::expansions::series
+        series /*= wproj_utilities::expansions::series::none */,
+    const t_uint order /* = 1 */, const t_real &interpolation_error /*= 1e-2 */) {
 
   const Sparse<t_complex> G = init_gridding_matrix_2d(u, v, weights, imsizey_, imsizex_,
                                                       oversample_ratio, kernelu, kernelv, Ju, Jv);
   if(w_term)
-    return wproj_utilities::wprojection_matrix(
-        G, std::floor(oversample_ratio * imsizex_), std::floor(oversample_ratio * imsizey_), w,
-        cellx, celly, energy_chirp_fraction, energy_kernel_fraction);
+    return wproj_utilities::wprojection_matrix(G, std::floor(oversample_ratio * imsizex_),
+                                               std::floor(oversample_ratio * imsizey_), w, cellx,
+                                               celly, energy_chirp_fraction, energy_kernel_fraction,
+                                               series, order, interpolation_error);
   else
     return G;
 }
