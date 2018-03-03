@@ -137,7 +137,11 @@ wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uin
   const t_real cL = std::get<0>(LM) * 0.5;
   const t_real cM = std::get<1>(LM) * 0.5;
   const t_real n_max = (1 - std::sqrt(1 - cL * cL - cM * cM));
-  const t_real xi = std::pow(interpolation_error / std::exp(1), 1. / order);
+  // const t_real xi = std::pow(interpolation_error / std::exp(1), 1. / order);
+  const t_real xi = (order + 1)
+                    * wproj_utilites::w_lambert(
+                          std::pow(interpolation_error, 1. / static_cast<t_real>(order + 1))
+                          / static_cast<t_real>(order + 1));
   const t_real w_cell = xi / (2 * constant::pi * n_max);
   const t_real w_max = std::sqrt(x_size * x_size + y_size * y_size) / std::sqrt(2) * w_cell;
   const Vector<t_real> w_grid_coords
