@@ -84,6 +84,7 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag) 
     uv_data.v.segment(i * baselines, baselines) = coords.row(1) * frequencies(i);
     uv_data.w.segment(i * baselines, baselines) = coords.row(2) * frequencies(i);
   }
+  uv_data.units = "lambda";
   PURIFY_LOW_LOG("All Data Read!");
   fits_close_file(fptr, &status);
   if(status) { /* print any error messages */
@@ -95,7 +96,8 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag) 
 utilities::vis_params filter(const utilities::vis_params &input) {
   t_uint size = 0;
   for(int i = 0; i < input.size(); i++) {
-    if(std::abs(input.weights(i)) > 0)
+    if((std::abs(input.weights(i)) > 0)
+       and (!std::isnan(input.vis(i).real()) and !std::isnan(input.vis(i).imag())))
       size++;
   }
 
@@ -106,7 +108,8 @@ utilities::vis_params filter(const utilities::vis_params &input) {
                                input.average_frequency);
   t_uint count = 0;
   for(int i = 0; i < input.size(); i++) {
-    if(std::abs(input.weights(i)) > 0) {
+    if((std::abs(input.weights(i)) > 0)
+       and (!std::isnan(input.vis(i).real()) and !std::isnan(input.vis(i).imag()))) {
       output.u(count) = input.u(i);
       output.v(count) = input.w(i);
       output.w(count) = input.v(i);
