@@ -130,9 +130,12 @@ distribute_params(utilities::vis_params const &params, sopt::mpi::Communicator c
 utilities::vis_params set_cell_size(const sopt::mpi::Communicator &comm,
                                     utilities::vis_params const &uv_vis, const t_real &cell_x,
                                     const t_real &cell_y) {
-  const auto max_u_vector
+  if(comm.size() == 1)
+    return utilities::set_cell_size(uv_vis, cell_x, cell_y);
+
+  const std::vector<t_real> max_u_vector
       = comm.gather<t_real>(std::sqrt((uv_vis.u.array() * uv_vis.u.array()).maxCoeff()));
-  const auto max_v_vector
+  const std::vector<t_real> max_v_vector
       = comm.gather<t_real>(std::sqrt((uv_vis.v.array() * uv_vis.v.array()).maxCoeff()));
   const t_real max_u
       = comm.broadcast(*(std::max_element(max_u_vector.begin(), max_u_vector.end())));

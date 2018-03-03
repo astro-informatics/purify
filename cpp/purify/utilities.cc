@@ -221,6 +221,7 @@ utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t
   }
   scaled_vis.u = uv_vis.u / scale_factor_u * 2 * constant::pi;
   scaled_vis.v = uv_vis.v / scale_factor_v * 2 * constant::pi;
+  scaled_vis.w = uv_vis.w / (2 * constant::pi);
 
   scaled_vis.vis = uv_vis.vis;
   scaled_vis.weights = uv_vis.weights;
