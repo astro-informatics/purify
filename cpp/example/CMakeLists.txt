@@ -20,6 +20,9 @@ add_example(w_gridding LIBRARIES libpurify NOTEST)
 add_example(padmm_simulation LIBRARIES libpurify NOTEST)
 add_example(padmm_reweighted_simulation LIBRARIES libpurify NOTEST)
 
+
+add_example(padmm_real_data LIBRARIES libpurify NOTEST )
+
 add_example(padmm_random_coverage LIBRARIES libpurify NOTEST )
 add_example(fb_random_coverage LIBRARIES libpurify NOTEST )
 target_compile_definitions(example_fb_random_coverage PRIVATE PURIFY_GPU=0)

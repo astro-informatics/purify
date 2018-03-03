@@ -19,6 +19,7 @@
 #include "purify/pfitsio.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
+#include "purify/uvfits.h"
 
 #ifdef PURIFY_GPU
 #include "purify/operators_gpu.h"
@@ -32,8 +33,9 @@ using namespace purify;
 using namespace purify::notinstalled;
 
 utilities::vis_params dirty_visibilities(const std::string &name) {
-  return purify::casa::read_measurementset(
-      name + ".ms", purify::casa::MeasurementSet::ChannelWrapper::polarization::I);
+  // return purify::casa::read_measurementset(
+  //    name + ".ms", purify::casa::MeasurementSet::ChannelWrapper::polarization::I);
+  return pfitsio::read_uvfits(name + ".uvfits");
 }
 
 utilities::vis_params
@@ -43,10 +45,10 @@ dirty_visibilities(const std::string &name, sopt::mpi::Communicator const &comm)
   if(comm.is_root()) {
     auto result = dirty_visibilities(name);
     auto const order = distribute::distribute_measurements(result, comm, "distance_distribution");
-    result = utilities::regroup_and_scatter(result, order, comm);
-    return result;
+    return utilities::regroup_and_scatter(result, order, comm);
   }
-  return utilities::scatter_visibilities(comm);
+  auto result = utilities::scatter_visibilities(comm);
+  return result;
 }
 
 std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>>
@@ -133,16 +135,18 @@ int main(int nargs, char const **args) {
   auto const session = sopt::mpi::init(nargs, args);
   auto const world = sopt::mpi::Communicator::World();
 
-  const std::string name = "M31";
+  const std::string name = "realdata";
+  const std::string filename = vla_filename("../mwa/uvdump_01");
+
   auto const kernel = "kb";
-  const bool w_term = true;
+  const bool w_term = false;
 
   const t_real cellsize = 30; // arcsec
   const t_uint imsizex = 512;
   const t_uint imsizey = 512;
 
   // Generating random uv(w) coverage
-  auto const data = dirty_visibilities(name, world);
+  auto const data = dirty_visibilities(filename, world);
 #if PURIFY_PADMM_ALGORITHM == 2 || PURIFY_PADMM_ALGORITHM == 3
 #ifndef PURIFY_GPU
   auto const measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
@@ -175,6 +179,26 @@ int main(int nargs, char const **args) {
           std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)},
       world);
 
+  Vector<t_real> const dirty_image = (measurements->adjoint() * (data.vis) / 10.).real();
+  /*
+  if(world.is_root()) {
+    // then writes stuff to files
+    boost::filesystem::path const path(output_filename(name));
+#if PURIFY_PADMM_ALGORITHM == 3
+    auto const pb_path = path / kernel / "local_epsilon_replicated_grids";
+#elif PURIFY_PADMM_ALGORITHM == 2
+    auto const pb_path = path / kernel / "global_epsilon_replicated_grids";
+#elif PURIFY_PADMM_ALGORITHM == 1
+    auto const pb_path = path / kernel / "local_epsilon_distributed_grids";
+#else
+#error Unknown or unimplemented algorithm
+#endif
+    std::cout << "test" << std::endl;
+    boost::filesystem::create_directories(pb_path);
+
+    pfitsio::write2d(dirty_image, imsizey, imsizex, (pb_path / "dirty.fits").native());
+  }
+  */
   // Create the padmm solver
   auto const padmm = padmm_factory(measurements, sara, data, world, imsizey, imsizex);
   // calls padmm
@@ -183,10 +207,10 @@ int main(int nargs, char const **args) {
   // makes sure we set things up correctly
   assert(world.broadcast(diagnostic.x).isApprox(diagnostic.x));
 
-  // then writes stuff to files
-  auto const residual_image = (measurements->adjoint() * diagnostic.residual).real();
-  auto const dirty_image = (measurements->adjoint() * data.vis).real();
+  Vector<t_real> const residual_image = (measurements->adjoint() * diagnostic.residual).real();
+  /*
   if(world.is_root()) {
+    // then writes stuff to files
     boost::filesystem::path const path(output_filename(name));
 #if PURIFY_PADMM_ALGORITHM == 3
     auto const pb_path = path / kernel / "local_epsilon_replicated_grids";
@@ -203,5 +227,6 @@ int main(int nargs, char const **args) {
     pfitsio::write2d(diagnostic.x.real(), imsizey, imsizex, (pb_path / "solution.fits").native());
     pfitsio::write2d(residual_image, imsizey, imsizex, (pb_path / "residual.fits").native());
   }
+  */
   return 0;
 }
