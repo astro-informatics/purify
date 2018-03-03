@@ -19,6 +19,18 @@ TEST_CASE("Calcuate Chirp Image") {
     CHECK((chirp_image.array().cwiseAbs() - 1. / (imsizex * imsizey)).matrix().norm() < 1e-12);
   }
 }
+TEST_CASE("W Lambert Function") {
+  // testing known values
+
+  // W(0) = 0
+  CHECK(std::abs(wproj_utilites::w_lambert(0)) < 1e-8);
+  // W(1) = 0.56714329040978387299
+  CHECK(std::abs(wproj_utilites::w_lambert(1.) - 0.567143290409784) < 1e-8);
+  // W(e) = 1
+  CHECK(std::abs(wproj_utilites::w_lambert(std::exp(1)) - 1) < 1e-8);
+  // W(1) = std::exp(-W(1))
+  CHECK(std::abs(wproj_utilites::w_lambert(1.) - std::exp(-wproj_utilites::w_lambert(1.))) < 1e-8);
+}
 TEST_CASE("W_expansion") {
   std::srand((unsigned int)std::time(0));
   const t_real fov = 15; // degrees
