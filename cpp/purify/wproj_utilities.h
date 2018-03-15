@@ -18,6 +18,10 @@
 #include "purify/utilities.h"
 
 namespace purify {
+namespace utilities {
+//! Sort visibilities to be from w_max to w_min
+vis_params sort_by_w(const vis_params &uv_data);
+} // namespace utilities
 namespace wproj_utilities {
 //! Work out max L and M directional cosines from image parameters
 std::tuple<t_real, t_real>

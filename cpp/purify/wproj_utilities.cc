@@ -2,6 +2,25 @@
 #include "purify/wproj_grid.h"
 
 namespace purify {
+namespace utilities {
+vis_params sort_by_w(const vis_params &uv_data) {
+
+  vis_params output = uv_data;
+  std::vector<t_uint> ind;
+  for(t_uint i = 0; i < uv_data.size(); i++)
+    ind.push_back(i);
+  std::sort(ind.begin(), ind.end(),
+            [&](const t_uint a, const t_uint b) { return uv_data.w(a) < uv_data.w(b); });
+  for(t_uint i = 0; i < uv_data.size(); i++) {
+    output.u(i) = uv_data.u(ind.at(i));
+    output.v(i) = uv_data.v(ind.at(i));
+    output.w(i) = uv_data.w(ind.at(i));
+    output.weights(i) = uv_data.weights(ind.at(i));
+    output.vis(i) = uv_data.vis(ind.at(i));
+  }
+  return output;
+}
+} // namespace utilities
 namespace wproj_utilities {
 std::vector<t_uint> w_rows(const Sparse<t_complex> &w_degrider) {
 

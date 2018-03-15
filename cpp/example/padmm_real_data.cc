@@ -25,25 +25,39 @@ using namespace purify::notinstalled;
 void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey,
            const std::string &kernel, const t_int J, const utilities::vis_params &uv_data,
            const t_real sigma, const std::tuple<bool, t_real> &w_term) {
+
   std::string const outfile_fits = output_filename(name + "_" + kernel + "_solution.fits");
   std::string const residual_fits = output_filename(name + "_" + kernel + "_residual.fits");
   std::string const dirty_image_fits = output_filename(name + "_" + kernel + "_dirty.fits");
 
   t_real const over_sample = 2;
+  std::vector<std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const>> m_op;
+  const t_uint G = 32;
+  const t_uint segment = uv_data.size() / G;
+  for(int i = 0; i < G; i++) {
+    m_op.push_back(measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+        uv_data.segment(i * segment, (i + 1) * segment), imsizey, imsizex, std::get<1>(w_term),
+        std::get<1>(w_term), over_sample, 100, 0.0001, kernel, J, J, operators::fftw_plan::measure,
+        std::get<0>(w_term), 0.99, 0.99, wproj_utilities::expansions::series::taylor, 1, 1e-1));
+  }
+  t_uint const M = uv_data.size();
+  t_uint const N = imsizex * imsizey;
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform
+      = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
+          [=](Vector<t_complex> &output, const Vector<t_complex> &input) {
+            output = Vector<t_complex>::Zero(M);
+            for(int i = 0; i < G; i++) {
+              const Vector<t_complex> buff = *(m_op.at(i)) * input;
+              output.segment(i * segment, segment) = buff;
+            }
 
-#ifndef PURIFY_GPU
-  auto const measurements_transform
-      = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 100,
-          0.0001, kernel, J, J, operators::fftw_plan::measure, std::get<0>(w_term), 1, 1,
-          wproj_utilities::expansions::series::taylor, 4, 1e-2);
+          },
+          [=](Vector<t_complex> &output, const Vector<t_complex> &input) {
+            output = Vector<t_complex>::Zero(N);
+            for(int i = 0; i < G; i++)
+              output += m_op.at(i)->adjoint() * (input.segment(i * segment, segment).eval() / N);
 
-#else
-  af::setDevice(0);
-  auto const measurements_transform = gpu::measurementoperator::init_degrid_operator_2d(
-      uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 100, 0.0001,
-      kernel, J, J, std::get<0>(w_term));
-#endif
+          });
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -125,14 +139,17 @@ int main(int, char **) {
   purify::logging::set_level("debug");
   const std::string &name = "real_data";
   const bool w_term = true;
-  const t_real cellsize = 30.;
-  const t_uint imsizex = 512;
-  const t_uint imsizey = 512;
+  const t_real cellsize = 60;
+  const t_uint imsizex = 1024;
+  const t_uint imsizey = 1024;
   std::string const inputfile = vla_filename("../mwa/uvdump_01.uvfits");
 
   auto uv_data = pfitsio::read_uvfits(inputfile);
+  uv_data = utilities::sort_by_w(uv_data);
   t_real const sigma = uv_data.weights.norm() / std::sqrt(uv_data.weights.size());
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array();
+  std::cout << uv_data.u.array().mean() << " " << uv_data.v.array().mean() << " "
+            << uv_data.w.array().mean() << std::endl;
   padmm(name, imsizex, imsizey, "kb", 4, uv_data, sigma, std::make_tuple(w_term, cellsize));
   return 0;
 }
