@@ -28,7 +28,8 @@ t_real ft_kaiser_bessel_general(const t_real &x, const t_int &J, const t_real &a
 
   t_complex eta = std::sqrt(
       static_cast<t_complex>((constant::pi * x * J) * (constant::pi * x * J) - alpha * alpha));
-  t_real normalisation = 38828.11016883; // Factor that keeps it consistent with fessler formula
+  const t_real normalisation
+      = 38828.11016883; // Factor that keeps it consistent with fessler formula
 
   return std::real(std::sin(eta) / eta) / normalisation; // simple way of doing the calculation, the
   // boost bessel funtions do not support

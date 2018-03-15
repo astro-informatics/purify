@@ -36,7 +36,7 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
         const t_uint q = utilities::mod(k_u(m) + ju, ftsizeu_);
         const t_uint p = utilities::mod(k_v(m) + jv, ftsizev_);
         const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
-        interpolation_matrix.coeffRef(m, index)
+        interpolation_matrix.insert(m, index)
             = std::exp(-2 * constant::pi * I * ((k_u(m) + ju) * 0.5 + (k_v(m) + jv) * 0.5))
               * kernelu(u(m) - (k_u(m) + ju)) * kernelv(v(m) - (k_v(m) + jv)) * weights(m);
       }
@@ -68,10 +68,11 @@ Sparse<t_complex> init_gridding_matrix_2d(
     return G;
 }
 
-Image<t_real> init_correction2d(const t_real &oversample_ratio, const t_uint &imsizey_,
-                                const t_uint imsizex_,
-                                const std::function<t_real(t_real)> ftkernelu,
-                                const std::function<t_real(t_real)> ftkernelv) {
+Image<t_complex> init_correction2d(const t_real &oversample_ratio, const t_uint &imsizey_,
+                                   const t_uint &imsizex_,
+                                   const std::function<t_real(t_real)> ftkernelu,
+                                   const std::function<t_real(t_real)> ftkernelv,
+                                   const t_real &w_mean, const t_real &cellx, const t_real &celly) {
 
   const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
   const t_uint ftsizev_ = std::floor(imsizey_ * oversample_ratio);
@@ -80,8 +81,14 @@ Image<t_real> init_correction2d(const t_real &oversample_ratio, const t_uint &im
 
   Array<t_real> range;
   range.setLinSpaced(std::max(ftsizeu_, ftsizev_), 0.5, std::max(ftsizeu_, ftsizev_) - 0.5);
-  return (1e0 / range.segment(y_start, imsizey_).unaryExpr(ftkernelv)).matrix()
-         * (1e0 / range.segment(x_start, imsizex_).unaryExpr(ftkernelu)).matrix().transpose();
+  auto primary_beam = [=](const t_real &x, const t_real &y) { return 1.; };
+  return ((1e0 / range.segment(y_start, imsizey_).unaryExpr(ftkernelv)).matrix()
+          * (1e0 / range.segment(x_start, imsizex_).unaryExpr(ftkernelu)).matrix().transpose())
+             .array()
+         * t_complex(1., 0.)
+         * wproj_utilities::generate_chirp(primary_beam, w_mean, cellx, celly, imsizex_, imsizey_)
+               .array()
+         * imsizex_ * imsizey_;
 }
 } // namespace details
 } // namespace purify

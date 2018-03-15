@@ -48,10 +48,11 @@ Sparse<t_complex> init_gridding_matrix_2d(
 
 //! Given the Fourier transform of a gridding kernel, creates the scaling image for gridding
 //! correction.
-Image<t_real> init_correction2d(const t_real &oversample_ratio, const t_uint &imsizey_,
-                                const t_uint imsizex_,
-                                const std::function<t_real(t_real)> ftkernelu,
-                                const std::function<t_real(t_real)> ftkernelv);
+Image<t_complex> init_correction2d(const t_real &oversample_ratio, const t_uint &imsizey_,
+                                   const t_uint &imsizex_,
+                                   const std::function<t_real(t_real)> ftkernelu,
+                                   const std::function<t_real(t_real)> ftkernelv,
+                                   const t_real &w_mean, const t_real &cellx, const t_real &celly);
 
 template <class T>
 t_real power_method(const sopt::LinearTransform<T> &op, const t_uint &niters,
@@ -188,7 +189,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_gridding_m
 //! Construsts zero padding operator
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
-init_zero_padding_2d(const Image<t_real> &S, const t_real &oversample_ratio) {
+init_zero_padding_2d(const Image<typename T::Scalar> &S, const t_real &oversample_ratio) {
   const t_uint imsizex_ = S.cols();
   const t_uint imsizey_ = S.rows();
   const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
@@ -306,13 +307,17 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
 base_padding_and_FFT_2d(const std::function<t_real(t_real)> &ftkernelu,
                         const std::function<t_real(t_real)> &ftkernelv, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real &oversample_ratio = 2,
-                        const fftw_plan &ft_plan = fftw_plan::measure) {
+                        const fftw_plan &ft_plan = fftw_plan::measure, const t_real &w_mean = 0,
+                        const t_real &cellx = 1, const t_real &celly = 1) {
   sopt::OperatorFunction<T> directZ, indirectZ;
   sopt::OperatorFunction<T> directFFT, indirectFFT;
-  const Image<t_real> S = purify::details::init_correction2d(oversample_ratio, imsizey, imsizex,
-                                                             ftkernelu, ftkernelv);
+
+  const Image<t_complex> S = purify::details::init_correction2d(
+      oversample_ratio, imsizey, imsizex, ftkernelu, ftkernelv, w_mean, cellx, celly);
   PURIFY_LOW_LOG("Building Measurement Operator: WGFZDB");
-  PURIFY_LOW_LOG("Constructing Zero Padding and Correction Operator: ZDB");
+  PURIFY_LOW_LOG("Constructing Zero Padding "
+                 "and Correction Operator: "
+                 "ZDB");
   PURIFY_MEDIUM_LOG("Image size (width, height): {} x {}", imsizex, imsizey);
   PURIFY_MEDIUM_LOG("Oversampling Factor: {}", oversample_ratio);
   std::tie(directZ, indirectZ) = purify::operators::init_zero_padding_2d<T>(S, oversample_ratio);
@@ -347,8 +352,9 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
   std::tie(kernelu, kernelv, ftkernelu, ftkernelv)
       = purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
   sopt::OperatorFunction<T> directFZ, indirectFZ;
-  std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(ftkernelu, ftkernelv, imsizey,
-                                                              imsizex, oversample_ratio, ft_plan);
+  std::tie(directFZ, indirectFZ)
+      = base_padding_and_FFT_2d<T>(ftkernelu, ftkernelv, imsizey, imsizex, oversample_ratio,
+                                   ft_plan, w.array().mean(), cellx, celly);
   sopt::OperatorFunction<T> directG, indirectG;
   if(w_term == true)
     PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
@@ -356,8 +362,9 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
   PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
-      u, v, w, weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv, w_term, cellx,
-      celly, energy_chirp_fraction, energy_kernel_fraction, series, order, interpolation_error);
+      u, v, w.array() - w.array().mean(), weights, imsizey, imsizex, oversample_ratio, kernelv,
+      kernelu, Ju, Jv, w_term, cellx, celly, energy_chirp_fraction, energy_kernel_fraction, series,
+      order, interpolation_error);
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
   PURIFY_LOW_LOG("Finished consturction of Φ.");
@@ -381,8 +388,9 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_mpi_degrid
   std::tie(kernelu, kernelv, ftkernelu, ftkernelv)
       = purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
   sopt::OperatorFunction<T> directFZ, indirectFZ;
-  std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(ftkernelu, ftkernelv, imsizey,
-                                                              imsizex, oversample_ratio, ft_plan);
+  std::tie(directFZ, indirectFZ)
+      = base_padding_and_FFT_2d<T>(ftkernelu, ftkernelv, imsizey, imsizex, oversample_ratio,
+                                   ft_plan, w.array().mean(), cellx, celly);
   sopt::OperatorFunction<T> directG, indirectG;
   if(w_term == true)
     PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
@@ -390,9 +398,9 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_mpi_degrid
   PURIFY_LOW_LOG("Constructing Weighting and MPI Gridding Operators: WG");
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
-      comm, u, v, w, weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv, w_term,
-      cellx, celly, energy_chirp_fraction, energy_kernel_fraction, series, order,
-      interpolation_error);
+      comm, u, v, w.array() - w.array().mean(), weights, imsizey, imsizex, oversample_ratio,
+      kernelv, kernelu, Ju, Jv, w_term, cellx, celly, energy_chirp_fraction, energy_kernel_fraction,
+      series, order, interpolation_error);
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
   PURIFY_LOW_LOG("Finished consturction of Φ.");
