@@ -94,6 +94,8 @@ Matrix<t_complex> generate_chirp(const std::function<t_complex(t_real, t_real)> 
   const auto chirp = [=](const t_real &y, const t_real &x) {
     return dde(y, x) * (std::exp(-2 * pi * I * w_rate * (std::sqrt(1 - x * x - y * y) - 1))) / nz;
   };
+  auto primary_beam
+      = [=](const t_real &x, const t_real &y) { return 1. / std::sqrt(1 - x * x - y * y); };
   const auto chirp_approx = [=](const t_real &y, const t_real &x) {
     return dde(y, x) * (std::exp(2 * pi * I * w_rate * (x * x + y * y))) / nz;
   };
@@ -144,7 +146,11 @@ wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uin
   const t_uint Npix = x_size * y_size;
   const t_uint Nvis = w_components.size();
 
-  PURIFY_HIGH_LOG("Hard-thresholding of the Chirp kernels: energy [{}] ", energy_fraction_chirp);
+  PURIFY_HIGH_LOG("Spread of w components {} ",
+                  std::sqrt(std::pow(w_components.norm(), 2) / Nvis
+                            - std::pow(w_components.array().mean(), 2)));
+  PURIFY_HIGH_LOG("Mean of w components {} ", w_components.array().mean());
+  PURIFY_HIGH_LOG("Hard-thresholding of the chirp kernels: energy [{}] ", energy_fraction_chirp);
   PURIFY_HIGH_LOG("Hard-thresholding of the rows of G: energy [{}]  ", energy_fraction_wproj);
 
   const auto ft_plan = operators::fftw_plan::measure;
@@ -162,7 +168,7 @@ wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uin
                           std::pow(interpolation_error, 1. / static_cast<t_real>(order + 1))
                           / static_cast<t_real>(order + 1));
   const t_real w_cell = xi / (2 * constant::pi * n_max);
-  const t_real w_max = std::sqrt(x_size * x_size + y_size * y_size) / std::sqrt(2) * w_cell;
+  const t_real w_max = 2 * w_components.cwiseAbs().maxCoeff();
   const Vector<t_real> w_grid_coords
       = (series != expansions::series::none) ? w_range(w_cell, w_max) : Vector<t_real>();
   const std::vector<t_uint> w_rows = (series != expansions::series::none) ?
@@ -193,12 +199,9 @@ wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uin
 
   t_uint counts = 0;
   t_uint total_non_zero = 0;
+  GW.reserve(G.nonZeros() * 1e3);
 #pragma omp parallel for
   for(t_int m = 0; m < G.rows(); m++) {
-    Sparse<t_complex> row(1, G.cols());
-    row.reserve(G.row(m).nonZeros());
-    for(Sparse<t_complex>::InnerIterator it(G, m); it; ++it)
-      row.coeffRef(0, it.index()) = it.value();
     const Sparse<t_complex> chirp
         = (series == expansions::series::none) ?
               create_chirp_row(w_components(m), cell_x, cell_y, x_size, y_size,
@@ -206,30 +209,31 @@ wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uin
               wproj_utilities::w_projection_expansion(w_expan, w_components(m), w_grid_coords,
                                                       w_rows.at(m), std::get<1>(coeff));
 
-    Sparse<t_complex> kernel = row_wise_sparse_convolution(row, chirp, x_size, y_size);
+    Sparse<t_complex> kernel = row_wise_sparse_convolution(G.row(m), chirp, x_size, y_size);
     const t_real thres = sparsify_row_thres(kernel, energy_fraction_wproj);
     kernel.prune([&](const t_uint &i, const t_uint &j, const t_complex &value) {
       return std::abs(value) > thres;
     });
     assert(kernel.cols() > 0);
     assert(kernel.rows() == 1);
-    assert(kernel.nonZeros() >= row.nonZeros());
 #pragma omp critical
     GW.row(m) = kernel;
 #pragma omp critical
     counts++;
 #pragma omp critical
     total_non_zero += kernel.nonZeros();
-    if(counts % 100 == 0) {
-      PURIFY_DEBUG("Row {} of {}", counts, GW.rows());
-      PURIFY_DEBUG("With {} entries non zero, which is {} entries per a row.", total_non_zero,
-                   static_cast<t_real>(total_non_zero) / counts);
-    }
+#pragma omp critical
+    // if(counts % 100 == 0) {
+    PURIFY_DEBUG("Row {} of {}", counts, GW.rows());
+    PURIFY_DEBUG("With {} entries non zero, which is {} entries per a row.", total_non_zero,
+                 static_cast<t_real>(total_non_zero) / counts);
+    //}
   }
   assert(GW.nonZeros() > 0);
   PURIFY_DEBUG("\nBuilding the rows of GW.. DONE!\n");
   PURIFY_DEBUG("DONE - With {} entries non zero, which is {} entries per a row.", GW.nonZeros(),
                static_cast<t_real>(GW.nonZeros()) / GW.rows());
+  GW.makeCompressed();
   return GW;
 }
 
