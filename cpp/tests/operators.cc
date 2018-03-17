@@ -63,15 +63,15 @@ TEST_CASE("Operators") {
     REQUIRE(indirect_output.isApprox(expected_indirect, 1e-4));
   }
   SECTION("Zero Padding") {
-    const Image<t_real> S
-        = details::init_correction2d(oversample_ratio, imsizey, imsizex, ftkbu, ftkbv);
+    const Image<t_complex> S
+        = details::init_correction2d(oversample_ratio, imsizey, imsizex, ftkbu, ftkbv, 0, 0, 0);
     CHECK(imsizex == S.cols());
     CHECK(imsizey == S.rows());
     CHECK(S.cols() == expected_op.S.cols());
     CHECK(S.rows() == expected_op.S.rows());
     INFO(S(0) / expected_op.S(0));
     INFO(S(5) / expected_op.S(5));
-    REQUIRE(S.isApprox(expected_op.S, 1e-4));
+    REQUIRE(S.real().isApprox(expected_op.S, 1e-4));
     sopt::OperatorFunction<Vector<t_complex>> directZ, indirectZ;
     std::tie(directZ, indirectZ)
         = operators::init_zero_padding_2d<Vector<t_complex>>(S, oversample_ratio);
