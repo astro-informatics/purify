@@ -58,7 +58,7 @@ utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B) {
   if(M != m)
     throw std::runtime_error(
         "Number of created baselines does not match expected baseline number N * (N - 1) / 2.");
-  utilities::vis_params coverage(u, v, w, vis, weights, "radians");
+  utilities::vis_params coverage(u, v, w, vis, weights, utilities::vis_units::radians);
   return coverage;
 };
 utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &mean,
@@ -209,12 +209,12 @@ utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t
   PURIFY_MEDIUM_LOG("Using a pixel size of {} by {} arcseconds", cell_size_u, cell_size_v);
   t_real scale_factor_u = 1;
   t_real scale_factor_v = 1;
-  if(uv_vis.units == "lambda") {
+  if(uv_vis.units == utilities::vis_units::lambda) {
     scale_factor_u = 180 * 3600 / cell_size_u / constant::pi;
     scale_factor_v = 180 * 3600 / cell_size_v / constant::pi;
     scaled_vis.w = uv_vis.w;
   }
-  if(uv_vis.units == "radians") {
+  if(uv_vis.units == utilities::vis_units::radians) {
     scale_factor_u = 180 * 3600 / constant::pi;
     scale_factor_v = 180 * 3600 / constant::pi;
     scaled_vis.w = uv_vis.w;
@@ -225,7 +225,7 @@ utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t
 
   scaled_vis.vis = uv_vis.vis;
   scaled_vis.weights = uv_vis.weights;
-  scaled_vis.units = "radians";
+  scaled_vis.units = utilities::vis_units::radians;
   scaled_vis.ra = uv_vis.ra;
   scaled_vis.dec = uv_vis.dec;
   scaled_vis.average_frequency = uv_vis.average_frequency;
@@ -253,7 +253,7 @@ uv_scale(const utilities::vis_params &uv_vis, const t_int &sizex, const t_int &s
     scaled_vis.v(i) = utilities::mod(scaled_vis.v(i), sizey);
   }
   scaled_vis.w = uv_vis.w;
-  scaled_vis.units = "pixels";
+  scaled_vis.units = utilities::vis_units::pixels;
   scaled_vis.ra = uv_vis.ra;
   scaled_vis.dec = uv_vis.dec;
   scaled_vis.average_frequency = uv_vis.average_frequency;

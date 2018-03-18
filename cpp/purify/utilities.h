@@ -11,13 +11,14 @@
 namespace purify {
 
 namespace utilities {
+enum class vis_units { lambda, radians, pixels };
 struct vis_params {
   Vector<t_real> u; // u coordinates
   Vector<t_real> v; // v coordinates
   Vector<t_real> w;
   Vector<t_complex> vis;     // complex visiblities
   Vector<t_complex> weights; // weights for visibilities
-  std::string units = "lambda";
+  vis_units units = vis_units::lambda;
   t_real ra = 0.;  // decimal degrees
   t_real dec = 0.; // decimal degrees
   t_real average_frequency = 0.;
@@ -35,8 +36,8 @@ struct vis_params {
   //! constructor
   vis_params(const Vector<t_real> &u_, const Vector<t_real> &v_, const Vector<t_real> &w_,
              const Vector<t_complex> &vis_, const Vector<t_complex> &weights_,
-             const std::string &units_ = "lambda", const t_real &ra_ = 0, const t_real &dec_ = 0,
-             const t_real &average_frequency_ = 0)
+             const vis_units units_ = vis_units::lambda, const t_real &ra_ = 0,
+             const t_real &dec_ = 0, const t_real &average_frequency_ = 0)
       : u(u_), v(v_), w(w_), vis(vis_), weights(weights_), ra(ra_), dec(dec_), units(units_),
         average_frequency(average_frequency_){};
   //! return number of measurements

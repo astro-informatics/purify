@@ -292,7 +292,7 @@ read_measurementset(MeasurementSet const &ms_file,
   }
   // make consistent with vis file format exported from casa
   uv_data.weights = 1. / uv_data.weights.array();
-  uv_data.units = "lambda";
+  uv_data.units = utilities::vis_units::lambda;
   return uv_data;
 }
 

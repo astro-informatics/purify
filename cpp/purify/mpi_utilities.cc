@@ -91,7 +91,7 @@ vis_params scatter_visibilities(vis_params const &params, std::vector<t_int> con
   result.w = comm.scatterv(params.w, sizes);
   result.vis = comm.scatterv(params.vis, sizes);
   result.weights = comm.scatterv(params.weights, sizes);
-  result.units = comm.broadcast(params.units);
+  result.units = static_cast<utilities::vis_units>(comm.broadcast(static_cast<int>(params.units)));
   result.ra = comm.broadcast(params.ra);
   result.dec = comm.broadcast(params.dec);
   result.average_frequency = comm.broadcast(params.average_frequency);
@@ -109,7 +109,8 @@ vis_params scatter_visibilities(sopt::mpi::Communicator const &comm) {
   result.w = comm.scatterv<decltype(result.w)::Scalar>(local_size);
   result.vis = comm.scatterv<decltype(result.vis)::Scalar>(local_size);
   result.weights = comm.scatterv<decltype(result.weights)::Scalar>(local_size);
-  result.units = comm.broadcast(decltype(result.units)(""));
+  result.units = static_cast<utilities::vis_units>(
+      comm.broadcast<std::remove_const<decltype(static_cast<int>(result.units))>::type>());
   result.ra = comm.broadcast<std::remove_const<decltype(result.ra)>::type>();
   result.dec = comm.broadcast<std::remove_const<decltype(result.dec)>::type>();
   result.average_frequency

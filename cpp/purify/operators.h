@@ -342,10 +342,10 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
 base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
                         const Vector<t_complex> &weights, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real &oversample_ratio = 2,
-                        const std::string &kernel = "kb", const t_uint Ju = 4, const t_uint Jv = 4,
-                        const t_uint Jw = 6, const fftw_plan &ft_plan = fftw_plan::measure,
-                        const bool w_term = false, const t_real &cellx = 1,
-                        const t_real &celly = 1) {
+                        const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
+                        const t_uint Jv = 4, const t_uint Jw = 6,
+                        const fftw_plan &ft_plan = fftw_plan::measure, const bool w_term = false,
+                        const t_real &cellx = 1, const t_real &celly = 1) {
 
   std::function<t_real(t_real)> kernelu, kernelv, ftkernelu, ftkernelv;
   std::tie(kernelu, kernelv, ftkernelu, ftkernelv)
@@ -378,7 +378,7 @@ base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_
                             const Vector<t_real> &v, const Vector<t_real> &w,
                             const Vector<t_complex> &weights, const t_uint &imsizey,
                             const t_uint &imsizex, const t_real oversample_ratio = 2,
-                            const std::string &kernel = "kb", const t_uint Ju = 4,
+                            const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
                             const t_uint Jv = 4, const t_uint Jw = 6,
                             const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                             const bool w_term = false, const t_real &cellx = 1,
@@ -422,8 +422,8 @@ init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
                         const Vector<t_complex> &weights, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real &oversample_ratio = 2,
                         const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
-                        const std::string &kernel = "kb", const t_uint Ju = 4, const t_uint Jv = 4,
-                        const t_uint Jw = 6,
+                        const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
+                        const t_uint Jv = 4, const t_uint Jw = 6,
                         const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                         const bool w_term = false, const t_real &cellx = 1,
                         const t_real &celly = 1) {
@@ -449,15 +449,16 @@ std::shared_ptr<sopt::LinearTransform<T> const>
 init_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
                         const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
-                        const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
-                        const t_uint Ju = 4, const t_uint Jv = 4, const t_uint Jw = 6,
+                        const t_real &power_tol = 1e-4,
+                        const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
+                        const t_uint Jv = 4, const t_uint Jw = 6,
                         const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                         const bool w_term = false) {
 
   auto uv_vis = uv_vis_input;
-  if(uv_vis.units == "lambda")
+  if(uv_vis.units == utilities::vis_units::lambda)
     uv_vis = utilities::set_cell_size(uv_vis, cell_x, cell_y);
-  if(uv_vis.units == "radians")
+  if(uv_vis.units == utilities::vis_units::radians)
     uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
                                  std::floor(oversample_ratio * imsizey));
   return init_degrid_operator_2d<T>(uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex,
@@ -474,8 +475,8 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
                         const Vector<t_complex> &weights, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real &oversample_ratio = 2,
                         const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
-                        const std::string &kernel = "kb", const t_uint Ju = 4, const t_uint Jv = 4,
-                        const t_uint Jw = 6,
+                        const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
+                        const t_uint Jv = 4, const t_uint Jw = 6,
                         const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                         const bool w_term = false, const t_real &cellx = 1,
                         const t_real &celly = 1) {
@@ -503,14 +504,15 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                         const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
                         const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
-                        const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
-                        const t_uint Ju = 4, const t_uint Jv = 4, const t_uint Jw = 6,
+                        const t_real &power_tol = 1e-4,
+                        const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
+                        const t_uint Jv = 4, const t_uint Jw = 6,
                         const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                         const bool w_term = false) {
   auto uv_vis = uv_vis_input;
-  if(uv_vis.units == "lambda")
+  if(uv_vis.units == utilities::vis_units::lambda)
     uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
-  if(uv_vis.units == "radians")
+  if(uv_vis.units == utilities::vis_units::radians)
     uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
                                  std::floor(oversample_ratio * imsizey));
   return init_degrid_operator_2d<T>(comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey,
@@ -527,7 +529,7 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_
                             const Vector<t_complex> &weights, const t_uint &imsizey,
                             const t_uint &imsizex, const t_real &oversample_ratio = 2,
                             const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
-                            const std::string &kernel = "kb", const t_uint Ju = 4,
+                            const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
                             const t_uint Jv = 4, const t_uint Jw = 6,
                             const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                             const bool w_term = false, const t_real &cellx = 1,
@@ -557,15 +559,16 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
                             const utilities::vis_params &uv_vis_input, const t_uint &imsizey,
                             const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
                             const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
-                            const t_real &power_tol = 1e-4, const std::string &kernel = "kb",
-                            const t_uint Ju = 4, const t_uint Jv = 4, const t_uint Jw = 6,
+                            const t_real &power_tol = 1e-4,
+                            const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
+                            const t_uint Jv = 4, const t_uint Jw = 6,
                             const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                             const bool w_term = false) {
 
   auto uv_vis = uv_vis_input;
-  if(uv_vis.units == "lambda")
+  if(uv_vis.units == utilities::vis_units::lambda)
     uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
-  if(uv_vis.units == "radians")
+  if(uv_vis.units == utilities::vis_units::radians)
     uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
                                  std::floor(oversample_ratio * imsizey));
 
