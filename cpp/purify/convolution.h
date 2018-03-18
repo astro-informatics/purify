@@ -79,9 +79,6 @@ linear_convol_2d(const std::function<T(t_int)> &kernelu, const std::function<T(t
     kernelfu(i) = kernelu(i);
   for(t_int i = 0; i < kernelfv.size(); i++)
     kernelfv(i) = kernelv(i);
-  std::cout << kernelfu << std::endl;
-  std::cout << kernelfv << std::endl;
-  std::cout << kernelg << std::endl;
   return linear_convol_2d<T>(kernelfu, kernelfv, kernelg);
 }
 
