@@ -7,6 +7,8 @@
 
 namespace purify {
 namespace projection_kernels {
+//! box kernel (which would also simulate an antenna)
+std::function<t_complex(t_real, t_real, t_real)> const box_proj();
 //! parabloic approximation for curvature
 inline t_complex w_proj_approx(const t_real &u, const t_real &v, const t_real &w, const t_real &dl,
                                const t_real &dm);

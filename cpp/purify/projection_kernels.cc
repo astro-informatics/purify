@@ -3,6 +3,10 @@
 
 namespace purify {
 namespace projection_kernels {
+
+std::function<t_complex(t_real, t_real, t_real)> const box_proj() {
+  return [=](const t_real &, const t_real &, const t_real &) -> t_complex { return 1.; };
+}
 inline t_complex w_proj_approx(const t_real &u, const t_real &v, const t_real &w, const t_real &du,
                                const t_real &dv) {
   if(std::abs(w) < 1e-12)
