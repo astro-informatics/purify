@@ -12,6 +12,8 @@
 #include "purify/wproj_grid.h"
 #include "purify/wproj_utilities.h"
 
+#include "purify/operators.h"
+
 using namespace purify;
 using namespace purify::notinstalled;
 
@@ -22,10 +24,12 @@ TEST_CASE("kernel") {
   const t_uint imsize = 2048;
   const t_real cell = 30; // arcseconds
   const t_real oversample_ratio = 2;
-  const auto uvkernels = purify::create_kernels("kb", Ju, Jv, imsize, imsize, oversample_ratio);
+  const auto uvkernels
+      = purify::create_kernels(kernels::kernel::kb, Ju, Jv, imsize, imsize, oversample_ratio);
   const auto kernelu = std::get<0>(uvkernels);
   const auto kernelv = std::get<1>(uvkernels);
-  const auto kernelw = projection_kernels::w_projection_kernel(cell, cell, imsize, imsize);
+  const auto kernelw
+      = projection_kernels::w_projection_kernel(cell, cell, imsize, imsize, oversample_ratio);
   const Vector<t_real> u = Vector<t_real>::Random(5);
   const Vector<t_real> v = Vector<t_real>::Random(5);
   const Vector<t_real> w = Vector<t_real>::Random(5) * 100;
@@ -34,6 +38,34 @@ TEST_CASE("kernel") {
         = projection_kernels::projection(kernelv, kernelu, kernelw, u(m), v(m), w(m), Ju, Jv, Jw);
     break;
   }
+}
+
+TEST_CASE("w_projection") {
+
+  const t_int Ju = 4;
+  const t_int Jv = 4;
+  const t_int Jw = 10;
+  const t_uint imsize = 2048;
+  const t_real cell = 30; // arcseconds
+  const t_real oversample_ratio = 2;
+  const auto uvkernels
+      = purify::create_kernels(kernels::kernel::kb, Ju, Jv, imsize, imsize, oversample_ratio);
+  const auto kernelu = std::get<0>(uvkernels);
+  const auto kernelv = std::get<1>(uvkernels);
+  const auto kernelw
+      = projection_kernels::w_projection_kernel(cell, cell, imsize, imsize, oversample_ratio);
+  const t_uint M = 5;
+  const Vector<t_real> u = Vector<t_real>::Random(M);
+  const Vector<t_real> v = Vector<t_real>::Random(M);
+  const Vector<t_real> w = Vector<t_real>::Random(M) * 100;
+  const Vector<t_complex> weights = Vector<t_complex>::Ones(M);
+
+  const Sparse<t_complex> G
+      = details::init_gridding_matrix_2d(u, v, w, weights, imsize, imsize, oversample_ratio,
+                                         kernelu, kernelv, kernelw, Ju, Jv, Jw, true);
+  const Vector<t_complex> output
+      = G * Vector<t_complex>::Random(imsize * imsize * oversample_ratio * oversample_ratio);
+  std::cout << output << std::endl;
 }
 
 TEST_CASE("Calcuate Chirp Image") {
