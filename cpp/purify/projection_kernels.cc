@@ -1,4 +1,5 @@
 #include "purify/projection_kernels.h"
+#include "purify/convolution.h"
 
 namespace purify {
 namespace projection_kernels {
@@ -21,5 +22,25 @@ w_projection_kernel(const t_real &cellx, const t_real &celly, const t_uint &imsi
 
   };
 }
+
+Matrix<t_complex>
+projection(const std::function<t_real(t_real)> kernelv, const std::function<t_real(t_real)> kernelu,
+           const std::function<t_complex(t_real, t_real, t_real)> kernelw, const t_real u,
+           const t_real v, const t_real w, const t_int &Ju, const t_int &Jv, const t_int &Jw) {
+
+  // w_projection convolution setup
+  t_real const du = u - std::floor(u - Ju * 0.5);
+  const auto convol_kernelu = [=](const t_int &ju) -> t_complex { return kernelu(du - ju - 1); };
+  t_real const dv = v - std::floor(v - Jv * 0.5);
+  const auto convol_kernelv = [=](const t_int &jv) -> t_complex { return kernelu(dv - jv - 1); };
+  const t_real dwu = u - std::floor(u - Jw * 0.5);
+  const t_real dwv = v - std::floor(v - Jw * 0.5);
+  const auto convol_kernelw = [=](const t_int &ju, const t_int &jv) -> t_complex {
+    return kernelw(dwu - ju - 1, dwv - jv - 1, w);
+  };
+  return convol::linear_convol_2d<t_complex>(convol_kernelu, convol_kernelv, convol_kernelw, Ju, Jv,
+                                             Jw, Jw);
+}
+
 } // namespace projection_kernels
 } // namespace purify
