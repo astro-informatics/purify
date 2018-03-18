@@ -2,25 +2,19 @@
 #define PURIFY_PROJECTION_KERNELS_H
 
 #include "purify/config.h"
-#include <fstream>
-#include <iostream>
-#include <omp.h>
-#include <random>
-#include <set>
-#include <stdio.h>
-#include <string>
-#include <time.h>
-#include <Eigen/Sparse>
-#include <sys/stat.h>
 #include "purify/logging.h"
-#include "purify/operators.h"
 #include "purify/types.h"
 
 namespace purify {
 namespace projection_kernels {
-t_complex w_proj_approx(const t_real &u, const t_real &v const &t_real &w, const t_real &dl,
-                        const t_real &dm);
-}
+//! parabloic approximation for curvature
+inline t_complex w_proj_approx(const t_real &u, const t_real &v, const t_real &w, const t_real &dl,
+                               const t_real &dm);
+//! returns lambda for w projection kernel
+std::function<t_complex(t_real, t_real, t_real)> const
+w_projection_kernel(const t_real &cellx, const t_real &celly, const t_uint &imsizex,
+                    const t_uint &imsizey);
+} // namespace projection_kernels
 } // namespace purify
 
 #endif
