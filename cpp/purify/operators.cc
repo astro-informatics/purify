@@ -22,12 +22,12 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
   interpolation_matrix.reserve(Vector<t_int>::Constant(rows, Ju * Jv));
 
   const t_complex I(0, 1);
-  const t_int ju_max = std::min(Ju + 1, ftsizeu_ + 1);
-  const t_int jv_max = std::min(Jv + 1, ftsizev_ + 1);
+  const t_int ju_max = std::min(Ju, ftsizeu_);
+  const t_int jv_max = std::min(Jv, ftsizev_);
 #pragma omp parallel for collapse(3)
   for(t_int m = 0; m < rows; ++m) {
-    for(t_int ju = 1; ju < ju_max; ++ju) {
-      for(t_int jv = 1; jv < jv_max; ++jv) {
+    for(t_int ju = 1; ju < ju_max + 1; ++ju) {
+      for(t_int jv = 1; jv < jv_max + 1; ++jv) {
         const t_real k_u = std::floor(u(m) - ju_max * 0.5);
         const t_real k_v = std::floor(v(m) - jv_max * 0.5);
         const t_uint q = utilities::mod(k_u + ju, ftsizeu_);
@@ -69,8 +69,6 @@ init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
   interpolation_matrix.reserve(Vector<t_int>::Constant(rows, Jwv * Jwu));
 
   const t_complex I(0, 1);
-  const t_int ju_max = std::min(Ju + 1, ftsizeu_ + 1);
-  const t_int jv_max = std::min(Jv + 1, ftsizev_ + 1);
 #pragma omp parallel for
   for(t_int m = 0; m < rows; ++m) {
     // w_projection convolution setup
@@ -78,8 +76,8 @@ init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
         = projection_kernels::projection(kernelv, kernelu, kernelw, u(m), v(m), w(m), Ju, Jv, Jw);
     const t_int kwu = std::floor(u(m) - Jwu * 0.5);
     const t_int kwv = std::floor(v(m) - Jwv * 0.5);
-    for(t_int ju = 1; ju < Jwu; ++ju) {
-      for(t_int jv = 1; jv < Jwv; ++jv) {
+    for(t_int ju = 1; ju < Jwu + 1; ++ju) {
+      for(t_int jv = 1; jv < Jwv + 1; ++jv) {
         const t_uint q = utilities::mod(kwu + ju, ftsizeu_);
         const t_uint p = utilities::mod(kwv + jv, ftsizev_);
         const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
