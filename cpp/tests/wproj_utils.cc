@@ -1,13 +1,40 @@
 #include "purify/config.h"
 #include <iostream>
 #include "catch.hpp"
-#include "purify/directories.h"
 #include "purify/logging.h"
+
 #include "purify/types.h"
+
+#include "purify/convolution.h"
+#include "purify/directories.h"
+#include "purify/kernels.h"
+#include "purify/projection_kernels.h"
 #include "purify/wproj_grid.h"
 #include "purify/wproj_utilities.h"
+
 using namespace purify;
 using namespace purify::notinstalled;
+
+TEST_CASE("kernel") {
+  const t_int Ju = 4;
+  const t_int Jv = 4;
+  const t_int Jw = 6;
+  const t_uint imsize = 2048;
+  const t_real cell = 30; // arcseconds
+  const t_real oversample_ratio = 2;
+  const auto uvkernels = purify::create_kernels("kb", Ju, Jv, imsize, imsize, oversample_ratio);
+  const auto kernelu = std::get<0>(uvkernels);
+  const auto kernelv = std::get<1>(uvkernels);
+  const auto kernelw = projection_kernels::w_projection_kernel(cell, cell, imsize, imsize);
+  const Vector<t_real> u = Vector<t_real>::Random(5);
+  const Vector<t_real> v = Vector<t_real>::Random(5);
+  const Vector<t_real> w = Vector<t_real>::Random(5) * 100;
+  for(t_uint m = 0; m < u.size(); m++) {
+    const Matrix<t_complex> output
+        = projection_kernels::projection(kernelv, kernelu, kernelw, u(m), v(m), w(m), Ju, Jv, Jw);
+    break;
+  }
+}
 
 TEST_CASE("Calcuate Chirp Image") {
   const t_int imsizex = 128;
