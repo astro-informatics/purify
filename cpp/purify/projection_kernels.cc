@@ -14,9 +14,9 @@ inline t_complex w_proj_approx(const t_real &u, const t_real &v, const t_real &w
 }
 std::function<t_complex(t_real, t_real, t_real)> const
 w_projection_kernel(const t_real &cellx, const t_real &celly, const t_uint &imsizex,
-                    const t_uint &imsizey) {
-  const t_real du = cellx * imsizex / (60 * 60 * 180);
-  const t_real dv = celly * imsizey / (60 * 60 * 180);
+                    const t_uint &imsizey, const t_real &oversample_ratio) {
+  const t_real du = cellx * imsizex * oversample_ratio / (60 * 60 * 180);
+  const t_real dv = celly * imsizey * oversample_ratio / (60 * 60 * 180);
   return [=](const t_real &u, const t_real &v, const t_real &w) -> t_complex {
     return w_proj_approx(u, v, w, du, dv);
 
