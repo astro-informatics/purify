@@ -62,6 +62,12 @@ init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
   if(u.size() != v.size())
     throw std::runtime_error(
         "Size of u and v vectors are not the same for creating gridding matrix.");
+  if(u.size() != w.size())
+    throw std::runtime_error(
+        "Size of u and w vectors are not the same for creating gridding matrix.");
+  if(u.size() != weights.size())
+    throw std::runtime_error(
+        "Size of u and w vectors are not the same for creating gridding matrix.");
 
   Sparse<t_complex> interpolation_matrix(rows, cols);
   const t_int Jwu = Jw + Ju - 1;
