@@ -1,5 +1,6 @@
 #include "purify/operators.h"
 #include "purify/convolution.h"
+#include "purify/wproj_utilities.h"
 namespace purify {
 
 namespace details {
@@ -24,7 +25,9 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
   const t_complex I(0, 1);
   const t_int ju_max = std::min(Ju, ftsizeu_);
   const t_int jv_max = std::min(Jv, ftsizev_);
-#pragma omp parallel for collapse(3)
+  // If I collapse this for loop there is a crash when using MPI... Sparse<>::insert() doesn't work
+  // right
+#pragma omp parallel for
   for(t_int m = 0; m < rows; ++m) {
     for(t_int ju = 1; ju < ju_max + 1; ++ju) {
       for(t_int jv = 1; jv < jv_max + 1; ++jv) {
@@ -80,6 +83,7 @@ init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
     // w_projection convolution setup
     const Matrix<t_complex> projection_kernel
         = projection_kernels::projection(kernelv, kernelu, kernelw, u(m), v(m), w(m), Ju, Jv, Jw);
+
     const t_int kwu = std::floor(u(m) - Jwu * 0.5);
     const t_int kwv = std::floor(v(m) - Jwv * 0.5);
     for(t_int ju = 1; ju < Jwu + 1; ++ju) {
