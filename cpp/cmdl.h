@@ -6,6 +6,7 @@
 #include <getopt.h>
 #include <string>
 #include "purify/casacore.h"
+#include "purify/kernels.h"
 #include "purify/types.h"
 
 namespace purify {
@@ -25,7 +26,7 @@ struct Params {
   t_real beta = 1e-3;
   // measurement operator stuff
   t_real over_sample = 2;
-  std::string kernel = "kb";
+  kernels::kernel kernel = kernels::kernel::kb;
   t_int J = 4;
   t_int width = 512;
   t_int height = 512;
