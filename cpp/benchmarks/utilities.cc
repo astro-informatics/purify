@@ -119,7 +119,7 @@ dirty_measurements(Image<t_complex> const &ground_truth_image, t_uint number_of_
   // creating operator to generate measurements
   auto measurement_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_data, ground_truth_image.rows(), ground_truth_image.cols(), cellsize, cellsize, 2, 0, 1e-4,
-      "kb", 8, 8, operators::fftw_plan::measure, false);
+      kernels::kernel::kb, 8, 8, operators::fftw_plan::measure, false);
   // Generates measurements from image
   uv_data.vis = (*measurement_op)
                 * Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);
@@ -157,12 +157,12 @@ utilities::vis_params random_measurements(t_int size) {
   utilities::vis_params uv_data;
   if(vis_file_str.good()) {
     uv_data = utilities::read_visibility(vis_file, false);
-    uv_data.units = "radians";
+    uv_data.units = utilities::vis_units::radians;
   } else {
     t_real const sigma_m = constant::pi / 3;
     const t_real max_w = 100.; // lambda
     uv_data = utilities::random_sample_density(size, 0, sigma_m, max_w);
-    uv_data.units = "radians";
+    uv_data.units = utilities::vis_units::radians;
     utilities::write_visibility(uv_data, vis_file);
   }
   return uv_data;
