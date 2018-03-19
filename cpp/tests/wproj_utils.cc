@@ -42,30 +42,45 @@ TEST_CASE("kernel") {
 
 TEST_CASE("w_projection") {
 
-  const t_int Ju = 4;
-  const t_int Jv = 4;
-  const t_int Jw = 10;
-  const t_uint imsize = 2048;
+  const t_int Ju = 5;
+  const t_int Jv = 5;
+  const t_uint imsize = 10;
   const t_real cell = 30; // arcseconds
   const t_real oversample_ratio = 2;
   const auto uvkernels
       = purify::create_kernels(kernels::kernel::kb, Ju, Jv, imsize, imsize, oversample_ratio);
   const auto kernelu = std::get<0>(uvkernels);
   const auto kernelv = std::get<1>(uvkernels);
-  const auto kernelw
-      = projection_kernels::w_projection_kernel(cell, cell, imsize, imsize, oversample_ratio);
   const t_uint M = 5;
   const Vector<t_real> u = Vector<t_real>::Random(M);
   const Vector<t_real> v = Vector<t_real>::Random(M);
   const Vector<t_real> w = Vector<t_real>::Random(M) * 100;
   const Vector<t_complex> weights = Vector<t_complex>::Ones(M);
-
-  const Sparse<t_complex> G
-      = details::init_gridding_matrix_2d(u, v, w, weights, imsize, imsize, oversample_ratio,
-                                         kernelu, kernelv, kernelw, Ju, Jv, Jw, true);
-  const Vector<t_complex> output
-      = G * Vector<t_complex>::Random(imsize * imsize * oversample_ratio * oversample_ratio);
-  std::cout << output << std::endl;
+  SECTION("small angle approximation") {
+    const t_int Jw = 10;
+    const auto kernelw
+        = projection_kernels::w_projection_kernel(cell, cell, imsize, imsize, oversample_ratio);
+    const Sparse<t_complex> G
+        = details::init_gridding_matrix_2d(u, v, w, weights, imsize, imsize, oversample_ratio,
+                                           kernelu, kernelv, kernelw, Ju, Jv, true, 1, 1, Jw);
+    const Vector<t_complex> output
+        = G * Vector<t_complex>::Random(imsize * imsize * oversample_ratio * oversample_ratio);
+  }
+  SECTION("delta") {
+    const t_int Jw = 1;
+    const auto kernelw = projection_kernels::box_proj();
+    const Sparse<t_complex> G
+        = details::init_gridding_matrix_2d(u, v, w, weights, imsize, imsize, oversample_ratio,
+                                           kernelu, kernelv, kernelw, Ju, Jv, true, 1, 1, Jw);
+    const Vector<t_complex> output
+        = G * Vector<t_complex>::Random(imsize * imsize * oversample_ratio * oversample_ratio);
+    const Sparse<t_complex> G_id = details::init_gridding_matrix_2d(
+        u, v, w, weights, imsize, imsize, oversample_ratio, kernelu, kernelv, kernelw, Ju, Jv);
+    CHECK(G.nonZeros() == G_id.nonZeros());
+    CAPTURE(G.row(0));
+    CAPTURE(G_id.row(0));
+    CHECK(G.isApprox(G_id));
+  }
 }
 
 TEST_CASE("Calcuate Chirp Image") {
