@@ -45,10 +45,11 @@ int main(int nargs, char const **args) {
   t_real const sigma_m = constant::pi / 3;
 
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
-  uv_data.units = "radians";
+  uv_data.units = utilities::vis_units::radians;
   PURIFY_MEDIUM_LOG("Number of measurements: {}", uv_data.u.size());
   MeasurementOperator simulate_measurements(uv_data, 4, 4, "kb", sky_model.cols(), sky_model.rows(),
-                                            20, 5); // Generating simulated high quality visibilites
+                                            20,
+                                            5); // Generating simulated high quality visibilites
   uv_data.vis = simulate_measurements.degrid(sky_model);
 
   auto const measurements = std::make_shared<MeasurementOperator const>(

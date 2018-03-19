@@ -40,7 +40,7 @@ int main(int, char **) {
   t_int const number_of_vis = 1e4;
   // Generating random uv(w) coverage
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
-  uv_data.units = "radians";
+  uv_data.units = utilities::vis_units::radians;
   utilities::write_visibility(uv_data, output_vis_file);
   PURIFY_MEDIUM_LOG("Number of measurements / number of pixels: {}",
                     uv_data.u.size() * 1. / M31.size());

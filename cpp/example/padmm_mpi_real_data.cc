@@ -138,7 +138,7 @@ int main(int nargs, char const **args) {
   const std::string name = "realdata";
   const std::string filename = vla_filename("../mwa/uvdump_01");
 
-  auto const kernel = "kb";
+  auto const kernel = kernels::kernel::kb;
   const bool w_term = false;
 
   const t_real cellsize = 30; // arcsec

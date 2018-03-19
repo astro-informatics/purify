@@ -25,14 +25,15 @@ using namespace purify;
 using namespace purify::notinstalled;
 
 void forward_backward(const std::string &name, const Image<t_complex> &M31,
-                      const std::string &kernel, const t_int J,
+                      const kernels::kernel kernel, const t_int J,
                       const utilities::vis_params &uv_data, const t_real sigma,
                       const std::tuple<bool, t_real> &w_term) {
-  std::string const outfile = output_filename(name + "_" + kernel + ".tiff");
-  std::string const outfile_fits = output_filename(name + "_" + kernel + "_solution.fits");
-  std::string const residual_fits = output_filename(name + "_" + kernel + "_residual.fits");
-  std::string const dirty_image = output_filename(name + "_" + kernel + "_dirty.tiff");
-  std::string const dirty_image_fits = output_filename(name + "_" + kernel + "_dirty.fits");
+  std::string const kernel_str = "kb";
+  std::string const outfile = output_filename(name + "_" + kernel_str + ".tiff");
+  std::string const outfile_fits = output_filename(name + "_" + kernel_str + "_solution.fits");
+  std::string const residual_fits = output_filename(name + "_" + kernel_str + "_residual.fits");
+  std::string const dirty_image = output_filename(name + "_" + kernel_str + "_dirty.tiff");
+  std::string const dirty_image_fits = output_filename(name + "_" + kernel_str + "_dirty.fits");
 
   t_real const over_sample = 2;
   t_uint const imsizey = M31.rows();
@@ -170,16 +171,17 @@ int main(int, char **) {
   // Generating random uv(w) coverage
   t_real const sigma_m = constant::pi / 3;
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, max_w);
-  uv_data.units = "radians";
+  uv_data.units = utilities::vis_units::radians;
   PURIFY_MEDIUM_LOG("Number of measurements / number of pixels: {}",
                     uv_data.u.size() * 1. / number_of_pixels);
 #if PURIFY_GPU == 1
   auto const sky_measurements = gpu::measurementoperator::init_degrid_operator_2d(
-      uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 500, 0.0001, "kb", 8, 8, w_term);
+      uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 500, 0.0001, kernels::kernel::kb, 8,
+      8, w_term);
 #else
   auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 500, 0.0001, "kb", 8, 8,
-      operators::fftw_plan::measure, w_term);
+      uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 500, 0.0001, kernels::kernel::kb, 8,
+      8, operators::fftw_plan::measure, w_term);
 #endif
   uv_data.vis = (*sky_measurements) * Vector<t_complex>::Map(M31.data(), M31.size());
   Vector<t_complex> const y0 = uv_data.vis;
@@ -188,6 +190,7 @@ int main(int, char **) {
   // adding noise to visibilities
   uv_data.vis = utilities::add_noise(y0, 0., sigma);
   // padmm(name + "30", M31, "box", 1, uv_data, sigma, std::make_tuple(w_term, cellsize));
-  forward_backward(name + "30", M31, "kb", 4, uv_data, sigma, std::make_tuple(w_term, cellsize));
+  forward_backward(name + "30", M31, kernels::kernel::kb, 4, uv_data, sigma,
+                   std::make_tuple(w_term, cellsize));
   return 0;
 }

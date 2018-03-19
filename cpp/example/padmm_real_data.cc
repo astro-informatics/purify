@@ -19,16 +19,17 @@
 #include "purify/types.h"
 #include "purify/utilities.h"
 #include "purify/uvfits.h"
+#include "purify/wproj_utilities.h"
 using namespace purify;
 using namespace purify::notinstalled;
 
 void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey,
-           const std::string &kernel, const t_int J, const utilities::vis_params &uv_data,
+           const kernels::kernel kernel, const t_int J, const utilities::vis_params &uv_data,
            const t_real sigma, const std::tuple<bool, t_real> &w_term) {
 
-  std::string const outfile_fits = output_filename(name + "_" + kernel + "_solution.fits");
-  std::string const residual_fits = output_filename(name + "_" + kernel + "_residual.fits");
-  std::string const dirty_image_fits = output_filename(name + "_" + kernel + "_dirty.fits");
+  std::string const outfile_fits = output_filename(name + "_solution.fits");
+  std::string const residual_fits = output_filename(name + "_residual.fits");
+  std::string const dirty_image_fits = output_filename(name + "_dirty.fits");
 
   t_real const over_sample = 2;
   std::vector<std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const>> m_op;
@@ -38,7 +39,7 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
     m_op.push_back(measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         uv_data.segment(i * segment, (i + 1) * segment), imsizey, imsizex, std::get<1>(w_term),
         std::get<1>(w_term), over_sample, 100, 0.0001, kernel, J, J, operators::fftw_plan::measure,
-        std::get<0>(w_term), 0.99, 0.99, wproj_utilities::expansions::series::taylor, 1, 1e-1));
+        std::get<0>(w_term)));
   }
   t_uint const M = uv_data.size();
   t_uint const N = imsizex * imsizey;
@@ -150,6 +151,7 @@ int main(int, char **) {
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array();
   std::cout << uv_data.u.array().mean() << " " << uv_data.v.array().mean() << " "
             << uv_data.w.array().mean() << std::endl;
-  padmm(name, imsizex, imsizey, "kb", 4, uv_data, sigma, std::make_tuple(w_term, cellsize));
+  padmm(name, imsizex, imsizey, kernels::kernel::kb, 4, uv_data, sigma,
+        std::make_tuple(w_term, cellsize));
   return 0;
 }
