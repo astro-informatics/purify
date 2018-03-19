@@ -62,7 +62,7 @@ TEST_CASE("w_projection") {
         = projection_kernels::w_projection_kernel(cell, cell, imsize, imsize, oversample_ratio);
     const Sparse<t_complex> G
         = details::init_gridding_matrix_2d(u, v, w, weights, imsize, imsize, oversample_ratio,
-                                           kernelu, kernelv, kernelw, Ju, Jv, true, 1, 1, Jw);
+                                           kernelu, kernelv, kernelw, Ju, Jv, Jw, true);
     const Vector<t_complex> output
         = G * Vector<t_complex>::Random(imsize * imsize * oversample_ratio * oversample_ratio);
   }
@@ -71,7 +71,7 @@ TEST_CASE("w_projection") {
     const auto kernelw = projection_kernels::box_proj();
     const Sparse<t_complex> G
         = details::init_gridding_matrix_2d(u, v, w, weights, imsize, imsize, oversample_ratio,
-                                           kernelu, kernelv, kernelw, Ju, Jv, true, 1, 1, Jw);
+                                           kernelu, kernelv, kernelw, Ju, Jv, Jw, true);
     const Vector<t_complex> output
         = G * Vector<t_complex>::Random(imsize * imsize * oversample_ratio * oversample_ratio);
     const Sparse<t_complex> G_id = details::init_gridding_matrix_2d(
