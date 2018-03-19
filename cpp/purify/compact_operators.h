@@ -70,17 +70,17 @@ base_mpi_grid_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vect
                                  const Vector<t_complex> &weights, const t_uint &imsizey,
                                  const t_uint &imsizex, const t_real oversample_ratio = 2,
                                  const kernels::kernel kernel = kernels::kernel::kb,
-                                 const t_uint Ju = 4, const t_uint Jv = 4, const t_uint Jw = 6,
+                                 const t_uint Ju = 4, const t_uint Jv = 4,
                                  const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
-                                 const bool w_term = false, const t_real &cellx = 1,
-                                 const t_real &celly = 1) {
+                                 const bool w_term = false, const t_uint Jw = 6,
+                                 const t_real &cellx = 1, const t_real &celly = 1) {
 
   std::function<t_real(t_real)> kernelu, kernelv, ftkernelu, ftkernelv;
   std::tie(kernelu, kernelv, ftkernelu, ftkernelv)
       = purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
   sopt::OperatorFunction<T> directFZ, indirectFZ;
-  std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(ftkernelu, ftkernelv, imsizey,
-                                                              imsizex, oversample_ratio, ft_plan);
+  std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(
+      ftkernelu, ftkernelv, imsizey, imsizex, oversample_ratio, ft_plan, 0., cellx, celly);
   sopt::OperatorFunction<T> GTG;
   PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
                     imsizey * celly / (60. * 60.));
@@ -132,10 +132,10 @@ base_grid_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
                              const t_uint &imsizey, const t_uint &imsizex,
                              const t_real &oversample_ratio = 2,
                              const kernels::kernel kernel = kernels::kernel::kb,
-                             const t_uint Ju = 4, const t_uint Jv = 4, const t_uint Jw = 6,
+                             const t_uint Ju = 4, const t_uint Jv = 4,
                              const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
-                             const bool w_term = false, const t_real &cellx = 1,
-                             const t_real &celly = 1) {
+                             const bool w_term = false, const t_uint Jw = 6,
+                             const t_real &cellx = 1, const t_real &celly = 1) {
   std::function<t_real(t_real)> kernelu, kernelv, ftkernelu, ftkernelv;
   std::tie(kernelu, kernelv, ftkernelu, ftkernelv)
       = purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
@@ -164,17 +164,17 @@ init_grid_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
                              const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
                              const t_real &power_tol = 1e-4,
                              const kernels::kernel kernel = kernels::kernel::kb,
-                             const t_uint Ju = 4, const t_uint Jv = 4, const t_uint Jw = 6,
+                             const t_uint Ju = 4, const t_uint Jv = 4,
                              const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
-                             const bool w_term = false, const t_real &cellx = 1,
-                             const t_real &celly = 1) {
+                             const bool w_term = false, const t_uint Jw = 6,
+                             const t_real &cellx = 1, const t_real &celly = 1) {
 
   /*
    *  Returns operator that degrids and grids
    */
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   const sopt::OperatorFunction<T> phiTphi = purify::operators::base_grid_degrid_operator_2d<T>(
-      u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, Jw, ft_plan, w_term,
+      u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, w_term, Jw,
       cellx, celly);
   auto direct = phiTphi;
   auto id = [](T &out, const T &in) { out = in; };
@@ -191,9 +191,9 @@ init_grid_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_
                              const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
                              const t_real &power_tol = 1e-4,
                              const kernels::kernel kernel = kernels::kernel::kb,
-                             const t_uint Ju = 4, const t_uint Jv = 4, const t_uint Jw = 6,
+                             const t_uint Ju = 4, const t_uint Jv = 4,
                              const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
-                             const bool w_term = false) {
+                             const bool w_term = false, const t_uint Jw = 6) {
 
   auto uv_vis = uv_vis_input;
   if(uv_vis.units == utilities::vis_units::lambda)
@@ -203,7 +203,7 @@ init_grid_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_
                                  std::floor(oversample_ratio * imsizey));
   return init_grid_degrid_operator_2d<T>(uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey,
                                          imsizex, oversample_ratio, power_iters, power_tol, kernel,
-                                         Ju, Jv, Jw, ft_plan, w_term, cell_x, cell_y);
+                                         Ju, Jv, ft_plan, w_term, Jw, cell_x, cell_y);
 }
 #ifdef PURIFY_MPI
 template <class T>
@@ -214,17 +214,17 @@ init_grid_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t
                              const t_uint &imsizex, const t_real &oversample_ratio = 2,
                              const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
                              const kernels::kernel kernel = kernels::kernel::kb,
-                             const t_uint Ju = 4, const t_uint Jv = 4, const t_uint Jw = 6,
+                             const t_uint Ju = 4, const t_uint Jv = 4,
                              const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
-                             const bool w_term = false, const t_real &cellx = 1,
-                             const t_real &celly = 1) {
+                             const bool w_term = false, const t_uint Jw = 6,
+                             const t_real &cellx = 1, const t_real &celly = 1) {
   /*
    *  Returns linear transform that is the weighted degridding operator with mpi all sum all
    */
 
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   const sopt::OperatorFunction<T> phiTphi = purify::operators::base_grid_degrid_operator_2d<T>(
-      u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, Jw, ft_plan, w_term,
+      u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, w_term, Jw,
       cellx, celly);
   const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
   auto direct = sopt::chained_operators<T>(allsumall, phiTphi);
@@ -244,9 +244,9 @@ init_grid_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                              const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
                              const t_real &power_tol = 1e-4,
                              const kernels::kernel kernel = kernels::kernel::kb,
-                             const t_uint Ju = 4, const t_uint Jv = 4, const t_uint Jw = 6,
+                             const t_uint Ju = 4, const t_uint Jv = 4,
                              const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
-                             const bool w_term = false) {
+                             const bool w_term = false, const t_uint Jw = 6) {
 
   auto uv_vis = uv_vis_input;
   if(uv_vis.units == utilities::vis_units::lambda)
@@ -256,7 +256,7 @@ init_grid_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                                  std::floor(oversample_ratio * imsizey));
   return init_grid_degrid_operator_2d<T>(comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights,
                                          imsizey, imsizex, oversample_ratio, power_iters, power_tol,
-                                         kernel, Ju, Jv, ft_plan, w_term, cell_x, cell_y);
+                                         kernel, Ju, Jv, ft_plan, w_term, Jw, cell_x, cell_y);
 }
 template <class T>
 sopt::OperatorFunction<T>
@@ -266,10 +266,10 @@ init_grid_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vect
                                  const t_uint &imsizex, const t_real &oversample_ratio = 2,
                                  const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
                                  const kernels::kernel kernel = kernels::kernel::kb,
-                                 const t_uint Ju = 4, const t_uint Jv = 4, const t_uint Jw = 6,
+                                 const t_uint Ju = 4, const t_uint Jv = 4,
                                  const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
-                                 const bool w_term = false, const t_real &cellx = 1,
-                                 const t_real &celly = 1) {
+                                 const bool w_term = false, const t_uint Jw = 6,
+                                 const t_real &cellx = 1, const t_real &celly = 1) {
   /*
    *  Returns linear transform that is the weighted degridding operator with distributed Fourier
    * grid
@@ -278,8 +278,8 @@ init_grid_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vect
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   auto Broadcast = purify::operators::init_broadcaster<T>(comm);
   const sopt::OperatorFunction<T> phiTphi = purify::operators::base_mpi_grid_degrid_operator_2d<T>(
-      comm, u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, Jw, ft_plan,
-      w_term, cellx, celly);
+      comm, u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, w_term,
+      Jw, cellx, celly);
 
   auto direct = sopt::chained_operators<T>(Broadcast, phiTphi);
   auto id = [](T &out, const T &in) { out = in; };
@@ -298,9 +298,9 @@ init_grid_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
                                  const t_real oversample_ratio = 2, const t_uint &power_iters = 100,
                                  const t_real &power_tol = 1e-4,
                                  const kernels::kernel kernel = kernels::kernel::kb,
-                                 const t_uint Ju = 4, const t_uint Jv = 4, const t_uint Jw = 6,
+                                 const t_uint Ju = 4, const t_uint Jv = 4,
                                  const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
-                                 const bool w_term = false) {
+                                 const bool w_term = false, const t_uint Jw = 6) {
   auto uv_vis = uv_vis_input;
   if(uv_vis.units == utilities::vis_units::lambda)
     uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
@@ -309,7 +309,7 @@ init_grid_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
                                  std::floor(oversample_ratio * imsizey));
   return init_grid_degrid_operator_2d_mpi<T>(
       comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-      power_iters, power_tol, kernel, Ju, Jv, Jw, ft_plan, w_term, cell_x, cell_y);
+      power_iters, power_tol, kernel, Ju, Jv, ft_plan, w_term, Jw, cell_x, cell_y);
 }
 #endif
 template <class T>

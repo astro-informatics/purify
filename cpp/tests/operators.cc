@@ -23,7 +23,6 @@ TEST_CASE("Operators") {
   const t_uint ftsizeu = std::floor(imsizex * oversample_ratio);
   const t_uint Ju = 4;
   const t_uint Jv = 4;
-  const t_uint Jw = 6;
   const t_uint power_iters = 100;
   const t_real power_tol = 1e-9;
   const kernels::kernel kernel = kernels::kernel::kb;
@@ -50,7 +49,7 @@ TEST_CASE("Operators") {
     sopt::OperatorFunction<Vector<t_complex>> directG, indirectG;
     std::tie(directG, indirectG) = operators::init_gridding_matrix_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, uv_vis.w, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex,
-        oversample_ratio, kbv, kbu, kernelw, Ju, Jv, Jw);
+        oversample_ratio, kbv, kbu, kernelw, Ju, Jv);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     Vector<t_complex> direct_output;
     directG(direct_output, direct_input);
@@ -130,7 +129,7 @@ TEST_CASE("Operators") {
                                              oversample_ratio, 1, 1, "natural");
     const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv, Jw, ft_plan);
+        power_iters, power_tol, kernel, Ju, Jv, ft_plan);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
     const Vector<t_complex> direct_output = *measure_op * direct_input;
     CHECK(direct_output.size() == M);
@@ -167,10 +166,10 @@ TEST_CASE("Operators") {
   SECTION("Create Weighted Compact Measurement Operator") {
     const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv, Jw, ft_plan);
+        power_iters, power_tol, kernel, Ju, Jv, ft_plan);
     const auto phiTphi = operators::init_grid_degrid_operator_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv, Jw, ft_plan);
+        power_iters, power_tol, kernel, Ju, Jv, ft_plan);
     const auto id = [](Vector<t_complex> &out, const Vector<t_complex> &in) { out = in; };
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
     const Vector<t_complex> direct_output = measure_op->adjoint()(*measure_op * direct_input);
@@ -194,7 +193,7 @@ TEST_CASE("Operators") {
   SECTION("Create convolution operator") {
     const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv, Jw, ft_plan);
+        power_iters, power_tol, kernel, Ju, Jv, ft_plan);
     const auto phiTphi
         = operators::init_psf_convolve_2d<Vector<t_complex>>(measure_op, imsizey, imsizex);
     const auto id = [](Vector<t_complex> &out, const Vector<t_complex> &in) { out = in; };
