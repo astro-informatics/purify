@@ -135,14 +135,14 @@ utilities::vis_params set_cell_size(const sopt::mpi::Communicator &comm,
     return utilities::set_cell_size(uv_vis, cell_x, cell_y);
 
   const std::vector<t_real> max_u_vector
-      = comm.gather<t_real>(std::sqrt((uv_vis.u.array() * uv_vis.u.array()).maxCoeff()));
+      = comm.broadcast(comm.gather<t_real>(uv_vis.u.array().cwiseAbs().maxCoeff()));
   const std::vector<t_real> max_v_vector
-      = comm.gather<t_real>(std::sqrt((uv_vis.v.array() * uv_vis.v.array()).maxCoeff()));
-  const t_real max_u
-      = comm.broadcast(*(std::max_element(max_u_vector.begin(), max_u_vector.end())));
-  const t_real max_v
-      = comm.broadcast(*(std::max_element(max_v_vector.begin(), max_v_vector.end())));
-  return utilities::set_cell_size(uv_vis, max_u, max_v, cell_x, cell_y);
+      = comm.broadcast(comm.gather<t_real>(uv_vis.v.array().cwiseAbs().maxCoeff()));
+  if((max_u_vector.size() == 0) or (max_v_vector.size() == 0))
+    throw std::runtime_error("Problem with distribution of maximum u and v coordinates.");
+  const auto max_u = std::max_element(max_u_vector.begin(), max_u_vector.end());
+  const auto max_v = std::max_element(max_v_vector.begin(), max_v_vector.end());
+  return utilities::set_cell_size(uv_vis, *max_u, *max_v, cell_x, cell_y);
 }
 } // namespace utilities
 } // namespace purify
