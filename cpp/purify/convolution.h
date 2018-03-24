@@ -45,7 +45,9 @@ inline Vector<T> linear_convol_1d(const Vector<T> &kernelf, const Vector<T> &ker
   const t_int Jf = kernelf.size();
   Vector<T> output = Vector<T>::Zero(kernelg.size() - Jf + 1);
   for(t_int j = 0; j < output.size(); j++)
-    output(j) = (kernelf.segment(0, Jf).array() * kernelg.segment(j, Jf).array()).sum();
+    output(j)
+        = (kernelf.segment(0, Jf).array() * kernelg.segment(output.size() - j - 1, Jf).array())
+              .sum();
   return output;
 }
 
