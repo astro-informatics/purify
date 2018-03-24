@@ -63,7 +63,7 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
     auto result = dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term);
     comm.broadcast(std::get<1>(result));
     auto const order
-        = distribute::distribute_measurements(std::get<0>(result), comm, "distance_distribution");
+        = distribute::distribute_measurements(std::get<0>(result), comm, distribute::plan::radial);
     std::get<0>(result) = utilities::regroup_and_scatter(std::get<0>(result), order, comm);
     return result;
   }

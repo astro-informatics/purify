@@ -140,7 +140,7 @@ dirty_measurements(Image<t_complex> const &ground_truth_image, t_uint number_of_
     auto result = dirty_measurements(ground_truth_image, number_of_vis, snr, cellsize);
     comm.broadcast(std::get<1>(result));
     auto const order
-        = distribute::distribute_measurements(std::get<0>(result), comm, "distance_distribution");
+        = distribute::distribute_measurements(std::get<0>(result), comm, distribute::plan::radial);
     std::get<0>(result) = utilities::regroup_and_scatter(std::get<0>(result), order, comm);
     return result;
   }
@@ -176,7 +176,7 @@ utilities::vis_params random_measurements(t_int size, sopt::mpi::Communicator co
       return uv_data;
 
     // Distribute them
-    auto const order = distribute::distribute_measurements(uv_data, comm, "distance_distribution");
+    auto const order = distribute::distribute_measurements(uv_data, comm, distribute::plan::radial);
     uv_data = utilities::regroup_and_scatter(uv_data, order, comm);
     return uv_data;
   }

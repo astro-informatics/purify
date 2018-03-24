@@ -30,7 +30,7 @@ TEST_CASE("Serial vs Distributed Operator") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
@@ -59,7 +59,7 @@ TEST_CASE("Serial vs Distributed Operator") {
     if(world.is_root()) {
       uv_degrid.vis = *op_serial * image;
       auto const order
-          = distribute::distribute_measurements(uv_degrid, world, "distance_distribution");
+          = distribute::distribute_measurements(uv_degrid, world, distribute::plan::radial);
       uv_degrid = utilities::regroup_and_scatter(uv_degrid, order, world);
     } else
       uv_degrid = utilities::scatter_visibilities(world);
@@ -90,7 +90,7 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
@@ -119,7 +119,7 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator") {
     if(world.is_root()) {
       uv_degrid.vis = *op_serial * image;
       auto const order
-          = distribute::distribute_measurements(uv_degrid, world, "distance_distribution");
+          = distribute::distribute_measurements(uv_degrid, world, distribute::plan::radial);
       uv_degrid = utilities::regroup_and_scatter(uv_degrid, order, world);
     } else
       uv_degrid = utilities::scatter_visibilities(world);
@@ -153,7 +153,7 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator weighted") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
@@ -181,7 +181,7 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator weighted") {
     if(world.is_root()) {
       uv_degrid.vis = *op_serial * image;
       auto const order
-          = distribute::distribute_measurements(uv_degrid, world, "distance_distribution");
+          = distribute::distribute_measurements(uv_degrid, world, distribute::plan::radial);
       uv_degrid = utilities::regroup_and_scatter(uv_degrid, order, world);
     } else
       uv_degrid = utilities::scatter_visibilities(world);
@@ -215,7 +215,7 @@ TEST_CASE("Serial vs Distributed GPU Fourier Grid Operator weighted") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
@@ -251,7 +251,7 @@ TEST_CASE("Serial vs Distributed GPU Fourier Grid Operator weighted") {
     if(world.is_root()) {
       uv_degrid.vis = *op_serial * image;
       auto const order
-          = distribute::distribute_measurements(uv_degrid, world, "distance_distribution");
+          = distribute::distribute_measurements(uv_degrid, world, distribute::plan::radial);
       uv_degrid = utilities::regroup_and_scatter(uv_degrid, order, world);
     } else
       uv_degrid = utilities::scatter_visibilities(world);
@@ -284,7 +284,7 @@ TEST_CASE("Serial vs Distributed GPU Operator weighted") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
@@ -320,7 +320,7 @@ TEST_CASE("Serial vs Distributed GPU Operator weighted") {
     if(world.is_root()) {
       uv_degrid.vis = *op_serial * image;
       auto const order
-          = distribute::distribute_measurements(uv_degrid, world, "distance_distribution");
+          = distribute::distribute_measurements(uv_degrid, world, distribute::plan::radial);
       uv_degrid = utilities::regroup_and_scatter(uv_degrid, order, world);
     } else
       uv_degrid = utilities::scatter_visibilities(world);
@@ -351,7 +351,7 @@ TEST_CASE("Serial vs Distributed GPU Compact Operator") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
@@ -403,7 +403,7 @@ TEST_CASE("Serial vs GPU Compact Distributed Fourier Grid Operator weighted") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
@@ -453,7 +453,7 @@ TEST_CASE("Serial vs Distributed Compact Operator") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
@@ -505,7 +505,7 @@ TEST_CASE("Serial vs Compact Distributed Fourier Grid Operator weighted") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);

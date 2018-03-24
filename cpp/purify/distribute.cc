@@ -5,31 +5,63 @@ namespace distribute {
 
 std::vector<t_int> distribute_measurements(Vector<t_real> const &u, Vector<t_real> const &v,
                                            Vector<t_real> const &w, t_int const number_of_nodes,
-                                           std::string const &distribution_plan,
+                                           distribute::plan const distribution_plan,
                                            t_int const &grid_size) {
   // distrubte visibilities from a measurement
   Vector<t_int> index = Vector<t_int>::LinSpaced(u.size(), 0, u.size());
   t_int const patition_size
       = std::ceil(static_cast<t_real>(u.size()) / static_cast<t_real>(number_of_nodes));
+  // return a vector of vectors of indicies for each node
+  std::string plan_name = "";
+  switch(distribution_plan) {
+  case plan::none: {
+    plan_name = "none";
+    break;
+  }
+  case plan::equal: {
+    index = equal_distribution(u, v, grid_size);
+    plan_name = "equal";
+    break;
+  }
+  case plan::radial: {
+    index = distance_distribution(u, v);
+    plan_name = "radial";
+    break;
+  }
+  case plan::w_term: {
+    index = w_distribution(w);
+    plan_name = "w_term";
+    break;
+  }
+  default: {
+    throw std::runtime_error("Distribution plan not recognised or implimented.");
+    break;
+  }
+  }
   PURIFY_DEBUG(
       "Using {} to make {} partitions from {} visibilities, with {} visibilities per a node.",
-      distribution_plan, number_of_nodes, index.size(), patition_size);
-  // return a vector of vectors of indicies for each node
-  if(distribution_plan == "equal_distribution")
-    index = equal_distribution(u, v, grid_size);
-  if(distribution_plan == "distance_distribution")
-    index = distance_distribution(u, v);
+      plan_name, number_of_nodes, index.size(), patition_size);
   std::vector<t_int> patitions(u.size());
   // creating patitions
   for(t_int i = 0; i < index.size(); i++) {
     if(std::floor(static_cast<t_real>(i) / static_cast<t_real>(patition_size))
        > number_of_nodes - 1) {
-      PURIFY_ERROR("Error: Probably a bug in distribution plan {}.", distribution_plan);
+      PURIFY_ERROR("Error: Probably a bug in distribution plan.");
       throw std::runtime_error("Distributing data into too many nodes");
     }
     patitions[index(i)] = std::floor(static_cast<t_real>(i) / static_cast<t_real>(patition_size));
   }
   return patitions;
+}
+Vector<t_int>
+w_distribution(const Vector<t_real> &u, const Vector<t_real> &v, Vector<t_real> const &w) {
+  return w_distribution(w);
+}
+Vector<t_int> w_distribution(Vector<t_real> const &w) {
+  // sort visibilities by w from  w_max to w_min
+  Vector<t_int> index = Vector<t_int>::LinSpaced(w.size(), 0, w.size());
+  std::sort(index.data(), index.data() + index.size(), [&w](int a, int b) { return w(a) < w(b); });
+  return index;
 }
 
 Vector<t_int> distance_distribution(Vector<t_real> const &u, Vector<t_real> const &v) {
@@ -65,5 +97,5 @@ equal_distribution(Vector<t_real> const &u, Vector<t_real> const &v, t_int const
             });
   return index;
 }
-}
-}
+} // namespace distribute
+} // namespace purify

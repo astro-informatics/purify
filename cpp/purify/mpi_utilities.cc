@@ -121,7 +121,7 @@ vis_params scatter_visibilities(sopt::mpi::Communicator const &comm) {
 utilities::vis_params
 distribute_params(utilities::vis_params const &params, sopt::mpi::Communicator const &comm) {
   if(comm.is_root() and comm.size() > 1) {
-    auto const order = distribute::distribute_measurements(params, comm, "distance_distribution");
+    auto const order = distribute::distribute_measurements(params, comm, distribute::plan::radial);
     return utilities::regroup_and_scatter(params, order, comm);
   } else if(comm.size() > 1)
     return utilities::scatter_visibilities(comm);

@@ -193,7 +193,7 @@ utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t
     cell_size:: size of a pixel in arcseconds
   */
 
-  utilities::vis_params scaled_vis;
+  utilities::vis_params scaled_vis = uv_vis;
   t_real cell_size_u = input_cell_size_u;
   t_real cell_size_v = input_cell_size_v;
   if(cell_size_u == 0 and cell_size_v == 0) {
@@ -221,14 +221,8 @@ utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t
   }
   scaled_vis.u = uv_vis.u / scale_factor_u * 2 * constant::pi;
   scaled_vis.v = uv_vis.v / scale_factor_v * 2 * constant::pi;
-  scaled_vis.w = uv_vis.w / (2 * constant::pi);
 
-  scaled_vis.vis = uv_vis.vis;
-  scaled_vis.weights = uv_vis.weights;
   scaled_vis.units = utilities::vis_units::radians;
-  scaled_vis.ra = uv_vis.ra;
-  scaled_vis.dec = uv_vis.dec;
-  scaled_vis.average_frequency = uv_vis.average_frequency;
   return scaled_vis;
 }
 utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t_real &cell_size_u,
@@ -249,8 +243,8 @@ uv_scale(const utilities::vis_params &uv_vis, const t_int &sizex, const t_int &s
   scaled_vis.vis = uv_vis.vis;
   scaled_vis.weights = uv_vis.weights;
   for(t_int i = 0; i < uv_vis.u.size(); ++i) {
-    scaled_vis.u(i) = utilities::mod(scaled_vis.u(i), sizex);
-    scaled_vis.v(i) = utilities::mod(scaled_vis.v(i), sizey);
+    // scaled_vis.u(i) = utilities::mod(scaled_vis.u(i), sizex);
+    // scaled_vis.v(i) = utilities::mod(scaled_vis.v(i), sizey);
   }
   scaled_vis.w = uv_vis.w;
   scaled_vis.units = utilities::vis_units::pixels;

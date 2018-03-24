@@ -35,7 +35,10 @@ using namespace purify::notinstalled;
 utilities::vis_params dirty_visibilities(const std::string &name) {
   // return purify::casa::read_measurementset(
   //    name + ".ms", purify::casa::MeasurementSet::ChannelWrapper::polarization::I);
-  return pfitsio::read_uvfits(name + ".uvfits");
+  auto uv_data = utilities::read_visibility(name + ".vis", true);
+  // uv_data.units = utilities::vis_units::radians;
+  return uv_data;
+  // return pfitsio::read_uvfits(name + ".uvfits");
 }
 
 utilities::vis_params
@@ -44,7 +47,7 @@ dirty_visibilities(const std::string &name, sopt::mpi::Communicator const &comm)
     return dirty_visibilities(name);
   if(comm.is_root()) {
     auto result = dirty_visibilities(name);
-    auto const order = distribute::distribute_measurements(result, comm, "distance_distribution");
+    auto const order = distribute::distribute_measurements(result, comm, distribute::plan::w_term);
     return utilities::regroup_and_scatter(result, order, comm);
   }
   auto result = utilities::scatter_visibilities(comm);
@@ -139,11 +142,12 @@ int main(int nargs, char const **args) {
   const std::string filename = vla_filename("../mwa/uvdump_01");
 
   auto const kernel = kernels::kernel::kb;
+  std::string kernel_name = "kb";
   const bool w_term = false;
 
-  const t_real cellsize = 30; // arcsec
-  const t_uint imsizex = 512;
-  const t_uint imsizey = 512;
+  const t_real cellsize = 20; // arcsec
+  const t_uint imsizex = 1024;
+  const t_uint imsizey = 1024;
 
   // Generating random uv(w) coverage
   auto const data = dirty_visibilities(filename, world);
@@ -179,25 +183,24 @@ int main(int nargs, char const **args) {
           std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)},
       world);
 
-  Vector<t_real> const dirty_image = (measurements->adjoint() * (data.vis) / 10.).real();
+  Vector<t_real> const dirty_image = (measurements->adjoint() * (data.vis)).real();
   /*
-  if(world.is_root()) {
-    // then writes stuff to files
-    boost::filesystem::path const path(output_filename(name));
-#if PURIFY_PADMM_ALGORITHM == 3
-    auto const pb_path = path / kernel / "local_epsilon_replicated_grids";
-#elif PURIFY_PADMM_ALGORITHM == 2
-    auto const pb_path = path / kernel / "global_epsilon_replicated_grids";
-#elif PURIFY_PADMM_ALGORITHM == 1
-    auto const pb_path = path / kernel / "local_epsilon_distributed_grids";
-#else
-#error Unknown or unimplemented algorithm
-#endif
-    std::cout << "test" << std::endl;
-    boost::filesystem::create_directories(pb_path);
+    if(world.is_root()) {
+      // then writes stuff to files
+      boost::filesystem::path const path(output_filename(name));
+  #if PURIFY_PADMM_ALGORITHM == 3
+      auto const pb_path = path / kernel_name / "local_epsilon_replicated_grids";
+  #elif PURIFY_PADMM_ALGORITHM == 2
+      auto const pb_path = path / kernel_name / "global_epsilon_replicated_grids";
+  #elif PURIFY_PADMM_ALGORITHM == 1
+      auto const pb_path = path / kernel_name / "local_epsilon_distributed_grids";
+  #else
+  #error Unknown or unimplemented algorithm
+  #endif
+      boost::filesystem::create_directories(pb_path);
 
-    pfitsio::write2d(dirty_image, imsizey, imsizex, (pb_path / "dirty.fits").native());
-  }
+      pfitsio::write2d(dirty_image, imsizey, imsizex, (pb_path / "dirty.fits").native());
+    }
   */
   // Create the padmm solver
   auto const padmm = padmm_factory(measurements, sara, data, world, imsizey, imsizex);
@@ -209,24 +212,24 @@ int main(int nargs, char const **args) {
 
   Vector<t_real> const residual_image = (measurements->adjoint() * diagnostic.residual).real();
   /*
-  if(world.is_root()) {
-    // then writes stuff to files
-    boost::filesystem::path const path(output_filename(name));
-#if PURIFY_PADMM_ALGORITHM == 3
-    auto const pb_path = path / kernel / "local_epsilon_replicated_grids";
-#elif PURIFY_PADMM_ALGORITHM == 2
-    auto const pb_path = path / kernel / "global_epsilon_replicated_grids";
-#elif PURIFY_PADMM_ALGORITHM == 1
-    auto const pb_path = path / kernel / "local_epsilon_distributed_grids";
-#else
-#error Unknown or unimplemented algorithm
-#endif
-    boost::filesystem::create_directories(pb_path);
+    if(world.is_root()) {
+      // then writes stuff to files
+      boost::filesystem::path const path(output_filename(name));
+  #if PURIFY_PADMM_ALGORITHM == 3
+      auto const pb_path = path / kernel_name / "local_epsilon_replicated_grids";
+  #elif PURIFY_PADMM_ALGORITHM == 2
+      auto const pb_path = path / kernel_name / "global_epsilon_replicated_grids";
+  #elif PURIFY_PADMM_ALGORITHM == 1
+      auto const pb_path = path / kernel_name / "local_epsilon_distributed_grids";
+  #else
+  #error Unknown or unimplemented algorithm
+  #endif
+      boost::filesystem::create_directories(pb_path);
 
-    pfitsio::write2d(dirty_image, imsizey, imsizex, (pb_path / "dirty.fits").native());
-    pfitsio::write2d(diagnostic.x.real(), imsizey, imsizex, (pb_path / "solution.fits").native());
-    pfitsio::write2d(residual_image, imsizey, imsizex, (pb_path / "residual.fits").native());
-  }
+      pfitsio::write2d(dirty_image, imsizey, imsizex, (pb_path / "dirty.fits").native());
+      pfitsio::write2d(diagnostic.x.real(), imsizey, imsizex, (pb_path / "solution.fits").native());
+      pfitsio::write2d(residual_image, imsizey, imsizex, (pb_path / "residual.fits").native());
+    }
   */
   return 0;
 }

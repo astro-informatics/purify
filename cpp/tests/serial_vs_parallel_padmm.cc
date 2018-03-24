@@ -96,7 +96,7 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
         utilities::vis_params serial = uv_serial;
         serial.vis = just_roots.broadcast<Vector<t_complex>>();
         auto const order
-            = distribute::distribute_measurements(serial, split_comm, "distance_distribution");
+            = distribute::distribute_measurements(serial, split_comm, distribute::plan::radial);
         auto const from_serial = utilities::regroup_and_scatter(serial, order, split_comm);
         CHECK(from_serial.vis.isApprox(degridded));
       } else if(split_comm.size() > 1) {

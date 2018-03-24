@@ -117,7 +117,7 @@ std::vector<utilities::vis_params> distribute_measurements(const Parameters &par
     std::vector<utilities::vis_params> distributed_channels(channels);
     for(t_int i = 0; i < channels; i++) {
       auto const order
-          = distribute::distribute_measurements(uv_data[i], params.comm, "distance_distribution");
+          = distribute::distribute_measurements(uv_data[i], params.comm, distribute::plan::radial);
       distributed_channels[i] = utilities::regroup_and_scatter(uv_data[i], order, params.comm);
     }
     return distributed_channels;

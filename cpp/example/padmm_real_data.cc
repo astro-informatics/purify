@@ -30,45 +30,32 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
   std::string const outfile_fits = output_filename(name + "_solution.fits");
   std::string const residual_fits = output_filename(name + "_residual.fits");
   std::string const dirty_image_fits = output_filename(name + "_dirty.fits");
+  std::string const psf_image_fits = output_filename(name + "_psf.fits");
 
   t_real const over_sample = 2;
-  std::vector<std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const>> m_op;
-  const t_uint G = 32;
-  const t_uint segment = uv_data.size() / G;
-  for(int i = 0; i < G; i++) {
-    m_op.push_back(measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        uv_data.segment(i * segment, (i + 1) * segment), imsizey, imsizex, std::get<1>(w_term),
-        std::get<1>(w_term), over_sample, 100, 0.0001, kernel, J, J, operators::fftw_plan::measure,
-        std::get<0>(w_term)));
-  }
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform
+      = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 100,
+          0.0001, kernel, J, J, operators::fftw_plan::measure, std::get<0>(w_term), 12);
   t_uint const M = uv_data.size();
   t_uint const N = imsizex * imsizey;
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform
-      = std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(
-          [=](Vector<t_complex> &output, const Vector<t_complex> &input) {
-            output = Vector<t_complex>::Zero(M);
-            for(int i = 0; i < G; i++) {
-              const Vector<t_complex> buff = *(m_op.at(i)) * input;
-              output.segment(i * segment, segment) = buff;
-            }
-
-          },
-          [=](Vector<t_complex> &output, const Vector<t_complex> &input) {
-            output = Vector<t_complex>::Zero(N);
-            for(int i = 0; i < G; i++)
-              output += m_op.at(i)->adjoint() * (input.segment(i * segment, segment).eval() / N);
-
-          });
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, imsizey, imsizex);
-  Vector<> dimage = (measurements_transform->adjoint() * uv_data.vis).real();
+  const Vector<> dimage = (measurements_transform->adjoint() * uv_data.vis).real();
+  Matrix<t_complex> point = Matrix<t_complex>::Zero(imsizey, imsizex);
+  point(std::floor(imsizey / 2), std::floor(imsizex / 2)) = 1.;
+  const Vector<> psf
+      = (measurements_transform->adjoint()
+         * (*measurements_transform * Vector<t_complex>::Map(point.data(), point.size())))
+            .real();
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), imsizey, imsizex), dirty_image_fits);
-
+  pfitsio::write2d(Image<t_real>::Map(psf.data(), imsizey, imsizex), psf_image_fits);
+  return;
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
   PURIFY_HIGH_LOG("Using epsilon of {}", epsilon);
 #ifdef PURIFY_CImg
@@ -140,12 +127,12 @@ int main(int, char **) {
   purify::logging::set_level("debug");
   const std::string &name = "real_data";
   const bool w_term = true;
-  const t_real cellsize = 60;
-  const t_uint imsizex = 1024;
-  const t_uint imsizey = 1024;
-  std::string const inputfile = vla_filename("../mwa/uvdump_01.uvfits");
+  const t_real cellsize = 20;
+  const t_uint imsizex = 512;
+  const t_uint imsizey = 512;
+  std::string const inputfile = vla_filename("../mwa/uvdump_01.vis");
 
-  auto uv_data = pfitsio::read_uvfits(inputfile);
+  auto uv_data = utilities::read_visibility(inputfile, true);
   uv_data = utilities::sort_by_w(uv_data);
   t_real const sigma = uv_data.weights.norm() / std::sqrt(uv_data.weights.size());
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array();
