@@ -88,7 +88,8 @@ base_mpi_grid_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vect
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   PURIFY_MEDIUM_LOG("Kernel Support: {} x {}", Ju, Jv);
   std::function<t_complex(t_real, t_real, t_real)> kernelw
-      = projection_kernels::w_projection_kernel(cellx, celly, imsizex, imsizey, oversample_ratio);
+      = projection_kernels::w_projection_kernel_approx(cellx, celly, imsizex, imsizey,
+                                                       oversample_ratio);
   GTG = purify::operators::init_gridding_degridding_matrix_2d<T>(
       comm, u, v, w, weights, imsizey, imsizex, oversample_ratio, kernelu, kernelv, kernelw, Ju, Jv,
       Jw, w_term, cellx, celly);
@@ -149,7 +150,8 @@ base_grid_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   PURIFY_MEDIUM_LOG("Kernel Support: {} x {}", Ju, Jv);
   std::function<t_complex(t_real, t_real, t_real)> kernelw
-      = projection_kernels::w_projection_kernel(cellx, celly, imsizex, imsizey, oversample_ratio);
+      = projection_kernels::w_projection_kernel_approx(cellx, celly, imsizex, imsizey,
+                                                       oversample_ratio);
   GTG = purify::operators::init_gridding_degridding_matrix_2d<T>(u, v, w, weights, imsizey, imsizex,
                                                                  oversample_ratio, kernelv, kernelu,
                                                                  kernelw, Ju, Jv, Jw, w_term);
