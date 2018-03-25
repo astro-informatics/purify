@@ -9,7 +9,7 @@
 #include "purify/directories.h"
 #include "purify/kernels.h"
 #include "purify/projection_kernels.h"
-#include "purify/wproj_grid.h"
+#include "purify/utilities.h"
 #include "purify/wproj_utilities.h"
 
 #include "purify/operators.h"
@@ -28,8 +28,8 @@ TEST_CASE("kernel") {
       = purify::create_kernels(kernels::kernel::kb, Ju, Jv, imsize, imsize, oversample_ratio);
   const auto kernelu = std::get<0>(uvkernels);
   const auto kernelv = std::get<1>(uvkernels);
-  const auto kernelw
-      = projection_kernels::w_projection_kernel(cell, cell, imsize, imsize, oversample_ratio);
+  const auto kernelw = projection_kernels::w_projection_kernel_sphere(cell, cell, imsize, imsize,
+                                                                      oversample_ratio);
   const Vector<t_real> u = Vector<t_real>::Random(5);
   const Vector<t_real> v = Vector<t_real>::Random(5);
   const Vector<t_real> w = Vector<t_real>::Random(5) * 100;
@@ -58,8 +58,8 @@ TEST_CASE("w_projection") {
   const Vector<t_complex> weights = Vector<t_complex>::Ones(M);
   SECTION("small angle approximation") {
     const t_int Jw = 10;
-    const auto kernelw
-        = projection_kernels::w_projection_kernel(cell, cell, imsize, imsize, oversample_ratio);
+    const auto kernelw = projection_kernels::w_projection_kernel_approx(cell, cell, imsize, imsize,
+                                                                        oversample_ratio);
     const Sparse<t_complex> G
         = details::init_gridding_matrix_2d(u, v, w, weights, imsize, imsize, oversample_ratio,
                                            kernelu, kernelv, kernelw, Ju, Jv, Jw, true);
@@ -80,6 +80,50 @@ TEST_CASE("w_projection") {
     CAPTURE(G.row(0));
     CAPTURE(G_id.row(0));
     CHECK(G.isApprox(G_id));
+  }
+}
+
+TEST_CASE("uvw units") {
+  const t_uint imsizex = 128;
+  const t_uint imsizey = 128;
+  const t_real oversample_ratio = 2;
+
+  SECTION("1arcsec") {
+
+    const utilities::vis_params uv_lambda(Vector<t_real>::Ones(5), Vector<t_real>::Ones(5),
+                                          Vector<t_real>::Ones(5), Vector<t_complex>::Ones(5),
+                                          Vector<t_complex>::Ones(5));
+    auto const uv_radians = utilities::set_cell_size(uv_lambda, 1., 1.);
+    auto const uv_pixels = utilities::uv_scale(uv_radians, std::floor(oversample_ratio * imsizex),
+                                               std::floor(oversample_ratio * imsizey));
+    CHECK(uv_radians.units == utilities::vis_units::radians);
+    CHECK(uv_lambda.units == utilities::vis_units::lambda);
+    CHECK(uv_pixels.units == utilities::vis_units::pixels);
+    // const t_real scale = 60. * 60. * 180. / std::floor(oversample_ratio * imsizex) /
+    // constant::pi;
+    const t_real scale = projection_kernels::pixel_to_lambda(1., imsizex, oversample_ratio);
+    CAPTURE(1. / scale);
+    CAPTURE(uv_pixels.u.transpose());
+    CHECK(uv_lambda.u.isApprox(uv_pixels.u * scale, 1e-6));
+  }
+  SECTION("arcsec") {
+
+    const t_real cell = 3;
+    const utilities::vis_params uv_lambda(Vector<t_real>::Ones(5), Vector<t_real>::Ones(5),
+                                          Vector<t_real>::Ones(5), Vector<t_complex>::Ones(5),
+                                          Vector<t_complex>::Ones(5));
+    auto const uv_radians = utilities::set_cell_size(uv_lambda, cell, cell);
+    auto const uv_pixels = utilities::uv_scale(uv_radians, std::floor(oversample_ratio * imsizex),
+                                               std::floor(oversample_ratio * imsizey));
+    CHECK(uv_radians.units == utilities::vis_units::radians);
+    CHECK(uv_lambda.units == utilities::vis_units::lambda);
+    CHECK(uv_pixels.units == utilities::vis_units::pixels);
+    // const t_real scale
+    //    = 60. * 60. * 180. / cell / std::floor(oversample_ratio * imsizex) / constant::pi;
+    const t_real scale = projection_kernels::pixel_to_lambda(cell, imsizex, oversample_ratio);
+    CAPTURE(1. / scale);
+    CAPTURE(uv_pixels.u.transpose());
+    CHECK(uv_lambda.u.isApprox(uv_pixels.u * scale, 1e-6));
   }
 }
 
