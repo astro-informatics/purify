@@ -82,7 +82,7 @@ init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
   for(t_int m = 0; m < rows; ++m) {
     // w_projection convolution setup
     const Matrix<t_complex> projection_kernel
-        = projection_kernels::projection(kernelv, kernelu, kernelw, u(m), v(m), w(m), Ju, Jv, Jw);
+        = projection_kernels::projection(kernelu, kernelv, kernelw, u(m), v(m), w(m), Ju, Jv, Jw);
 
     const t_int kwu = std::floor(u(m) - Jwu * 0.5);
     const t_int kwv = std::floor(v(m) - Jwv * 0.5);
