@@ -101,6 +101,29 @@ utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &
   uv_vis.average_frequency = 0;
   return uv_vis;
 }
+utilities::vis_params
+read_visibility(const std::string &vis_name2, const utilities::vis_params &u1) {
+  const bool w_term = not u1.w.isZero(0);
+
+  const auto uv2 = read_visibility(vis_name2, w_term);
+  utilities::vis_params uv;
+  uv.u = Vector<t_real>::Zeros(uv1.size() + uv2.size());
+  uv.v = Vector<t_real>::Zeros(uv1.size() + uv2.size());
+  uv.w = Vector<t_real>::Zeros(uv1.size() + uv2.size());
+  uv.vis = Vector<t_complex>::Zeros(uv1.size() + uv2.size());
+  uv.weights = Vector<t_complex>::Zeros(uv1.size() + uv2.size());
+  uv.u.segment(0, uv1.size()) = uv1.u;
+  uv.v.segment(0, uv1.size()) = uv1.v;
+  uv.w.segment(0, uv1.size()) = uv1.w;
+  uv.vis.segment(0, uv1.size()) = uv1.vis;
+  uv.weights.segment(0, uv1.size()) = uv1.weights;
+  uv.u.segment(uv1.size(), uv2.size()) = uv2.u;
+  uv.v.segment(uv1.size(), uv2.size()) = uv2.v;
+  uv.w.segment(uv1.size(), uv2.size()) = uv2.w;
+  uv.vis.segment(uv1.size(), uv2.size()) = uv2.vis;
+  uv.weights.segment(uv1.size(), uv2.size()) = uv2.weights;
+  return uv;
+}
 utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term) {
   /*
     Reads an csv file with u, v, visibilities and returns the vectors.
