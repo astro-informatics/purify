@@ -68,8 +68,9 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
 #elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
 #endif
-  auto const gamma
-      = (Psi.adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3;
+  auto const gamma = comm.all_reduce<t_real>(
+      (Psi.adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3,
+      MPI_MAX);
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
   PURIFY_MEDIUM_LOG("Gamma {}", gamma);
 
@@ -77,7 +78,7 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
   // not reproduce. E.g. padmm definition is self-referential.
   auto padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(uv_data.vis);
   padmm->itermax(50)
-      .gamma(comm.all_reduce(gamma, MPI_MAX))
+      .gamma(gamma)
       .relative_variation(1e-3)
       .l2ball_proximal_epsilon(epsilon)
 #if PURIFY_PADMM_ALGORITHM == 2
@@ -184,24 +185,24 @@ int main(int nargs, char const **args) {
       world);
 
   Vector<t_real> const dirty_image = (measurements->adjoint() * (data.vis)).real();
-  /*
-    if(world.is_root()) {
-      // then writes stuff to files
-      boost::filesystem::path const path(output_filename(name));
-  #if PURIFY_PADMM_ALGORITHM == 3
-      auto const pb_path = path / kernel_name / "local_epsilon_replicated_grids";
-  #elif PURIFY_PADMM_ALGORITHM == 2
-      auto const pb_path = path / kernel_name / "global_epsilon_replicated_grids";
-  #elif PURIFY_PADMM_ALGORITHM == 1
-      auto const pb_path = path / kernel_name / "local_epsilon_distributed_grids";
-  #else
-  #error Unknown or unimplemented algorithm
-  #endif
-      boost::filesystem::create_directories(pb_path);
 
-      pfitsio::write2d(dirty_image, imsizey, imsizex, (pb_path / "dirty.fits").native());
-    }
-  */
+  if(world.is_root()) {
+    // then writes stuff to files
+    boost::filesystem::path const path(output_filename(name));
+#if PURIFY_PADMM_ALGORITHM == 3
+    auto const pb_path = path / kernel_name / "local_epsilon_replicated_grids";
+#elif PURIFY_PADMM_ALGORITHM == 2
+    auto const pb_path = path / kernel_name / "global_epsilon_replicated_grids";
+#elif PURIFY_PADMM_ALGORITHM == 1
+    auto const pb_path = path / kernel_name / "local_epsilon_distributed_grids";
+#else
+#error Unknown or unimplemented algorithm
+#endif
+    boost::filesystem::create_directories(pb_path);
+
+    pfitsio::write2d(dirty_image, imsizey, imsizex, (pb_path / "dirty.fits").native());
+  }
+
   // Create the padmm solver
   auto const padmm = padmm_factory(measurements, sara, data, world, imsizey, imsizex);
   // calls padmm
@@ -211,25 +212,23 @@ int main(int nargs, char const **args) {
   assert(world.broadcast(diagnostic.x).isApprox(diagnostic.x));
 
   Vector<t_real> const residual_image = (measurements->adjoint() * diagnostic.residual).real();
-  /*
-    if(world.is_root()) {
-      // then writes stuff to files
-      boost::filesystem::path const path(output_filename(name));
-  #if PURIFY_PADMM_ALGORITHM == 3
-      auto const pb_path = path / kernel_name / "local_epsilon_replicated_grids";
-  #elif PURIFY_PADMM_ALGORITHM == 2
-      auto const pb_path = path / kernel_name / "global_epsilon_replicated_grids";
-  #elif PURIFY_PADMM_ALGORITHM == 1
-      auto const pb_path = path / kernel_name / "local_epsilon_distributed_grids";
-  #else
-  #error Unknown or unimplemented algorithm
-  #endif
-      boost::filesystem::create_directories(pb_path);
+  if(world.is_root()) {
+    // then writes stuff to files
+    boost::filesystem::path const path(output_filename(name));
+#if PURIFY_PADMM_ALGORITHM == 3
+    auto const pb_path = path / kernel_name / "local_epsilon_replicated_grids";
+#elif PURIFY_PADMM_ALGORITHM == 2
+    auto const pb_path = path / kernel_name / "global_epsilon_replicated_grids";
+#elif PURIFY_PADMM_ALGORITHM == 1
+    auto const pb_path = path / kernel_name / "local_epsilon_distributed_grids";
+#else
+#error Unknown or unimplemented algorithm
+#endif
+    boost::filesystem::create_directories(pb_path);
 
-      pfitsio::write2d(dirty_image, imsizey, imsizex, (pb_path / "dirty.fits").native());
-      pfitsio::write2d(diagnostic.x.real(), imsizey, imsizex, (pb_path / "solution.fits").native());
-      pfitsio::write2d(residual_image, imsizey, imsizex, (pb_path / "residual.fits").native());
-    }
-  */
+    pfitsio::write2d(dirty_image, imsizey, imsizex, (pb_path / "dirty.fits").native());
+    pfitsio::write2d(diagnostic.x.real(), imsizey, imsizex, (pb_path / "solution.fits").native());
+    pfitsio::write2d(residual_image, imsizey, imsizex, (pb_path / "residual.fits").native());
+  }
   return 0;
 }
