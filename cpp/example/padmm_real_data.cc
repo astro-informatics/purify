@@ -151,16 +151,16 @@ int main(int, char **) {
   sopt::logging::set_level("debug");
   purify::logging::set_level("debug");
   const std::string &name = "real_data";
-  const bool w_term = true;
+  const bool w_term = false;
   const t_real cellsize = 20;
   const t_uint imsizex = 512;
   const t_uint imsizey = 512;
   std::string const inputfile = vla_filename("../mwa/uvdump_01.vis");
 
   auto uv_data = utilities::read_visibility(inputfile, true);
-  uv_data = utilities::sort_by_w(uv_data);
-  t_real const sigma = uv_data.weights.norm() / std::sqrt(uv_data.weights.size());
-  uv_data.vis = uv_data.vis.array() * uv_data.weights.array();
+  t_real const sigma = uv_data.weights.norm() / std::sqrt(uv_data.weights.size()) * 2.4;
+  uv_data.vis = uv_data.vis.array() * uv_data.weights.array()
+                / uv_data.weights.array().cwiseAbs().maxCoeff();
   std::cout << uv_data.u.array().mean() << " " << uv_data.v.array().mean() << " "
             << uv_data.w.array().mean() << std::endl;
   padmm(name, imsizex, imsizey, kernels::kernel::kb, 4, uv_data, sigma,

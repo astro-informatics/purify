@@ -56,12 +56,12 @@ dirty_visibilities(const std::string &name, sopt::mpi::Communicator const &comm)
 
 std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>>
 padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> const &measurements,
-              const sopt::wavelets::SARA &sara, const utilities::vis_params &uv_data,
-              const sopt::mpi::Communicator &comm, const t_uint &imsizex, const t_uint &imsizey) {
+              t_real const sigma, const sopt::wavelets::SARA &sara,
+              const utilities::vis_params &uv_data, const sopt::mpi::Communicator &comm,
+              const t_uint &imsizex, const t_uint &imsizey) {
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, imsizey, imsizex, comm);
 
-  t_real const sigma = 1.;
 #if PURIFY_PADMM_ALGORITHM == 2
   auto const epsilon = std::sqrt(
       comm.all_sum_all(std::pow(utilities::calculate_l2_radius(uv_data.vis, sigma), 2)));
@@ -179,13 +179,16 @@ int main(int nargs, char const **args) {
   const t_uint imsizey = 1024;
 
   // Generating random uv(w) coverage
-  auto const data = dirty_visibilities(filename, world);
+  utilities::vis_params data = dirty_visibilities(filename, world);
+
+  data.vis = (data.vis.array() * data.weights.array())
+             / world.all_reduce(data.weights.array().cwiseAbs().maxCoeff(), MPI_MAX);
+  t_real const sigma = data.weights.norm() / std::sqrt(data.weights.size()) * 2.4;
 #if PURIFY_PADMM_ALGORITHM == 2 || PURIFY_PADMM_ALGORITHM == 3
 #ifndef PURIFY_GPU
   auto const measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       world, data, imsizey, imsizex, cellsize, cellsize, 2, 100, 1e-4, kernel, 4, 4,
       operators::fftw_plan::measure, w_term);
-
 #else
   af::setDevice(0);
   auto const measurements = gpu::measurementoperator::init_degrid_operator_2d(
@@ -232,7 +235,7 @@ int main(int nargs, char const **args) {
   }
 
   // Create the padmm solver
-  auto const padmm = padmm_factory(measurements, sara, data, world, imsizey, imsizex);
+  auto const padmm = padmm_factory(measurements, sigma, sara, data, world, imsizey, imsizex);
   // calls padmm
   auto const diagnostic = (*padmm)();
 
