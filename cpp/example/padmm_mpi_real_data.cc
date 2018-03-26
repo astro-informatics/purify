@@ -128,6 +128,34 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
 #endif
   });
 
+  auto convergence_function = [](const Vector<t_complex> &x) { return true; };
+  const std::shared_ptr<t_uint> iter = std::make_shared<t_uint>(0);
+  const auto algo_update
+      = [uv_data, imsizex, imsizey, padmm_weak, iter, comm](const Vector<t_complex> &x) -> bool {
+    auto padmm = padmm_weak.lock();
+    if(comm.is_root())
+      PURIFY_MEDIUM_LOG("Step size γ {}", padmm->gamma());
+    *iter = *iter + 1;
+    Vector<t_complex> const alpha = padmm->Psi().adjoint() * x;
+    const t_real new_gamma = comm.all_reduce(alpha.cwiseAbs().maxCoeff(), MPI_MAX) * 1e-3;
+    if(comm.is_root())
+      PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
+    padmm->gamma(((std::abs(padmm->gamma() - new_gamma) > 0.2) and *iter < 200) ? new_gamma :
+                                                                                  padmm->gamma());
+    // updating parameter
+
+    Vector<t_complex> const residual = padmm->Phi().adjoint() * (uv_data.vis - padmm->Phi() * x);
+
+    if(comm.is_root()) {
+      pfitsio::write2d(x, imsizey, imsizex, "solution_update.fits");
+      pfitsio::write2d(residual, imsizey, imsizex, "residual_update.fits");
+    }
+    return true;
+  };
+  auto lambda = [convergence_function, algo_update](Vector<t_complex> const &x) {
+    return convergence_function(x) and algo_update(x);
+  };
+  padmm->is_converged(lambda);
   return padmm;
 }
 

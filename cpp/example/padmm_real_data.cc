@@ -55,12 +55,11 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), imsizey, imsizex), dirty_image_fits);
   pfitsio::write2d(Image<t_real>::Map(psf.data(), imsizey, imsizex), psf_image_fits);
-  return;
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
   PURIFY_HIGH_LOG("Using epsilon of {}", epsilon);
 #ifdef PURIFY_CImg
-  auto const canvas
-      = std::make_shared<CDisplay>(cimg::make_display(Vector<t_real>::Zero(1024 * 512), 1024, 512));
+  auto const canvas = std::make_shared<CDisplay>(
+      cimg::make_display(Vector<t_real>::Zero(2 * imsizex * imsizey), 2 * imsizex, imsizey));
   canvas->resize(true);
   auto const show_image = [&, measurements_transform](const Vector<t_complex> &x) -> bool {
     if(!canvas->is_closed()) {
@@ -79,28 +78,54 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
     return true;
   };
 #endif
-  auto const padmm
-      = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
-            .itermax(500)
-            .gamma((measurements_transform->adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
-            .relative_variation(1e-3)
-            .l2ball_proximal_epsilon(epsilon)
-            .tight_frame(false)
-            .l1_proximal_tolerance(1e-2)
-            .l1_proximal_nu(1.)
-            .l1_proximal_itermax(50)
-            .l1_proximal_positivity_constraint(true)
-            .l1_proximal_real_constraint(true)
-            .residual_convergence(epsilon * 1.001)
-            .lagrange_update_scale(0.9)
-#ifdef PURIFY_CImg
-            .is_converged(show_image)
-#endif
-            .nu(1e0)
-            .Psi(Psi)
-            .Phi(*measurements_transform);
+  auto padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(uv_data.vis);
+  padmm->itermax(500)
+      .gamma((measurements_transform->adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
+      .relative_variation(1e-3)
+      .l2ball_proximal_epsilon(epsilon)
+      .tight_frame(false)
+      .l1_proximal_tolerance(1e-2)
+      .l1_proximal_nu(1.)
+      .l1_proximal_itermax(50)
+      .l1_proximal_positivity_constraint(true)
+      .l1_proximal_real_constraint(true)
+      .residual_convergence(epsilon * 1.001)
+      .lagrange_update_scale(0.9)
+      .nu(1e0)
+      .Psi(Psi)
+      .Phi(*measurements_transform);
 
-  auto const diagnostic = padmm();
+  auto convergence_function = [](const Vector<t_complex> &x) { return true; };
+  const std::shared_ptr<t_uint> iter = std::make_shared<t_uint>(0);
+
+  std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
+  const auto algo_update
+      = [uv_data, imsizex, imsizey, padmm_weak, iter](const Vector<t_complex> &x) -> bool {
+    auto padmm = padmm_weak.lock();
+    PURIFY_MEDIUM_LOG("Step size γ {}", padmm->gamma());
+    *iter = *iter + 1;
+    Vector<t_complex> const alpha = padmm->Psi().adjoint() * x;
+    // updating parameter
+    const t_real new_gamma = alpha.cwiseAbs().maxCoeff() * 1e-3;
+    PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
+    padmm->gamma(((std::abs(padmm->gamma() - new_gamma) > 0.2) and *iter < 200) ? new_gamma :
+                                                                                  padmm->gamma());
+
+    Vector<t_complex> const residual = padmm->Phi().adjoint() * (uv_data.vis - padmm->Phi() * x);
+
+    pfitsio::write2d(x, imsizey, imsizex, "solution_update.fits");
+    pfitsio::write2d(residual, imsizey, imsizex, "residual_update.fits");
+    return true;
+  };
+  auto lambda = [=](Vector<t_complex> const &x) {
+    return convergence_function(x)
+#ifdef PURIFY_CImg
+           and show_image(x)
+#endif
+           and algo_update(x);
+  };
+  padmm->is_converged(lambda);
+  auto const diagnostic = (*padmm)();
   Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
   pfitsio::write2d(image.real(), outfile_fits);
   Vector<t_complex> residuals = measurements_transform->adjoint()
