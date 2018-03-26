@@ -9,7 +9,7 @@
 namespace purify {
 namespace pfitsio {
 
-utilities::vis_params read_uvfits(const std::string &filename, const bool flag) {
+utilities::vis_params read_uvfits(const std::string &filename, const bool flag, const stokes pol) {
   utilities::vis_params uv_data;
   fitsfile *fptr;
   t_int status = 0;
@@ -57,33 +57,63 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag) 
   PURIFY_MEDIUM_LOG("Polarisations: {}", pols);
   PURIFY_MEDIUM_LOG("Total data per baseline: {}", total);
   PURIFY_LOW_LOG("Reading Data...");
-  const Matrix<t_real> coords = read_uvfits_coords(fptr, &status, baselines, pcount);
-
-  const Matrix<t_real> data = read_uvfits_data(fptr, &status, naxis, pcount, baselines);
-  const t_uint stride = channels * baselines;
-  uv_data.u = Vector<t_real>::Zero(stride);
-  uv_data.v = Vector<t_real>::Zero(stride);
-  uv_data.w = Vector<t_real>::Zero(stride);
-  uv_data.vis = Vector<t_complex>::Zero(stride);
-  uv_data.weights = Vector<t_complex>::Zero(stride);
-  const Matrix<t_real> I
-      = (data.block(0, 2 * stride, 3, stride) + data.block(0, 3 * stride, 3, stride))
-        / 2; // assuming xy, yx, xx, yy is the order
-  uv_data.vis.real() = I.row(0);
-  uv_data.vis.imag() = I.row(1);
-  uv_data.weights.real() = I.row(2);
-
   const Vector<t_real> frequencies = read_uvfits_freq(fptr, &status, 4);
-  uv_data.average_frequency = frequencies.array().mean();
   if(frequencies.size() != channels)
     throw std::runtime_error("Number of frequencies doesn't match number of channels. "
                              + std::to_string(frequencies.size())
                              + "!=" + std::to_string(channels));
+
+  const Matrix<t_real> coords = read_uvfits_coords(fptr, &status, baselines, pcount);
+
+  //  (real, imag, weight, pol, frequency) is the order
+  const Vector<t_real> data = read_uvfits_data(fptr, &status, naxis, baselines);
+  const t_uint stride = channels * baselines;
+  uv_data.u = Vector<t_real>::Zero(stride);
+  uv_data.v = Vector<t_real>::Zero(stride);
+  uv_data.w = Vector<t_real>::Zero(stride);
+  uv_data.time = Vector<t_real>::Zero(stride);
+  uv_data.baseline = Vector<t_uint>::Zero(stride);
+  uv_data.vis = Vector<t_complex>::Zero(stride);
+  uv_data.weights = Vector<t_complex>::Zero(stride);
+  t_int pol_index;
+  switch(pol) {
+  case stokes::I:
+    pol_index = 0;
+    break;
+  case stokes::Q:
+    pol_index = 1;
+    break;
+  case stokes::U:
+    pol_index = 2;
+    break;
+  case stokes::V:
+    pol_index = 3;
+    break;
+  default:
+    pol_index = 0;
+    throw std::runtime_error("Polarisation not supported for reading uvfits.");
+    break;
+  }
+  if(pol_index >= pols)
+    throw std::runtime_error("Polarisation index out of bounds.");
+  uv_data.average_frequency = frequencies.array().mean();
   for(t_uint i = 0; i < frequencies.size(); i++) {
     uv_data.u.segment(i * baselines, baselines) = coords.row(0) * frequencies(i);
     uv_data.v.segment(i * baselines, baselines) = coords.row(1) * frequencies(i);
     uv_data.w.segment(i * baselines, baselines) = coords.row(2) * frequencies(i);
+    uv_data.baseline.segment(i * baselines, baselines) = coords.row(3).cast<t_uint>();
+    uv_data.time.segment(i * baselines, baselines) = coords.row(4);
   }
+  // reading in data
+  t_uint count = 0;
+  for(t_uint b = 0; b < baselines; b++)
+    for(t_uint c = 0; c < channels; c++) {
+      uv_data.vis(count) = read_vis_from_data(data, pol_index, pols, c, channels, b);
+      uv_data.weights(count) = read_weight_from_data(data, pol_index, pols, c, channels, b);
+      count++;
+    }
+
+  uv_data.frequencies = frequencies;
   uv_data.units = utilities::vis_units::lambda;
   PURIFY_LOW_LOG("All Data Read!");
   fits_close_file(fptr, &status);
@@ -96,7 +126,7 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag) 
 utilities::vis_params filter(const utilities::vis_params &input) {
   t_uint size = 0;
   for(int i = 0; i < input.size(); i++) {
-    if((std::abs(input.weights(i)) > 0)
+    if((std::abs(input.weights(i)) > 0) and (std::abs(input.vis(i)) > 0)
        and (!std::isnan(input.vis(i).real()) and !std::isnan(input.vis(i).imag())))
       size++;
   }
@@ -106,18 +136,23 @@ utilities::vis_params filter(const utilities::vis_params &input) {
                                Vector<t_real>::Zero(size), Vector<t_complex>::Zero(size),
                                Vector<t_complex>::Zero(size), input.units, input.ra, input.dec,
                                input.average_frequency);
+  output.time = Vector<t_real>::Zero(size);
+  output.baseline = Vector<t_uint>::Zero(size);
+  output.frequencies = input.frequencies;
   t_uint count = 0;
-  for(int i = 0; i < input.size(); i++) {
-    if((std::abs(input.weights(i)) > 0)
+  for(t_uint i = 0; i < input.size(); i++)
+    if((std::abs(input.weights(i)) > 0) and (std::abs(input.vis(i)) > 0)
        and (!std::isnan(input.vis(i).real()) and !std::isnan(input.vis(i).imag()))) {
       output.u(count) = input.u(i);
-      output.v(count) = input.w(i);
-      output.w(count) = input.v(i);
-      output.weights(count) = input.weights(i);
+      output.v(count) = input.v(i);
+      output.w(count) = input.w(i);
       output.vis(count) = input.vis(i);
+      output.weights(count) = input.weights(i);
+      output.baseline(count) = input.baseline(i);
+      output.time(count) = input.time(i);
       count++;
     }
-  }
+
   return output;
 }
 Vector<t_real> read_uvfits_freq(fitsfile *fptr, t_int *status, const t_int &col) {
@@ -141,42 +176,61 @@ void read_uvfits_freq(fitsfile *fptr, t_int *status, Vector<t_real> &output, con
   key = "NAXIS" + std::to_string(col);
   fits_read_key(fptr, TINT, key.c_str(), &nfreq, comment.get(), status);
   if(nfreq == 0)
-    throw std::runtime_error("Wrong number of channels read from header.");
+    throw std::runtime_error("Wrong oumber of channels read from header.");
   output = Vector<t_real>::Zero(nfreq);
   for(t_int i = 0; i < output.size(); i++)
     output(i) = (i + 1 - crpix) * dfreq + cfreq;
 }
-Matrix<t_real> read_uvfits_data(fitsfile *fptr, t_int *status, const std::vector<t_int> &naxis,
-                                const t_int &pcount, const t_int &baselines) {
-  Matrix<t_real> output;
-  read_uvfits_data(fptr, status, naxis, pcount, baselines, output);
+Vector<t_real> read_uvfits_data(fitsfile *fptr, t_int *status, const std::vector<t_int> &naxis,
+                                const t_int &baselines) {
+  Vector<t_real> output;
+  read_uvfits_data(fptr, status, naxis, baselines, output);
   return output;
 }
 void read_uvfits_data(fitsfile *fptr, t_int *status, const std::vector<t_int> &naxis,
-                      const t_int &pcount, const t_int &baselines, Matrix<t_real> &output) {
+                      const t_int &baselines, Vector<t_real> &output) {
   long nelements = 1;
   for(int i = 2; i < naxis.size(); i++) {
     nelements *= static_cast<long>(naxis.at(i));
   }
   if(nelements == 0)
     throw std::runtime_error("Zero number of elements.");
-  output = Matrix<t_real>::Zero(naxis.at(1), nelements * baselines);
+  output = Vector<t_real>::Zero(naxis.at(1) * nelements * baselines);
   t_int nulval = 0;
   t_int anynul;
-  fits_read_col(fptr, TDOUBLE, 2, 1, 1, output.size(), &nulval, output.data(), &anynul, status);
+  fits_read_col(fptr, TDOUBLE, 2, 1, 1, static_cast<long>(naxis.at(1) * nelements * baselines),
+                &nulval, output.data(), &anynul, status);
 }
 Matrix<t_real>
 read_uvfits_coords(fitsfile *fptr, t_int *status, const t_int &groups, const t_int &pcount) {
   Matrix<t_real> output;
-  read_uvfits_coords(fptr, status, groups, pcount, output);
+  read_uvfits_coords(fptr, status, pcount, groups, output);
   return output;
+}
+t_real read_value_from_data(const Vector<t_real> &data, const t_uint col, const t_uint pol,
+                            const t_uint pols, const t_uint chan, const t_uint chans,
+                            const t_uint baseline) {
+
+  return data(col + 3 * (pol + pols * (chan + chans * baseline)));
+}
+t_complex read_vis_from_data(const Vector<t_real> &data, const t_uint pol, const t_uint pols,
+                             const t_uint chan, const t_uint chans, const t_uint baseline) {
+  return t_complex(read_value_from_data(data, 0, pol, pols, chan, chans, baseline),
+                   read_value_from_data(data, 1, pol, pols, chan, chans, baseline));
+}
+t_complex read_weight_from_data(const Vector<t_real> &data, const t_uint pol, const t_uint pols,
+                                const t_uint chan, const t_uint chans, const t_uint baseline) {
+  return t_complex(read_value_from_data(data, 2, pol, pols, chan, chans, baseline), 0.);
 }
 void read_uvfits_coords(fitsfile *fptr, t_int *status, const t_int &pcount, const t_int &groups,
                         Matrix<t_real> &output) {
-  output = Matrix<t_real>::Zero(groups, pcount);
+  output = Matrix<t_real>::Zero(pcount, groups);
   t_int nulval = 0;
   t_int anynul;
-  fits_read_col(fptr, TDOUBLE, 1, 1, 1, output.size(), &nulval, output.data(), &anynul, status);
+  // reading in parameters per baseline
+  for(int i = 0; i < groups; i++)
+    fits_read_col(fptr, TDOUBLE, 1, 1 + i, 1, pcount, &nulval, output.col(i).data(), &anynul,
+                  status);
 }
 void read_fits_keys(fitsfile *fptr, t_int *status) {
 
