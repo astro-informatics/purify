@@ -74,7 +74,7 @@ TEST_CASE("GPU Operators") {
   }
   SECTION("Gridding") {
     std::function<t_complex(t_real, t_real, t_real)> kernelw
-        = projection_kernels::w_projection_kernel(1, 1, imsizex, imsizey, oversample_ratio);
+        = projection_kernels::w_projection_kernel_approx(1, 1, imsizex, imsizey, oversample_ratio);
     sopt::OperatorFunction<af::array> direct_gpu_G, indirect_gpu_G;
     std::tie(direct_gpu_G, indirect_gpu_G) = gpu::operators::init_af_gridding_matrix_2d(
         uv_vis.u, uv_vis.v, uv_vis.w, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex,

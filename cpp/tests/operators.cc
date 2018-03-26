@@ -44,7 +44,7 @@ TEST_CASE("Operators") {
   std::tie(kbu, kbv, ftkbu, ftkbv)
       = create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
   std::function<t_complex(t_real, t_real, t_real)> kernelw
-      = projection_kernels::w_projection_kernel(1, 1, imsizex, imsizey, oversample_ratio);
+      = projection_kernels::w_projection_kernel_approx(1, 1, imsizex, imsizey, oversample_ratio);
   SECTION("Gridding") {
     sopt::OperatorFunction<Vector<t_complex>> directG, indirectG;
     std::tie(directG, indirectG) = operators::init_gridding_matrix_2d<Vector<t_complex>>(
