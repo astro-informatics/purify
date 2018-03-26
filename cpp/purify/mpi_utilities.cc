@@ -134,15 +134,9 @@ utilities::vis_params set_cell_size(const sopt::mpi::Communicator &comm,
   if(comm.size() == 1)
     return utilities::set_cell_size(uv_vis, cell_x, cell_y);
 
-  const std::vector<t_real> max_u_vector
-      = comm.broadcast(comm.gather<t_real>(uv_vis.u.array().cwiseAbs().maxCoeff()));
-  const std::vector<t_real> max_v_vector
-      = comm.broadcast(comm.gather<t_real>(uv_vis.v.array().cwiseAbs().maxCoeff()));
-  if((max_u_vector.size() == 0) or (max_v_vector.size() == 0))
-    throw std::runtime_error("Problem with distribution of maximum u and v coordinates.");
-  const auto max_u = std::max_element(max_u_vector.begin(), max_u_vector.end());
-  const auto max_v = std::max_element(max_v_vector.begin(), max_v_vector.end());
-  return utilities::set_cell_size(uv_vis, *max_u, *max_v, cell_x, cell_y);
+  const t_real max_u = comm.all_reduce<t_real>(uv_vis.u.array().cwiseAbs().maxCoeff(), MPI_MAX);
+  const t_real max_v = comm.all_reduce<t_real>(uv_vis.v.array().cwiseAbs().maxCoeff(), MPI_MAX);
+  return utilities::set_cell_size(uv_vis, max_u, max_v, cell_x, cell_y);
 }
 } // namespace utilities
 } // namespace purify
