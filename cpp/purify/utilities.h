@@ -16,6 +16,9 @@ struct vis_params {
   Vector<t_real> u; // u coordinates
   Vector<t_real> v; // v coordinates
   Vector<t_real> w;
+  Vector<t_real> time;
+  Vector<t_uint> baseline;
+  Vector<t_real> frequencies;
   Vector<t_complex> vis;     // complex visiblities
   Vector<t_complex> weights; // weights for visibilities
   vis_units units = vis_units::lambda;
