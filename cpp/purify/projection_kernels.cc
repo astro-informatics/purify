@@ -34,7 +34,6 @@ w_projection_kernel_approx(const t_real &cellx, const t_real &celly, const t_uin
                            const t_uint &imsizey, const t_real &oversample_ratio) {
   const t_real du = pixel_to_lambda(cellx, imsizex, oversample_ratio);
   const t_real dv = pixel_to_lambda(celly, imsizey, oversample_ratio);
-  std::cout << du << std::endl;
   // return gauss_proj(2);
   return [=](const t_real &u, const t_real &v, const t_real &w) -> t_complex {
     if((std::abs(u * du / w) < 1) and (std::abs(v * dv / w) < 1))

@@ -102,16 +102,16 @@ utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &
   return uv_vis;
 }
 utilities::vis_params
-read_visibility(const std::string &vis_name2, const utilities::vis_params &u1) {
-  const bool w_term = not u1.w.isZero(0);
+read_visibility(const std::string &vis_name2, const utilities::vis_params &uv1) {
+  const bool w_term = not uv1.w.isZero(0);
 
   const auto uv2 = read_visibility(vis_name2, w_term);
   utilities::vis_params uv;
-  uv.u = Vector<t_real>::Zeros(uv1.size() + uv2.size());
-  uv.v = Vector<t_real>::Zeros(uv1.size() + uv2.size());
-  uv.w = Vector<t_real>::Zeros(uv1.size() + uv2.size());
-  uv.vis = Vector<t_complex>::Zeros(uv1.size() + uv2.size());
-  uv.weights = Vector<t_complex>::Zeros(uv1.size() + uv2.size());
+  uv.u = Vector<t_real>::Zero(uv1.size() + uv2.size());
+  uv.v = Vector<t_real>::Zero(uv1.size() + uv2.size());
+  uv.w = Vector<t_real>::Zero(uv1.size() + uv2.size());
+  uv.vis = Vector<t_complex>::Zero(uv1.size() + uv2.size());
+  uv.weights = Vector<t_complex>::Zero(uv1.size() + uv2.size());
   uv.u.segment(0, uv1.size()) = uv1.u;
   uv.v.segment(0, uv1.size()) = uv1.v;
   uv.w.segment(0, uv1.size()) = uv1.w;
