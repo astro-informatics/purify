@@ -157,10 +157,10 @@ int main(int, char **) {
   const t_uint imsizex = 1024;
   const t_uint imsizey = 1024;
   const std::vector<std::string> inputfiles
-      = {vla_filename("../mwa/uvdump_01.vis"), vla_filename("../mwa/uvdump_02.vis")};
+      = {vla_filename("../mwa/uvdump_01.vis")}; //, vla_filename("../mwa/uvdump_02.vis")};
 
   auto uv_data = utilities::read_visibility(inputfiles, true);
-  t_real const sigma = uv_data.weights.norm() / std::sqrt(uv_data.weights.size());
+  t_real const sigma = uv_data.weights.norm() / std::sqrt(uv_data.weights.size()) * 0.5;
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array()
                 / uv_data.weights.array().cwiseAbs().maxCoeff();
   std::cout << uv_data.u.array().mean() << " " << uv_data.v.array().mean() << " "

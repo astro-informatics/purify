@@ -167,7 +167,8 @@ int main(int nargs, char const **args) {
 
   const std::string name = "realdata";
   const std::string filename_base = vla_filename("../mwa/uvdump_");
-  const std::vector<std::string> filenames = {filename_base + "01.vis", filename_base + "02.vis"};
+  const std::vector<std::string> filenames
+      = {filename_base + "01.vis"}; //, filename_base + "02.vis"};
   auto const kernel = kernels::kernel::kb;
   std::string kernel_name = "kb";
   const bool w_term = false;
@@ -179,7 +180,8 @@ int main(int nargs, char const **args) {
   // Generating random uv(w) coverage
   utilities::vis_params data = dirty_visibilities(filenames, world);
 
-  t_real const sigma = data.weights.norm() / std::sqrt(world.all_sum_all(data.weights.size()));
+  t_real const sigma
+      = data.weights.norm() / std::sqrt(world.all_sum_all(data.weights.size())) * 0.5;
   data.vis = (data.vis.array() * data.weights.array())
              / world.all_reduce(data.weights.array().cwiseAbs().maxCoeff(), MPI_MAX);
 #if PURIFY_PADMM_ALGORITHM == 2 || PURIFY_PADMM_ALGORITHM == 3
