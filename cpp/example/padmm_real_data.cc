@@ -153,11 +153,12 @@ int main(int, char **) {
   const std::string &name = "real_data";
   const bool w_term = false;
   const t_real cellsize = 20;
-  const t_uint imsizex = 512;
-  const t_uint imsizey = 512;
-  std::string const inputfile = vla_filename("../mwa/uvdump_01.vis");
+  const t_uint imsizex = 1024;
+  const t_uint imsizey = 1024;
+  const std::vector<std::string> inputfiles
+      = {vla_filename("../mwa/uvdump_01.vis"), vla_filename("../mwa/uvdump_02.vis")};
 
-  auto uv_data = utilities::read_visibility(inputfile, true);
+  auto uv_data = utilities::read_visibility(inputfiles, true);
   t_real const sigma = uv_data.weights.norm() / std::sqrt(uv_data.weights.size()) * 2.4;
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array()
                 / uv_data.weights.array().cwiseAbs().maxCoeff();

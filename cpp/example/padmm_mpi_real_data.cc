@@ -32,21 +32,20 @@
 using namespace purify;
 using namespace purify::notinstalled;
 
-utilities::vis_params dirty_visibilities(const std::string &name) {
+utilities::vis_params dirty_visibilities(const std::vector<std::string> &names) {
   // return purify::casa::read_measurementset(
   //    name + ".ms", purify::casa::MeasurementSet::ChannelWrapper::polarization::I);
-  auto uv_data = utilities::read_visibility(name + ".vis", true);
+  return utilities::read_visibility(names, true);
   // uv_data.units = utilities::vis_units::radians;
-  return uv_data;
   // return pfitsio::read_uvfits(name + ".uvfits");
 }
 
 utilities::vis_params
-dirty_visibilities(const std::string &name, sopt::mpi::Communicator const &comm) {
+dirty_visibilities(const std::vector<std::string> &names, sopt::mpi::Communicator const &comm) {
   if(comm.size() == 1)
-    return dirty_visibilities(name);
+    return dirty_visibilities(names);
   if(comm.is_root()) {
-    auto result = dirty_visibilities(name);
+    auto result = dirty_visibilities(names);
     auto const order = distribute::distribute_measurements(result, comm, distribute::plan::w_term);
     return utilities::regroup_and_scatter(result, order, comm);
   }
@@ -168,8 +167,8 @@ int main(int nargs, char const **args) {
   auto const world = sopt::mpi::Communicator::World();
 
   const std::string name = "realdata";
-  const std::string filename = vla_filename("../mwa/uvdump_01");
-
+  const std::string filename_base = vla_filename("../mwa/uvdump_");
+  const std::vector<std::string> filenames = {filename_base + "01.vis", filename_base + "02.vis"};
   auto const kernel = kernels::kernel::kb;
   std::string kernel_name = "kb";
   const bool w_term = false;
@@ -179,7 +178,7 @@ int main(int nargs, char const **args) {
   const t_uint imsizey = 1024;
 
   // Generating random uv(w) coverage
-  utilities::vis_params data = dirty_visibilities(filename, world);
+  utilities::vis_params data = dirty_visibilities(filenames, world);
 
   data.vis = (data.vis.array() * data.weights.array())
              / world.all_reduce(data.weights.array().cwiseAbs().maxCoeff(), MPI_MAX);

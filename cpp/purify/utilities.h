@@ -59,14 +59,12 @@ utilities::vis_params antenna_to_coverage(const t_uint N);
 utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B);
 //! Reads in visibility file
 utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term = false);
+//! Read visibility files from name of vector
+utilities::vis_params
+read_visibility(const std::vector<std::string> &names, const bool w_term = false);
 //! Reads in two visibility files
 utilities::vis_params
 read_visibility(const std::string &vis_name2, const utilities::vis_params &u1);
-//! Read in multiple visiblity files
-template <class... ARGS>
-utilities::vis_params read_visibility(const std::string &vis_name2, ARGS &&... args) {
-  return read_visibility(vis_name2, true, read_visibility(std::forward<ARGS>(args)...));
-}
 //! Writes visibilities to txt
 void write_visibility(const utilities::vis_params &uv_vis, const std::string &file_name,
                       const bool w_term = false);

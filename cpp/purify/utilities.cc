@@ -101,6 +101,15 @@ utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &
   uv_vis.average_frequency = 0;
   return uv_vis;
 }
+
+utilities::vis_params read_visibility(const std::vector<std::string> &names, const bool w_term) {
+  utilities::vis_params output = read_visibility(names.at(0), w_term);
+  if(names.size() == 1)
+    return output;
+  for(int i = 1; i < names.size(); i++)
+    output = read_visibility(names.at(i), output);
+  return output;
+}
 utilities::vis_params
 read_visibility(const std::string &vis_name2, const utilities::vis_params &uv1) {
   const bool w_term = not uv1.w.isZero(0);
