@@ -118,7 +118,7 @@ Image<t_complex> init_correction2d(const t_real &oversample_ratio, const t_uint 
           * (1e0 / range.segment(x_start, imsizex_).unaryExpr(ftkernelu)).matrix().transpose())
              .array()
          * t_complex(1., 0.)
-         * wproj_utilities::generate_chirp(primary_beam, w_mean, cellx, celly, imsizex_, imsizey_)
+         * wproj_utilities::generate_chirp(primary_beam, 0., cellx, celly, imsizex_, imsizey_)
                .array()
                .conjugate()
          * imsizex_ * imsizey_;
