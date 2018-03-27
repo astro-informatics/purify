@@ -145,8 +145,8 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
     Vector<t_complex> const residual = padmm->Phi().adjoint() * (uv_data.vis - padmm->Phi() * x);
 
     if(comm.is_root()) {
-      pfitsio::write2d(x, imsizey, imsizex, "solution_update.fits");
-      pfitsio::write2d(residual, imsizey, imsizex, "residual_update.fits");
+      pfitsio::write2d(x, imsizey, imsizex, "mpi_solution_update.fits");
+      pfitsio::write2d(residual, imsizey, imsizex, "mpi_residual_update.fits");
     }
     return true;
   };
