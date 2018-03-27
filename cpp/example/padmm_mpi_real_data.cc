@@ -62,14 +62,13 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
   auto const Psi = sopt::linear_transform<t_complex>(sara, imsizey, imsizex, comm);
 
 #if PURIFY_PADMM_ALGORITHM == 2
-  auto const epsilon = std::sqrt(
-      comm.all_sum_all(std::pow(utilities::calculate_l2_radius(uv_data.vis, sigma), 2)));
+  auto const epsilon = 3 * std::sqrt(comm.all_sum_all(std::pow(sigma, 2)))
+                       * std::sqrt(2 * comm.all_sum_all(uv_data.size()));
 #elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
-  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
+  auto const epsilon = 3 * std::sqrt(2 * uv_data.size()) * sigma;
 #endif
   auto const gamma = comm.all_reduce<t_real>(
-      (Psi.adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3,
-      MPI_MAX);
+      ((measurements->adjoint() * uv_data.vis)).real().maxCoeff() * 1e-3, MPI_MAX);
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
   PURIFY_MEDIUM_LOG("Gamma {}", gamma);
 
@@ -136,7 +135,7 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
       PURIFY_MEDIUM_LOG("Step size γ {}", padmm->gamma());
     *iter = *iter + 1;
     Vector<t_complex> const alpha = padmm->Psi().adjoint() * x;
-    const t_real new_gamma = comm.all_reduce(alpha.cwiseAbs().maxCoeff(), MPI_MAX) * 1e-3;
+    const t_real new_gamma = comm.all_reduce(alpha.real().cwiseAbs().maxCoeff(), MPI_MAX) * 1e-3;
     if(comm.is_root())
       PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
     padmm->gamma(((std::abs(padmm->gamma() - new_gamma) > 0.2) and *iter < 200) ? new_gamma :
@@ -180,9 +179,9 @@ int main(int nargs, char const **args) {
   // Generating random uv(w) coverage
   utilities::vis_params data = dirty_visibilities(filenames, world);
 
+  t_real const sigma = data.weights.norm() / std::sqrt(world.all_sum_all(data.weights.size()));
   data.vis = (data.vis.array() * data.weights.array())
              / world.all_reduce(data.weights.array().cwiseAbs().maxCoeff(), MPI_MAX);
-  t_real const sigma = data.weights.norm() / std::sqrt(data.weights.size()) * 2.4;
 #if PURIFY_PADMM_ALGORITHM == 2 || PURIFY_PADMM_ALGORITHM == 3
 #ifndef PURIFY_GPU
   auto const measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(

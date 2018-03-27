@@ -36,7 +36,7 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform
       = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 100,
-          0.0001, kernel, J, J, operators::fftw_plan::measure, std::get<0>(w_term), 12);
+          1e-4, kernel, J, J, operators::fftw_plan::measure, std::get<0>(w_term), 12);
   t_uint const M = uv_data.size();
   t_uint const N = imsizex * imsizey;
   sopt::wavelets::SARA const sara{
@@ -55,7 +55,8 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), imsizey, imsizex), dirty_image_fits);
   pfitsio::write2d(Image<t_real>::Map(psf.data(), imsizey, imsizex), psf_image_fits);
-  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
+  auto const epsilon = 3 * std::sqrt(2 * uv_data.size()) * sigma;
+  auto const gamma = (measurements_transform->adjoint() * uv_data.vis).real().maxCoeff() * 1e-3;
   PURIFY_HIGH_LOG("Using epsilon of {}", epsilon);
 #ifdef PURIFY_CImg
   auto const canvas = std::make_shared<CDisplay>(
@@ -80,7 +81,7 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
 #endif
   auto padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(uv_data.vis);
   padmm->itermax(500)
-      .gamma((measurements_transform->adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
+      .gamma(gamma)
       .relative_variation(1e-3)
       .l2ball_proximal_epsilon(epsilon)
       .tight_frame(false)
@@ -89,7 +90,7 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
       .l1_proximal_itermax(50)
       .l1_proximal_positivity_constraint(true)
       .l1_proximal_real_constraint(true)
-      .residual_convergence(epsilon * 1.001)
+      .residual_convergence(epsilon)
       .lagrange_update_scale(0.9)
       .nu(1e0)
       .Psi(Psi)
@@ -106,7 +107,7 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
     *iter = *iter + 1;
     Vector<t_complex> const alpha = padmm->Psi().adjoint() * x;
     // updating parameter
-    const t_real new_gamma = alpha.cwiseAbs().maxCoeff() * 1e-3;
+    const t_real new_gamma = alpha.real().cwiseAbs().maxCoeff() * 1e-3;
     PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
     padmm->gamma(((std::abs(padmm->gamma() - new_gamma) > 0.2) and *iter < 200) ? new_gamma :
                                                                                   padmm->gamma());
@@ -159,7 +160,7 @@ int main(int, char **) {
       = {vla_filename("../mwa/uvdump_01.vis"), vla_filename("../mwa/uvdump_02.vis")};
 
   auto uv_data = utilities::read_visibility(inputfiles, true);
-  t_real const sigma = uv_data.weights.norm() / std::sqrt(uv_data.weights.size()) * 2.4;
+  t_real const sigma = uv_data.weights.norm() / std::sqrt(uv_data.weights.size());
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array()
                 / uv_data.weights.array().cwiseAbs().maxCoeff();
   std::cout << uv_data.u.array().mean() << " " << uv_data.v.array().mean() << " "
