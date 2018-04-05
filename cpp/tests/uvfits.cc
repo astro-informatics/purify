@@ -16,7 +16,7 @@ TEST_CASE("readfile") {
   const auto vis = utilities::read_visibility(filename + ".vis", true);
   REQUIRE(299792458. == constant::c);
   REQUIRE(199675000.0 == uvfits.frequencies(0));
-  CHECK(uvfits.size() == vis.size());
+  REQUIRE(uvfits.size() == vis.size());
   for(int i = 0; i < uvfits.size(); i++) {
     CAPTURE(i);
     CAPTURE(vis.u(i));

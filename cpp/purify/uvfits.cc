@@ -159,7 +159,6 @@ filter_and_combine(const utilities::vis_params &input, const utilities::vis_para
       output.v(count) = input.v(i);
       output.w(count) = input.w(i);
       output.vis(count) = input.vis(i) * stokes_transform(0) + input2.vis(i) * stokes_transform(1);
-      std::cout << output.vis(count) << std::endl;
       output.weights(count)
           = 1.
             / std::sqrt(1. / input.weights(i) / input.weights(i) * stokes_transform(0)
