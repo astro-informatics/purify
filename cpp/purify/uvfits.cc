@@ -9,6 +9,43 @@
 namespace purify {
 namespace pfitsio {
 
+utilities::vis_params
+read_uvfits(const std::vector<std::string> &names, const bool flag, const stokes pol) {
+  utilities::vis_params output = read_uvfits(names.at(0), flag, pol);
+  if(names.size() == 1)
+    return output;
+  for(int i = 1; i < names.size(); i++)
+    output = read_uvfits(names.at(i), output);
+  return output;
+}
+utilities::vis_params read_uvfits(const std::string &vis_name2, const utilities::vis_params &uv1,
+                                  const bool flag, const stokes pol) {
+  utilities::vis_params uv;
+  const bool w_term = not uv1.w.isZero(0);
+  const auto uv2 = read_uvfits(vis_name2, flag, pol);
+  if(std::abs(uv1.ra - uv2.ra) > 1e-6)
+    throw std::runtime_error(vis_name2 + ": wrong RA in pointing.");
+  if(std::abs(uv1.dec - uv2.dec) > 1e-6)
+    throw std::runtime_error(vis_name2 + ": wrong DEC in pointing.");
+  uv.ra = uv1.ra;
+  uv.dec = uv1.dec;
+  uv.u = Vector<t_real>::Zero(uv1.size() + uv2.size());
+  uv.v = Vector<t_real>::Zero(uv1.size() + uv2.size());
+  uv.w = Vector<t_real>::Zero(uv1.size() + uv2.size());
+  uv.vis = Vector<t_complex>::Zero(uv1.size() + uv2.size());
+  uv.weights = Vector<t_complex>::Zero(uv1.size() + uv2.size());
+  uv.u.segment(0, uv1.size()) = uv1.u;
+  uv.v.segment(0, uv1.size()) = uv1.v;
+  uv.w.segment(0, uv1.size()) = uv1.w;
+  uv.vis.segment(0, uv1.size()) = uv1.vis;
+  uv.weights.segment(0, uv1.size()) = uv1.weights;
+  uv.u.segment(uv1.size(), uv2.size()) = uv2.u;
+  uv.v.segment(uv1.size(), uv2.size()) = uv2.v;
+  uv.w.segment(uv1.size(), uv2.size()) = uv2.w;
+  uv.vis.segment(uv1.size(), uv2.size()) = uv2.vis;
+  uv.weights.segment(uv1.size(), uv2.size()) = uv2.weights;
+  return uv;
+}
 utilities::vis_params read_uvfits(const std::string &filename, const bool flag, const stokes pol) {
   utilities::vis_params uv_data;
   fitsfile *fptr;
@@ -52,6 +89,8 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
   }
   const t_uint channels = naxis.at(3);
   const t_uint pols = naxis.at(2);
+  const t_uint snapshots = naxis.at(4);
+  PURIFY_MEDIUM_LOG("Snapshots: {}", snapshots);
   PURIFY_MEDIUM_LOG("Baselines: {}", baselines);
   PURIFY_MEDIUM_LOG("Channels: {}", channels);
   PURIFY_MEDIUM_LOG("Polarisations: {}", pols);
@@ -248,7 +287,7 @@ void read_uvfits_data(fitsfile *fptr, t_int *status, const std::vector<t_int> &n
   if(nelements == 0)
     throw std::runtime_error("Zero number of elements.");
   output = Vector<t_real>::Zero(naxis.at(1) * nelements * baselines);
-  t_int nulval = NAN;
+  t_int nulval = static_cast<t_int>(NAN);
   t_int anynul;
   fits_read_col(fptr, TDOUBLE, 2, 1, 1, static_cast<long>(naxis.at(1) * nelements * baselines),
                 &nulval, output.data(), &anynul, status);
@@ -279,7 +318,7 @@ t_complex read_weight_from_data(const Vector<t_real> &data, const t_uint pol, co
 void read_uvfits_coords(fitsfile *fptr, t_int *status, const t_int &pcount, const t_int &groups,
                         Matrix<t_real> &output) {
   output = Matrix<t_real>::Zero(pcount, groups);
-  t_int nulval = NAN;
+  t_int nulval = static_cast<t_int>(NAN);
   t_int anynul;
   // reading in parameters per baseline
   for(int i = 0; i < groups; i++)

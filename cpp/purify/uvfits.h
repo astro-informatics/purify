@@ -17,6 +17,12 @@ enum class stokes { I, Q, U, V, XX, YY, XY, YX };
 //! Read uvfits file
 utilities::vis_params
 read_uvfits(const std::string &filename, const bool flag = true, const stokes pol = stokes::I);
+//! Read uvfits files from name of vector
+utilities::vis_params read_uvfits(const std::vector<std::string> &names, const bool flag = true,
+                                  const stokes pol = stokes::I);
+//! Reads in combine visiblities from uvfits files
+utilities::vis_params read_uvfits(const std::string &vis_name2, const utilities::vis_params &u1,
+                                  const bool flag = true, const stokes pol = stokes::I);
 //! Remove visibilities with zero weighting
 utilities::vis_params
 filter_and_combine(const utilities::vis_params &input, const utilities::vis_params &input2,
