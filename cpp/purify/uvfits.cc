@@ -85,16 +85,23 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
     std::string key = "NAXIS" + std::to_string(i + 1);
     fits_read_key(fptr, TINT, key.c_str(), &n, comment.get(), &status);
     naxis[i] = n;
+    PURIFY_LOW_LOG("NAXIS {} Size: {}", i, n);
     total *= n;
   }
   const t_uint channels = naxis.at(3);
   const t_uint pols = naxis.at(2);
-  const t_uint snapshots = naxis.at(4);
-  PURIFY_MEDIUM_LOG("Snapshots: {}", snapshots);
+  const t_uint ifs = naxis.at(4);
+  const t_uint pointings_num = naxis.at(5);
+  PURIFY_MEDIUM_LOG("Pointings: {}", pointings_num);
+  PURIFY_MEDIUM_LOG("IFs: {}", ifs);
   PURIFY_MEDIUM_LOG("Baselines: {}", baselines);
   PURIFY_MEDIUM_LOG("Channels: {}", channels);
   PURIFY_MEDIUM_LOG("Polarisations: {}", pols);
   PURIFY_MEDIUM_LOG("Total data per baseline: {}", total);
+  if(pointings_num > 1)
+    throw std::runtime_error("More than one pointing is not supported.");
+  if(ifs > 1)
+    throw std::runtime_error("More than one IF is not supported.");
   PURIFY_LOW_LOG("Reading Data...");
 
   const Matrix<t_real> coords = read_uvfits_coords(fptr, &status, baselines, pcount);
@@ -146,7 +153,7 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
       = read_polarisation(data, coords, frequencies, pol_index1, pols, baselines, channels);
   auto const uv_data2
       = read_polarisation(data, coords, frequencies, pol_index2, pols, baselines, channels);
-  PURIFY_LOW_LOG("All Data Read!");
+  PURIFY_MEDIUM_LOG("All Data Read!");
   fits_close_file(fptr, &status);
   if(status) { /* print any error messages */
     fits_report_error(stderr, status);
@@ -198,10 +205,9 @@ filter_and_combine(const utilities::vis_params &input, const utilities::vis_para
       output.v(count) = input.v(i);
       output.w(count) = input.w(i);
       output.vis(count) = input.vis(i) * stokes_transform(0) + input2.vis(i) * stokes_transform(1);
-      output.weights(count)
-          = 1.
-            / std::sqrt(1. / input.weights(i) / input.weights(i) * stokes_transform(0)
-                        + 1. / input2.weights(i) / input2.weights(i) * stokes_transform(1));
+      output.weights(count) = 1.
+                              / std::sqrt(1. / input.weights(i) * stokes_transform(0)
+                                          + 1. / input2.weights(i) * stokes_transform(1));
       output.baseline(count) = input.baseline(i);
       output.time(count) = input.time(i);
       count++;
@@ -288,9 +294,9 @@ void read_uvfits_data(fitsfile *fptr, t_int *status, const std::vector<t_int> &n
     throw std::runtime_error("Zero number of elements.");
   output = Vector<t_real>::Zero(naxis.at(1) * nelements * baselines);
   t_int nulval = static_cast<t_int>(NAN);
-  t_int anynul;
-  fits_read_col(fptr, TDOUBLE, 2, 1, 1, static_cast<long>(naxis.at(1) * nelements * baselines),
-                &nulval, output.data(), &anynul, status);
+  t_int anynul = 0;
+  fits_read_col(fptr, TDOUBLE, 2, 1, 1, static_cast<long>(output.size()), &nulval, output.data(),
+                &anynul, status);
 }
 Matrix<t_real>
 read_uvfits_coords(fitsfile *fptr, t_int *status, const t_int &groups, const t_int &pcount) {

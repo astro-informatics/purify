@@ -32,7 +32,7 @@ filter_and_combine(const utilities::vis_params &input, const utilities::vis_para
                    = [](const t_real, const t_real, const t_real, const t_complex vis1,
                         const t_complex weight1, const t_real, const t_real, const t_real,
                         const t_complex vis2, const t_complex weight2) {
-                       return (std::abs(weight1) > 0) and (std::abs(weight2) > 0)
+                       return (weight1.real() > 0.) and (weight2.real() > 0.)
                               and (std::abs(vis1) > 1e-20) and (std::abs(vis2) > 1e-20)
                               and (!std::isnan(vis1.real()) and !std::isnan(vis1.imag()))
                               and (!std::isnan(vis2.real()) and !std::isnan(vis2.imag()));
