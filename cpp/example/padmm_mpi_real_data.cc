@@ -10,7 +10,6 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include "purify/casacore.h"
 #include "purify/directories.h"
 #include "purify/distribute.h"
 #include "purify/logging.h"
@@ -33,11 +32,7 @@ using namespace purify;
 using namespace purify::notinstalled;
 
 utilities::vis_params dirty_visibilities(const std::vector<std::string> &names) {
-  // return purify::casa::read_measurementset(
-  //    name + ".ms", purify::casa::MeasurementSet::ChannelWrapper::polarization::I);
   return utilities::read_visibility(names, true);
-  // uv_data.units = utilities::vis_units::radians;
-  // return pfitsio::read_uvfits(name + ".uvfits");
 }
 
 utilities::vis_params
