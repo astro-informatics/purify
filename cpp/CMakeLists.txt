@@ -20,7 +20,6 @@ add_include_dir(
   ${Boost_INCLUDE_DIR}
   ${EIGEN3_INCLUDE_DIR}
   ${CFitsIO_INCLUDE_DIR}
-  ${CCFits_INCLUDE_DIR}/..
   ${CImg_INCLUDE_DIR}
   )
 

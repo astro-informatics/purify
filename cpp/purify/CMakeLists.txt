@@ -61,10 +61,9 @@ add_include_dir(
   ${EIGEN3_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
   ${CFitsIO_INCLUDE_DIR}
-  ${CCFits_INCLUDE_DIR}/..
   )
 target_link_libraries(libpurify
-  ${FFTW3_DOUBLE_LIBRARY} ${CCFits_LIBRARY} ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY} ${X11_X11_LIB})
+  ${FFTW3_DOUBLE_LIBRARY}  ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY} ${X11_X11_LIB})
 if(TARGET casacore::casa)
   target_link_libraries(libpurify casacore::ms)
 endif()

@@ -88,7 +88,6 @@ else()
 endif()
 
 lookup_package(CFitsIO REQUIRED 3.41 EXACT ARGUMENTS CHECKCASA URL "ftp://heasarc.gsfc.nasa.gov/software/fitsio/c/cfitsio3410.tar.gz")
-lookup_package(CCFits REQUIRED)
 if(docimg)
   set(PURIFY_CImg TRUE)
   find_package(X11)
