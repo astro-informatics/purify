@@ -1,8 +1,36 @@
-#include "purify/pfitsio.h"
 #include "purify/config.h"
 #include "purify/logging.h"
+
+#include "purify/pfitsio.h"
 namespace purify {
 namespace pfitsio {
+void write_key(fitsfile *fptr, const std::string &key, const std::string &value,
+               const std::string &comment, int *status) {
+  std::string entry = value;
+  if(fits_write_key(fptr, TSTRING, const_cast<char *>(key.c_str()),
+                    reinterpret_cast<void *>(const_cast<char *>(entry.c_str())),
+                    const_cast<char *>(comment.c_str()), status))
+    throw std::runtime_error("Problem writing key in fits file: " + key);
+}
+void write_key(fitsfile *fptr, const std::string &key, const char *value,
+               const std::string &comment, int *status) {
+  write_key(fptr, key, std::string(value), comment, status);
+}
+void write_history(fitsfile *fptr, const std::string &context, const std::string &history,
+                   int *status) {
+  const std::string entry = context + ": " + history;
+  if(fits_write_history(fptr, const_cast<char *>(entry.c_str()), status))
+    throw std::runtime_error("Problem writing comments in fits file");
+}
+std::string read_key(fitsfile *fptr, const std::string &key, int *status) {
+
+  std::string value = "";
+  std::string comment = "";
+  if(fits_read_key(fptr, TSTRING, const_cast<char *>(key.c_str()),
+                   const_cast<char *>(value.c_str()), const_cast<char *>(comment.c_str()), status))
+    throw std::runtime_error("Error reading value from key " + key);
+  return value;
+}
 //! Write image to fits file
 void write2d_header(const Image<t_real> &eigen_image, const pfitsio::header_params &header,
                     const bool &overwrite) {
