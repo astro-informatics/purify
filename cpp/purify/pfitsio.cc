@@ -183,15 +183,14 @@ std::vector<Image<t_complex>> read3d(const std::string &fits_name) {
   if(fits_open_image(&fptr, fits_name.c_str(), READONLY, &status))
     throw std::runtime_error("Error opening image " + fits_name);
   const t_int naxis = read_key<int>(fptr, "NAXIS", &status);
+  if(naxis > 1)
+    throw std::runtime_error("Image contains zero axes.");
   const t_int rows = read_key<int>(fptr, "NAXIS1", &status);
-  const t_int cols = read_key<int>(fptr, "NAXIS2", &status);
-  const t_int channels = read_key<int>(fptr, "NAXIS3", &status);
+  const t_int cols = (naxis > 1) ? read_key<int>(fptr, "NAXIS2", &status) : 1;
+  const t_int channels = (naxis > 2) ? read_key<int>(fptr, "NAXIS3", &status) : 1;
+  const t_int pols = (naxis > 3) ? read_key<int>(fptr, "NAXIS4", &status) : 1;
   PURIFY_LOW_LOG("Axes {}", naxis);
   std::vector<long> fpixel(naxis, 1);
-  t_int pols = 1;
-  if(naxis > 3) {
-    pols = read_key<int>(fptr, "NAXIS4", &status);
-  }
   PURIFY_LOW_LOG("Dimensions {}x{}x{}x{}", rows, cols, channels, pols);
   if(pols > 1)
     throw std::runtime_error("Too many polarisations when reading " + fits_name);
