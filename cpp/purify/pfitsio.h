@@ -3,8 +3,8 @@
 #include "purify/config.h"
 #include "purify/types.h"
 
+#include <fitsio.h>
 #include <string>
-#include <CCfits/CCfits>
 #include "purify/utilities.h"
 
 namespace purify {
