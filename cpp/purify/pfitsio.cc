@@ -250,27 +250,47 @@ void write3d(const std::vector<Image<t_real>> &eigen_images, const std::string &
   pFits->pHDU().addKey("NAXIS3", eigen_images.size(), "");
   pFits->pHDU().write(fpixel, naxes[0] * naxes[1] * eigen_images.size(), image);
 }
+
 std::vector<Image<t_complex>> read3d(const std::string &fits_name) {
   /*
      Reads in a cube from a fits file and returns the vector of images.
      fits_name:: name of fits file
      */
 
-  std::auto_ptr<CCfits::FITS> pInfile(new CCfits::FITS(fits_name, CCfits::Read, true));
-  std::valarray<t_real> contents;
-  CCfits::PHDU &image = pInfile->pHDU();
-  image.read(contents);
-  t_int ax1(image.axis(0));
-  t_int ax2(image.axis(1));
-  t_int channels_total;
-  image.readKey("NAXIS3", channels_total);
-  std::vector<Image<t_complex>> eigen_images;
-  for(int i = 0; i < channels_total; i++) {
-    Image<t_complex> eigen_image(ax1, ax2);
-    std::copy(&contents[ax1 * ax2 * i], &contents[ax1 * ax2 * i] + eigen_image.size(),
-              eigen_image.data());
-    eigen_images.push_back(eigen_image);
+  fitsfile *fptr;
+  int status = 0;
+  PURIFY_LOW_LOG("Reading fits file {}", fits_name);
+  if(fits_open_image(&fptr, fits_name.c_str(), READONLY, &status))
+    throw std::runtime_error("Error opening image " + fits_name);
+  const t_int naxis = read_key<int>(fptr, "NAXIS", &status);
+  const t_int rows = read_key<int>(fptr, "NAXIS1", &status);
+  const t_int cols = read_key<int>(fptr, "NAXIS2", &status);
+  const t_int channels = read_key<int>(fptr, "NAXIS3", &status);
+  PURIFY_LOW_LOG("Axes {}", naxis);
+  std::vector<long> fpixel(naxis, 1);
+  t_int pols = 1;
+  if(naxis > 3) {
+    pols = read_key<int>(fptr, "NAXIS4", &status);
   }
+  PURIFY_LOW_LOG("Dimensions {}x{}x{}x{}", rows, cols, channels, pols);
+  if(pols > 1)
+    throw std::runtime_error("Too many polarisations when reading " + fits_name);
+  std::vector<Image<t_complex>> eigen_images;
+  t_real nulval = 0;
+  t_int anynul = 0;
+  Vector<t_real> image = Vector<t_real>::Zero(rows * cols * channels * pols);
+  if(fits_read_pix(fptr, TDOUBLE, fpixel.data(), static_cast<long>(image.size()), &nulval,
+                   image.data(), &anynul, &status))
+    throw std::runtime_error("Error reading data from image " + fits_name);
+  if(anynul)
+    PURIFY_LOW_LOG("There are bad values when reading " + fits_name);
+  for(int i = 0; i < channels; i++) {
+    Vector<t_complex> eigen_image = Vector<t_complex>::Zero(rows * cols);
+    eigen_image.real() = image.segment(i * rows * cols, rows * cols);
+    eigen_images.push_back(Image<t_complex>::Map(eigen_image.data(), rows, cols));
+  }
+  if(fits_close_file(fptr, &status))
+    throw std::runtime_error("Problem closing fits file: " + fits_name);
   return eigen_images;
 }
 } // namespace pfitsio
