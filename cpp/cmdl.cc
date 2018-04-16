@@ -147,7 +147,8 @@ Params parse_cmdl(int argc, char **argv) {
       break;
 
     case 'r':
-      params.kernel = optarg;
+      if(optarg == "kb")
+        params.kernel = kernels::kernel::kb;
       break;
 
     case 's':

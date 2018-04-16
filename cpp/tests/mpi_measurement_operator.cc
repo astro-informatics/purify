@@ -14,7 +14,6 @@
 #endif
 using namespace purify;
 
-
 TEST_CASE("Serial vs Distributed Operator") {
   auto const world = sopt::mpi::Communicator::World();
 
@@ -23,7 +22,7 @@ TEST_CASE("Serial vs Distributed Operator") {
   uv_serial.u = world.broadcast(uv_serial.u);
   uv_serial.v = world.broadcast(uv_serial.v);
   uv_serial.w = world.broadcast(uv_serial.w);
-  uv_serial.units = "radians";
+  uv_serial.units = utilities::vis_units::radians;
   uv_serial.vis = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
   uv_serial.weights
       = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
@@ -31,14 +30,14 @@ TEST_CASE("Serial vs Distributed Operator") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
 
   auto const over_sample = 2;
   auto const J = 4;
-  auto const kernel = "kb";
+  auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
   const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
@@ -60,7 +59,7 @@ TEST_CASE("Serial vs Distributed Operator") {
     if(world.is_root()) {
       uv_degrid.vis = *op_serial * image;
       auto const order
-          = distribute::distribute_measurements(uv_degrid, world, "distance_distribution");
+          = distribute::distribute_measurements(uv_degrid, world, distribute::plan::radial);
       uv_degrid = utilities::regroup_and_scatter(uv_degrid, order, world);
     } else
       uv_degrid = utilities::scatter_visibilities(world);
@@ -83,7 +82,7 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator") {
   uv_serial.u = world.broadcast(uv_serial.u);
   uv_serial.v = world.broadcast(uv_serial.v);
   uv_serial.w = world.broadcast(uv_serial.w);
-  uv_serial.units = "radians";
+  uv_serial.units = utilities::vis_units::radians;
   uv_serial.vis = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
   uv_serial.weights
       = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
@@ -91,14 +90,14 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
 
   auto const over_sample = 2;
   auto const J = 4;
-  auto const kernel = "kb";
+  auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
   const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
@@ -120,7 +119,7 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator") {
     if(world.is_root()) {
       uv_degrid.vis = *op_serial * image;
       auto const order
-          = distribute::distribute_measurements(uv_degrid, world, "distance_distribution");
+          = distribute::distribute_measurements(uv_degrid, world, distribute::plan::radial);
       uv_degrid = utilities::regroup_and_scatter(uv_degrid, order, world);
     } else
       uv_degrid = utilities::scatter_visibilities(world);
@@ -146,7 +145,7 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator weighted") {
   uv_serial.u = world.broadcast(uv_serial.u);
   uv_serial.v = world.broadcast(uv_serial.v);
   uv_serial.w = world.broadcast(uv_serial.w);
-  uv_serial.units = "radians";
+  uv_serial.units = utilities::vis_units::radians;
   uv_serial.vis = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
   uv_serial.weights
       = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
@@ -154,14 +153,14 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator weighted") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
 
   auto const over_sample = 2;
   auto const J = 4;
-  auto const kernel = "kb";
+  auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
   const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
@@ -182,7 +181,7 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator weighted") {
     if(world.is_root()) {
       uv_degrid.vis = *op_serial * image;
       auto const order
-          = distribute::distribute_measurements(uv_degrid, world, "distance_distribution");
+          = distribute::distribute_measurements(uv_degrid, world, distribute::plan::radial);
       uv_degrid = utilities::regroup_and_scatter(uv_degrid, order, world);
     } else
       uv_degrid = utilities::scatter_visibilities(world);
@@ -208,7 +207,7 @@ TEST_CASE("Serial vs Distributed GPU Fourier Grid Operator weighted") {
   uv_serial.u = world.broadcast(uv_serial.u);
   uv_serial.v = world.broadcast(uv_serial.v);
   uv_serial.w = world.broadcast(uv_serial.w);
-  uv_serial.units = "radians";
+  uv_serial.units = utilities::vis_units::radians;
   uv_serial.vis = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
   uv_serial.weights
       = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
@@ -216,14 +215,14 @@ TEST_CASE("Serial vs Distributed GPU Fourier Grid Operator weighted") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
 
   auto const over_sample = 2;
   auto const J = 4;
-  auto const kernel = "kb";
+  auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
   const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
@@ -252,7 +251,7 @@ TEST_CASE("Serial vs Distributed GPU Fourier Grid Operator weighted") {
     if(world.is_root()) {
       uv_degrid.vis = *op_serial * image;
       auto const order
-          = distribute::distribute_measurements(uv_degrid, world, "distance_distribution");
+          = distribute::distribute_measurements(uv_degrid, world, distribute::plan::radial);
       uv_degrid = utilities::regroup_and_scatter(uv_degrid, order, world);
     } else
       uv_degrid = utilities::scatter_visibilities(world);
@@ -277,7 +276,7 @@ TEST_CASE("Serial vs Distributed GPU Operator weighted") {
   uv_serial.u = world.broadcast(uv_serial.u);
   uv_serial.v = world.broadcast(uv_serial.v);
   uv_serial.w = world.broadcast(uv_serial.w);
-  uv_serial.units = "radians";
+  uv_serial.units = utilities::vis_units::radians;
   uv_serial.vis = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
   uv_serial.weights
       = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
@@ -285,14 +284,14 @@ TEST_CASE("Serial vs Distributed GPU Operator weighted") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
 
   auto const over_sample = 2;
   auto const J = 4;
-  auto const kernel = "kb";
+  auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
   const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
@@ -321,7 +320,7 @@ TEST_CASE("Serial vs Distributed GPU Operator weighted") {
     if(world.is_root()) {
       uv_degrid.vis = *op_serial * image;
       auto const order
-          = distribute::distribute_measurements(uv_degrid, world, "distance_distribution");
+          = distribute::distribute_measurements(uv_degrid, world, distribute::plan::radial);
       uv_degrid = utilities::regroup_and_scatter(uv_degrid, order, world);
     } else
       uv_degrid = utilities::scatter_visibilities(world);
@@ -344,7 +343,7 @@ TEST_CASE("Serial vs Distributed GPU Compact Operator") {
   uv_serial.u = world.broadcast(uv_serial.u);
   uv_serial.v = world.broadcast(uv_serial.v);
   uv_serial.w = world.broadcast(uv_serial.w);
-  uv_serial.units = "radians";
+  uv_serial.units = utilities::vis_units::radians;
   uv_serial.vis = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
   uv_serial.weights
       = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
@@ -352,14 +351,14 @@ TEST_CASE("Serial vs Distributed GPU Compact Operator") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
 
   auto const over_sample = 2;
   auto const J = 4;
-  auto const kernel = "kb";
+  auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
   const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
@@ -396,7 +395,7 @@ TEST_CASE("Serial vs GPU Compact Distributed Fourier Grid Operator weighted") {
   uv_serial.u = world.broadcast(uv_serial.u);
   uv_serial.v = world.broadcast(uv_serial.v);
   uv_serial.w = world.broadcast(uv_serial.w);
-  uv_serial.units = "radians";
+  uv_serial.units = utilities::vis_units::radians;
   uv_serial.vis = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
   uv_serial.weights
       = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
@@ -404,14 +403,14 @@ TEST_CASE("Serial vs GPU Compact Distributed Fourier Grid Operator weighted") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
 
   auto const over_sample = 2;
   auto const J = 4;
-  auto const kernel = "kb";
+  auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
   const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
@@ -446,7 +445,7 @@ TEST_CASE("Serial vs Distributed Compact Operator") {
   uv_serial.u = world.broadcast(uv_serial.u);
   uv_serial.v = world.broadcast(uv_serial.v);
   uv_serial.w = world.broadcast(uv_serial.w);
-  uv_serial.units = "radians";
+  uv_serial.units = utilities::vis_units::radians;
   uv_serial.vis = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
   uv_serial.weights
       = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
@@ -454,14 +453,14 @@ TEST_CASE("Serial vs Distributed Compact Operator") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
 
   auto const over_sample = 2;
   auto const J = 4;
-  auto const kernel = "kb";
+  auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
   const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
@@ -498,7 +497,7 @@ TEST_CASE("Serial vs Compact Distributed Fourier Grid Operator weighted") {
   uv_serial.u = world.broadcast(uv_serial.u);
   uv_serial.v = world.broadcast(uv_serial.v);
   uv_serial.w = world.broadcast(uv_serial.w);
-  uv_serial.units = "radians";
+  uv_serial.units = utilities::vis_units::radians;
   uv_serial.vis = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
   uv_serial.weights
       = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(uv_serial.u.size()));
@@ -506,14 +505,14 @@ TEST_CASE("Serial vs Compact Distributed Fourier Grid Operator weighted") {
   utilities::vis_params uv_mpi;
   if(world.is_root()) {
     auto const order
-        = distribute::distribute_measurements(uv_serial, world, "distance_distribution");
+        = distribute::distribute_measurements(uv_serial, world, distribute::plan::radial);
     uv_mpi = utilities::regroup_and_scatter(uv_serial, order, world);
   } else
     uv_mpi = utilities::scatter_visibilities(world);
 
   auto const over_sample = 2;
   auto const J = 4;
-  auto const kernel = "kb";
+  auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
   const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(

@@ -30,7 +30,7 @@ int main(int, char **) {
   t_real const beta = 1e-3;
   t_real const over_sample = 1.375;
   auto uv_data = utilities::read_visibility(visfile);
-  uv_data.units = "lambda";
+  uv_data.units = utilities::vis_units::lambda;
   t_real cellsize = 0.3;
   t_int width = 512;
   t_int height = 512;

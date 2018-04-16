@@ -51,7 +51,7 @@ int main(int nargs, char const **args) {
   t_int const number_of_vis = std::floor(m_over_n * sky_model.size());
   t_real const sigma_m = constant::pi / 3;
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
-  uv_data.units = "radians";
+  uv_data.units = utilities::vis_units::radians;
   PURIFY_MEDIUM_LOG("Number of measurements: {}", uv_data.u.size());
   MeasurementOperator simulate_measurements(uv_data, 8, 8, "kb", sky_model.cols(), sky_model.rows(),
                                             200,

@@ -25,7 +25,7 @@ TEST_CASE("Operators") {
   const t_uint Jv = 4;
   const t_uint power_iters = 100;
   const t_real power_tol = 1e-9;
-  const std::string &kernel = "kb";
+  const kernels::kernel kernel = kernels::kernel::kb;
   const auto ft_plan = operators::fftw_plan::measure;
   const std::string &weighting_type = "natural";
   const t_real R = 0;
@@ -37,17 +37,19 @@ TEST_CASE("Operators") {
   uv_vis.w = u * 0.;
   uv_vis.weights = Vector<t_complex>::Random(M);
   uv_vis.vis = Vector<t_complex>::Random(M);
-  uv_vis.units = "pixel";
-  MeasurementOperator expected_op(uv_vis, Ju, Jv, kernel, imsizex, imsizey, power_iters,
+  uv_vis.units = utilities::vis_units::pixels;
+  MeasurementOperator expected_op(uv_vis, Ju, Jv, "kb", imsizex, imsizey, power_iters,
                                   oversample_ratio);
   std::function<t_real(t_real)> kbu, kbv, ftkbu, ftkbv;
   std::tie(kbu, kbv, ftkbu, ftkbv)
       = create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
+  std::function<t_complex(t_real, t_real, t_real)> kernelw
+      = projection_kernels::w_projection_kernel_approx(1, 1, imsizex, imsizey, oversample_ratio);
   SECTION("Gridding") {
     sopt::OperatorFunction<Vector<t_complex>> directG, indirectG;
     std::tie(directG, indirectG) = operators::init_gridding_matrix_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, uv_vis.w, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex,
-        oversample_ratio, kbv, kbu, Ju, Jv);
+        oversample_ratio, kbv, kbu, kernelw, Ju, Jv);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     Vector<t_complex> direct_output;
     directG(direct_output, direct_input);
@@ -63,15 +65,15 @@ TEST_CASE("Operators") {
     REQUIRE(indirect_output.isApprox(expected_indirect, 1e-4));
   }
   SECTION("Zero Padding") {
-    const Image<t_real> S
-        = details::init_correction2d(oversample_ratio, imsizey, imsizex, ftkbu, ftkbv);
+    const Image<t_complex> S
+        = details::init_correction2d(oversample_ratio, imsizey, imsizex, ftkbu, ftkbv, 0, 0, 0);
     CHECK(imsizex == S.cols());
     CHECK(imsizey == S.rows());
     CHECK(S.cols() == expected_op.S.cols());
     CHECK(S.rows() == expected_op.S.rows());
     INFO(S(0) / expected_op.S(0));
     INFO(S(5) / expected_op.S(5));
-    REQUIRE(S.isApprox(expected_op.S, 1e-4));
+    REQUIRE(S.real().isApprox(expected_op.S, 1e-4));
     sopt::OperatorFunction<Vector<t_complex>> directZ, indirectZ;
     std::tie(directZ, indirectZ)
         = operators::init_zero_padding_2d<Vector<t_complex>>(S, oversample_ratio);
@@ -103,7 +105,7 @@ TEST_CASE("Operators") {
     CHECK(inverse_check.isApprox(direct_input, 1e-4));
   }
   SECTION("Weights") {
-    MeasurementOperator weighted_expected_op(uv_vis, Ju, Jv, kernel, imsizex, imsizey, power_iters,
+    MeasurementOperator weighted_expected_op(uv_vis, Ju, Jv, "kb", imsizex, imsizey, power_iters,
                                              oversample_ratio, 1, 1, "natural", 0);
     sopt::OperatorFunction<Vector<t_complex>> directW, indirectW;
     std::tie(directW, indirectW)
@@ -123,7 +125,7 @@ TEST_CASE("Operators") {
     CHECK(expected_indirect.isApprox(indirect_output, 1e-4));
   }
   SECTION("Create Weighted Measurement Operator") {
-    MeasurementOperator weighted_expected_op(uv_vis, Ju, Jv, kernel, imsizex, imsizey, power_iters,
+    MeasurementOperator weighted_expected_op(uv_vis, Ju, Jv, "kb", imsizex, imsizey, power_iters,
                                              oversample_ratio, 1, 1, "natural");
     const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,

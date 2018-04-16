@@ -18,14 +18,14 @@ int main(int nargs, char const **args) {
   auto const imsizex = 256;
   auto const imsizey = 256;
 
-  auto const kernel = "kb";
+  auto const kernel = kernels::kernel::kb;
 
   t_uint const number_of_pixels = imsizex * imsizey;
   t_uint const number_of_vis = 4e6; // std::floor(number_of_pixels * 2);
   // Generating random uv(w) coverage
   t_real const sigma_m = constant::pi / 3;
   auto uv_vis = utilities::random_sample_density(number_of_vis, 0, sigma_m);
-  uv_vis.units = "radians";
+  uv_vis.units = utilities::vis_units::radians;
   const Vector<t_complex> image = Vector<t_complex>::Random(number_of_pixels);
   const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,

@@ -10,7 +10,6 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include "purify/casacore.h"
 #include "purify/directories.h"
 #include "purify/distribute.h"
 #include "purify/logging.h"
@@ -19,6 +18,7 @@
 #include "purify/pfitsio.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
+#include "purify/uvfits.h"
 
 #ifdef PURIFY_GPU
 #include "purify/operators_gpu.h"
@@ -31,40 +31,39 @@
 using namespace purify;
 using namespace purify::notinstalled;
 
-utilities::vis_params dirty_visibilities(const std::string &name) {
-  return purify::casa::read_measurementset(
-      name + ".ms", purify::casa::MeasurementSet::ChannelWrapper::polarization::I);
+utilities::vis_params dirty_visibilities(const std::vector<std::string> &names) {
+  return utilities::read_visibility(names, true);
 }
 
 utilities::vis_params
-dirty_visibilities(const std::string &name, sopt::mpi::Communicator const &comm) {
+dirty_visibilities(const std::vector<std::string> &names, sopt::mpi::Communicator const &comm) {
   if(comm.size() == 1)
-    return dirty_visibilities(name);
+    return dirty_visibilities(names);
   if(comm.is_root()) {
-    auto result = dirty_visibilities(name);
-    auto const order = distribute::distribute_measurements(result, comm, "distance_distribution");
-    result = utilities::regroup_and_scatter(result, order, comm);
-    return result;
+    auto result = dirty_visibilities(names);
+    auto const order = distribute::distribute_measurements(result, comm, distribute::plan::w_term);
+    return utilities::regroup_and_scatter(result, order, comm);
   }
-  return utilities::scatter_visibilities(comm);
+  auto result = utilities::scatter_visibilities(comm);
+  return result;
 }
 
 std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>>
 padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> const &measurements,
-              const sopt::wavelets::SARA &sara, const utilities::vis_params &uv_data,
-              const sopt::mpi::Communicator &comm, const t_uint &imsizex, const t_uint &imsizey) {
+              t_real const sigma, const sopt::wavelets::SARA &sara,
+              const utilities::vis_params &uv_data, const sopt::mpi::Communicator &comm,
+              const t_uint &imsizex, const t_uint &imsizey) {
 
   auto const Psi = sopt::linear_transform<t_complex>(sara, imsizey, imsizex, comm);
 
-  t_real const sigma = 1.;
 #if PURIFY_PADMM_ALGORITHM == 2
-  auto const epsilon = std::sqrt(
-      comm.all_sum_all(std::pow(utilities::calculate_l2_radius(uv_data.vis, sigma), 2)));
+  auto const epsilon = 3 * std::sqrt(comm.all_sum_all(std::pow(sigma, 2)))
+                       * std::sqrt(2 * comm.all_sum_all(uv_data.size()));
 #elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
-  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
+  auto const epsilon = 3 * std::sqrt(2 * uv_data.size()) * sigma;
 #endif
-  auto const gamma
-      = (Psi.adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3;
+  auto const gamma = comm.all_reduce<t_real>(
+      ((measurements->adjoint() * uv_data.vis)).real().maxCoeff() * 1e-3, MPI_MAX);
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
   PURIFY_MEDIUM_LOG("Gamma {}", gamma);
 
@@ -72,7 +71,7 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
   // not reproduce. E.g. padmm definition is self-referential.
   auto padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(uv_data.vis);
   padmm->itermax(50)
-      .gamma(comm.all_reduce(gamma, MPI_MAX))
+      .gamma(gamma)
       .relative_variation(1e-3)
       .l2ball_proximal_epsilon(epsilon)
 #if PURIFY_PADMM_ALGORITHM == 2
@@ -122,6 +121,34 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
 #endif
   });
 
+  auto convergence_function = [](const Vector<t_complex> &x) { return true; };
+  const std::shared_ptr<t_uint> iter = std::make_shared<t_uint>(0);
+  const auto algo_update
+      = [uv_data, imsizex, imsizey, padmm_weak, iter, comm](const Vector<t_complex> &x) -> bool {
+    auto padmm = padmm_weak.lock();
+    if(comm.is_root())
+      PURIFY_MEDIUM_LOG("Step size γ {}", padmm->gamma());
+    *iter = *iter + 1;
+    Vector<t_complex> const alpha = padmm->Psi().adjoint() * x;
+    const t_real new_gamma = comm.all_reduce(alpha.real().cwiseAbs().maxCoeff(), MPI_MAX) * 1e-3;
+    if(comm.is_root())
+      PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
+    padmm->gamma(((std::abs(padmm->gamma() - new_gamma) > 0.2) and *iter < 200) ? new_gamma :
+                                                                                  padmm->gamma());
+    // updating parameter
+
+    Vector<t_complex> const residual = padmm->Phi().adjoint() * (uv_data.vis - padmm->Phi() * x);
+
+    if(comm.is_root()) {
+      pfitsio::write2d(x, imsizey, imsizex, "mpi_solution_update.fits");
+      pfitsio::write2d(residual, imsizey, imsizex, "mpi_residual_update.fits");
+    }
+    return true;
+  };
+  auto lambda = [convergence_function, algo_update](Vector<t_complex> const &x) {
+    return convergence_function(x) and algo_update(x);
+  };
+  padmm->is_converged(lambda);
   return padmm;
 }
 
@@ -133,22 +160,30 @@ int main(int nargs, char const **args) {
   auto const session = sopt::mpi::init(nargs, args);
   auto const world = sopt::mpi::Communicator::World();
 
-  const std::string name = "M31";
-  auto const kernel = "kb";
-  const bool w_term = true;
+  const std::string name = "realdata";
+  const std::string filename_base = vla_filename("../mwa/uvdump_");
+  const std::vector<std::string> filenames
+      = {filename_base + "01.vis"}; //, filename_base + "02.vis"};
+  auto const kernel = kernels::kernel::kb;
+  std::string kernel_name = "kb";
+  const bool w_term = false;
 
-  const t_real cellsize = 30; // arcsec
-  const t_uint imsizex = 512;
-  const t_uint imsizey = 512;
+  const t_real cellsize = 20; // arcsec
+  const t_uint imsizex = 1024;
+  const t_uint imsizey = 1024;
 
   // Generating random uv(w) coverage
-  auto const data = dirty_visibilities(name, world);
+  utilities::vis_params data = dirty_visibilities(filenames, world);
+
+  t_real const sigma
+      = data.weights.norm() / std::sqrt(world.all_sum_all(data.weights.size())) * 0.5;
+  data.vis = (data.vis.array() * data.weights.array())
+             / world.all_reduce(data.weights.array().cwiseAbs().maxCoeff(), MPI_MAX);
 #if PURIFY_PADMM_ALGORITHM == 2 || PURIFY_PADMM_ALGORITHM == 3
 #ifndef PURIFY_GPU
   auto const measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       world, data, imsizey, imsizex, cellsize, cellsize, 2, 100, 1e-4, kernel, 4, 4,
       operators::fftw_plan::measure, w_term);
-
 #else
   af::setDevice(0);
   auto const measurements = gpu::measurementoperator::init_degrid_operator_2d(
@@ -175,25 +210,43 @@ int main(int nargs, char const **args) {
           std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)},
       world);
 
+  Vector<t_real> const dirty_image = (measurements->adjoint() * (data.vis)).real();
+
+  if(world.is_root()) {
+    // then writes stuff to files
+    boost::filesystem::path const path(output_filename(name));
+#if PURIFY_PADMM_ALGORITHM == 3
+    auto const pb_path = path / kernel_name / "local_epsilon_replicated_grids";
+#elif PURIFY_PADMM_ALGORITHM == 2
+    auto const pb_path = path / kernel_name / "global_epsilon_replicated_grids";
+#elif PURIFY_PADMM_ALGORITHM == 1
+    auto const pb_path = path / kernel_name / "local_epsilon_distributed_grids";
+#else
+#error Unknown or unimplemented algorithm
+#endif
+    boost::filesystem::create_directories(pb_path);
+
+    pfitsio::write2d(dirty_image, imsizey, imsizex, (pb_path / "dirty.fits").native());
+  }
+
   // Create the padmm solver
-  auto const padmm = padmm_factory(measurements, sara, data, world, imsizey, imsizex);
+  auto const padmm = padmm_factory(measurements, sigma, sara, data, world, imsizey, imsizex);
   // calls padmm
   auto const diagnostic = (*padmm)();
 
   // makes sure we set things up correctly
   assert(world.broadcast(diagnostic.x).isApprox(diagnostic.x));
 
-  // then writes stuff to files
-  auto const residual_image = (measurements->adjoint() * diagnostic.residual).real();
-  auto const dirty_image = (measurements->adjoint() * data.vis).real();
+  Vector<t_real> const residual_image = (measurements->adjoint() * diagnostic.residual).real();
   if(world.is_root()) {
+    // then writes stuff to files
     boost::filesystem::path const path(output_filename(name));
 #if PURIFY_PADMM_ALGORITHM == 3
-    auto const pb_path = path / kernel / "local_epsilon_replicated_grids";
+    auto const pb_path = path / kernel_name / "local_epsilon_replicated_grids";
 #elif PURIFY_PADMM_ALGORITHM == 2
-    auto const pb_path = path / kernel / "global_epsilon_replicated_grids";
+    auto const pb_path = path / kernel_name / "global_epsilon_replicated_grids";
 #elif PURIFY_PADMM_ALGORITHM == 1
-    auto const pb_path = path / kernel / "local_epsilon_distributed_grids";
+    auto const pb_path = path / kernel_name / "local_epsilon_distributed_grids";
 #else
 #error Unknown or unimplemented algorithm
 #endif

@@ -113,7 +113,7 @@ MeasurementOperator::init_interpolation_matrix2d(const Vector<t_real> &u, const 
         const t_complex I(0, 1);
         interpolation_matrix.coeffRef(m, index)
             = std::exp(-2 * constant::pi * I * ((k_u(m) + ju) * 0.5 + (k_v(m) + jv) * 0.5))
-               * kernelu(u(m) - (k_u(m) + ju)) * kernelv(v(m) - (k_v(m) + jv));
+              * kernelu(u(m) - (k_u(m) + ju)) * kernelv(v(m) - (k_v(m) + jv));
       }
     }
   }
@@ -264,9 +264,9 @@ void MeasurementOperator::init_operator(const utilities::vis_params &uv_vis_inpu
   fftoperator_.set_up_multithread();
   fftoperator_.init_plan(Matrix<t_complex>::Zero(ftsizev_, ftsizeu_));
   utilities::vis_params uv_vis = uv_vis_input;
-  if(uv_vis.units == "lambda")
+  if(uv_vis.units == utilities::vis_units::lambda)
     uv_vis = utilities::set_cell_size(uv_vis_input, cell_x_, cell_y_);
-  if(uv_vis.units == "radians")
+  if(uv_vis.units == utilities::vis_units::radians)
     uv_vis = utilities::uv_scale(uv_vis, floor(oversample_factor_ * imsizex_),
                                  floor(oversample_factor_ * imsizey_));
 

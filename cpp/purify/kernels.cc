@@ -28,7 +28,8 @@ t_real ft_kaiser_bessel_general(const t_real &x, const t_int &J, const t_real &a
 
   t_complex eta = std::sqrt(
       static_cast<t_complex>((constant::pi * x * J) * (constant::pi * x * J) - alpha * alpha));
-  t_real normalisation = 38828.11016883; // Factor that keeps it consistent with fessler formula
+  const t_real normalisation
+      = 38828.11016883; // Factor that keeps it consistent with fessler formula
 
   return std::real(std::sin(eta) / eta) / normalisation; // simple way of doing the calculation, the
   // boost bessel funtions do not support
@@ -231,18 +232,19 @@ t_real ft_gaussian_general(const t_real &x, const t_int &J, const t_real &sigma)
 
 std::tuple<std::function<t_real(t_real)>, std::function<t_real(t_real)>,
            std::function<t_real(t_real)>, std::function<t_real(t_real)>>
-create_kernels(const std::string &kernel_name_, const t_uint &Ju_, const t_uint &Jv_,
+create_kernels(const kernels::kernel kernel_name_, const t_uint &Ju_, const t_uint &Jv_,
                const t_uint &imsizey_, const t_uint &imsizex_, const t_real &oversample_ratio) {
 
-  PURIFY_MEDIUM_LOG("Kernel Name: {}", kernel_name_.c_str());
+  // PURIFY_MEDIUM_LOG("Kernel Name: {}", kernel_name_.c_str());
   PURIFY_MEDIUM_LOG("Kernel Support: {} x {}", Ju_, Jv_);
   const t_uint ftsizev_ = std::floor(imsizey_ * oversample_ratio);
   const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
-  if((kernel_name_ == "pswf") and (Ju_ != 6 or Jv_ != 6)) {
+  if((kernel_name_ == kernels::kernel::pswf) and (Ju_ != 6 or Jv_ != 6)) {
     PURIFY_ERROR("Error: Only a support of 6 is implemented for PSWFs.");
     throw std::runtime_error("Incorrect input: PSWF requires a support of 6");
   }
-  if(kernel_name_ == "kb") {
+  switch(kernel_name_) {
+  case kernels::kernel::kb: {
     auto kbu = [=](const t_real &x) { return kernels::kaiser_bessel(x, Ju_); };
     auto kbv = [=](const t_real &x) { return kernels::kaiser_bessel(x, Jv_); };
     auto ftkbu
@@ -250,7 +252,9 @@ create_kernels(const std::string &kernel_name_, const t_uint &Ju_, const t_uint 
     auto ftkbv
         = [=](const t_real &x) { return kernels::ft_kaiser_bessel(x / ftsizev_ - 0.5, Jv_); };
     return std::make_tuple(kbu, kbv, ftkbu, ftkbv);
-  } else if(kernel_name_ == "kb_min") {
+    break;
+  }
+  case kernels::kernel::kbmin: {
     const t_real kb_interp_alpha_Ju
         = constant::pi
           * std::sqrt(Ju_ * Ju_ / (oversample_ratio * oversample_ratio) * (oversample_ratio - 0.5)
@@ -274,28 +278,33 @@ create_kernels(const std::string &kernel_name_, const t_uint &Ju_, const t_uint 
       return kernels::ft_kaiser_bessel_general(x / ftsizev_ - 0.5, Jv_, kb_interp_alpha_Jv);
     };
     return std::make_tuple(kbu, kbv, ftkbu, ftkbv);
-  } else if(kernel_name_ == "pswf") {
+    break;
+  }
+  case kernels::kernel::pswf: {
     auto pswfu = [=](const t_real &x) { return kernels::pswf(x, Ju_); };
     auto pswfv = [=](const t_real &x) { return kernels::pswf(x, Jv_); };
     auto ftpswfu = [=](const t_real &x) { return kernels::ft_pswf(x / ftsizeu_ - 0.5, Ju_); };
     auto ftpswfv = [=](const t_real &x) { return kernels::ft_pswf(x / ftsizev_ - 0.5, Jv_); };
     return std::make_tuple(pswfu, pswfv, ftpswfu, ftpswfv);
+    break;
   }
-  if(kernel_name_ == "gauss") {
+  case kernels::kernel::gauss: {
     auto gaussu = [=](const t_real &x) { return kernels::gaussian(x, Ju_); };
     auto gaussv = [=](const t_real &x) { return kernels::gaussian(x, Jv_); };
     auto ftgaussu = [=](const t_real &x) { return kernels::ft_gaussian(x / ftsizeu_ - 0.5, Ju_); };
     auto ftgaussv = [=](const t_real &x) { return kernels::ft_gaussian(x / ftsizev_ - 0.5, Jv_); };
     return std::make_tuple(gaussu, gaussv, ftgaussu, ftgaussv);
+    break;
   }
-  if(kernel_name_ == "box") {
+  case kernels::kernel::box: {
     auto boxu = [=](const t_real &x) { return kernels::pill_box(x, Ju_); };
     auto boxv = [=](const t_real &x) { return kernels::pill_box(x, Jv_); };
     auto ftboxu = [=](const t_real &x) { return kernels::ft_pill_box(x / ftsizeu_ - 0.5, Ju_); };
     auto ftboxv = [=](const t_real &x) { return kernels::ft_pill_box(x / ftsizev_ - 0.5, Jv_); };
     return std::make_tuple(boxu, boxv, ftboxu, ftboxv);
+    break;
   }
-  if(kernel_name_ == "gauss_alt") {
+  case kernels::kernel::gauss_alt: {
     const t_real sigma = 1; // In units of radians, Rafael uses sigma = 2 * pi / ftsizeu_. However,
     // this should be 1 in units of pixels.
     auto gaussu = [=](const t_real &x) { return kernels::gaussian_general(x, Ju_, sigma); };
@@ -307,7 +316,9 @@ create_kernels(const std::string &kernel_name_, const t_uint &Ju_, const t_uint 
       return kernels::ft_gaussian_general(x / ftsizev_ - 0.5, Jv_, sigma);
     };
     return std::make_tuple(gaussu, gaussv, ftgaussu, ftgaussv);
-  } else {
+    break;
+  }
+  default:
     throw std::runtime_error("Did not choose valid kernel.");
   }
 }

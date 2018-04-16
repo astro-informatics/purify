@@ -11,6 +11,7 @@
 namespace purify {
 
 namespace kernels {
+enum class kernel { kb, gauss, box, pswf, kbmin, gauss_alt };
 
 //! Kaiser-Bessel kernel
 t_real kaiser_bessel(const t_real &x, const t_int &J);
@@ -53,7 +54,7 @@ t_real ft_gaussian_general(const t_real &x, const t_int &J, const t_real &sigma)
 } // namespace kernels
 std::tuple<std::function<t_real(t_real)>, std::function<t_real(t_real)>,
            std::function<t_real(t_real)>, std::function<t_real(t_real)>>
-create_kernels(const std::string &kernel_name_, const t_uint &Ju_, const t_uint &Jv_,
+create_kernels(const kernels::kernel kernel_name, const t_uint &Ju_, const t_uint &Jv_,
                const t_uint &ftsizeu_, const t_uint &ftsizev_, const t_real &oversample_ratio);
 } // namespace purify
 

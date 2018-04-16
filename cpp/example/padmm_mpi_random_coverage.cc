@@ -35,13 +35,13 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
                    const std::tuple<bool, t_real> &w_term) {
   auto uv_data
       = utilities::random_sample_density(number_of_vis, 0, constant::pi / 3, std::get<0>(w_term));
-  uv_data.units = "radians";
+  uv_data.units = utilities::vis_units::radians;
   PURIFY_HIGH_LOG("Number of measurements / number of pixels: {}",
                   uv_data.u.size() / ground_truth_image.size());
   // creating operator to generate measurements
   auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_data, ground_truth_image.rows(), ground_truth_image.cols(), std::get<1>(w_term),
-      std::get<1>(w_term), 2, 100, 1e-4, "kb", 8, 8, operators::fftw_plan::measure,
+      std::get<1>(w_term), 2, 100, 1e-4, kernels::kernel::kb, 8, 8, operators::fftw_plan::measure,
       std::get<0>(w_term));
   // Generates measurements from image
   uv_data.vis = (*sky_measurements)
@@ -63,7 +63,7 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
     auto result = dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term);
     comm.broadcast(std::get<1>(result));
     auto const order
-        = distribute::distribute_measurements(std::get<0>(result), comm, "distance_distribution");
+        = distribute::distribute_measurements(std::get<0>(result), comm, distribute::plan::radial);
     std::get<0>(result) = utilities::regroup_and_scatter(std::get<0>(result), order, comm);
     return result;
   }
@@ -160,7 +160,7 @@ int main(int nargs, char const **args) {
   const t_real max_w = 100; // lambda
   const std::string name = "M31";
   const t_real snr = 30;
-  auto const kernel = "kb";
+  auto const kernel = kernels::kernel::kb;
   const bool w_term = true;
   // string of fits file of image to reconstruct
   auto ground_truth_image = pfitsio::read2d(image_filename(name + ".fits"));
@@ -224,11 +224,11 @@ int main(int nargs, char const **args) {
   if(world.is_root()) {
     boost::filesystem::path const path(output_filename(name));
 #if PURIFY_PADMM_ALGORITHM == 3
-    auto const pb_path = path / kernel / "local_epsilon_replicated_grids";
+    auto const pb_path = path / "local_epsilon_replicated_grids";
 #elif PURIFY_PADMM_ALGORITHM == 2
-    auto const pb_path = path / kernel / "global_epsilon_replicated_grids";
+    auto const pb_path = path / "global_epsilon_replicated_grids";
 #elif PURIFY_PADMM_ALGORITHM == 1
-    auto const pb_path = path / kernel / "local_epsilon_distributed_grids";
+    auto const pb_path = path / "local_epsilon_distributed_grids";
 #else
 #error Unknown or unimplemented algorithm
 #endif

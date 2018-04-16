@@ -36,7 +36,7 @@ int main(int nargs, char const **args) {
   t_int const number_of_vis = std::floor(m_over_n * M31.size());
   // Generating random uv(w) coverage
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
-  uv_data.units = "radians";
+  uv_data.units = utilities::vis_units::radians;
 
   PURIFY_HIGH_LOG("Number of measurements: {}", uv_data.u.size());
   // uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements

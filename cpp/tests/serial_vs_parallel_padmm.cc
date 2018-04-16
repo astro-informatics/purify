@@ -22,7 +22,7 @@ utilities::vis_params dirty_visibilities(t_uint number_of_vis = 10, t_uint width
                                          t_uint height = 20, t_uint over_sample = 2,
                                          t_real ISNR = 30) {
   auto result = utilities::random_sample_density(number_of_vis, 0, constant::pi / 3);
-  result.units = "radians";
+  result.units = utilities::vis_units::radians;
   result.vis = Vector<t_complex>::Random(result.u.size());
   result.weights = Vector<t_complex>::Random(result.u.size());
   return result;
@@ -43,7 +43,8 @@ utilities::vis_params dirty_visibilities(sopt::mpi::Communicator const &comm,
   result.ra = comm.broadcast(result.ra);
   result.dec = comm.broadcast(result.dec);
   result.average_frequency = comm.broadcast(result.average_frequency);
-  result.units = comm.broadcast(result.units);
+  result.units
+      = static_cast<utilities::vis_units>(comm.broadcast(static_cast<t_int>(result.units)));
   return result;
 }
 
@@ -95,7 +96,7 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
         utilities::vis_params serial = uv_serial;
         serial.vis = just_roots.broadcast<Vector<t_complex>>();
         auto const order
-            = distribute::distribute_measurements(serial, split_comm, "distance_distribution");
+            = distribute::distribute_measurements(serial, split_comm, distribute::plan::radial);
         auto const from_serial = utilities::regroup_and_scatter(serial, order, split_comm);
         CHECK(from_serial.vis.isApprox(degridded));
       } else if(split_comm.size() > 1) {

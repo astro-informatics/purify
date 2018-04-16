@@ -37,8 +37,8 @@ public:
       const bool w_term = false;
       // algorithm 1
       m_measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-          m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2, 0, 1e-4, "kb",
-          m_kernel, m_kernel, operators::fftw_plan::measure, w_term);
+          m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2, 0, 1e-4,
+          kernels::kernel::kb, m_kernel, m_kernel, operators::fftw_plan::measure, w_term);
     }
   }
 

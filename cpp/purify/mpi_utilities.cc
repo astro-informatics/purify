@@ -91,7 +91,7 @@ vis_params scatter_visibilities(vis_params const &params, std::vector<t_int> con
   result.w = comm.scatterv(params.w, sizes);
   result.vis = comm.scatterv(params.vis, sizes);
   result.weights = comm.scatterv(params.weights, sizes);
-  result.units = comm.broadcast(params.units);
+  result.units = static_cast<utilities::vis_units>(comm.broadcast(static_cast<int>(params.units)));
   result.ra = comm.broadcast(params.ra);
   result.dec = comm.broadcast(params.dec);
   result.average_frequency = comm.broadcast(params.average_frequency);
@@ -109,7 +109,8 @@ vis_params scatter_visibilities(sopt::mpi::Communicator const &comm) {
   result.w = comm.scatterv<decltype(result.w)::Scalar>(local_size);
   result.vis = comm.scatterv<decltype(result.vis)::Scalar>(local_size);
   result.weights = comm.scatterv<decltype(result.weights)::Scalar>(local_size);
-  result.units = comm.broadcast(decltype(result.units)(""));
+  result.units = static_cast<utilities::vis_units>(
+      comm.broadcast<std::remove_const<decltype(static_cast<int>(result.units))>::type>());
   result.ra = comm.broadcast<std::remove_const<decltype(result.ra)>::type>();
   result.dec = comm.broadcast<std::remove_const<decltype(result.dec)>::type>();
   result.average_frequency
@@ -120,7 +121,7 @@ vis_params scatter_visibilities(sopt::mpi::Communicator const &comm) {
 utilities::vis_params
 distribute_params(utilities::vis_params const &params, sopt::mpi::Communicator const &comm) {
   if(comm.is_root() and comm.size() > 1) {
-    auto const order = distribute::distribute_measurements(params, comm, "distance_distribution");
+    auto const order = distribute::distribute_measurements(params, comm, distribute::plan::radial);
     return utilities::regroup_and_scatter(params, order, comm);
   } else if(comm.size() > 1)
     return utilities::scatter_visibilities(comm);
@@ -130,14 +131,11 @@ distribute_params(utilities::vis_params const &params, sopt::mpi::Communicator c
 utilities::vis_params set_cell_size(const sopt::mpi::Communicator &comm,
                                     utilities::vis_params const &uv_vis, const t_real &cell_x,
                                     const t_real &cell_y) {
-  const auto max_u_vector
-      = comm.gather<t_real>(std::sqrt((uv_vis.u.array() * uv_vis.u.array()).maxCoeff()));
-  const auto max_v_vector
-      = comm.gather<t_real>(std::sqrt((uv_vis.v.array() * uv_vis.v.array()).maxCoeff()));
-  const t_real max_u
-      = comm.broadcast(*(std::max_element(max_u_vector.begin(), max_u_vector.end())));
-  const t_real max_v
-      = comm.broadcast(*(std::max_element(max_v_vector.begin(), max_v_vector.end())));
+  if(comm.size() == 1)
+    return utilities::set_cell_size(uv_vis, cell_x, cell_y);
+
+  const t_real max_u = comm.all_reduce<t_real>(uv_vis.u.array().cwiseAbs().maxCoeff(), MPI_MAX);
+  const t_real max_v = comm.all_reduce<t_real>(uv_vis.v.array().cwiseAbs().maxCoeff(), MPI_MAX);
   return utilities::set_cell_size(uv_vis, max_u, max_v, cell_x, cell_y);
 }
 } // namespace utilities

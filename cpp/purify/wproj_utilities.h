@@ -18,6 +18,12 @@
 #include "purify/utilities.h"
 
 namespace purify {
+namespace utilities {
+//! Sort visibilities to be from w_max to w_min
+vis_params sort_by_w(const vis_params &uv_data);
+//! Calculate W Lambert function
+template <typename T> t_real w_lambert(T x, const t_real &relative_difference);
+} // namespace utilities
 namespace wproj_utilities {
 //! Work out max L and M directional cosines from image parameters
 std::tuple<t_real, t_real>
@@ -281,6 +287,26 @@ row_wise_sparse_convolution(const Sparse<t_complex> &Grid_, const Sparse<T> &chi
   return output_row;
 }
 } // namespace wproj_utilities
+namespace utilities {
+
+template <typename T> t_real w_lambert(const T &x, const t_real &relative_difference = 1e-8) {
+
+  if(std::is_integral<T>::value)
+    return w_lambert<t_real>(x, relative_difference);
+  T z = T(x);
+  T diff = T(1e4 * relative_difference);
+  if(x < -1 / std::exp(1))
+    throw std::runtime_error("Out of bounds for W lambert function!");
+  while(std::abs(diff) > relative_difference) {
+    const T f = z * std::exp(z) - x;
+    const T w = z - f / (std::exp(z) * (z + 1) - f * (z + 2) / (2 * z + 2));
+    diff = w - z;
+    z = w;
+  }
+  return z;
+}
+
+} // namespace utilities
 } // namespace purify
 
 #endif

@@ -14,7 +14,7 @@ int main(int nargs, char const **args) {
   const t_real oversample = 2;
   const t_int J = 4;
   const t_int width = 2048;
-  const std::string kernel = "kb";
+  const auto kernel = kernels::kernel::kb;
   const t_int number_of_samples = 100;
   const t_real RM1 = -70;
   const t_real RM2 = 50;
@@ -23,7 +23,7 @@ int main(int nargs, char const **args) {
   rm_vis.u.setLinSpaced(number_of_samples, 100, 110);
   rm_vis.v = Vector<t_real>::Zero(rm_vis.u.size());
   rm_vis.w = rm_vis.v;
-  rm_vis.units = "radians";
+  rm_vis.units = utilities::vis_units::radians;
   const Array<t_real> wavelength_squared
       = constant::c * constant::c / (rm_vis.u.array() * rm_vis.u.array()) * 1e-12;
   const t_complex I(0, 1);

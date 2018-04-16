@@ -52,7 +52,7 @@ int main(int nargs, char const **args) {
   t_real const sigma_m = constant::pi / 3;
 
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
-  uv_data.units = "radians";
+  uv_data.units = utilities::vis_units::radians;
   PURIFY_MEDIUM_LOG("Number of measurements: {}", uv_data.u.size());
 
   MeasurementOperator sky_measurements(uv_data, 8, 8, "kb", sky_model.cols(), sky_model.rows(), 100,
@@ -134,8 +134,8 @@ int main(int nargs, char const **args) {
   }
   const t_uint maxiters = iters;
 
-  Image<t_complex> image
-      = Image<t_complex>::Map(diagnostic.x.data(), measurements->imsizey(), measurements->imsizex());
+  Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), measurements->imsizey(),
+                                                 measurements->imsizex());
 
   Vector<t_complex> original = Vector<t_complex>::Map(sky_model.data(), sky_model.size(), 1);
   Image<t_complex> res = sky_model - image;
