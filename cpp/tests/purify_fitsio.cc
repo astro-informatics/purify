@@ -1,6 +1,12 @@
 #include "catch.hpp"
+
+#include "purify/config.h"
+#include "purify/logging.h"
+#include "purify/types.h"
+
 #include "purify/directories.h"
 #include "purify/pfitsio.h"
+
 using namespace purify;
 using namespace purify::notinstalled;
 
@@ -24,6 +30,7 @@ TEST_CASE("readwrite2dheader", "purify fitsio") {
 
 TEST_CASE("readwrite3d", "purify fitsio") {
 
+  purify::logging::set_level("debug");
   std::vector<Image<t_complex>> input = pfitsio::read3d(image_filename("cube_example.fits"));
   CHECK(input.size() == 4);
   CHECK(input[0].size() == 200 * 200);
@@ -41,17 +48,21 @@ TEST_CASE("readwrite3dheader", "purify fitsio") {
 
   std::vector<Image<t_complex>> input = pfitsio::read3d(image_filename("cube_example.fits"));
   CHECK(input.size() == 4);
-  CHECK(input[0].size() == 200 * 200);
+  CHECK(input.at(0).size() == 200 * 200);
   std::vector<Image<t_real>> input_real;
   for(int i = 0; i < input.size(); i++) {
-    input_real.push_back(input[i].real());
+    CAPTURE(input.size());
+    CAPTURE(i);
+    input_real.push_back(input.at(i).real());
   }
   pfitsio::header_params header_example;
   header_example.fits_name = output_filename("cube_output.fits");
   pfitsio::write3d_header(input_real, header_example);
   std::vector<Image<t_complex>> input2 = pfitsio::read3d(output_filename("cube_output.fits"));
+  CAPTURE(input.size());
   for(int i = 0; i < input.size(); i++) {
-    CHECK(input[i].isApprox(input2[i], 1e-6));
+    CAPTURE(i);
+    CHECK(input.at(i).isApprox(input2.at(i), 1e-6));
   }
 }
 TEST_CASE("readwrite3dwith2d", "purify fitsio") {

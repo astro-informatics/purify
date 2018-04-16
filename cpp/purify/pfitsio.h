@@ -3,8 +3,8 @@
 #include "purify/config.h"
 #include "purify/types.h"
 
+#include <fitsio.h>
 #include <string>
-#include <CCfits/CCfits>
 #include "purify/utilities.h"
 
 namespace purify {
@@ -30,6 +30,66 @@ struct header_params {
   t_real residual_convergence = 0;
   t_real epsilon = 0;
 };
+//! write key to fits file header
+void write_key(fitsfile *fptr, const std::string &key, const std::string &value,
+               const std::string &comment, int *status);
+void write_key(fitsfile *fptr, const std::string &key, const char *value,
+               const std::string &comment, int *status);
+//! write history to fits file
+void write_history(fitsfile *fptr, const std::string &context, const std::string &history,
+                   int *status);
+template <class T>
+typename std::enable_if<std::is_scalar<T>::value, void>::type
+write_history(fitsfile *fptr, const std::string &context, const T &history, int *status) {
+  T value = history;
+  write_history(fptr, context, std::to_string(value), status);
+}
+template <class T>
+typename std::enable_if<std::is_scalar<T>::value, void>::type
+write_key(fitsfile *fptr, const std::string &key, const T &value, const std::string &comment,
+          int *status) {
+  int datatype = 0;
+  if(std::is_same<T, double>::value)
+    datatype = TDOUBLE;
+  else if(std::is_same<T, float>::value)
+    datatype = TFLOAT;
+  else if(std::is_same<T, int>::value)
+    datatype = TINT;
+  else if(std::is_same<T, bool>::value)
+    datatype = TLOGICAL;
+  else
+    throw std::runtime_error("Key type of value not supported by PURIFY template for " + key);
+
+  T entry = value;
+  if(fits_write_key(fptr, datatype, const_cast<char *>(key.c_str()),
+                    reinterpret_cast<void *>(&entry), const_cast<char *>(comment.c_str()), status))
+    throw std::runtime_error("Problem writing key in fits file: " + key);
+}
+
+//! read fits key and return as tuple
+template <class T>
+typename std::enable_if<std::is_scalar<T>::value, T>::type
+read_key(fitsfile *fptr, const std::string &key, int *status) {
+
+  int datatype = 0;
+  if(std::is_same<T, double>::value)
+    datatype = TDOUBLE;
+  else if(std::is_same<T, float>::value)
+    datatype = TFLOAT;
+  else if(std::is_same<T, int>::value)
+    datatype = TINT;
+  else if(std::is_same<T, bool>::value)
+    datatype = TLOGICAL;
+  else
+    throw std::runtime_error("Key type of value not supported by PURIFY template for " + key);
+  T value;
+  std::string comment = "";
+  if(fits_read_key(fptr, datatype, const_cast<char *>(key.c_str()), &value,
+                   const_cast<char *>(comment.c_str()), status))
+    throw std::runtime_error("Error reading value from key " + key);
+  return value;
+}
+std::string read_key(fitsfile *fptr, const std::string &key, int *status);
 //! Write image to fits file using header information
 void write2d_header(const Image<t_real> &image, const pfitsio::header_params &header,
                     const bool &overwrite = true);
