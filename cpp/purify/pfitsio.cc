@@ -183,7 +183,7 @@ std::vector<Image<t_complex>> read3d(const std::string &fits_name) {
   if(fits_open_image(&fptr, fits_name.c_str(), READONLY, &status))
     throw std::runtime_error("Error opening image " + fits_name);
   const t_int naxis = read_key<int>(fptr, "NAXIS", &status);
-  if(naxis > 1)
+  if(naxis < 1)
     throw std::runtime_error("Image contains zero axes.");
   const t_int rows = read_key<int>(fptr, "NAXIS1", &status);
   const t_int cols = (naxis > 1) ? read_key<int>(fptr, "NAXIS2", &status) : 1;
