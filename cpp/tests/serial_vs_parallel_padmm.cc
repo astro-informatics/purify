@@ -58,12 +58,11 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   if(world.size() < 2)
     return;
 
-  auto const nvis = 10;
-  auto const width = 12;
-  auto const height = 12;
-  auto const kernel = "kb";
+  auto const nvis = 20;
+  auto const width = 32;
+  auto const height = 32;
   auto const over_sample = 2;
-  auto const J = 1;
+  auto const J = 4;
   auto const ISNR = 30;
 
   auto const uv_serial = dirty_visibilities(world, nvis, width, height, over_sample, ISNR);
@@ -71,20 +70,21 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   auto const uv_data = distribute_params(uv_serial, split_comm);
 
 
-   auto Phi
-      = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data.u, uv_data.v, uv_data.w, uv_data.weights, width, height, over_sample, 100);
-   const t_real norm = world.broadcast((Phi * Vector<t_complex>::Ones(width * height)).cwiseAbs().maxCoeff());
+  // auto Phi
+  //    = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+  //        uv_data.u, uv_data.v, uv_data.w, uv_data.weights, width, height, over_sample, 100);
+ //  const t_real norm = world.broadcast((Phi * Vector<t_complex>::Ones(width * height)).cwiseAbs().maxCoeff());
 
-    Phi
-      = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data.u, uv_data.v, uv_data.w, uv_data.weights/norm, width, height, over_sample, 0);
+ auto   Phi
+      =  *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          split_comm, uv_data.u, uv_data.v, uv_data.w, uv_data.weights, width, height, over_sample, 500, 1e-9);
 
   SECTION("Measurement operator parallelization") {
     SECTION("Gridding") {
       Vector<t_complex> const grid = Phi.adjoint() * uv_data.vis;
       auto const serial = world.broadcast(grid);
       CAPTURE(split_comm.is_root());
+      CAPTURE((grid.array()/serial.array()).head(5));
       CHECK(grid.isApprox(serial));
     }
 
