@@ -1208,26 +1208,6 @@ TEST_CASE("Operators") {
           *measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
       CHECK(std::abs(op_norm - 1.) < power_tol);
     }
-    SECTION("Degrid") {
-      const Vector<t_complex> input = Vector<t_complex>::Random(imsizex * imsizey);
-      const Image<t_complex> input_image = Image<t_complex>::Map(input.data(), imsizey, imsizex);
-      const Vector<t_complex> expected_output = weighted_expected_op.degrid(input_image);
-      const Vector<t_complex> actual_output = *measure_op * input;
-      CHECK(expected_output.size() == actual_output.size());
-      CHECK(actual_output.isApprox(
-          expected_output / std::sqrt(imsizex * imsizey * oversample_ratio * oversample_ratio),
-          1e-4));
-    }
-    SECTION("Grid") {
-      const Vector<t_complex> input = Vector<t_complex>::Random(M);
-      const Vector<t_complex> expected_output
-          = Image<t_complex>::Map(weighted_expected_op.grid(input).data(), imsizex * imsizey, 1);
-      const Vector<t_complex> actual_output = measure_op->adjoint() * input;
-      CHECK(expected_output.size() == actual_output.size());
-      CHECK(actual_output.isApprox(
-          expected_output * std::sqrt(imsizex * imsizey * oversample_ratio * oversample_ratio),
-          1e-4));
-    }
   }
 
   SECTION("Create Weighted Compact Measurement Operator") {
