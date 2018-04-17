@@ -1,4 +1,5 @@
 #include "purify/utilities.h"
+#include "purify/operators.h"
 #include "purify/config.h"
 #include <fstream>
 #include <random>
@@ -704,12 +705,17 @@ Matrix<t_complex> re_sample_ft_grid(const Matrix<t_complex> &input, const t_real
   return output;
 }
 Matrix<t_complex> re_sample_image(const Matrix<t_complex> &input, const t_real &re_sample_ratio) {
-  t_int fft_flag = (FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
-  auto fftop = purify::FFTOperator().fftw_flag(fft_flag);
-  auto const ft_grid = fftop.forward(input);
-  auto const new_ft_grid = utilities::re_sample_ft_grid(ft_grid, re_sample_ratio);
-  auto const output = fftop.inverse(new_ft_grid) * re_sample_ratio * re_sample_ratio;
-  return output;
+const auto ft_plan = operators::fftw_plan::estimate;
+  auto fft 
+      = purify::operators::init_FFT_2d<Vector<t_complex>>(input.rows(), input.cols(), 1., ft_plan);
+  Vector<t_complex> ft_grid = Vector<t_complex>::Zero(input.size());
+  std::get<0>(fft)(ft_grid, Vector<t_complex>::Map(input.data(), input.size()));
+  Matrix<t_complex> const new_ft_grid = utilities::re_sample_ft_grid(Matrix<t_complex>::Map(ft_grid.data(),input.rows(), input.cols()), re_sample_ratio);
+  Vector<t_complex> output = Vector<t_complex>::Zero(input.size());
+  fft 
+      = purify::operators::init_FFT_2d<Vector<t_complex>>(new_ft_grid.rows(), new_ft_grid.cols(), 1., ft_plan);
+  std::get<1>(fft)(output, Vector<t_complex>::Map(new_ft_grid.data(), new_ft_grid.size()));
+  return Matrix<t_complex>::Map(output.data(), new_ft_grid.rows(), new_ft_grid.cols()) * re_sample_ratio;
 }
 } // namespace utilities
 } // namespace purify
