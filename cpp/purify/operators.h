@@ -14,6 +14,8 @@
 
 #include "purify/projection_kernels.h"
 
+#include <fftw3.h>
+
 #ifdef PURIFY_MPI
 #include <sopt/mpi/communicator.h>
 #include "purify/DistributeSparseVector.h"
