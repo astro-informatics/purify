@@ -20,6 +20,7 @@ ExternalProject_Add(
     # INSTALL_DIR ${EXTERNAL_ROOT}
     CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX=${EXTERNAL_ROOT}
+    INSTALL_DIR ${EXTERNAL_ROOT}
     # Wrap download, configure and build steps in a script to log output
     UPDATE_COMMAND ""
     LOG_DOWNLOAD ON
