@@ -1,20 +1,19 @@
 #include "purify/operators.h"
 #include "purify/config.h"
-#include <iostream>
 #include "catch.hpp"
 #include "purify/MeasurementOperator.h"
 #include "purify/compact_operators.h"
 #include "purify/directories.h"
+#include "purify/test_data.h"
 #include "purify/kernels.h"
 #include "purify/logging.h"
 #include "purify/types.h"
+
 
 using namespace purify;
 using namespace purify::notinstalled;
 
 TEST_CASE("Operators") {
-  // sopt::logging::set_level("debug");
-  // purify::logging::set_level("debug");
   const t_uint M = 10;
   const t_real oversample_ratio = 2;
   const t_uint imsizex = 16;
