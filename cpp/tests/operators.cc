@@ -1171,29 +1171,7 @@ TEST_CASE("Operators") {
     indirectFFT(inverse_check, buff);
     CHECK(inverse_check.isApprox(direct_input, 1e-4));
   }
-  SECTION("Weights") {
-    MeasurementOperator weighted_expected_op(uv_vis, Ju, Jv, "kb", imsizex, imsizey, power_iters,
-                                             oversample_ratio, 1, 1, "natural", 0);
-    sopt::OperatorFunction<Vector<t_complex>> directW, indirectW;
-    std::tie(directW, indirectW)
-        = purify::operators::init_weights_<Vector<t_complex>>(uv_vis.weights);
-    const Vector<t_complex> direct_input = Vector<t_complex>::Random(M);
-    Vector<t_complex> direct_output;
-    directW(direct_output, direct_input);
-    CHECK(direct_output.size() == M);
-    const Vector<t_complex> expected_direct = weighted_expected_op.W.array() * direct_input.array();
-    CHECK(expected_direct.isApprox(direct_output, 1e-4));
-    const Vector<t_complex> indirect_input = Vector<t_complex>::Random(M);
-    Vector<t_complex> indirect_output;
-    indirectW(indirect_output, indirect_input);
-    CHECK(indirect_output.size() == M);
-    const Vector<t_complex> expected_indirect
-        = weighted_expected_op.W.conjugate().array() * indirect_input.array();
-    CHECK(expected_indirect.isApprox(indirect_output, 1e-4));
-  }
   SECTION("Create Weighted Measurement Operator") {
-    MeasurementOperator weighted_expected_op(uv_vis, Ju, Jv, "kb", imsizex, imsizey, power_iters,
-                                             oversample_ratio, 1, 1, "natural");
     const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
         power_iters, power_tol, kernel, Ju, Jv, ft_plan);
