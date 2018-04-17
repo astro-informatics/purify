@@ -1,7 +1,6 @@
 #include <iomanip>
 #include <sopt/mpi/communicator.h>
 #include "catch.hpp"
-#include "purify/MeasurementOperator_mpi.h"
 #include "purify/compact_operators.h"
 #include "purify/distribute.h"
 #include "purify/logging.h"

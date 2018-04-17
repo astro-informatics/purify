@@ -1,7 +1,6 @@
 #include "purify/operators.h"
 #include "purify/config.h"
 #include "catch.hpp"
-#include "purify/MeasurementOperator.h"
 #include "purify/compact_operators.h"
 #include "purify/directories.h"
 #include "purify/test_data.h"
