@@ -19,12 +19,15 @@ class YamlParser {
   void readFile();
   void setParserVariablesFromYaml();
   void parseAndSetGeneralConfiguration(YAML::Node node);
+  void parseAndSetInputOutput(YAML::Node node);
   // Variables
   std::string filename;
   std::string logging;
   int iterations;
   int epsilonScaling;
   std::string gamma;
+  std::string output_prefix;
+  std::string skymodel;
   YAML::Node config_file;
 };
 
@@ -60,17 +63,27 @@ void YamlParser::setParserVariablesFromYaml () {
 
 void YamlParser::parseAndSetGeneralConfiguration (YAML::Node generalConfigNode) {
   
-  // for (YAML::const_iterator iter = generalConfigNode.begin(); iter != generalConfigNode.end(); ++iter) {
-  //     std::cout << iter->first << std::endl;
-  //     std::cout << generalConfigNode[iter->first] << std::endl;   
-  //   }
-
   this->logging = generalConfigNode["logging"].as<std::string>();
   this->iterations = generalConfigNode["iterations"].as<int>();
   this->epsilonScaling = generalConfigNode["epsilonScaling"].as<int>();
   this->gamma = generalConfigNode["gamma"].as<std::string>();
+  // Go one level deeper
+  this->parseAndSetInputOutput(generalConfigNode["InputOutput"]);
   
 }
+
+void YamlParser::parseAndSetInputOutput (YAML::Node inputOutputNode) {
+
+   for (YAML::const_iterator iter = inputOutputNode.begin(); iter != inputOutputNode.end(); ++iter) {
+      // Key k = iter.first;
+      std::cout << iter->first << std::endl;
+      std::cout << inputOutputNode[iter->first] << std::endl;   
+    }
+  
+   this->output_prefix = inputOutputNode["output_prefix"].as<std::string>();
+   this->skymodel = inputOutputNode["skymodel"].as<std::string>();
+
+} 
 
 int main () {
 
