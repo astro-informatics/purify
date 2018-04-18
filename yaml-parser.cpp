@@ -20,6 +20,7 @@ class YamlParser {
   void setParserVariablesFromYaml();
   void parseAndSetGeneralConfiguration(YAML::Node node);
   void parseAndSetInputOutput(YAML::Node node);
+  void parseAndSetInput(YAML::Node node);
   // Variables
   std::string filename;
   std::string logging;
@@ -28,6 +29,11 @@ class YamlParser {
   std::string gamma;
   std::string output_prefix;
   std::string skymodel;
+  std::string measurements;
+  std::string polarization_measurement;
+  std::string noise_estimate;
+  std::string polarization_noise;
+  
   YAML::Node config_file;
 };
 
@@ -53,12 +59,6 @@ void YamlParser::setParserVariablesFromYaml () {
   
   this->parseAndSetGeneralConfiguration(this->config_file["GeneralConfiguration"]);
   
-    //   for (YAML::const_iterator iter = generalConfigNode.begin(); iter != generalConfigNode.end(); ++iter) {
-    //   // Key k = iter.first;
-    //   std::cout << iter->first << std::endl;
-    //   std::cout << generalConfigNode[iter->first] << std::endl;   
-    // }
-
 }
 
 void YamlParser::parseAndSetGeneralConfiguration (YAML::Node generalConfigNode) {
@@ -67,23 +67,29 @@ void YamlParser::parseAndSetGeneralConfiguration (YAML::Node generalConfigNode) 
   this->iterations = generalConfigNode["iterations"].as<int>();
   this->epsilonScaling = generalConfigNode["epsilonScaling"].as<int>();
   this->gamma = generalConfigNode["gamma"].as<std::string>();
-  // Go one level deeper
+  // Go one node deeper
   this->parseAndSetInputOutput(generalConfigNode["InputOutput"]);
   
 }
 
 void YamlParser::parseAndSetInputOutput (YAML::Node inputOutputNode) {
-
-   for (YAML::const_iterator iter = inputOutputNode.begin(); iter != inputOutputNode.end(); ++iter) {
-      // Key k = iter.first;
-      std::cout << iter->first << std::endl;
-      std::cout << inputOutputNode[iter->first] << std::endl;   
-    }
   
    this->output_prefix = inputOutputNode["output_prefix"].as<std::string>();
    this->skymodel = inputOutputNode["skymodel"].as<std::string>();
-
+   // Go one node deeper
+   this->parseAndSetInput(inputOutputNode["input"]);
+   
 } 
+
+void YamlParser::parseAndSetInput (YAML::Node inputNode) {
+
+   this->measurements = inputNode["measurements"].as<std::string>();
+   this->polarization_measurement = inputNode["polarization_measurement"].as<std::string>();
+   this->noise_estimate = inputNode["noise_estimate"].as<std::string>();
+   this->polarization_noise = inputNode["polarization_noise"].as<std::string>();
+   
+}
+
 
 int main () {
 
