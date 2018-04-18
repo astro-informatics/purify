@@ -10,6 +10,20 @@
 using namespace purify;
 using namespace purify::notinstalled;
 
+  namespace kernels_test {
+  const std::string test_dir = "expected/kernels/";
+  const std::vector<t_real> kernel_x_values = notinstalled::read_data<t_real>(notinstalled::data_filename(test_dir + "kernel_x_data"));
+  const std::vector<t_real> kernel_pswf_values =  notinstalled::read_data<t_real>(notinstalled::data_filename(test_dir + "kernel_pswf_data"));
+  const std::vector<t_real> kernel_kb_values = notinstalled::read_data<t_real>(notinstalled::data_filename(test_dir + "kernel_kb_data"));
+  const std::vector<t_real> kernel_gauss_values = notinstalled::read_data<t_real>(notinstalled::data_filename(test_dir + "kernel_gauss_data"));
+  
+const std::vector<t_real> correction_x_values = notinstalled::read_data<t_real>(notinstalled::data_filename(test_dir + "correction_x_data"));
+const std::vector<t_real> correction_pswf_values = notinstalled::read_data<t_real>(notinstalled::data_filename(test_dir + "correction_pswf_data"));
+const std::vector<t_real> correction_kb_values = notinstalled::read_data<t_real>(notinstalled::data_filename(test_dir + "correction_kb_data"));
+
+const std::vector<t_real> correction_gauss_values = notinstalled::read_data<t_real>(notinstalled::data_filename(test_dir + "correction_gauss_data"));
+
+  }
 
 TEST_CASE("kernels") {
   const t_uint number_of_samples = kernels_test::kernel_x_values.size();
