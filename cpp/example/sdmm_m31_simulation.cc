@@ -50,7 +50,7 @@ int main(int nargs, char const **args) {
   auto simulate_measurements 
       = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
-          2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8);
+          2, 100, 1e-4, kernels::kernel_from_string.at("kb"), 8, 8);
   uv_data.vis = simulate_measurements * sky_model;
 
   auto measurements_transform 
