@@ -4,7 +4,6 @@ include_directories(SYSTEM ${Sopt_INCLUDE_DIRS})
 include_directories("${PROJECT_SOURCE_DIR}/cpp")
 
 add_example(gridding LIBRARIES libpurify NOTEST)
-add_example(rm_gridding_example LIBRARIES libpurify NOTEST)
 add_example(generate_vis_data LIBRARIES libpurify NOTEST)
 
 
