@@ -18,9 +18,13 @@ class YamlParser {
   // Methods
   void readFile();
   void setParserVariablesFromYaml();
-  void parseAndSetGeneralConfiguration();
+  void parseAndSetGeneralConfiguration(YAML::Node node);
   // Variables
   std::string filename;
+  std::string logging;
+  int iterations;
+  int epsilonScaling;
+  std::string gamma;
   YAML::Node config_file;
 };
 
@@ -43,33 +47,29 @@ void YamlParser::readFile () {
 
 // Method for setting the class variables definition
 void YamlParser::setParserVariablesFromYaml () {
-  // for (std::size_t i=0; i<this->config_file.size(); i++) {
-  //   std::cout << "i from iteration " << i << std::endl;
-  //   std::cout << this->config_file[i] << std::endl;
-  // }
-
-  this->parseAndSetGeneralConfiguration(this->config_file["GeneralConfiguration"])
-
   
-    // std::cout << this->config_file["GeneralConfiguration"][0] << std::endl;
-
-
-    // for (YAML::const_iterator iter = config_file.begin(); iter != config_file.end(); ++iter) {
+  this->parseAndSetGeneralConfiguration(this->config_file["GeneralConfiguration"]);
+  
+    //   for (YAML::const_iterator iter = generalConfigNode.begin(); iter != generalConfigNode.end(); ++iter) {
     //   // Key k = iter.first;
     //   std::cout << iter->first << std::endl;
-    //   std::cout << config_file[iter->first] << std::endl;   
+    //   std::cout << generalConfigNode[iter->first] << std::endl;   
     // }
 
 }
 
-void Yaml::parseAndSetGeneralConfiguration (YAML::node generalConfigurationNode) {
-    for (YAML::const_iterator iter = {generalConfigurationNode.begin(); iter != generalConfigurationNode.end(); ++iter) {
-      // Key k = iter.first;
-      std::cout << iter->first << std::endl;
-      std::cout << config_file[iter->first] << std::endl;   
-    }
+void YamlParser::parseAndSetGeneralConfiguration (YAML::Node generalConfigNode) {
   
+  // for (YAML::const_iterator iter = generalConfigNode.begin(); iter != generalConfigNode.end(); ++iter) {
+  //     std::cout << iter->first << std::endl;
+  //     std::cout << generalConfigNode[iter->first] << std::endl;   
+  //   }
 
+  this->logging = generalConfigNode["logging"].as<std::string>();
+  this->iterations = generalConfigNode["iterations"].as<int>();
+  this->epsilonScaling = generalConfigNode["epsilonScaling"].as<int>();
+  this->gamma = generalConfigNode["gamma"].as<std::string>();
+  
 }
 
 int main () {
