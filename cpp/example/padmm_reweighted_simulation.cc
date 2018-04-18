@@ -56,7 +56,7 @@ int main(int nargs, char const **args) {
   auto simulate_measurements 
       = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
-          over_sample, 100, 1e-4, kernels::kernel::kb, J, J);
+          over_sample, 100, 1e-4, kernels::kernel_from_string.at("kb"), J, J);
   uv_data.vis = simulate_measurements * sky_model;
 
 
@@ -64,7 +64,7 @@ int main(int nargs, char const **args) {
   auto measurements_transform 
       = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
-          over_sample, 100, 1e-4, kernels::kernel::kb, J, J);
+          over_sample, 100, 1e-4, kernels::kernel_from_string.at(kernel), J, J);
 
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),

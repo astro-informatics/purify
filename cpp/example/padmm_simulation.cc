@@ -30,16 +30,7 @@ int main(int nargs, char const **args) {
   purify::logging::set_level("debug");
 
   std::string const test_type = args[1];
-  std::string const kernel_string = args[2];
-  kernels::kernel kernel;
-  if(kernel_string == "kb")
-    kernel = kernels::kernel::kb;
-  if(kernel_string == "pswf")
-    kernel = kernels::kernel::pswf;
-  if(kernel_string == "box")
-    kernel = kernels::kernel::box;
-  if(kernel_string == "gauss")
-    kernel = kernels::kernel::gauss;
+  const std::string kernel = args[2];
   t_real const over_sample = std::stod(static_cast<std::string>(args[3]));
   t_int const J = static_cast<t_int>(std::stod(static_cast<std::string>(args[4])));
   t_real const m_over_n = std::stod(static_cast<std::string>(args[5]));
@@ -50,9 +41,9 @@ int main(int nargs, char const **args) {
   std::string const fitsfile = image_filename(name + ".fits");
 
   std::string const dirty_image_fits
-      = output_filename(name + "_dirty_" + kernel_string + "_" + test_number + ".fits");
+      = output_filename(name + "_dirty_" + kernel + "_" + test_number + ".fits");
   std::string const results
-      = output_filename(name + "_results_" + kernel_string + "_" + test_number + ".txt");
+      = output_filename(name + "_results_" + kernel + "_" + test_number + ".txt");
 
   auto sky_model = pfitsio::read2d(fitsfile);
   auto sky_model_max = sky_model.array().abs().maxCoeff();
@@ -67,12 +58,12 @@ int main(int nargs, char const **args) {
   auto measurements_sky
       = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
-          over_sample, 100, 1e-4, kernels::kernel::kb, 8, 8);
+          over_sample, 100, 1e-4,kernels::kernel_from_string.at(kernel) , 8, 8);
   uv_data.vis = measurements_sky * Vector<t_complex>::Map(sky_model.data(), sky_model.size());
   auto measurements_transform
       = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
-          over_sample, 100, 1e-4, kernel, J, J);
+          over_sample, 100, 1e-4, kernels::kernel_from_string.at(kernel), J, J);
 
   std::vector<std::tuple<std::string, t_uint>> wavelets;
 

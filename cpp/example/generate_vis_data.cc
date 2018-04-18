@@ -18,7 +18,7 @@ int main(int nargs, char const **args) {
   std::string const fitsfile = image_filename("M31.fits");
   std::string const inputfile = output_filename("M31_input.fits");
 
-  kernels::kernel kernel = kernels::kernel::kb;
+  const std::string kernel = "kb";
   t_real const over_sample = 5.;
   t_int const J = 24;
   t_real const m_over_n = std::stod(static_cast<std::string>(args[1]));
@@ -42,7 +42,7 @@ int main(int nargs, char const **args) {
   auto measurements_transform 
       = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data.u, uv_data.v, uv_data.w, uv_data.weights, M31.cols(), M31.rows(),
-          over_sample, 100, 1e-4, kernel, J, J);
+          over_sample, 100, 1e-4, kernels::kernel_from_string.at(kernel), J, J);
   uv_data.vis = *measurements_transform * Vector<t_complex>::Map(M31.data(), M31.size());
   utilities::write_visibility(uv_data, vis_file);
 }

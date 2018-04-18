@@ -48,7 +48,7 @@ int main(int, char **) {
   auto measurements_transform
       = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data.u, uv_data.v, uv_data.w, uv_data.weights, M31.cols(), M31.rows(),
-          over_sample, 100, 1e-4, kernels::kernel::kb, 4, 4);
+          over_sample, 100, 1e-4, kernels::kernel_from_string.at("kb"), 4, 4);
 
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
