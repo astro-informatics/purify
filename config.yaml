@@ -7,7 +7,7 @@ GeneralConfiguration:
       noise_estimate: /path/to/noise/estimate # path to the noise measurement set
       polarization_noise: I # one from I Q V XX LL
     output_prefix: purified # result will be called as input with this prefix
-    skymodel:  # model of the sky, if not set created (file)
+    skymodel: none  # model of the sky, if not set created (file)
 
   ### Execution parameters
   logging: debug # How much logging you want (debug, critical, ..)# FIXME: add the options, compile?
