@@ -3,6 +3,7 @@
 
 #include "purify/config.h"
 #include <array>
+#include <map>
 #include <tuple>
 #include <boost/math/special_functions/bessel.hpp>
 #include <boost/math/special_functions/sinc.hpp>
@@ -12,6 +13,8 @@ namespace purify {
 
 namespace kernels {
 enum class kernel { kb, gauss, box, pswf, kbmin, gauss_alt };
+const std::map<std::string, kernel> kernel_from_string = {{"kb", kernel::kb}, {"gauss", kernel::gauss}, {"box", kernel::box},
+  {"pswf", kernel::pswf}, {"kbmin", kernel::kbmin}, {"gauss_alt", kernel::gauss_alt} };
 
 //! Kaiser-Bessel kernel
 t_real kaiser_bessel(const t_real &x, const t_int &J);
