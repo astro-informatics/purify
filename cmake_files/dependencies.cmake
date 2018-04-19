@@ -5,6 +5,15 @@ include(PackageLookup)
 # Get the yaml reader
 lookup_package(Yamlcpp REQUIRED)
 
+if(docs)
+  cmake_policy(SET CMP0057 NEW)
+  find_package(Doxygen REQUIRED dot)
+  if(NOT DOXYGEN_FOUND)
+    mesage(STATUS "Could not find Doxygen or dot. No building documentation")
+    set(docs OFF)
+  endif()
+endif()
+
 # Look for external software
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   find_package(Threads)
