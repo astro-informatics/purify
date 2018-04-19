@@ -3,8 +3,8 @@
 Dependencies
 ============
 
-
-* Boost for thr argument parser.
+* GNU compiler 
+* Boost for the argument parser.
 * A Yaml parser for C++: https://github.com/jbeder/yaml-cpp
 * Catch for testing
 
