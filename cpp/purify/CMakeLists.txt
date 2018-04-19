@@ -20,7 +20,7 @@ configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 set(HEADERS
   logging.h kernels.h pfitsio.h  logging.disabled.h types.h
   IndexMapping.h logging.enabled.h utilities.h operators.h operators_gpu.h wproj_utilities.h
-  cimg.h uvfits.h convolution.h projection_kernels.h measurement_operator_factory.h
+  cimg.h uvfits.h convolution.h projection_kernels.h measurement_operator_factory.h wavelet_operator_factory.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(SOURCES utilities.cc pfitsio.cc
