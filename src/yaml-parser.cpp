@@ -29,6 +29,9 @@ class YamlParser {
   void parseAndSetJ(YAML::Node node);
   void parseAndSetWProjectionOptions(YAML::Node node);
   void parseAndSetSARA(YAML::Node node);
+  void parseAndSetAlgorithmOptions(YAML::Node node);
+  void parseAndSetPADMM(YAML::Node node);
+  void parseAndSetPD(YAML::Node node);
   std::vector<int> getWavelets(std::string values_str);
   // Variables
   std::string filename;
@@ -58,6 +61,15 @@ class YamlParser {
   std::vector<int> wavelet_basis;
   int wavelet_levels;
   std::string algorithm;
+  int epsilonConvergenceScaling;
+  bool realValueConstraint;
+  bool positiveValueConstraint;
+  std::string mpiAlgorithm;
+  float relVarianceConvergence;
+  std::string param1;
+  std::string param2;
+
+
   
   YAML::Node config_file;
 };
@@ -85,7 +97,33 @@ void YamlParser::setParserVariablesFromYaml () {
   this->parseAndSetGeneralConfiguration(this->config_file["GeneralConfiguration"]);
   this->parseAndSetMeasureOperators(this->config_file["MeasureOperators"]);
   this->parseAndSetSARA(this->config_file["SARA"]);
+  this->parseAndSetAlgorithmOptions(this->config_file["AlgorithmOptions"]);
   
+}
+
+void YamlParser::parseAndSetAlgorithmOptions(YAML::Node algorithmOptionsNode) {
+
+  this->parseAndSetPADMM(algorithmOptionsNode["padmm"]);
+  this->parseAndSetPD(algorithmOptionsNode["pd"]);
+
+}
+
+void YamlParser::parseAndSetPD(YAML::Node pdNode) {
+
+  // this->param1 = pdNode["param1"].as<std::string>();
+  // this->param2 = pdNode["param2"].as<std::string>();
+  
+
+}
+
+void YamlParser::parseAndSetPADMM(YAML::Node padmmNode) {
+
+  this->epsilonConvergenceScaling = padmmNode["epsilonConvergenceScaling"].as<int>();
+  this->realValueConstraint = padmmNode["realValueConstraint"].as<bool>();
+  this->positiveValueConstraint = padmmNode["positiveValueConstraint"].as<bool>();
+  this->mpiAlgorithm = padmmNode["mpiAlgorithm"].as<std::string>();
+  this->relVarianceConvergence = padmmNode["relVarianceConvergence"].as<float>();
+
 }
 
 
