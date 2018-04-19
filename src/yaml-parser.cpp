@@ -80,7 +80,15 @@ void YamlParser::setParserVariablesFromYaml () {
   
   this->parseAndSetGeneralConfiguration(this->config_file["GeneralConfiguration"]);
   this->parseAndSetMeasureOperators(this->config_file["MeasureOperators"]);
+  this->parseAndSetSARA(this->config_file["SARA"]);
   
+}
+
+
+void YamlParser::parseAndSetSARA(YAML::Node SARANode) {
+
+
+
 }
 
 void YamlParser::parseAndSetMeasureOperators (YAML::Node measureOperatorsNode) {
