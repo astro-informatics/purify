@@ -21,6 +21,7 @@ class YamlParser {
   void readFile();
   void setParserVariablesFromYaml();
   void parseAndSetGeneralConfiguration(YAML::Node node);
+  void parseAndSetMeasureOperators(YAML::Node node);
   void parseAndSetInputOutput(YAML::Node node);
   void parseAndSetInput(YAML::Node node);
   // Variables
@@ -60,8 +61,16 @@ void YamlParser::readFile () {
 void YamlParser::setParserVariablesFromYaml () {
   
   this->parseAndSetGeneralConfiguration(this->config_file["GeneralConfiguration"]);
+  this->parseAndSetMeasureOperators(this->config_file["MeasureOperators"]);
   
 }
+
+void YamlParser::parseAndSetMeasureOperators (YAML::Node measureOperatorsNode) {
+
+  
+
+}
+
 
 void YamlParser::parseAndSetGeneralConfiguration (YAML::Node generalConfigNode) {
   
