@@ -3,7 +3,9 @@
 #include <fstream>
 #include "yaml-cpp/yaml.h"
 #include <assert.h>
+#include <boost/program_options.hpp>
 
+namespace po = boost::program_options;
 
 bool fexists(const char *filename) {
   std::ifstream ifile(filename);
@@ -91,13 +93,47 @@ void YamlParser::parseAndSetInput (YAML::Node inputNode) {
 }
 
 
-int main () {
+int main (int argc, char *argv[]) {
+
+  // Declare the supported options.
+  po::options_description desc(std::string (argv[0]).append("options"));
+  desc.add_options()
+    ("help", "produce help message");
+  po::variables_map args;
+  po::store (po::command_line_parser (argc, argv).options (desc)
+                        .style (po::command_line_style::default_style |
+                                po::command_line_style::allow_long_disguise)
+                        .run (), args);
+  po::notify (args);
+  if (args.count ("h")) {
+    std::cout << desc << std::endl;
+            return 0;
+        }
+  // po::variables_map vm;
+  // po::store(po::parse_command_line(ac, av, desc), vm);
+  // po::notify(vm);    
+
+  // if (vm.count("help")) {
+  //   std::cout << desc << "\n";
+  //   return 1;
+  // }
+
+  // if (vm.count("compression")) {
+  //   std::cout << "Compression level was set to " << vm["compression"].as<int>() << ".\n";
+  // } else {
+  //   std::cout << "Compression level was not set.\n";
+  // }
+
+
+
+
+  
 
   // A bit of defensive programming
-  assert (fexists("config.yaml"));
+  assert (fexists("../data/config.yaml"));
 
   // Parsing the YAML file and setting the class variables
-  YamlParser yaml_parser = YamlParser("config.yaml");
+  YamlParser yaml_parser = YamlParser("../data/config.yaml");
 
   return 0;
   
