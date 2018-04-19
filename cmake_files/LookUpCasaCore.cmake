@@ -43,7 +43,6 @@ ExternalProject_Add(
       -C "${EXTERNAL_ROOT}/src/CasaCoreVariables.cmake"
       -DBUILD_SHARED_LIBS=OFF
       -DCMAKE_BUILD_TYPE=${CasaCore_BUILD_TYPE}
-      -DUSE_FFTW3=ON
       -DUSE_OPENMP=${CasaCore_OPENMP}
       -DBUILD_PYTHON=OFF
       -DUSE_THREADS=${CasaCore_THREADS}
