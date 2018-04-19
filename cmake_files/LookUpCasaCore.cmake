@@ -41,7 +41,6 @@ ExternalProject_Add(
     GIT_TAG ${CasaCore_GIT_TAG}
     CMAKE_ARGS
       -C "${EXTERNAL_ROOT}/src/CasaCoreVariables.cmake"
-      -DBUILD_SHARED_LIBS=OFF
       -DCMAKE_BUILD_TYPE=${CasaCore_BUILD_TYPE}
       -DUSE_OPENMP=${CasaCore_OPENMP}
       -DBUILD_PYTHON=OFF
