@@ -24,7 +24,7 @@ using namespace purify;
 using namespace purify::notinstalled;
 
 void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey,
-           const kernels::kernel kernel, const t_int J, const utilities::vis_params &uv_data,
+           const std::string & kernel, const t_int J, const utilities::vis_params &uv_data,
            const t_real sigma, const std::tuple<bool, t_real> &w_term) {
 
   std::string const outfile_fits = output_filename(name + "_solution.fits");
@@ -36,7 +36,7 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform
       = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 100,
-          1e-4, kernel, J, J, operators::fftw_plan::measure, std::get<0>(w_term), 12);
+          1e-4, kernels::kernel_from_string.at(kernel), J, J, operators::fftw_plan::measure, std::get<0>(w_term), 12);
   t_uint const M = uv_data.size();
   t_uint const N = imsizex * imsizey;
   sopt::wavelets::SARA const sara{
@@ -156,6 +156,7 @@ int main(int, char **) {
   const t_real cellsize = 20;
   const t_uint imsizex = 1024;
   const t_uint imsizey = 1024;
+  const std::string kernel = "kb";
   const std::vector<std::string> inputfiles
       = {vla_filename("../mwa/uvdump_01.uvfits"), vla_filename("../mwa/uvdump_02.uvfits")};
 
@@ -163,7 +164,7 @@ int main(int, char **) {
   t_real const sigma = uv_data.weights.norm() / std::sqrt(uv_data.weights.size()) * 0.05;
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array()
                 / uv_data.weights.array().cwiseAbs().maxCoeff();
-  padmm(name, imsizex, imsizey, kernels::kernel::kb, 4, uv_data, sigma,
+  padmm(name, imsizex, imsizey, kernel, 4, uv_data, sigma,
         std::make_tuple(w_term, cellsize));
   return 0;
 }

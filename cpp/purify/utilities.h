@@ -5,7 +5,6 @@
 #include <fstream>
 #include <string>
 #include <type_traits>
-#include "purify/FFTOperator.h"
 #include "purify/types.h"
 
 namespace purify {

@@ -18,7 +18,7 @@ int main(int nargs, char const **args) {
   auto const imsizex = 256;
   auto const imsizey = 256;
 
-  auto const kernel = kernels::kernel::kb;
+  auto const kernel = "kb";
 
   t_uint const number_of_pixels = imsizex * imsizey;
   t_uint const number_of_vis = 4e6; // std::floor(number_of_pixels * 2);
@@ -29,7 +29,7 @@ int main(int nargs, char const **args) {
   const Vector<t_complex> image = Vector<t_complex>::Random(number_of_pixels);
   const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
-      power_tol, kernel, Ju, Jv, ft_plan);
+      power_tol, kernels::kernel_from_string.at(kernel), Ju, Jv, ft_plan);
   for(t_uint i = 0; i < 100; i++) {
     PURIFY_LOW_LOG("Iteration: {}", i);
     Vector<t_complex> const measurements = *measure_op * image;

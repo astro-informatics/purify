@@ -160,7 +160,7 @@ int main(int nargs, char const **args) {
   const t_real max_w = 100; // lambda
   const std::string name = "M31";
   const t_real snr = 30;
-  auto const kernel = kernels::kernel::kb;
+  auto const kernel = "kb";
   const bool w_term = true;
   // string of fits file of image to reconstruct
   auto ground_truth_image = pfitsio::read2d(image_filename(name + ".fits"));
@@ -178,26 +178,26 @@ int main(int nargs, char const **args) {
 #ifndef PURIFY_GPU
   auto const measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernel, 4, 4, operators::fftw_plan::measure, w_term);
+      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, operators::fftw_plan::measure, w_term);
 
 #else
   af::setDevice(0);
   auto const measurements = gpu::measurementoperator::init_degrid_operator_2d(
       world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernel, 8, 8, w_term);
+      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, w_term);
 
 #endif
 #elif PURIFY_PADMM_ALGORITHM == 1
 #ifndef PURIFY_GPU
   auto const measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
       world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernel, 8, 8, operators::fftw_plan::measure, w_term);
+      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, operators::fftw_plan::measure, w_term);
 
 #else
   af::setDevice(0);
   auto const measurements = gpu::measurementoperator::init_degrid_operator_2d_mpi(
       world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernel, 8, 8, w_term);
+      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, w_term);
 
 #endif
 #endif
@@ -224,11 +224,11 @@ int main(int nargs, char const **args) {
   if(world.is_root()) {
     boost::filesystem::path const path(output_filename(name));
 #if PURIFY_PADMM_ALGORITHM == 3
-    auto const pb_path = path / "local_epsilon_replicated_grids";
+    auto const pb_path = path / kernel / "local_epsilon_replicated_grids";
 #elif PURIFY_PADMM_ALGORITHM == 2
-    auto const pb_path = path / "global_epsilon_replicated_grids";
+    auto const pb_path = path / kernel / "global_epsilon_replicated_grids";
 #elif PURIFY_PADMM_ALGORITHM == 1
-    auto const pb_path = path / "local_epsilon_distributed_grids";
+    auto const pb_path = path / kernel / "local_epsilon_distributed_grids";
 #else
 #error Unknown or unimplemented algorithm
 #endif

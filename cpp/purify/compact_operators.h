@@ -322,7 +322,6 @@ init_psf_convolve_2d(const std::shared_ptr<sopt::LinearTransform<T> const> &degr
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   t_uint const index = utilities::sub2ind(std::floor(imsizey * 0.5) - 1,
                                           std::floor(imsizex * 0.5) - 1, imsizey, imsizex);
-  std::cout << index << std::endl;
   T delta = T::Zero(imsizey * imsizex);
   delta(index) = 1.;
   const T psf = degrid_grid->adjoint() * (*degrid_grid * delta);

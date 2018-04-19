@@ -4,14 +4,8 @@ include_directories(SYSTEM ${Sopt_INCLUDE_DIRS})
 include_directories("${PROJECT_SOURCE_DIR}/cpp")
 
 add_example(gridding LIBRARIES libpurify NOTEST)
-add_example(rm_gridding_example LIBRARIES libpurify NOTEST)
 add_example(generate_vis_data LIBRARIES libpurify NOTEST)
 
-add_example(time_gridding_degridding LIBRARIES libpurify NOTEST)
-
-add_example(sdmm_vla LIBRARIES libpurify NOTEST)
-
-add_example(resample LIBRARIES libpurify)
 
 add_example(show_image LIBRARIES libpurify NOTEST)
 add_example(sdmm_m31_simulation LIBRARIES libpurify NOTEST)
@@ -87,7 +81,6 @@ if(PURIFY_MPI AND PURIFY_ARRAYFIRE)
 endif()
 add_example(sara_padmm_random_coverage LIBRARIES libpurify NOTEST)
 
-add_example(clean_vla LIBRARIES libpurify NOTEST)
 
 if(data AND TARGET casacore::ms)
   add_example(casa LIBRARIES libpurify)

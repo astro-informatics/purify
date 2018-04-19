@@ -8,7 +8,6 @@
 #include <sopt/mpi/communicator.h>
 #include <sopt/mpi/utilities.h>
 #include <sopt/wavelets.h>
-#include "purify/MeasurementOperator.h"
 #include "purify/directories.h"
 #include "purify/distribute.h"
 #include "purify/logging.h"
@@ -16,6 +15,7 @@
 #include "purify/pfitsio.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
+#include "purify/operators.h"
 
 using namespace purify;
 utilities::vis_params dirty_visibilities(t_uint number_of_vis = 10, t_uint width = 20,
@@ -58,28 +58,33 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   if(world.size() < 2)
     return;
 
-  auto const nvis = 10;
-  auto const width = 12;
-  auto const height = 12;
-  auto const kernel = "kb";
+  auto const nvis = 20;
+  auto const width = 32;
+  auto const height = 32;
   auto const over_sample = 2;
-  auto const J = 1;
+  auto const J = 4;
   auto const ISNR = 30;
 
   auto const uv_serial = dirty_visibilities(world, nvis, width, height, over_sample, ISNR);
   // distribute only on processors doing it parallel
   auto const uv_data = distribute_params(uv_serial, split_comm);
 
-  auto measurements = std::make_shared<MeasurementOperator>(uv_data, J, J, kernel, width, height,
-                                                            100, over_sample);
-  measurements->norm = world.broadcast(measurements->norm);
-  auto const Phi = linear_transform(measurements, uv_data.vis.size(), split_comm);
+
+  // auto Phi
+  //    = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+  //        uv_data.u, uv_data.v, uv_data.w, uv_data.weights, width, height, over_sample, 100);
+ //  const t_real norm = world.broadcast((Phi * Vector<t_complex>::Ones(width * height)).cwiseAbs().maxCoeff());
+
+ auto   Phi
+      =  *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          split_comm, uv_data.u, uv_data.v, uv_data.w, uv_data.weights, width, height, over_sample, 500, 1e-9);
 
   SECTION("Measurement operator parallelization") {
     SECTION("Gridding") {
       Vector<t_complex> const grid = Phi.adjoint() * uv_data.vis;
       auto const serial = world.broadcast(grid);
       CAPTURE(split_comm.is_root());
+      CAPTURE((grid.array()/serial.array()).head(5));
       CHECK(grid.isApprox(serial));
     }
 
@@ -114,11 +119,11 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   auto const startw = start(sara.size(), split_comm.size(), split_comm.rank());
   auto const endw = start(sara.size(), split_comm.size(), split_comm.rank() + 1);
   auto const split_sara = sopt::wavelets::SARA(sara.begin() + startw, sara.begin() + endw);
-  auto const Psi = sopt::linear_transform<t_complex>(split_sara, measurements->imsizey(),
-                                                     measurements->imsizex(), split_comm);
+  auto const Psi = sopt::linear_transform<t_complex>(split_sara, height,
+                                                     width, split_comm);
   SECTION("Wavelet operator parallelization") {
-    auto const Nx = measurements->imsizex();
-    auto const Ny = measurements->imsizey();
+    auto const Nx = width;
+    auto const Ny = height;
     SECTION("Signal to Coefficients") {
       auto const signal = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(Nx * Ny));
       Vector<t_complex> const coefficients = Psi.adjoint() * signal;

@@ -8,7 +8,7 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include "purify/MeasurementOperator.h"
+#include "purify/operators.h"
 #include "purify/directories.h"
 #include "purify/logging.h"
 #include "purify/pfitsio.h"
@@ -47,15 +47,16 @@ int main(int nargs, char const **args) {
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = utilities::vis_units::radians;
   PURIFY_MEDIUM_LOG("Number of measurements: {}", uv_data.u.size());
-  MeasurementOperator simulate_measurements(uv_data, 4, 4, "kb", sky_model.cols(), sky_model.rows(),
-                                            20,
-                                            5); // Generating simulated high quality visibilites
-  uv_data.vis = simulate_measurements.degrid(sky_model);
+  auto simulate_measurements 
+      = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
+          2, 100, 1e-4, kernels::kernel_from_string.at("kb"), 8, 8);
+  uv_data.vis = simulate_measurements * sky_model;
 
-  auto const measurements = std::make_shared<MeasurementOperator const>(
-      uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(), over_sample);
-  // putting measurement operator in a form that sopt can use
-  auto measurements_transform = linear_transform(measurements, uv_data.vis.size());
+  auto measurements_transform 
+      = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
+          over_sample, 100, 1e-4, kernels::kernel_from_string.at(kernel), J, J);
 
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
@@ -63,7 +64,7 @@ int main(int nargs, char const **args) {
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
   auto const Psi
-      = sopt::linear_transform<t_complex>(sara, measurements->imsizey(), measurements->imsizex());
+      = sopt::linear_transform<t_complex>(sara, sky_model.rows(), sky_model.cols());
 
   // working out value of sigma given SNR of 30
   t_real sigma = utilities::SNR_to_standard_deviation(uv_data.vis, 30.);
@@ -75,7 +76,7 @@ int main(int nargs, char const **args) {
   dimage = dimage / max_val;
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   pfitsio::write2d(
-      Image<t_real>::Map(dimage.data(), measurements->imsizey(), measurements->imsizex()),
+      Image<t_real>::Map(dimage.data(), sky_model.rows(), sky_model.cols()),
       dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
@@ -99,7 +100,7 @@ int main(int nargs, char const **args) {
     PURIFY_HIGH_LOG("SDMM did no converge");
   std::clock_t c_end = std::clock();
   Image<t_complex> image
-      = Image<t_complex>::Map(result.data(), measurements->imsizey(), measurements->imsizex());
+      = Image<t_complex>::Map(result.data(), sky_model.rows(), sky_model.cols());
   t_real const max_val_final = image.array().abs().maxCoeff();
   image = image / max_val_final;
 
