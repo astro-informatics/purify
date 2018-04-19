@@ -50,5 +50,7 @@ ExternalProject_Add(
     LOG_CONFIGURE ON
     LOG_BUILD ON
 )
+
+set(CasaCore_DIR ${EXTERNAL_ROOT})
 add_recursive_cmake_step(Lookup-CasaCore DEPENDEES install)
 
