@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include "yaml-cpp/yaml.h"
+#include "yaml-parser.h"
 #include <assert.h>
 #include <boost/program_options.hpp>
 
@@ -11,33 +12,6 @@ bool fexists(const char *filename) {
   std::ifstream ifile(filename);
   return (bool)ifile;
 }
-
-class YamlParser {
-
- public:
-  // Constructor
-  YamlParser(std::string filename);
-  // Methods
-  void readFile();
-  void setParserVariablesFromYaml();
-  void parseAndSetGeneralConfiguration(YAML::Node node);
-  void parseAndSetInputOutput(YAML::Node node);
-  void parseAndSetInput(YAML::Node node);
-  // Variables
-  std::string filename;
-  std::string logging;
-  int iterations;
-  double epsilonScaling;
-  double gamma;
-  std::string output_prefix;
-  std::string skymodel;
-  std::string measurements;
-  std::string polarization_measurement;
-  std::string noise_estimate;
-  std::string polarization_noise;
-  
-  YAML::Node config_file;
-};
 
 // YamlParser constructor definition
 YamlParser::YamlParser (std::string filename) {
@@ -93,49 +67,49 @@ void YamlParser::parseAndSetInput (YAML::Node inputNode) {
 }
 
 
-int main (int argc, char *argv[]) {
+// int main (int argc, char *argv[]) {
 
-  // Declare the supported options.
-  po::options_description desc(std::string (argv[0]).append("options"));
-  desc.add_options()
-    ("help", "produce help message");
-  po::variables_map args;
-  po::store (po::command_line_parser (argc, argv).options (desc)
-                        .style (po::command_line_style::default_style |
-                                po::command_line_style::allow_long_disguise)
-                        .run (), args);
-  po::notify (args);
-  if (args.count ("h")) {
-    std::cout << desc << std::endl;
-            return 0;
-        }
-  // po::variables_map vm;
-  // po::store(po::parse_command_line(ac, av, desc), vm);
-  // po::notify(vm);    
+//   // Declare the supported options.
+//   po::options_description desc(std::string (argv[0]).append("options"));
+//   desc.add_options()
+//     ("help", "produce help message");
+//   po::variables_map args;
+//   po::store (po::command_line_parser (argc, argv).options (desc)
+//                         .style (po::command_line_style::default_style |
+//                                 po::command_line_style::allow_long_disguise)
+//                         .run (), args);
+//   po::notify (args);
+//   if (args.count ("h")) {
+//     std::cout << desc << std::endl;
+//             return 0;
+//         }
+//   // po::variables_map vm;
+//   // po::store(po::parse_command_line(ac, av, desc), vm);
+//   // po::notify(vm);    
 
-  // if (vm.count("help")) {
-  //   std::cout << desc << "\n";
-  //   return 1;
-  // }
+//   // if (vm.count("help")) {
+//   //   std::cout << desc << "\n";
+//   //   return 1;
+//   // }
 
-  // if (vm.count("compression")) {
-  //   std::cout << "Compression level was set to " << vm["compression"].as<int>() << ".\n";
-  // } else {
-  //   std::cout << "Compression level was not set.\n";
-  // }
+//   // if (vm.count("compression")) {
+//   //   std::cout << "Compression level was set to " << vm["compression"].as<int>() << ".\n";
+//   // } else {
+//   //   std::cout << "Compression level was not set.\n";
+//   // }
 
 
 
 
   
 
-  // A bit of defensive programming
-  assert (fexists("../data/config.yaml"));
+//   // A bit of defensive programming
+//   assert (fexists("../data/config.yaml"));
 
-  // Parsing the YAML file and setting the class variables
-  YamlParser yaml_parser = YamlParser("../data/config.yaml");
+//   // Parsing the YAML file and setting the class variables
+//   YamlParser yaml_parser = YamlParser("../data/config.yaml");
 
-  return 0;
+//   return 0;
   
-}
+// }
 
