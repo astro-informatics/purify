@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include "yaml-cpp/yaml.h"
+#include "yaml-parser.h"
 #include <assert.h>
 #include <boost/program_options.hpp>
 
@@ -11,56 +12,6 @@ bool fexists(const char *filename) {
   std::ifstream ifile(filename);
   return (bool)ifile;
 }
-
-class YamlParser {
-
- public:
-  // Constructor
-  YamlParser(std::string filename);
-  // Methods
-  void readFile();
-  void setParserVariablesFromYaml();
-  void parseAndSetGeneralConfiguration(YAML::Node node);
-  void parseAndSetMeasureOperators(YAML::Node node);
-  void parseAndSetInputOutput(YAML::Node node);
-  void parseAndSetInput(YAML::Node node);
-  void parseAndSetPixelSize(YAML::Node node);
-  void parseAndSetImageSize(YAML::Node node);
-  void parseAndSetJ(YAML::Node node);
-  void parseAndSetWProjectionOptions(YAML::Node node);
-  void parseAndSetSARA(YAML::Node node);
-  std::vector<int> getWavelets(std::string values_str);
-  // Variables
-  std::string filename;
-  std::string logging;
-  int iterations;
-  int epsilonScaling;
-  std::string gamma;
-  std::string output_prefix;
-  std::string skymodel;
-  std::string measurements;
-  std::string polarization_measurement;
-  std::string noise_estimate;
-  std::string polarization_noise;
-  std::string Jweights;
-  bool wProjection;
-  float oversampling;
-  int powMethod_iter;
-  float powMethod_tolerance;
-  double Dx;
-  double Dy;
-  int x;
-  int y;
-  unsigned int Jx;
-  unsigned int Jy;
-  float chirp_fraction;
-  float kernel_fraction;
-  std::vector<int> wavelet_basis;
-  int wavelet_levels;
-  std::string algorithm;
-  
-  YAML::Node config_file;
-};
 
 // YamlParser constructor definition
 YamlParser::YamlParser (std::string filename) {
@@ -213,49 +164,49 @@ void YamlParser::parseAndSetInput (YAML::Node inputNode) {
 }
 
 
-int main (int argc, char *argv[]) {
+// int main (int argc, char *argv[]) {
 
-  // Declare the supported options.
-  po::options_description desc(std::string (argv[0]).append("options"));
-  desc.add_options()
-    ("help", "produce help message");
-  po::variables_map args;
-  po::store (po::command_line_parser (argc, argv).options (desc)
-                        .style (po::command_line_style::default_style |
-                                po::command_line_style::allow_long_disguise)
-                        .run (), args);
-  po::notify (args);
-  if (args.count ("h")) {
-    std::cout << desc << std::endl;
-            return 0;
-        }
-  // po::variables_map vm;
-  // po::store(po::parse_command_line(ac, av, desc), vm);
-  // po::notify(vm);    
+//   // Declare the supported options.
+//   po::options_description desc(std::string (argv[0]).append("options"));
+//   desc.add_options()
+//     ("help", "produce help message");
+//   po::variables_map args;
+//   po::store (po::command_line_parser (argc, argv).options (desc)
+//                         .style (po::command_line_style::default_style |
+//                                 po::command_line_style::allow_long_disguise)
+//                         .run (), args);
+//   po::notify (args);
+//   if (args.count ("h")) {
+//     std::cout << desc << std::endl;
+//             return 0;
+//         }
+//   // po::variables_map vm;
+//   // po::store(po::parse_command_line(ac, av, desc), vm);
+//   // po::notify(vm);    
 
-  // if (vm.count("help")) {
-  //   std::cout << desc << "\n";
-  //   return 1;
-  // }
+//   // if (vm.count("help")) {
+//   //   std::cout << desc << "\n";
+//   //   return 1;
+//   // }
 
-  // if (vm.count("compression")) {
-  //   std::cout << "Compression level was set to " << vm["compression"].as<int>() << ".\n";
-  // } else {
-  //   std::cout << "Compression level was not set.\n";
-  // }
+//   // if (vm.count("compression")) {
+//   //   std::cout << "Compression level was set to " << vm["compression"].as<int>() << ".\n";
+//   // } else {
+//   //   std::cout << "Compression level was not set.\n";
+//   // }
 
 
 
 
   
 
-  // A bit of defensive programming
-  assert (fexists("../data/config.yaml"));
+//   // A bit of defensive programming
+//   assert (fexists("../data/config.yaml"));
 
-  // Parsing the YAML file and setting the class variables
-  YamlParser yaml_parser = YamlParser("../data/config.yaml");
+//   // Parsing the YAML file and setting the class variables
+//   YamlParser yaml_parser = YamlParser("../data/config.yaml");
 
-  return 0;
+//   return 0;
   
-}
+// }
 
