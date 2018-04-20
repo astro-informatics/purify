@@ -1,8 +1,8 @@
 
 #include <iostream>
 #include <fstream>
-#include "yaml-parser.h"
 #include "yaml-cpp/yaml.h"
+#include "yaml-parser.h"
 #include <assert.h>
 #include <boost/program_options.hpp>
 
@@ -12,6 +12,7 @@ bool fexists(const char *filename) {
   std::ifstream ifile(filename);
   return (bool)ifile;
 }
+
 
 // YamlParser constructor definition
 YamlParser::YamlParser (std::string filename) {
@@ -83,10 +84,6 @@ void YamlParser::parseAndSetInput (YAML::Node inputNode) {
 //     std::cout << desc << std::endl;
 //             return 0;
 //         }
-
-
-//   std::cout << "Yay" << std::endl;
-
 //   // po::variables_map vm;
 //   // po::store(po::parse_command_line(ac, av, desc), vm);
 //   // po::notify(vm);    
@@ -111,7 +108,7 @@ void YamlParser::parseAndSetInput (YAML::Node inputNode) {
 //   assert (fexists("../data/config.yaml"));
 
 //   // Parsing the YAML file and setting the class variables
-//   // YamlParser yaml_parser = YamlParser("../data/config.yaml");
+//   YamlParser yaml_parser = YamlParser("../data/config.yaml");
 
 //   return 0;
   
