@@ -1,4 +1,3 @@
-
 yaml-parser:
 	g++ -c yaml-parser.cpp
 test:

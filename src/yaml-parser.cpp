@@ -34,7 +34,53 @@ void YamlParser::readFile () {
 void YamlParser::setParserVariablesFromYaml () {
   
   this->parseAndSetGeneralConfiguration(this->config_file["GeneralConfiguration"]);
+  this->parseAndSetMeasureOperators(this->config_file["MeasureOperators"]);
   
+}
+
+void YamlParser::parseAndSetMeasureOperators (YAML::Node measureOperatorsNode) {
+
+  this->Jweights = measureOperatorsNode["Jweights"].as<std::string>();
+  this->wProjection = measureOperatorsNode["wProjection"].as<bool>();
+  this->oversampling = measureOperatorsNode["oversampling"].as<float>();
+  this->powMethod_iter = measureOperatorsNode["powMethod_iter"].as<int>();
+  this->powMethod_tolerance = measureOperatorsNode["powMethod_tolerance"].as<float>();
+
+  this->parseAndSetPixelSize(measureOperatorsNode["pixelSize"]);
+  this->parseAndSetImageSize(measureOperatorsNode["imageSize"]);
+  this->parseAndSetJ(measureOperatorsNode["J"]);
+  this->parseAndSetWProjectionOptions(measureOperatorsNode["wProjection_options"]);
+
+  
+}
+
+
+void YamlParser::parseAndSetWProjectionOptions(YAML::Node wProjectionOptionsNode) {
+
+  this->chirp_fraction = wProjectionOptionsNode["chirp_fraction"].as<float>();
+  this->kernel_fraction = wProjectionOptionsNode["kernel_fraction"].as<float>();
+  
+}
+
+void YamlParser::parseAndSetJ(YAML::Node Jnode) {
+
+  this->Jx = Jnode["Jx"].as<unsigned int>();
+  this->Jy = Jnode["Jy"].as<unsigned int>();
+
+}
+
+void YamlParser::parseAndSetPixelSize(YAML::Node pixelSizeNode) {
+
+  this->Dx = pixelSizeNode["Dx"].as<double>();
+  this->Dy = pixelSizeNode["Dy"].as<double>();
+
+}
+
+void YamlParser::parseAndSetImageSize(YAML::Node imageSizeNode) {
+
+  this->x = imageSizeNode["x"].as<int>();
+  this->y = imageSizeNode["y"].as<int>();
+
 }
 
 void YamlParser::parseAndSetGeneralConfiguration (YAML::Node generalConfigNode) {
