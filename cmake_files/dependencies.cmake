@@ -95,6 +95,9 @@ if(docimg)
 endif()
 if(docasa)
   find_package(CasaCore OPTIONAL_COMPONENTS ms)
+  if(NOT CasaCore_FOUND)
+    lookup_package(CasaCore REQUIRED)
+  endif()
 endif()
 
 # Add script to execute to make sure libraries in the build tree can be found
