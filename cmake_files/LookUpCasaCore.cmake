@@ -1,6 +1,6 @@
-# Looks up [CasaCore](http://basp-group.github.io/sopt/)
+# Looks up [CasaCore](https://github.com/casacore/casacore)
 #
-# - GIT_REPOSITORY: defaults to https://github.com/basp-group/sopt.git
+# - GIT_REPOSITORY: defaults to https://github.com/casacore/casacore.git
 # - GIT_TAG: defaults to master
 # - BUILD_TYPE: defaults to Release
 #
@@ -11,7 +11,7 @@ if(NOT CasaCore_GIT_REPOSITORY)
     set(CasaCore_GIT_REPOSITORY https://github.com/casacore/casacore.git)
 endif()
 if(NOT CasaCore_GIT_TAG)
-    set(CasaCore_GIT_TAG v2.4.1)
+    set(CasaCore_GIT_TAG v2.4.1) # Hardcoded to latest release
 endif()
 if(NOT CasaCore_BUILD_TYPE)
     set(CasaCore_BUILD_TYPE Release)
@@ -23,7 +23,7 @@ if(NOT CasaCore_THREADS)
   set(CasaCore_THREADS OFF)
 endif()
 
-# write subset of variables to cache for sopt to use
+# write subset of variables to cache for casacore to use
 include(PassonVariables)
 passon_variables(Lookup-CasaCore
   FILENAME "${EXTERNAL_ROOT}/src/CasaCoreVariables.cmake"
