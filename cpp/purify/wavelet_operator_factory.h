@@ -1,6 +1,9 @@
 #ifndef WAVELET_OPERATOR_FACTORY_H
 #define WAVELET_OPERATOR_FACTORY_H
 
+#include "purify/config.h"
+#include "purify/types.h"
+
 #include <vector>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
@@ -11,7 +14,7 @@ namespace purify {
 //! construct distributed sara wavelet operator
 #ifdef PURIFY_MPI
 template <class T>
-std::shared_ptr<sopt::LinearTransform<T>>
+std::shared_ptr<sopt::LinearTransform<T> const>
 wavelet_operator_factory(const sopt::mpi::Communicator &comm, const std::vector<std::tuple<std::string, t_uint>> & wavelets,
     const t_uint imsizey, const t_uint imsizex){
   const auto sara = sopt::wavelets::SARA(wavelets.begin(), wavelets.end());
@@ -21,7 +24,7 @@ return  std::make_shared<sopt::LinearTransform<T>>(sopt::linear_transform<typena
 #endif
 //! construct sara wavelet operator
 template <class T>
-std::shared_ptr<sopt::LinearTransform<T>>
+std::shared_ptr<sopt::LinearTransform<T> const>
 wavelet_operator_factory(const std::vector<std::tuple<std::string, t_uint>> & wavelets,
     const t_uint imsizey, const t_uint imsizex){
   const auto sara = sopt::wavelets::SARA(wavelets.begin(), wavelets.end());
