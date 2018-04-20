@@ -13,7 +13,6 @@ bool fexists(const char *filename) {
   return (bool)ifile;
 }
 
-
 // YamlParser constructor definition
 YamlParser::YamlParser (std::string filename) {
   // Setting the variable
