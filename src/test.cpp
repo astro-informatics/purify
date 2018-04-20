@@ -25,5 +25,21 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser.noise_estimate == "/path/to/noise/estimate");
     REQUIRE(yaml_parser.polarization_noise == "I");
   }
+  SECTION("Check the MeasureOperators node variables") {
+    REQUIRE(yaml_parser.Jweights == "kb");
+    REQUIRE(yaml_parser.wProjection == false);
+    REQUIRE(yaml_parser.oversampling == 2);
+    REQUIRE(yaml_parser.powMethod_iter == 100);
+    REQUIRE(yaml_parser.powMethod_tolerance == float(1e-4));
+    REQUIRE(yaml_parser.Dx == 1);
+    REQUIRE(yaml_parser.Dy == 1);
+    REQUIRE(yaml_parser.x == 1024);
+    REQUIRE(yaml_parser.y == 1024);
+    REQUIRE(yaml_parser.Jx == 4);
+    REQUIRE(yaml_parser.Jy == 4);
+    REQUIRE(yaml_parser.chirp_fraction == 1);
+    REQUIRE(yaml_parser.kernel_fraction == 1);
+
+  }
  
 }
