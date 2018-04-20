@@ -133,53 +133,49 @@ read_visibility(const std::string &vis_name2, const utilities::vis_params &uv1) 
   uv.weights.segment(uv1.size(), uv2.size()) = uv2.weights;
   return uv;
 }
+  
+//! Reading reals from visibility file (including nan's and inf's)
+  t_real streamtoreal(std::ifstream& stream) {
+    std::string input;
+    stream >> input;
+    return std::stod(input);
+  }
+   
 utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term) {
   /*
     Reads an csv file with u, v, visibilities and returns the vectors.
 
     vis_name:: name of input text file containing [u, v, real(V), imag(V)] (separated by ' ').
   */
-  std::ifstream temp_file(vis_name);
+ std::ifstream vis_file(vis_name);
   t_int row = 0;
   std::string line;
   // counts size of vis file
-  while(std::getline(temp_file, line))
+  while(std::getline(vis_file, line))
     ++row;
   Vector<t_real> utemp = Vector<t_real>::Zero(row);
   Vector<t_real> vtemp = Vector<t_real>::Zero(row);
   Vector<t_real> wtemp = Vector<t_real>::Zero(row);
   Vector<t_complex> vistemp = Vector<t_complex>::Zero(row);
   Vector<t_complex> weightstemp = Vector<t_complex>::Zero(row);
-  std::ifstream vis_file(vis_name);
 
+  vis_file.clear();
+  vis_file.seekg(0);
   // reads in vis file
-  row = 0;
   t_real real;
   t_real imag;
-  std::string s;
-  std::string entry;
-  while(vis_file) {
-    if(!std::getline(vis_file, s))
-      break;
-    std::istringstream ss(s);
-    std::getline(ss, entry, ' ');
-    utemp(row) = std::stod(entry);
-    std::getline(ss, entry, ' ');
-    vtemp(row) = std::stod(entry);
-
+  t_real entry;
+  for (row=0; row<vistemp.size(); ++row) {
+    utemp(row) = streamtoreal(vis_file);
+    vtemp(row) = streamtoreal(vis_file);
     if(w_term) {
-      std::getline(ss, entry, ' ');
-      wtemp(row) = std::stod(entry);
+      wtemp(row) = streamtoreal(vis_file);
     }
-
-    std::getline(ss, entry, ' ');
-    real = std::stod(entry);
-    std::getline(ss, entry, ' ');
-    imag = std::stod(entry);
+    real = streamtoreal(vis_file);
+    imag = streamtoreal(vis_file);
+    entry = streamtoreal(vis_file);
     vistemp(row) = t_complex(real, imag);
-    std::getline(ss, entry, ' ');
-    weightstemp(row) = 1 / std::stod(entry);
-    ++row;
+    weightstemp(row) = 1 / entry;
   }
   utilities::vis_params uv_vis;
   uv_vis.u = utemp;
