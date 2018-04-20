@@ -21,7 +21,7 @@ class YamlParser {
   std::string filename;
   std::string logging;
   int iterations;
-  int epsilonScaling;
+  double epsilonScaling;
   std::string gamma;
   std::string output_prefix;
   std::string skymodel;
