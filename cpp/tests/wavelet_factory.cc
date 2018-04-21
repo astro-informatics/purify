@@ -14,9 +14,11 @@ TEST_CASE("Wavelet Factory Operator") {
   auto const imsizey = 128;
   auto const imsizex = 128;
   const auto sara = sopt::wavelets::SARA(wavelets.begin(), wavelets.end());
-  auto op =  std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(sopt::linear_transform<t_complex>(sara, imsizey, imsizex));
+  auto phi = sopt::linear_transform<t_complex>(sara, imsizey, imsizex);
+  auto op =  std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(phi);
   auto factory_op = factory::wavelet_operator_factory<Vector<t_complex>>(wavelets, imsizey, imsizex);
   
+  CAPTURE(sara.size());
   SECTION("forward"){
   const  Vector<t_complex> input = Vector<t_complex>::Random(sara.size() * imsizex * imsizey);
   REQUIRE((*op * input).isApprox(*factory_op * input));
