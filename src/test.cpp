@@ -39,7 +39,13 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser.Jy == 4);
     REQUIRE(yaml_parser.chirp_fraction == 1);
     REQUIRE(yaml_parser.kernel_fraction == 1);
-
   }
- 
+  SECTION("Check the SARA node variables") {
+    std::vector<int> expected_wavelets = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    REQUIRE(yaml_parser.wavelet_basis == expected_wavelets);
+    REQUIRE(yaml_parser.wavelet_levels == 4);
+    REQUIRE(yaml_parser.algorithm == "padmm");
+  }
+
+  
 }
