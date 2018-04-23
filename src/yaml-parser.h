@@ -22,6 +22,8 @@ class YamlParser {
   void parseAndSetImageSize(YAML::Node node);
   void parseAndSetJ(YAML::Node node);
   void parseAndSetWProjectionOptions(YAML::Node node);
+  void parseAndSetSARA(YAML::Node node);
+  std::vector<int> getWavelets(std::string values_str);
   // Variables
   std::string filename;
   std::string logging;
@@ -47,7 +49,9 @@ class YamlParser {
   unsigned int Jy;
   float chirp_fraction;
   float kernel_fraction;
-
+  std::vector<int> wavelet_basis;
+  int wavelet_levels;
+  std::string algorithm;
   
   YAML::Node config_file;
 };			       
