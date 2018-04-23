@@ -46,6 +46,4 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser.wavelet_levels == 4);
     REQUIRE(yaml_parser.algorithm == "padmm");
   }
-
-  
 }
