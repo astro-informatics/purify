@@ -46,4 +46,14 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser.wavelet_levels == 4);
     REQUIRE(yaml_parser.algorithm == "padmm");
   }
+  SECTION("Check the AlgorithmOptions node variables") {
+    REQUIRE(yaml_parser.epsilonConvergenceScaling == 1);
+    REQUIRE(yaml_parser.realValueConstraint == true);
+    REQUIRE(yaml_parser.positiveValueConstraint == true);
+    REQUIRE(yaml_parser.mpiAlgorithm == "fully-distributed");
+    REQUIRE(yaml_parser.relVarianceConvergence == 1e-3);
+    REQUIRE(yaml_parser.param1 == "none");
+    REQUIRE(yaml_parser.param2 == "none");
+  }
+
 }
