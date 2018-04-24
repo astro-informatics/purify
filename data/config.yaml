@@ -57,5 +57,5 @@ AlgorithmOptions:
     relVarianceConvergence: 1e-3 # (>0)
 
   pd: # this is ignored if not chosen in algorithm.
-    param1: # something
-    param2: # something else
+    param1: none # something
+    param2: none # something else
