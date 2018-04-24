@@ -36,7 +36,33 @@ void YamlParser::setParserVariablesFromYaml () {
   this->parseAndSetGeneralConfiguration(this->config_file["GeneralConfiguration"]);
   this->parseAndSetMeasureOperators(this->config_file["MeasureOperators"]);
   this->parseAndSetSARA(this->config_file["SARA"]);
+  this->parseAndSetAlgorithmOptions(this->config_file["AlgorithmOptions"]);
   
+}
+
+void YamlParser::parseAndSetAlgorithmOptions (YAML::Node algorithmOptionsNode) {
+
+  this->parseAndSetPADMM(algorithmOptionsNode["padmm"]);
+  this->parseAndSetPD(algorithmOptionsNode["pd"]);
+
+}
+
+void YamlParser::parseAndSetPD (YAML::Node PD) {
+
+  this->param1 = PD["param1"].as<std::string>();
+  this->param2 = PD["param2"].as<std::string>();
+  
+}
+
+
+void YamlParser::parseAndSetPADMM (YAML::Node PADMMNode) {
+
+  this->epsilonConvergenceScaling = PADMMNode["epsilonConvergenceScaling"].as<int>();
+  this->realValueConstraint = PADMMNode["realValueConstraint"].as<bool>();
+  this->positiveValueConstraint = PADMMNode["positiveValueConstraint"].as<bool>();
+  this->mpiAlgorithm = PADMMNode["mpiAlgorithm"].as<std::string>();
+  this->relVarianceConvergence = PADMMNode["relVarianceConvergence"].as<double>();
+
 }
 
 void YamlParser::parseAndSetSARA (YAML::Node SARANode) {
