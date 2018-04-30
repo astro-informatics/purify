@@ -24,6 +24,10 @@ class YamlParser {
   void parseAndSetWProjectionOptions(YAML::Node node);
   void parseAndSetSARA(YAML::Node node);
   std::vector<int> getWavelets(std::string values_str);
+  void parseAndSetAlgorithmOptions(YAML::Node node);
+  void parseAndSetPADMM(YAML::Node node);
+  void parseAndSetPD(YAML::Node node);
+
   // Variables
   std::string filename;
   std::string logging;
@@ -52,6 +56,13 @@ class YamlParser {
   std::vector<int> wavelet_basis;
   int wavelet_levels;
   std::string algorithm;
+  int epsilonConvergenceScaling;
+  bool realValueConstraint;
+  bool positiveValueConstraint;
+  std::string mpiAlgorithm;
+  double relVarianceConvergence;
+  std::string param1;
+  std::string param2;
   
   YAML::Node config_file;
 };			       
