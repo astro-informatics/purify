@@ -2,3 +2,4 @@
 *.out
 *.o
 parser-test
+docs/
