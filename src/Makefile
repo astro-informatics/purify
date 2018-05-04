@@ -1,22 +1,22 @@
 yaml-parser:
 	g++ -c yaml-parser.cpp
-test:
-	g++ test.o ../src/yaml-parser.o -lyaml-cpp -lboost_program_options -o test
+parser-test:
+	g++ parser-test.o ../src/yaml-parser.o -lyaml-cpp -lboost_program_options -o parser-test
 
-test_object:
-	g++ -c test.cpp
+parser-test_object:
+	g++ -c parser-test.cpp
 
 objects:
-	$(MAKE) test_object
+	$(MAKE) parser-test_object
 	$(MAKE) yaml-parser
 
 all:
 	$(MAKE) clean
 	$(MAKE) objects
-	$(MAKE) test
+	$(MAKE) parser-test
 
 clean:
-	$(RM) test.o
+	$(RM) parser-test.o
 	$(RM) yaml-parser.o
-	$(RM) test
+	$(RM) parser-test
 	$(RM) yaml-parser
