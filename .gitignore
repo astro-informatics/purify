@@ -1,4 +1,4 @@
 *~
 *.out
 *.o
-test
+parser-test
