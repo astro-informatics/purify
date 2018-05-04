@@ -1,3 +1,10 @@
+/**
+   YamlParser header for purify project
+   @author Roland Guichard
+   @version 1.0
+ */
+
+
 #ifndef YAML_PARSER_H_
 #define YAML_PARSER_H_
 #include <iostream>
@@ -6,30 +13,33 @@
 #include <assert.h>
 #include <boost/program_options.hpp>
 
-class YamlParser {
 
+/**
+   The YamlParser class definition.
+
+   It browses and searches through the config.yaml file in the data folder
+   and sets the class variable members accordingly, to be used by the 
+   purify algorithm.
+
+   @param filepath path to the config file
+ */
+
+class YamlParser
+{
  public:
   // Constructor
-  YamlParser(std::string filename);
+  YamlParser(std::string filepath);
   // Methods
   void readFile();
   void setParserVariablesFromYaml();
   void parseAndSetGeneralConfiguration(YAML::Node node);
   void parseAndSetMeasureOperators(YAML::Node node);
-  void parseAndSetInputOutput(YAML::Node node);
-  void parseAndSetInput(YAML::Node node);
-  void parseAndSetPixelSize(YAML::Node node);
-  void parseAndSetImageSize(YAML::Node node);
-  void parseAndSetJ(YAML::Node node);
-  void parseAndSetWProjectionOptions(YAML::Node node);
   void parseAndSetSARA(YAML::Node node);
   std::vector<int> getWavelets(std::string values_str);
   void parseAndSetAlgorithmOptions(YAML::Node node);
-  void parseAndSetPADMM(YAML::Node node);
-  void parseAndSetPD(YAML::Node node);
-
+  
   // Variables
-  std::string filename;
+  std::string filepath;
   std::string logging;
   int iterations;
   double epsilonScaling;
@@ -64,6 +74,6 @@ class YamlParser {
   std::string param1;
   std::string param2;
   
-  YAML::Node config_file;
+  YAML::Node config_file;  
 };			       
 #endif /* YAML_PARSER_H */
