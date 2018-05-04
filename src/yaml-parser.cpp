@@ -1,3 +1,9 @@
+/** 
+    YamlParser definition for the purify project
+    @author Roland Guichard
+    @version 1.0
+ */
+
 #include <typeinfo>
 #include <iostream>
 #include <fstream>
@@ -5,23 +11,25 @@
 #include "yaml-parser.h"
 #include <assert.h>
 
-bool fexists(const char *filepath)
+/** 
+    YamlParser constructor definition
+    
+    @param filepath path to config file
+*/
+YamlParser::YamlParser (std::string& filepath)
 {
-  std::ifstream ifile(filepath);
-  return (bool)ifile;
-}
-
-// YamlParser constructor definition
-YamlParser::YamlParser (std::string filepath)
-{
-  // Setting the variable
+  // Setting the class variable
   this->filepath = filepath;
   // Reading the file
   this->readFile();
+  // Run a batch of methods to parse the YAML and set the
+  // class members accordingly
   this->setParserVariablesFromYaml();
 }
 
-// Method for reading file definition
+/** 
+    Class method for reading the config file
+*/
 void YamlParser::readFile ()
 {
   YAML::Node config = YAML::LoadFile(this->filepath);
@@ -30,15 +38,21 @@ void YamlParser::readFile ()
   this->config_file = config;
 }
 
-// Method for setting the class variables definition
+/** 
+    Class method for setting the class members from the YAML inputs
+*/
 void YamlParser::setParserVariablesFromYaml ()
 {
+  // Each of these methods correspond to blocks in the YAML
   this->parseAndSetGeneralConfiguration(this->config_file["GeneralConfiguration"]);
   this->parseAndSetMeasureOperators(this->config_file["MeasureOperators"]);
   this->parseAndSetSARA(this->config_file["SARA"]);
   this->parseAndSetAlgorithmOptions(this->config_file["AlgorithmOptions"]); 
 }
 
+/** 
+    Class method for the YAML GeneralConfiguration block
+*/
 void YamlParser::parseAndSetGeneralConfiguration (YAML::Node generalConfigNode)
 {  
   this->logging = generalConfigNode["logging"].as<std::string>();
@@ -53,6 +67,9 @@ void YamlParser::parseAndSetGeneralConfiguration (YAML::Node generalConfigNode)
   this->polarization_noise = generalConfigNode["InputOutput"]["input"]["polarization_noise"].as<std::string>();
 }
 
+/** 
+    Class method for the YAML MeasureOperators block
+*/
 void YamlParser::parseAndSetMeasureOperators (YAML::Node measureOperatorsNode)
 {
   this->Jweights = measureOperatorsNode["Jweights"].as<std::string>();
@@ -70,6 +87,9 @@ void YamlParser::parseAndSetMeasureOperators (YAML::Node measureOperatorsNode)
   this->kernel_fraction = measureOperatorsNode["wProjection_options"]["kernel_fraction"].as<float>();
 }
 
+/** 
+    Class method for the YAML SARA block
+*/
 void YamlParser::parseAndSetSARA (YAML::Node SARANode)
 {
   std::string values_str = SARANode["wavelet_dict"].as<std::string>();
@@ -78,7 +98,9 @@ void YamlParser::parseAndSetSARA (YAML::Node SARANode)
   this->algorithm = SARANode["algorithm"].as<std::string>();
 }
 
-
+/** 
+    Class method for the YAML AlgorithmOptions block
+*/
 void YamlParser::parseAndSetAlgorithmOptions (YAML::Node algorithmOptionsNode)
 {
   this->epsilonConvergenceScaling = algorithmOptionsNode["padmm"]["epsilonConvergenceScaling"].as<int>();
@@ -90,7 +112,9 @@ void YamlParser::parseAndSetAlgorithmOptions (YAML::Node algorithmOptionsNode)
   this->param2 = algorithmOptionsNode["pd"]["param2"].as<std::string>();
 }
 
-
+/** 
+    Class method for translating the YAML input wavelet definition into a vector
+*/
 std::vector<int> YamlParser::getWavelets(std::string values_str)
 {
   // input - values_str
