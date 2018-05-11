@@ -17,9 +17,8 @@
     @param filepath path to config file
 */
 YamlParser::YamlParser (const std::string& filepath)
+  : filepath(filepath)
 {
-  // Setting the class variable
-  this->filepath = filepath;
   // Reading the file
   this->readFile();
   // Run a batch of methods to parse the YAML and set the

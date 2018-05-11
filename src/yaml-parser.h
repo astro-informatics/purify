@@ -28,7 +28,7 @@ class YamlParser
 {
  public:
   // Constructor
-  YamlParser(std::string &filepath);
+  YamlParser(const std::string &filepath);
   // Methods
   void readFile();
   void setParserVariablesFromYaml();
