@@ -6,7 +6,7 @@ addons:
     packages:
       - build-essential
       - cmake
-      - libyaml-cpp0.6.0
+      - libyaml-cpp0.6v5
 
 matrix:
   include:
