@@ -43,7 +43,18 @@ class YamlParser
   std::string logging;
   int iterations;
   double epsilonScaling;
-  std::string gamma;
+#define YAML_MACRO(TYPE, NAME, VALUE)			\
+  private:		       \
+  TYPE NAME##_ =  VALUE; \
+  public:\
+  const TYPE NAME(){ return NAME##_;};
+
+  YAML_MACRO(std::string, gamma, "")
+  YAML_MACRO(bool, wProjection, true);
+
+#undef YAML_MACRO
+
+  /* std::string gamma; */
   std::string output_prefix;
   std::string skymodel;
   std::string measurements;
@@ -51,7 +62,7 @@ class YamlParser
   std::string noise_estimate;
   std::string polarization_noise;
   std::string Jweights;
-  bool wProjection;
+  /* bool wProjection; */
   float oversampling;
   int powMethod_iter;
   float powMethod_tolerance;

@@ -57,7 +57,7 @@ void YamlParser::parseAndSetGeneralConfiguration (YAML::Node generalConfigNode)
   this->logging = generalConfigNode["logging"].as<std::string>();
   this->iterations = generalConfigNode["iterations"].as<int>();
   this->epsilonScaling = generalConfigNode["epsilonScaling"].as<int>();
-  this->gamma = generalConfigNode["gamma"].as<std::string>();
+  this->gamma_ = generalConfigNode["gamma"].as<std::string>();
   this->output_prefix = generalConfigNode["InputOutput"]["output_prefix"].as<std::string>();
   this->skymodel = generalConfigNode["InputOutput"]["skymodel"].as<std::string>();
   this->measurements = generalConfigNode["InputOutput"]["input"]["measurements"].as<std::string>();
@@ -72,7 +72,7 @@ void YamlParser::parseAndSetGeneralConfiguration (YAML::Node generalConfigNode)
 void YamlParser::parseAndSetMeasureOperators (YAML::Node measureOperatorsNode)
 {
   this->Jweights = measureOperatorsNode["Jweights"].as<std::string>();
-  this->wProjection = measureOperatorsNode["wProjection"].as<bool>();
+  this->wProjection_ = measureOperatorsNode["wProjection"].as<bool>();
   this->oversampling = measureOperatorsNode["oversampling"].as<float>();
   this->powMethod_iter = measureOperatorsNode["powMethod_iter"].as<int>();
   this->powMethod_tolerance = measureOperatorsNode["powMethod_tolerance"].as<float>();

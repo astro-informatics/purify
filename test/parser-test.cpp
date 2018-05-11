@@ -16,10 +16,9 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser.logging == "debug");
     REQUIRE(yaml_parser.iterations == 100);
     REQUIRE(yaml_parser.epsilonScaling == 1);
-    REQUIRE(yaml_parser.gamma == "default");
+    REQUIRE(yaml_parser.gamma() == "default");
     REQUIRE(yaml_parser.output_prefix == "purified");
     REQUIRE(yaml_parser.skymodel == "none");
-    REQUIRE(yaml_parser.gamma == "default");
     REQUIRE(yaml_parser.measurements == "/path/to/measurment/set");
     REQUIRE(yaml_parser.polarization_measurement == "I");
     REQUIRE(yaml_parser.noise_estimate == "/path/to/noise/estimate");
@@ -27,7 +26,7 @@ TEST_CASE("Yaml parser and setting variables test") {
   }
   SECTION("Check the MeasureOperators node variables") {
     REQUIRE(yaml_parser.Jweights == "kb");
-    REQUIRE(yaml_parser.wProjection == false);
+    REQUIRE(yaml_parser.wProjection() == false);
     REQUIRE(yaml_parser.oversampling == 2);
     REQUIRE(yaml_parser.powMethod_iter == 100);
     REQUIRE(yaml_parser.powMethod_tolerance == float(1e-4));
