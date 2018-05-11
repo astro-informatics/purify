@@ -126,7 +126,6 @@ std::vector<int> YamlParser::getWavelets(std::string values_str)
   std::string value2add;
   values_str.erase(std::remove_if(values_str.begin(), values_str.end(),
                                   [](char x){return std::isspace(x);}), values_str.end());
-  int final_value;
   // NOTE Maybe a while reststring and using find is better?
   for (int i=0; i <= values_str.size(); i++) {
     if (i == values_str.size() || values_str[i] == ','){
