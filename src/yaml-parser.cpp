@@ -1,4 +1,4 @@
-/** 
+ /** 
     YamlParser definition for the purify project
     @author Roland Guichard
     @version 1.0
@@ -11,13 +11,8 @@
 #include "yaml-parser.h"
 #include <assert.h>
 
-/** 
-    YamlParser constructor definition
-    
-    @param filepath path to config file
-*/
 YamlParser::YamlParser (const std::string& filepath)
-  : filepath(filepath)
+  : filepath_(filepath)
 {
   // Reading the file
   this->readFile();
@@ -26,20 +21,14 @@ YamlParser::YamlParser (const std::string& filepath)
   this->setParserVariablesFromYaml();
 }
 
-/** 
-    Class method for reading the config file
-*/
 void YamlParser::readFile ()
 {
-  YAML::Node config = YAML::LoadFile(this->filepath);
+  YAML::Node config = YAML::LoadFile(this->filepath_);
   // A bit of defensive programming
   assert(config.Type() == YAML::NodeType::Map);
   this->config_file = config;
 }
 
-/** 
-    Class method for setting the class members from the YAML inputs
-*/
 void YamlParser::setParserVariablesFromYaml ()
 {
   // Each of these methods correspond to blocks in the YAML
@@ -49,71 +38,56 @@ void YamlParser::setParserVariablesFromYaml ()
   this->parseAndSetAlgorithmOptions(this->config_file["AlgorithmOptions"]); 
 }
 
-/** 
-    Class method for the YAML GeneralConfiguration block
-*/
 void YamlParser::parseAndSetGeneralConfiguration (YAML::Node generalConfigNode)
 {  
-  this->logging = generalConfigNode["logging"].as<std::string>();
-  this->iterations = generalConfigNode["iterations"].as<int>();
-  this->epsilonScaling = generalConfigNode["epsilonScaling"].as<int>();
+  this->logging_ = generalConfigNode["logging"].as<std::string>();
+  this->iterations_ = generalConfigNode["iterations"].as<int>();
+  this->epsilonScaling_ = generalConfigNode["epsilonScaling"].as<int>();
   this->gamma_ = generalConfigNode["gamma"].as<std::string>();
-  this->output_prefix = generalConfigNode["InputOutput"]["output_prefix"].as<std::string>();
-  this->skymodel = generalConfigNode["InputOutput"]["skymodel"].as<std::string>();
-  this->measurements = generalConfigNode["InputOutput"]["input"]["measurements"].as<std::string>();
-  this->polarization_measurement = generalConfigNode["InputOutput"]["input"]["polarization_measurement"].as<std::string>();
-  this->noise_estimate = generalConfigNode["InputOutput"]["input"]["noise_estimate"].as<std::string>();
-  this->polarization_noise = generalConfigNode["InputOutput"]["input"]["polarization_noise"].as<std::string>();
+  this->output_prefix_ = generalConfigNode["InputOutput"]["output_prefix"].as<std::string>();
+  this->skymodel_ = generalConfigNode["InputOutput"]["skymodel"].as<std::string>();
+  this->measurements_ = generalConfigNode["InputOutput"]["input"]["measurements"].as<std::string>();
+  this->polarization_measurement_ = generalConfigNode["InputOutput"]["input"]["polarization_measurement"].as<std::string>();
+  this->noise_estimate_ = generalConfigNode["InputOutput"]["input"]["noise_estimate"].as<std::string>();
+  this->polarization_noise_ = generalConfigNode["InputOutput"]["input"]["polarization_noise"].as<std::string>();
 }
 
-/** 
-    Class method for the YAML MeasureOperators block
-*/
 void YamlParser::parseAndSetMeasureOperators (YAML::Node measureOperatorsNode)
 {
-  this->Jweights = measureOperatorsNode["Jweights"].as<std::string>();
+  this->Jweights_ = measureOperatorsNode["Jweights"].as<std::string>();
   this->wProjection_ = measureOperatorsNode["wProjection"].as<bool>();
-  this->oversampling = measureOperatorsNode["oversampling"].as<float>();
-  this->powMethod_iter = measureOperatorsNode["powMethod_iter"].as<int>();
-  this->powMethod_tolerance = measureOperatorsNode["powMethod_tolerance"].as<float>();
-  this->Dx = measureOperatorsNode["pixelSize"]["Dx"].as<double>();
-  this->Dy = measureOperatorsNode["pixelSize"]["Dy"].as<double>();
-  this->x = measureOperatorsNode["imageSize"]["x"].as<int>();
-  this->y = measureOperatorsNode["imageSize"]["y"].as<int>();
-  this->Jx = measureOperatorsNode["J"]["Jx"].as<unsigned int>();
-  this->Jy = measureOperatorsNode["J"]["Jy"].as<unsigned int>();
-  this->chirp_fraction = measureOperatorsNode["wProjection_options"]["chirp_fraction"].as<float>();
-  this->kernel_fraction = measureOperatorsNode["wProjection_options"]["kernel_fraction"].as<float>();
+  this->oversampling_ = measureOperatorsNode["oversampling"].as<float>();
+  this->powMethod_iter_ = measureOperatorsNode["powMethod_iter"].as<int>();
+  this->powMethod_tolerance_ = measureOperatorsNode["powMethod_tolerance"].as<float>();
+  this->Dx_ = measureOperatorsNode["pixelSize"]["Dx"].as<double>();
+  this->Dy_ = measureOperatorsNode["pixelSize"]["Dy"].as<double>();
+  this->x_ = measureOperatorsNode["imageSize"]["x"].as<int>();
+  this->y_ = measureOperatorsNode["imageSize"]["y"].as<int>();
+  this->Jx_ = measureOperatorsNode["J"]["Jx"].as<unsigned int>();
+  this->Jy_ = measureOperatorsNode["J"]["Jy"].as<unsigned int>();
+  this->chirp_fraction_ = measureOperatorsNode["wProjection_options"]["chirp_fraction"].as<float>();
+  this->kernel_fraction_ = measureOperatorsNode["wProjection_options"]["kernel_fraction"].as<float>();
 }
 
-/** 
-    Class method for the YAML SARA block
-*/
 void YamlParser::parseAndSetSARA (YAML::Node SARANode)
 {
   std::string values_str = SARANode["wavelet_dict"].as<std::string>();
-  this->wavelet_basis = this->getWavelets(values_str);
-  this->wavelet_levels = SARANode["wavelet_levels"].as<int>();
-  this->algorithm = SARANode["algorithm"].as<std::string>();
+  this->wavelet_basis_ = this->getWavelets(values_str);
+  this->wavelet_levels_ = SARANode["wavelet_levels"].as<int>();
+  this->algorithm_ = SARANode["algorithm"].as<std::string>();
 }
 
-/** 
-    Class method for the YAML AlgorithmOptions block
-*/
 void YamlParser::parseAndSetAlgorithmOptions (YAML::Node algorithmOptionsNode)
 {
-  this->epsilonConvergenceScaling = algorithmOptionsNode["padmm"]["epsilonConvergenceScaling"].as<int>();
-  this->realValueConstraint = algorithmOptionsNode["padmm"]["realValueConstraint"].as<bool>();
-  this->positiveValueConstraint = algorithmOptionsNode["padmm"]["positiveValueConstraint"].as<bool>();
-  this->mpiAlgorithm = algorithmOptionsNode["padmm"]["mpiAlgorithm"].as<std::string>();
-  this->relVarianceConvergence = algorithmOptionsNode["padmm"]["relVarianceConvergence"].as<double>();  
-  this->param1 = algorithmOptionsNode["pd"]["param1"].as<std::string>();
-  this->param2 = algorithmOptionsNode["pd"]["param2"].as<std::string>();
+  this->epsilonConvergenceScaling_ = algorithmOptionsNode["padmm"]["epsilonConvergenceScaling"].as<int>();
+  this->realValueConstraint_ = algorithmOptionsNode["padmm"]["realValueConstraint"].as<bool>();
+  this->positiveValueConstraint_ = algorithmOptionsNode["padmm"]["positiveValueConstraint"].as<bool>();
+  this->mpiAlgorithm_ = algorithmOptionsNode["padmm"]["mpiAlgorithm"].as<std::string>();
+  this->relVarianceConvergence_ = algorithmOptionsNode["padmm"]["relVarianceConvergence"].as<double>();  
+  this->param1_ = algorithmOptionsNode["pd"]["param1"].as<std::string>();
+  this->param2_ = algorithmOptionsNode["pd"]["param2"].as<std::string>();
 }
 
-/** 
-    Class method for translating the YAML input wavelet definition into a vector
-*/
 std::vector<int> YamlParser::getWavelets(std::string values_str)
 {
   // input - values_str
