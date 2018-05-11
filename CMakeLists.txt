@@ -21,4 +21,4 @@ add_compile_options(-Wall)
 add_library(yaml-parser-lib src/yaml-parser.cpp)
 
 add_executable(parser-test test/parser-test.cpp)
-target_link_libraries(parser-test yaml-parser-lib -lyaml-cpp)
+target_link_libraries(parser-test yaml-parser-lib ${YAML_CPP_LIBRARIES})
