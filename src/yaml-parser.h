@@ -85,6 +85,6 @@ class YamlParser
   std::string param1;
   std::string param2;
   
-  YAML::Node config_file;  
+  YAML::Node config_file;
 };			       
 #endif /* YAML_PARSER_H */
