@@ -293,7 +293,7 @@ void read_uvfits_data(fitsfile *fptr, t_int *status, const std::vector<t_int> &n
   if(nelements == 0)
     throw std::runtime_error("Zero number of elements.");
   output = Vector<t_real>::Zero(naxis.at(1) * nelements * baselines);
-  t_int nulval = static_cast<t_int>(NAN);
+  t_int nulval = 0;
   t_int anynul = 0;
   fits_read_col(fptr, TDOUBLE, 2, 1, 1, static_cast<long>(output.size()), &nulval, output.data(),
                 &anynul, status);
@@ -324,7 +324,7 @@ t_complex read_weight_from_data(const Vector<t_real> &data, const t_uint pol, co
 void read_uvfits_coords(fitsfile *fptr, t_int *status, const t_int &pcount, const t_int &groups,
                         Matrix<t_real> &output) {
   output = Matrix<t_real>::Zero(pcount, groups);
-  t_int nulval = static_cast<t_int>(NAN);
+  t_int nulval = 0;
   t_int anynul;
   // reading in parameters per baseline
   for(int i = 0; i < groups; i++)

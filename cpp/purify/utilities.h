@@ -56,6 +56,8 @@ Matrix<t_real> generate_antennas(const t_uint N);
 utilities::vis_params antenna_to_coverage(const t_uint N);
 //! Provided antenna positions generate a coverage
 utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B);
+//! Reading reals from visibility file (including nan's and inf's)
+ t_real streamtoreal(std::ifstream& stream);
 //! Reads in visibility file
 utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term = false);
 //! Read visibility files from name of vector

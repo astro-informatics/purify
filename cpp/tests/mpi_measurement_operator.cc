@@ -16,7 +16,7 @@ using namespace purify;
 TEST_CASE("Serial vs Distributed Operator") {
   auto const world = sopt::mpi::Communicator::World();
 
-  auto const N = 5;
+  auto const N = 100;
   auto uv_serial = utilities::random_sample_density(N, 0, constant::pi / 3);
   uv_serial.u = world.broadcast(uv_serial.u);
   uv_serial.v = world.broadcast(uv_serial.v);
