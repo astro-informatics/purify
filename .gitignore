@@ -1,4 +1,6 @@
 *~
 *.out
 *.o
-test
+parser-test
+docs/
+build/

@@ -1,0 +1,38 @@
+language: c++
+
+
+addons:
+  apt:
+    packages:
+      - build-essential
+      - cmake
+      - g++-4.8
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      language: generic
+
+before_install:
+
+install:
+  - git clone https://github.com/jbeder/yaml-cpp.git yaml-cpp-lib
+  - cd yaml-cpp-lib
+  - mkdir build
+  - cd build
+  - cmake -DBUILD_SHARED_LIBS=ON ..
+  - make
+  - cd ../../
+
+before_script:
+
+script:
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - ./parser-test
+
+after_success:
