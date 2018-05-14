@@ -38,7 +38,7 @@ void YamlParser::setParserVariablesFromYaml ()
   this->parseAndSetAlgorithmOptions(this->config_file["AlgorithmOptions"]); 
 }
 
-void YamlParser::parseAndSetGeneralConfiguration (YAML::Node generalConfigNode)
+void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfigNode)
 {  
   this->logging_ = generalConfigNode["logging"].as<std::string>();
   this->iterations_ = generalConfigNode["iterations"].as<int>();
@@ -52,7 +52,7 @@ void YamlParser::parseAndSetGeneralConfiguration (YAML::Node generalConfigNode)
   this->polarization_noise_ = generalConfigNode["InputOutput"]["input"]["polarization_noise"].as<std::string>();
 }
 
-void YamlParser::parseAndSetMeasureOperators (YAML::Node measureOperatorsNode)
+void YamlParser::parseAndSetMeasureOperators (const YAML::Node& measureOperatorsNode)
 {
   this->Jweights_ = measureOperatorsNode["Jweights"].as<std::string>();
   this->wProjection_ = measureOperatorsNode["wProjection"].as<bool>();
@@ -69,7 +69,7 @@ void YamlParser::parseAndSetMeasureOperators (YAML::Node measureOperatorsNode)
   this->kernel_fraction_ = measureOperatorsNode["wProjection_options"]["kernel_fraction"].as<float>();
 }
 
-void YamlParser::parseAndSetSARA (YAML::Node SARANode)
+void YamlParser::parseAndSetSARA (const YAML::Node& SARANode)
 {
   std::string values_str = SARANode["wavelet_dict"].as<std::string>();
   this->wavelet_basis_ = this->getWavelets(values_str);
@@ -77,7 +77,7 @@ void YamlParser::parseAndSetSARA (YAML::Node SARANode)
   this->algorithm_ = SARANode["algorithm"].as<std::string>();
 }
 
-void YamlParser::parseAndSetAlgorithmOptions (YAML::Node algorithmOptionsNode)
+void YamlParser::parseAndSetAlgorithmOptions (const YAML::Node& algorithmOptionsNode)
 {
   this->epsilonConvergenceScaling_ = algorithmOptionsNode["padmm"]["epsilonConvergenceScaling"].as<int>();
   this->realValueConstraint_ = algorithmOptionsNode["padmm"]["realValueConstraint"].as<bool>();
