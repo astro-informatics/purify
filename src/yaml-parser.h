@@ -32,7 +32,7 @@ class YamlParser
     
     @param filepath path to config file
   */
-  YamlParser(const std::string &filepath);
+  YamlParser(const std::string& filepath);
 
   /** 
     Read configuration file in memory
@@ -48,19 +48,19 @@ class YamlParser
     Parse the YAML GeneralConfiguration block
     and set the class members appropriately
   */
-  void parseAndSetGeneralConfiguration(YAML::Node node);
+  void parseAndSetGeneralConfiguration(const YAML::Node& node);
 
   /** 
     Parse the YAML MeasureOperator block
     and set the class members appropriately
   */
-  void parseAndSetMeasureOperators(YAML::Node node);
+  void parseAndSetMeasureOperators(const YAML::Node& node);
 
   /** 
     Parse the YAML SARA block
     and set the class members appropriately
   */
-  void parseAndSetSARA(YAML::Node node);
+  void parseAndSetSARA(const YAML::Node& node);
 
   /** 
     Translate the waveket basis string into a vector
@@ -71,7 +71,7 @@ class YamlParser
     Parse the YAML AlgorithmOptions block
     and set the class members appropriately
   */
-  void parseAndSetAlgorithmOptions(YAML::Node node);
+  void parseAndSetAlgorithmOptions(const YAML::Node& node);
   
   // Variables
 #define YAML_MACRO(TYPE, NAME, VALUE) \
@@ -79,7 +79,6 @@ class YamlParser
   TYPE NAME##_ =  VALUE; \
   public: \
   const TYPE NAME(){ return NAME##_;};
-
 
   YAML_MACRO(std::string, filepath, "");
   YAML_MACRO(std::string, logging, "");
@@ -105,9 +104,7 @@ class YamlParser
   YAML_MACRO(double, Dx, 0);
   YAML_MACRO(double, Dy, 0);
   YAML_MACRO(double, relVarianceConvergence, 0);
-  YAML_MACRO(std::vector<int>, wavelet_basis, {0});
-
-  
+  YAML_MACRO(std::vector<int>, wavelet_basis, {0});  
   YAML_MACRO(std::string, gamma, "");
   YAML_MACRO(std::string, output_prefix, "");
   YAML_MACRO(std::string, skymodel, "");
@@ -120,7 +117,6 @@ class YamlParser
 
 #undef YAML_MACRO
 
-  
   YAML::Node config_file;
 };			       
 #endif /* YAML_PARSER_H */
