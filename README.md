@@ -14,11 +14,18 @@ Dependencies
 Compilation and running the tests
 ---------------------------------
 
-In the `src` directory:
+Usual `CMake` build:
 
 ```
-make all
-./parser-test
+mkdir build
+cmake ..
+make
+```
+
+Running the tests:
+
+```
+./parser_test
 ```
 
 Documentation
