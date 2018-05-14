@@ -19,7 +19,8 @@ before_install:
 
 install:
   - git clone https://github.com/jbeder/yaml-cpp.git
-  - cd yaml-cpp
+  - mv yaml-cpp yaml-cpp-lib
+  - cd yaml-cpp-lib
   - mkdir build
   - cd build
   - cmake -DBUILD_SHARED_LIBS=ON ..
