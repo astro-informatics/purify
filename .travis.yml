@@ -22,7 +22,7 @@ install:
   - cd yaml-cpp
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake -DBUILD_SHARED_LIBS=ON ..
   - make
   - cd ../../
 
