@@ -7,7 +7,7 @@
 #include <typeinfo>
 #include <iostream>
 #include <fstream>
-#include "yaml-cpp/yaml.h"
+#include <yaml-cpp/yaml.h>
 #include "yaml-parser.h"
 #include <assert.h>
 
