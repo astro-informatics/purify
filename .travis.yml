@@ -23,7 +23,7 @@ install:
   - mkdir build
   - cd build
   - cmake -DBUILD_SHARED_LIBS=ON ..
-  - make
+  - make -VERBOSE=1
   - cd ../../
 
 before_script:
