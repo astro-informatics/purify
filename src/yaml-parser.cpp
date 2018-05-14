@@ -1,8 +1,8 @@
- /** 
+/** 
     YamlParser definition for the purify project
     @author Roland Guichard
     @version 1.0
- */
+*/
 
 #include <typeinfo>
 #include <iostream>
