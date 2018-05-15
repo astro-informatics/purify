@@ -20,6 +20,9 @@ before_install:
   - sudo apt-get install gcc-snapshot -y
   - sudo apt-get update
   - sudo apt-get install gcc-7 g++-7 -y
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 --slave /usr/bin/g++ g++ /usr/bin/g++-7
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 60 --slave /usr/bin/g++ g++ /usr/bin/g++-4.8
+  - sudo update-alternatives --config gcc
   - gcc -v
 
 install:
