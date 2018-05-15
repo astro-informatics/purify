@@ -4,6 +4,7 @@
 #include "purify/config.h"
 #include <vector>
 #include <sopt/mpi/communicator.h>
+#include <sopt/linear_transform.h>
 #include "purify/utilities.h"
 
 namespace purify {
@@ -39,6 +40,29 @@ vis_params scatter_visibilities(vis_params const &params, std::vector<t_int> con
   return params;
 }
 #endif
+//! \brief Calculate step size using MPI (does not include factor of 1e-3)
+//! \param[in] vis: Vector of measurement data
+//! \param[in] measurements: Shared pointer to measurement linear operator
+//! \param[in] wavelets: Shared pointer to SARA wavelet linear operator
+//! \param[in] sara_size: Size of sara dictionary of MPI node.
+//! \details Please use this function to calculate the step size for PADMM, Forward Backward, etc. 
+//! Especially when using MPI.
+//! \note There is an issue with using the adjoint wavelet transform of the SARA basis.
+//! When there are more nodes than wavelets, there will be nodes with an empty Vector<T> 
+//! of wavelet coefficients. This can cause some functions to break, like .maxCoeff().
+template <class T>
+t_real step_size(Vector<t_complex> const & vis,
+    const std::shared_ptr<sopt::LinearTransform<T> const> &measurements,
+    const std::shared_ptr<sopt::LinearTransform<T> const> &wavelets,
+    const t_uint sara_size){
+  //measurement operator may use different number of nodes than wavelet operator
+  //so needs to be done separately
+    const T dimage = measurements->adjoint() * vis;
+      return (sara_size > 0) ?
+      (wavelets->adjoint() * dimage).cwiseAbs().maxCoeff(): 
+      0.;
+
+};
 }
 } // namespace purify
 #endif
