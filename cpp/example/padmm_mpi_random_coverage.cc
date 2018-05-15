@@ -86,12 +86,12 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
 #elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
 #endif
-  PURIFY_MEDIUM_LOG("SARA Size = {}, Rank = {}", sara.size(), comm.rank());
+  PURIFY_LOW_LOG("SARA Size = {}, Rank = {}", sara.size(), comm.rank());
   const t_real gamma
       = utilities::step_size(uv_data.vis, measurements, 
           std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(Psi), sara.size()) * 1e-3;
-  PURIFY_MEDIUM_LOG("Epsilon {}, Rank = {}", epsilon, comm.rank());
-  PURIFY_MEDIUM_LOG("Gamma {}, SARA Size = {}, Rank = {}", gamma, sara.size(), comm.rank());
+  PURIFY_LOW_LOG("Epsilon {}, Rank = {}", epsilon, comm.rank());
+  PURIFY_LOW_LOG("Gamma {}, SARA Size = {}, Rank = {}", gamma, sara.size(), comm.rank());
 
   // shared pointer because the convergence function need access to some data that we would rather
   // not reproduce. E.g. padmm definition is self-referential.
@@ -205,8 +205,8 @@ int main(int nargs, char const **args) {
 #endif
   auto const sara = sopt::wavelets::distribute_sara(
       sopt::wavelets::SARA{
-          std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u)
-          ,std::make_tuple("DB3", 3u), std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
+          std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
+          std::make_tuple("DB3", 3u), std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
           std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)
           },
       world);
