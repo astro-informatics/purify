@@ -4,6 +4,7 @@
 #include "purify/config.h"
 #include <vector>
 #include <sopt/mpi/communicator.h>
+#include <sopt/linear_transform.h>
 #include "purify/utilities.h"
 
 namespace purify {
@@ -39,6 +40,20 @@ vis_params scatter_visibilities(vis_params const &params, std::vector<t_int> con
   return params;
 }
 #endif
+//! Calculate step size using MPI (does not include factor of 1e-3)
+template <class T>
+t_real step_size(const utilities::vis_params & uv_data,
+    const std::shared_ptr<sopt::LinearTransform<T> const> &measurements,
+    const std::shared_ptr<sopt::LinearTransform<T> const> &wavelets,
+    const t_uint sara_size){
+  //measurement operator may use different number of nodes than wavelet operator
+  //so needs to be done separately
+    const T dimage = measurements->adjoint() * uv_data.vis;
+      return (sara_size > 0) ?
+      (wavelets->adjoint() * dimage).cwiseAbs().maxCoeff(): 
+      0.;
+
+};
 }
 } // namespace purify
 #endif

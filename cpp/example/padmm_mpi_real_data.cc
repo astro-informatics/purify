@@ -62,8 +62,9 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
 #elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
   auto const epsilon = 3 * std::sqrt(2 * uv_data.size()) * sigma;
 #endif
-  auto const gamma = comm.all_reduce<t_real>(
-      ((measurements->adjoint() * uv_data.vis)).real().maxCoeff() * 1e-3, MPI_MAX);
+  const t_real gamma
+      = utilities::step_size(uv_data, measurements, 
+          std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(Psi), sara.size()) * 1e-3;
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
   PURIFY_MEDIUM_LOG("Gamma {}", gamma);
 
@@ -71,7 +72,7 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
   // not reproduce. E.g. padmm definition is self-referential.
   auto padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(uv_data.vis);
   padmm->itermax(50)
-      .gamma(gamma)
+      .gamma(comm.all_reduce<t_real>(gamma, MPI_MAX))
       .relative_variation(1e-3)
       .l2ball_proximal_epsilon(epsilon)
 #if PURIFY_PADMM_ALGORITHM == 2
