@@ -7,7 +7,6 @@ addons:
       - build-essential
       - software-properties-common
       - cmake
-      - g++-4.8
 
 matrix:
   include:
