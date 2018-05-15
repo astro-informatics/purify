@@ -17,10 +17,10 @@ matrix:
       language: generic
 
 before_install:
-  - add-apt-repository ppa:ubuntu-toolchain-r/test -y
-  - apt-get update
-  - apt-get install gcc-7 g++-7 -y
-  - update-alternatives --config gcc
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo apt-get update
+  - sudo apt-get install gcc-7 g++-7 -y
+  - sudo update-alternatives --config gcc
   - gcc -v
 
 
