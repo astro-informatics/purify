@@ -1,25 +1,32 @@
-# yaml-cpp for purify
+# yaml-parser for the purify project
+
+C++ YAML parser for the purify project.
+
+**Work in progress!**
 
 Dependencies
-============
+------------
 
-* GNU compiler 
-* Boost for the argument parser.
-* A Yaml parser for C++: https://github.com/jbeder/yaml-cpp
-* Catch for testing
+* GNU C++ compiler 
+* A Yaml parser library for C++: https://github.com/jbeder/yaml-cpp 
+* Catch for testing: https://github.com/catchorg/Catch2
 
+Compilation and running the tests
+---------------------------------
 
-Compilation and running
-=======================
+Usual `CMake` build:
 
-* Link to the Yaml and Boost libraries for the parser:
+```
+mkdir build
+cmake ..
+make
+```
 
-`g++ -c yaml-parser.cpp`
+Running the tests:
 
-`g++ yaml-parser.o -I/. -lyaml-cpp -lboost_program_options -o yaml-parser.out`
+```
+./parser_test
+```
 
-* Nicely formatted reporting for the tests:
-
-`g++ test.cpp -o test.out`
-
-`./test.out --reporter compact --success`
+Documentation
+-------------

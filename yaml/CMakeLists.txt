@@ -16,7 +16,9 @@ if (NOT yaml-cpp_FOUND)
    message(FATAL_ERROR "yaml-cpp library not found. Please install.")
 endif (NOT yaml-cpp_FOUND)
 
-add_compile_options(-Wall)
+include_directories(${YAML_CPP_INCLUDE_DIR})
+
+add_compile_options(-Wall) 
 
 add_library(yaml-parser-lib src/yaml-parser.cpp)
 

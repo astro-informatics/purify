@@ -11,8 +11,6 @@
 #include <fstream>
 #include "yaml-cpp/yaml.h"
 #include <assert.h>
-#include <boost/program_options.hpp>
-
 
 /**
    The YamlParser class definition.
