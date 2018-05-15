@@ -5,6 +5,7 @@ addons:
   apt:
     packages:
       - build-essential
+      - software-properties-common
       - cmake
       - g++-4.8
 
@@ -16,6 +17,12 @@ matrix:
       language: generic
 
 before_install:
+  - add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - apt-get update
+  - apt-get install gcc-7 g++-7 -y
+  - update-alternatives --config gcc
+  - gcc -v
+
 
 install:
   - git clone https://github.com/jbeder/yaml-cpp.git yaml-cpp-lib
