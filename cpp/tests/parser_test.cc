@@ -1,15 +1,13 @@
-// Let Catch provide main():
-#define CATCH_CONFIG_MAIN
 
 #include<iostream>
 #include<string>
 #include "catch.hpp"
-#include "../src/yaml-parser.h"
+#include "../purify/yaml-parser.h"
 #include "yaml-cpp/yaml.h"
 
 
 TEST_CASE("Yaml parser and setting variables test") {
-  std::string file_path = "../data/config.yaml";
+  std::string file_path = "../data/config/config.yaml";
   YamlParser yaml_parser = YamlParser(file_path);
   SECTION("Check the GeneralConfiguration node variables") {
     REQUIRE(yaml_parser.filepath() == file_path);
