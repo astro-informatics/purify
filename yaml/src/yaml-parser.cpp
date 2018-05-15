@@ -6,6 +6,7 @@
 
 #include <typeinfo>
 #include <iostream>
+#include <algorithm>
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 #include "yaml-parser.h"
