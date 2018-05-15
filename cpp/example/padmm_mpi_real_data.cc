@@ -63,7 +63,7 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
   auto const epsilon = 3 * std::sqrt(2 * uv_data.size()) * sigma;
 #endif
   const t_real gamma
-      = utilities::step_size(uv_data, measurements, 
+      = utilities::step_size(uv_data.vis, measurements, 
           std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(Psi), sara.size()) * 1e-3;
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
   PURIFY_MEDIUM_LOG("Gamma {}", gamma);

@@ -87,9 +87,8 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
 #endif
   PURIFY_MEDIUM_LOG("SARA Size = {}, Rank = {}", sara.size(), comm.rank());
-  const Vector<t_complex> dimage = measurements->adjoint() * uv_data.vis;
   const t_real gamma
-      = utilities::step_size(uv_data, measurements, 
+      = utilities::step_size(uv_data.vis, measurements, 
           std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(Psi), sara.size()) * 1e-3;
   PURIFY_MEDIUM_LOG("Epsilon {}, Rank = {}", epsilon, comm.rank());
   PURIFY_MEDIUM_LOG("Gamma {}, SARA Size = {}, Rank = {}", gamma, sara.size(), comm.rank());
@@ -208,7 +207,7 @@ int main(int nargs, char const **args) {
       sopt::wavelets::SARA{
           std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u)
           ,std::make_tuple("DB3", 3u), std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
-          std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)},
+          std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)
           },
       world);
 
