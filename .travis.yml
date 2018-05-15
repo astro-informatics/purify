@@ -1,0 +1,45 @@
+language: c++
+
+
+addons:
+  apt:
+    packages:
+      - software-properties-common
+      - cmake
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      language: generic
+
+before_install:
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo apt-get update
+  - sudo apt-get install gcc-snapshot -y
+  - sudo apt-get update
+  - sudo apt-get install gcc-7 g++-7 -y
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 --slave /usr/bin/g++ g++ /usr/bin/g++-7
+  - gcc -v
+
+install:
+  - git clone https://github.com/jbeder/yaml-cpp.git yaml-cpp-lib
+  - cd yaml-cpp-lib
+  - mkdir build
+  - cd build
+  - cmake -DBUILD_SHARED_LIBS=ON ..
+  - make
+  - cd ../../
+
+before_script:
+
+script:
+  - cd yaml
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make VERBOSE=1
+  - ./parser-test
+
+after_success:
