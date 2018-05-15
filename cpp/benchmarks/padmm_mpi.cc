@@ -74,7 +74,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
   auto const Psi
       = sopt::linear_transform<t_complex>(saraDistr, m_image.rows(), m_image.cols(), m_world);
    t_real gamma
-      = utilities::step_size(m_uv_data.vis, measurements1, 
+      = utilities::step_size(m_uv_data.vis, m_measurements1, 
           std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(Psi), saraDistr.size()) * 1e-3;
   gamma = m_world.all_reduce(gamma, MPI_MAX);
 
@@ -133,7 +133,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
   auto const Psi
       = sopt::linear_transform<t_complex>(saraDistr, m_image.rows(), m_image.cols(), m_world);
    t_real gamma
-      = utilities::step_size(uv_data, measurements3, 
+      = utilities::step_size(m_uv_data.vis, m_measurements3, 
           std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(Psi), saraDistr.size()) * 1e-3;
   gamma = m_world.all_reduce(gamma, MPI_MAX);
 
