@@ -18,7 +18,7 @@ option(dompi          "Enable MPI"                                      on)
 option(doaf           "Enable ArrayFire"                                off)
 option(docimg         "Enable CImg"                                     off)
 option(docasa         "Enable CASA"                                     off)
-option(docs           "Build documentation"                             on)
+option(docs           "Build documentation"                             off)
 
 # Set version and build id of this package
 include(version)
