@@ -40,14 +40,11 @@ TEST_CASE("Serial vs Distributed Operator") {
   CAPTURE(world.size());
   if(world.size() > 1)
     REQUIRE_THROWS_AS(factory::measurement_operator_factory<Vector<t_complex>>(
-       world, factory::distributed_type::serial, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100), std::runtime_error);
+      factory::distributed_type::serial, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100), std::runtime_error);
 
   for(auto method :{factory::distributed_type::mpi_distribute_image, factory::distributed_type::mpi_distribute_grid}){
-  if(world.size() > 1)
-    REQUIRE_THROWS_AS(factory::measurement_operator_factory<Vector<t_complex>>(
-       method, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100), std::runtime_error);
   const auto op = factory::measurement_operator_factory<Vector<t_complex>>(
-      world, method, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
+      method, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
 
   if(uv_serial.u.size() == uv_mpi.u.size()) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));

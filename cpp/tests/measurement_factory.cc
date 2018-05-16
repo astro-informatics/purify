@@ -19,10 +19,6 @@ TEST_CASE("Serial vs Distributed Operator") {
   auto const height = 128;
   const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
-    REQUIRE_THROWS_AS(factory::measurement_operator_factory<Vector<t_complex>>(factory::distributed_type::mpi_distribute_image,
-        uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100), std::runtime_error);
-    REQUIRE_THROWS_AS(factory::measurement_operator_factory<Vector<t_complex>>(factory::distributed_type::mpi_distribute_grid,
-        uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100), std::runtime_error);
   const auto op = factory::measurement_operator_factory<Vector<t_complex>>(
        factory::distributed_type::serial, uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
 
