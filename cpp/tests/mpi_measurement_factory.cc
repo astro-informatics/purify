@@ -42,7 +42,6 @@ TEST_CASE("Serial vs Distributed Operator") {
   for(auto method :{factory::distributed_measurement_operator::mpi_distribute_image, factory::distributed_measurement_operator::mpi_distribute_grid}){
   const auto op = factory::measurement_operator_factory<Vector<t_complex>>(
       method, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
-
   if(uv_serial.u.size() == uv_mpi.u.size()) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
     CHECK(uv_serial.v.isApprox(uv_mpi.v));
@@ -72,7 +71,6 @@ TEST_CASE("Serial vs Distributed Operator") {
   }
   }
 }
-#ifdef PURIFY_ARRAYFIRE
 TEST_CASE("GPU Serial vs Distributed Operator") {
   purify::logging::set_level("debug");
   auto const world = sopt::mpi::Communicator::World();
@@ -105,6 +103,10 @@ TEST_CASE("GPU Serial vs Distributed Operator") {
   CAPTURE(world.size());
 
   for(auto method :{factory::distributed_measurement_operator::gpu_mpi_distribute_image, factory::distributed_measurement_operator::gpu_mpi_distribute_grid}){
+#ifndef PURIFY_ARRAYFIRE
+  REQUIRE_THROWS(factory::measurement_operator_factory<Vector<t_complex>>(
+      method, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100));
+#else
   const auto op = factory::measurement_operator_factory<Vector<t_complex>>(
       method, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
 
@@ -135,6 +137,6 @@ TEST_CASE("GPU Serial vs Distributed Operator") {
     REQUIRE(gridded.size() == gridded_serial.size());
     REQUIRE(gridded.isApprox(gridded_serial, 1e-4));
   }
+#endif
   }
 }
-#endif

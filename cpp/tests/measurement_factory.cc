@@ -40,7 +40,6 @@ TEST_CASE("Serial vs Distributed Operator") {
   }
 }
 
-#ifdef PURIFY_ARRAYFIRE
 TEST_CASE("GPU Serial vs Distributed Operator"){
 
   auto const N = 100;
@@ -55,6 +54,10 @@ TEST_CASE("GPU Serial vs Distributed Operator"){
   auto const height = 128;
   const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
+#ifndef PURIFY_ARRAYFIRE
+  REQUIRE_THROWS(factory::measurement_operator_factory<Vector<t_complex>>(
+      factory::distributed_measurement_operator::gpu_serial, uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100));
+#else
   const auto op = factory::measurement_operator_factory<Vector<t_complex>>(
        factory::distributed_measurement_operator::gpu_serial, uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
 
@@ -74,8 +77,5 @@ TEST_CASE("GPU Serial vs Distributed Operator"){
     REQUIRE(gridded.size() == gridded_serial.size());
     REQUIRE(gridded.isApprox(gridded_serial, 1e-4));
   }
-
-
-
-}
 #endif
+}
