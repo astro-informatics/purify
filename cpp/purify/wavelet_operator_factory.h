@@ -29,6 +29,7 @@ wavelet_operator_factory(const distributed_wavelet_operator distribute, const st
     if(comm.size() > 1)
       throw std::runtime_error("Using serial wavelet operator with more than one MPI process.");
     #endif
+      PURIFY_LOW_LOG("Using serial wavelet operator.");
       return  std::make_shared<sopt::LinearTransform<T>>(sopt::linear_transform<typename T::Scalar>(sara, imsizey, imsizex));
     }
 #ifdef PURIFY_MPI
