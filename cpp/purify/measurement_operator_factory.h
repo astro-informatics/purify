@@ -49,6 +49,30 @@ measurement_operator_factory(const distributed_measurement_operator distribute, 
       PURIFY_LOW_LOG("Using distributed grid MPI measurement operator.");
       return measurementoperator::init_degrid_operator_2d_mpi<T>(world, std::forward<ARGS>(args)...);
     }
+    case(distributed_measurement_operator::gpu_mpi_distribute_image):{
+#ifndef PURIFY_PURIFY_ARRAYFIRE
+  throw std::runtime_error("Tried to use GPU operator but arrayfire is not usable.");
+#else
+    if(!std::is_same<Vector<t_complex>, T>::value)
+      throw std::runtime_error("Arrayfire will only use complex type with Eigen.");
+    auto const world = sopt::mpi::Communicator::World();
+    PURIFY_LOW_LOG("Using distributed image MPI + Arrayfire measurement operator.");
+    af::setDevice(0);
+    return gpu::measurementoperator::init_degrid_operator_2d(world, std::forward<ARGS>(args)...);
+#endif
+    }
+    case(distributed_measurement_operator::gpu_mpi_distribute_grid):{
+#ifndef PURIFY_PURIFY_ARRAYFIRE
+  throw std::runtime_error("Tried to use GPU operator but arrayfire is not usable.");
+#else
+    if(!std::is_same<Vector<t_complex>, T>::value)
+      throw std::runtime_error("Arrayfire will only use complex type with Eigen.");
+    auto const world = sopt::mpi::Communicator::World();
+    PURIFY_LOW_LOG("Using distributed grid MPI + Arrayfire measurement operator.");
+    af::setDevice(0);
+    return gpu::measurementoperator::init_degrid_operator_2d_mpi(world, std::forward<ARGS>(args)...);
+#endif
+    }
 #endif
     default:
       throw std::runtime_error("Distributed method not found for Measurement Operator. Are you sure you compiled with MPI?");
