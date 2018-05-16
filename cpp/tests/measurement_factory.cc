@@ -20,7 +20,7 @@ TEST_CASE("Serial vs Distributed Operator") {
   const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
   const auto op = factory::measurement_operator_factory<Vector<t_complex>>(
-       factory::distributed_type::serial, uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
+       factory::distributed_measurement_operator::serial, uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
 
   SECTION("Degridding") {
     Vector<t_complex> const image
