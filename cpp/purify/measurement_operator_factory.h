@@ -15,7 +15,8 @@
 namespace purify {
   namespace factory {
   //! determine type of distribute for mpi measurement operator
-enum class distributed_type {serial, mpi_distribute_image, mpi_distribute_grid};
+enum class distributed_measurement_operator {serial, mpi_distribute_image, mpi_distribute_grid,
+                                          gpu_serial, gpu_mpi_distribute_image, gpu_mpi_distribute_grid};
 
 
 //! Non-distributed measurement operator factory with arrayfire
@@ -41,34 +42,36 @@ measurement_operator_factory_gpu(const distributed_type distribute, ARGS &&... a
 //! distributed measurement operator factory
 template <class T, class... ARGS>
 std::shared_ptr<sopt::LinearTransform<T> const>
-measurement_operator_factory(const distributed_type distribute,  ARGS &&... args){
-
-#ifndef PURIFY_MPI
-   if(distribute != distributed_type::serial)
-        throw std::runtime_error("Using MPI algorithm without communicator in measurement operator factory.");
-    return measurementoperator::init_degrid_operator_2d<T>(std::forward<ARGS>(args)...);
-#endif
-#ifdef PURIFY_MPI
-  auto const world = sopt::mpi::Communicator::World();
-  std::cout << world.size() << std::endl;
+measurement_operator_factory(const distributed_measurement_operator distribute,  ARGS &&... args){
   switch(distribute){
-    case(distributed_type::serial):{
-      if(world.size() > 1)
-        throw std::runtime_error("Using serial algorithm with MPI, using " + std::to_string(world.size()) + " > 1 nodes.");
+    case(distributed_measurement_operator::serial):{
       return measurementoperator::init_degrid_operator_2d<T>(std::forward<ARGS>(args)...);
     }
-    case(distributed_type::mpi_distribute_image):{
+    case(distributed_measurement_operator::af_serial){
+#ifndef PURIFY_PURIFY_ARRAYFIRE
+  throw std::runtime_error("Tried to use GPU operator but arrayfire is not usable.");
+#else
+    if(!std::is_same<Vector<t_complex>, T>::value)
+      throw std::runtime_error("Arrayfire will only use complex type with Eigen.");
+    af::setDevice(0);
+    return gpu::measurementoperator::init_degrid_operator_2d(std::forward<ARGS>(args)...);
+#endif
+    }
+#ifdef PURIFY_MPI
+    case(distributed_measurement_operator::mpi_distribute_image):{
+      auto const world = sopt::mpi::Communicator::World();
       PURIFY_LOW_LOG("Using distributed image MPI measurement operator.");
       return measurementoperator::init_degrid_operator_2d<T>(world, std::forward<ARGS>(args)...);
     }
-    case(distributed_type::mpi_distribute_grid):{
+    case(distributed_measurement_operator::mpi_distribute_grid):{
+      auto const world = sopt::mpi::Communicator::World();
       PURIFY_LOW_LOG("Using distributed grid MPI measurement operator.");
       return measurementoperator::init_degrid_operator_2d_mpi<T>(world, std::forward<ARGS>(args)...);
     }
+#endif
     default:
       throw std::runtime_error("Distributed method not found for Measurement Operator. Are you sure you compiled with MPI?");
   }
-#endif
 };
 
 #ifdef PURIFY_MPI
