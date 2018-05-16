@@ -18,6 +18,13 @@ namespace purify {
 enum class distributed_measurement_operator {serial, mpi_distribute_image, mpi_distribute_grid,
                                           gpu_serial, gpu_mpi_distribute_image, gpu_mpi_distribute_grid};
 
+namespace {
+template <class T>
+void check_complex_for_gpu(){
+    if(!std::is_same<Vector<t_complex>, T>::value)
+      throw std::runtime_error("Arrayfire will only use complex type with Eigen.");
+}
+}
 
 //! distributed measurement operator factory
 template <class T, class... ARGS>
