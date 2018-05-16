@@ -16,7 +16,7 @@ TEST_CASE("Wavelet Factory Operator") {
   const auto sara = sopt::wavelets::SARA(wavelets.begin(), wavelets.end());
   auto phi = sopt::linear_transform<t_complex>(sara, imsizey, imsizex);
   auto op =  std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(phi);
-  auto factory_op = factory::wavelet_operator_factory<Vector<t_complex>>(wavelets, imsizey, imsizex);
+  auto factory_op = factory::wavelet_operator_factory<Vector<t_complex>>(factory::distributed_wavelet_operator::serial, wavelets, imsizey, imsizex);
   
   CAPTURE(sara.size());
   SECTION("forward"){

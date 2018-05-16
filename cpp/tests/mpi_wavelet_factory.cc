@@ -23,7 +23,7 @@ TEST_CASE("Serial vs Distributed Operator") {
   const auto sara = sopt::wavelets::SARA(wavelets.begin(), wavelets.end());
 const auto distribute_sara = sopt::wavelets::distribute_sara(sara, world);
 auto op =  std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(sopt::linear_transform<t_complex>(distribute_sara, imsizey, imsizex, world));
-  auto factory_op = factory::wavelet_operator_factory<Vector<t_complex>>(world, wavelets, imsizey, imsizex);
+  auto factory_op = factory::wavelet_operator_factory<Vector<t_complex>>(factory::distributed_wavelet_operator::mpi_sara, wavelets, imsizey, imsizex);
 
   SECTION("forward"){
   const  Vector<t_complex> input = Vector<t_complex>::Random(distribute_sara.size() * imsizex * imsizey);
