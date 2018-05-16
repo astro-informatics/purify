@@ -10,7 +10,7 @@
 namespace purify {
 namespace factory {
   enum class algorithm {padmm, primal_dual, sdmm, forward_backward};
-  enum class algo_distribution {serial, mpi};
+  enum class algo_distribution {serial, mpi_serial, mpi_distributed};
 
 //! return padmm algorithm given parameters
 template <class Algorithm>
