@@ -154,5 +154,8 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   PURIFY_HIGH_LOG("Starting sopt!");
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
   PURIFY_MEDIUM_LOG("Gamma {}", purify_gamma);
-  auto padmm = factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(factory::algorithm::padmm, factory::algo_distribution::mpi_serial, std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(Psi), std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(Phi), uv_data, sigma, height, width);
+  auto padmm = factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(factory::algorithm::padmm, 
+      factory::algo_distribution::mpi_serial, 
+      std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(Psi), 
+      std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(Phi), uv_data, sigma, height, width);
 }
