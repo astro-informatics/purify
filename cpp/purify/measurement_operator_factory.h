@@ -27,12 +27,13 @@ measurement_operator_factory(const distributed_measurement_operator distribute, 
     case(distributed_measurement_operator::serial):{
       return measurementoperator::init_degrid_operator_2d<T>(std::forward<ARGS>(args)...);
     }
-    case(distributed_measurement_operator::af_serial){
+    case(distributed_measurement_operator::gpu_serial):{
 #ifndef PURIFY_PURIFY_ARRAYFIRE
   throw std::runtime_error("Tried to use GPU operator but arrayfire is not usable.");
 #else
     if(!std::is_same<Vector<t_complex>, T>::value)
       throw std::runtime_error("Arrayfire will only use complex type with Eigen.");
+    PURIFY_LOW_LOG("Using serial measurement operator with Arrayfire.");
     af::setDevice(0);
     return gpu::measurementoperator::init_degrid_operator_2d(std::forward<ARGS>(args)...);
 #endif
