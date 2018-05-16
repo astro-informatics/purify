@@ -32,14 +32,14 @@ std::shared_ptr<sopt::LinearTransform<T> const>
 measurement_operator_factory(const distributed_measurement_operator distribute,  ARGS &&... args){
   switch(distribute){
     case(distributed_measurement_operator::serial):{
+      PURIFY_LOW_LOG("Using serial measurement operator.");
       return measurementoperator::init_degrid_operator_2d<T>(std::forward<ARGS>(args)...);
     }
     case(distributed_measurement_operator::gpu_serial):{
 #ifndef PURIFY_ARRAYFIRE
-  throw std::runtime_error("Tried to use GPU operator but arrayfire is not usable.");
+  throw std::runtime_error("Tried to use GPU operator but you did not build with ArrayFire.");
 #else
-    if(!std::is_same<Vector<t_complex>, T>::value)
-      throw std::runtime_error("Arrayfire will only use complex type with Eigen.");
+    check_complex_for_gpu<T>();
     PURIFY_LOW_LOG("Using serial measurement operator with Arrayfire.");
     af::setDevice(0);
     return gpu::measurementoperator::init_degrid_operator_2d(std::forward<ARGS>(args)...);
@@ -58,10 +58,9 @@ measurement_operator_factory(const distributed_measurement_operator distribute, 
     }
     case(distributed_measurement_operator::gpu_mpi_distribute_image):{
 #ifndef PURIFY_ARRAYFIRE
-  throw std::runtime_error("Tried to use GPU operator but arrayfire is not usable.");
+  throw std::runtime_error("Tried to use GPU operator but you did not build with ArrayFire.");
 #else
-    if(!std::is_same<Vector<t_complex>, T>::value)
-      throw std::runtime_error("Arrayfire will only use complex type with Eigen.");
+    check_complex_for_gpu<T>();
     auto const world = sopt::mpi::Communicator::World();
     PURIFY_LOW_LOG("Using distributed image MPI + Arrayfire measurement operator.");
     af::setDevice(0);
@@ -70,10 +69,9 @@ measurement_operator_factory(const distributed_measurement_operator distribute, 
     }
     case(distributed_measurement_operator::gpu_mpi_distribute_grid):{
 #ifndef PURIFY_ARRAYFIRE
-  throw std::runtime_error("Tried to use GPU operator but arrayfire is not usable.");
+  throw std::runtime_error("Tried to use GPU operator but you did not build with ArrayFire.");
 #else
-    if(!std::is_same<Vector<t_complex>, T>::value)
-      throw std::runtime_error("Arrayfire will only use complex type with Eigen.");
+    check_complex_for_gpu<T>();
     auto const world = sopt::mpi::Communicator::World();
     PURIFY_LOW_LOG("Using distributed grid MPI + Arrayfire measurement operator.");
     af::setDevice(0);
