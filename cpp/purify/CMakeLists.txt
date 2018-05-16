@@ -24,6 +24,9 @@ set(HEADERS
   algorithm_factory.h
   yaml-parser.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
+if(PURIFY_MPI)
+  list(APPEND HEADERS convergence_factory.h)
+endif()
 
 set(SOURCES utilities.cc pfitsio.cc
   kernels.cc distribute.cc wproj_utilities.cc operators.cc uvfits.cc projection_kernels.cc yaml-parser.cc )
