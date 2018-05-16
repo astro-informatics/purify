@@ -28,7 +28,7 @@ measurement_operator_factory(const distributed_measurement_operator distribute, 
       return measurementoperator::init_degrid_operator_2d<T>(std::forward<ARGS>(args)...);
     }
     case(distributed_measurement_operator::gpu_serial):{
-#ifndef PURIFY_PURIFY_ARRAYFIRE
+#ifndef PURIFY_ARRAYFIRE
   throw std::runtime_error("Tried to use GPU operator but arrayfire is not usable.");
 #else
     if(!std::is_same<Vector<t_complex>, T>::value)
@@ -50,7 +50,7 @@ measurement_operator_factory(const distributed_measurement_operator distribute, 
       return measurementoperator::init_degrid_operator_2d_mpi<T>(world, std::forward<ARGS>(args)...);
     }
     case(distributed_measurement_operator::gpu_mpi_distribute_image):{
-#ifndef PURIFY_PURIFY_ARRAYFIRE
+#ifndef PURIFY_ARRAYFIRE
   throw std::runtime_error("Tried to use GPU operator but arrayfire is not usable.");
 #else
     if(!std::is_same<Vector<t_complex>, T>::value)
@@ -62,7 +62,7 @@ measurement_operator_factory(const distributed_measurement_operator distribute, 
 #endif
     }
     case(distributed_measurement_operator::gpu_mpi_distribute_grid):{
-#ifndef PURIFY_PURIFY_ARRAYFIRE
+#ifndef PURIFY_ARRAYFIRE
   throw std::runtime_error("Tried to use GPU operator but arrayfire is not usable.");
 #else
     if(!std::is_same<Vector<t_complex>, T>::value)
