@@ -20,15 +20,22 @@ namespace purify {
       };
     }
 
-  } // namespace factory
-} // namespace purify
-
-/*padmm->objective_convergence([padmm_weak, conv, this](Vector<t_complex> const &x,
-                                                        Vector<t_complex> const &) mutable -> bool {
-    auto const padmm = padmm_weak.lock();
-    auto const result = this->m_world.all_reduce<uint8_t>(
+    template <class T>
+      std::function<bool(Vector<T> const &, Vector<T> const &)>
+      objective_convergence_factory(std::weak_ptr<sopt::algorithm::ImagingProximalADMM<T>> const padmm_weak) {
+      
+      return [padmm_weak](Vector<T> const & x, Vector<T> const &) {
+	auto const padmm = padmm_weak.lock();
+ 	sopt::mpi::Communicator comm = sopt::mpi::Communicator::World();
+	sopt::ScalarRelativeVariation<t_complex> conv(padmm->relative_variation(),
+						      padmm->relative_variation(), "Objective function");
+	auto const result = comm.all_reduce<uint8_t>(
         conv(sopt::l1_norm(padmm->Psi().adjoint() * x, padmm->l1_proximal_weights())), MPI_LAND);
     return result;
-    });*/
+      };
+    }
+    
+  } // namespace factory
+} // namespace purify
 
 #endif
