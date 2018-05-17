@@ -70,6 +70,13 @@ class YamlParser
     and set the class members appropriately
   */
   void parseAndSetAlgorithmOptions(const YAML::Node& node);
+
+  /** 
+    Write an output YAML file for the current
+    simulation parameters. 
+  */
+  void writeOutput(const std::string& output_file_name);
+
   
   // Variables
 #define YAML_MACRO(TYPE, NAME, VALUE) \
