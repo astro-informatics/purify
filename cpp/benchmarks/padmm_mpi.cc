@@ -99,17 +99,9 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
       .Psi(Psi)
       .Phi(*m_measurements1);
 
-  sopt::ScalarRelativeVariation<t_complex> conv(padmm->relative_variation(),
-                                                padmm->relative_variation(), "Objective function");
   std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
   padmm->residual_convergence( factory::residual_convergence_factory<t_complex>(padmm_weak) );
-  padmm->objective_convergence([padmm_weak, conv, this](Vector<t_complex> const &x,
-                                                        Vector<t_complex> const &) mutable -> bool {
-    auto const padmm = padmm_weak.lock();
-    auto const result = this->m_world.all_reduce<uint8_t>(
-        conv(sopt::l1_norm(padmm->Psi().adjoint() * x, padmm->l1_proximal_weights())), MPI_LAND);
-    return result;
-  });
+  padmm->objective_convergence( factory::objective_convergence_factory<t_complex>(padmm_weak) );
   // Benchmark the application of the algorithm
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
