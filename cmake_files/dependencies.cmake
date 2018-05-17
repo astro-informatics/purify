@@ -64,7 +64,7 @@ else()
   lookup_package(Boost REQUIRED)
 endif()
 
-lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS URL "http://bitbucket.org/eigen/eigen/get/3.3.4.tar.gz" MD5 "1a47e78efe365a97de0c022d127607c3")
+lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS URL "http://bitbucket.org/eigen/eigen/get/3.2.tar.gz" MD5 "035ccc791f046f48e90bb1fb42ce227e")
 
 set(PURIFY_ARRAYFIRE FALSE)
 if(doaf)
