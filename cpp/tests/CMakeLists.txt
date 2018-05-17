@@ -29,13 +29,7 @@ add_catch_test(index_mapping LIBRARIES libpurify)
 add_catch_test(uvfits LIBRARIES libpurify)
 add_catch_test(convolution LIBRARIES libpurify)
 add_catch_test(wproj_utils LIBRARIES libpurify)
-
-find_package(yaml-cpp)
-include_directories(${YAML_CPP_INCLUDE_DIR})
-add_library(yaml-parser-lib ../purify/yaml-parser.cc)
-add_catch_test(parser_test LIBRARIES libpurify ${YAML_CPP_LIBRARIES} yaml-parser-lib)
-
-
+add_catch_test(parser_test LIBRARIES libpurify)
 
 if(data AND TARGET casacore::ms)
   add_catch_test(casacore LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
