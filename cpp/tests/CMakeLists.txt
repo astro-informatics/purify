@@ -31,6 +31,7 @@ add_catch_test(convolution LIBRARIES libpurify)
 add_catch_test(wproj_utils LIBRARIES libpurify)
 add_catch_test(measurement_factory LIBRARIES libpurify)
 add_catch_test(wavelet_factory LIBRARIES libpurify)
+
 if(data AND TARGET casacore::ms)
   add_catch_test(casacore LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 endif()
