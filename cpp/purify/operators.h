@@ -423,10 +423,10 @@ init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
                         const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
                         const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
                         const t_uint Jv = 4,
-                        const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                         const bool w_term = false, const t_uint Jw = 6, const t_real &cellx = 1,
                         const t_real &celly = 1) {
 
+  const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
@@ -451,7 +451,6 @@ init_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_uint 
                         const t_real &power_tol = 1e-4,
                         const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
                         const t_uint Jv = 4,
-                        const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                         const bool w_term = false, const t_uint Jw = 6) {
 
   auto uv_vis = uv_vis_input;
@@ -462,7 +461,7 @@ init_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_uint 
                                  std::floor(oversample_ratio * imsizey));
   return init_degrid_operator_2d<T>(uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex,
                                     oversample_ratio, power_iters, power_tol, kernel, Ju, Jv,
-                                    ft_plan, w_term, Jw, cell_x, cell_y);
+                                    w_term, Jw, cell_x, cell_y);
 }
 
 #ifdef PURIFY_MPI
@@ -476,10 +475,10 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
                         const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
                         const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
                         const t_uint Jv = 4,
-                        const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                         const bool w_term = false, const t_uint Jw = 6, const t_real &cellx = 1,
                         const t_real &celly = 1) {
 
+  const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
@@ -506,7 +505,6 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                         const t_real &power_tol = 1e-4,
                         const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
                         const t_uint Jv = 4,
-                        const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                         const bool w_term = false, const t_uint Jw = 6) {
   auto uv_vis = uv_vis_input;
   if(uv_vis.units == utilities::vis_units::lambda)
@@ -516,7 +514,7 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                                  std::floor(oversample_ratio * imsizey));
   return init_degrid_operator_2d<T>(comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey,
                                     imsizex, oversample_ratio, power_iters, power_tol, kernel, Ju,
-                                    Jv, ft_plan, w_term, Jw, cell_x, cell_y);
+                                    Jv, w_term, Jw, cell_x, cell_y);
 }
 
 //! Returns linear transform that is the weighted degridding operator with a distributed Fourier
@@ -530,10 +528,10 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_
                             const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
                             const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
                             const t_uint Jv = 4,
-                            const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                             const bool w_term = false, const t_uint Jw = 6, const t_real &cellx = 1,
                             const t_real &celly = 1) {
 
+  const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
   auto Broadcast = purify::operators::init_broadcaster<T>(comm);
@@ -561,7 +559,6 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
                             const t_real &power_tol = 1e-4,
                             const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
                             const t_uint Jv = 4,
-                            const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                             const bool w_term = false, const t_uint Jw = 6) {
 
   auto uv_vis = uv_vis_input;
@@ -573,7 +570,7 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
 
   return init_degrid_operator_2d_mpi<T>(comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey,
                                         imsizex, oversample_ratio, power_iters, power_tol, kernel,
-                                        Ju, Jv, ft_plan, w_term, Jw, cell_x, cell_y);
+                                        Ju, Jv, w_term, Jw, cell_x, cell_y);
 }
 #endif
 

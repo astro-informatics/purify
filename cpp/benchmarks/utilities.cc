@@ -119,7 +119,7 @@ dirty_measurements(Image<t_complex> const &ground_truth_image, t_uint number_of_
   // creating operator to generate measurements
   auto measurement_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_data, ground_truth_image.rows(), ground_truth_image.cols(), cellsize, cellsize, 2, 0, 1e-4,
-      kernels::kernel::kb, 8, 8, operators::fftw_plan::measure, false);
+      kernels::kernel::kb, 8, 8, false);
   // Generates measurements from image
   uv_data.vis = (*measurement_op)
                 * Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);

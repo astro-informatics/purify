@@ -183,8 +183,7 @@ int main(int nargs, char const **args) {
 #if PURIFY_PADMM_ALGORITHM == 2 || PURIFY_PADMM_ALGORITHM == 3
 #ifndef PURIFY_GPU
   auto const measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      world, data, imsizey, imsizex, cellsize, cellsize, 2, 100, 1e-4, kernel, 4, 4,
-      operators::fftw_plan::measure, w_term);
+      world, data, imsizey, imsizex, cellsize, cellsize, 2, 100, 1e-4, kernel, 4, 4, w_term);
 #else
   af::setDevice(0);
   auto const measurements = gpu::measurementoperator::init_degrid_operator_2d(
@@ -194,8 +193,7 @@ int main(int nargs, char const **args) {
 #elif PURIFY_PADMM_ALGORITHM == 1
 #ifndef PURIFY_GPU
   auto const measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-      world, data, imsizey, imsizex, cellsize, cellsize, 2, 100, 1e-4, kernel, 4, 4,
-      operators::fftw_plan::measure, w_term);
+      world, data, imsizey, imsizex, cellsize, cellsize, 2, 100, 1e-4, kernel, 4, 4, w_term);
 
 #else
   af::setDevice(0);

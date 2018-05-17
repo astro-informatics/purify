@@ -41,7 +41,7 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
   // creating operator to generate measurements
   auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_data, ground_truth_image.rows(), ground_truth_image.cols(), std::get<1>(w_term),
-      std::get<1>(w_term), 2, 100, 1e-4, kernels::kernel::kb, 8, 8, operators::fftw_plan::measure,
+      std::get<1>(w_term), 2, 100, 1e-4, kernels::kernel::kb, 8, 8,
       std::get<0>(w_term));
   // Generates measurements from image
   uv_data.vis = (*sky_measurements)
@@ -180,7 +180,7 @@ int main(int nargs, char const **args) {
 #ifndef PURIFY_GPU
   auto const measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, operators::fftw_plan::measure, w_term);
+      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, w_term);
 
 #else
   af::setDevice(0);
@@ -193,7 +193,7 @@ int main(int nargs, char const **args) {
 #ifndef PURIFY_GPU
   auto const measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
       world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, operators::fftw_plan::measure, w_term);
+      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, w_term);
 
 #else
   af::setDevice(0);
