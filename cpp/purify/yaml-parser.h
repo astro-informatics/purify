@@ -75,7 +75,7 @@ class YamlParser
     Write an output YAML file for the current
     simulation parameters. 
   */
-  void writeOutput();
+  void writeOutput(const std::string& output_file_name);
 
   
   // Variables

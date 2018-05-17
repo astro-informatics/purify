@@ -125,7 +125,7 @@ std::vector<int> YamlParser::getWavelets(std::string values_str)
   return wavelets;
 }
 
-void YamlParser::writeOutput()
+void YamlParser::writeOutput(const std::string& output_file_name)
 {
   YAML::Emitter out;
   out << YAML::BeginMap;
@@ -140,7 +140,7 @@ void YamlParser::writeOutput()
   out << YAML::EndMap;  
 
   std::ofstream output_file;
-  output_file.open("config_save.yaml");
+  output_file.open(output_file_name);
   output_file << out.c_str();
   output_file.close();
 
