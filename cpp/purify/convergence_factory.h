@@ -6,17 +6,25 @@
 
 namespace purify {
   namespace factory {
+    enum class AlgorithmType {algo1, algo2, algo3};
 
     template <class T>
       std::function<bool(Vector<T> const &, Vector<T> const &)>
-      residual_convergence_factory(std::weak_ptr<sopt::algorithm::ImagingProximalADMM<T>> const padmm_weak) {
-      
-      return [padmm_weak](Vector<T> const &, Vector<T> const & residual) {
+      residual_convergence_factory(const AlgorithmType algo,
+				   std::weak_ptr<sopt::algorithm::ImagingProximalADMM<T>> const padmm_weak) {
+      return [algo, padmm_weak](Vector<T> const &, Vector<T> const & residual) {
 	auto const padmm = padmm_weak.lock();
-	auto const residual_norm = sopt::l2_norm(residual, padmm->l2ball_proximal_weights());
 	sopt::mpi::Communicator comm = sopt::mpi::Communicator::World();
-	auto const result = comm.all_reduce<int8_t>(residual_norm < padmm->residual_tolerance(), MPI_LAND);
-	return result;
+	if (algo==AlgorithmType::algo1 || algo==AlgorithmType::algo3) {
+	  auto const residual_norm = sopt::l2_norm(residual, padmm->l2ball_proximal_weights());
+	  return bool(comm.all_reduce<int8_t>(residual_norm < padmm->residual_tolerance(), MPI_LAND));
+	}
+	else if (algo==AlgorithmType::algo2) {
+	  auto const residual_norm = sopt::mpi::l2_norm(residual, padmm->l2ball_proximal_weights(), comm);
+	  return (residual_norm<padmm->residual_tolerance());
+	}
+	else
+	  throw std::runtime_error("Unknown type of distributed PADMM algorithm.");
       };
     }
 

@@ -100,7 +100,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
       .Phi(*m_measurements1);
 
   std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
-  padmm->residual_convergence( factory::residual_convergence_factory<t_complex>(padmm_weak) );
+  padmm->residual_convergence( factory::residual_convergence_factory<t_complex>(factory::AlgorithmType::algo1, padmm_weak) );
   padmm->objective_convergence( factory::objective_convergence_factory<t_complex>(padmm_weak) );
   // Benchmark the application of the algorithm
   while(state.KeepRunning()) {
@@ -143,7 +143,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
       .Phi(*m_measurements3);
 
   std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
-  padmm->residual_convergence(factory::residual_convergence_factory<t_complex>(padmm_weak) );
+  padmm->residual_convergence(factory::residual_convergence_factory<t_complex>(factory::AlgorithmType::algo3, padmm_weak) );
   padmm->objective_convergence( factory::objective_convergence_factory<t_complex>(padmm_weak) );
   // Benchmark the application of the algorithm
   while(state.KeepRunning()) {
