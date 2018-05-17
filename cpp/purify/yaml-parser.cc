@@ -6,6 +6,7 @@
 
 #include <typeinfo>
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 #include <fstream>
 #include <yaml-cpp/yaml.h>
@@ -124,3 +125,23 @@ std::vector<int> YamlParser::getWavelets(std::string values_str)
   return wavelets;
 }
 
+void YamlParser::writeOutput()
+{
+  YAML::Emitter out;
+  out << YAML::BeginMap;
+  out << YAML::Key << "GeneralConfiguration";
+  out << this->config_file["GeneralConfiguration"];
+  out << YAML::Key << "MeasureOperators";
+  out << this->config_file["MeasureOperators"];
+  out << YAML::Key << "SARA";
+  out << this->config_file["SARA"];
+  out << YAML::Key << "AlgorithmOptions";
+  out << this->config_file["AlgorithmOptions"];
+  out << YAML::EndMap;  
+
+  std::ofstream output_file;
+  output_file.open("config_save.yaml");
+  output_file << out.c_str();
+  output_file.close();
+
+}
