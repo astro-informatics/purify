@@ -22,10 +22,13 @@ set(HEADERS
   IndexMapping.h logging.enabled.h utilities.h operators.h operators_gpu.h wproj_utilities.h
   cimg.h uvfits.h convolution.h projection_kernels.h measurement_operator_factory.h wavelet_operator_factory.h
   algorithm_factory.h
+  read_measurements.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(SOURCES utilities.cc pfitsio.cc
-  kernels.cc distribute.cc wproj_utilities.cc operators.cc uvfits.cc projection_kernels.cc)
+  kernels.cc distribute.cc wproj_utilities.cc operators.cc uvfits.cc projection_kernels.cc
+  read_measurements.cc
+  )
 
 if(TARGET casacore::ms)
   list(APPEND SOURCES casacore.cc)
