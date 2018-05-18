@@ -33,26 +33,29 @@ padmm_factory(const algo_distribution dist, std::shared_ptr<sopt::LinearTransfor
               std::shared_ptr<sopt::LinearTransform<Vector<typename Algorithm::Scalar>> const> const &Psi, 
               const utilities::vis_params &uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, 
               const t_uint max_iterations = 500,
-              const bool real_constraint = true, const bool positive_constraint = true, const bool tight_frame = false,
-              const t_real relative_variation = 1e-3, const t_real l1_proximal_tolerance = 1e-2, 
+              const bool real_constraint = true, 
+              const bool positive_constraint = true, 
+              const bool tight_frame = false,
+              const t_real relative_variation = 1e-3,
+              const t_real l1_proximal_tolerance = 1e-2, 
               const t_uint maximum_proximal_iterations = 50) {
   typedef typename Algorithm::Scalar t_scalar;
-  // shared pointer because the convergence function need access to some data that we would rather
-  // not reproduce. E.g. padmm definition is self-referential.
-  auto epsilon = 3 * std::sqrt(2 * uv_data.size()) * sigma;
+
+  auto epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
   auto gamma =
-      ((measurements->adjoint() * uv_data.vis)).real().maxCoeff() * 1e-3;
+      (Psi->adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3;
   auto padmm = std::make_shared<Algorithm>(uv_data.vis);
-  padmm->itermax(50)
+  padmm->itermax(max_iterations)
       .gamma(gamma)
       .relative_variation(relative_variation)
+      .l2ball_proximal_epsilon(epsilon)
       .tight_frame(tight_frame)
       .l1_proximal_tolerance(l1_proximal_tolerance)
-      .l1_proximal_nu(1)
+      .l1_proximal_nu(1.)
       .l1_proximal_itermax(maximum_proximal_iterations)
       .l1_proximal_positivity_constraint(positive_constraint)
       .l1_proximal_real_constraint(real_constraint)
-      .residual_tolerance(epsilon)
+      .residual_convergence(epsilon)
       .lagrange_update_scale(0.9)
       .nu(1e0)
       .Psi(*Psi)
@@ -64,7 +67,7 @@ padmm_factory(const algo_distribution dist, std::shared_ptr<sopt::LinearTransfor
       return padmm;
       }
 #ifdef PURIFY_MPI
-    case(algo_distribution::mpi_serial): 
+    case(algo_distribution::mpi_serial):
       {
   auto const comm = sopt::mpi::Communicator::World();
   epsilon = 3 * std::sqrt(comm.all_sum_all(std::pow(sigma, 2)))
@@ -72,7 +75,7 @@ padmm_factory(const algo_distribution dist, std::shared_ptr<sopt::LinearTransfor
    padmm->l2ball_proximal_communicator(comm);
    break;
       }
-    case(algo_distribution::mpi_distributed): 
+    case(algo_distribution::mpi_distributed):
       {
   epsilon = 3 * std::sqrt(2 * uv_data.size()) * sigma;
    break;
@@ -80,6 +83,7 @@ padmm_factory(const algo_distribution dist, std::shared_ptr<sopt::LinearTransfor
 #endif
     default:
   throw std::runtime_error("Type of distributed proximal ADMM algorithm not recognised. You might not have compiled with MPI.");
+  }
 #ifdef PURIFY_MPI
   auto const comm = sopt::mpi::Communicator::World();
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
@@ -90,7 +94,6 @@ padmm_factory(const algo_distribution dist, std::shared_ptr<sopt::LinearTransfor
       .l2ball_proximal_epsilon(epsilon);
 #endif
   return padmm;
-  }
 }
 
 
