@@ -20,7 +20,8 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser.gamma() == "default");
       REQUIRE(yaml_parser.output_prefix() == "purified");
       REQUIRE(yaml_parser.skymodel() == "none");
-      REQUIRE(yaml_parser.measurements() == "/path/to/measurment/set");
+      std::vector<std::string> expected_measurements = {"/path/to/measurment/set"};
+      REQUIRE(yaml_parser.measurements() == expected_measurements);
       REQUIRE(yaml_parser.polarization_measurement() == "I");
       REQUIRE(yaml_parser.noise_estimate() == "/path/to/noise/estimate");
       REQUIRE(yaml_parser.polarization_noise() == "I");
