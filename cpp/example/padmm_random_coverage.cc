@@ -34,16 +34,16 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   t_real const over_sample = 2;
   t_uint const imsizey = M31.rows();
   t_uint const imsizex = M31.cols();
-
+  utilities::write_visibility(uv_data, output_filename("input_data.vis"));
 #ifndef PURIFY_GPU
   auto const measurements_transform
       = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 100,
+          uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 1000,
           0.0001, kernels::kernel_from_string.at(kernel), J, J, std::get<0>(w_term));
 #else
   af::setDevice(0);
   auto const measurements_transform = gpu::measurementoperator::init_degrid_operator_2d(
-      uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 100, 0.0001,
+      uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 1000, 0.0001,
       kernels::kernel_from_string.at(kernel), J, J, std::get<0>(w_term));
 #endif
   sopt::wavelets::SARA const sara{
@@ -84,7 +84,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   auto const padmm
       = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
             .itermax(500)
-            .gamma((measurements_transform->adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
+            .gamma((Psi.adjoint() * (measurements_transform->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3)
             .relative_variation(1e-3)
             .l2ball_proximal_epsilon(epsilon)
             .tight_frame(false)
@@ -93,7 +93,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
             .l1_proximal_itermax(50)
             .l1_proximal_positivity_constraint(true)
             .l1_proximal_real_constraint(true)
-            .residual_convergence(epsilon * 1.001)
+            .residual_convergence(epsilon)
             .lagrange_update_scale(0.9)
 #ifdef PURIFY_CImg
             .is_converged(show_image)
@@ -136,7 +136,7 @@ int main(int, char **) {
   const std::string kernel = "kb";
   std::string const fitsfile = image_filename(name + ".fits");
   auto M31 = pfitsio::read2d(fitsfile);
-  const t_real cellsize = FoV / M31.cols() * 60. * 60.;
+  const t_real cellsize = 1;//FoV / M31.cols() * 60. * 60.;
   std::string const inputfile = output_filename(name + "_" + "input.fits");
 
   t_real const max = M31.array().abs().maxCoeff();
@@ -154,11 +154,11 @@ int main(int, char **) {
 
 #ifndef PURIFY_GPU
   auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 100, 0.0001, kernels::kernel_from_string.at("kb"), 8,
+      uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 1000, 0.0001, kernels::kernel_from_string.at("kb"), 8,
       8, w_term);
 #else
   auto const sky_measurements = gpu::measurementoperator::init_degrid_operator_2d(
-      uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 100, 0.0001, kernels::kernel_from_string.at("kb"), 8,
+      uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 1000, 0.0001, kernels::kernel_from_string.at("kb"), 8,
       8, w_term);
 #endif
   uv_data.vis = (*sky_measurements) * Image<t_complex>::Map(M31.data(), M31.size(), 1);
@@ -168,7 +168,7 @@ int main(int, char **) {
   // adding noise to visibilities
   uv_data.vis = utilities::add_noise(y0, 0., sigma);
   // padmm(name + "30", M31, "box", 1, uv_data, sigma, std::make_tuple(w_term, cellsize));
-  padmm(name + "30", M31, kernel, 4, uv_data, sigma,
+  padmm(name + "10", M31, kernel, 4, uv_data, sigma,
         std::make_tuple(w_term, cellsize));
   return 0;
 }
