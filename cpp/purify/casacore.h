@@ -369,6 +369,18 @@ utilities::vis_params read_measurementset(MeasurementSet const &ms_file,
                                           = MeasurementSet::ChannelWrapper::polarization::I,
                                           const std::vector<t_int> &channels = std::vector<t_int>(),
                                           std::string const &filter = "");
+//! Read measurement set object then combine it with a uv_params structure
+utilities::vis_params read_measurementset(std::string const &filename, const utilities::vis_params &uv1,
+                                          const MeasurementSet::ChannelWrapper::polarization pol,
+                                          const std::vector<t_int> &channels,
+                                          std::string const &filter);
+//! Read multiple measurement sets into one vis_params structure
+utilities::vis_params read_measurementset(std::vector<std::string> const &filename,
+                                          const MeasurementSet::ChannelWrapper::polarization pol
+                                          = MeasurementSet::ChannelWrapper::polarization::I,
+                                          const std::vector<t_int> &channels = std::vector<t_int>(),
+                                          std::string const &filter = "");
+
 //! Return average frequency over channels
 t_real average_frequency(const purify::casa::MeasurementSet &ms_file, std::string const &filter,
                          const std::vector<t_int> &channels);

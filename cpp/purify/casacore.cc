@@ -154,6 +154,48 @@ read_measurementset(std::string const &filename,
   auto const ms_file = purify::casa::MeasurementSet(filename);
   return read_measurementset(ms_file, polarization, channels_input, filter);
 };
+utilities::vis_params read_measurementset(std::string const &filename, const utilities::vis_params &uv1,
+                                          const MeasurementSet::ChannelWrapper::polarization pol,
+                                          const std::vector<t_int> &channels,
+                                          std::string const &filter){
+  utilities::vis_params uv;
+  const auto uv2 = read_measurementset(filename, pol, channels, filter);
+  if(std::abs(uv1.ra - uv2.ra) > 1e-6)
+    throw std::runtime_error(vis_name2 + ": wrong RA in pointing.");
+  if(std::abs(uv1.dec - uv2.dec) > 1e-6)
+    throw std::runtime_error(vis_name2 + ": wrong DEC in pointing.");
+  uv.ra = uv1.ra;
+  uv.dec = uv1.dec;
+  uv.u = Vector<t_real>::Zero(uv1.size() + uv2.size());
+  uv.v = Vector<t_real>::Zero(uv1.size() + uv2.size());
+  uv.w = Vector<t_real>::Zero(uv1.size() + uv2.size());
+  uv.vis = Vector<t_complex>::Zero(uv1.size() + uv2.size());
+  uv.weights = Vector<t_complex>::Zero(uv1.size() + uv2.size());
+  uv.u.segment(0, uv1.size()) = uv1.u;
+  uv.v.segment(0, uv1.size()) = uv1.v;
+  uv.w.segment(0, uv1.size()) = uv1.w;
+  uv.vis.segment(0, uv1.size()) = uv1.vis;
+  uv.weights.segment(0, uv1.size()) = uv1.weights;
+  uv.u.segment(uv1.size(), uv2.size()) = uv2.u;
+  uv.v.segment(uv1.size(), uv2.size()) = uv2.v;
+  uv.w.segment(uv1.size(), uv2.size()) = uv2.w;
+  uv.vis.segment(uv1.size(), uv2.size()) = uv2.vis;
+  uv.weights.segment(uv1.size(), uv2.size()) = uv2.weights;
+  return uv;
+
+}
+utilities::vis_params read_measurementset(std::vector<std::string> const &filename,
+                                          const MeasurementSet::ChannelWrapper::polarization pol,
+                                          const std::vector<t_int> &channel,
+                                          std::string const &filter){
+   utilities::vis_params output = read_measurementset(filename.at(0), pol, channels, filter);
+  if(filename.size() == 1)
+    return output;
+  for(int i = 1; i < names.size(); i++)
+    output = read_uvfits(filename.at(i), output);
+  return output;
+ 
+}
 utilities::vis_params
 read_measurementset(MeasurementSet const &ms_file,
                     const MeasurementSet::ChannelWrapper::polarization polarization,
