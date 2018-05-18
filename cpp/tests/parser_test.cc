@@ -1,6 +1,7 @@
 
-#include<iostream>
-#include<string>
+#include <iostream>
+#include <cstdio>
+#include <string>
 #include "catch.hpp"
 #include "../purify/yaml-parser.h"
 #include "yaml-cpp/yaml.h"
@@ -59,8 +60,8 @@ TEST_CASE("Yaml parser and setting variables test")
     }
   SECTION("Check the writeOutput method")
     {
-      std::string file_path_save = "config_save.yaml";
-      yaml_parser.writeOutput(file_path_save);
+      yaml_parser.writeOutput();
+      std::string file_path_save = "config_" + yaml_parser.timestamp() + "_save.yaml";
       YamlParser yaml_parser_check(file_path_save);
       REQUIRE(yaml_parser_check.filepath() == file_path_save);
       REQUIRE(yaml_parser_check.logging() == yaml_parser.logging());
@@ -96,5 +97,6 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser.relVarianceConvergence() == yaml_parser.relVarianceConvergence());
       REQUIRE(yaml_parser.param1() == yaml_parser.param1());
       REQUIRE(yaml_parser.param2() == yaml_parser.param2());
+      std::remove(file_path_save.c_str());
     }
 }

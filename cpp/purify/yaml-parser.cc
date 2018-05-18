@@ -5,6 +5,9 @@
 */
 
 #include <typeinfo>
+#include <chrono>
+#include <ctime>
+#include <typeinfo>
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -125,8 +128,23 @@ std::vector<int> YamlParser::getWavelets(std::string values_str)
   return wavelets;
 }
 
-void YamlParser::writeOutput(const std::string& output_file_name)
+void YamlParser::writeOutput()
 {
+  std::string file_path = "../data/config";
+  std::string extension = ".yaml";
+  
+  std::string base_file_name = this->filepath_.erase(this->filepath_.size()-extension.size());
+  base_file_name = base_file_name.substr(file_path.size() + 1, base_file_name.size());
+  
+  std::time_t t = std::time(0);   // get time now
+  std::tm* now = std::localtime(&t);
+
+  // Make the datetime human readable
+  std::string datetime = std::to_string(now->tm_year + 1900) + '-' + std::to_string(now->tm_mon + 1) + '-' + std::to_string(now->tm_mday);
+  datetime = datetime + '-' + std::to_string(now->tm_hour) + ':' + std::to_string(now->tm_min) + ':' + std::to_string(now->tm_sec);
+
+  this->timestamp_ = datetime;
+
   YAML::Emitter out;
   out << YAML::BeginMap;
   out << YAML::Key << "GeneralConfiguration";
@@ -140,7 +158,7 @@ void YamlParser::writeOutput(const std::string& output_file_name)
   out << YAML::EndMap;  
 
   std::ofstream output_file;
-  output_file.open(output_file_name);
+  output_file.open(base_file_name + "_" + datetime + "_save.yaml");
   output_file << out.c_str();
   output_file.close();
 
