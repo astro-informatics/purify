@@ -1,55 +1,86 @@
 
-#include "purify/directories.h"
+#include "catch.hpp"
+
+#include "purify/config.h"
 #include "purify/logging.h"
-#include "purify/operators.h"
+
+#include "purify/utilities.h"
+#include "purify/directories.h"
 #include "purify/pfitsio.h"
 #include "purify/types.h"
-#include "purify/utilities.h"
 
 #include "purify/algorithm_factory.h"
+#include "purify/measurement_operator_factory.h"
+#include "purify/wavelet_operator_factory.h"
 
 #include "purify/test_data.h"
+
 using namespace purify;
 using namespace purify::notinstalled;
 
-
-int main(int, char **) {
-  sopt::logging::initialize();
-  purify::logging::initialize();
+TEST_CASE("padmm_factory"){
   sopt::logging::set_level("debug");
   purify::logging::set_level("debug");
   const t_real snr = 10;
-  const std::string test_dir = "expected/kernels/";
-  const std::string input_data = notinstalled::data_filename(test_dir + "test_data.vis");
-  auto uv_data = utilities::read_visibility(input_data);
+  const std::string &test_dir = "expected/padmm_serial/";
+  const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
+  const std::string &expected_solution_path = notinstalled::data_filename(test_dir + "solution.fits");
+  const std::string &expected_residual_path = notinstalled::data_filename(test_dir + "residual.fits");
+
+  const auto solution = pfitsio::read2d(expected_solution_path);
+  const auto residual = pfitsio::read2d(expected_residual_path);
+
+  auto uv_data = utilities::read_visibility(input_data_path, false);
   uv_data.units = utilities::vis_units::radians;
+  CAPTURE(uv_data.vis.head(5));
+  CHECK(uv_data.size() == 13107);
 
   // working out value of signal given SNR of 10
-  t_real const sigma = utilities::SNR_to_standard_deviation(uv_data.vis, snr);
   t_uint const imsizey = 256;
   t_uint const imsizex = 256;
 
   auto const measurements_transform
-      = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data, imsizey, imsizex, 1, 1, 2, 100,
-          0.0001, kernels::kernel_from_string.at("kb"), 4, 4, operators::fftw_plan::measure, false);
-  sopt::wavelets::SARA const sara{
+      = factory::measurement_operator_factory<Vector<t_complex>>(
+          factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2, 1000,
+          0.0001, kernels::kernel_from_string.at("kb"), 4, 4);
+  std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
-
-  auto const wavelets = std::make_shared(sopt::linear_transform<t_complex>(sara, imsizey, imsizex));
-
+  auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(factory::distributed_wavelet_operator::serial, sara, imsizey, imsizex);
+  t_real const sigma = utilities::SNR_to_standard_deviation(uv_data.vis, snr);
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
-  PURIFY_HIGH_LOG("Using epsilon of {}", epsilon);
+ // auto const padmm
+ //     =   factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(factory::algorithm::padmm, factory::algo_distribution::serial,
+ //         measurements_transform, wavelets, uv_data, sigma, imsizey, imsizex, 500);
   auto const padmm
-      =   factory::algorithm_factory(factory::algorithm::padmm, factory::algo_distribution::serial,
-          measurements_transform, wavelets, uv_data, sigma, imsizey, imsizex);
+      = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
+            .itermax(500)
+            .gamma((wavelets->adjoint() * (measurements_transform->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3)
+            .relative_variation(1e-3)
+            .l2ball_proximal_epsilon(epsilon)
+            .tight_frame(false)
+            .l1_proximal_tolerance(1e-2)
+            .l1_proximal_nu(1.)
+            .l1_proximal_itermax(50)
+            .l1_proximal_positivity_constraint(true)
+            .l1_proximal_real_constraint(true)
+            .residual_convergence(epsilon)
+            .lagrange_update_scale(0.9)
+            .nu(1e0)
+            .Psi(*wavelets)
+            .Phi(*measurements_transform);
   auto const diagnostic = padmm();
-  assert(diagnostic.x.size() == M31.size());
-  Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
-  Vector<t_complex> residuals = measurements_transform->adjoint()
+  const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
+  CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
+  CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
+  CAPTURE(Vector<t_complex>::Map((image/solution).eval().data(), image.size()).real().head(10));
+  CHECK(image.isApprox(solution, 1e-6));
+
+  const Vector<t_complex> residuals = measurements_transform->adjoint()
                                 * (uv_data.vis - ((*measurements_transform) * diagnostic.x));
-  Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
-  return 0;
+  const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
+  CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
+  CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
+  CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
 }
