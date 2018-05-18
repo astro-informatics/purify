@@ -75,7 +75,7 @@ class YamlParser
     Write an output YAML file for the current
     simulation parameters. 
   */
-  void writeOutput(const std::string& output_file_name);
+  void writeOutput();
 
   
   // Variables
@@ -86,6 +86,7 @@ class YamlParser
   const TYPE NAME(){ return NAME##_;};
 
   YAML_MACRO(std::string, filepath, "");
+  YAML_MACRO(std::string, timestamp, "");
   YAML_MACRO(std::string, logging, "");
   YAML_MACRO(std::string, algorithm, "");
   YAML_MACRO(std::string, mpiAlgorithm, "");
