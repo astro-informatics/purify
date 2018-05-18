@@ -1,6 +1,7 @@
 
-#include<iostream>
-#include<string>
+#include <iostream>
+#include <cstdio>
+#include <string>
 #include "catch.hpp"
 #include "../purify/yaml-parser.h"
 #include "yaml-cpp/yaml.h"
@@ -96,5 +97,6 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser.relVarianceConvergence() == yaml_parser.relVarianceConvergence());
       REQUIRE(yaml_parser.param1() == yaml_parser.param1());
       REQUIRE(yaml_parser.param2() == yaml_parser.param2());
+      std::remove(file_path_save.c_str());
     }
 }
