@@ -1,0 +1,32 @@
+//used wavelets
+  sopt::wavelets::SARA const sara{
+      std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
+      std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
+      std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
+  auto const Psi = sopt::linear_transform<t_complex>(sara, 256, 256);
+//used measurement operator
+  auto const measurements_transform = gpu::measurementoperator::init_degrid_operator_2d(
+      uv_data, 256, 256, 1, 1, 2, 100, 0.0001,
+      kernels::kernel_from_string.at("kb"), 4, 4);
+//noise was esimated from
+  const t_real snr = 10;
+  t_real const sigma = utilities::SNR_to_standard_deviation(y0, snr);
+  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
+//used algorithm
+  auto const padmm
+      = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
+            .itermax(500)
+            .gamma((measurements_transform->adjoint() * uv_data.vis).real().maxCoeff() * 1e-3)
+            .relative_variation(1e-3)
+            .l2ball_proximal_epsilon(epsilon)
+            .tight_frame(false)
+            .l1_proximal_tolerance(1e-2)
+            .l1_proximal_nu(1.)
+            .l1_proximal_itermax(50)
+            .l1_proximal_positivity_constraint(true)
+            .l1_proximal_real_constraint(true)
+            .residual_convergence(epsilon)
+            .lagrange_update_scale(0.9)
+            .nu(1e0)
+            .Psi(Psi)
+            .Phi(*measurements_transform);
