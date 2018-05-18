@@ -149,6 +149,7 @@ utilities::vis_params read_visibility(const std::string &vis_name, const bool w_
     vis_name:: name of input text file containing [u, v, real(V), imag(V)] (separated by ' ').
   */
  std::ifstream vis_file(vis_name);
+  vis_file.precision(13);
   t_int row = 0;
   std::string line;
   // counts size of vis file
