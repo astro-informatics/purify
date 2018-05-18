@@ -114,7 +114,7 @@ class YamlParser
   YAML_MACRO(std::string, gamma, "");
   YAML_MACRO(std::string, output_prefix, "");
   YAML_MACRO(std::string, skymodel, "");
-  YAML_MACRO(std::string, measurements, "");
+  YAML_MACRO(std::vector<std::string>, measurements, {""});
   YAML_MACRO(std::string, polarization_measurement, "");
   YAML_MACRO(std::string, noise_estimate, "");
   YAML_MACRO(std::string, polarization_noise, "");
