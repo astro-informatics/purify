@@ -54,7 +54,7 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
   YAML::Node measurement_seq = generalConfigNode["InputOutput"]["input"]["measurements"];
   for (int i=0; i < measurement_seq.size(); i++)
     {
-      this->measurements_[i] = measurement_seq[i].as<std::string>();
+      this->measurements_.push_back(measurement_seq[i].as<std::string>());
     }
 
   this->polarization_measurement_ = generalConfigNode["InputOutput"]["input"]["polarization_measurement"].as<std::string>();
