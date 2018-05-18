@@ -2,7 +2,8 @@
 GeneralConfiguration:
   InputOutput:
     input:
-      measurements: /path/to/measurment/set # path to the measurement set
+      measurements:
+        - /path/to/measurment/set # path to the measurement set
       polarization_measurement: I # one from I Q V XX LL
       noise_estimate: /path/to/noise/estimate # path to the noise measurement set
       polarization_noise: I # one from I Q V XX LL
