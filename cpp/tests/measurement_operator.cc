@@ -29,14 +29,13 @@ TEST_CASE("regression_degrid"){
   const t_uint Jv = 4;
   const t_uint power_iters = 1;
   const t_real power_tol = 1e-9;
-  const auto ft_plan = operators::fftw_plan::measure;
 
 SECTION("kb"){
   const kernels::kernel kernel = kernels::kernel::kb;
   const std::vector<t_complex> y_exact = read_data<t_complex>(notinstalled::data_filename(test_dir +"kb_exact_data"));
   const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         Vector<t_real>::Map(v.data(), v.size()), Vector<t_real>::Map(u.data(), u.size()),Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M), imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv, ft_plan);
+        power_iters, power_tol, kernel, Ju, Jv);
   const Vector<t_complex> y_test =  (*measure_op) * input;
   const Vector<t_complex> y = Vector<t_complex>::Map(y_exact.data(), y_exact.size());
   CAPTURE(y_test.array()/y.array());
@@ -52,7 +51,7 @@ SECTION("pswf"){
 
   const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         Vector<t_real>::Map(v.data(), v.size()), Vector<t_real>::Map(u.data(), u.size()),Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M), imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, 6, 6, ft_plan);
+        power_iters, power_tol, kernel, 6, 6);
   const Vector<t_complex> y_test =  (*measure_op) * input;
   const Vector<t_complex> y = Vector<t_complex>::Map(y_exact.data(), y_exact.size());
   CAPTURE(y_test.array()/y.array());
@@ -67,7 +66,7 @@ SECTION("gauss"){
   std::vector<t_complex> y_exact = read_data<t_complex>(notinstalled::data_filename(test_dir + "gauss_exact_data"));
   const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         Vector<t_real>::Map(v.data(), v.size()), Vector<t_real>::Map(u.data(), u.size()),Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M), imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, 6, 6, ft_plan);
+        power_iters, power_tol, kernel, 6, 6);
   const Vector<t_complex> y_test =  (*measure_op) * input;
   const Vector<t_complex> y = Vector<t_complex>::Map(y_exact.data(), y_exact.size());
   CAPTURE(y_test.array()/y.array());
