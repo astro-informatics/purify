@@ -59,8 +59,8 @@ TEST_CASE("Yaml parser and setting variables test")
     }
   SECTION("Check the writeOutput method")
     {
-      std::string file_path_save = "config_save.yaml";
-      yaml_parser.writeOutput(file_path_save);
+      yaml_parser.writeOutput();
+      std::string file_path_save = "config_" + yaml_parser.timestamp() + "_save.yaml";
       YamlParser yaml_parser_check(file_path_save);
       REQUIRE(yaml_parser_check.filepath() == file_path_save);
       REQUIRE(yaml_parser_check.logging() == yaml_parser.logging());
