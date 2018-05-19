@@ -180,7 +180,7 @@ init_grid_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
       cellx, celly);
   auto direct = phiTphi;
   auto id = [](T &out, const T &in) { out = in; };
-  const t_real op_norm = details::power_method<T>({direct, N, id, N}, power_iters, power_tol,
+  const t_real op_norm = sopt::algorithm::power_method<T>({direct, N, id, N}, power_iters, power_tol,
                                                   T::Random(imsizex * imsizey));
   const auto operator_norm = purify::operators::init_normalise<T>(op_norm * op_norm);
   direct = sopt::chained_operators<T>(direct, operator_norm);
@@ -230,7 +230,7 @@ init_grid_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t
   const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
   auto direct = sopt::chained_operators<T>(allsumall, phiTphi);
   auto id = [](T &out, const T &in) { out = in; };
-  const t_real op_norm = details::power_method<T>({direct, N, id, N}, power_iters, power_tol,
+  const t_real op_norm = sopt::algorithm::power_method<T>({direct, N, id, N}, power_iters, power_tol,
                                                   comm.broadcast<T>(T::Random(imsizex * imsizey)));
   auto const operator_norm = purify::operators::init_normalise<T>(op_norm * op_norm);
   direct = sopt::chained_operators<T>(direct, operator_norm);
@@ -283,7 +283,7 @@ init_grid_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vect
 
   auto direct = sopt::chained_operators<T>(Broadcast, phiTphi);
   auto id = [](T &out, const T &in) { out = in; };
-  const t_real op_norm = details::power_method<T>({direct, N, id, N}, power_iters, power_tol,
+  const t_real op_norm = sopt::algorithm::power_method<T>({direct, N, id, N}, power_iters, power_tol,
                                                   comm.broadcast<T>(T::Random(imsizex * imsizey)));
   const auto operator_norm = purify::operators::init_normalise<T>(op_norm * op_norm);
   direct = sopt::chained_operators<T>(direct, operator_norm);
@@ -336,7 +336,7 @@ init_psf_convolve_2d(const std::shared_ptr<sopt::LinearTransform<T> const> &degr
   };
   const auto psf_convolve = sopt::chained_operators<T>(ifftop, ft_psf_multiply, fftop);
   const auto id = [](T &out, const T &in) { out = in; };
-  const t_real op_norm = details::power_method<T>({psf_convolve, N, id, N}, power_iters, power_tol,
+  const t_real op_norm = sopt::algorithm::power_method<T>({psf_convolve, N, id, N}, power_iters, power_tol,
                                                   T::Random(imsizex * imsizey));
   const auto operator_norm = purify::operators::init_normalise<T>(op_norm * op_norm);
   return sopt::chained_operators<T>(psf_convolve, operator_norm);

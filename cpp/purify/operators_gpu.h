@@ -4,8 +4,9 @@
 #include "purify/config.h"
 #include <iostream>
 #include <tuple>
-#include "sopt/chained_operators.h"
-#include "sopt/linear_transform.h"
+#include <sopt/chained_operators.h>
+#include <sopt/linear_transform.h>
+#include <sopt/power_method.h>
 #include "purify/logging.h"
 #include "purify/operators.h"
 #include "purify/types.h"
@@ -313,7 +314,7 @@ init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
   auto direct = directDegrid;
   auto indirect = indirectDegrid;
   const t_real op_norm
-      = details::power_method<Vector<t_complex>>({direct, M, indirect, N}, power_iters, power_tol,
+      = sopt::algorithm::power_method<Vector<t_complex>>({direct, M, indirect, N}, power_iters, power_tol,
                                                  Vector<t_complex>::Random(imsizex * imsizey));
   auto operator_norm = purify::operators::init_normalise<Vector<t_complex>>(op_norm);
   direct = sopt::chained_operators<Vector<t_complex>>(direct, operator_norm);
@@ -361,7 +362,7 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> init_degrid_oper
   auto Broadcast = purify::operators::init_broadcaster<Vector<t_complex>>(comm);
   auto direct = directDegrid;
   auto indirect = sopt::chained_operators<Vector<t_complex>>(Broadcast, indirectDegrid);
-  const t_real op_norm = details::power_method<Vector<t_complex>>(
+  const t_real op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
       {direct, M, indirect, N}, power_iters, power_tol,
       comm.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(imsizex * imsizey)));
   auto operator_norm = purify::operators::init_normalise<Vector<t_complex>>(op_norm);
@@ -413,7 +414,7 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
   auto direct = directDegrid;
   auto indirect = sopt::chained_operators<Vector<t_complex>>(allsumall, indirectDegrid);
   const t_real op_norm
-      = details::power_method<Vector<t_complex>>({direct, M, indirect, N}, power_iters, power_tol,
+      = sopt::algorithm::power_method<Vector<t_complex>>({direct, M, indirect, N}, power_iters, power_tol,
                                                  Vector<t_complex>::Random(imsizex * imsizey));
   auto operator_norm = purify::operators::init_normalise<Vector<t_complex>>(op_norm);
   direct = sopt::chained_operators<Vector<t_complex>>(direct, operator_norm);

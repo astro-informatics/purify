@@ -5,8 +5,9 @@
 #include <iostream>
 #include <tuple>
 #include <type_traits>
-#include "sopt/chained_operators.h"
-#include "sopt/linear_transform.h"
+#include <sopt/chained_operators.h>
+#include <sopt/power_method.h>
+#include <sopt/linear_transform.h>
 #include "purify/kernels.h"
 #include "purify/logging.h"
 #include "purify/types.h"
@@ -54,38 +55,6 @@ Image<t_complex> init_correction2d(const t_real &oversample_ratio, const t_uint 
                                    const std::function<t_real(t_real)> ftkernelv,
                                    const t_real &w_mean, const t_real &cellx, const t_real &celly);
 
-template <class T>
-t_real power_method(const sopt::LinearTransform<T> &op, const t_uint &niters,
-                    const t_real &relative_difference, const T &initial_vector) {
-
-  if(niters <= 0)
-    return 1;
-  t_real estimate_eigen_value = 1;
-  t_real old_value = 0;
-  T estimate_eigen_vector = initial_vector;
-  estimate_eigen_vector = estimate_eigen_vector / estimate_eigen_vector.matrix().norm();
-  PURIFY_DEBUG("Starting power method");
-  PURIFY_DEBUG("Iteration: 0, norm = {}", estimate_eigen_value);
-  for(t_int i = 0; i < niters; ++i) {
-    estimate_eigen_vector = op.adjoint() * (op * estimate_eigen_vector);
-    estimate_eigen_value = estimate_eigen_vector.matrix().norm();
-    PURIFY_DEBUG("Iteration: {}, norm = {}", i + 1, estimate_eigen_value);
-    if(estimate_eigen_value <= 0)
-      throw std::runtime_error("Error in operator.");
-    if(estimate_eigen_value != estimate_eigen_value)
-      throw std::runtime_error("Error in operator or data corrupted.");
-    estimate_eigen_vector = estimate_eigen_vector / estimate_eigen_value;
-    if(relative_difference * relative_difference
-       > std::abs(old_value - estimate_eigen_value) / old_value) {
-      old_value = estimate_eigen_value;
-      PURIFY_DEBUG("Converged to norm = {}, relative difference < {}", std::sqrt(old_value),
-                   relative_difference);
-      break;
-    }
-    old_value = estimate_eigen_value;
-  }
-  return std::sqrt(old_value);
-}
 
 //! Construct gridding matrix with mixing
 template <class T, class... ARGS>
@@ -435,8 +404,8 @@ init_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
       cellx, celly);
   auto direct = directDegrid;
   auto indirect = indirectDegrid;
-  const t_real op_norm = details::power_method<T>({direct, M, indirect, N}, power_iters, power_tol,
-                                                  T::Random(imsizex * imsizey));
+  const t_real op_norm = sopt::algorithm::power_method<T>({direct, M, indirect, N}, power_iters, power_tol,
+                                                  T::Ones(imsizex * imsizey));
   auto operator_norm = purify::operators::init_normalise<T>(op_norm);
   direct = sopt::chained_operators<T>(direct, operator_norm);
   indirect = sopt::chained_operators<T>(operator_norm, indirect);
@@ -488,7 +457,7 @@ init_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_real
   const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
   auto direct = directDegrid;
   auto indirect = sopt::chained_operators<T>(allsumall, indirectDegrid);
-  const t_real op_norm = details::power_method<T>({direct, M, indirect, N}, power_iters, power_tol,
+  const t_real op_norm = sopt::algorithm::power_method<T>({direct, M, indirect, N}, power_iters, power_tol,
                                                   comm.broadcast<T>(T::Random(imsizex * imsizey)));
   auto const operator_norm = purify::operators::init_normalise<T>(op_norm);
   direct = sopt::chained_operators<T>(direct, operator_norm);
@@ -542,7 +511,7 @@ init_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vector<t_
 
   auto direct = directDegrid;
   auto indirect = sopt::chained_operators<T>(Broadcast, indirectDegrid);
-  const t_real op_norm = details::power_method<T>({direct, M, indirect, N}, power_iters, power_tol,
+  const t_real op_norm = sopt::algorithm::power_method<T>({direct, M, indirect, N}, power_iters, power_tol,
                                                   comm.broadcast<T>(T::Random(imsizex * imsizey)));
   auto operator_norm = purify::operators::init_normalise<T>(op_norm);
   direct = sopt::chained_operators<T>(direct, operator_norm);
