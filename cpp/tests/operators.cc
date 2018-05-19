@@ -7,6 +7,7 @@
 #include "purify/kernels.h"
 #include "purify/logging.h"
 #include "purify/types.h"
+#include <sopt/power_method.h>
 
 
 using namespace purify;
@@ -40,8 +41,7 @@ TEST_CASE("Operators") {
   const t_uint ftsizeu = std::floor(imsizex * oversample_ratio);
   const t_uint Ju = 4;
   const t_uint Jv = 4;
-  const t_uint Jt_complexv = 4;
-  const t_uint power_iters = 100;
+  const t_uint power_iters = 1e4;
   const t_real power_tol = 1e-9;
   const kernels::kernel kernel = kernels::kernel::kb;
   const std::string &weighting_type = "natural";
@@ -113,19 +113,41 @@ TEST_CASE("Operators") {
     CHECK(inverse_check.isApprox(direct_input, 1e-4));
   }
   SECTION("Create Weighted Measurement Operator") {
+    const t_uint M_measures = 1e4;
+    const Vector<t_real> u = Vector<t_real>::Random(M_measures);
+    const Vector<t_real> v = Vector<t_real>::Random(M_measures);
+    const Vector<t_real> w = Vector<t_real>::Random(M_measures);
+    const Vector<t_complex> weights = Vector<t_complex>::Random(M_measures);
     const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
+        u, v, w, weights, imsizey, imsizex, oversample_ratio,
         power_iters, power_tol, kernel, Ju, Jv);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
     const Vector<t_complex> direct_output = *measure_op * direct_input;
-    CHECK(direct_output.size() == M);
+    CHECK(direct_output.size() == M_measures);
     const Vector<t_complex> indirect_input = Vector<t_complex>::Random(M);
     const Vector<t_complex> indirect_output = measure_op->adjoint() * indirect_input;
     CHECK(indirect_output.size() == imsizex * imsizey);
     SECTION("Power Method") {
-      auto op_norm = details::power_method<Vector<t_complex>>(
+      auto op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
           *measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
       CHECK(std::abs(op_norm - 1.) < power_tol);
+      auto op_norm2 = sopt::algorithm::power_method<Vector<t_complex>>(
+          *measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
+      CHECK(std::abs(op_norm - op_norm2) < power_tol);
+    }
+    SECTION("Norm Accuracy"){
+    const auto measure_op2 = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+        u, v, w, weights, imsizey, imsizex, oversample_ratio,
+        power_iters, power_tol, kernel, Ju, Jv);
+    const Vector<t_complex> input = Vector<t_complex>::Random(imsizey * imsizex);
+    Vector<t_complex> buff1 = input;
+    Vector<t_complex> buff2 = input;
+    for (int i = 0; i < 100; i++) {
+      buff1 = measure_op->adjoint() * (*measure_op * buff1);
+      buff2 = measure_op->adjoint() * (*measure_op2 * buff2);
+    }
+    CAPTURE((buff1.array()/buff2.array()).cwiseAbs().maxCoeff());
+    CHECK(buff1.isApprox(buff2, 1e-12));
     }
   }
 
@@ -142,9 +164,12 @@ TEST_CASE("Operators") {
     auto const phiTphi_op = sopt::LinearTransform<Vector<t_complex>>({phiTphi, id});
     CHECK(direct_output.size() == imsizex * imsizey);
     SECTION("Power Method") {
-      auto op_norm = details::power_method<Vector<t_complex>>(
+      auto op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
           phiTphi_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
       CHECK(std::abs(op_norm - 1.) < power_tol);
+      auto op_norm2 = sopt::algorithm::power_method<Vector<t_complex>>(
+          phiTphi_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
+      CHECK(std::abs(op_norm - op_norm2) < power_tol);
     }
     SECTION("operation") {
       const Vector<t_complex> input = Vector<t_complex>::Random(imsizex * imsizey);
@@ -166,7 +191,7 @@ TEST_CASE("Operators") {
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
     auto const phiTphi_op = sopt::LinearTransform<Vector<t_complex>>({phiTphi, id});
     SECTION("Power Method") {
-      auto op_norm = details::power_method<Vector<t_complex>>(
+      auto op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
           phiTphi_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
       CHECK(std::abs(op_norm - 1.) < power_tol);
     }
