@@ -21,7 +21,8 @@ add_include_dir(
   ${EIGEN3_INCLUDE_DIR}
   ${CFitsIO_INCLUDE_DIR}
   ${CImg_INCLUDE_DIR}
-  )
+  ${Yamlcpp_INCLUDE_DIR}
+)
 
 add_subdirectory(purify)
 if(tests OR examples OR benchmarks)

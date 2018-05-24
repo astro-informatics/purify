@@ -5,7 +5,11 @@
 */
 
 #include <typeinfo>
+#include <chrono>
+#include <ctime>
+#include <typeinfo>
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 #include <fstream>
 #include <yaml-cpp/yaml.h>
@@ -47,7 +51,10 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
   this->gamma_ = generalConfigNode["gamma"].as<std::string>();
   this->output_prefix_ = generalConfigNode["InputOutput"]["output_prefix"].as<std::string>();
   this->skymodel_ = generalConfigNode["InputOutput"]["skymodel"].as<std::string>();
-  this->measurements_ = generalConfigNode["InputOutput"]["input"]["measurements"].as<std::string>();
+  YAML::Node measurement_seq = generalConfigNode["InputOutput"]["input"]["measurements"];
+  for (int i=0; i < measurement_seq.size(); i++)
+      this->measurements_.push_back(measurement_seq[i].as<std::string>());
+
   this->polarization_measurement_ = generalConfigNode["InputOutput"]["input"]["polarization_measurement"].as<std::string>();
   this->noise_estimate_ = generalConfigNode["InputOutput"]["input"]["noise_estimate"].as<std::string>();
   this->polarization_noise_ = generalConfigNode["InputOutput"]["input"]["polarization_noise"].as<std::string>();
@@ -124,3 +131,38 @@ std::vector<int> YamlParser::getWavelets(std::string values_str)
   return wavelets;
 }
 
+void YamlParser::writeOutput()
+{
+  std::string file_path = "../data/config";
+  std::string extension = ".yaml";
+  
+  std::string base_file_name = this->filepath_.erase(this->filepath_.size()-extension.size());
+  base_file_name = base_file_name.substr(file_path.size() + 1, base_file_name.size());
+  
+  std::time_t t = std::time(0);   // get time now
+  std::tm* now = std::localtime(&t);
+
+  // Make the datetime human readable
+  std::string datetime = std::to_string(now->tm_year + 1900) + '-' + std::to_string(now->tm_mon + 1) + '-' + std::to_string(now->tm_mday);
+  datetime = datetime + '-' + std::to_string(now->tm_hour) + ':' + std::to_string(now->tm_min) + ':' + std::to_string(now->tm_sec);
+
+  this->timestamp_ = datetime;
+
+  YAML::Emitter out;
+  out << YAML::BeginMap;
+  out << YAML::Key << "GeneralConfiguration";
+  out << this->config_file["GeneralConfiguration"];
+  out << YAML::Key << "MeasureOperators";
+  out << this->config_file["MeasureOperators"];
+  out << YAML::Key << "SARA";
+  out << this->config_file["SARA"];
+  out << YAML::Key << "AlgorithmOptions";
+  out << this->config_file["AlgorithmOptions"];
+  out << YAML::EndMap;  
+
+  std::ofstream output_file;
+  output_file.open(base_file_name + "_" + datetime + "_save.yaml");
+  output_file << out.c_str();
+  output_file.close();
+
+}

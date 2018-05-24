@@ -29,6 +29,7 @@ add_catch_test(index_mapping LIBRARIES libpurify)
 add_catch_test(uvfits LIBRARIES libpurify)
 add_catch_test(convolution LIBRARIES libpurify)
 add_catch_test(wproj_utils LIBRARIES libpurify)
+add_catch_test(parser_test LIBRARIES libpurify)
 add_catch_test(measurement_factory LIBRARIES libpurify)
 add_catch_test(wavelet_factory LIBRARIES libpurify)
 
