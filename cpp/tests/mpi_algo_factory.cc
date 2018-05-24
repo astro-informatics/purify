@@ -39,111 +39,57 @@ dirty_visibilities(const std::vector<std::string> &names, sopt::mpi::Communicato
 }
 
 TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
-  logging::set_level("debug");
-  sopt::logging::set_level("debug");
 
   auto const world = sopt::mpi::Communicator::World();
   // split into serial and parallel
-  auto const split_comm = world.split(world.is_root());
   if(world.size() < 2)
     return;
 
-  auto const nvis = 20;
-  auto const width = 32;
-  auto const height = 32;
-  auto const over_sample = 2;
-  auto const J = 4;
-  auto const ISNR = 30;
+  const std::string &test_dir = "expected/padmm_serial/";
+  const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
+  const std::string &expected_solution_path = notinstalled::data_filename(test_dir + "solution.fits");
+  const std::string &expected_residual_path = notinstalled::data_filename(test_dir + "residual.fits");
 
-  auto const uv_serial = dirty_visibilities(world, nvis, width, height, over_sample, ISNR);
-  // distribute only on processors doing it parallel
-  auto const uv_data = distribute_params(uv_serial, split_comm);
+  const auto solution = pfitsio::read2d(expected_solution_path);
+  const auto residual = pfitsio::read2d(expected_residual_path);
 
+  auto uv_data = utilities::read_visibility(input_data_path, false);
+  uv_data.units = utilities::vis_units::radians;
+  CAPTURE(uv_data.vis.head(5));
+  CHECK(uv_data.size() == 13107);
 
+  t_uint const imsizey = 256;
+  t_uint const imsizex = 256;
 
- auto   Phi
-      =  *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          split_comm, uv_data.u, uv_data.v, uv_data.w, uv_data.weights, width, height, over_sample, 500, 1e-9);
+  auto const measurements_transform
+      = factory::measurement_operator_factory<Vector<t_complex>>(
+          factory::distributed_measurement_operator::mpi_distribute_image,
+          uv_data, imsizey, imsizex, 1, 1, 2, 1000,
+          0.0001, kernels::kernel_from_string.at("kb"), 4, 4);
+  std::vector<std::tuple<std::string, t_uint>> const sara{
+      std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
+      std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
+      std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
+  auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
+      factory::distributed_wavelet_operator::mpi_sara, sara, imsizey, imsizex);
+  t_real const sigma = world.broadcast(0.02378738741225); //see test_parameters file
+  auto const padmm
+      = factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
+          factory::algorithm::padmm, factory::algo_distribution::mpi_serial,
+          measurements_transform, wavelets, uv_data, sigma, imsizey, imsizex, sara.size(), 500);
 
-  SECTION("Measurement operator parallelization") {
-    SECTION("Gridding") {
-      Vector<t_complex> const grid = Phi.adjoint() * uv_data.vis;
-      auto const serial = world.broadcast(grid);
-      CAPTURE(split_comm.is_root());
-      CAPTURE((grid.array()/serial.array()).head(5));
-      CHECK(grid.isApprox(serial));
-    }
+  auto const diagnostic = (*padmm)();
+  
+  const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
+  CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
+  CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
+  CAPTURE(Vector<t_complex>::Map((image/solution).eval().data(), image.size()).real().head(10));
+  CHECK(image.isApprox(solution, 1e-6));
 
-    SECTION("Degridding") {
-      auto const image
-          = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(width * height));
-      Vector<t_complex> const degridded = Phi * image;
-      REQUIRE(degridded.size() == uv_data.vis.size());
-
-      auto const just_roots = world.split(split_comm.is_root());
-      if(world.is_root())
-        just_roots.broadcast(degridded);
-      else if(split_comm.is_root() and split_comm.size() > 1) {
-        utilities::vis_params serial = uv_serial;
-        serial.vis = just_roots.broadcast<Vector<t_complex>>();
-        auto const order
-            = distribute::distribute_measurements(serial, split_comm, distribute::plan::radial);
-        auto const from_serial = utilities::regroup_and_scatter(serial, order, split_comm);
-        CHECK(from_serial.vis.isApprox(degridded));
-      } else if(split_comm.size() > 1) {
-        auto const from_serial = utilities::scatter_visibilities(split_comm);
-        CHECK(from_serial.vis.isApprox(degridded));
-      }
-    }
-  }
-
-  sopt::wavelets::SARA const sara(
-      {std::make_tuple("DB4", 2u), std::make_tuple("DB2", 2u), std::make_tuple("DB1", 2u)});
-  auto const start = [](t_uint size, t_uint ncomms, t_uint rank) {
-    return std::min(size, rank * (size / ncomms) + std::min(rank, size % ncomms));
-  };
-  auto const startw = start(sara.size(), split_comm.size(), split_comm.rank());
-  auto const endw = start(sara.size(), split_comm.size(), split_comm.rank() + 1);
-  auto const split_sara = sopt::wavelets::SARA(sara.begin() + startw, sara.begin() + endw);
-  auto const Psi = sopt::linear_transform<t_complex>(split_sara, height,
-                                                     width, split_comm);
-  SECTION("Wavelet operator parallelization") {
-    auto const Nx = width;
-    auto const Ny = height;
-    SECTION("Signal to Coefficients") {
-      auto const signal = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(Nx * Ny));
-      Vector<t_complex> const coefficients = Psi.adjoint() * signal;
-      CHECK(world.broadcast(coefficients)
-                .segment(startw * Nx * Ny, (endw - startw) * Nx * Ny)
-                .isApprox(coefficients));
-    }
-
-    SECTION("Coefficients to Signal") {
-      auto const coefficients
-          = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(Nx * Ny * sara.size()));
-      Vector<t_complex> const signal
-          = Psi * coefficients.segment(startw * Nx * Ny, (endw - startw) * Nx * Ny);
-      CHECK(world.broadcast(signal).isApprox(signal));
-    }
-  }
-
-  Vector<> dimage = (Phi.adjoint() * uv_data.vis).real();
-  t_real const max_val = dimage.array().abs().maxCoeff();
-  dimage = dimage / max_val;
-  Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
-
-  auto const sigma = world.broadcast(utilities::SNR_to_standard_deviation(uv_data.vis, ISNR));
-  auto const epsilon = world.broadcast(utilities::calculate_l2_radius(uv_data.vis, sigma));
-  auto const purify_gamma
-      = world.is_root() ?
-            world.broadcast((Psi.adjoint() * (Phi.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff()
-                            * 1e-3) :
-            world.broadcast<t_real>();
-  PURIFY_HIGH_LOG("Starting sopt!");
-  PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
-  PURIFY_MEDIUM_LOG("Gamma {}", purify_gamma);
-  auto padmm = factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(factory::algorithm::padmm, 
-      factory::algo_distribution::mpi_serial, 
-      std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(Psi), 
-      std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(Phi), uv_data, sigma, height, width);
+  const Vector<t_complex> residuals = measurements_transform->adjoint()
+                                * (uv_data.vis - ((*measurements_transform) * diagnostic.x));
+  const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
+  CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
+  CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
+  CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
 }
