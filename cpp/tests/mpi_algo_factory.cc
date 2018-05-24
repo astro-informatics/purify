@@ -15,38 +15,26 @@
 #include "purify/pfitsio.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
-#include "purify/operators.h"
 
 #include "purify/algorithm_factory.h"
+#include "purify/wavelet_operator_factory.h"
+#include "purify/measurement_operator_factory.h"
 
 using namespace purify;
-utilities::vis_params dirty_visibilities(t_uint number_of_vis = 10, t_uint width = 20,
-                                         t_uint height = 20, t_uint over_sample = 2,
-                                         t_real ISNR = 30) {
-  auto result = utilities::random_sample_density(number_of_vis, 0, constant::pi / 3);
-  result.units = utilities::vis_units::radians;
-  result.vis = Vector<t_complex>::Random(result.u.size());
-  result.weights = Vector<t_complex>::Random(result.u.size());
-  return result;
+utilities::vis_params dirty_visibilities(const std::vector<std::string> &names) {
+  return utilities::read_visibility(names, false);
 }
 
-utilities::vis_params dirty_visibilities(sopt::mpi::Communicator const &comm,
-                                         t_uint number_of_vis = 10, t_uint width = 20,
-                                         t_uint height = 20, t_uint over_sample = 2,
-                                         t_real ISNR = 30) {
-  utilities::vis_params result;
-  if(comm.is_root())
-    result = dirty_visibilities(number_of_vis, width, height, over_sample, ISNR);
-  result.u = comm.broadcast(result.u);
-  result.v = comm.broadcast(result.v);
-  result.w = comm.broadcast(result.w);
-  result.weights = comm.broadcast(result.weights);
-  result.vis = comm.broadcast(result.vis);
-  result.ra = comm.broadcast(result.ra);
-  result.dec = comm.broadcast(result.dec);
-  result.average_frequency = comm.broadcast(result.average_frequency);
-  result.units
-      = static_cast<utilities::vis_units>(comm.broadcast(static_cast<t_int>(result.units)));
+utilities::vis_params
+dirty_visibilities(const std::vector<std::string> &names, sopt::mpi::Communicator const &comm) {
+  if(comm.size() == 1)
+    return dirty_visibilities(names);
+  if(comm.is_root()) {
+    auto result = dirty_visibilities(names);
+    auto const order = distribute::distribute_measurements(result, comm, distribute::plan::w_term);
+    return utilities::regroup_and_scatter(result, order, comm);
+  }
+  auto result = utilities::scatter_visibilities(comm);
   return result;
 }
 
