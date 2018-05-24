@@ -15,6 +15,7 @@
 #include "purify/pfitsio.h"
 #include "purify/types.h"
 #include "purify/utilities.h"
+#include "purify/convergence_factory.h"
 
 using namespace purify;
 
@@ -98,25 +99,9 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
       .Psi(Psi)
       .Phi(*m_measurements1);
 
-  sopt::ScalarRelativeVariation<t_complex> conv(padmm->relative_variation(),
-                                                padmm->relative_variation(), "Objective function");
   std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
-  padmm->residual_convergence([padmm_weak,
-                               this](Vector<t_complex> const &,
-                                     Vector<t_complex> const &residual) mutable -> bool {
-    auto const padmm = padmm_weak.lock();
-    auto const residual_norm = sopt::l2_norm(residual, padmm->l2ball_proximal_weights());
-    auto const result
-        = this->m_world.all_reduce<int8_t>(residual_norm < padmm->residual_tolerance(), MPI_LAND);
-    return result;
-  });
-  padmm->objective_convergence([padmm_weak, conv, this](Vector<t_complex> const &x,
-                                                        Vector<t_complex> const &) mutable -> bool {
-    auto const padmm = padmm_weak.lock();
-    auto const result = this->m_world.all_reduce<uint8_t>(
-        conv(sopt::l1_norm(padmm->Psi().adjoint() * x, padmm->l1_proximal_weights())), MPI_LAND);
-    return result;
-  });
+  padmm->residual_convergence( factory::residual_convergence_factory<t_complex>(factory::ConvergenceType::mpi_local, padmm_weak) );
+  padmm->objective_convergence( factory::objective_convergence_factory<t_complex>(padmm_weak) );
   // Benchmark the application of the algorithm
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
@@ -157,25 +142,9 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
       .Psi(Psi)
       .Phi(*m_measurements3);
 
-  sopt::ScalarRelativeVariation<t_complex> conv(padmm->relative_variation(),
-                                                padmm->relative_variation(), "Objective function");
   std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
-  padmm->residual_convergence([padmm_weak,
-                               this](Vector<t_complex> const &,
-                                     Vector<t_complex> const &residual) mutable -> bool {
-    auto const padmm = padmm_weak.lock();
-    auto const residual_norm = sopt::l2_norm(residual, padmm->l2ball_proximal_weights());
-    auto const result
-        = this->m_world.all_reduce<int8_t>(residual_norm < padmm->residual_tolerance(), MPI_LAND);
-    return result;
-  });
-  padmm->objective_convergence([padmm_weak, conv, this](Vector<t_complex> const &x,
-                                                        Vector<t_complex> const &) mutable -> bool {
-    auto const padmm = padmm_weak.lock();
-    auto const result = this->m_world.all_reduce<uint8_t>(
-        conv(sopt::l1_norm(padmm->Psi().adjoint() * x, padmm->l1_proximal_weights())), MPI_LAND);
-    return result;
-  });
+  padmm->residual_convergence(factory::residual_convergence_factory<t_complex>(factory::ConvergenceType::mpi_local, padmm_weak) );
+  padmm->objective_convergence( factory::objective_convergence_factory<t_complex>(padmm_weak) );
   // Benchmark the application of the algorithm
   while(state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
@@ -188,16 +157,18 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo1)
     //->Apply(b_utilities::Arguments)
-    ->Args({1024, 1000000, 4})
-    ->Args({1024, 10000000, 4})
+//->Args({1024, 1000000, 4})
+//->Args({1024, 10000000, 4})
+->Args({128, 1000, 4})
     ->UseManualTime()
-    ->Repetitions(10) //->ReportAggregatesOnly(true)
+//->Repetitions(10) //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo3)
     //->Apply(b_utilities::Arguments)
-    ->Args({1024, 1000000, 4})
-    ->Args({1024, 10000000, 4})
+//->Args({1024, 1000000, 4})
+//->Args({1024, 10000000, 4})
+->Args({128, 1000, 4})
     ->UseManualTime()
-    ->Repetitions(10) //->ReportAggregatesOnly(true)
+//->Repetitions(10) //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
