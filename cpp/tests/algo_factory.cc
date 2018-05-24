@@ -45,10 +45,9 @@ TEST_CASE("padmm_factory"){
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(factory::distributed_wavelet_operator::serial, sara, imsizey, imsizex);
   t_real const sigma = 0.02378738741225; //see test_parameters file
-  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
   auto const padmm
       =   factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(factory::algorithm::padmm, factory::algo_distribution::serial,
-          measurements_transform, wavelets, uv_data, sigma, imsizey, imsizex, 500);
+          measurements_transform, wavelets, uv_data, sigma, imsizey, imsizex, sara.size(), 500);
 
   auto const diagnostic = (*padmm)();
   

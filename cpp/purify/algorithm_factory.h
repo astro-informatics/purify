@@ -29,9 +29,11 @@ template <class Algorithm, class... ARGS>
 //! return shared pointer to padmm object
 template <class Algorithm>
 typename std::enable_if<std::is_same<Algorithm, sopt::algorithm::ImagingProximalADMM<t_complex>>::value,std::shared_ptr<Algorithm> >::type
-padmm_factory(const algo_distribution dist, std::shared_ptr<sopt::LinearTransform<Vector<typename Algorithm::Scalar>> const> const &measurements,
-              std::shared_ptr<sopt::LinearTransform<Vector<typename Algorithm::Scalar>> const> const &Psi, 
+padmm_factory(const algo_distribution dist, 
+              std::shared_ptr<sopt::LinearTransform<Vector<typename Algorithm::Scalar>> const> const &measurements,
+              std::shared_ptr<sopt::LinearTransform<Vector<typename Algorithm::Scalar>> const> const &wavelets, 
               const utilities::vis_params &uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, 
+              const t_uint sara_size,
               const t_uint max_iterations = 500,
               const bool real_constraint = true, 
               const bool positive_constraint = true, 
@@ -40,13 +42,11 @@ padmm_factory(const algo_distribution dist, std::shared_ptr<sopt::LinearTransfor
               const t_real l1_proximal_tolerance = 1e-2, 
               const t_uint maximum_proximal_iterations = 50) {
   typedef typename Algorithm::Scalar t_scalar;
-
+  if(sara_size > 1 and tight_frame)
+    throw std::runtime_error("l1 proximal not consistent: You say you are using a tight frame, but you have more than one wavelet basis.");
   auto epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
-  auto gamma =
-      (Psi->adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3;
   auto padmm = std::make_shared<Algorithm>(uv_data.vis);
   padmm->itermax(max_iterations)
-      .gamma(gamma)
       .relative_variation(relative_variation)
       .l2ball_proximal_epsilon(epsilon)
       .tight_frame(tight_frame)
@@ -58,12 +58,15 @@ padmm_factory(const algo_distribution dist, std::shared_ptr<sopt::LinearTransfor
       .residual_convergence(epsilon)
       .lagrange_update_scale(0.9)
       .nu(1e0)
-      .Psi(*Psi)
+      .Psi(*wavelets)
       .Phi(*measurements);
   auto convergence_function = [](const Vector<t_complex> &x) { return true; };
   switch(dist) {
     case(algo_distribution::serial):
       {
+      auto gamma =
+      (wavelets->adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3;
+      padmm->gamma(gamma);
       return padmm;
       }
 #ifdef PURIFY_MPI
@@ -86,9 +89,7 @@ padmm_factory(const algo_distribution dist, std::shared_ptr<sopt::LinearTransfor
   }
 #ifdef PURIFY_MPI
   auto const comm = sopt::mpi::Communicator::World();
-  PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
-  PURIFY_MEDIUM_LOG("Gamma {}", gamma);
-  padmm->gamma(gamma)
+  padmm->gamma(utilities::step_size(uv_data.vis, measurements, wavelets, sara_size) * 1e-3)
       // communicator ensuring l1 norm in l1 proximal is global
       .l1_proximal_adjoint_space_comm(comm)
       .l2ball_proximal_epsilon(epsilon);
