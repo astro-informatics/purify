@@ -6,7 +6,7 @@
 
 namespace purify {
   namespace factory {
-    enum class ConvergenceType {mpi_local, mpi_global)
+    enum class ConvergenceType {mpi_local, mpi_global};
 
     template <class T>
       std::function<bool(Vector<T> const &, Vector<T> const &)>
