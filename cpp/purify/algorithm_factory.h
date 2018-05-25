@@ -7,7 +7,8 @@
 #include "purify/logging.h"
 #include "purify/types.h"
 
-#include "purify/operators.h"
+#include "purify/convergence_factory.h"
+#include "purify/mpi_utilities.h"
 
 #include <sopt/mpi/communicator.h>
 
@@ -44,44 +45,46 @@ padmm_factory(const algo_distribution dist,
   typedef typename Algorithm::Scalar t_scalar;
   if(sara_size > 1 and tight_frame)
     throw std::runtime_error("l1 proximal not consistent: You say you are using a tight frame, but you have more than one wavelet basis.");
-  auto epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
+  auto epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
   auto padmm = std::make_shared<Algorithm>(uv_data.vis);
   padmm->itermax(max_iterations)
       .relative_variation(relative_variation)
-      .l2ball_proximal_epsilon(epsilon)
       .tight_frame(tight_frame)
       .l1_proximal_tolerance(l1_proximal_tolerance)
       .l1_proximal_nu(1.)
       .l1_proximal_itermax(maximum_proximal_iterations)
       .l1_proximal_positivity_constraint(positive_constraint)
       .l1_proximal_real_constraint(real_constraint)
-      .residual_convergence(epsilon)
       .lagrange_update_scale(0.9)
       .nu(1e0)
       .Psi(*wavelets)
       .Phi(*measurements);
-  auto convergence_function = [](const Vector<t_complex> &x) { return true; };
+        ConvergenceType obj_conv = ConvergenceType::mpi_global;
+        ConvergenceType rel_conv = ConvergenceType::mpi_global;
   switch(dist) {
     case(algo_distribution::serial):
       {
-      auto gamma =
-      (wavelets->adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3;
-      padmm->gamma(gamma);
+      padmm->gamma((wavelets->adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3)
+      .l2ball_proximal_epsilon(epsilon)
+      .residual_tolerance(epsilon);
       return padmm;
       }
 #ifdef PURIFY_MPI
     case(algo_distribution::mpi_serial):
       {
-  auto const comm = sopt::mpi::Communicator::World();
-  epsilon = 3 * std::sqrt(comm.all_sum_all(std::pow(sigma, 2)))
-                       * std::sqrt(2 * comm.all_sum_all(uv_data.size()));
-   padmm->l2ball_proximal_communicator(comm);
-   break;
+        obj_conv = ConvergenceType::mpi_global;
+        rel_conv = ConvergenceType::mpi_global;
+        auto const comm = sopt::mpi::Communicator::World();
+        epsilon = utilities::calculate_l2_radius(comm.all_sum_all(uv_data.vis.size()), comm.broadcast(sigma));
+        // communicator ensuring l2 norm in l2ball proximal is global
+        padmm->l2ball_proximal_communicator(comm);
+    break;
       }
     case(algo_distribution::mpi_distributed):
       {
-  epsilon = 3 * std::sqrt(2 * uv_data.size()) * sigma;
-   break;
+        obj_conv = ConvergenceType::mpi_local;
+        rel_conv = ConvergenceType::mpi_local;
+    break;
       }
 #endif
     default:
@@ -89,10 +92,19 @@ padmm_factory(const algo_distribution dist,
   }
 #ifdef PURIFY_MPI
   auto const comm = sopt::mpi::Communicator::World();
-  padmm->gamma(utilities::step_size(uv_data.vis, measurements, wavelets, sara_size) * 1e-3)
-      // communicator ensuring l1 norm in l1 proximal is global
-      .l1_proximal_adjoint_space_comm(comm)
+  std::weak_ptr<Algorithm> const padmm_weak(padmm);
+// set epsilon
+  padmm->residual_tolerance(epsilon)
       .l2ball_proximal_epsilon(epsilon);
+// set gamma
+  padmm->gamma(
+      comm.all_reduce(utilities::step_size(uv_data.vis, measurements, wavelets, sara_size) * 1e-3, MPI_MAX));
+      // communicator ensuring l1 norm in l1 proximal is global
+      padmm->l1_proximal_adjoint_space_comm(comm);
+      padmm->residual_convergence(
+          purify::factory::l2_convergence_factory<typename Algorithm::Scalar>(rel_conv, padmm_weak));
+      padmm->objective_convergence(
+          purify::factory::l1_convergence_factory<typename Algorithm::Scalar>(obj_conv, padmm_weak));
 #endif
   return padmm;
 }
