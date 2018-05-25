@@ -105,7 +105,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
   CHECK(sopt::mpi::l2_norm(diagnostic.residual,padmm->l2ball_proximal_weights(), world) < epsilon);
   //the algorithm depends on nodes, so other than a basic bounds check, 
   //it is hard to know exact precision (might depend on probability theory...)
-  if(world.size() > 2)
+  if(world.size() > 2 or world.size() == 0)
     return;
   //testing the case where there are two nodes exactly.
   const std::string &expected_solution_path = (world.size() == 2) ?
