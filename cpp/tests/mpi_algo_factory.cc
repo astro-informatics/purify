@@ -38,25 +38,18 @@ dirty_visibilities(const std::vector<std::string> &names, sopt::mpi::Communicato
   return result;
 }
 
-TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
+TEST_CASE("Serial vs. Serial with MPI PADMM") {
 
   auto const world = sopt::mpi::Communicator::World();
-  // split into serial and parallel
-  if(world.size() < 2)
-    return;
 
   const std::string &test_dir = "expected/padmm_serial/";
   const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
-  const std::string &expected_solution_path = notinstalled::data_filename(test_dir + "solution.fits");
-  const std::string &expected_residual_path = notinstalled::data_filename(test_dir + "residual.fits");
 
-  const auto solution = pfitsio::read2d(expected_solution_path);
-  const auto residual = pfitsio::read2d(expected_residual_path);
-
-  auto uv_data = utilities::read_visibility(input_data_path, false);
+  auto uv_data = dirty_visibilities({input_data_path}, world);
   uv_data.units = utilities::vis_units::radians;
-  CAPTURE(uv_data.vis.head(5));
-  CHECK(uv_data.size() == 13107);
+  if(world.is_root())
+    CAPTURE(uv_data.vis.head(5));
+  REQUIRE(world.all_sum_all(uv_data.size()) == 13107);
 
   t_uint const imsizey = 256;
   t_uint const imsizex = 256;
@@ -73,13 +66,21 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
       factory::distributed_wavelet_operator::mpi_sara, sara, imsizey, imsizex);
   t_real const sigma = world.broadcast(0.02378738741225); //see test_parameters file
+  SECTION("global"){
   auto const padmm
       = factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
           factory::algorithm::padmm, factory::algo_distribution::mpi_serial,
           measurements_transform, wavelets, uv_data, sigma, imsizey, imsizex, sara.size(), 500);
 
   auto const diagnostic = (*padmm)();
-  
+  CHECK(diagnostic.niters == 139);
+
+  const std::string &expected_solution_path = notinstalled::data_filename(test_dir + "solution.fits");
+  const std::string &expected_residual_path = notinstalled::data_filename(test_dir + "residual.fits");
+
+  const auto solution = pfitsio::read2d(expected_solution_path);
+  const auto residual = pfitsio::read2d(expected_residual_path);
+
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
@@ -92,4 +93,45 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
   CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
+  }
+  SECTION("local"){
+  auto const padmm
+      = factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
+          factory::algorithm::padmm, factory::algo_distribution::mpi_distributed,
+          measurements_transform, wavelets, uv_data, sigma, imsizey, imsizex, sara.size(), 500);
+
+  auto const diagnostic = (*padmm)();
+  t_real const epsilon = utilities::calculate_l2_radius(world.all_sum_all(uv_data.vis.size()), world.broadcast(sigma));
+  CHECK(sopt::mpi::l2_norm(diagnostic.residual,padmm->l2ball_proximal_weights(), world) < epsilon);
+  //the algorithm depends on nodes, so other than a basic bounds check, 
+  //it is hard to know exact precision (might depend on probability theory...)
+  if(world.size() > 2)
+    return;
+  //testing the case where there are two nodes exactly.
+  const std::string &expected_solution_path = (world.size() == 2) ?
+    notinstalled::data_filename(test_dir + "mpi_solution.fits"):
+    notinstalled::data_filename(test_dir + "solution.fits");
+  const std::string &expected_residual_path = (world.size() == 2) ? 
+    notinstalled::data_filename(test_dir + "mpi_residual.fits"):
+    notinstalled::data_filename(test_dir + "residual.fits");
+  if(world.size() == 1)
+    CHECK(diagnostic.niters == 139);
+  if(world.size() == 2)
+    CHECK(diagnostic.niters == 131);
+  const auto solution = pfitsio::read2d(expected_solution_path);
+  const auto residual = pfitsio::read2d(expected_residual_path);
+
+  const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
+  CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
+  CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
+  CAPTURE(Vector<t_complex>::Map((image/solution).eval().data(), image.size()).real().head(10));
+  CHECK(image.isApprox(solution, 1e-6));
+
+  const Vector<t_complex> residuals = measurements_transform->adjoint()
+                                * (uv_data.vis - ((*measurements_transform) * diagnostic.x));
+  const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
+  CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
+  CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
+  CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
+  }
 }

@@ -30,7 +30,7 @@ TEST_CASE("padmm_factory"){
   auto uv_data = utilities::read_visibility(input_data_path, false);
   uv_data.units = utilities::vis_units::radians;
   CAPTURE(uv_data.vis.head(5));
-  CHECK(uv_data.size() == 13107);
+  REQUIRE(uv_data.size() == 13107);
 
   t_uint const imsizey = 256;
   t_uint const imsizex = 256;
@@ -46,11 +46,12 @@ TEST_CASE("padmm_factory"){
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(factory::distributed_wavelet_operator::serial, sara, imsizey, imsizex);
   t_real const sigma = 0.02378738741225; //see test_parameters file
   auto const padmm
-      =   factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(factory::algorithm::padmm, factory::algo_distribution::serial,
+      =   factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
+          factory::algorithm::padmm, factory::algo_distribution::serial,
           measurements_transform, wavelets, uv_data, sigma, imsizey, imsizex, sara.size(), 500);
 
   auto const diagnostic = (*padmm)();
-  
+  CHECK(diagnostic.niters == 139);
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
