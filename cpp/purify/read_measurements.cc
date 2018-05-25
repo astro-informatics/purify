@@ -9,6 +9,9 @@
 
 namespace purify {
   namespace read_measurements {
+utilities::vis_params read_measurements(const std::string &name) {
+  return read_measurements(std::vector<std::string>{name});
+}
 utilities::vis_params read_measurements(const std::vector<std::string> &names) {
   format format_type = format::uvfits;
   for(t_int i = 0; i < names.size(); i++){
@@ -49,6 +52,10 @@ utilities::vis_params read_measurements(const std::vector<std::string> &names) {
   }
 }
 
+#ifdef PURIFY_MPI
+utilities::vis_params read_measurements(const std::string &name, sopt::mpi::Communicator const & comm) {
+  return read_measurements(std::vector<std::string>{name}, comm);
+}
 utilities::vis_params
 read_measurements(const std::vector<std::string> &names, sopt::mpi::Communicator const &comm) {
   if(comm.size() == 1)
@@ -61,6 +68,7 @@ read_measurements(const std::vector<std::string> &names, sopt::mpi::Communicator
   auto result = utilities::scatter_visibilities(comm);
   return result;
 }
+#endif
 
 }
 }
