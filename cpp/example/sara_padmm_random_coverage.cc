@@ -76,7 +76,7 @@ int main(int, char **) {
       Image<t_real>::Map(dimage.data(), M31.rows(), M31.cols()),
       dirty_image_fits);
 
-  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
+  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
   auto const purify_gamma
       = (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff()
         * beta;

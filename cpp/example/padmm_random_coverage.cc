@@ -58,7 +58,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   sopt::utilities::write_tiff(Image<t_real>::Map(dimage.data(), imsizey, imsizex), dirty_image);
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), imsizey, imsizex), dirty_image_fits);
 
-  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
+  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
   PURIFY_HIGH_LOG("Using epsilon of {}", epsilon);
 #ifdef PURIFY_CImg
   auto const canvas
