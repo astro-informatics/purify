@@ -23,12 +23,15 @@ set(HEADERS
   cimg.h uvfits.h convolution.h projection_kernels.h measurement_operator_factory.h wavelet_operator_factory.h
   algorithm_factory.h
   read_measurements.h
+  yaml-parser.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
+if(PURIFY_MPI)
+  list(APPEND HEADERS convergence_factory.h)
+endif()
 
 set(SOURCES utilities.cc pfitsio.cc
-  kernels.cc distribute.cc wproj_utilities.cc operators.cc uvfits.cc projection_kernels.cc
-  read_measurements.cc
-  )
+  kernels.cc distribute.cc wproj_utilities.cc operators.cc uvfits.cc projection_kernels.cc yaml-parser.cc 
+  read_measurements.cc)
 
 if(TARGET casacore::ms)
   list(APPEND SOURCES casacore.cc)
@@ -64,9 +67,10 @@ add_include_dir(
   ${EIGEN3_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
   ${CFitsIO_INCLUDE_DIR}
-  )
+  ${Yamlcpp_INCLUDE_DIR}
+)
 target_link_libraries(libpurify
-  ${FFTW3_DOUBLE_LIBRARY}  ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY} ${X11_X11_LIB})
+  ${FFTW3_DOUBLE_LIBRARY}  ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY} ${X11_X11_LIB} ${Yamlcpp_LIBRARY})
 if(TARGET casacore::casa)
   target_link_libraries(libpurify casacore::ms)
 endif()

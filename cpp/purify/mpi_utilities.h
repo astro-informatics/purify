@@ -51,7 +51,7 @@ vis_params scatter_visibilities(vis_params const &params, std::vector<t_int> con
 //! When there are more nodes than wavelets, there will be nodes with an empty Vector<T> 
 //! of wavelet coefficients. This can cause some functions to break, like .maxCoeff().
 template <class T>
-t_real step_size(Vector<t_complex> const & vis,
+t_real step_size(T const & vis,
     const std::shared_ptr<sopt::LinearTransform<T> const> &measurements,
     const std::shared_ptr<sopt::LinearTransform<T> const> &wavelets,
     const t_uint sara_size){

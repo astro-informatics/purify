@@ -19,9 +19,6 @@ using namespace purify;
 using namespace purify::notinstalled;
 
 TEST_CASE("padmm_factory"){
-  sopt::logging::set_level("debug");
-  purify::logging::set_level("debug");
-  const t_real snr = 10;
   const std::string &test_dir = "expected/padmm_serial/";
   const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
   const std::string &expected_solution_path = notinstalled::data_filename(test_dir + "solution.fits");
@@ -33,9 +30,8 @@ TEST_CASE("padmm_factory"){
   auto uv_data = utilities::read_visibility(input_data_path, false);
   uv_data.units = utilities::vis_units::radians;
   CAPTURE(uv_data.vis.head(5));
-  CHECK(uv_data.size() == 13107);
+  REQUIRE(uv_data.size() == 13107);
 
-  // working out value of signal given SNR of 10
   t_uint const imsizey = 256;
   t_uint const imsizex = 256;
 
@@ -48,29 +44,14 @@ TEST_CASE("padmm_factory"){
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(factory::distributed_wavelet_operator::serial, sara, imsizey, imsizex);
-  t_real const sigma = utilities::SNR_to_standard_deviation(uv_data.vis, snr);
-  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
- // auto const padmm
- //     =   factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(factory::algorithm::padmm, factory::algo_distribution::serial,
- //         measurements_transform, wavelets, uv_data, sigma, imsizey, imsizex, 500);
+  t_real const sigma = 0.02378738741225; //see test_parameters file
   auto const padmm
-      = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
-            .itermax(500)
-            .gamma((wavelets->adjoint() * (measurements_transform->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3)
-            .relative_variation(1e-3)
-            .l2ball_proximal_epsilon(epsilon)
-            .tight_frame(false)
-            .l1_proximal_tolerance(1e-2)
-            .l1_proximal_nu(1.)
-            .l1_proximal_itermax(50)
-            .l1_proximal_positivity_constraint(true)
-            .l1_proximal_real_constraint(true)
-            .residual_convergence(epsilon)
-            .lagrange_update_scale(0.9)
-            .nu(1e0)
-            .Psi(*wavelets)
-            .Phi(*measurements_transform);
-  auto const diagnostic = padmm();
+      =   factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
+          factory::algorithm::padmm, factory::algo_distribution::serial,
+          measurements_transform, wavelets, uv_data, sigma, imsizey, imsizex, sara.size(), 500);
+
+  auto const diagnostic = (*padmm)();
+  CHECK(diagnostic.niters == 139);
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
@@ -83,4 +64,5 @@ TEST_CASE("padmm_factory"){
   CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
   CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
+  
 }

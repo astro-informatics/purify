@@ -82,9 +82,9 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
 
 #if PURIFY_PADMM_ALGORITHM == 2
   auto const epsilon = std::sqrt(
-      comm.all_sum_all(std::pow(utilities::calculate_l2_radius(uv_data.vis, sigma), 2)));
+      comm.all_sum_all(std::pow(utilities::calculate_l2_radius(uv_data.vis.size(), sigma), 2)));
 #elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
-  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
+  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
 #endif
   PURIFY_LOW_LOG("SARA Size = {}, Rank = {}", sara.size(), comm.rank());
   const t_real gamma

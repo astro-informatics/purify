@@ -70,6 +70,13 @@ class YamlParser
     and set the class members appropriately
   */
   void parseAndSetAlgorithmOptions(const YAML::Node& node);
+
+  /** 
+    Write an output YAML file for the current
+    simulation parameters. 
+  */
+  void writeOutput();
+
   
   // Variables
 #define YAML_MACRO(TYPE, NAME, VALUE) \
@@ -79,6 +86,7 @@ class YamlParser
   const TYPE NAME(){ return NAME##_;};
 
   YAML_MACRO(std::string, filepath, "");
+  YAML_MACRO(std::string, timestamp, "");
   YAML_MACRO(std::string, logging, "");
   YAML_MACRO(std::string, algorithm, "");
   YAML_MACRO(std::string, mpiAlgorithm, "");
@@ -106,7 +114,7 @@ class YamlParser
   YAML_MACRO(std::string, gamma, "");
   YAML_MACRO(std::string, output_prefix, "");
   YAML_MACRO(std::string, skymodel, "");
-  YAML_MACRO(std::string, measurements, "");
+  YAML_MACRO(std::vector<std::string>, measurements, {});
   YAML_MACRO(std::string, polarization_measurement, "");
   YAML_MACRO(std::string, noise_estimate, "");
   YAML_MACRO(std::string, polarization_noise, "");
