@@ -6,7 +6,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_files)
 
 # Downloads and installs GreatCMakeCookOff
 # It contains a number of cmake recipes
-# include(LookUp-GreatCMakeCookOff)
+include(LookUp-GreatCMakeCookOff)
 
 option(tests          "Enable testing"                                  on)
 option(examples       "Compile examples"                                on)
@@ -26,7 +26,7 @@ endif()
 message(STATUS "Building purify in ${CMAKE_BUILD_TYPE} mode")
 
 # Set version and build id of this package
-# include(version)
+include(version)
 
 # we are doing c++11
 include(AddCPP11Flags)
