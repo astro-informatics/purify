@@ -21,7 +21,7 @@ option(docasa         "Enable CASA"                                     off)
 option(docs           "Build documentation"                             off)
 
 # Set version and build id of this package
-include(version)
+# include(version)
 
 # we are doing c++11
 include(AddCPP11Flags)
