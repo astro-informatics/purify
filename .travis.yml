@@ -48,7 +48,6 @@ script:
   - cd build
   - cmake .. -DCMAKE_BUILD_TYPE=Release
   - make -j
-  - while sleep 540 ; do echo "=========== tests are taking more than 9m - pinging travis =========="; done &
   - ctest --output-on-failure
 
 after_success:
