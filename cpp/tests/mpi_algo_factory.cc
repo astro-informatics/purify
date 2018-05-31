@@ -117,7 +117,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
   if(world.size() == 1)
     CHECK(diagnostic.niters == 139);
   if(world.size() == 2)
-    CHECK(diagnostic.niters == 131);
+    CHECK(diagnostic.niters == 138);
   const auto solution = pfitsio::read2d(expected_solution_path);
   const auto residual = pfitsio::read2d(expected_residual_path);
 
