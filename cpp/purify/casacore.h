@@ -358,25 +358,25 @@ protected:
 };
 //! Read measurement set into vis_params structure
 utilities::vis_params read_measurementset(std::string const &filename,
-                                          const MeasurementSet::ChannelWrapper::polarization pol
-                                          = MeasurementSet::ChannelWrapper::polarization::I,
+                                          const stokes pol
+                                          = stokes::I,
                                           const std::vector<t_int> &channels = std::vector<t_int>(),
                                           std::string const &filter = "");
 //! Read measurement set object into vis_params structure
 utilities::vis_params read_measurementset(MeasurementSet const &ms_file,
-                                          const MeasurementSet::ChannelWrapper::polarization pol
-                                          = MeasurementSet::ChannelWrapper::polarization::I,
+                                          const stokes pol
+                                          = stokes::I,
                                           const std::vector<t_int> &channels = std::vector<t_int>(),
                                           std::string const &filter = "");
 //! Read measurement set object then combine it with a uv_params structure
 utilities::vis_params read_measurementset(std::string const &filename, const utilities::vis_params &uv1,
-                                          const MeasurementSet::ChannelWrapper::polarization pol,
+                                          const stokes pol,
                                           const std::vector<t_int> &channels,
                                           std::string const &filter);
 //! Read multiple measurement sets into one vis_params structure
 utilities::vis_params read_measurementset(std::vector<std::string> const &filename,
-                                          const MeasurementSet::ChannelWrapper::polarization pol
-                                          = MeasurementSet::ChannelWrapper::polarization::I,
+                                          const stokes pol
+                                          = stokes::I,
                                           const std::vector<t_int> &channels = std::vector<t_int>(),
                                           std::string const &filter = "");
 
@@ -386,8 +386,8 @@ t_real average_frequency(const purify::casa::MeasurementSet &ms_file, std::strin
 //! Read meassurement set into a vector of vis_params
 std::vector<utilities::vis_params>
 read_measurementset_channels(std::string const &filename,
-                             const MeasurementSet::ChannelWrapper::polarization pol
-                             = MeasurementSet::ChannelWrapper::polarization::I,
+                             const stokes pol
+                             = stokes::I,
                              const t_int &channel_width = 1, std::string const &filter = "");
 
 inline MeasurementSet::const_iterator operator+(MeasurementSet::const_iterator::difference_type n,
