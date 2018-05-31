@@ -161,9 +161,9 @@ utilities::vis_params read_measurementset(std::string const &filename, const uti
   utilities::vis_params uv;
   const auto uv2 = read_measurementset(filename, pol, channels, filter);
   if(std::abs(uv1.ra - uv2.ra) > 1e-6)
-    throw std::runtime_error(vis_name2 + ": wrong RA in pointing.");
+    throw std::runtime_error(filename + ": wrong RA in pointing.");
   if(std::abs(uv1.dec - uv2.dec) > 1e-6)
-    throw std::runtime_error(vis_name2 + ": wrong DEC in pointing.");
+    throw std::runtime_error(filename + ": wrong DEC in pointing.");
   uv.ra = uv1.ra;
   uv.dec = uv1.dec;
   uv.u = Vector<t_real>::Zero(uv1.size() + uv2.size());
@@ -188,17 +188,17 @@ utilities::vis_params read_measurementset(std::vector<std::string> const &filena
                                           const stokes pol,
                                           const std::vector<t_int> &channel,
                                           std::string const &filter){
-   utilities::vis_params output = read_measurementset(filename.at(0), pol, channels, filter);
+   utilities::vis_params output = read_measurementset(filename.at(0), pol, channel, filter);
   if(filename.size() == 1)
     return output;
-  for(int i = 1; i < names.size(); i++)
-    output = read_uvfits(filename.at(i), output);
+  for(int i = 1; i < filename.size(); i++)
+    output = read_measurementset(filename.at(i), output, pol, channel, filter);
   return output;
  
 }
 utilities::vis_params
 read_measurementset(MeasurementSet const &ms_file,
-                    const MeasurementSet::ChannelWrapper::polarization polarization,
+                    const stokes polarization,
                     const std::vector<t_int> &channels_input, std::string const &filter) {
 
   utilities::vis_params uv_data;
@@ -340,7 +340,7 @@ read_measurementset(MeasurementSet const &ms_file,
 
 std::vector<utilities::vis_params>
 read_measurementset_channels(std::string const &filename,
-                             const MeasurementSet::ChannelWrapper::polarization pol,
+                             const stokes pol,
                              const t_int &channel_width, std::string const &filter) {
   // Read and average the channels into a vector of vis_params
   std::vector<utilities::vis_params> channels_vis;
