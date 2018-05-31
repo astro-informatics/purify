@@ -8,6 +8,7 @@ addons:
       - cmake # 2.8.12
       - g++ # 4.8.2
       - libfftw3-dev # version 3.3.3
+      - mpi-default-dev # version 4.8.4
       - libboost-dev # version 1.54
       - libeigen3-dev # version 3.2.0
       - llvm # version 3.4
