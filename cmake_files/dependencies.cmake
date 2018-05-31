@@ -58,7 +58,7 @@ find_package(TIFF REQUIRED)
 
 lookup_package(Boost REQUIRED COMPONENTS filesystem)
 
-lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS URL "http://bitbucket.org/eigen/eigen/get/3.2.tar.gz" MD5 "035ccc791f046f48e90bb1fb42ce227e")
+lookup_package(Eigen3 REQUIRED ARGUMENTS URL "http://bitbucket.org/eigen/eigen/get/3.2.tar.gz" MD5 "035ccc791f046f48e90bb1fb42ce227e")
 
 set(PURIFY_ARRAYFIRE FALSE)
 if(doaf)
@@ -73,10 +73,10 @@ endif()
 # Unless otherwise specified, if purify is not on master, then sopt will be
 # downloaded from development branch.
 if(NOT Sopt_GIT_TAG)
-  set(Sopt_GIT_TAG master CACHE STRING "Branch/tag when downloading sopt")
+  set(Sopt_GIT_TAG development CACHE STRING "Branch/tag when downloading sopt")
 endif()
 if(NOT Sopt_GIT_REPOSITORY)
-  set(Sopt_GIT_REPOSITORY https://www.github.com/basp-group/sopt.git
+  set(Sopt_GIT_REPOSITORY https://www.github.com/astro-informatics/sopt.git
     CACHE STRING "Location when downloading sopt")
 endif()
 if(dompi)
