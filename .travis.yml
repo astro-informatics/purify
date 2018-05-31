@@ -10,7 +10,7 @@ addons:
       - libfftw3-dev # version 3.3.3
       - mpi-default-dev # version 4.8.4
       - libtiff5-dev # version 5 ?
-      - libboost-dev # version 1.54
+      - libboost-all-dev # version 1.54
       - libeigen3-dev # version 3.2.0
       - llvm # version 3.4
       - libcfitsio3-dev # version 3.34
