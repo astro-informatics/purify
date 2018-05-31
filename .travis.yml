@@ -1,0 +1,51 @@
+language: python
+
+# The apt packages below are needed but can no longer be installed with
+# sudo apt-get.
+addons:
+  apt:
+    packages:
+      - cmake
+      - fftw
+      - libtiff
+      - boost
+      - eigen
+      - llvm
+      - openmp
+      - cfitsio
+      - ccfits
+      - yaml-cpp
+
+matrix:
+  # Don't wait for allowed failures - do we really need this? TODO
+  fast_finish: true
+
+  include:
+    - os: osx
+      language: generic
+      
+    - os: linux
+      dist: trusty
+      sudo: required
+      language: generic
+
+before_install:
+  # Install stuff specifically for MacOS
+  #- if [ $TRAVIS_OS_NAME = osx ]; then brew update; rm '/usr/local/include/c++'; brew install gcc; fi
+  #- if [ $TRAVIS_OS_NAME = linux ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; sudo apt-get update -q; sudo apt-get install -y gfortran-7; sudo ln -s `which gfortran-7` /usr/bin/gfortran; fi
+
+
+install:
+
+before_script:
+
+script:
+  - mkdir build
+  - cd build
+  - cmake .. -DCMAKE_BUILD_TYPE=Release
+  - make -j
+  - while sleep 540 ; do echo "=========== tests are taking more than 9m - pinging travis =========="; done &
+  - ctest --output-on-failure
+
+after_success:
+
