@@ -12,7 +12,6 @@
 namespace purify {
 
 namespace pfitsio {
-enum class stokes { I, Q, U, V, XX, YY, XY, YX };
 
 //! Read uvfits file
 utilities::vis_params
