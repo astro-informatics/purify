@@ -70,7 +70,9 @@ add_include_dir(
   ${Yamlcpp_INCLUDE_DIR}
 )
 target_link_libraries(libpurify
-  ${FFTW3_DOUBLE_LIBRARY}  ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY} ${X11_X11_LIB} ${Yamlcpp_LIBRARY})
+  ${FFTW3_DOUBLE_LIBRARY}  ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY} ${X11_X11_LIB} ${Yamlcpp_LIBRARY}
+  ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY}
+  )
 if(TARGET casacore::casa)
   target_link_libraries(libpurify casacore::ms)
 endif()

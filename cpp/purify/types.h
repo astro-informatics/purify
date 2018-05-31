@@ -53,6 +53,10 @@ template <class T = t_real> using CImageList = cimg_library::CImgList<T>;
 //! Display used to display CImg images
 typedef cimg_library::CImgDisplay CDisplay;
 #endif
+
+enum class stokes {I, Q, U, V, XX, YY, XY, YX, LL, RR, LR, RL, P};
+
+
 namespace wproj_utilities {
 namespace expansions {
 //! Type of series approximation

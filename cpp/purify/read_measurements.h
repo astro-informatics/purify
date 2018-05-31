@@ -13,15 +13,18 @@ namespace purify {
   namespace read_measurements {
     enum class format {vis, uvfits, ms};
 //! read in signle measurement file
-utilities::vis_params read_measurements(const std::string &name);
+utilities::vis_params read_measurements(const std::string &name, const bool w_term = false, const stokes pol = stokes::I);
 //! read in measurements from a vector of file names
-utilities::vis_params read_measurements(const std::vector<std::string> &names);
+utilities::vis_params read_measurements(const std::vector<std::string> &names, const bool w_term = false,
+    const stokes pol = stokes::I);
 #ifdef PURIFY_MPI
 //! read in and distribute measurements
-utilities::vis_params read_measurements(const std::string &name, sopt::mpi::Communicator const & comm);
+utilities::vis_params read_measurements(const std::string &name, sopt::mpi::Communicator const & comm,
+    const distribute::plan plan = distribute::plan::w_term, const bool w_term = false, const stokes pol = stokes::I);
 //! read in and distribute mutliple measurements
 utilities::vis_params
-read_measurements(const std::vector<std::string> &names, sopt::mpi::Communicator const &comm);
+read_measurements(const std::vector<std::string> &names, sopt::mpi::Communicator const &comm,
+    const distribute::plan plan = distribute::plan::w_term, const bool w_term = false, const stokes pol = stokes::I);
 #endif
 }
 }
