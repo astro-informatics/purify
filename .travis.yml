@@ -5,16 +5,16 @@ language: python
 addons:
   apt:
     packages:
-      - cmake
-      - fftw
-      - libtiff
-      - boost
-      - eigen
-      - llvm
-      - openmp
-      - cfitsio
-      - ccfits
-      - yaml-cpp
+      - cmake # 2.8.12
+      - fftw3 # version 3.3.3
+      - libboost-dev # version 1.54
+      - libeigen3-dev # version 3.2.0
+      - llvm # version 3.4
+      - libcfitsio3-dev # version 3.34
+      - libccfits-dev # version 2.4
+      - libyaml-cpp-dev # version 0.5.1
+
+# libtiff is version 5 in Trusty
 
 matrix:
   # Don't wait for allowed failures - do we really need this? TODO
