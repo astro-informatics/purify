@@ -27,6 +27,7 @@ namespace factory {
 template <class Algorithm, class... ARGS>
     std::shared_ptr<Algorithm>
     algorithm_factory(const factory::algorithm algo, ARGS &&... args);
+namespace {
 //! return shared pointer to padmm object
 template <class Algorithm>
 typename std::enable_if<std::is_same<Algorithm, sopt::algorithm::ImagingProximalADMM<t_complex>>::value,std::shared_ptr<Algorithm> >::type
@@ -107,6 +108,8 @@ padmm_factory(const algo_distribution dist,
           purify::factory::l1_convergence_factory<typename Algorithm::Scalar>(obj_conv, padmm_weak));
 #endif
   return padmm;
+}
+
 }
 
 
