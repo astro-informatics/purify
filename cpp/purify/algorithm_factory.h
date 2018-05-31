@@ -60,8 +60,10 @@ padmm_factory(const algo_distribution dist,
       .nu(1e0)
       .Psi(*wavelets)
       .Phi(*measurements);
+#ifdef PURIFY_MPI
         ConvergenceType obj_conv = ConvergenceType::mpi_global;
         ConvergenceType rel_conv = ConvergenceType::mpi_global;
+#endif
   switch(dist) {
     case(algo_distribution::serial):
       {
@@ -122,13 +124,13 @@ template <class Algorithm, class... ARGS>
           break;
           /*
         case algorithm::primal_dual:
-          return padmm_factory(std::forward<ARGS>(args)...);
+          return pd_factory(std::forward<ARGS>(args)...);
           break;
         case algorithm::sdmm:
-          return padmm_factory(std::forward<ARGS>(args)...);
+          return sdmm_factory(std::forward<ARGS>(args)...);
           break;
         case algorithm::forward_backward:
-          return padmm_factory(std::forward<ARGS>(args)...);
+          return fb_factory(std::forward<ARGS>(args)...);
           break;
           */
         default:
