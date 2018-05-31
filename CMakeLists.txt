@@ -6,7 +6,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_files)
 
 # Downloads and installs GreatCMakeCookOff
 # It contains a number of cmake recipes
-include(LookUp-GreatCMakeCookOff)
+# include(LookUp-GreatCMakeCookOff)
 
 option(tests          "Enable testing"                                  on)
 option(examples       "Compile examples"                                on)
