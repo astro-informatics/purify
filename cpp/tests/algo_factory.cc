@@ -37,7 +37,7 @@ TEST_CASE("padmm_factory"){
 
   auto const measurements_transform
       = factory::measurement_operator_factory<Vector<t_complex>>(
-          factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2, 1000,
+          factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2, 100,
           0.0001, kernels::kernel_from_string.at("kb"), 4, 4);
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
