@@ -11,27 +11,27 @@ namespace purify {
 
     template <class T, class Algo>
       std::function<bool(Vector<T> const &, Vector<T> const &)>
-      l2_convergence_factory(const ConvergenceType algo,	std::weak_ptr<Algo> const padmm_weak) {
+      l2_convergence_factory(const ConvergenceType algo, std::weak_ptr<Algo> const algo_weak) {
 	const auto comm = sopt::mpi::Communicator::World();
   switch(algo){
     case(ConvergenceType::mpi_local):
       {
-      return [algo, padmm_weak, comm](Vector<T> const &, Vector<T> const & residual) {
-	      auto const padmm = padmm_weak.lock();
-	      auto const residual_norm = sopt::l2_norm(residual, padmm->l2ball_proximal_weights());
-        SOPT_LOW_LOG("    - [PADMM] Residuals: {} <? {}", residual_norm, padmm->residual_tolerance());
+      return [algo, algo_weak, comm](Vector<T> const &, Vector<T> const & residual) {
+	      auto const algo = algo_weak.lock();
+	      auto const residual_norm = sopt::l2_norm(residual, algo->l2ball_proximal_weights());
+        SOPT_LOW_LOG("    - [Algorithm] Residuals: {} <? {}", residual_norm, algo->residual_tolerance());
 	      return static_cast<bool>(comm.all_reduce<int8_t>(
-              residual_norm < padmm->residual_tolerance(), MPI_LAND));
+              residual_norm < algo->residual_tolerance(), MPI_LAND));
       };
       break;
     }
     case (ConvergenceType::mpi_global):
     {
-      return [algo, padmm_weak, comm](Vector<T> const &, Vector<T> const & residual) {
-	      auto const padmm = padmm_weak.lock();
-	      auto const residual_norm = sopt::mpi::l2_norm(residual, padmm->l2ball_proximal_weights(), comm);
-        SOPT_LOW_LOG("    - [PADMM] Residuals: {} <? {}", residual_norm, padmm->residual_tolerance());
-	      return static_cast<bool>(residual_norm < padmm->residual_tolerance());
+      return [algo, algo_weak, comm](Vector<T> const &, Vector<T> const & residual) {
+	      auto const algo = algo_weak.lock();
+	      auto const residual_norm = sopt::mpi::l2_norm(residual, algo->l2ball_proximal_weights(), comm);
+        SOPT_LOW_LOG("    - [Algorithm] Residuals: {} <? {}", residual_norm, algo->residual_tolerance());
+	      return static_cast<bool>(residual_norm < algo->residual_tolerance());
 	    };
       break;
     }
@@ -42,27 +42,28 @@ namespace purify {
 
     template <class T, class Algo>
       std::function<bool(Vector<T> const &, Vector<T> const &)>
-      l1_convergence_factory(const ConvergenceType algo, std::weak_ptr<Algo> const padmm_weak) {
+      l1_convergence_factory(const ConvergenceType algo, std::weak_ptr<Algo> const algo_weak) {
  	      auto const comm = sopt::mpi::Communicator::World();
-	      auto const padmm_temp = padmm_weak.lock();
-       const std::shared_ptr<sopt::ScalarRelativeVariation<T>> conv = std::make_shared<sopt::ScalarRelativeVariation<T>>(padmm_temp->relative_variation(),
-						      padmm_temp->relative_variation(), "Objective function");
+	      auto const algo_temp = algo_weak.lock();
+       const std::shared_ptr<sopt::ScalarRelativeVariation<T>> conv 
+         = std::make_shared<sopt::ScalarRelativeVariation<T>>(algo_temp->relative_variation(),
+						      0, "Objective function");
         switch(algo){
           case(ConvergenceType::mpi_local):
             {
-            return [padmm_weak, comm, conv](Vector<T> const & x, Vector<T> const &) {
-	            auto const padmm = padmm_weak.lock();
+            return [algo_weak, comm, conv](Vector<T> const & x, Vector<T> const &) {
+	            auto const algo = algo_weak.lock();
 	            return comm.all_reduce<uint8_t>(
-              (*conv)(sopt::l1_norm(padmm->Psi().adjoint() * x, padmm->l1_proximal_weights())), MPI_LAND);
+              (*conv)(sopt::l1_norm(algo->Psi().adjoint() * x, algo->l1_proximal_weights())), MPI_LAND);
               };
           break;
             }
           case(ConvergenceType::mpi_global):
             {
-            return [padmm_weak, comm, conv](Vector<T> const & x, Vector<T> const &) {
-	            auto const padmm = padmm_weak.lock();
+            return [algo_weak, comm, conv](Vector<T> const & x, Vector<T> const &) {
+	            auto const algo = algo_weak.lock();
 	          return
-              (*conv)(sopt::mpi::l1_norm(padmm->Psi().adjoint() * x, padmm->l1_proximal_weights(), comm));
+              (*conv)(sopt::mpi::l1_norm(algo->Psi().adjoint() * x, algo->l1_proximal_weights(), comm));
               };
           break;
           }
