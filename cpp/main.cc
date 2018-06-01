@@ -23,20 +23,6 @@
 using namespace purify;
 namespace {
 
-pfitsio::header_params
-create_new_header(purify::utilities::vis_params const &uv_data, purify::Params const &params) {
-  // header information
-  pfitsio::header_params header;
-  header.mean_frequency = uv_data.average_frequency;
-  header.ra = uv_data.ra;
-  header.dec = uv_data.dec;
-  header.cell_x = params.cellsizex;
-  header.cell_y = params.cellsizey;
-  header.residual_convergence = params.residual_convergence;
-  header.relative_variation = params.relative_variation;
-  return header;
-}
-
   /*purify::casa::MeasurementSet::ChannelWrapper::polarization choose_pol(std::string const &stokes) {
   /* TODO: move this inside the parser, using the new enum
    Chooses the polarisation to read from a measurement set.
@@ -101,60 +87,6 @@ create_new_header(purify::utilities::vis_params const &uv_data, purify::Params c
   return max_val;
   }*/
 
-void save_final_image(
-    std::string const &outfile_fits, std::string const &residual_fits, Vector<t_complex> const &x,
-    utilities::vis_params const &uv_data, Params const &params,
-    std::shared_ptr<sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const> const
-        &measurements) {
-  //! Save final output image
-  purify::pfitsio::header_params header = create_new_header(uv_data, params);
-  Image<t_complex> const image = Image<t_complex>::Map(x.data(), params.height, params.width);
-  // header information
-  header.pix_units = "JY/PIXEL";
-  header.niters = params.iter;
-  header.epsilon = params.epsilon;
-  header.fits_name = outfile_fits + ".fits";
-  pfitsio::write2d_header(image.real(), header);
-  if(params.stokes_val == purify::casa::MeasurementSet::ChannelWrapper::polarization::P) {
-    header.fits_name = outfile_fits + "_imag.fits";
-    pfitsio::write2d_header(image.real(), header);
-  }
-  Vector<t_complex> const res_vector = measurements->adjoint() * (uv_data.vis - *measurements * x);
-  const Image<t_complex> residual
-      = Image<t_complex>::Map(res_vector.data(), params.height, params.width);
-  header.pix_units = "JY/PIXEL";
-  header.fits_name = residual_fits + ".fits";
-  pfitsio::write2d_header(residual.real(), header);
-  if(params.stokes_val == purify::casa::MeasurementSet::ChannelWrapper::polarization::P) {
-    header.fits_name = residual_fits + "_imag.fits";
-    pfitsio::write2d_header(residual.real(), header);
-  }
-}
-
-  /*std::tuple<Vector<t_complex>, Vector<t_complex>> read_estimates(
-    std::shared_ptr<sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const> const &measurements,
-    purify::utilities::vis_params const &uv_data, purify::Params const &params) {
-  Vector<t_complex> initial_estimate = measurements->adjoint() * uv_data.vis;
-  Vector<t_complex> initial_residuals = Vector<t_complex>::Zero(uv_data.vis.size());
-  // loading data from check point.
-  if(utilities::file_exists(params.name + "_diagnostic") and params.warmstart == true) {
-    PURIFY_HIGH_LOG("Loading checkpoint for {}", params.name.c_str());
-    std::string const outfile_fits = params.name + "_solution_" + params.weighting + "_update.fits";
-    if(utilities::file_exists(outfile_fits)) {
-      auto const image = pfitsio::read2d(outfile_fits);
-      if(params.height != image.rows() or params.width != image.cols()) {
-        std::runtime_error("Initial model estimate is the wrong size.");
-      }
-      initial_estimate = Matrix<t_complex>::Map(image.data(), image.size(), 1);
-      Vector<t_complex> const model = *measurements * initial_estimate;
-      initial_residuals = uv_data.vis - model;
-    }
-  }
-  std::tuple<Vector<t_complex>, Vector<t_complex>> const estimates(initial_estimate,
-                                                                   initial_residuals);
-  return estimates;
-  }*/
-
 } // namespace
 
 int main(int argc, char **argv) {
@@ -167,14 +99,10 @@ int main(int argc, char **argv) {
   sopt::logging::set_level(params.logging());
   purify::logging::set_level(params.logging());
   PURIFY_HIGH_LOG("Stokes input {}", params.polarization_measurement());
-  // checking if reading measurement set or .vis file
-  std::size_t found = params.measurements().find_last_of(".");
-  std::string format = "." + params.measurements().substr(found + 1);
-  std::transform(format.begin(), format.end(), format.begin(), ::tolower);
-  auto uv_data = utilities::read_visibility(params.measurements(), false); // TODO: use_w_term hardcoded to false for now
+  auto uv_data = utilities::read_visibility(params.measurements()[0], false); // TODO: use_w_term hardcoded to false for now
+  uv_data.units = utilities::vis_units::radians; // TODO: add units parameter in config.yaml
 
   // create measurement operator
-  auto const noise_rms = estimate_noise(params);
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
     factory::measurement_operator_factory<Vector<t_complex>>(
 							     factory::distributed_measurement_operator::serial,
@@ -207,7 +135,7 @@ int main(int argc, char **argv) {
   //   PURIFY_MEDIUM_LOG("Convergence criteria: Residual norm is less than {}.",
   //                    params.residual_convergence);
   //PURIFY_MEDIUM_LOG("Gamma = {}", purify_gamma);
-  t_real sigma = 1.; // TODO: Real data: input it in yaml file, default to 1. Simulated data: input snr in yaml file defaulted to ?, calculate sigma.
+  t_real sigma = 0.02378738741225; //1.; // TODO: Real data: input it in yaml file, default to 1. Simulated data: input snr in yaml file defaulted to ?, calculate sigma.
   // TODO: remove noise_estimate and polarization_noise from yaml.
   auto const padmm =
     factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
@@ -253,13 +181,13 @@ int main(int argc, char **argv) {
 
   auto const diagnostic = (*padmm)();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), params.y(), params.x());
-  std::size_t file_begin = params.measurements().find_last_of("/");
-  std::string outfile_fits = params.measurements().substr(0,file_begin) + params.output_prefix() + "_" + params.measurements().substr(file_begin+1);
-  std::cout << outfile_fits << std::endl;
-  //pfitsio::write2d(image.real(), outfile_fits);
+  std::size_t file_begin = params.measurements()[0].find_last_of("/");
+  std::size_t file_end = params.measurements()[0].find_last_of(".");
+  std::string outfile_fits = params.measurements()[0].substr(0,file_begin) + "/" + params.output_prefix() + "_" + params.measurements()[0].substr(file_begin+1,file_end-file_begin) + "fits";
+  pfitsio::write2d(image.real(), outfile_fits);
   const Vector<t_complex> residuals = measurements_transform->adjoint()
     * (uv_data.vis - ((*measurements_transform) * diagnostic.x));
-  const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), params.y(), params.x());
+    const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), params.y(), params.x());
 
   return 0;
 }
