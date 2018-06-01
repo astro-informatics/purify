@@ -9,11 +9,12 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include "AlgorithmUpdate.h"
-#include "cmdl.h"
-#include "purify/casacore.h"
+#include "purify/yaml-parser.h"
 #include "purify/logging.h"
 #include "purify/operators.h"
+#include "purify/measurement_operator_factory.h"
+#include "purify/wavelet_operator_factory.h"
+#include "purify/algorithm_factory.h"
 #ifdef PURIFY_ARRAYFIRE
 #include "purify/operators_gpu.h"
 #endif
@@ -21,21 +22,6 @@
 #include "purify/types.h"
 using namespace purify;
 namespace {
-
-void bandwidth_scaling(purify::utilities::vis_params const &uv_data, purify::Params &params) {
-  t_real const max_u = std::sqrt((uv_data.u.array() * uv_data.u.array()).maxCoeff());
-  t_real const max_v = std::sqrt((uv_data.v.array() * uv_data.v.array()).maxCoeff());
-  if(params.cellsizex == 0 and params.cellsizey == 0) {
-    t_real const max = std::sqrt(
-        (uv_data.u.array() * uv_data.u.array() + uv_data.v.array() * uv_data.v.array()).maxCoeff());
-    params.cellsizex = (180 * 3600) / max / constant::pi / 2;
-    params.cellsizey = (180 * 3600) / max / constant::pi / 2;
-  }
-  if(params.cellsizex == 0)
-    params.cellsizex = (180 * 3600) / max_u / constant::pi / 2;
-  if(params.cellsizey == 0)
-    params.cellsizey = (180 * 3600) / max_v / constant::pi / 2;
-}
 
 pfitsio::header_params
 create_new_header(purify::utilities::vis_params const &uv_data, purify::Params const &params) {
@@ -51,33 +37,11 @@ create_new_header(purify::utilities::vis_params const &uv_data, purify::Params c
   return header;
 }
 
-t_real estimate_noise(purify::Params const &params) {
-
-  // Read in visibilities for noise estimate
-  t_real sigma_real = 1 / std::sqrt(2);
-  t_real sigma_imag = 1 / std::sqrt(2);
-
-  if(params.noisefile != "") {
-    auto const noise_uv_data = purify::casa::read_measurementset(
-        params.noisefile, purify::casa::MeasurementSet::ChannelWrapper::polarization::V);
-    Vector<t_complex> const noise_vis = noise_uv_data.weights.array() * noise_uv_data.vis.array();
-    sigma_real = utilities::median(noise_vis.real().cwiseAbs()) / 0.6745;
-    sigma_imag = utilities::median(noise_vis.imag().cwiseAbs()) / 0.6745;
-  }
-
-  PURIFY_MEDIUM_LOG("RMS noise of {}Jy + i{}Jy", sigma_real, sigma_real);
-  return std::sqrt(sigma_real * sigma_real + sigma_imag * sigma_imag); // calculation is for
-                                                                       // combined real and
-                                                                       // imaginary sigma, factor of
-                                                                       // 1/sqrt(2) in epsilon
-                                                                       // calculation
-}
-
-purify::casa::MeasurementSet::ChannelWrapper::polarization choose_pol(std::string const &stokes) {
-  /*
+  /*purify::casa::MeasurementSet::ChannelWrapper::polarization choose_pol(std::string const &stokes) {
+  /* TODO: move this inside the parser, using the new enum
    Chooses the polarisation to read from a measurement set.
    */
-  auto stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::I;
+  /* auto stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::I;
   // stokes
   if(stokes == "I" or stokes == "i")
     stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::I;
@@ -108,8 +72,8 @@ purify::casa::MeasurementSet::ChannelWrapper::polarization choose_pol(std::strin
   if(stokes == "P" or stokes == "p")
     stokes_val = purify::casa::MeasurementSet::ChannelWrapper::polarization::P;
   return stokes_val;
-}
-t_real save_psf_and_dirty_image(
+}*/
+  /*t_real save_psf_and_dirty_image(
     std::shared_ptr<sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const> const &measurements,
     purify::utilities::vis_params const &uv_data, purify::Params const &params) {
   // returns psf normalisation
@@ -135,7 +99,7 @@ t_real save_psf_and_dirty_image(
     pfitsio::write2d_header(dimage.imag(), header);
   }
   return max_val;
-}
+  }*/
 
 void save_final_image(
     std::string const &outfile_fits, std::string const &residual_fits, Vector<t_complex> const &x,
@@ -167,7 +131,7 @@ void save_final_image(
   }
 }
 
-std::tuple<Vector<t_complex>, Vector<t_complex>> read_estimates(
+  /*std::tuple<Vector<t_complex>, Vector<t_complex>> read_estimates(
     std::shared_ptr<sopt::LinearTransform<sopt::Vector<sopt::t_complex>> const> const &measurements,
     purify::utilities::vis_params const &uv_data, purify::Params const &params) {
   Vector<t_complex> initial_estimate = measurements->adjoint() * uv_data.vis;
@@ -189,7 +153,7 @@ std::tuple<Vector<t_complex>, Vector<t_complex>> read_estimates(
   std::tuple<Vector<t_complex>, Vector<t_complex>> const estimates(initial_estimate,
                                                                    initial_residuals);
   return estimates;
-}
+  }*/
 
 } // namespace
 
@@ -197,104 +161,62 @@ int main(int argc, char **argv) {
   sopt::logging::initialize();
   purify::logging::initialize();
 
-  Params params = parse_cmdl(argc, argv);
-  sopt::logging::set_level(params.sopt_logging_level);
-  purify::logging::set_level(params.sopt_logging_level);
-  params.stokes_val = choose_pol(params.stokes);
-  PURIFY_HIGH_LOG("Stokes input {}", params.stokes);
-  // checking if reading measurement set or .vis file
-  std::size_t found = params.visfile.find_last_of(".");
-  std::string format = "." + params.visfile.substr(found + 1);
-  std::transform(format.begin(), format.end(), format.begin(), ::tolower);
-  auto uv_data = (format == ".ms") ?
-                     purify::casa::read_measurementset(params.visfile, params.stokes_val) :
-                     utilities::read_visibility(params.visfile, params.use_w_term);
-  bandwidth_scaling(uv_data, params);
+  std::string file_path = "../data/config/config.yaml";
+  YamlParser params = YamlParser(file_path);
 
-  // calculate weights outside of measurement operator
-  uv_data.weights = utilities::init_weights(
-      uv_data.u, uv_data.v, uv_data.weights, params.over_sample, params.weighting, 0,
-      params.over_sample * params.width, params.over_sample * params.height);
-  uv_data.weights = uv_data.weights / uv_data.weights.sum() * uv_data.weights.size();
-  uv_data.vis = uv_data.vis.array() * uv_data.weights.array();
+  sopt::logging::set_level(params.logging());
+  purify::logging::set_level(params.logging());
+  PURIFY_HIGH_LOG("Stokes input {}", params.polarization_measurement());
+  // checking if reading measurement set or .vis file
+  std::size_t found = params.measurements().find_last_of(".");
+  std::string format = "." + params.measurements().substr(found + 1);
+  std::transform(format.begin(), format.end(), format.begin(), ::tolower);
+  auto uv_data = utilities::read_visibility(params.measurements(), false); // TODO: use_w_term hardcoded to false for now
+
+  // create measurement operator
   auto const noise_rms = estimate_noise(params);
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform;
-  if(params.gpu == false)
-    measurements_transform = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        uv_data, params.height, params.width, params.cellsizey, params.cellsizex,
-        params.over_sample, params.power_method_iterations, 1e-4, params.kernel, params.J, params.J,
-        (params.fftw_plan == "measure") ? operators::fftw_plan::measure :
-                                          operators::fftw_plan::estimate,
-        params.use_w_term);
-  else {
-#ifdef PURIFY_ARRAYFIRE
-    measurements_transform = gpu::measurementoperator::init_degrid_operator_2d(
-        uv_data, params.height, params.width, params.cellsizey, params.cellsizex,
-        params.over_sample, params.power_method_iterations, 1e-4, params.kernel, params.J, params.J,
-        params.use_w_term);
-#else
-    throw std::runtime_error("Compile with ArrayFire to use GPU gridding.");
-#endif
-  }
-  sopt::wavelets::SARA const sara{
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
+    factory::measurement_operator_factory<Vector<t_complex>>(
+							     factory::distributed_measurement_operator::serial,
+							     uv_data, params.y(), params.x(), params.Dy(), params.Dx(),
+							     params.oversampling(), params.powMethod_iter(), params.powMethod_tolerance(),
+							     kernels::kernel_from_string.at(params.Jweights()), params.Jy(), params.Jx());
+  // create wavelet operator -- TODO: read those from params structure
+  std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
+  auto const Psi =
+    factory::wavelet_operator_factory<Vector<t_complex>>(
+							 factory::distributed_wavelet_operator::serial, sara, params.y(), params.x());
+  
+  //PURIFY_LOW_LOG("Saving dirty map");
+  //params.psf_norm = save_psf_and_dirty_image(measurements_transform, uv_data, params);
 
-  auto const Psi = sopt::linear_transform<t_complex>(sara, params.height, params.width);
+  //auto const estimates = read_estimates(measurements_transform, uv_data, params);
 
-  PURIFY_LOW_LOG("Saving dirty map");
-  params.psf_norm = save_psf_and_dirty_image(measurements_transform, uv_data, params);
-
-  auto const estimates = read_estimates(measurements_transform, uv_data, params);
-  t_real const epsilon = params.n_mu * std::sqrt(2 * uv_data.vis.size()) * noise_rms / std::sqrt(2)
-                         * params.psf_norm; // Calculation of l_2 bound following SARA paper
-  params.epsilon = epsilon;
-  params.residual_convergence
-      = (params.residual_convergence < 0) ? 0. : params.residual_convergence * epsilon;
-  t_real purify_gamma = 0;
-  std::tie(params.iter, purify_gamma) = utilities::checkpoint_log(params.name + "_diagnostic");
-  if(params.iter == 0)
-    purify_gamma = (Psi.adjoint() * (measurements_transform->adjoint() * uv_data.vis))
-                       .array()
-                       .cwiseAbs()
-                       .maxCoeff()
-                   * params.beta;
-
-  std::ofstream out_diagnostic;
-  out_diagnostic.precision(13);
-  out_diagnostic.open(params.name + "_diagnostic", std::ios_base::app);
+  //std::ofstream out_diagnostic;
+  // out_diagnostic.precision(13);
+  // out_diagnostic.open(params.filepath() + "_diagnostic", std::ios_base::app);
 
   PURIFY_HIGH_LOG("Starting sopt!");
-  PURIFY_MEDIUM_LOG("Epsilon = {}", epsilon);
-  PURIFY_MEDIUM_LOG("Convergence criteria: Relative variation is less than {}.",
-                    params.relative_variation);
-  if(params.residual_convergence > 0)
-    PURIFY_MEDIUM_LOG("Convergence criteria: Residual norm is less than {}.",
-                      params.residual_convergence);
-  PURIFY_MEDIUM_LOG("Gamma = {}", purify_gamma);
-  auto padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(uv_data.vis)
-                   ->gamma(purify_gamma)
-                   .relative_variation(params.relative_variation)
-                   .l2ball_proximal_epsilon(epsilon)
-                   .tight_frame(false)
-                   .l1_proximal_tolerance(1e-3)
-                   .l1_proximal_nu(1)
-                   .l1_proximal_itermax(100)
-                   .l1_proximal_positivity_constraint(params.positive)
-                   .l1_proximal_real_constraint(true)
-                   .residual_convergence(params.residual_convergence)
-                   .lagrange_update_scale(0.9)
-                   .nu(1e0)
-                   .Psi(Psi)
-                   .Phi(*measurements_transform);
+  //PURIFY_MEDIUM_LOG("Epsilon = {}", epsilon);
+  //PURIFY_MEDIUM_LOG("Convergence criteria: Relative variation is less than {}.",
+  //                   params.relative_variation);
+  //if(params.residual_convergence > 0)
+  //   PURIFY_MEDIUM_LOG("Convergence criteria: Residual norm is less than {}.",
+  //                    params.residual_convergence);
+  //PURIFY_MEDIUM_LOG("Gamma = {}", purify_gamma);
+  t_real sigma = 1.; // TODO: Real data: input it in yaml file, default to 1. Simulated data: input snr in yaml file defaulted to ?, calculate sigma.
+  // TODO: remove noise_estimate and polarization_noise from yaml.
+  auto const padmm =
+    factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
+										factory::algorithm::padmm, factory::algo_distribution::serial,
+										measurements_transform, Psi, uv_data, sigma,
+										params.y(), params.x(), sara.size(), params.iterations());
 
-  auto convergence_function = [](const Vector<t_complex> &x) { return true; };
-  AlgorithmUpdate algo_update(params, uv_data, padmm, out_diagnostic, measurements_transform, Psi);
-  auto lambda = [&convergence_function, &algo_update](Vector<t_complex> const &x) {
-    return convergence_function(x) and algo_update(x);
-  };
-  Vector<t_complex> final_model = Vector<t_complex>::Zero(params.width * params.height);
+
+  /*Vector<t_complex> final_model = Vector<t_complex>::Zero(params.width * params.height);
   std::string outfile_fits = "";
   std::string residual_fits = "";
   if(params.stokes_val != purify::casa::MeasurementSet::ChannelWrapper::polarization::I
@@ -327,7 +249,17 @@ int main(int argc, char **argv) {
   }
   save_final_image(outfile_fits, residual_fits, final_model, uv_data, params,
                    measurements_transform);
-  out_diagnostic.close();
+		   out_diagnostic.close();*/
+
+  auto const diagnostic = (*padmm)();
+  const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), params.y(), params.x());
+  std::size_t file_begin = params.measurements().find_last_of("/");
+  std::string outfile_fits = params.measurements().substr(0,file_begin) + params.output_prefix() + "_" + params.measurements().substr(file_begin+1);
+  std::cout << outfile_fits << std::endl;
+  //pfitsio::write2d(image.real(), outfile_fits);
+  const Vector<t_complex> residuals = measurements_transform->adjoint()
+    * (uv_data.vis - ((*measurements_transform) * diagnostic.x));
+  const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), params.y(), params.x());
 
   return 0;
 }
