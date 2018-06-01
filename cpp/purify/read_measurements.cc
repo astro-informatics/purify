@@ -9,6 +9,9 @@
 #include <iostream>
 #include <boost/filesystem.hpp>
 
+#ifdef PURIFY_MPI
+#include <sopt/mpi/mpi_exception.h>
+#endif
 
 namespace purify {
   namespace read_measurements {
@@ -97,9 +100,22 @@ utilities::vis_params
 read_measurements(const std::vector<std::string> &names, sopt::mpi::Communicator const &comm, 
     const distribute::plan plan, const bool w_term, const stokes pol) {
   if(comm.size() == 1)
+  {
+    try
+    {
     return read_measurements(names, w_term, pol);
+    } catch (const std::runtime_error& e){
+      throw sopt::mpi::MPIexception(e.what(), comm);
+    }
+  }
   if(comm.is_root()) {
-    auto result = read_measurements(names, w_term, pol);
+    utilities::vis_params result;
+    try
+    {
+    result = read_measurements(names, w_term, pol);
+    } catch (const std::runtime_error& e){
+      throw sopt::mpi::MPIexception(e.what(), comm);
+    }
     auto const order = distribute::distribute_measurements(result, comm, plan);
     return utilities::regroup_and_scatter(result, order, comm);
   }

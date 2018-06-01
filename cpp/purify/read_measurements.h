@@ -20,11 +20,11 @@ utilities::vis_params read_measurements(const std::vector<std::string> &names, c
 #ifdef PURIFY_MPI
 //! read in and distribute measurements
 utilities::vis_params read_measurements(const std::string &name, sopt::mpi::Communicator const & comm,
-    const distribute::plan plan = distribute::plan::w_term, const bool w_term = false, const stokes pol = stokes::I);
+    const distribute::plan plan = distribute::plan::radial, const bool w_term = false, const stokes pol = stokes::I);
 //! read in and distribute mutliple measurements
 utilities::vis_params
 read_measurements(const std::vector<std::string> &names, sopt::mpi::Communicator const &comm,
-    const distribute::plan plan = distribute::plan::w_term, const bool w_term = false, const stokes pol = stokes::I);
+    const distribute::plan plan = distribute::plan::radial, const bool w_term = false, const stokes pol = stokes::I);
 #endif
 }
 }
