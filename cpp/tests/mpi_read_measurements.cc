@@ -20,9 +20,11 @@ TEST_CASE("uvfits") {
      CHECK(comm.all_sum_all(uvfits.size()) == 245886);
     }
     SECTION("vis"){
-     const auto vis = read_measurements::read_measurements(filename + ".vis", comm);
+     const auto vis = read_measurements::read_measurements(filename + ".vis", comm, distribute::plan::w_term, false, stokes::I,
+         utilities::vis_units::radians);
      CAPTURE(comm.rank());
      CHECK(comm.all_sum_all(vis.size()) == 245886);
+     CHECK(vis.units == utilities::vis_units::radians);
     }
   }
   SECTION("two"){
@@ -35,6 +37,7 @@ TEST_CASE("uvfits") {
      const auto vis = read_measurements::read_measurements(std::vector<std::string>{filename + ".vis", filename + ".vis"}, comm);
      CAPTURE(comm.rank());
      CHECK(comm.all_sum_all(vis.size()) == 245886 * 2);
+     CHECK(vis.units == utilities::vis_units::lambda);
     }
   }
     SECTION("ms"){

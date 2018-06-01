@@ -16,17 +16,23 @@ TEST_CASE("uvfits") {
   SECTION("one"){
     SECTION("uvfits") {
      const auto uvfits = read_measurements::read_measurements(filename + ".uvfits");
+     CHECK(uvfits.size() == 245886);
     }
     SECTION("vis"){
-     const auto vis = read_measurements::read_measurements(filename + ".vis");
+     const auto vis = read_measurements::read_measurements(filename + ".vis", false, stokes::I, utilities::vis_units::radians);
+     CHECK(vis.units == utilities::vis_units::radians);
+     CHECK(vis.size() == 245886);
     }
   }
   SECTION("two"){
     SECTION("uvfits") {
      const auto uvfits = read_measurements::read_measurements(std::vector<std::string>{filename + ".uvfits", filename + ".uvfits"});
+     CHECK(uvfits.size() == 245886 * 2);
     }
     SECTION("vis"){
      const auto vis = read_measurements::read_measurements(std::vector<std::string>{filename + ".vis", filename + ".vis"});
+     CHECK(vis.units == utilities::vis_units::lambda);
+     CHECK(vis.size() == 245886 * 2);
     }
     SECTION("vis_uvfits"){
     CHECK_THROWS(read_measurements::read_measurements(std::vector<std::string>{filename + ".vis", filename + ".uvfits"}));
@@ -35,23 +41,24 @@ TEST_CASE("uvfits") {
     SECTION("otherformat") {
      CHECK_THROWS(read_measurements::read_measurements(filename + ".format"));
     }
-}
-
-TEST_CASE("ms") {
-  purify::logging::set_level("debug");
-  const std::string filename = atca_filename("0332-391");
+    SECTION("ms")
+    {
   SECTION("one"){
 #ifdef PURIFY_CASACORE
      const auto ms = read_measurements::read_measurements(filename + ".ms");
+     CHECK(ms.size() == 245886);
 #else
      CHECK_THROWS(read_measurements::read_measurements(filename + ".ms"));
 #endif
   }
   SECTION("two"){
 #ifdef PURIFY_CASACORE
-     const auto uvfits = read_measurements::read_measurements(std::vector<std::string>{filename + ".ms", filename + ".ms"});
+     const auto ms = read_measurements::read_measurements(std::vector<std::string>{filename + ".ms", filename + ".ms"});
+     CHECK(ms.size() == 245886 * 2);
 #else
      CHECK_THROWS(read_measurements::read_measurements(std::vector<std::string>{filename + ".ms", filename + ".ms"}));
 #endif
     }
+    }
 }
+
