@@ -13,7 +13,7 @@ TEST_CASE("readfile") {
   purify::logging::set_level("debug");
   const std::string filename = atca_filename("0332-391");
   SECTION("filter") {
-    const auto uvfits = pfitsio::read_uvfits(filename + ".uvfits", true, pfitsio::stokes::I);
+    const auto uvfits = pfitsio::read_uvfits(filename + ".uvfits", true, stokes::I);
     const auto vis = utilities::read_visibility(filename + ".vis", true);
     REQUIRE(299792458. == constant::c);
     REQUIRE(1431999959.5 == uvfits.frequencies(0));
@@ -47,7 +47,7 @@ TEST_CASE("readfile") {
     }
   }
   SECTION("no_filter") {
-    const auto uvfits = pfitsio::read_uvfits(filename + ".uvfits", false, pfitsio::stokes::I);
+    const auto uvfits = pfitsio::read_uvfits(filename + ".uvfits", false, stokes::I);
     const auto vis = utilities::read_visibility(filename + "_nofilter.vis", true);
     REQUIRE(299792458. == constant::c);
     REQUIRE(1431999959.5 == uvfits.frequencies(0));
