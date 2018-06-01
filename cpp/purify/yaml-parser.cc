@@ -133,7 +133,8 @@ std::vector<int> YamlParser::getWavelets(std::string values_str)
 
 void YamlParser::writeOutput()
 {
-  std::string file_path = "../data/config";
+  std::size_t file_begin = filepath_.find_last_of("/");
+  std::string file_path = filepath_.substr(0,file_begin);
   std::string extension = ".yaml";
   
   std::string base_file_name = this->filepath_.erase(this->filepath_.size()-extension.size());
@@ -161,7 +162,7 @@ void YamlParser::writeOutput()
   out << YAML::EndMap;  
 
   std::ofstream output_file;
-  output_file.open(base_file_name + "_" + datetime + "_save.yaml");
+  output_file.open(file_path + "/" + base_file_name + "_" + datetime + "_save.yaml");
   output_file << out.c_str();
   output_file.close();
 

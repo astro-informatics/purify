@@ -83,7 +83,7 @@ class YamlParser
   private: \
   TYPE NAME##_ =  VALUE; \
   public: \
-  const TYPE NAME(){ return NAME##_;};
+  TYPE NAME(){ return NAME##_;};
 
   YAML_MACRO(std::string, filepath, "");
   YAML_MACRO(std::string, timestamp, "");

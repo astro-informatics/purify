@@ -1,15 +1,15 @@
-
 #include <iostream>
 #include <cstdio>
 #include <string>
 #include "catch.hpp"
-#include "../purify/yaml-parser.h"
-#include "yaml-cpp/yaml.h"
+#include "purify/directories.h"
+#include "purify/yaml-parser.h"
+#include <yaml-cpp/yaml.h>
 
 
 TEST_CASE("Yaml parser and setting variables test")
 {
-  std::string file_path = "../data/config/config.yaml";
+  std::string file_path = purify::notinstalled::data_filename("config/config.yaml");
   YamlParser yaml_parser = YamlParser(file_path);
   SECTION("Check the GeneralConfiguration node variables")
     {
@@ -62,7 +62,7 @@ TEST_CASE("Yaml parser and setting variables test")
   SECTION("Check the writeOutput method")
     {
       yaml_parser.writeOutput();
-      std::string file_path_save = "config_" + yaml_parser.timestamp() + "_save.yaml";
+      std::string file_path_save = purify::notinstalled::data_filename("config/config_" + yaml_parser.timestamp() + "_save.yaml");
       YamlParser yaml_parser_check(file_path_save);
       REQUIRE(yaml_parser_check.filepath() == file_path_save);
       REQUIRE(yaml_parser_check.logging() == yaml_parser.logging());
