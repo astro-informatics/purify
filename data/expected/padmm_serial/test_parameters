@@ -1,18 +1,22 @@
-//used wavelets
+  REQUIRE(uv_data.size() == 13107);
+
+  t_uint const imsizey = 256;
+  t_uint const imsizex = 256;
+
+  auto const measurements_transform
+      = factory::measurement_operator_factory<Vector<t_complex>>(
+          factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2, 100,
+          0.0001, kernels::kernel_from_string.at("kb"), 4, 4);
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(factory::distributed_wavelet_operator::serial, sara, imsizey, imsizex);
-//used measurement operator
-  auto const measurements_transform
-      = factory::measurement_operator_factory<Vector<t_complex>>(
-          factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2, 1000,
-          0.0001, kernels::kernel_from_string.at("kb"), 4, 4);
-//noise was esimated from
-  t_real const sigma = 0.02378738741225;
-  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
-//used algorithm
+  t_real const sigma = 0.02378738741225; //see test_parameters file
   auto const padmm
-      =   factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(factory::algorithm::padmm, factory::algo_distribution::serial,
-          measurements_transform, wavelets, uv_data, sigma, imsizey, imsizex, 500);
+      =   factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
+          factory::algorithm::padmm, factory::algo_distribution::serial,
+          measurements_transform, wavelets, uv_data, sigma, imsizey, imsizex, sara.size(), 500);
+
+  auto const diagnostic = (*padmm)();
+  CHECK(diagnostic.niters == 139);
