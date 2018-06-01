@@ -15,10 +15,11 @@
 
 namespace purify {
   namespace read_measurements {
-utilities::vis_params read_measurements(const std::string &name, const bool w_term, const stokes pol) {
-  return read_measurements(std::vector<std::string>{name}, w_term, pol);
+utilities::vis_params read_measurements(const std::string &name, const bool w_term, const stokes pol, const utilities::vis_units units) {
+  return read_measurements(std::vector<std::string>{name}, w_term, pol, units);
 }
-utilities::vis_params read_measurements(const std::vector<std::string> &names, const bool w_term, const stokes pol) {
+utilities::vis_params read_measurements(const std::vector<std::string> &names, const bool w_term, const stokes pol, 
+    const utilities::vis_units units) {
   std::vector<std::string> found_files;
   format format_type = format::uvfits;
   for(t_int i = 0; i < names.size(); i++)
@@ -69,7 +70,9 @@ utilities::vis_params read_measurements(const std::vector<std::string> &names, c
       {
       if(pol != stokes::I)
         throw std::runtime_error(".vis files are ascii, so it is assumed that it is Stokes I. But, you are trying to choose a different type!");
-      return utilities::read_visibility(found_files, w_term);
+      auto measurements = utilities::read_visibility(found_files, w_term);
+      measurements.units = units;
+      return measurements;
       break;
       }
     case(format::uvfits):
@@ -93,17 +96,17 @@ utilities::vis_params read_measurements(const std::vector<std::string> &names, c
 
 #ifdef PURIFY_MPI
 utilities::vis_params read_measurements(const std::string &name, sopt::mpi::Communicator const & comm, 
-    const distribute::plan plan, const bool w_term, const stokes pol) {
-  return read_measurements(std::vector<std::string>{name}, comm, plan, w_term, pol);
+    const distribute::plan plan, const bool w_term, const stokes pol, const utilities::vis_units units) {
+  return read_measurements(std::vector<std::string>{name}, comm, plan, w_term, pol, units);
 }
 utilities::vis_params
 read_measurements(const std::vector<std::string> &names, sopt::mpi::Communicator const &comm, 
-    const distribute::plan plan, const bool w_term, const stokes pol) {
+    const distribute::plan plan, const bool w_term, const stokes pol, const utilities::vis_units units) {
   if(comm.size() == 1)
   {
     try
     {
-    return read_measurements(names, w_term, pol);
+    return read_measurements(names, w_term, pol, units);
     } catch (const std::runtime_error& e){
       throw sopt::mpi::MPIexception(e.what(), comm);
     }
@@ -112,7 +115,7 @@ read_measurements(const std::vector<std::string> &names, sopt::mpi::Communicator
     utilities::vis_params result;
     try
     {
-    result = read_measurements(names, w_term, pol);
+    result = read_measurements(names, w_term, pol, units);
     } catch (const std::runtime_error& e){
       throw sopt::mpi::MPIexception(e.what(), comm);
     }
