@@ -19,7 +19,7 @@ using namespace purify;
 using namespace purify::notinstalled;
 
 TEST_CASE("padmm_factory"){
-  const std::string &test_dir = "expected/padmm_serial/";
+  const std::string &test_dir = "expected/padmm/";
   const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
   const std::string &expected_solution_path = notinstalled::data_filename(test_dir + "solution.fits");
   const std::string &expected_residual_path = notinstalled::data_filename(test_dir + "residual.fits");

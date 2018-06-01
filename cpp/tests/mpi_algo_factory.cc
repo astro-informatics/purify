@@ -42,7 +42,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
 
   auto const world = sopt::mpi::Communicator::World();
 
-  const std::string &test_dir = "expected/padmm_serial/";
+  const std::string &test_dir = "expected/padmm/";
   const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
 
   auto uv_data = dirty_visibilities({input_data_path}, world);
