@@ -16,7 +16,7 @@ TEST_CASE("Purify fitsio", "[readwrite]") {
   pfitsio::write2d(input.real(), output_filename("fits_output.fits"));
   Image<t_complex> input2 = pfitsio::read2d(output_filename("fits_output.fits"));
   CAPTURE(input2);
-  CHECK(input.isApprox(input2, 1e-6));
+  CHECK(input.isApprox(input2, 1e-12));
 }
 
 TEST_CASE("readwrite2dheader", "purify fitsio") {
@@ -25,7 +25,7 @@ TEST_CASE("readwrite2dheader", "purify fitsio") {
   header_example.fits_name = output_filename("fits_output.fits");
   pfitsio::write2d_header(input.real(), header_example);
   Image<t_complex> input2 = pfitsio::read2d(output_filename("fits_output.fits"));
-  CHECK(input.isApprox(input2, 1e-6));
+  CHECK(input.isApprox(input2, 1e-12));
 }
 
 TEST_CASE("readwrite3d", "purify fitsio") {
@@ -41,7 +41,7 @@ TEST_CASE("readwrite3d", "purify fitsio") {
   pfitsio::write3d(input_real, output_filename("cube_output.fits"));
   std::vector<Image<t_complex>> input2 = pfitsio::read3d(output_filename("cube_output.fits"));
   for(int i = 0; i < input.size(); i++) {
-    CHECK(input[i].isApprox(input2[i], 1e-6));
+    CHECK(input[i].isApprox(input2[i], 1e-12));
   }
 }
 TEST_CASE("readwrite3dheader", "purify fitsio") {
@@ -62,7 +62,7 @@ TEST_CASE("readwrite3dheader", "purify fitsio") {
   CAPTURE(input.size());
   for(int i = 0; i < input.size(); i++) {
     CAPTURE(i);
-    CHECK(input.at(i).isApprox(input2.at(i), 1e-6));
+    CHECK(input.at(i).isApprox(input2.at(i), 1e-12));
   }
 }
 TEST_CASE("readwrite3dwith2d", "purify fitsio") {
@@ -76,9 +76,9 @@ TEST_CASE("readwrite3dwith2d", "purify fitsio") {
   }
   pfitsio::write3d(input_real, output_filename("2dcube_output.fits"));
   std::vector<Image<t_complex>> input2 = pfitsio::read3d(output_filename("2dcube_output.fits"));
-  for(int i = 0; i < input.size(); i++) {
-    CHECK(input[i].isApprox(input2[i], 1e-6));
-  }
+  for(int i = 0; i < input.size(); i++)
+    CHECK(input[i].isApprox(input2[i], 1e-12));
+  
 }
 TEST_CASE("readwrite3dheaderwith2d", "purify fitsio") {
 
@@ -86,14 +86,14 @@ TEST_CASE("readwrite3dheaderwith2d", "purify fitsio") {
   CHECK(input.size() == 1);
   CHECK(input[0].size() == 256 * 256);
   std::vector<Image<t_real>> input_real;
-  for(int i = 0; i < input.size(); i++) {
+  for(int i = 0; i < input.size(); i++)
     input_real.push_back(input[i].real());
-  }
+  
   pfitsio::header_params header_example;
   header_example.fits_name = output_filename("2dcube_output.fits");
   pfitsio::write3d_header(input_real, header_example);
   std::vector<Image<t_complex>> input2 = pfitsio::read3d(output_filename("2dcube_output.fits"));
-  for(int i = 0; i < input.size(); i++) {
-    CHECK(input[i].isApprox(input2[i], 1e-6));
-  }
+  for(int i = 0; i < input.size(); i++)
+    CHECK(input[i].isApprox(input2[i], 1e-12));
+  
 }

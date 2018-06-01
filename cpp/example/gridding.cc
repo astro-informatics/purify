@@ -12,7 +12,6 @@ int main(int nargs, char const **args) {
   auto const oversample_ratio = 2;
   auto const power_iters = 0;
   auto const power_tol = 1e-4;
-  auto const ft_plan = operators::fftw_plan::measure;
   auto const Ju = 4;
   auto const Jv = 4;
   auto const imsizex = 256;
@@ -29,7 +28,7 @@ int main(int nargs, char const **args) {
   const Vector<t_complex> image = Vector<t_complex>::Random(number_of_pixels);
   const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
-      power_tol, kernels::kernel_from_string.at(kernel), Ju, Jv, ft_plan);
+      power_tol, kernels::kernel_from_string.at(kernel), Ju, Jv);
   for(t_uint i = 0; i < 100; i++) {
     PURIFY_LOW_LOG("Iteration: {}", i);
     Vector<t_complex> const measurements = *measure_op * image;

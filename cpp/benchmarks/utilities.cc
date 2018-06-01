@@ -81,7 +81,7 @@ bool updateMeasurements(t_uint newSize, utilities::vis_params &data, t_real &eps
   std::tuple<utilities::vis_params, t_real> temp
       = b_utilities::dirty_measurements(image, newSize, 30., cellsize);
   data = std::get<0>(temp);
-  epsilon = utilities::calculate_l2_radius(data.vis, std::get<1>(temp));
+  epsilon = utilities::calculate_l2_radius(data.vis.size(), std::get<1>(temp));
 
   return true;
 }
@@ -107,7 +107,7 @@ bool updateMeasurements(t_uint newSize, utilities::vis_params &data, t_real &eps
   std::tuple<utilities::vis_params, t_real> temp
       = b_utilities::dirty_measurements(image, newSize, 30., cellsize, comm);
   data = std::get<0>(temp);
-  epsilon = utilities::calculate_l2_radius(data.vis, std::get<1>(temp));
+  epsilon = utilities::calculate_l2_radius(data.vis.size(), std::get<1>(temp));
 
   return true;
 }
@@ -119,7 +119,7 @@ dirty_measurements(Image<t_complex> const &ground_truth_image, t_uint number_of_
   // creating operator to generate measurements
   auto measurement_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_data, ground_truth_image.rows(), ground_truth_image.cols(), cellsize, cellsize, 2, 0, 1e-4,
-      kernels::kernel::kb, 8, 8, operators::fftw_plan::measure, false);
+      kernels::kernel::kb, 8, 8, false);
   // Generates measurements from image
   uv_data.vis = (*measurement_op)
                 * Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);

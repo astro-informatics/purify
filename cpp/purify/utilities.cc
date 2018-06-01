@@ -149,6 +149,7 @@ utilities::vis_params read_visibility(const std::string &vis_name, const bool w_
     vis_name:: name of input text file containing [u, v, real(V), imag(V)] (separated by ' ').
   */
  std::ifstream vis_file(vis_name);
+  vis_file.precision(13);
   t_int row = 0;
   std::string line;
   // counts size of vis file
@@ -400,7 +401,7 @@ utilities::vis_params whiten_vis(const utilities::vis_params &uv_vis) {
   output_uv_vis.vis = uv_vis.vis.array() * uv_vis.weights.array().cwiseAbs().sqrt();
   return output_uv_vis;
 }
-t_real calculate_l2_radius(const Vector<t_complex> &y, const t_real &sigma, const t_real &n_sigma,
+t_real calculate_l2_radius(const t_uint y_size, const t_real &sigma, const t_real &n_sigma,
                            const std::string distirbution) {
   /*
                   Calculates the epsilon, the radius of the l2_ball in sopt
@@ -408,16 +409,16 @@ t_real calculate_l2_radius(const Vector<t_complex> &y, const t_real &sigma, cons
   */
   if(distirbution == "chi^2") {
     if(sigma == 0) {
-      return std::sqrt(2 * y.size() + n_sigma * std::sqrt(4 * y.size()));
+      return std::sqrt(2 * y_size + n_sigma * std::sqrt(4 * y_size));
     }
-    return std::sqrt(2 * y.size() + n_sigma * std::sqrt(4 * y.size())) * sigma;
+    return std::sqrt(2 * y_size + n_sigma * std::sqrt(4 * y_size)) * sigma;
   }
   if(distirbution == "chi") {
-    auto alpha = 1. / (8 * y.size())
-                 - 1. / (128 * y.size() * y.size()); // series expansion for gamma relation
-    auto mean = std::sqrt(2) * std::sqrt(y.size())
+    auto alpha = 1. / (8 * y_size)
+                 - 1. / (128 * y_size * y_size); // series expansion for gamma relation
+    auto mean = std::sqrt(2) * std::sqrt(y_size)
                 * (1 - alpha); // using Gamma(k+1/2)/Gamma(k) asymptotic formula
-    auto standard_deviation = std::sqrt(2 * y.size() * alpha * (2 - alpha));
+    auto standard_deviation = std::sqrt(2 * y_size * alpha * (2 - alpha));
     if(sigma == 0) {
       return mean + n_sigma * standard_deviation;
     }

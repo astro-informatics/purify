@@ -28,7 +28,6 @@ TEST_CASE("GPU Operators") {
   const t_uint power_iters = 100;
   const t_real power_tol = 1e-9;
   const kernels::kernel kernel = kernels::kernel::kb;
-  const auto ft_plan = purify::operators::fftw_plan::estimate;
   const std::string &weighting_type = "natural";
   const t_real R = 0;
   auto u = Vector<t_real>::Random(M);
@@ -60,7 +59,7 @@ TEST_CASE("GPU Operators") {
     CHECK(input.isApprox(new_input, 1e-6));
     sopt::OperatorFunction<Vector<t_complex>> direct_fft, indirect_fft;
     std::tie(direct_fft, indirect_fft)
-        = operators::init_FFT_2d<Vector<t_complex>>(imsizey, imsizex, oversample_ratio, ft_plan);
+        = operators::init_FFT_2d<Vector<t_complex>>(imsizey, imsizex, oversample_ratio);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     const Vector<t_complex> indirect_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     Vector<t_complex> output_new;
@@ -131,7 +130,7 @@ TEST_CASE("GPU Operators") {
   SECTION("Serial Operator") {
     const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv, ft_plan);
+        power_iters, power_tol, kernel, Ju, Jv);
 
     const auto measure_op_gpu = gpu::measurementoperator::init_degrid_operator_2d(
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
@@ -165,7 +164,7 @@ TEST_CASE("GPU Operators") {
   SECTION("Compact Operator") {
     const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv, ft_plan);
+        power_iters, power_tol, kernel, Ju, Jv);
 
     const auto phiTphi = gpu::operators::init_grid_degrid_operator_2d(
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,

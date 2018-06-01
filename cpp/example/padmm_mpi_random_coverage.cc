@@ -41,7 +41,7 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
   // creating operator to generate measurements
   auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_data, ground_truth_image.rows(), ground_truth_image.cols(), std::get<1>(w_term),
-      std::get<1>(w_term), 2, 100, 1e-4, kernels::kernel::kb, 8, 8, operators::fftw_plan::measure,
+      std::get<1>(w_term), 2, 100, 1e-4, kernels::kernel::kb, 8, 8,
       std::get<0>(w_term));
   // Generates measurements from image
   uv_data.vis = (*sky_measurements)
@@ -82,9 +82,9 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
 
 #if PURIFY_PADMM_ALGORITHM == 2
   auto const epsilon = std::sqrt(
-      comm.all_sum_all(std::pow(utilities::calculate_l2_radius(uv_data.vis, sigma), 2)));
+      comm.all_sum_all(std::pow(utilities::calculate_l2_radius(uv_data.vis.size(), sigma), 2)));
 #elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
-  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
+  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
 #endif
   PURIFY_LOW_LOG("SARA Size = {}, Rank = {}", sara.size(), comm.rank());
   const t_real gamma
@@ -180,7 +180,7 @@ int main(int nargs, char const **args) {
 #ifndef PURIFY_GPU
   auto const measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, operators::fftw_plan::measure, w_term);
+      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, w_term);
 
 #else
   af::setDevice(0);
@@ -193,7 +193,7 @@ int main(int nargs, char const **args) {
 #ifndef PURIFY_GPU
   auto const measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
       world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, operators::fftw_plan::measure, w_term);
+      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, w_term);
 
 #else
   af::setDevice(0);
