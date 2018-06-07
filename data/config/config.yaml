@@ -6,6 +6,7 @@ GeneralConfiguration:
 #        - /home/cceaiac/Scratch/purify/purify/data/expected/padmm_serial/input_data.vis
         - /path/to/measurment/set # path to the measurement set
       polarization_measurement: I # one from I Q V XX LL
+      units_measurement: radians # one from lambda, radians, pixels
       noise_estimate: /path/to/noise/estimate # path to the noise measurement set
       polarization_noise: I # one from I Q V XX LL
     output_prefix: purified # result will be called as input with this prefix

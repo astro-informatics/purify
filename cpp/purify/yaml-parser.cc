@@ -56,6 +56,15 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
       this->measurements_.push_back(measurement_seq[i].as<std::string>());
 
   this->polarization_measurement_ = generalConfigNode["InputOutput"]["input"]["polarization_measurement"].as<std::string>();
+  std::string units_measurement_str = generalConfigNode["InputOutput"]["input"]["units_measurement"].as<std::string>();
+  if (units_measurement_str=="lambda")
+    this->units_measurement_ = purify::utilities::vis_units::lambda;
+  else if (units_measurement_str=="radians")
+    this->units_measurement_ = purify::utilities::vis_units::radians;
+  else if (units_measurement_str=="pixels")
+    this->units_measurement_ = purify::utilities::vis_units::pixels;
+  else
+    throw std::runtime_error("Visibility units \""+units_measurement_str+"\" not recognised. Check your config file.");
   this->noise_estimate_ = generalConfigNode["InputOutput"]["input"]["noise_estimate"].as<std::string>();
   this->polarization_noise_ = generalConfigNode["InputOutput"]["input"]["polarization_noise"].as<std::string>();
 }

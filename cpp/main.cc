@@ -98,14 +98,14 @@ int main(int argc, char **argv) {
     PURIFY_HIGH_LOG("Specify the config file full path. Aborting.");
     return 1;
   }
-  std::string file_path = argv[1]; //"../data/config/config.yaml";
+  std::string file_path = argv[1];
   YamlParser params = YamlParser(file_path);
 
   sopt::logging::set_level(params.logging());
   purify::logging::set_level(params.logging());
   PURIFY_HIGH_LOG("Stokes input {}", params.polarization_measurement());
   auto uv_data = utilities::read_visibility(params.measurements()[0], false); // TODO: use_w_term hardcoded to false for now
-  uv_data.units = utilities::vis_units::radians; // TODO: add units parameter in config.yaml
+  uv_data.units = params.units_measurement();
 
   // create measurement operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
