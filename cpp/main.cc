@@ -93,7 +93,12 @@ int main(int argc, char **argv) {
   sopt::logging::initialize();
   purify::logging::initialize();
 
-  std::string file_path = "../data/config/config.yaml";
+  // Read config file path from command line
+  if (argc==1) {
+    PURIFY_HIGH_LOG("Specify the config file full path. Aborting.");
+    return 1;
+  }
+  std::string file_path = argv[1]; //"../data/config/config.yaml";
   YamlParser params = YamlParser(file_path);
 
   sopt::logging::set_level(params.logging());
