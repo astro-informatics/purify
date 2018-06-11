@@ -114,14 +114,11 @@ int main(int argc, char **argv) {
 							     uv_data, params.y(), params.x(), params.Dy(), params.Dx(),
 							     params.oversampling(), params.powMethod_iter(), params.powMethod_tolerance(),
 							     kernels::kernel_from_string.at(params.Jweights()), params.Jy(), params.Jx());
-  // create wavelet operator -- TODO: put this processing inside yaml parser
+  // create wavelet operator
   std::vector<std::tuple<std::string, t_uint>> sara;
   for (size_t i=0; i<params.wavelet_basis().size(); i++)
     {
-      if (params.wavelet_basis()[i]==0)
-	sara.push_back( std::make_tuple("Dirac", params.wavelet_levels()) );
-      else
-	sara.push_back( std::make_tuple("DB"+std::to_string(params.wavelet_basis()[i]), params.wavelet_levels()) );
+      sara.push_back( std::make_tuple(params.wavelet_basis()[i], params.wavelet_levels()) );
     }
   auto const Psi =
     factory::wavelet_operator_factory<Vector<t_complex>>(

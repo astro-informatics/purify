@@ -23,6 +23,7 @@ TEST_CASE("Yaml parser and setting variables test")
       std::vector<std::string> expected_measurements = {"/path/to/measurment/set"};
       REQUIRE(yaml_parser.measurements() == expected_measurements);
       REQUIRE(yaml_parser.polarization_measurement() == "I");
+      REQUIRE(yaml_parser.units_measurement() == purify::utilities::vis_units::radians);
       REQUIRE(yaml_parser.noise_estimate() == "/path/to/noise/estimate");
       REQUIRE(yaml_parser.polarization_noise() == "I");
     }
@@ -44,7 +45,7 @@ TEST_CASE("Yaml parser and setting variables test")
     }
   SECTION("Check the SARA node variables")
     {
-      std::vector<int> expected_wavelets = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+      std::vector<std::string> expected_wavelets = {"Dirac", "DB1", "DB2", "DB3", "DB4", "DB5", "DB6", "DB7", "DB8"};
       REQUIRE(yaml_parser.wavelet_basis() == expected_wavelets);
       REQUIRE(yaml_parser.wavelet_levels() == 4);
       REQUIRE(yaml_parser.algorithm() == "padmm");

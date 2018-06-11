@@ -65,7 +65,7 @@ class YamlParser
   /** 
     Translate the waveket basis string into a vector
   */
-  std::vector<int> getWavelets(std::string values_str);
+  std::vector<std::string> getWavelets(std::string values_str);
 
   /** 
     Parse the YAML AlgorithmOptions block
@@ -112,7 +112,7 @@ class YamlParser
   YAML_MACRO(double, Dx, 0);
   YAML_MACRO(double, Dy, 0);
   YAML_MACRO(double, relVarianceConvergence, 0);
-  YAML_MACRO(std::vector<int>, wavelet_basis, {0});  
+  YAML_MACRO(std::vector<std::string>, wavelet_basis, {});  
   YAML_MACRO(std::string, gamma, "");
   YAML_MACRO(std::string, output_prefix, "");
   YAML_MACRO(std::string, skymodel, "");
