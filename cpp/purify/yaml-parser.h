@@ -119,8 +119,6 @@ class YamlParser
   YAML_MACRO(std::vector<std::string>, measurements, {});
   YAML_MACRO(std::string, polarization_measurement, "");
   YAML_MACRO(purify::utilities::vis_units, units_measurement, purify::utilities::vis_units::radians);
-  YAML_MACRO(std::string, noise_estimate, "");
-  YAML_MACRO(std::string, polarization_noise, "");
   YAML_MACRO(std::string, Jweights, "");
   YAML_MACRO(bool, wProjection, true);
 

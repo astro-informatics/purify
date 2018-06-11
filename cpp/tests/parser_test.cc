@@ -24,8 +24,6 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser.measurements() == expected_measurements);
       REQUIRE(yaml_parser.polarization_measurement() == "I");
       REQUIRE(yaml_parser.units_measurement() == purify::utilities::vis_units::radians);
-      REQUIRE(yaml_parser.noise_estimate() == "/path/to/noise/estimate");
-      REQUIRE(yaml_parser.polarization_noise() == "I");
     }
   SECTION("Check the MeasureOperators node variables")
     {
@@ -74,8 +72,6 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser_check.skymodel() == yaml_parser.skymodel());
       REQUIRE(yaml_parser_check.measurements() == yaml_parser.measurements());
       REQUIRE(yaml_parser_check.polarization_measurement() == yaml_parser.polarization_measurement());
-      REQUIRE(yaml_parser_check.noise_estimate() == yaml_parser.noise_estimate());
-      REQUIRE(yaml_parser_check.polarization_noise() == yaml_parser.polarization_noise());
       REQUIRE(yaml_parser_check.Jweights() == yaml_parser.Jweights());
       REQUIRE(yaml_parser_check.wProjection() == yaml_parser.wProjection());
       REQUIRE(yaml_parser_check.oversampling() == yaml_parser.oversampling());

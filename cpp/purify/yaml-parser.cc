@@ -65,8 +65,6 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
     this->units_measurement_ = purify::utilities::vis_units::pixels;
   else
     throw std::runtime_error("Visibility units \""+units_measurement_str+"\" not recognised. Check your config file.");
-  this->noise_estimate_ = generalConfigNode["InputOutput"]["input"]["noise_estimate"].as<std::string>();
-  this->polarization_noise_ = generalConfigNode["InputOutput"]["input"]["polarization_noise"].as<std::string>();
 }
 
 void YamlParser::parseAndSetMeasureOperators (const YAML::Node& measureOperatorsNode)
