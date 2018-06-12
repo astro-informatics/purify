@@ -103,6 +103,7 @@ int main(int argc, char **argv) {
 
   sopt::logging::set_level(params.logging());
   purify::logging::set_level(params.logging());
+  PURIFY_HIGH_LOG("Input visibilities are from {}", params.source()==purify::utilities::vis_source::measurements ? "measurements" : "simulation");
   PURIFY_HIGH_LOG("Stokes input {}", params.measurements_polarization());
   auto uv_data = utilities::read_visibility(params.measurements_files()[0], false); // TODO: use_w_term hardcoded to false for now
   uv_data.units = params.measurements_units();

@@ -116,6 +116,8 @@ class YamlParser
   YAML_MACRO(std::string, gamma, "");
   YAML_MACRO(std::string, output_prefix, "");
   YAML_MACRO(std::string, skymodel, "");
+
+  YAML_MACRO(purify::utilities::vis_source, source, purify::utilities::vis_source::measurements);
   YAML_MACRO(std::vector<std::string>, measurements_files, {});
   YAML_MACRO(std::string, measurements_polarization, "");
   YAML_MACRO(purify::utilities::vis_units, measurements_units, purify::utilities::vis_units::radians);

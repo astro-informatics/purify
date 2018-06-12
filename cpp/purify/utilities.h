@@ -10,6 +10,7 @@
 namespace purify {
 
 namespace utilities {
+enum class vis_source { measurements, simulation };  
 enum class vis_units { lambda, radians, pixels };
 struct vis_params {
   Vector<t_real> u; // u coordinates
