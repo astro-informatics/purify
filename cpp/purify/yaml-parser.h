@@ -116,9 +116,10 @@ class YamlParser
   YAML_MACRO(std::string, gamma, "");
   YAML_MACRO(std::string, output_prefix, "");
   YAML_MACRO(std::string, skymodel, "");
-  YAML_MACRO(std::vector<std::string>, measurements, {});
-  YAML_MACRO(std::string, polarization_measurement, "");
-  YAML_MACRO(purify::utilities::vis_units, units_measurement, purify::utilities::vis_units::radians);
+  YAML_MACRO(std::vector<std::string>, measurements_files, {});
+  YAML_MACRO(std::string, measurements_polarization, "");
+  YAML_MACRO(purify::utilities::vis_units, measurements_units, purify::utilities::vis_units::radians);
+  YAML_MACRO(float, measurements_sigma, 1);
   YAML_MACRO(std::string, Jweights, "");
   YAML_MACRO(bool, wProjection, true);
 

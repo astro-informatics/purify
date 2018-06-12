@@ -103,9 +103,9 @@ int main(int argc, char **argv) {
 
   sopt::logging::set_level(params.logging());
   purify::logging::set_level(params.logging());
-  PURIFY_HIGH_LOG("Stokes input {}", params.polarization_measurement());
-  auto uv_data = utilities::read_visibility(params.measurements()[0], false); // TODO: use_w_term hardcoded to false for now
-  uv_data.units = params.units_measurement();
+  PURIFY_HIGH_LOG("Stokes input {}", params.measurements_polarization());
+  auto uv_data = utilities::read_visibility(params.measurements_files()[0], false); // TODO: use_w_term hardcoded to false for now
+  uv_data.units = params.measurements_units();
 
   // create measurement operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
@@ -141,12 +141,11 @@ int main(int argc, char **argv) {
   //   PURIFY_MEDIUM_LOG("Convergence criteria: Residual norm is less than {}.",
   //                    params.residual_convergence);
   //PURIFY_MEDIUM_LOG("Gamma = {}", purify_gamma);
-  t_real sigma = 0.02378738741225; //1.; // TODO: Real data: input it in yaml file, default to 1. Simulated data: input snr in yaml file defaulted to ?, calculate sigma.
-  // TODO: remove noise_estimate and polarization_noise from yaml.
+  // TODO: sigma: Real data: input it in yaml file, default to 1. Simulated data: input snr in yaml file defaulted to ?, calculate sigma.
   auto const padmm =
     factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
 										factory::algorithm::padmm, factory::algo_distribution::serial,
-										measurements_transform, Psi, uv_data, sigma,
+										measurements_transform, Psi, uv_data, params.measurements_sigma(),
 										params.y(), params.x(), sara.size(), params.iterations());
 
 
@@ -187,9 +186,9 @@ int main(int argc, char **argv) {
 
   auto const diagnostic = (*padmm)();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), params.y(), params.x());
-  std::size_t file_begin = params.measurements()[0].find_last_of("/");
-  std::size_t file_end = params.measurements()[0].find_last_of(".");
-  std::string outfile_fits = params.measurements()[0].substr(0,file_begin) + "/" + params.output_prefix() + "_" + params.measurements()[0].substr(file_begin+1,file_end-file_begin) + "fits";
+  std::size_t file_begin = params.measurements_files()[0].find_last_of("/");
+  std::size_t file_end = params.measurements_files()[0].find_last_of(".");
+  std::string outfile_fits = params.measurements_files()[0].substr(0,file_begin) + "/" + params.output_prefix() + "_" + params.measurements_files()[0].substr(file_begin+1,file_end-file_begin) + "fits";
   pfitsio::write2d(image.real(), outfile_fits);
   const Vector<t_complex> residuals = measurements_transform->adjoint()
     * (uv_data.vis - ((*measurements_transform) * diagnostic.x));

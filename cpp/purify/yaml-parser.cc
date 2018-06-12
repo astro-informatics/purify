@@ -49,22 +49,24 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
   this->iterations_ = generalConfigNode["iterations"].as<int>();
   this->epsilonScaling_ = generalConfigNode["epsilonScaling"].as<int>();
   this->gamma_ = generalConfigNode["gamma"].as<std::string>();
+  
   this->output_prefix_ = generalConfigNode["InputOutput"]["output_prefix"].as<std::string>();
   this->skymodel_ = generalConfigNode["InputOutput"]["skymodel"].as<std::string>();
-  YAML::Node measurement_seq = generalConfigNode["InputOutput"]["input"]["measurements"];
+  
+  YAML::Node measurement_seq = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_files"];
   for (int i=0; i < measurement_seq.size(); i++)
-      this->measurements_.push_back(measurement_seq[i].as<std::string>());
-
-  this->polarization_measurement_ = generalConfigNode["InputOutput"]["input"]["polarization_measurement"].as<std::string>();
-  std::string units_measurement_str = generalConfigNode["InputOutput"]["input"]["units_measurement"].as<std::string>();
+      this->measurements_files_.push_back(measurement_seq[i].as<std::string>());
+  this->measurements_polarization_ = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_polarization"].as<std::string>();
+  std::string units_measurement_str = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_units"].as<std::string>();
   if (units_measurement_str=="lambda")
-    this->units_measurement_ = purify::utilities::vis_units::lambda;
+    this->measurements_units_ = purify::utilities::vis_units::lambda;
   else if (units_measurement_str=="radians")
-    this->units_measurement_ = purify::utilities::vis_units::radians;
+    this->measurements_units_ = purify::utilities::vis_units::radians;
   else if (units_measurement_str=="pixels")
-    this->units_measurement_ = purify::utilities::vis_units::pixels;
+    this->measurements_units_ = purify::utilities::vis_units::pixels;
   else
     throw std::runtime_error("Visibility units \""+units_measurement_str+"\" not recognised. Check your config file.");
+  this->measurements_sigma_ = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_sigma"].as<float>();
 }
 
 void YamlParser::parseAndSetMeasureOperators (const YAML::Node& measureOperatorsNode)
