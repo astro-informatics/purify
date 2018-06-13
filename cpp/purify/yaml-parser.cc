@@ -51,7 +51,6 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
   this->gamma_ = generalConfigNode["gamma"].as<std::string>();
   
   this->output_prefix_ = generalConfigNode["InputOutput"]["output_prefix"].as<std::string>();
-  this->skymodel_ = generalConfigNode["InputOutput"]["skymodel"].as<std::string>();
   
   std::string source_str = generalConfigNode["InputOutput"]["input"]["source"].as<std::string>();
   if (source_str=="measurements")
@@ -60,6 +59,7 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
     this->source_ = purify::utilities::vis_source::simulation;
   else
     throw std::runtime_error("Visibility source \""+source_str+"\" not recognised. Check your config file.");
+  
   YAML::Node measurement_seq = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_files"];
   for (int i=0; i < measurement_seq.size(); i++)
       this->measurements_files_.push_back(measurement_seq[i].as<std::string>());
@@ -74,6 +74,9 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
   else
     throw std::runtime_error("Visibility units \""+units_measurement_str+"\" not recognised. Check your config file.");
   this->measurements_sigma_ = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_sigma"].as<float>();
+
+  this->skymodel_ = generalConfigNode["InputOutput"]["input"]["simulation"]["skymodel"].as<std::string>();
+  this->signal_to_noise_ = generalConfigNode["InputOutput"]["input"]["simulation"]["signal_to_noise"].as<float>();
 }
 
 void YamlParser::parseAndSetMeasureOperators (const YAML::Node& measureOperatorsNode)

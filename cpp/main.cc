@@ -103,11 +103,37 @@ int main(int argc, char **argv) {
 
   sopt::logging::set_level(params.logging());
   purify::logging::set_level(params.logging());
-  PURIFY_HIGH_LOG("Input visibilities are from {}", params.source()==purify::utilities::vis_source::measurements ? "measurements" : "simulation");
   PURIFY_HIGH_LOG("Stokes input {}", params.measurements_polarization());
-  auto uv_data = utilities::read_visibility(params.measurements_files()[0], false); // TODO: use_w_term hardcoded to false for now
-  uv_data.units = params.measurements_units();
 
+  utilities::vis_params uv_data;
+  t_real sigma;
+  if (params.source()==purify::utilities::vis_source::measurements) {
+    PURIFY_HIGH_LOG("Input visibilities are from file {}", params.measurements_files()[0]);
+    sigma = params.measurements_sigma();
+    uv_data = utilities::read_visibility(params.measurements_files()[0], false); // TODO: use_w_term hardcoded to false for now
+    uv_data.units = params.measurements_units();
+  }
+  else if (params.source()==purify::utilities::vis_source::simulation) {
+    PURIFY_HIGH_LOG("Input visibilities will be generated for random coverage.");
+    // TODO: move this to function (in utilities.h?)
+    auto image = pfitsio::read2d(params.skymodel());
+    t_int const number_of_pixels = image.size();
+    t_int const number_of_vis = std::floor(number_of_pixels * 0.2);
+    t_real const sigma_m = constant::pi / 3;
+    const t_real cellsize = 1;
+    const t_real max_w = 100.; // lambda 
+    uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, max_w);
+    uv_data.units = utilities::vis_units::radians;
+    // TODO: use measurement operator factory instead
+    auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      uv_data, image.rows(), image.cols(), cellsize, cellsize, 2, 1000, 0.0001, kernels::kernel_from_string.at("kb"),
+      8, 8, false);
+    uv_data.vis = (*sky_measurements) * Image<t_complex>::Map(image.data(), image.size(), 1);
+    Vector<t_complex> const y0 = uv_data.vis;
+    sigma = utilities::SNR_to_standard_deviation(y0, params.signal_to_noise());
+    uv_data.vis = utilities::add_noise(y0, 0., sigma);
+  }
+  
   // create measurement operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
     factory::measurement_operator_factory<Vector<t_complex>>(
@@ -142,11 +168,10 @@ int main(int argc, char **argv) {
   //   PURIFY_MEDIUM_LOG("Convergence criteria: Residual norm is less than {}.",
   //                    params.residual_convergence);
   //PURIFY_MEDIUM_LOG("Gamma = {}", purify_gamma);
-  // TODO: sigma: Real data: input it in yaml file, default to 1. Simulated data: input snr in yaml file defaulted to ?, calculate sigma.
   auto const padmm =
     factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
 										factory::algorithm::padmm, factory::algo_distribution::serial,
-										measurements_transform, Psi, uv_data, params.measurements_sigma(),
+										measurements_transform, Psi, uv_data, sigma,
 										params.y(), params.x(), sara.size(), params.iterations());
 
 

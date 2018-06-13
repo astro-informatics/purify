@@ -14,8 +14,9 @@ GeneralConfiguration:
         measurements_units: radians # one from lambda, radians, pixels
         measurements_sigma: 1 # the noise level in the data
       simulation:
+        skymodel: /path/to/sky/image # path to the sky model image file
+        signal_to_noise: 30 # signal-to-noise ratio to be added to the sky model
     output_prefix: purified # result will be called as input with this prefix
-    skymodel: none  # model of the sky, if not set created (file)
 
   ### Execution parameters
   logging: debug # How much logging you want (debug, critical, ..)# FIXME: add the options, compile?

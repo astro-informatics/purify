@@ -19,14 +19,15 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser.epsilonScaling() == 1);
       REQUIRE(yaml_parser.gamma() == "default");
       REQUIRE(yaml_parser.output_prefix() == "purified");
-      REQUIRE(yaml_parser.skymodel() == "none");
       REQUIRE(yaml_parser.source() == purify::utilities::vis_source::measurements);
       std::vector<std::string> expected_measurements = {"/path/to/measurment/set"};
       REQUIRE(yaml_parser.measurements_files() == expected_measurements);
       REQUIRE(yaml_parser.measurements_polarization() == "I");
       REQUIRE(yaml_parser.measurements_units() == purify::utilities::vis_units::radians);
       REQUIRE(yaml_parser.measurements_sigma() == 1);
-    }
+      REQUIRE(yaml_parser.skymodel() == "/path/to/sky/image");
+      REQUIRE(yaml_parser.signal_to_noise() == 30);
+   }
   SECTION("Check the MeasureOperators node variables")
     {
       REQUIRE(yaml_parser.Jweights() == "kb");
@@ -71,12 +72,13 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser_check.epsilonScaling() == yaml_parser.epsilonScaling());
       REQUIRE(yaml_parser_check.gamma() == yaml_parser.gamma());
       REQUIRE(yaml_parser_check.output_prefix() == yaml_parser.output_prefix());
-      REQUIRE(yaml_parser_check.skymodel() == yaml_parser.skymodel());
       REQUIRE(yaml_parser_check.source() == yaml_parser.source());
       REQUIRE(yaml_parser_check.measurements_files() == yaml_parser.measurements_files());
       REQUIRE(yaml_parser_check.measurements_polarization() == yaml_parser.measurements_polarization());
       REQUIRE(yaml_parser_check.measurements_units() == yaml_parser.measurements_units());
       REQUIRE(yaml_parser_check.measurements_sigma() == yaml_parser.measurements_sigma());
+      REQUIRE(yaml_parser_check.skymodel() == yaml_parser.skymodel());
+      REQUIRE(yaml_parser_check.signal_to_noise() == yaml_parser.signal_to_noise());
       REQUIRE(yaml_parser_check.Jweights() == yaml_parser.Jweights());
       REQUIRE(yaml_parser_check.wProjection() == yaml_parser.wProjection());
       REQUIRE(yaml_parser_check.oversampling() == yaml_parser.oversampling());
