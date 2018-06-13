@@ -53,30 +53,34 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
   this->output_prefix_ = generalConfigNode["InputOutput"]["output_prefix"].as<std::string>();
   
   std::string source_str = generalConfigNode["InputOutput"]["input"]["source"].as<std::string>();
-  if (source_str=="measurements")
+  if (source_str=="measurements") {
+    if (generalConfigNode["InputOutput"]["input"]["simulation"])
+      throw std::runtime_error("Expecting input measurements block in the configuration file. Please remove simulation block!");
     this->source_ = purify::utilities::vis_source::measurements;
-  else if (source_str=="simulation")
+    YAML::Node measurement_seq = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_files"];
+    for (int i=0; i < measurement_seq.size(); i++)
+      this->measurements_files_.push_back(measurement_seq[i].as<std::string>());
+    this->measurements_polarization_ = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_polarization"].as<std::string>();
+    std::string units_measurement_str = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_units"].as<std::string>();
+    if (units_measurement_str=="lambda")
+      this->measurements_units_ = purify::utilities::vis_units::lambda;
+    else if (units_measurement_str=="radians")
+      this->measurements_units_ = purify::utilities::vis_units::radians;
+    else if (units_measurement_str=="pixels")
+      this->measurements_units_ = purify::utilities::vis_units::pixels;
+    else
+      throw std::runtime_error("Visibility units \""+units_measurement_str+"\" not recognised. Check your config file.");
+    this->measurements_sigma_ = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_sigma"].as<float>();
+  }
+  else if (source_str=="simulation") {
+    if (generalConfigNode["InputOutput"]["input"]["measurements"])
+      throw std::runtime_error("Expecting input simulation block in the configuration file. Please remove measurements block!");
     this->source_ = purify::utilities::vis_source::simulation;
+    this->skymodel_ = generalConfigNode["InputOutput"]["input"]["simulation"]["skymodel"].as<std::string>();
+    this->signal_to_noise_ = generalConfigNode["InputOutput"]["input"]["simulation"]["signal_to_noise"].as<float>();
+  }
   else
     throw std::runtime_error("Visibility source \""+source_str+"\" not recognised. Check your config file.");
-  
-  YAML::Node measurement_seq = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_files"];
-  for (int i=0; i < measurement_seq.size(); i++)
-      this->measurements_files_.push_back(measurement_seq[i].as<std::string>());
-  this->measurements_polarization_ = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_polarization"].as<std::string>();
-  std::string units_measurement_str = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_units"].as<std::string>();
-  if (units_measurement_str=="lambda")
-    this->measurements_units_ = purify::utilities::vis_units::lambda;
-  else if (units_measurement_str=="radians")
-    this->measurements_units_ = purify::utilities::vis_units::radians;
-  else if (units_measurement_str=="pixels")
-    this->measurements_units_ = purify::utilities::vis_units::pixels;
-  else
-    throw std::runtime_error("Visibility units \""+units_measurement_str+"\" not recognised. Check your config file.");
-  this->measurements_sigma_ = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_sigma"].as<float>();
-
-  this->skymodel_ = generalConfigNode["InputOutput"]["input"]["simulation"]["skymodel"].as<std::string>();
-  this->signal_to_noise_ = generalConfigNode["InputOutput"]["input"]["simulation"]["signal_to_noise"].as<float>();
 }
 
 void YamlParser::parseAndSetMeasureOperators (const YAML::Node& measureOperatorsNode)

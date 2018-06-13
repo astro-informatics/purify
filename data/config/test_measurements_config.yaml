@@ -11,11 +11,8 @@ GeneralConfiguration:
         measurements_files:
           - /path/to/measurment/set # path to the measurement set
         measurements_polarization: I # one from I Q V XX LL
-        measurements_units: radians # one from lambda, radians, pixels
-        measurements_sigma: 1 # the noise level in the data
-      #simulation:
-      #  skymodel: /path/to/sky/image # path to the sky model image file
-      #  signal_to_noise: 30 # signal-to-noise ratio to be added to the sky model
+        measurements_units: pixels # one from lambda, radians, pixels
+        measurements_sigma: 0.1 # the noise level in the data
     output_prefix: purified # result will be called as input with this prefix
 
   ### Execution parameters

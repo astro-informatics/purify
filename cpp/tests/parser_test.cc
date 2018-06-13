@@ -11,7 +11,32 @@ TEST_CASE("Yaml parser and setting variables test")
 {
   std::string file_path = purify::notinstalled::data_filename("config/config.yaml");
   YamlParser yaml_parser = YamlParser(file_path);
-  SECTION("Check the GeneralConfiguration node variables")
+  SECTION("Check the GeneralConfiguration measurement input variables")
+    {
+      std::string file_path_m = purify::notinstalled::data_filename("config/test_measurements_config.yaml");
+      YamlParser yaml_parser_m = YamlParser(file_path_m);
+      REQUIRE(yaml_parser_m.source() == purify::utilities::vis_source::measurements);
+      std::vector<std::string> expected_measurements = {"/path/to/measurment/set"};
+      REQUIRE(yaml_parser_m.measurements_files() == expected_measurements);
+      REQUIRE(yaml_parser_m.measurements_polarization() == "I");
+      REQUIRE(yaml_parser_m.measurements_units() == purify::utilities::vis_units::pixels);
+      REQUIRE(yaml_parser_m.measurements_sigma() == 0.1f);
+      REQUIRE(yaml_parser_m.skymodel() == "");
+      REQUIRE(yaml_parser_m.signal_to_noise() == 30);
+    }
+  SECTION("Check the GeneralConfiguration simulation input variables")
+    {
+      std::string file_path_s = purify::notinstalled::data_filename("config/test_simulation_config.yaml");
+      YamlParser yaml_parser_s = YamlParser(file_path_s);
+      REQUIRE(yaml_parser_s.source() == purify::utilities::vis_source::simulation);
+      REQUIRE(yaml_parser_s.measurements_files() == std::vector<std::string>());
+      REQUIRE(yaml_parser_s.measurements_polarization() == "");
+      REQUIRE(yaml_parser_s.measurements_units() == purify::utilities::vis_units::radians);
+      REQUIRE(yaml_parser_s.measurements_sigma() == 1);
+      REQUIRE(yaml_parser_s.skymodel() == "/path/to/sky/image");
+      REQUIRE(yaml_parser_s.signal_to_noise() == 10);
+   }
+  SECTION("Check the rest of the GeneralConfiguration variables")
     {
       REQUIRE(yaml_parser.filepath() == file_path);
       REQUIRE(yaml_parser.logging() == "debug");
@@ -19,15 +44,7 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser.epsilonScaling() == 1);
       REQUIRE(yaml_parser.gamma() == "default");
       REQUIRE(yaml_parser.output_prefix() == "purified");
-      REQUIRE(yaml_parser.source() == purify::utilities::vis_source::measurements);
-      std::vector<std::string> expected_measurements = {"/path/to/measurment/set"};
-      REQUIRE(yaml_parser.measurements_files() == expected_measurements);
-      REQUIRE(yaml_parser.measurements_polarization() == "I");
-      REQUIRE(yaml_parser.measurements_units() == purify::utilities::vis_units::radians);
-      REQUIRE(yaml_parser.measurements_sigma() == 1);
-      REQUIRE(yaml_parser.skymodel() == "/path/to/sky/image");
-      REQUIRE(yaml_parser.signal_to_noise() == 30);
-   }
+    }
   SECTION("Check the MeasureOperators node variables")
     {
       REQUIRE(yaml_parser.Jweights() == "kb");
