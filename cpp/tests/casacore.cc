@@ -94,6 +94,8 @@ TEST_CASE("Single channel") {
     CHECK(pc::MeasurementSet::const_iterator::value_type(0, ms).is_valid());
     CHECK(pc::MeasurementSet::const_iterator::value_type(4, ms).is_valid());
   }
+  // Raw data from the measurement set "0332-391.ms" was read out using CASA's casabrowser executable. 
+  // Then it was copied into this test.
   SECTION("Raw UVW") {
     auto const channel = pc::MeasurementSet::const_iterator::value_type(11, ms);
     REQUIRE(channel.size() == 20541);

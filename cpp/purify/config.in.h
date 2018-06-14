@@ -25,7 +25,7 @@
 //! Whether PURIFY is running with CImg
 #cmakedefine PURIFY_CImg
 
-//! Whether PURIFY is running with arrayfire
+//! Whether PURIFY is running with casacore
 #cmakedefine PURIFY_CASACORE
 
 #include <string>
