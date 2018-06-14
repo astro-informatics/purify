@@ -97,6 +97,7 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
   PURIFY_MEDIUM_LOG("Baselines: {}", baselines);
   PURIFY_MEDIUM_LOG("Channels: {}", channels);
   PURIFY_MEDIUM_LOG("Polarisations: {}", pols);
+  PURIFY_LOW_LOG("Purify currently assumes uvfits files are in XX YY XY YX format. Also will only read Stokes I for now.");
   PURIFY_MEDIUM_LOG("Total data per baseline: {}", total);
   if(pointings_num > 1)
     throw std::runtime_error("More than one pointing is not supported.");
