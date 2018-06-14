@@ -11,7 +11,6 @@ include(LookUp-GreatCMakeCookOff)
 option(tests          "Enable testing"                                  on)
 option(examples       "Compile examples"                                on)
 option(benchmarks     "Enable benchmarking"                             on)
-option(data           "Download measurement set for testing"            off)
 option(openmp         "Enable OpenMP"                                   on)
 option(logging        "Enable logging"                                  on)
 option(dompi          "Enable MPI"                                      on)
@@ -35,9 +34,6 @@ include(logging)
 # include exernal dependencies
 include(dependencies)
 
-if(tests AND data)
-  include(data_dependencies)
-endif()
 
 if(tests)  # Adds ctest
   enable_testing()
