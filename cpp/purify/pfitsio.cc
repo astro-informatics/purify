@@ -4,6 +4,50 @@
 #include "purify/pfitsio.h"
 namespace purify {
 namespace pfitsio {
+  t_int stokes_to_int(const stokes pol){
+  
+      switch(pol){
+        case stokes::I :
+          return 1;
+          break;
+        case stokes::Q :
+          return 2;
+          break;
+        case stokes::U :
+          return 3;
+          break;
+        case stokes::V :
+          return 4;
+          break;
+        case stokes::RR :
+          return -1;
+          break;
+        case stokes::LL :
+          return -2;
+          break;
+        case stokes::RL :
+          return -3;
+          break;
+        case stokes::LR :
+          return -4;
+          break;
+        case stokes::XX :
+          return -5;
+          break;
+        case stokes::YY :
+          return -6;
+          break;
+        case stokes::XY :
+          return -7;
+          break;
+        case stokes::YX :
+          return -8;
+          break;
+        default:
+          PURIFY_LOW_LOG("Polarisation type does not have a FITS convention, writing as Stokes I.");
+      }
+          return 1;
+  };
 void write_key(fitsfile *fptr, const std::string &key, const std::string &value,
                const std::string &comment, int *status) {
   std::string entry = value;
@@ -124,9 +168,9 @@ void write3d_header(const std::vector<Image<t_real>> &eigen_images,
   PURIFY_MACRO("CRVAL1", static_cast<t_real>(header.ra * 180. / purify::constant::pi), "");
   PURIFY_MACRO("CRVAL2", static_cast<t_real>(header.dec * 180. / purify::constant::pi), "");
   PURIFY_MACRO("CRVAL3", static_cast<t_real>(header.mean_frequency * std::pow(10, 6) * 1.), "");
-  PURIFY_MACRO("CRVAL4", static_cast<t_real>(1), "");
-  PURIFY_MACRO("CTYPE1", "RA---SIN", "");
-  PURIFY_MACRO("CTYPE2", "DEC---SIN", "");
+  PURIFY_MACRO("CRVAL4", static_cast<t_real>(header.polarisation), "");
+  PURIFY_MACRO("CTYPE1", "RA--SIN", "");
+  PURIFY_MACRO("CTYPE2", "DEC--SIN", "");
   PURIFY_MACRO("CTYPE3", "FREQ-OBS", "");
   PURIFY_MACRO("CTYPE4", "STOKES", "");
   PURIFY_MACRO("CDELT1", static_cast<t_real>(-header.cell_x / 3600.), "");
