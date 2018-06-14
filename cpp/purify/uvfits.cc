@@ -124,29 +124,32 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
     stokes_transform(1) = 1. / 2;
     break;
   case stokes::Q:
+    throw std::runtime_error("Polarisation not supported for reading uvfits.");
     pol_index1 = 0;
     pol_index2 = 1;
     stokes_transform(0) = 1. / 2;
     stokes_transform(1) = -1. / 2;
     break;
   case stokes::U:
+    throw std::runtime_error("Polarisation not supported for reading uvfits.");
     pol_index1 = 0;
     pol_index2 = 1;
     stokes_transform(0) = 1. / 2 * t_complex(0, -1);
     stokes_transform(1) = 1. / 2 * t_complex(0, -1);
     break;
   case stokes::V:
+    throw std::runtime_error("Polarisation not supported for reading uvfits.");
     pol_index1 = 0;
     pol_index2 = 1;
     stokes_transform(0) = 1. / 2 * t_complex(0, -1);
     stokes_transform(1) = -1. / 2 * t_complex(0, -1);
     break;
   default:
+    throw std::runtime_error("Polarisation not supported for reading uvfits.");
     pol_index1 = 0;
     pol_index2 = 1;
     stokes_transform(0) = 1. / 2;
     stokes_transform(1) = 1. / 2;
-    throw std::runtime_error("Polarisation not supported for reading uvfits.");
     break;
   }
   auto const uv_data1
