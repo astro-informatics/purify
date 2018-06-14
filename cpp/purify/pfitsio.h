@@ -10,10 +10,12 @@
 namespace purify {
 
 namespace pfitsio {
+//! convert stokes enum to integer for fits file header
+t_int stokes_to_int(const stokes pol);
 struct header_params {
   // structure containing parameters for fits header
   std::string fits_name = "output_image.fits";
-  t_real mean_frequency = 1400; // in MHz
+  t_real mean_frequency = 0; // in MHz
   t_real cell_x = 1;            // in arcseconds
   t_real cell_y = 1;            // in arcseconds
   t_real ra = 0;                // in radians, converted to decimal degrees before write
@@ -29,6 +31,27 @@ struct header_params {
   t_real relative_variation = 0;
   t_real residual_convergence = 0;
   t_real epsilon = 0;
+  //! create fits header object and fill
+  header_params(const std::string &fits_name_, const std::string & pix_units_,
+      const t_real channels_total_,
+      const t_real ra_, const t_real dec_, 
+      const stokes pol, 
+      const t_real cellx_, const t_real celly_,const t_real mean_frequency_,  
+      const t_real channel_width_,
+      const t_uint niters_, const bool hasconverged_,
+      const t_real relative_variation_, const t_real residual_convergence_,
+      const t_real epsilon_) 
+    : fits_name(fits_name_), pix_units(pix_units_),
+      channels_total(channels_total_),
+      mean_frequency(mean_frequency_), channel_width(channel_width_),
+      cell_x(cellx_), cell_y(celly_), ra(ra_), dec(dec_),
+      polarisation(pfitsio::stokes_to_int(pol)), niters(niters_),
+      hasconverged(hasconverged_), epsilon(epsilon_),
+      relative_variation(relative_variation_),
+      residual_convergence(residual_convergence_)
+       {};
+  //! create empty fits header
+  header_params() {};
 };
 //! write key to fits file header
 void write_key(fitsfile *fptr, const std::string &key, const std::string &value,
