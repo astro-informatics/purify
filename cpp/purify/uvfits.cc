@@ -54,7 +54,6 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
   t_int baselines;
   t_int naxes;
   t_int pcount;
-  t_int stokes;
   std::shared_ptr<char> comment
       = std::shared_ptr<char>(new char[FLEN_CARD], [](char *ptr) { delete[] ptr; });
   PURIFY_MEDIUM_LOG("Reading uvfits {}", filename);
@@ -69,7 +68,6 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
 
   fits_read_key(fptr, TDOUBLE, "CRVAL5", &uv_data.ra, comment.get(), &status);
   fits_read_key(fptr, TDOUBLE, "CRVAL6", &uv_data.dec, comment.get(), &status);
-  // fits_read_key(fptr, TINT, "CRVAL3", &stokes, comment.get(), &status);
   fits_read_key(fptr, TINT, "GCOUNT", &baselines, comment.get(), &status);
   fits_read_key(fptr, TINT, "NAXIS", &naxes, comment.get(), &status);
   fits_read_key(fptr, TINT, "PCOUNT", &pcount, comment.get(), &status);
