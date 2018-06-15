@@ -16,7 +16,7 @@ GeneralConfiguration:
       #simulation:
       #  skymodel: /path/to/sky/image # path to the sky model image file
       #  signal_to_noise: 30 # signal-to-noise ratio to be added to the sky model
-    output_prefix: purified # result will be called as input with this prefix
+    output_path: /path/to/output/dir # results directory will be created inside this path, and called output_<timestamp>
 
   ### Execution parameters
   logging: debug # How much logging you want (debug, critical, ..)# FIXME: add the options, compile?

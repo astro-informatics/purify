@@ -105,6 +105,7 @@ int main(int argc, char **argv) {
   purify::logging::set_level(params.logging());
   PURIFY_HIGH_LOG("Stokes input {}", params.measurements_polarization());
 
+  // Read or generate imput data
   utilities::vis_params uv_data;
   t_real sigma;
   if (params.source()==purify::utilities::vis_source::measurements) {
@@ -150,24 +151,9 @@ int main(int argc, char **argv) {
   auto const Psi =
     factory::wavelet_operator_factory<Vector<t_complex>>(
 							 factory::distributed_wavelet_operator::serial, sara, params.y(), params.x());
-  
-  //PURIFY_LOW_LOG("Saving dirty map");
-  //params.psf_norm = save_psf_and_dirty_image(measurements_transform, uv_data, params);
 
-  //auto const estimates = read_estimates(measurements_transform, uv_data, params);
-
-  //std::ofstream out_diagnostic;
-  // out_diagnostic.precision(13);
-  // out_diagnostic.open(params.filepath() + "_diagnostic", std::ios_base::app);
-
+  // Create and apply PADMM
   PURIFY_HIGH_LOG("Starting sopt!");
-  //PURIFY_MEDIUM_LOG("Epsilon = {}", epsilon);
-  //PURIFY_MEDIUM_LOG("Convergence criteria: Relative variation is less than {}.",
-  //                   params.relative_variation);
-  //if(params.residual_convergence > 0)
-  //   PURIFY_MEDIUM_LOG("Convergence criteria: Residual norm is less than {}.",
-  //                    params.residual_convergence);
-  //PURIFY_MEDIUM_LOG("Gamma = {}", purify_gamma);
   auto const padmm =
     factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
 										factory::algorithm::padmm, factory::algo_distribution::serial,
@@ -211,14 +197,18 @@ int main(int argc, char **argv) {
 		   out_diagnostic.close();*/
 
   auto const diagnostic = (*padmm)();
+
+  // Save output
+  params.writeOutput(); // the config yaml file - this also generates the output directory
+  std::string out_dir = params.output_path()+"/output_"+params.timestamp();
+  // the clean image
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), params.y(), params.x());
-  std::size_t file_begin = params.measurements_files()[0].find_last_of("/");
-  std::size_t file_end = params.measurements_files()[0].find_last_of(".");
-  std::string outfile_fits = params.measurements_files()[0].substr(0,file_begin) + "/" + params.output_prefix() + "_" + params.measurements_files()[0].substr(file_begin+1,file_end-file_begin) + "fits";
-  pfitsio::write2d(image.real(), outfile_fits);
+  pfitsio::write2d(image.real(), out_dir+"/purified.fits");
+  // the residuals
   const Vector<t_complex> residuals = measurements_transform->adjoint()
     * (uv_data.vis - ((*measurements_transform) * diagnostic.x));
-    const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), params.y(), params.x());
+  const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), params.y(), params.x());
+  pfitsio::write2d(residual_image.real(), out_dir+"/residuals.fits");
 
   return 0;
 }

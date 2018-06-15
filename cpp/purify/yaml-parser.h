@@ -114,7 +114,7 @@ class YamlParser
   YAML_MACRO(double, relVarianceConvergence, 0);
   YAML_MACRO(std::vector<std::string>, wavelet_basis, {});  
   YAML_MACRO(std::string, gamma, "");
-  YAML_MACRO(std::string, output_prefix, "");
+  YAML_MACRO(std::string, output_path, "");
 
   YAML_MACRO(purify::utilities::vis_source, source, purify::utilities::vis_source::measurements);
   YAML_MACRO(std::vector<std::string>, measurements_files, {});

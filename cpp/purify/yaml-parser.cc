@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <fstream>
 #include <yaml-cpp/yaml.h>
+#include <boost/filesystem.hpp>
 #include "yaml-parser.h"
 #include <assert.h>
 
@@ -50,12 +51,12 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
   this->epsilonScaling_ = generalConfigNode["epsilonScaling"].as<int>();
   this->gamma_ = generalConfigNode["gamma"].as<std::string>();
   
-  this->output_prefix_ = generalConfigNode["InputOutput"]["output_prefix"].as<std::string>();
+  this->output_path_ = generalConfigNode["InputOutput"]["output_path"].as<std::string>();
   
   std::string source_str = generalConfigNode["InputOutput"]["input"]["source"].as<std::string>();
   if (source_str=="measurements") {
     if (generalConfigNode["InputOutput"]["input"]["simulation"])
-      throw std::runtime_error("Expecting input measurements block in the configuration file. Please remove simulation block!");
+      throw std::runtime_error("Expecting only the input measurements block in the configuration file. Please remove simulation block!");
     this->source_ = purify::utilities::vis_source::measurements;
     YAML::Node measurement_seq = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_files"];
     for (int i=0; i < measurement_seq.size(); i++)
@@ -74,7 +75,7 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
   }
   else if (source_str=="simulation") {
     if (generalConfigNode["InputOutput"]["input"]["measurements"])
-      throw std::runtime_error("Expecting input simulation block in the configuration file. Please remove measurements block!");
+      throw std::runtime_error("Expecting only the input simulation block in the configuration file. Please remove measurements block!");
     this->source_ = purify::utilities::vis_source::simulation;
     this->skymodel_ = generalConfigNode["InputOutput"]["input"]["simulation"]["skymodel"].as<std::string>();
     this->signal_to_noise_ = generalConfigNode["InputOutput"]["input"]["simulation"]["signal_to_noise"].as<float>();
@@ -156,22 +157,30 @@ std::vector<std::string> YamlParser::getWavelets(std::string values_str)
 
 void YamlParser::writeOutput()
 {
+  // Get base file name (without path or extension)
   std::size_t file_begin = filepath_.find_last_of("/");
+  if (file_begin==std::string::npos) file_begin=0;
   std::string file_path = filepath_.substr(0,file_begin);
   std::string extension = ".yaml";
-  
   std::string base_file_name = this->filepath_.erase(this->filepath_.size()-extension.size());
-  base_file_name = base_file_name.substr(file_path.size() + 1, base_file_name.size());
-  
+  base_file_name = base_file_name.substr((file_path.size() ? file_path.size()+1 : 0), base_file_name.size());
+
+  // Get timestamp string
   std::time_t t = std::time(0);   // get time now
   std::tm* now = std::localtime(&t);
-
   // Make the datetime human readable
   std::string datetime = std::to_string(now->tm_year + 1900) + '-' + std::to_string(now->tm_mon + 1) + '-' + std::to_string(now->tm_mday);
   datetime = datetime + '-' + std::to_string(now->tm_hour) + ':' + std::to_string(now->tm_min) + ':' + std::to_string(now->tm_sec);
 
   this->timestamp_ = datetime;
 
+  // Construct output directory structure and file name
+  boost::filesystem::path const path(this->output_path_);
+  auto const out_path = path / ("output_"+datetime);
+  boost::filesystem::create_directories(out_path);
+  std::string out_filename = (out_path / base_file_name).native() + "_save.yaml";
+
+  // Write out the yaml info
   YAML::Emitter out;
   out << YAML::BeginMap;
   out << YAML::Key << "GeneralConfiguration";
@@ -185,7 +194,7 @@ void YamlParser::writeOutput()
   out << YAML::EndMap;  
 
   std::ofstream output_file;
-  output_file.open(file_path + "/" + base_file_name + "_" + datetime + "_save.yaml");
+  output_file.open(out_filename);
   output_file << out.c_str();
   output_file.close();
 
