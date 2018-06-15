@@ -90,6 +90,9 @@ int main(int argc, char **argv) {
   // the config yaml file - this also generates the output directory and the timestamp
   params.writeOutput();
   std::string out_dir = params.output_path()+"/output_"+params.timestamp();
+  // the input measurements, if simulated
+  if (params.source()==purify::utilities::vis_source::simulation)
+    utilities::write_visibility(uv_data, out_dir+"/input.vis");
   // the dirty image
   const Vector<t_complex> dimage = measurements_transform->adjoint() * uv_data.vis;
   const Image<t_real> dirty_image = Image<t_complex>::Map(dimage.data(), params.y(), params.x()).real();
