@@ -61,6 +61,31 @@ struct header_params {
        };
   //! create empty fits header
   header_params() {};
+#define  PURIFY_MACRO(VAR, H2) \
+    (this->VAR == H2.VAR)
+  bool operator==(const header_params &h2) const{
+  return
+    PURIFY_MACRO(mean_frequency, h2) and
+    PURIFY_MACRO(cell_x, h2) and
+    PURIFY_MACRO(cell_y, h2) and
+    PURIFY_MACRO(ra, h2) and
+    PURIFY_MACRO(dec, h2) and
+    PURIFY_MACRO(pix_ref_x, h2) and
+    PURIFY_MACRO(pix_ref_y, h2) and
+    PURIFY_MACRO(pix_units, h2) and
+    PURIFY_MACRO(channels_total, h2) and
+    PURIFY_MACRO(channel_width, h2) and
+    PURIFY_MACRO(polarisation, h2) and
+    PURIFY_MACRO(niters, h2) and
+    PURIFY_MACRO(hasconverged, h2) and
+    PURIFY_MACRO(relative_variation, h2) and
+    PURIFY_MACRO(residual_convergence, h2) and
+    PURIFY_MACRO(epsilon, h2);
+  }
+#undef PURIFY_MACRO
+  bool operator!=(const header_params &h2) const{
+    return not (*this == h2);
+  }
 };
 //! write key to fits file header
 void write_key(fitsfile *fptr, const std::string &key, const std::string &value,
