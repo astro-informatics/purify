@@ -107,6 +107,7 @@ if(docasa)
   if(NOT CasaCore_FOUND)
     lookup_package(CasaCore REQUIRED)
   endif()
+  set(PURIFY_CASACORE TRUE)
 endif()
 
 # Add script to execute to make sure libraries in the build tree can be found
