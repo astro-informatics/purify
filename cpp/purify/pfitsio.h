@@ -10,8 +10,6 @@
 namespace purify {
 
 namespace pfitsio {
-//! convert stokes enum to integer for fits file header
-t_int stokes_to_int(const stokes pol);
 struct header_params {
   // structure containing parameters for fits header
   std::string fits_name = "output_image.fits";
@@ -45,11 +43,21 @@ struct header_params {
       channels_total(channels_total_),
       mean_frequency(mean_frequency_), channel_width(channel_width_),
       cell_x(cellx_), cell_y(celly_), ra(ra_), dec(dec_),
-      polarisation(pfitsio::stokes_to_int(pol)), niters(niters_),
+      niters(niters_),
       hasconverged(hasconverged_), epsilon(epsilon_),
       relative_variation(relative_variation_),
       residual_convergence(residual_convergence_)
-       {};
+       {
+         try
+         {
+             this->polarisation = stokes_int.at(pol);
+          } 
+          catch (std::out_of_range & e)
+          {
+                 PURIFY_LOW_LOG("Polarisation type not recognised by FITS, assuming Stokes I.");
+                 this->polarisation = stokes_int.at(stokes::I);
+          };
+       };
   //! create empty fits header
   header_params() {};
 };
