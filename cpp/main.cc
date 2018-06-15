@@ -96,17 +96,24 @@ int main(int argc, char **argv) {
   // the input measurements, if simulated
   if (params.source()==purify::utilities::vis_source::simulation)
     utilities::write_visibility(uv_data, out_dir+"/input.vis");
+  const pfitsio::header_params def_header = pfitsio::header_params("", "Jy/Pixel", 
+      1, uv_data.ra, uv_data.dec , stokes_string.at(params.measurements_polarization()),
+      params.Dx(), params.Dy(), uv_data.average_frequency, 
+      0, 0, false, 0, 0, 0);
   // the dirty image
-  const pfitsio::header_params def_header();
   pfitsio::header_params dirty_header = def_header;
   dirty_header.fits_name = out_dir+"/dirty.fits";
+  dirty_header.pix_units = "Jy/Beam";
   const Vector<t_complex> dimage = measurements_transform->adjoint() * uv_data.vis;
   const Image<t_real> dirty_image = Image<t_complex>::Map(dimage.data(), params.y(), params.x()).real();
-  pfitsio::write2d(dirty_image, dirty_header);
+  pfitsio::write2d(dirty_image/dirty_image.maxCoeff(), dirty_header, true);
   // the psf
+  pfitsio::header_params psf_header = def_header;
+  psf_header.fits_name = out_dir+"/psf.fits";
+  psf_header.pix_units = "Jy/Beam";
   const Vector<t_complex> psf = measurements_transform->adjoint() * (uv_data.weights.array());
   const Image<t_real> psf_image = Image<t_complex>::Map(psf.data(), params.y(), params.x()).real();
-  pfitsio::write2d(psf_image, out_dir+"/psf.fits");
+  pfitsio::write2d(psf_image/psf_image.maxCoeff(), psf_header, true);
 
   // Apply algorithm
   auto const diagnostic = (*padmm)();
@@ -114,12 +121,18 @@ int main(int argc, char **argv) {
   // Save the rest of the output
   // the clean image
   const Image<t_real> image = Image<t_complex>::Map(diagnostic.x.data(), params.y(), params.x()).real();
-  pfitsio::write2d(image, out_dir+"/purified.fits");
+  pfitsio::header_params purified_header = def_header;
+  purified_header.fits_name = out_dir+"/purified.fits";
+  purified_header.hasconverged = diagnostic.good;
+  purified_header.niters = diagnostic.niters;
+  pfitsio::write2d(image, purified_header, true);
   // the residuals
+  pfitsio::header_params residuals_header = purified_header;
+  residuals_header.fits_name = out_dir+"/residuals.fits";
   const Vector<t_complex> residuals = measurements_transform->adjoint()
     * (uv_data.vis - ((*measurements_transform) * diagnostic.x));
   const Image<t_real> residual_image = Image<t_complex>::Map(residuals.data(), params.y(), params.x()).real();
-  pfitsio::write2d(residual_image, out_dir+"/residuals.fits");
+  pfitsio::write2d(residual_image,residuals_header, true);
 
   return 0;
 }
