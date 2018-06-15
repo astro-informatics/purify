@@ -60,6 +60,7 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
     this->source_ = purify::utilities::vis_source::measurements;
     YAML::Node measurement_seq = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_files"];
     for (int i=0; i < measurement_seq.size(); i++)
+      // TODO: check if files exist, and remove from list if they don't (see read_measurements.cc)
       this->measurements_files_.push_back(measurement_seq[i].as<std::string>());
     // TODO: use the enum instead of string.
     this->measurements_polarization_ = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_polarization"].as<std::string>();

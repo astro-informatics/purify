@@ -22,7 +22,7 @@ utilities::vis_params read_measurements(const std::vector<std::string> &names, c
   {
   const boost::filesystem::path file_path(names.at(i));
   if(not boost::filesystem::exists(file_path)){
-    PURIFY_LOW_LOG("Missing file will be removed from list: {}", names.at(i));
+    PURIFY_HIGH_LOG("Missing file will be removed from list: {}", names.at(i));
   }
   else
   {

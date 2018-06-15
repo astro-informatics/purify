@@ -8,6 +8,7 @@
 #include <sopt/reweighted.h>
 #include "purify/yaml-parser.h"
 #include "purify/logging.h"
+#include "purify/read_measurements.h"
 #include "purify/measurement_operator_factory.h"
 #include "purify/wavelet_operator_factory.h"
 #include "purify/algorithm_factory.h"
@@ -35,10 +36,12 @@ int main(int argc, char **argv) {
   utilities::vis_params uv_data;
   t_real sigma;
   if (params.source()==purify::utilities::vis_source::measurements) {
-    PURIFY_HIGH_LOG("Input visibilities are from file {}", params.measurements_files()[0]);
+    PURIFY_HIGH_LOG("Input visibilities are from files:");
+    for (size_t i=0; i<params.measurements_files().size(); i++)
+      PURIFY_HIGH_LOG("{}", params.measurements_files()[i]);
     sigma = params.measurements_sigma();
-    uv_data = utilities::read_visibility(params.measurements_files()[0], false); // TODO: use_w_term hardcoded to false for now
-    uv_data.units = params.measurements_units();
+    // TODO: use_w_term hardcoded to false for now
+    uv_data = read_measurements::read_measurements(params.measurements_files(), false, stokes::I, params.measurements_units());
   }
   else if (params.source()==purify::utilities::vis_source::simulation) {
     PURIFY_HIGH_LOG("Input visibilities will be generated for random coverage.");
