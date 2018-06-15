@@ -97,9 +97,12 @@ int main(int argc, char **argv) {
   if (params.source()==purify::utilities::vis_source::simulation)
     utilities::write_visibility(uv_data, out_dir+"/input.vis");
   // the dirty image
+  const pfitsio::header_params def_header();
+  pfitsio::header_params dirty_header = def_header;
+  dirty_header.fits_name = out_dir+"/dirty.fits";
   const Vector<t_complex> dimage = measurements_transform->adjoint() * uv_data.vis;
   const Image<t_real> dirty_image = Image<t_complex>::Map(dimage.data(), params.y(), params.x()).real();
-  pfitsio::write2d(dirty_image, out_dir+"/dirty.fits");
+  pfitsio::write2d(dirty_image, dirty_header);
   // the psf
   const Vector<t_complex> psf = measurements_transform->adjoint() * (uv_data.weights.array());
   const Image<t_real> psf_image = Image<t_complex>::Map(psf.data(), params.y(), params.x()).real();
