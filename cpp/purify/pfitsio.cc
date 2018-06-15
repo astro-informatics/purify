@@ -32,7 +32,7 @@ std::string read_key(fitsfile *fptr, const std::string &key, int *status) {
   return value;
 }
 //! Write image to fits file
-void write2d_header(const Image<t_real> &eigen_image, const pfitsio::header_params &header,
+void write2d(const Image<t_real> &eigen_image, const pfitsio::header_params &header,
                     const bool &overwrite) {
   /*
     Writes an image to a fits file.
@@ -43,7 +43,7 @@ void write2d_header(const Image<t_real> &eigen_image, const pfitsio::header_para
 
   */
 
-  write3d_header(std::vector<Image<t_real>>(1, eigen_image), header, overwrite);
+  write3d(std::vector<Image<t_real>>(1, eigen_image), header, overwrite);
 }
 
 void write2d(const Image<t_real> &eigen_image, const std::string &fits_name,
@@ -62,7 +62,7 @@ void write2d(const Image<t_real> &eigen_image, const std::string &fits_name,
   header.fits_name = fits_name;
   header.pix_units = pix_units;
 
-  write2d_header(eigen_image, header, overwrite);
+  write2d(eigen_image, header, overwrite);
 }
 
 Image<t_complex> read2d(const std::string &fits_name) {
@@ -75,7 +75,7 @@ Image<t_complex> read2d(const std::string &fits_name) {
   std::vector<Image<t_complex>> images = read3d(fits_name);
   return images.at(0);
 }
-void write3d_header(const std::vector<Image<t_real>> &eigen_images,
+void write3d(const std::vector<Image<t_real>> &eigen_images,
                     const pfitsio::header_params &header, const bool &overwrite) {
   /*
      Writes an image to a fits file.
@@ -168,7 +168,7 @@ void write3d(const std::vector<Image<t_real>> &eigen_images, const std::string &
   header.fits_name = fits_name;
   header.pix_units = pix_units;
 
-  write3d_header(eigen_images, header, overwrite);
+  write3d(eigen_images, header, overwrite);
 }
 
 std::vector<Image<t_complex>> read3d(const std::string &fits_name) {

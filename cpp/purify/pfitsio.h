@@ -1,6 +1,7 @@
 #ifndef PURIFY_PFITSIO_H
 #define PURIFY_PFITSIO_H
 #include "purify/config.h"
+#include "purify/logging.h"
 #include "purify/types.h"
 
 #include <fitsio.h>
@@ -122,7 +123,7 @@ read_key(fitsfile *fptr, const std::string &key, int *status) {
 }
 std::string read_key(fitsfile *fptr, const std::string &key, int *status);
 //! Write image to fits file using header information
-void write2d_header(const Image<t_real> &image, const pfitsio::header_params &header,
+void write2d(const Image<t_real> &image, const pfitsio::header_params &header,
                     const bool &overwrite = true);
 //! Write image to fits file
 void write2d(const Image<t_real> &image, const std::string &fits_name,
@@ -135,15 +136,15 @@ void write2d(const Eigen::EigenBase<DERIVED> &input, int nx, int ny, const std::
   write2d(Image<t_real>::Map(data.data(), nx, ny), fits_name, pix_units, overwrite);
 }
 template <class DERIVED>
-void write2d_header(const Eigen::EigenBase<DERIVED> &input, int nx, int ny,
+void write2d(const Eigen::EigenBase<DERIVED> &input, int nx, int ny,
                     const pfitsio::header_params &header, const bool &overwrite = true) {
   Image<t_real> const data = input.derived().real().template cast<t_real>();
-  write2d_header(Image<t_real>::Map(data.data(), nx, ny), header, overwrite);
+  write2d(Image<t_real>::Map(data.data(), nx, ny), header, overwrite);
 }
 //! Read image from fits file
 Image<t_complex> read2d(const std::string &fits_name);
 //! Write cube to fits file using header information
-void write3d_header(const std::vector<Image<t_real>> &image, const pfitsio::header_params &header,
+void write3d(const std::vector<Image<t_real>> &image, const pfitsio::header_params &header,
                     const bool &overwrite = true);
 //! Write cube to fits file
 void write3d(const std::vector<Image<t_real>> &image, const std::string &fits_name,
@@ -160,14 +161,14 @@ void write3d(const std::vector<Eigen::EigenBase<DERIVED>> &input, int nx, int ny
   write3d(images, fits_name, pix_units, overwrite);
 }
 template <class DERIVED>
-void write3d_header(const std::vector<Eigen::EigenBase<DERIVED>> &input, int nx, int ny,
+void write3d(const std::vector<Eigen::EigenBase<DERIVED>> &input, int nx, int ny,
                     const pfitsio::header_params &header, const bool &overwrite = true) {
   std::vector<Image<t_real>> images;
   for(int i = 0; i < input.size(); i++) {
     Image<t_real> const data = input.derived().real().template cast<t_real>();
     images.push_back(Image<t_real>::Map(data.data(), nx, ny));
   }
-  write3d_header(images, header, overwrite);
+  write3d(images, header, overwrite);
 }
 //! Read cube from fits file
 std::vector<Image<t_complex>> read3d(const std::string &fits_name);
