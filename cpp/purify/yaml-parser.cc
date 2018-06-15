@@ -61,6 +61,7 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
     YAML::Node measurement_seq = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_files"];
     for (int i=0; i < measurement_seq.size(); i++)
       this->measurements_files_.push_back(measurement_seq[i].as<std::string>());
+    // TODO: use the enum instead of string.
     this->measurements_polarization_ = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_polarization"].as<std::string>();
     std::string units_measurement_str = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_units"].as<std::string>();
     if (units_measurement_str=="lambda")
