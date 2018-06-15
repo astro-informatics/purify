@@ -54,7 +54,6 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
   t_int baselines;
   t_int naxes;
   t_int pcount;
-  t_int stokes;
   std::shared_ptr<char> comment
       = std::shared_ptr<char>(new char[FLEN_CARD], [](char *ptr) { delete[] ptr; });
   PURIFY_MEDIUM_LOG("Reading uvfits {}", filename);
@@ -69,7 +68,6 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
 
   fits_read_key(fptr, TDOUBLE, "CRVAL5", &uv_data.ra, comment.get(), &status);
   fits_read_key(fptr, TDOUBLE, "CRVAL6", &uv_data.dec, comment.get(), &status);
-  // fits_read_key(fptr, TINT, "CRVAL3", &stokes, comment.get(), &status);
   fits_read_key(fptr, TINT, "GCOUNT", &baselines, comment.get(), &status);
   fits_read_key(fptr, TINT, "NAXIS", &naxes, comment.get(), &status);
   fits_read_key(fptr, TINT, "PCOUNT", &pcount, comment.get(), &status);
@@ -97,6 +95,7 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
   PURIFY_MEDIUM_LOG("Baselines: {}", baselines);
   PURIFY_MEDIUM_LOG("Channels: {}", channels);
   PURIFY_MEDIUM_LOG("Polarisations: {}", pols);
+  PURIFY_LOW_LOG("Purify currently assumes uvfits files are in XX YY XY YX format. Also will only read Stokes I for now.");
   PURIFY_MEDIUM_LOG("Total data per baseline: {}", total);
   if(pointings_num > 1)
     throw std::runtime_error("More than one pointing is not supported.");
@@ -124,29 +123,32 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
     stokes_transform(1) = 1. / 2;
     break;
   case stokes::Q:
+    throw std::runtime_error("Polarisation not supported for reading uvfits.");
     pol_index1 = 0;
     pol_index2 = 1;
     stokes_transform(0) = 1. / 2;
     stokes_transform(1) = -1. / 2;
     break;
   case stokes::U:
+    throw std::runtime_error("Polarisation not supported for reading uvfits.");
     pol_index1 = 0;
     pol_index2 = 1;
     stokes_transform(0) = 1. / 2 * t_complex(0, -1);
     stokes_transform(1) = 1. / 2 * t_complex(0, -1);
     break;
   case stokes::V:
+    throw std::runtime_error("Polarisation not supported for reading uvfits.");
     pol_index1 = 0;
     pol_index2 = 1;
     stokes_transform(0) = 1. / 2 * t_complex(0, -1);
     stokes_transform(1) = -1. / 2 * t_complex(0, -1);
     break;
   default:
+    throw std::runtime_error("Polarisation not supported for reading uvfits.");
     pol_index1 = 0;
     pol_index2 = 1;
     stokes_transform(0) = 1. / 2;
     stokes_transform(1) = 1. / 2;
-    throw std::runtime_error("Polarisation not supported for reading uvfits.");
     break;
   }
   auto const uv_data1
