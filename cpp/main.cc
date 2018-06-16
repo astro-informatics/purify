@@ -88,26 +88,24 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
   // create measurement operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
     factory::measurement_operator_factory<Vector<t_complex>>(
-							     factory::distributed_measurement_operator::serial,
+							     mop_algo,
 							     uv_data, params.y(), params.x(), params.Dy(), params.Dx(),
 							     params.oversampling(), params.powMethod_iter(), params.powMethod_tolerance(),
 							     kernels::kernel_from_string.at(params.Jweights()), params.Jy(), params.Jx());
   // create wavelet operator
   std::vector<std::tuple<std::string, t_uint>> sara;
   for (size_t i=0; i<params.wavelet_basis().size(); i++)
-    {
-      sara.push_back( std::make_tuple(params.wavelet_basis()[i], params.wavelet_levels()) );
-    }
-  auto const Psi =
-    factory::wavelet_operator_factory<Vector<t_complex>>(
-							 factory::distributed_wavelet_operator::serial, sara, params.y(), params.x());
+      sara.push_back( std::make_tuple(params.wavelet_basis().at(i), params.wavelet_levels()));
+
+  auto const wavelets_transform =
+    factory::wavelet_operator_factory<Vector<t_complex>>(wop_algo, sara, params.y(), params.x());
 
   // Create algorithm
   PURIFY_HIGH_LOG("Starting sopt!");
   auto const padmm =
     factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
-										factory::algorithm::padmm, factory::algo_distribution::serial,
-										measurements_transform, Psi, uv_data, sigma,
+										factory::algorithm::padmm, params.mpiAlgorithm(),
+										measurements_transform, wavelets_transform, uv_data, sigma,
 										params.y(), params.x(), sara.size(), params.iterations());
 
   // Save some things before applying the algorithm
