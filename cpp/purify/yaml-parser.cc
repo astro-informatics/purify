@@ -17,6 +17,7 @@
 #include "yaml-parser.h"
 #include <assert.h>
 
+namespace purify {
 YamlParser::YamlParser (const std::string& filepath)
   : filepath_(filepath)
 {
@@ -61,9 +62,9 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
     YAML::Node measurement_seq = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_files"];
     for (int i=0; i < measurement_seq.size(); i++)
       // TODO: check if files exist, and remove from list if they don't (see read_measurements.cc)
-      this->measurements_files_.push_back(measurement_seq[i].as<std::string>());
+      this->measurements_.push_back(measurement_seq[i].as<std::string>());
     // TODO: use the enum instead of string.
-    this->measurements_polarization_ = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_polarization"].as<std::string>();
+    this->measurements_polarization_ = stokes_string.at(generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_polarization"].as<std::string>());
     std::string units_measurement_str = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_units"].as<std::string>();
     if (units_measurement_str=="lambda")
       this->measurements_units_ = purify::utilities::vis_units::lambda;
@@ -89,7 +90,6 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
 void YamlParser::parseAndSetMeasureOperators (const YAML::Node& measureOperatorsNode)
 {
   this->Jweights_ = measureOperatorsNode["Jweights"].as<std::string>();
-  this->wProjection_ = measureOperatorsNode["wProjection"].as<bool>();
   this->oversampling_ = measureOperatorsNode["oversampling"].as<float>();
   this->powMethod_iter_ = measureOperatorsNode["powMethod_iter"].as<int>();
   this->powMethod_tolerance_ = measureOperatorsNode["powMethod_tolerance"].as<float>();
@@ -99,16 +99,13 @@ void YamlParser::parseAndSetMeasureOperators (const YAML::Node& measureOperators
   this->y_ = measureOperatorsNode["imageSize"]["y"].as<int>();
   this->Jx_ = measureOperatorsNode["J"]["Jx"].as<unsigned int>();
   this->Jy_ = measureOperatorsNode["J"]["Jy"].as<unsigned int>();
-  this->chirp_fraction_ = measureOperatorsNode["wProjection_options"]["chirp_fraction"].as<float>();
-  this->kernel_fraction_ = measureOperatorsNode["wProjection_options"]["kernel_fraction"].as<float>();
 }
 
 void YamlParser::parseAndSetSARA (const YAML::Node& SARANode)
 {
-  std::string values_str = SARANode["wavelet_dict"].as<std::string>();
+  const std::string values_str = SARANode["wavelet_dict"].as<std::string>();
   this->wavelet_basis_ = this->getWavelets(values_str);
   this->wavelet_levels_ = SARANode["wavelet_levels"].as<int>();
-  this->algorithm_ = SARANode["algorithm"].as<std::string>();
 }
 
 void YamlParser::parseAndSetAlgorithmOptions (const YAML::Node& algorithmOptionsNode)
@@ -116,13 +113,13 @@ void YamlParser::parseAndSetAlgorithmOptions (const YAML::Node& algorithmOptions
   this->epsilonConvergenceScaling_ = algorithmOptionsNode["padmm"]["epsilonConvergenceScaling"].as<int>();
   this->realValueConstraint_ = algorithmOptionsNode["padmm"]["realValueConstraint"].as<bool>();
   this->positiveValueConstraint_ = algorithmOptionsNode["padmm"]["positiveValueConstraint"].as<bool>();
-  this->mpiAlgorithm_ = algorithmOptionsNode["padmm"]["mpiAlgorithm"].as<std::string>();
+  this->mpiAlgorithm_ = factory::algo_distribution_string.at(algorithmOptionsNode["padmm"]["mpiAlgorithm"].as<std::string>());
   this->relVarianceConvergence_ = algorithmOptionsNode["padmm"]["relVarianceConvergence"].as<double>();  
   this->param1_ = algorithmOptionsNode["pd"]["param1"].as<std::string>();
   this->param2_ = algorithmOptionsNode["pd"]["param2"].as<std::string>();
 }
 
-std::vector<std::string> YamlParser::getWavelets(std::string values_str)
+std::vector<std::string> YamlParser::getWavelets(const std::string &values_str)
 {
   // input - values_str
   // std::string values_str;
@@ -131,26 +128,28 @@ std::vector<std::string> YamlParser::getWavelets(std::string values_str)
   // Logic to extract the values as vectors
   std::vector<std::string> wavelets;
   std::string value2add;
-  values_str.erase(std::remove_if(values_str.begin(), values_str.end(),
-                                  [](char x){return std::isspace(x);}), values_str.end());
+  std::string input = values_str;
+  input.erase(std::remove_if(input.begin(), input.end(),
+                                  [](char x){return std::isspace(x);}), input.end());
   // NOTE Maybe a while reststring and using find is better?
-  for (int i=0; i <= values_str.size(); i++) {
-    if (i == values_str.size() || values_str[i] == ','){
-      wavelets.push_back( value2add=="0" ? "Dirac" : "DB"+value2add );
+  for (int i=0; i <= input.size(); i++) {
+    if ((i == input.size()) || (input.at(i) == ','))
+    {
+      wavelets.push_back((value2add == "0") ? "Dirac" : ("DB" + value2add));
       value2add = "";
-    } else if (values_str[i] == '.') {
+    } else if (input.at(i) == '.') {
       // TODO throw exception if open ended: 9..
       // TODO throw if at the begining
       // TODO throw if 3 digits on side
-      int n = values_str[i+3] == ',' ? 2 : 3;
-      std::string final_value = values_str.substr(i+2, n);
+      const int n =((i + 3) >= input.size()) ? 2 : ((input.at(i + 3) == ',') ? 2 : 3);
+      const std::string final_value = input.substr(i+2, n);
       // TODO throw if final_value < start value
-      for (int j=std::stoi(value2add); j <= std::stoi(final_value); j++ )
-        wavelets.push_back( j==0 ? "Dirac" : "DB"+std::to_string(j) );
+      for (int j = std::stoi(value2add); j <= std::stoi(final_value); j++ )
+        wavelets.push_back((j == 0) ? "Dirac" : ("DB"+std::to_string(j)));
       i += (n + 1);
       value2add = "";
     } else {
-      value2add = value2add + values_str[i];
+      value2add = value2add + input.at(i);
     }
   }
 
@@ -200,4 +199,5 @@ void YamlParser::writeOutput()
   output_file << out.c_str();
   output_file.close();
 
+}
 }
