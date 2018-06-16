@@ -21,6 +21,10 @@ namespace purify {
 namespace factory {
   enum class algorithm {padmm, primal_dual, sdmm, forward_backward};
   enum class algo_distribution {serial, mpi_serial, mpi_distributed};
+  const std::map<std::string, algo_distribution>
+    algo_distribution_string = {{"none", algo_distribution::serial}, 
+    {"serial-equivalent", algo_distribution::mpi_serial}, 
+    {"fully-distributed", algo_distribution::mpi_distributed}};
 
 //! return chosen algorithm given parameters
 template <class Algorithm, class... ARGS>
