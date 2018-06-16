@@ -16,17 +16,36 @@
 #include "purify/types.h"
 using namespace purify;
 
-int main(int argc, char **argv) {
+int main(int argc, const char **argv) {
   sopt::logging::initialize();
   purify::logging::initialize();
+  
 
   // Read config file path from command line
   if (argc==1) {
     PURIFY_HIGH_LOG("Specify the config file full path. Aborting.");
     return 1;
   }
+
   std::string file_path = argv[1];
   YamlParser params = YamlParser(file_path);
+
+  factory::distributed_measurement_operator mop_algo = factory::distributed_measurement_operator::serial;
+  factory::distributed_wavelet_operator wop_algo = factory::distributed_wavelet_operator::serial;
+
+  auto const session = (params.mpiAlgorithm() != factory::algo_distribution::serial) ? sopt::mpi::init(argc, argv) : 0;
+if (params.mpiAlgorithm() != factory::algo_distribution::serial)
+{
+#ifdef PURIFY_MPI
+  auto const world = sopt::mpi::Communicator::World();
+#else
+  throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
+#endif
+  mop_algo = factory::distributed_measurement_operator::mpi_distribute_image;
+  wop_algo = factory::distributed_wavelet_operator::mpi_sara;
+}
+
+
 
   sopt::logging::set_level(params.logging());
   purify::logging::set_level(params.logging());
