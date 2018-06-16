@@ -1,5 +1,4 @@
-
-#ifndef ALGORITHM_OPERATOR_FACTORY_H
+#ifndef ALGORITHM_FACTORY_H
 #define ALGORITHM_FACTORY_H
 
 #include "purify/config.h"
