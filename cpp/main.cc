@@ -49,18 +49,17 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
 
   sopt::logging::set_level(params.logging());
   purify::logging::set_level(params.logging());
-  PURIFY_HIGH_LOG("Stokes input {}", params.measurements_polarization());
 
   // Read or generate imput data
   utilities::vis_params uv_data;
   t_real sigma;
   if (params.source()==purify::utilities::vis_source::measurements) {
     PURIFY_HIGH_LOG("Input visibilities are from files:");
-    for (size_t i=0; i<params.measurements_files().size(); i++)
-      PURIFY_HIGH_LOG("{}", params.measurements_files()[i]);
+    for (size_t i=0; i<params.measurements().size(); i++)
+      PURIFY_HIGH_LOG("{}", params.measurements()[i]);
     sigma = params.measurements_sigma();
     // TODO: use_w_term hardcoded to false for now
-    uv_data = read_measurements::read_measurements(params.measurements_files(), false, stokes::I, params.measurements_units());
+    uv_data = read_measurements::read_measurements(params.measurements(), false, stokes::I, params.measurements_units());
   }
   else if (params.source()==purify::utilities::vis_source::simulation) {
     PURIFY_HIGH_LOG("Input visibilities will be generated for random coverage.");
@@ -74,9 +73,12 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
     uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, max_w);
     uv_data.units = utilities::vis_units::radians;
     // TODO: use measurement operator factory instead
-    auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_data, image.rows(), image.cols(), cellsize, cellsize, 2, 1000, 0.0001, kernels::kernel_from_string.at("kb"),
-      8, 8, false);
+    auto const sky_measurements = 
+    factory::measurement_operator_factory<Vector<t_complex>>(
+							     mop_algo,
+							     uv_data, params.y(), params.x(), params.Dy(), params.Dx(),
+							     params.oversampling(), params.powMethod_iter(), params.powMethod_tolerance(),
+							     kernels::kernel_from_string.at(params.Jweights()), 2 * params.Jy(), 2 * params.Jx());
     uv_data.vis = (*sky_measurements) * Image<t_complex>::Map(image.data(), image.size(), 1);
     Vector<t_complex> const y0 = uv_data.vis;
     sigma = utilities::SNR_to_standard_deviation(y0, params.signal_to_noise());
@@ -116,7 +118,7 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
   if (params.source()==purify::utilities::vis_source::simulation)
     utilities::write_visibility(uv_data, out_dir+"/input.vis");
   const pfitsio::header_params def_header = pfitsio::header_params("", "Jy/Pixel", 
-      1, uv_data.ra, uv_data.dec , stokes_string.at(params.measurements_polarization()),
+      1, uv_data.ra, uv_data.dec , params.measurements_polarization(),
       params.Dx(), params.Dy(), uv_data.average_frequency, 
       0, 0, false, 0, 0, 0);
   // the dirty image
