@@ -125,14 +125,33 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
   dirty_header.pix_units = "Jy/Beam";
   const Vector<t_complex> dimage = measurements_transform->adjoint() * uv_data.vis;
   const Image<t_real> dirty_image = Image<t_complex>::Map(dimage.data(), params.y(), params.x()).real();
+if (params.mpiAlgorithm() != factory::algo_distribution::serial)
+{
+#ifdef PURIFY_MPI
+  auto const world = sopt::mpi::Communicator::World();
+  if(world.is_root())
+#endif
   pfitsio::write2d(dirty_image/dirty_image.maxCoeff(), dirty_header, true);
+} else {
+
+  pfitsio::write2d(dirty_image/dirty_image.maxCoeff(), dirty_header, true);
+}
   // the psf
   pfitsio::header_params psf_header = def_header;
   psf_header.fits_name = out_dir+"/psf.fits";
   psf_header.pix_units = "Jy/Beam";
   const Vector<t_complex> psf = measurements_transform->adjoint() * (uv_data.weights.array());
   const Image<t_real> psf_image = Image<t_complex>::Map(psf.data(), params.y(), params.x()).real();
+if (params.mpiAlgorithm() != factory::algo_distribution::serial)
+{
+#ifdef PURIFY_MPI
+  auto const world = sopt::mpi::Communicator::World();
+  if(world.is_root())
+#endif
   pfitsio::write2d(psf_image/psf_image.maxCoeff(), psf_header, true);
+} else {
+  pfitsio::write2d(psf_image/psf_image.maxCoeff(), psf_header, true);
+}
 
   // Apply algorithm
   auto const diagnostic = (*padmm)();
@@ -144,14 +163,32 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
   purified_header.fits_name = out_dir+"/purified.fits";
   purified_header.hasconverged = diagnostic.good;
   purified_header.niters = diagnostic.niters;
+if (params.mpiAlgorithm() != factory::algo_distribution::serial)
+{
+#ifdef PURIFY_MPI
+  auto const world = sopt::mpi::Communicator::World();
+  if(world.is_root())
+#endif
   pfitsio::write2d(image, purified_header, true);
+} else {
+  pfitsio::write2d(image, purified_header, true);
+}
   // the residuals
   pfitsio::header_params residuals_header = purified_header;
   residuals_header.fits_name = out_dir+"/residuals.fits";
   const Vector<t_complex> residuals = measurements_transform->adjoint()
     * (uv_data.vis - ((*measurements_transform) * diagnostic.x));
   const Image<t_real> residual_image = Image<t_complex>::Map(residuals.data(), params.y(), params.x()).real();
-  pfitsio::write2d(residual_image,residuals_header, true);
+if (params.mpiAlgorithm() != factory::algo_distribution::serial)
+{
+#ifdef PURIFY_MPI
+  auto const world = sopt::mpi::Communicator::World();
+  if(world.is_root())
+#endif
+  pfitsio::write2d(image, purified_header, true);
+} else {
+  pfitsio::write2d(image, purified_header, true);
+}
 
   return 0;
 }
