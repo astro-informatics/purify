@@ -30,7 +30,7 @@ if(PURIFY_MPI)
 endif()
 
 set(SOURCES utilities.cc pfitsio.cc
-  kernels.cc distribute.cc wproj_utilities.cc operators.cc uvfits.cc projection_kernels.cc yaml-parser.cc 
+  kernels.cc distribute.cc wproj_utilities.cc operators.cc uvfits.cc projection_kernels.cc yaml-parser.cc
   read_measurements.cc)
 
 if(TARGET casacore::ms)
@@ -38,9 +38,9 @@ if(TARGET casacore::ms)
   list(APPEND HEADERS casacore.h)
 endif()
 
-list(APPEND HEADERS mpi_utilities.h distribute.h)
 if(PURIFY_MPI)
-  list(APPEND SOURCES mpi_utilities.cc)
+  list(APPEND HEADERS mpi_utilities.h distribute.h)
+  list(APPEND SOURCES mpi_utilities.cc distribute.cc)
 endif()
 
 add_library(libpurify SHARED ${SOURCES})
