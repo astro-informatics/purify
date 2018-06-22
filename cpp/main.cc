@@ -33,10 +33,10 @@ int main(int argc, const char **argv) {
   factory::distributed_measurement_operator mop_algo = factory::distributed_measurement_operator::serial;
   factory::distributed_wavelet_operator wop_algo = factory::distributed_wavelet_operator::serial;
 
-  auto const session = (params.mpiAlgorithm() != factory::algo_distribution::serial) ? sopt::mpi::init(argc, argv) : 0;
 if (params.mpiAlgorithm() != factory::algo_distribution::serial)
 {
 #ifdef PURIFY_MPI
+  sopt::mpi::init(argc, argv);
   auto const world = sopt::mpi::Communicator::World();
 #else
   throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
@@ -45,12 +45,10 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
   wop_algo = factory::distributed_wavelet_operator::mpi_sara;
 }
 
-
-
   sopt::logging::set_level(params.logging());
   purify::logging::set_level(params.logging());
 
-  // Read or generate imput data
+  // Read or generate input data
   utilities::vis_params uv_data;
   t_real sigma;
   if (params.source()==purify::utilities::vis_source::measurements) {
@@ -65,14 +63,15 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
     PURIFY_HIGH_LOG("Input visibilities will be generated for random coverage.");
     // TODO: move this to function (in utilities.h?)
     auto image = pfitsio::read2d(params.skymodel());
+    if (params.y()!=image.rows() || params.x()!=image.cols())
+      throw std::runtime_error("Input image size ("+std::to_string(image.cols())+"x"+std::to_string(image.rows())+
+			       ") is not equal to the input one ("+std::to_string(params.x())+"x"+std::to_string(params.y())+")."); 
     t_int const number_of_pixels = image.size();
     t_int const number_of_vis = std::floor(number_of_pixels * 0.2);
     t_real const sigma_m = constant::pi / 3;
-    const t_real cellsize = 1;
     const t_real max_w = 100.; // lambda 
     uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, max_w);
     uv_data.units = utilities::vis_units::radians;
-    // TODO: use measurement operator factory instead
     auto const sky_measurements = 
     factory::measurement_operator_factory<Vector<t_complex>>(
 							     mop_algo,
@@ -130,10 +129,11 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
 #ifdef PURIFY_MPI
   auto const world = sopt::mpi::Communicator::World();
   if(world.is_root())
+#else
+  throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
   pfitsio::write2d(dirty_image/dirty_image.maxCoeff(), dirty_header, true);
 } else {
-
   pfitsio::write2d(dirty_image/dirty_image.maxCoeff(), dirty_header, true);
 }
   // the psf
@@ -147,6 +147,8 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
 #ifdef PURIFY_MPI
   auto const world = sopt::mpi::Communicator::World();
   if(world.is_root())
+#else
+  throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
   pfitsio::write2d(psf_image/psf_image.maxCoeff(), psf_header, true);
 } else {
@@ -168,6 +170,8 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
 #ifdef PURIFY_MPI
   auto const world = sopt::mpi::Communicator::World();
   if(world.is_root())
+#else
+  throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
   pfitsio::write2d(image, purified_header, true);
 } else {
@@ -184,6 +188,8 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
 #ifdef PURIFY_MPI
   auto const world = sopt::mpi::Communicator::World();
   if(world.is_root())
+#else
+  throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
   pfitsio::write2d(image, purified_header, true);
 } else {

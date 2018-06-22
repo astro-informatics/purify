@@ -56,8 +56,7 @@ AlgorithmOptions:
     realValueConstraint: True # Boolean
     positiveValueConstraint: True #boolean
     # Following is only accepted when MPI is used
-    mpiAlgorithm:  fully-distributed # 1,2 or 3 - from the list of the possible algorithms - NOTE this changes the MO.; FIXME: Names as in paper
-      #  (0) none, (1) fully-distributed, (2) serial-equivalent, (3) partially-distributed
+    mpiAlgorithm:  fully-distributed # one of none, serial-equivalent, fully-distributed
     # Be careful changing the following unless you know what you are doing
     relVarianceConvergence: 1e-3 # (>0)
 

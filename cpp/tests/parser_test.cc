@@ -23,7 +23,7 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser_m.measurements_units() == purify::utilities::vis_units::pixels);
       REQUIRE(yaml_parser_m.measurements_sigma() == 0.1f);
       REQUIRE(yaml_parser_m.skymodel() == "");
-      REQUIRE(yaml_parser_m.signal_to_noise() == 0);
+      REQUIRE(yaml_parser_m.signal_to_noise() == 30);
     }
   SECTION("Check the GeneralConfiguration simulation input variables")
     {
@@ -33,7 +33,7 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser_s.measurements() == std::vector<std::string>());
       REQUIRE(yaml_parser_s.measurements_polarization() == stokes::I);
       REQUIRE(yaml_parser_s.measurements_units() == purify::utilities::vis_units::radians);
-      REQUIRE(yaml_parser_s.measurements_sigma() == 0);
+      REQUIRE(yaml_parser_s.measurements_sigma() == 1);
       REQUIRE(yaml_parser_s.skymodel() == "/path/to/sky/image");
       REQUIRE(yaml_parser_s.signal_to_noise() == 10);
    }
