@@ -25,9 +25,6 @@ set(HEADERS
   read_measurements.h
   yaml-parser.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
-if(PURIFY_MPI)
-  list(APPEND HEADERS convergence_factory.h)
-endif()
 
 set(SOURCES utilities.cc pfitsio.cc
   kernels.cc distribute.cc wproj_utilities.cc operators.cc uvfits.cc projection_kernels.cc yaml-parser.cc
@@ -39,8 +36,9 @@ if(TARGET casacore::ms)
 endif()
 
 if(PURIFY_MPI)
-  list(APPEND HEADERS mpi_utilities.h distribute.h)
-  list(APPEND SOURCES mpi_utilities.cc distribute.cc)
+  list(APPEND HEADERS mpi_utilities.h distribute.h wavelet_operator_factory.h
+                      measurement_operator_factory.h operators.h convergence_factory.h)
+  list(APPEND SOURCES mpi_utilities.cc distribute.cc operators.cc )
 endif()
 
 add_library(libpurify SHARED ${SOURCES})
