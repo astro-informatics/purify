@@ -84,7 +84,7 @@ class YamlParser
   private: \
   TYPE NAME##_ =  VALUE; \
   public: \
-  const TYPE NAME(){ return NAME##_;};
+  TYPE NAME(){ return NAME##_;};
 
   YAML_MACRO(std::string, filepath, "")
   YAML_MACRO(std::string, timestamp, "")
@@ -107,8 +107,6 @@ class YamlParser
   YAML_MACRO(unsigned int, Jy, 0)
   YAML_MACRO(float, oversampling, 0)
   YAML_MACRO(float, powMethod_tolerance, 0)
-  YAML_MACRO(float, chirp_fraction, 0)
-  YAML_MACRO(float, kernel_fraction, 0)
   YAML_MACRO(double, epsilonScaling, 0)
   YAML_MACRO(double, Dx, 0)
   YAML_MACRO(double, Dy, 0)
@@ -125,7 +123,6 @@ class YamlParser
   YAML_MACRO(std::string, noise_estimate, "")
   YAML_MACRO(std::string, polarization_noise, "")
   YAML_MACRO(std::string, Jweights, "")
-  YAML_MACRO(bool, wProjection, false)
 
 #undef YAML_MACRO
 

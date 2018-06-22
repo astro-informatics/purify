@@ -6,6 +6,7 @@
 #include "purify/yaml-parser.h"
 #include <yaml-cpp/yaml.h>
 
+using namespace purify;
 
 TEST_CASE("Yaml parser and setting variables test")
 {
@@ -17,22 +18,22 @@ TEST_CASE("Yaml parser and setting variables test")
     {
       REQUIRE(yaml_parser_m.source() == purify::utilities::vis_source::measurements);
       std::vector<std::string> expected_measurements = {"/path/to/measurment/set"};
-      REQUIRE(yaml_parser_m.measurements_files() == expected_measurements);
-      REQUIRE(yaml_parser_m.measurements_polarization() == "I");
+      REQUIRE(yaml_parser_m.measurements() == expected_measurements);
+      REQUIRE(yaml_parser_m.measurements_polarization() == stokes::I);
       REQUIRE(yaml_parser_m.measurements_units() == purify::utilities::vis_units::pixels);
       REQUIRE(yaml_parser_m.measurements_sigma() == 0.1f);
       REQUIRE(yaml_parser_m.skymodel() == "");
-      REQUIRE(yaml_parser_m.signal_to_noise() == 30);
+      REQUIRE(yaml_parser_m.signal_to_noise() == 0);
     }
   SECTION("Check the GeneralConfiguration simulation input variables")
     {
       std::string file_path_s = purify::notinstalled::data_filename("config/test_simulation_config.yaml");
       YamlParser yaml_parser_s = YamlParser(file_path_s);
       REQUIRE(yaml_parser_s.source() == purify::utilities::vis_source::simulation);
-      REQUIRE(yaml_parser_s.measurements_files() == std::vector<std::string>());
-      REQUIRE(yaml_parser_s.measurements_polarization() == "");
+      REQUIRE(yaml_parser_s.measurements() == std::vector<std::string>());
+      REQUIRE(yaml_parser_s.measurements_polarization() == stokes::I);
       REQUIRE(yaml_parser_s.measurements_units() == purify::utilities::vis_units::radians);
-      REQUIRE(yaml_parser_s.measurements_sigma() == 1);
+      REQUIRE(yaml_parser_s.measurements_sigma() == 0);
       REQUIRE(yaml_parser_s.skymodel() == "/path/to/sky/image");
       REQUIRE(yaml_parser_s.signal_to_noise() == 10);
    }
@@ -48,7 +49,6 @@ TEST_CASE("Yaml parser and setting variables test")
   SECTION("Check the MeasureOperators node variables")
     {
       REQUIRE(yaml_parser.Jweights() == "kb");
-      REQUIRE(yaml_parser.wProjection() == false);
       REQUIRE(yaml_parser.oversampling() == 2);
       REQUIRE(yaml_parser.powMethod_iter() == 100);
       REQUIRE(yaml_parser.powMethod_tolerance() == float(1e-4));
@@ -58,8 +58,6 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser.y() == 1024);
       REQUIRE(yaml_parser.Jx() == 4);
       REQUIRE(yaml_parser.Jy() == 4);
-      REQUIRE(yaml_parser.chirp_fraction() == 1);
-      REQUIRE(yaml_parser.kernel_fraction() == 1);
     }
   SECTION("Check the SARA node variables")
     {
@@ -73,7 +71,7 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser.epsilonConvergenceScaling() == 1);
       REQUIRE(yaml_parser.realValueConstraint() == true);
       REQUIRE(yaml_parser.positiveValueConstraint() == true);
-      REQUIRE(yaml_parser.mpiAlgorithm() == "fully-distributed");
+      REQUIRE(yaml_parser.mpiAlgorithm() == factory::algo_distribution::mpi_distributed);
       REQUIRE(yaml_parser.relVarianceConvergence() == 1e-3);
       REQUIRE(yaml_parser.param1() == "none");
       REQUIRE(yaml_parser.param2() == "none");
@@ -90,14 +88,13 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser_check.gamma() == yaml_parser_m.gamma());
       REQUIRE(yaml_parser_check.output_path() == yaml_parser_m.output_path());
       REQUIRE(yaml_parser_check.source() == yaml_parser_m.source());
-      REQUIRE(yaml_parser_check.measurements_files() == yaml_parser_m.measurements_files());
+      REQUIRE(yaml_parser_check.measurements() == yaml_parser_m.measurements());
       REQUIRE(yaml_parser_check.measurements_polarization() == yaml_parser_m.measurements_polarization());
       REQUIRE(yaml_parser_check.measurements_units() == yaml_parser_m.measurements_units());
       REQUIRE(yaml_parser_check.measurements_sigma() == yaml_parser_m.measurements_sigma());
       REQUIRE(yaml_parser_check.skymodel() == yaml_parser_m.skymodel());
       REQUIRE(yaml_parser_check.signal_to_noise() == yaml_parser_m.signal_to_noise());
       REQUIRE(yaml_parser_check.Jweights() == yaml_parser_m.Jweights());
-      REQUIRE(yaml_parser_check.wProjection() == yaml_parser_m.wProjection());
       REQUIRE(yaml_parser_check.oversampling() == yaml_parser_m.oversampling());
       REQUIRE(yaml_parser_check.powMethod_iter() == yaml_parser_m.powMethod_iter());
       REQUIRE(yaml_parser_check.powMethod_tolerance() == yaml_parser_m.powMethod_tolerance());
@@ -107,8 +104,6 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser_check.y() == yaml_parser_m.y());
       REQUIRE(yaml_parser_check.Jx() == yaml_parser_m.Jx());
       REQUIRE(yaml_parser_check.Jy() == yaml_parser_m.Jy());
-      REQUIRE(yaml_parser_check.chirp_fraction() == yaml_parser_m.chirp_fraction());
-      REQUIRE(yaml_parser_check.kernel_fraction() == yaml_parser_m.kernel_fraction());
       REQUIRE(yaml_parser.wavelet_basis() == yaml_parser_m.wavelet_basis());
       REQUIRE(yaml_parser.wavelet_levels() == yaml_parser_m.wavelet_levels());
       REQUIRE(yaml_parser.algorithm() == yaml_parser_m.algorithm());

@@ -110,6 +110,9 @@ void YamlParser::parseAndSetSARA (const YAML::Node& SARANode)
 
 void YamlParser::parseAndSetAlgorithmOptions (const YAML::Node& algorithmOptionsNode)
 {
+  this->algorithm_ = algorithmOptionsNode["algorithm"].as<std::string>();
+  if (this->algorithm_ != "padmm")
+    throw std::runtime_error("Only padmm algorithm configured for now. Please fill the appropriate block in the configuration file.");
   this->epsilonConvergenceScaling_ = algorithmOptionsNode["padmm"]["epsilonConvergenceScaling"].as<int>();
   this->realValueConstraint_ = algorithmOptionsNode["padmm"]["realValueConstraint"].as<bool>();
   this->positiveValueConstraint_ = algorithmOptionsNode["padmm"]["positiveValueConstraint"].as<bool>();
