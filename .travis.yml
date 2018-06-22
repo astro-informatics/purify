@@ -1,42 +1,91 @@
-language: python
+language: cpp
+sudo: required
+dist: trusty
+
+env:
+  global:
+    - BUILD_CMD='make VERBOSE=1'
+    - TEST_CMD='ctest -T test --output-on-failure -V'
+    - OMP_NUM_THREADS=4
+    - MPI_CONFIG='CMAKE_CMD_EXTRA="-DMPIEXEC:FILEPATH=$(which mpirun) -DMPIEXEC_MAX_NUMPROCS=${MPI_PROCS}"'
 
 # The apt packages below are needed but can no longer be installed with
 # sudo apt-get.
 addons:
   apt:
-    packages:
-      - cmake # 2.8.12
-      - g++ # 4.8.2
-      - libfftw3-dev # version 3.3.3
-      - mpi-default-dev # version 4.8.4
+    sources: &basic_sources
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-trusty-5.0
+    packages: &native_deps
+      - g++-7
+      - clang-5.0
       - libtiff5-dev # version 5 ?
-      - libboost-all-dev # version 1.54
-      - libeigen3-dev # version 3.2.0
-      - llvm # version 3.4
-      - libcfitsio3-dev # version 3.34
-      - libccfits-dev # version 2.4
-      - libyaml-cpp-dev # version 0.5.1
-
-# libtiff is version 5 in Trusty
+      - libgomp1 # version 4.8.4-2
 
 matrix:
-  # Don't wait for allowed failures - do we really need this? TODO
   fast_finish: true
 
   include:
     - os: osx
-      language: generic
-      
+      osx_image: xcode8
+      env:
+        - TITLE="Who knows - GCC"
+        - MPI=OFF
+        - openMP=OFF
+        - DOCS=OFF
+
+    # - os: osx
+    #   osx_image: xcode8
+    #   env:
+    #     - TITLE="Who knows - GCC - OMP"
+    #     - MPI=OFF
+    #     - openMP=ON
+    #     - DOCS=OFF
+
+    # - os: osx
+    #   osx_image: xcode8
+    #   env:
+    #     - TITLE="Who knows - GCC - MPI"
+    #     - MPI=ON
+    #     - openMP=ON
+    #     - DOCS=OFF
+    #     - MPI_PROCS=2
+
+    # - os: osx
+    #   osx_image: xcode8
+    #   env:
+    #     - TITLE="Who knows - Clang"
+    #     - MPI=OFF
+    #     - openMP=OFF
+    #     - DOCS=OFF
+
     - os: linux
-      dist: trusty
-      sudo: required
-      language: generic
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+            - &all_deps [ libfftw3-dev, libboost-all-dev, libeigen3-dev, libcfitsio3-dev, libyaml-cpp-dev ]
+            # libfftw3 version 3.3.3; libboost-all-dev version 1.54; libeigen3-dev version 3.2.0
+            # libcfitsio3-dev version 3.34; libyaml-cpp-dev version 0.5.1
+      env:
+        - TITLE="All dependencies - GCC"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - MPI=OFF
+        - openMP=OFF
+        - DOCS=OFF
 
 before_install:
-  # Install stuff specifically for MacOS
-  #- if [ $TRAVIS_OS_NAME = osx ]; then brew update; rm '/usr/local/include/c++'; brew install gcc; fi
-  - if [ $TRAVIS_OS_NAME = linux ]; then sudo add-apt-repository -y ppa:george-edison55/cmake-3.x; sudo apt-get update; sudo apt-get install cmake; fi
-  - if [ $TRAVIS_OS_NAME = linux ]; then sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y; sudo apt-get update; sudo apt-get install gcc-snapshot -y; sudo apt-get update; sudo apt-get install gcc-7 g++-7 -y; sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 --slave /usr/bin/g++ g++ /usr/bin/g++-7; fi
+  - if [ $TRAVIS_OS_NAME = osx ]; then brew update; brew install gcc@7 open-mpi; fi
+  - if [ $TRAVIS_OS_NAME = linux ]; then ClangVer="-5.0"; fi
+  - if [[ ${TITLE} = *GCC* ]]; then CC=gcc-7; else CC=clang${ClangVer}; fi
+  - if [[ ${TITLE} = *GCC* ]]; then CXX=g++-7; else CXX=clang++${ClangVer}; fi
+  # As MPI is not installed already, this variable is not set properly; this
+  # way is set up for all the jobs in the same manner.
+  - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; fi
+  - echo "==================== ${TITLE} ====================="
 
 install:
 
@@ -46,9 +95,18 @@ script:
   - pwd
   - mkdir build
   - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Release
-  - make -j
-  - ctest --output-on-failure
+  - |
+    cmake .. -DCMAKE_BUILD_TYPE=Release \
+    -Ddompi=${MPI} \
+    -Dexamples=OFF \
+    -Dopenmp=${openMP} \
+    -Ddocs=${DOCS} \
+    -Dbenchmarks=${Benchmarks-OFF} \
+    -DSopt_GIT_REPOSITORY=https://github.com/astro-informatics/sopt.git \
+    -DSopt_GIT_TAG=development \
+    ${CMAKE_CMD_EXTRA}
+  - eval $BUILD_CMD
+  - eval $TEST_CMD
 
 after_success:
 
