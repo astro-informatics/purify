@@ -90,8 +90,7 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
   // create measurement operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
     factory::measurement_operator_factory<Vector<t_complex>>(
-							     mop_algo,
-							     uv_data, params.y(), params.x(), params.Dy(), params.Dx(),
+							     mop_algo, uv_data, params.y(), params.x(), params.Dy(), params.Dx(),
 							     params.oversampling(), params.powMethod_iter(), params.powMethod_tolerance(),
 							     kernels::kernel_from_string.at(params.Jweights()), params.Jy(), params.Jx());
   // create wavelet operator
