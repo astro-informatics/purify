@@ -208,9 +208,9 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
 #else
   throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
-  pfitsio::write2d(image, residuals_header, true);
+  pfitsio::write2d(residual_image, residuals_header, true);
 } else {
-  pfitsio::write2d(image, residuals_header, true);
+  pfitsio::write2d(residual_image, residuals_header, true);
 }
 
   return 0;
