@@ -12,6 +12,7 @@
 #include "purify/measurement_operator_factory.h"
 #include "purify/wavelet_operator_factory.h"
 #include "purify/algorithm_factory.h"
+#include "purify/update_factory.h"
 #include "purify/pfitsio.h"
 #include "purify/types.h"
 using namespace purify;
@@ -32,6 +33,7 @@ int main(int argc, const char **argv) {
 
   factory::distributed_measurement_operator mop_algo = factory::distributed_measurement_operator::serial;
   factory::distributed_wavelet_operator wop_algo = factory::distributed_wavelet_operator::serial;
+  bool using_mpi = false;
 
 if (params.mpiAlgorithm() != factory::algo_distribution::serial)
 {
@@ -43,6 +45,7 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
 #endif
   mop_algo = factory::distributed_measurement_operator::mpi_distribute_image;
   wop_algo = factory::distributed_wavelet_operator::mpi_sara;
+  using_mpi = true;
 }
 
   sopt::logging::set_level(params.logging());
@@ -109,7 +112,21 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
   // Save some things before applying the algorithm
   // the config yaml file - this also generates the output directory and the timestamp
   params.writeOutput();
-  std::string out_dir = params.output_path()+"/output_"+params.timestamp();
+  const std::string out_dir = params.output_path()+"/output_"+params.timestamp();
+  // Creating header for saving output images during iterations
+  const pfitsio::header_params update_header_sol = pfitsio::header_params(out_dir + "/sol_update.fits", "Jy/Pixel", 
+      1, uv_data.ra, uv_data.dec , params.measurements_polarization(),
+      params.Dx(), params.Dy(), uv_data.average_frequency, 
+      0, 0, false, 0, 0, 0);
+  const pfitsio::header_params update_header_res = pfitsio::header_params(out_dir + "/res_update.fits", "Jy/Pixel", 
+      1, uv_data.ra, uv_data.dec , params.measurements_polarization(),
+      params.Dx(), params.Dy(), uv_data.average_frequency, 
+      0, 0, false, 0, 0, 0);
+
+  const std::weak_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> algo_weak(algo);
+  // Adding step size update to algorithm
+  factory::add_updater<t_complex, sopt::algorithm::ImagingProximalADMM<t_complex>>(algo_weak, 1e-3, 1e-1, 0, update_header_sol, update_header_res,
+          params.y(), params.x(), using_mpi);
   // the input measurements, if simulated
   if (params.source()==purify::utilities::vis_source::simulation)
     utilities::write_visibility(uv_data, out_dir+"/input.vis");
