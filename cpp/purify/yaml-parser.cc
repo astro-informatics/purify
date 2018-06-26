@@ -26,6 +26,15 @@ YamlParser::YamlParser (const std::string& filepath)
   // Run a batch of methods to parse the YAML and set the
   // class members accordingly
   this->setParserVariablesFromYaml();
+  //Setting time stamp
+  // Get timestamp string
+  std::time_t t = std::time(0);   // get time now
+  std::tm* now = std::localtime(&t);
+  // Make the datetime human readable
+  std::string datetime = std::to_string(now->tm_year + 1900) + '-' + std::to_string(now->tm_mon + 1) + '-' + std::to_string(now->tm_mday);
+  datetime = datetime + '-' + std::to_string(now->tm_hour) + ':' + std::to_string(now->tm_min) + ':' + std::to_string(now->tm_sec);
+
+  this->timestamp_ = datetime;
 }
 
 void YamlParser::readFile ()
@@ -161,6 +170,7 @@ std::vector<std::string> YamlParser::getWavelets(const std::string &values_str)
 
 void YamlParser::writeOutput()
 {
+
   // Get base file name (without path or extension)
   std::size_t file_begin = filepath_.find_last_of("/");
   if (file_begin==std::string::npos) file_begin=0;
@@ -168,19 +178,9 @@ void YamlParser::writeOutput()
   std::string extension = ".yaml";
   std::string base_file_name = this->filepath_.erase(this->filepath_.size()-extension.size());
   base_file_name = base_file_name.substr((file_path.size() ? file_path.size()+1 : 0), base_file_name.size());
-
-  // Get timestamp string
-  std::time_t t = std::time(0);   // get time now
-  std::tm* now = std::localtime(&t);
-  // Make the datetime human readable
-  std::string datetime = std::to_string(now->tm_year + 1900) + '-' + std::to_string(now->tm_mon + 1) + '-' + std::to_string(now->tm_mday);
-  datetime = datetime + '-' + std::to_string(now->tm_hour) + ':' + std::to_string(now->tm_min) + ':' + std::to_string(now->tm_sec);
-
-  this->timestamp_ = datetime;
-
   // Construct output directory structure and file name
   boost::filesystem::path const path(this->output_path_);
-  auto const out_path = path / ("output_"+datetime);
+  auto const out_path = path / ("output_" + std::string(this->timestamp()));
   boost::filesystem::create_directories(out_path);
   std::string out_filename = (out_path / base_file_name).native() + "_save.yaml";
 
