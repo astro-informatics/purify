@@ -100,8 +100,7 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
     factory::wavelet_operator_factory<Vector<t_complex>>(wop_algo, sara, params.y(), params.x());
 
   // Create algorithm
-  PURIFY_HIGH_LOG("Starting sopt!");
-  auto const padmm =
+  auto algo =
     factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
 										factory::algorithm::padmm, params.mpiAlgorithm(),
 										measurements_transform, wavelets_transform, uv_data, sigma,
@@ -155,8 +154,9 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
   pfitsio::write2d(psf_image/psf_image.maxCoeff(), psf_header, true);
 }
 
+  PURIFY_HIGH_LOG("Starting sopt!");
   // Apply algorithm
-  auto const diagnostic = (*padmm)();
+  auto const diagnostic = (*algo)();
 
   // Save the rest of the output
   // the clean image
