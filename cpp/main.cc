@@ -125,7 +125,7 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
 
   const std::weak_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> algo_weak(algo);
   // Adding step size update to algorithm
-  factory::add_updater<t_complex, sopt::algorithm::ImagingProximalADMM<t_complex>>(algo_weak, 1e-3, 1e-1, 0, update_header_sol, update_header_res,
+  factory::add_updater<t_complex, sopt::algorithm::ImagingProximalADMM<t_complex>>(algo_weak, 1e-3, 0, 0, update_header_sol, update_header_res,
           params.y(), params.x(), using_mpi);
   // the input measurements, if simulated
   if (params.source()==purify::utilities::vis_source::simulation)
