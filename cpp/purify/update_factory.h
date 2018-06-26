@@ -84,8 +84,7 @@ namespace purify {
             const t_real new_gamma = alpha.real().cwiseAbs().maxCoeff()* step_size_scale;
             PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
             // updating parameter
-  //          algo->gamma(((std::abs(algo->gamma() - new_gamma) > update_tol) and *iter < update_iters) ? new_gamma :
-  //              algo->gamma());
+            algo->gamma(((std::abs(algo->gamma() - new_gamma) > update_tol) and *iter < update_iters) ? new_gamma :  algo->gamma());
 
             Vector<t_complex> const residual = algo->Phi().adjoint() * res;
 #ifdef PURIFY_CImg
