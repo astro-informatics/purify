@@ -19,7 +19,7 @@ option(docimg         "Enable CImg"                                     off)
 option(docasa         "Enable CASA"                                     off)
 option(docs           "Build documentation"                             off)
 
-set(CMAKE_BUILD_TYPE=Release)
+set(CMAKE_BUILD_TYPE "Release")
 
 # Set version and build id of this package
 include(version)
