@@ -36,9 +36,8 @@ if(TARGET casacore::ms)
 endif()
 
 if(PURIFY_MPI)
-  list(APPEND HEADERS mpi_utilities.h distribute.h wavelet_operator_factory.h
-                      measurement_operator_factory.h operators.h convergence_factory.h)
-  list(APPEND SOURCES mpi_utilities.cc distribute.cc operators.cc )
+  list(APPEND HEADERS mpi_utilities.h distribute.h)
+  list(APPEND SOURCES mpi_utilities.cc distribute.cc)
 endif()
 
 add_library(libpurify SHARED ${SOURCES})
