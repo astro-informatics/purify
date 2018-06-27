@@ -24,5 +24,5 @@ ExternalProject_Add(
   LOG_DOWNLOAD ON
   )
 
-add_recursive_cmake_step(Lookup-Yamlcpp DEPENDEES install)
+add_recursive_cmake_step(Lookup-CImg DEPENDEES install)
 
