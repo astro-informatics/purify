@@ -19,7 +19,11 @@ option(docimg         "Enable CImg"                                     off)
 option(docasa         "Enable CASA"                                     off)
 option(docs           "Build documentation"                             off)
 
-set(CMAKE_BUILD_TYPE "Release")
+if(NOT CMAKE_BUILD_TYPE)
+  message(STATUS "Setting build type to 'Relese' as none was specified.")
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build Type" FORCE)
+endif()
+message(STATUS "Building purify in ${CMAKE_BUILD_TYPE} mode")
 
 # Set version and build id of this package
 include(version)
