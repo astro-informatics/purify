@@ -106,7 +106,9 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
     factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
 										factory::algorithm::padmm, params.mpiAlgorithm(),
 										measurements_transform, wavelets_transform, uv_data, sigma,
-										params.y(), params.x(), sara.size(), params.iterations());
+										params.y(), params.x(), sara.size(), params.iterations(), 
+                    params.realValueConstraint(), params.positiveValueConstraint(), 
+                    (sara.size() < 2), params.relVarianceConvergence(), 50);
 
   // Save some things before applying the algorithm
   // the config yaml file - this also generates the output directory and the timestamp
