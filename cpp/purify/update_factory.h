@@ -94,7 +94,7 @@ namespace purify {
             const auto img2 = cimg::make_image(residual.real().eval(), imsizey, imsizex)
               .get_normalize(0, 1)
               .get_resize(512, 512);
-            const auto results = CImageList<t_real>(img1, img2);
+            const auto results = CImageList<t_real>(img1.get_equalize(256, 0.05, 1.), img2.get_equalize(256, 0.1, 1.));
             canvas->display(results);
             canvas->resize(true);
 #endif
