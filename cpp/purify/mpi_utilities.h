@@ -33,12 +33,6 @@ distribute_params(utilities::vis_params const &params, sopt::mpi::Communicator c
 utilities::vis_params set_cell_size(const sopt::mpi::Communicator &comm,
                                     utilities::vis_params const &uv_vis, const t_real &cell_x,
                                     const t_real &cell_y);
-#else
-void regroup(utilities::vis_params &, std::vector<t_int> const &) {}
-vis_params scatter_visibilities(vis_params const &params, std::vector<t_int> const &,
-                                sopt::Communicator const &) {
-  return params;
-}
 #endif
 //! \brief Calculate step size using MPI (does not include factor of 1e-3)
 //! \param[in] vis: Vector of measurement data
