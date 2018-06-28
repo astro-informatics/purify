@@ -15,6 +15,8 @@
 #include <yaml-cpp/yaml.h>
 #include "yaml-parser.h"
 #include <assert.h>
+#include <unistd.h>
+
 
 YamlParser::YamlParser (const std::string& filepath)
   : filepath_(filepath)
@@ -28,10 +30,44 @@ YamlParser::YamlParser (const std::string& filepath)
 
 void YamlParser::readFile ()
 {
-  YAML::Node config = YAML::LoadFile(this->filepath_);
-  // A bit of defensive programming
-  assert(config.Type() == YAML::NodeType::Map);
-  this->config_file = config;
+  try
+    {
+      YAML::Node config = YAML::LoadFile(this->filepath_);
+      // A bit of defensive programming
+      assert(config.Type() == YAML::NodeType::Map);
+      this->config_file = config;
+    }
+  catch(YAML::BadFile& exception)
+    {
+      char cwd[1024];
+      getcwd(cwd, sizeof(cwd));
+      std::cerr << "The input file path " << this->filepath_ << " could not be found from " << cwd << std::endl;
+      throw (std::runtime_error("Runtime error while trying to find config.yaml"));
+    }
+}
+
+template <typename T>
+T get(const YAML::Node& node_map, const std::initializer_list<const char*> indicies)
+{
+  YAML::Node node = YAML::Clone (node_map);
+  std::string faulty_variable;
+  for (const char* index : indicies)
+    {
+      faulty_variable = std::string(index);	  
+      node = node[index];
+      if (!node.IsDefined())
+	{
+	  throw std::runtime_error("The initialisation of " + faulty_variable + " is wrong.");
+	}
+    }
+  try
+    {
+      return node.as<T>();
+    }
+  catch (std::exception e)
+    {
+      throw std::runtime_error("There is a mismatch in the type conversion of " + faulty_variable);
+    }
 }
 
 void YamlParser::setParserVariablesFromYaml ()
@@ -44,56 +80,57 @@ void YamlParser::setParserVariablesFromYaml ()
 }
 
 void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfigNode)
-{  
-  this->logging_ = generalConfigNode["logging"].as<std::string>();
-  this->iterations_ = generalConfigNode["iterations"].as<int>();
-  this->epsilonScaling_ = generalConfigNode["epsilonScaling"].as<int>();
-  this->gamma_ = generalConfigNode["gamma"].as<std::string>();
-  this->output_prefix_ = generalConfigNode["InputOutput"]["output_prefix"].as<std::string>();
-  this->skymodel_ = generalConfigNode["InputOutput"]["skymodel"].as<std::string>();
+{
+  this->logging_ = get<std::string>(generalConfigNode, {"logging"});
+  this->iterations_ = get<int>(generalConfigNode, {"iterations"});
+  this->epsilonScaling_ = get<int>(generalConfigNode, {"epsilonScaling"});
+  this->gamma_ = get<std::string>(generalConfigNode, {"gamma"});
+  this->output_prefix_ = get<std::string>(generalConfigNode, {"InputOutput", "output_prefix"});
+  this->skymodel_ = get<std::string>(generalConfigNode,{"InputOutput", "skymodel"});
   YAML::Node measurement_seq = generalConfigNode["InputOutput"]["input"]["measurements"];
   for (int i=0; i < measurement_seq.size(); i++)
-      this->measurements_.push_back(measurement_seq[i].as<std::string>());
+    this->measurements_.push_back(measurement_seq[i].as<std::string>());
 
-  this->polarization_measurement_ = generalConfigNode["InputOutput"]["input"]["polarization_measurement"].as<std::string>();
-  this->noise_estimate_ = generalConfigNode["InputOutput"]["input"]["noise_estimate"].as<std::string>();
-  this->polarization_noise_ = generalConfigNode["InputOutput"]["input"]["polarization_noise"].as<std::string>();
+  this->polarization_measurement_ = get<std::string>(generalConfigNode,{"InputOutput", "input", "polarization_measurement"});
+  this->noise_estimate_ = get<std::string>(generalConfigNode, {"InputOutput", "input", "noise_estimate"});
+  this->polarization_noise_ = get<std::string>(generalConfigNode, {"InputOutput", "input", "polarization_noise"});
+  
 }
 
 void YamlParser::parseAndSetMeasureOperators (const YAML::Node& measureOperatorsNode)
 {
-  this->Jweights_ = measureOperatorsNode["Jweights"].as<std::string>();
-  this->wProjection_ = measureOperatorsNode["wProjection"].as<bool>();
-  this->oversampling_ = measureOperatorsNode["oversampling"].as<float>();
-  this->powMethod_iter_ = measureOperatorsNode["powMethod_iter"].as<int>();
-  this->powMethod_tolerance_ = measureOperatorsNode["powMethod_tolerance"].as<float>();
-  this->Dx_ = measureOperatorsNode["pixelSize"]["Dx"].as<double>();
-  this->Dy_ = measureOperatorsNode["pixelSize"]["Dy"].as<double>();
-  this->x_ = measureOperatorsNode["imageSize"]["x"].as<int>();
-  this->y_ = measureOperatorsNode["imageSize"]["y"].as<int>();
-  this->Jx_ = measureOperatorsNode["J"]["Jx"].as<unsigned int>();
-  this->Jy_ = measureOperatorsNode["J"]["Jy"].as<unsigned int>();
-  this->chirp_fraction_ = measureOperatorsNode["wProjection_options"]["chirp_fraction"].as<float>();
-  this->kernel_fraction_ = measureOperatorsNode["wProjection_options"]["kernel_fraction"].as<float>();
+  this->Jweights_ = get<std::string>(measureOperatorsNode, {"Jweights"});
+  this->wProjection_ = get<bool>(measureOperatorsNode, {"wProjection"});
+  this->oversampling_ = get<float>(measureOperatorsNode, {"oversampling"});
+  this->powMethod_iter_ = get<int>(measureOperatorsNode, {"powMethod_iter"});
+  this->powMethod_tolerance_ =get<float>(measureOperatorsNode, {"powMethod_tolerance"});
+  this->Dx_ = get<double>(measureOperatorsNode, {"pixelSize", "Dx"});
+  this->Dy_ = get<double>(measureOperatorsNode, {"pixelSize", "Dy"});
+  this->x_ = get<int>(measureOperatorsNode, {"imageSize", "x"});
+  this->y_ = get<int>(measureOperatorsNode, {"imageSize", "y"});
+  this->Jx_ = get<unsigned int>(measureOperatorsNode, {"J", "Jx"});
+  this->Jy_ = get<unsigned int>(measureOperatorsNode, {"J", "Jy"});
+  this->chirp_fraction_ = get<float>(measureOperatorsNode, {"wProjection_options", "chirp_fraction"});
+  this->kernel_fraction_ = get<float>(measureOperatorsNode, {"wProjection_options", "kernel_fraction"});
 }
 
 void YamlParser::parseAndSetSARA (const YAML::Node& SARANode)
 {
   std::string values_str = SARANode["wavelet_dict"].as<std::string>();
   this->wavelet_basis_ = this->getWavelets(values_str);
-  this->wavelet_levels_ = SARANode["wavelet_levels"].as<int>();
-  this->algorithm_ = SARANode["algorithm"].as<std::string>();
+  this->wavelet_levels_ = get<int>(SARANode, {"wavelet_levels"});
+  this->algorithm_ = get<std::string>(SARANode, {"algorithm"});
 }
 
 void YamlParser::parseAndSetAlgorithmOptions (const YAML::Node& algorithmOptionsNode)
 {
-  this->epsilonConvergenceScaling_ = algorithmOptionsNode["padmm"]["epsilonConvergenceScaling"].as<int>();
-  this->realValueConstraint_ = algorithmOptionsNode["padmm"]["realValueConstraint"].as<bool>();
-  this->positiveValueConstraint_ = algorithmOptionsNode["padmm"]["positiveValueConstraint"].as<bool>();
-  this->mpiAlgorithm_ = algorithmOptionsNode["padmm"]["mpiAlgorithm"].as<std::string>();
-  this->relVarianceConvergence_ = algorithmOptionsNode["padmm"]["relVarianceConvergence"].as<double>();  
-  this->param1_ = algorithmOptionsNode["pd"]["param1"].as<std::string>();
-  this->param2_ = algorithmOptionsNode["pd"]["param2"].as<std::string>();
+  this->epsilonConvergenceScaling_ = get<int>(algorithmOptionsNode, {"padmm", "epsilonConvergenceScaling"});
+  this->realValueConstraint_ = get<bool>(algorithmOptionsNode, {"padmm", "realValueConstraint"});
+  this->positiveValueConstraint_ = get<bool>(algorithmOptionsNode, {"padmm", "positiveValueConstraint"});
+  this->mpiAlgorithm_ = get<std::string>(algorithmOptionsNode, {"padmm", "mpiAlgorithm"});
+  this->relVarianceConvergence_ = get<double>(algorithmOptionsNode, {"padmm", "relVarianceConvergence"});  
+  this->param1_ = get<std::string>(algorithmOptionsNode, {"pd", "param1"});
+  this->param2_ = get<std::string>(algorithmOptionsNode, {"pd", "param2"});
 }
 
 std::vector<int> YamlParser::getWavelets(std::string values_str)
@@ -131,9 +168,9 @@ std::vector<int> YamlParser::getWavelets(std::string values_str)
   return wavelets;
 }
 
-void YamlParser::writeOutput()
+void YamlParser::writeOutput(const std::string& folder_path)
 {
-  std::string file_path = "../data/config";
+  std::string file_path = folder_path + "/config";
   std::string extension = ".yaml";
   
   std::string base_file_name = this->filepath_.erase(this->filepath_.size()-extension.size());

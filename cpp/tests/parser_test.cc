@@ -9,7 +9,7 @@
 
 TEST_CASE("Yaml parser and setting variables test")
 {
-  std::string file_path = "../data/config/config.yaml";
+  std::string file_path = "../../../data/config/config.yaml";
   YamlParser yaml_parser = YamlParser(file_path);
   SECTION("Check the GeneralConfiguration node variables")
     {
@@ -61,7 +61,8 @@ TEST_CASE("Yaml parser and setting variables test")
     }
   SECTION("Check the writeOutput method")
     {
-      yaml_parser.writeOutput();
+      std::string folder_path = "../../../data";
+      yaml_parser.writeOutput(folder_path);
       std::string file_path_save = "config_" + yaml_parser.timestamp() + "_save.yaml";
       YamlParser yaml_parser_check(file_path_save);
       REQUIRE(yaml_parser_check.filepath() == file_path_save);
