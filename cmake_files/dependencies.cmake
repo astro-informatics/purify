@@ -56,13 +56,7 @@ endif()
 find_package(TIFF REQUIRED)
 
 
-if(data AND tests)
-  lookup_package(Boost REQUIRED COMPONENTS filesystem)
-elseif(examples AND dompi)
-  lookup_package(Boost REQUIRED COMPONENTS filesystem)
-else()
-  lookup_package(Boost REQUIRED)
-endif()
+lookup_package(Boost REQUIRED COMPONENTS filesystem)
 
 lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS URL "http://bitbucket.org/eigen/eigen/get/3.2.tar.gz" MD5 "035ccc791f046f48e90bb1fb42ce227e")
 
