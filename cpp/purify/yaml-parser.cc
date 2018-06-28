@@ -14,7 +14,7 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 #include <boost/filesystem.hpp>
-#include "yaml-parser.h"
+#include "purify/yaml-parser.h"
 #include <assert.h>
 
 namespace purify {
