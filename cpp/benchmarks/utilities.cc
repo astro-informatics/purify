@@ -30,14 +30,6 @@ double duration(std::chrono::high_resolution_clock::time_point start,
   return elapsed_seconds.count();
 }
 
-double duration(std::chrono::high_resolution_clock::time_point start,
-                std::chrono::high_resolution_clock::time_point end,
-                sopt::mpi::Communicator const &comm) {
-  auto elapsed_seconds = duration(start, end);
-  // Now get the max time across all procs: the slowest processor is the one that is
-  // holding back the others in the benchmark.
-  return comm.all_reduce(elapsed_seconds, MPI_MAX);
-}
 
 bool updateImage(t_uint newSize, Image<t_complex> &image, t_uint &sizex, t_uint &sizey) {
   if(sizex == newSize) {
@@ -86,6 +78,63 @@ bool updateMeasurements(t_uint newSize, utilities::vis_params &data, t_real &eps
   return true;
 }
 
+
+std::tuple<utilities::vis_params, t_real>
+dirty_measurements(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
+                   const t_real &cellsize) {
+  auto uv_data = random_measurements(number_of_vis);
+  // creating operator to generate measurements
+  auto measurement_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      uv_data, ground_truth_image.rows(), ground_truth_image.cols(), cellsize, cellsize, 2, 0, 1e-4,
+      kernels::kernel::kb, 8, 8, false);
+  // Generates measurements from image
+  uv_data.vis = (*measurement_op)
+                * Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);
+
+  // working out value of signal given SNR
+  auto const sigma = utilities::SNR_to_standard_deviation(uv_data.vis, snr);
+  // adding noise to visibilities
+  uv_data.vis = utilities::add_noise(uv_data.vis, 0., sigma);
+  return std::make_tuple(uv_data, sigma);
+}
+
+
+utilities::vis_params random_measurements(t_int size) {
+  std::stringstream filename;
+  filename << "random_" << size << ".vis";
+  std::string const vis_file = visibility_filename(filename.str());
+  std::ifstream vis_file_str(vis_file);
+
+  utilities::vis_params uv_data;
+  if(vis_file_str.good()) {
+    uv_data = utilities::read_visibility(vis_file, false);
+    uv_data.units = utilities::vis_units::radians;
+  } else {
+    t_real const sigma_m = constant::pi / 3;
+    const t_real max_w = 100.; // lambda
+    uv_data = utilities::random_sample_density(size, 0, sigma_m, max_w);
+    uv_data.units = utilities::vis_units::radians;
+    utilities::write_visibility(uv_data, vis_file);
+  }
+  return uv_data;
+}
+
+#ifdef PURIFY_MPI
+utilities::vis_params random_measurements(t_int size, sopt::mpi::Communicator const &comm) {
+  if(comm.is_root()) {
+    // Generate random measurements
+    auto uv_data = random_measurements(size);
+    if(comm.size() == 1)
+      return uv_data;
+
+    // Distribute them
+    auto const order = distribute::distribute_measurements(uv_data, comm, distribute::plan::radial);
+    uv_data = utilities::regroup_and_scatter(uv_data, order, comm);
+    return uv_data;
+  }
+  return utilities::scatter_visibilities(comm);
+}
+
 bool updateMeasurements(t_uint newSize, utilities::vis_params &data,
                         sopt::mpi::Communicator &comm) {
   if(data.vis.size() == newSize) {
@@ -111,26 +160,14 @@ bool updateMeasurements(t_uint newSize, utilities::vis_params &data, t_real &eps
 
   return true;
 }
-
-std::tuple<utilities::vis_params, t_real>
-dirty_measurements(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
-                   const t_real &cellsize) {
-  auto uv_data = random_measurements(number_of_vis);
-  // creating operator to generate measurements
-  auto measurement_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_data, ground_truth_image.rows(), ground_truth_image.cols(), cellsize, cellsize, 2, 0, 1e-4,
-      kernels::kernel::kb, 8, 8, false);
-  // Generates measurements from image
-  uv_data.vis = (*measurement_op)
-                * Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);
-
-  // working out value of signal given SNR
-  auto const sigma = utilities::SNR_to_standard_deviation(uv_data.vis, snr);
-  // adding noise to visibilities
-  uv_data.vis = utilities::add_noise(uv_data.vis, 0., sigma);
-  return std::make_tuple(uv_data, sigma);
+double duration(std::chrono::high_resolution_clock::time_point start,
+                std::chrono::high_resolution_clock::time_point end,
+                sopt::mpi::Communicator const &comm) {
+  auto elapsed_seconds = duration(start, end);
+  // Now get the max time across all procs: the slowest processor is the one that is
+  // holding back the others in the benchmark.
+  return comm.all_reduce(elapsed_seconds, MPI_MAX);
 }
-
 std::tuple<utilities::vis_params, t_real>
 dirty_measurements(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
                    const t_real &cellsize, sopt::mpi::Communicator const &comm) {
@@ -147,40 +184,5 @@ dirty_measurements(Image<t_complex> const &ground_truth_image, t_uint number_of_
   auto const sigma = comm.broadcast<t_real>();
   return std::make_tuple(utilities::scatter_visibilities(comm), sigma);
 }
-
-utilities::vis_params random_measurements(t_int size) {
-  std::stringstream filename;
-  filename << "random_" << size << ".vis";
-  std::string const vis_file = visibility_filename(filename.str());
-  std::ifstream vis_file_str(vis_file);
-
-  utilities::vis_params uv_data;
-  if(vis_file_str.good()) {
-    uv_data = utilities::read_visibility(vis_file, false);
-    uv_data.units = utilities::vis_units::radians;
-  } else {
-    t_real const sigma_m = constant::pi / 3;
-    const t_real max_w = 100.; // lambda
-    uv_data = utilities::random_sample_density(size, 0, sigma_m, max_w);
-    uv_data.units = utilities::vis_units::radians;
-    utilities::write_visibility(uv_data, vis_file);
-  }
-  return uv_data;
-}
-
-utilities::vis_params random_measurements(t_int size, sopt::mpi::Communicator const &comm) {
-  if(comm.is_root()) {
-    // Generate random measurements
-    auto uv_data = random_measurements(size);
-    if(comm.size() == 1)
-      return uv_data;
-
-    // Distribute them
-    auto const order = distribute::distribute_measurements(uv_data, comm, distribute::plan::radial);
-    uv_data = utilities::regroup_and_scatter(uv_data, order, comm);
-    return uv_data;
-  }
-  return utilities::scatter_visibilities(comm);
-}
-
+#endif
 } // namespace b_utilities

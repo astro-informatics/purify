@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include "yaml-cpp/yaml.h"
+#include "purify/algorithm_factory.h"
 #include <assert.h>
 
 /**
@@ -21,7 +22,7 @@
 
    @param filepath path to the config file
  */
-
+namespace purify {
 class YamlParser
 {
  public:
@@ -31,7 +32,6 @@ class YamlParser
     @param filepath path to config file
   */
   YamlParser(const std::string& filepath);
-
   /** 
     Read configuration file in memory
   */
@@ -63,7 +63,7 @@ class YamlParser
   /** 
     Translate the waveket basis string into a vector
   */
-  std::vector<int> getWavelets(std::string values_str);
+  std::vector<std::string> getWavelets(const std::string &values_str);
 
   /** 
     Parse the YAML AlgorithmOptions block
@@ -75,7 +75,7 @@ class YamlParser
     Write an output YAML file for the current
     simulation parameters. 
   */
-  void writeOutput(const std::string& folderpath);
+  void writeOutput();
 
   
   // Variables
@@ -83,46 +83,50 @@ class YamlParser
   private: \
   TYPE NAME##_ =  VALUE; \
   public: \
-  const TYPE NAME(){ return NAME##_;};
+  TYPE NAME(){ return NAME##_;};
 
-  YAML_MACRO(std::string, filepath, "");
-  YAML_MACRO(std::string, timestamp, "");
-  YAML_MACRO(std::string, logging, "");
-  YAML_MACRO(std::string, algorithm, "");
-  YAML_MACRO(std::string, mpiAlgorithm, "");
-  YAML_MACRO(std::string, param1, "");
-  YAML_MACRO(std::string, param2, "");
-  YAML_MACRO(bool, realValueConstraint, true);
-  YAML_MACRO(bool, positiveValueConstraint, true);
-  YAML_MACRO(int, iterations, 0);
-  YAML_MACRO(int, powMethod_iter, 0);
-  YAML_MACRO(int, x, 0);
-  YAML_MACRO(int, y, 0);
-  YAML_MACRO(int, wavelet_levels, 0);
-  YAML_MACRO(int, epsilonConvergenceScaling, 0);
-  YAML_MACRO(unsigned int, Jx, 0);
-  YAML_MACRO(unsigned int, Jy, 0);
-  YAML_MACRO(float, oversampling, 0);
-  YAML_MACRO(float, powMethod_tolerance, 0);
-  YAML_MACRO(float, chirp_fraction, 0);
-  YAML_MACRO(float, kernel_fraction, 0);
-  YAML_MACRO(double, epsilonScaling, 0);
-  YAML_MACRO(double, Dx, 0);
-  YAML_MACRO(double, Dy, 0);
-  YAML_MACRO(double, relVarianceConvergence, 0);
-  YAML_MACRO(std::vector<int>, wavelet_basis, {0});  
-  YAML_MACRO(std::string, gamma, "");
-  YAML_MACRO(std::string, output_prefix, "");
-  YAML_MACRO(std::string, skymodel, "");
-  YAML_MACRO(std::vector<std::string>, measurements, {});
-  YAML_MACRO(std::string, polarization_measurement, "");
-  YAML_MACRO(std::string, noise_estimate, "");
-  YAML_MACRO(std::string, polarization_noise, "");
-  YAML_MACRO(std::string, Jweights, "");
-  YAML_MACRO(bool, wProjection, true);
+  YAML_MACRO(std::string, filepath, "")
+  YAML_MACRO(std::string, timestamp, "")
+  YAML_MACRO(std::string, logging, "")
+  YAML_MACRO(std::string, algorithm, "")
+  YAML_MACRO(factory::algo_distribution, mpiAlgorithm,
+      factory::algo_distribution::serial)
+  YAML_MACRO(purify::utilities::vis_source, source, purify::utilities::vis_source::measurements)
+  YAML_MACRO(bool, realValueConstraint, true)
+  YAML_MACRO(bool, positiveValueConstraint, true)
+  YAML_MACRO(int, iterations, 0)
+  YAML_MACRO(int, powMethod_iter, 0)
+  YAML_MACRO(int, x, 0)
+  YAML_MACRO(int, y, 0)
+  YAML_MACRO(int, wavelet_levels, 0)
+  YAML_MACRO(int, epsilonConvergenceScaling, 0)
+  YAML_MACRO(unsigned int, Jx, 0)
+  YAML_MACRO(unsigned int, Jy, 0)
+  YAML_MACRO(float, oversampling, 0)
+  YAML_MACRO(float, powMethod_tolerance, 0)
+  YAML_MACRO(double, epsilonScaling, 0)
+  YAML_MACRO(double, Dx, 0)
+  YAML_MACRO(double, Dy, 0)
+  YAML_MACRO(double, measurements_sigma, 1)
+  YAML_MACRO(double, signal_to_noise, 30)
+  YAML_MACRO(double, relVarianceConvergence, 0)
+  YAML_MACRO(std::vector<std::string>, wavelet_basis, {})
+  YAML_MACRO(std::string, gamma, "")
+  YAML_MACRO(std::string, output_prefix, "")
+  YAML_MACRO(std::string, skymodel, "")
+  YAML_MACRO(std::vector<std::string>, measurements, {})
+  YAML_MACRO(stokes, measurements_polarization, stokes::I)
+  YAML_MACRO(utilities::vis_units, measurements_units, utilities::vis_units::radians)
+  YAML_MACRO(std::string, noise_estimate, "")
+  YAML_MACRO(std::string, polarization_noise, "")
+  YAML_MACRO(std::string, Jweights, "")
 
 #undef YAML_MACRO
-
+  private:
   YAML::Node config_file;
-};			       
+
+template <typename T>
+T get(const YAML::Node& node_map, const std::initializer_list<const char*> indicies);
+};
+}
 #endif /* YAML_PARSER_H */

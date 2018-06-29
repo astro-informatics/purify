@@ -1,7 +1,6 @@
 #include "purify/read_measurements.h"
 
 #include "purify/uvfits.h"
-#include "purify/mpi_utilities.h"
 
 #ifdef PURIFY_CASACORE
 #include "purify/casacore.h"
@@ -9,6 +8,9 @@
 #include <iostream>
 #include <boost/filesystem.hpp>
 
+#ifdef PURIFY_MPI
+#include "purify/mpi_utilities.h"
+#endif
 namespace purify {
   namespace read_measurements {
 utilities::vis_params read_measurements(const std::string &name, const bool w_term, const stokes pol, const utilities::vis_units units) {
@@ -22,7 +24,7 @@ utilities::vis_params read_measurements(const std::vector<std::string> &names, c
   {
   const boost::filesystem::path file_path(names.at(i));
   if(not boost::filesystem::exists(file_path)){
-    PURIFY_LOW_LOG("Missing file will be removed from list: {}", names.at(i));
+    PURIFY_HIGH_LOG("Missing file will be removed from list: {}", names.at(i));
   }
   else
   {

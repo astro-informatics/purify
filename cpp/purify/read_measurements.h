@@ -6,7 +6,9 @@
 
 #include "purify/utilities.h"
 #include "purify/distribute.h"
+#ifdef PURIFY_MPI
 #include <sopt/mpi/communicator.h>
+#endif
 
 
 namespace purify {

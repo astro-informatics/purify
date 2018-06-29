@@ -6,16 +6,10 @@ GeneralConfiguration:
       # be provided, and the measurements will be read from file. If it's "simulation", only the
       # simulation block should be provided, and random measurements of the given
       # image will be generated with the requested noise.
-      source: measurements # one from measurements, simulation
-      measurements:
-        measurements_files:
-          - /path/to/measurment/set # path to the measurement set
-        measurements_polarization: I # one from I Q V XX LL
-        measurements_units: radians # one from lambda, radians, pixels
-        measurements_sigma: 1 # the noise level in the data
-      #simulation:
-      #  skymodel: /path/to/sky/image # path to the sky model image file
-      #  signal_to_noise: 30 # signal-to-noise ratio to be added to the sky model
+      source: simulation # one from measurements, simulation
+      simulation:
+        skymodel: /path/to/sky/image # path to the sky model image file
+        signal_to_noise: 10 # signal-to-noise ratio to be added to the sky model
     output_path: /path/to/output/dir # results directory will be created inside this path, and called output_<timestamp>
 
   ### Execution parameters

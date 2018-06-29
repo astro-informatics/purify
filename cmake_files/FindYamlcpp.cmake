@@ -6,3 +6,7 @@ include(FindPackageHandleStandardArgs)
 # if all listed variables are TRUE
 find_package_handle_standard_args(
   Yamlcpp  DEFAULT_MSG Yamlcpp_INCLUDE_DIR Yamlcpp_LIBRARY)
+if(NOT Yamlcpp_FOUND)
+       set(Yamlcpp_INCLUDE_DIR "")
+       set(Yamlcpp_LIBRARY "")
+endif()
