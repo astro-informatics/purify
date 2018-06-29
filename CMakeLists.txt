@@ -8,8 +8,8 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_files)
 # It contains a number of cmake recipes
 include(LookUp-GreatCMakeCookOff)
 
-option(tests          "Enable testing"                                  on)
-option(examples       "Compile examples"                                on)
+option(tests          "Enable testing"                                  off)
+option(examples       "Compile examples"                                off)
 option(benchmarks     "Enable benchmarking"                             on)
 option(openmp         "Enable OpenMP"                                   on)
 option(logging        "Enable logging"                                  on)
@@ -51,6 +51,7 @@ if(benchmarks)
 endif()
 
 add_subdirectory(cpp)
+
 
 # Exports Purify so other packages can access it
 include(export_purify)
