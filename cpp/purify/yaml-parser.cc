@@ -3,7 +3,7 @@
     @author Roland Guichard
     @version 1.0
 */
-
+#include <boost/filesystem.hpp>
 #include <typeinfo>
 #include <chrono>
 #include <ctime>
@@ -15,8 +15,6 @@
 #include <yaml-cpp/yaml.h>
 #include "yaml-parser.h"
 #include <assert.h>
-#include <unistd.h>
-
 
 YamlParser::YamlParser (const std::string& filepath)
   : filepath_(filepath)
@@ -39,10 +37,8 @@ void YamlParser::readFile ()
     }
   catch(YAML::BadFile& exception)
     {
-      char cwd[1024];
-      getcwd(cwd, sizeof(cwd));
-      std::cerr << "The input file path " << this->filepath_ << " could not be found from " << cwd << std::endl;
-      throw (std::runtime_error("Runtime error while trying to find config.yaml"));
+      const std::string current_path = boost::filesystem::current_path().native();
+      throw (std::runtime_error("Runtime error while trying to find config.yaml. The input file path " + this->filepath_ + " could not be found from " + current_path));
     }
 }
 
@@ -62,6 +58,8 @@ T get(const YAML::Node& node_map, const std::initializer_list<const char*> indic
     }
   try
     {
+      if(node.size() > 1)
+	throw std::runtime_error("The node has more than one element.");
       return node.as<T>();
     }
   catch (std::exception e)
@@ -69,6 +67,35 @@ T get(const YAML::Node& node_map, const std::initializer_list<const char*> indic
       throw std::runtime_error("There is a mismatch in the type conversion of " + faulty_variable);
     }
 }
+
+
+template <typename T>
+T get_vector(const YAML::Node& node_map, const std::initializer_list<const char*> indicies)
+{
+  YAML::Node node = YAML::Clone (node_map);
+  std::string faulty_variable;
+  for (const char* index : indicies)
+    {
+      faulty_variable = std::string(index);	  
+      node = node[index];
+      if (!node.IsDefined())
+	{
+	  throw std::runtime_error("The initialisation of " + faulty_variable + " is wrong.");
+	}
+    }
+  try
+    {
+      T output;
+      for (int i=0; i < node.size(); i++)
+	output.push_back(node[i].as<typename T::value_type>());
+      return output;
+    }
+  catch (std::exception e)
+    {
+      throw std::runtime_error("There is a mismatch in the type conversion of " + faulty_variable);
+    }
+}
+
 
 void YamlParser::setParserVariablesFromYaml ()
 {
@@ -87,9 +114,9 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
   this->gamma_ = get<std::string>(generalConfigNode, {"gamma"});
   this->output_prefix_ = get<std::string>(generalConfigNode, {"InputOutput", "output_prefix"});
   this->skymodel_ = get<std::string>(generalConfigNode,{"InputOutput", "skymodel"});
-  YAML::Node measurement_seq = generalConfigNode["InputOutput"]["input"]["measurements"];
-  for (int i=0; i < measurement_seq.size(); i++)
-    this->measurements_.push_back(measurement_seq[i].as<std::string>());
+  // YAML::Node measurement_seq = generalConfigNode["InputOutput"]["input"]["measurements"];
+  // for (int i=0; i < measurement_seq.size(); i++)
+  this->measurements_ = get_vector<std::vector<std::string>>(generalConfigNode, {"InputOutput", "input", "measurements"});
 
   this->polarization_measurement_ = get<std::string>(generalConfigNode,{"InputOutput", "input", "polarization_measurement"});
   this->noise_estimate_ = get<std::string>(generalConfigNode, {"InputOutput", "input", "noise_estimate"});
@@ -170,15 +197,9 @@ std::vector<int> YamlParser::getWavelets(std::string values_str)
 
 void YamlParser::writeOutput(const std::string& folder_path)
 {
-  std::string file_path = folder_path + "/config";
-  std::string extension = ".yaml";
-  
-  std::string base_file_name = this->filepath_.erase(this->filepath_.size()-extension.size());
-  base_file_name = base_file_name.substr(file_path.size() + 1, base_file_name.size());
-  
+
   std::time_t t = std::time(0);   // get time now
   std::tm* now = std::localtime(&t);
-
   // Make the datetime human readable
   std::string datetime = std::to_string(now->tm_year + 1900) + '-' + std::to_string(now->tm_mon + 1) + '-' + std::to_string(now->tm_mday);
   datetime = datetime + '-' + std::to_string(now->tm_hour) + ':' + std::to_string(now->tm_min) + ':' + std::to_string(now->tm_sec);
@@ -198,7 +219,7 @@ void YamlParser::writeOutput(const std::string& folder_path)
   out << YAML::EndMap;  
 
   std::ofstream output_file;
-  output_file.open(base_file_name + "_" + datetime + "_save.yaml");
+  output_file.open(folder_path + "/config_" + datetime + "_save.yaml");
   output_file << out.c_str();
   output_file.close();
 
