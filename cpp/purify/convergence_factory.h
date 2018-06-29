@@ -1,13 +1,17 @@
- #ifndef CONVERGENCE_FACTORY_H
+#ifndef CONVERGENCE_FACTORY_H
 #define CONVERGENCE_FACTORY_H
 
 #include <sopt/imaging_padmm.h>
+#ifdef PURIFY_MPI
 #include <sopt/mpi/communicator.h>
+#endif
 #include <sopt/relative_variation.h>
 
 namespace purify {
   namespace factory {
     enum class ConvergenceType {mpi_local, mpi_global};
+
+#ifdef PURIFY_MPI
 
     template <class T, class Algo>
       std::function<bool(Vector<T> const &, Vector<T> const &)>
@@ -71,7 +75,8 @@ namespace purify {
 	  throw std::runtime_error("Unknown type of distributed MPI convergence algorithm.");
         }
     }
+    #endif
   } // namespace factory
 } // namespace purify
-
 #endif
+
