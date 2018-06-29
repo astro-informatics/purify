@@ -9,8 +9,10 @@
 #include "purify/operators.h"
 #include "purify/operators_gpu.h"
 
+#ifdef PURIFY_MPI
 #include <sopt/mpi/communicator.h>
 #include <sopt/mpi/session.h>
+#endif
 
 namespace purify {
   namespace factory {

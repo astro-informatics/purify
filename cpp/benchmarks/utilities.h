@@ -4,7 +4,9 @@
 #include <chrono>
 #include "purify/utilities.h"
 #include <benchmark/benchmark.h>
+#ifdef PURIFY_MPI
 #include <sopt/mpi/communicator.h>
+#endif
 
 using namespace purify;
 
