@@ -66,9 +66,9 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
     PURIFY_HIGH_LOG("Input visibilities will be generated for random coverage.");
     // TODO: move this to function (in utilities.h?)
     auto image = pfitsio::read2d(params.skymodel());
-    if (params.y()!=image.rows() || params.x()!=image.cols())
+    if (params.height()!=image.rows() || params.width()!=image.cols())
       throw std::runtime_error("Input image size ("+std::to_string(image.cols())+"x"+std::to_string(image.rows())+
-			       ") is not equal to the input one ("+std::to_string(params.x())+"x"+std::to_string(params.y())+")."); 
+			       ") is not equal to the input one ("+std::to_string(params.width())+"x"+std::to_string(params.height())+")."); 
     t_int const number_of_pixels = image.size();
     t_int const number_of_vis = std::floor(number_of_pixels * 0.2);
     t_real const sigma_m = constant::pi / 3;
@@ -78,9 +78,9 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
     auto const sky_measurements = 
     factory::measurement_operator_factory<Vector<t_complex>>(
 							     mop_algo,
-							     uv_data, params.y(), params.x(), params.Dy(), params.Dx(),
+							     uv_data, params.height(), params.width(), params.cellsizey(), params.cellsizex(),
 							     params.oversampling(), params.powMethod_iter(), params.powMethod_tolerance(),
-							     kernels::kernel_from_string.at(params.Jweights()), 2 * params.Jy(), 2 * params.Jx());
+							     kernels::kernel_from_string.at(params.kernel()), 2 * params.Jy(), 2 * params.Jx());
     uv_data.vis = (*sky_measurements) * Image<t_complex>::Map(image.data(), image.size(), 1);
     Vector<t_complex> const y0 = uv_data.vis;
     sigma = utilities::SNR_to_standard_deviation(y0, params.signal_to_noise());
@@ -90,57 +90,58 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
   // create measurement operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
     factory::measurement_operator_factory<Vector<t_complex>>(
-							     mop_algo, uv_data, params.y(), params.x(), params.Dy(), params.Dx(),
+							     mop_algo, uv_data, params.height(), params.width(), params.cellsizey(), params.cellsizex(),
 							     params.oversampling(), params.powMethod_iter(), params.powMethod_tolerance(),
-							     kernels::kernel_from_string.at(params.Jweights()), params.Jy(), params.Jx());
+							     kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jx());
   // create wavelet operator
   std::vector<std::tuple<std::string, t_uint>> sara;
   for (size_t i=0; i<params.wavelet_basis().size(); i++)
       sara.push_back( std::make_tuple(params.wavelet_basis().at(i), params.wavelet_levels()));
 
   auto const wavelets_transform =
-    factory::wavelet_operator_factory<Vector<t_complex>>(wop_algo, sara, params.y(), params.x());
+    factory::wavelet_operator_factory<Vector<t_complex>>(wop_algo, sara, params.height(), params.width());
 
   // Create algorithm
   auto algo =
     factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
 										factory::algorithm::padmm, params.mpiAlgorithm(),
-										measurements_transform, wavelets_transform, uv_data, sigma,
-										params.y(), params.x(), sara.size(), params.iterations(), 
+										measurements_transform, wavelets_transform, uv_data, sigma * params.epsilonScaling(),
+										params.height(), params.width(), sara.size(), params.iterations(), 
                     params.realValueConstraint(), params.positiveValueConstraint(), 
                     (sara.size() < 2), params.relVarianceConvergence(), 50);
 
   // Save some things before applying the algorithm
   // the config yaml file - this also generates the output directory and the timestamp
   params.writeOutput();
-  const std::string out_dir = params.output_path()+"/output_"+params.timestamp();
+  const std::string out_dir = params.output_prefix()+"/output_"+params.timestamp();
   // Creating header for saving output images during iterations
   const pfitsio::header_params update_header_sol = pfitsio::header_params(out_dir + "/sol_update.fits", "Jy/Pixel", 
       1, uv_data.ra, uv_data.dec , params.measurements_polarization(),
-      params.Dx(), params.Dy(), uv_data.average_frequency, 
+      params.cellsizex(), params.cellsizey(), uv_data.average_frequency, 
       0, 0, false, 0, 0, 0);
   const pfitsio::header_params update_header_res = pfitsio::header_params(out_dir + "/res_update.fits", "Jy/Pixel", 
       1, uv_data.ra, uv_data.dec , params.measurements_polarization(),
-      params.Dx(), params.Dy(), uv_data.average_frequency, 
+      params.cellsizex(), params.cellsizey(), uv_data.average_frequency, 
       0, 0, false, 0, 0, 0);
-
+  //TODO: allow for other algorithm types
   const std::weak_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> algo_weak(algo);
   // Adding step size update to algorithm
-  factory::add_updater<t_complex, sopt::algorithm::ImagingProximalADMM<t_complex>>(algo_weak, 1e-3, 0, 0, update_header_sol, update_header_res,
-          params.y(), params.x(), using_mpi);
+  factory::add_updater<t_complex, sopt::algorithm::ImagingProximalADMM<t_complex>>(algo_weak, 1e-3, params.update_tolerance(),
+      params.update_iters(), update_header_sol, update_header_res,
+          params.height(), params.width(), using_mpi);
   // the input measurements, if simulated
   if (params.source()==purify::utilities::vis_source::simulation)
     utilities::write_visibility(uv_data, out_dir+"/input.vis");
   const pfitsio::header_params def_header = pfitsio::header_params("", "Jy/Pixel", 
       1, uv_data.ra, uv_data.dec , params.measurements_polarization(),
-      params.Dx(), params.Dy(), uv_data.average_frequency, 
+      params.cellsizex(), params.cellsizey(), uv_data.average_frequency, 
       0, 0, false, 0, 0, 0);
   // the dirty image
   pfitsio::header_params dirty_header = def_header;
   dirty_header.fits_name = out_dir+"/dirty.fits";
   dirty_header.pix_units = "Jy/Beam";
   const Vector<t_complex> dimage = measurements_transform->adjoint() * uv_data.vis;
-  const Image<t_real> dirty_image = Image<t_complex>::Map(dimage.data(), params.y(), params.x()).real();
+  const Image<t_real> dirty_image = Image<t_complex>::Map(dimage.data(), params.height(), params.width()).real();
 if (params.mpiAlgorithm() != factory::algo_distribution::serial)
 {
 #ifdef PURIFY_MPI
@@ -158,7 +159,7 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
   psf_header.fits_name = out_dir+"/psf.fits";
   psf_header.pix_units = "Jy/Beam";
   const Vector<t_complex> psf = measurements_transform->adjoint() * (uv_data.weights.array());
-  const Image<t_real> psf_image = Image<t_complex>::Map(psf.data(), params.y(), params.x()).real();
+  const Image<t_real> psf_image = Image<t_complex>::Map(psf.data(), params.height(), params.width()).real();
 if (params.mpiAlgorithm() != factory::algo_distribution::serial)
 {
 #ifdef PURIFY_MPI
@@ -178,7 +179,7 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
 
   // Save the rest of the output
   // the clean image
-  const Image<t_real> image = Image<t_complex>::Map(diagnostic.x.data(), params.y(), params.x()).real();
+  const Image<t_real> image = Image<t_complex>::Map(diagnostic.x.data(), params.height(), params.width()).real();
   pfitsio::header_params purified_header = def_header;
   purified_header.fits_name = out_dir+"/purified.fits";
   purified_header.hasconverged = diagnostic.good;
@@ -200,7 +201,7 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
   residuals_header.fits_name = out_dir+"/residuals.fits";
   const Vector<t_complex> residuals = measurements_transform->adjoint()
     * (uv_data.vis - ((*measurements_transform) * diagnostic.x));
-  const Image<t_real> residual_image = Image<t_complex>::Map(residuals.data(), params.y(), params.x()).real();
+  const Image<t_real> residual_image = Image<t_complex>::Map(residuals.data(), params.height(), params.width()).real();
 if (params.mpiAlgorithm() != factory::algo_distribution::serial)
 {
 #ifdef PURIFY_MPI
