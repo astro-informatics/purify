@@ -21,6 +21,7 @@ addons:
       - clang-5.0
       - libtiff5-dev # version 5 ?
       - libgomp1 # version 4.8.4-2
+      - libfftw3-dev # version 3.3.3
 
 matrix:
   fast_finish: true
@@ -66,8 +67,8 @@ matrix:
             - *basic_sources
           packages:
             - *native_deps
-            - &all_deps [ libfftw3-dev, libboost-all-dev, libeigen3-dev, libyaml-cpp-dev ]
-            # libfftw3 version 3.3.3; libboost-all-dev version 1.54; libeigen3-dev version 3.2.0
+            - &all_deps [ libboost-all-dev, libeigen3-dev, libyaml-cpp-dev ]
+            # libboost-all-dev version 1.54; libeigen3-dev version 3.2.0
             # libcfitsio3-dev version 3.34; libyaml-cpp-dev version 0.5.1
             #   \-> We need CFITSIO 3.41, this could help to install other dependencies...
       env:
