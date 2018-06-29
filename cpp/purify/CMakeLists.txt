@@ -20,7 +20,7 @@ configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 set(HEADERS
   logging.h kernels.h pfitsio.h  logging.disabled.h types.h
   IndexMapping.h logging.enabled.h utilities.h operators.h operators_gpu.h wproj_utilities.h
-  cimg.h uvfits.h convolution.h projection_kernels.h measurement_operator_factory.h wavelet_operator_factory.h
+  cimg.h uvfits.h convolution.h projection_kernels.h measurement_operator_factory.h wavelet_operator_factory.h distribute.h
   algorithm_factory.h
   read_measurements.h
   yaml-parser.h
@@ -28,7 +28,7 @@ set(HEADERS
 
 set(SOURCES utilities.cc pfitsio.cc
   kernels.cc wproj_utilities.cc operators.cc uvfits.cc projection_kernels.cc yaml-parser.cc
-  read_measurements.cc)
+  read_measurements.cc distribute.cc)
 
 if(TARGET casacore::ms)
   list(APPEND SOURCES casacore.cc)
