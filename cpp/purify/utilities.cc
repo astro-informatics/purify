@@ -1,4 +1,5 @@
 #include "purify/utilities.h"
+#include "purify/operators.h"
 #include "purify/config.h"
 #include <fstream>
 #include <random>
@@ -58,7 +59,7 @@ utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B) {
   if(M != m)
     throw std::runtime_error(
         "Number of created baselines does not match expected baseline number N * (N - 1) / 2.");
-  utilities::vis_params coverage(u, v, w, vis, weights, "radians");
+  utilities::vis_params coverage(u, v, w, vis, weights, utilities::vis_units::radians);
   return coverage;
 };
 utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &mean,
@@ -101,53 +102,82 @@ utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &
   uv_vis.average_frequency = 0;
   return uv_vis;
 }
+
+utilities::vis_params read_visibility(const std::vector<std::string> &names, const bool w_term) {
+  utilities::vis_params output = read_visibility(names.at(0), w_term);
+  if(names.size() == 1)
+    return output;
+  for(int i = 1; i < names.size(); i++)
+    output = read_visibility(names.at(i), output);
+  return output;
+}
+utilities::vis_params
+read_visibility(const std::string &vis_name2, const utilities::vis_params &uv1) {
+  const bool w_term = not uv1.w.isZero(0);
+
+  const auto uv2 = read_visibility(vis_name2, w_term);
+  utilities::vis_params uv;
+  uv.u = Vector<t_real>::Zero(uv1.size() + uv2.size());
+  uv.v = Vector<t_real>::Zero(uv1.size() + uv2.size());
+  uv.w = Vector<t_real>::Zero(uv1.size() + uv2.size());
+  uv.vis = Vector<t_complex>::Zero(uv1.size() + uv2.size());
+  uv.weights = Vector<t_complex>::Zero(uv1.size() + uv2.size());
+  uv.u.segment(0, uv1.size()) = uv1.u;
+  uv.v.segment(0, uv1.size()) = uv1.v;
+  uv.w.segment(0, uv1.size()) = uv1.w;
+  uv.vis.segment(0, uv1.size()) = uv1.vis;
+  uv.weights.segment(0, uv1.size()) = uv1.weights;
+  uv.u.segment(uv1.size(), uv2.size()) = uv2.u;
+  uv.v.segment(uv1.size(), uv2.size()) = uv2.v;
+  uv.w.segment(uv1.size(), uv2.size()) = uv2.w;
+  uv.vis.segment(uv1.size(), uv2.size()) = uv2.vis;
+  uv.weights.segment(uv1.size(), uv2.size()) = uv2.weights;
+  return uv;
+}
+  
+//! Reading reals from visibility file (including nan's and inf's)
+  t_real streamtoreal(std::ifstream& stream) {
+    std::string input;
+    stream >> input;
+    return std::stod(input);
+  }
+   
 utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term) {
   /*
     Reads an csv file with u, v, visibilities and returns the vectors.
 
     vis_name:: name of input text file containing [u, v, real(V), imag(V)] (separated by ' ').
   */
-  std::ifstream temp_file(vis_name);
+ std::ifstream vis_file(vis_name);
+  vis_file.precision(13);
   t_int row = 0;
   std::string line;
   // counts size of vis file
-  while(std::getline(temp_file, line))
+  while(std::getline(vis_file, line))
     ++row;
   Vector<t_real> utemp = Vector<t_real>::Zero(row);
   Vector<t_real> vtemp = Vector<t_real>::Zero(row);
   Vector<t_real> wtemp = Vector<t_real>::Zero(row);
   Vector<t_complex> vistemp = Vector<t_complex>::Zero(row);
   Vector<t_complex> weightstemp = Vector<t_complex>::Zero(row);
-  std::ifstream vis_file(vis_name);
 
+  vis_file.clear();
+  vis_file.seekg(0);
   // reads in vis file
-  row = 0;
   t_real real;
   t_real imag;
-  std::string s;
-  std::string entry;
-  while(vis_file) {
-    if(!std::getline(vis_file, s))
-      break;
-    std::istringstream ss(s);
-    std::getline(ss, entry, ' ');
-    utemp(row) = std::stod(entry);
-    std::getline(ss, entry, ' ');
-    vtemp(row) = std::stod(entry);
-
+  t_real entry;
+  for (row=0; row<vistemp.size(); ++row) {
+    utemp(row) = streamtoreal(vis_file);
+    vtemp(row) = streamtoreal(vis_file);
     if(w_term) {
-      std::getline(ss, entry, ' ');
-      wtemp(row) = std::stod(entry);
+      wtemp(row) = streamtoreal(vis_file);
     }
-
-    std::getline(ss, entry, ' ');
-    real = std::stod(entry);
-    std::getline(ss, entry, ' ');
-    imag = std::stod(entry);
+    real = streamtoreal(vis_file);
+    imag = streamtoreal(vis_file);
+    entry = streamtoreal(vis_file);
     vistemp(row) = t_complex(real, imag);
-    std::getline(ss, entry, ' ');
-    weightstemp(row) = 1 / std::stod(entry);
-    ++row;
+    weightstemp(row) = 1 / entry;
   }
   utilities::vis_params uv_vis;
   uv_vis.u = utemp;
@@ -193,7 +223,7 @@ utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t
     cell_size:: size of a pixel in arcseconds
   */
 
-  utilities::vis_params scaled_vis;
+  utilities::vis_params scaled_vis = uv_vis;
   t_real cell_size_u = input_cell_size_u;
   t_real cell_size_v = input_cell_size_v;
   if(cell_size_u == 0 and cell_size_v == 0) {
@@ -209,12 +239,12 @@ utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t
   PURIFY_MEDIUM_LOG("Using a pixel size of {} by {} arcseconds", cell_size_u, cell_size_v);
   t_real scale_factor_u = 1;
   t_real scale_factor_v = 1;
-  if(uv_vis.units == "lambda") {
+  if(uv_vis.units == utilities::vis_units::lambda) {
     scale_factor_u = 180 * 3600 / cell_size_u / constant::pi;
     scale_factor_v = 180 * 3600 / cell_size_v / constant::pi;
     scaled_vis.w = uv_vis.w;
   }
-  if(uv_vis.units == "radians") {
+  if(uv_vis.units == utilities::vis_units::radians) {
     scale_factor_u = 180 * 3600 / constant::pi;
     scale_factor_v = 180 * 3600 / constant::pi;
     scaled_vis.w = uv_vis.w;
@@ -222,12 +252,7 @@ utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t
   scaled_vis.u = uv_vis.u / scale_factor_u * 2 * constant::pi;
   scaled_vis.v = uv_vis.v / scale_factor_v * 2 * constant::pi;
 
-  scaled_vis.vis = uv_vis.vis;
-  scaled_vis.weights = uv_vis.weights;
-  scaled_vis.units = "radians";
-  scaled_vis.ra = uv_vis.ra;
-  scaled_vis.dec = uv_vis.dec;
-  scaled_vis.average_frequency = uv_vis.average_frequency;
+  scaled_vis.units = utilities::vis_units::radians;
   return scaled_vis;
 }
 utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t_real &cell_size_u,
@@ -248,11 +273,11 @@ uv_scale(const utilities::vis_params &uv_vis, const t_int &sizex, const t_int &s
   scaled_vis.vis = uv_vis.vis;
   scaled_vis.weights = uv_vis.weights;
   for(t_int i = 0; i < uv_vis.u.size(); ++i) {
-    scaled_vis.u(i) = utilities::mod(scaled_vis.u(i), sizex);
-    scaled_vis.v(i) = utilities::mod(scaled_vis.v(i), sizey);
+    // scaled_vis.u(i) = utilities::mod(scaled_vis.u(i), sizex);
+    // scaled_vis.v(i) = utilities::mod(scaled_vis.v(i), sizey);
   }
   scaled_vis.w = uv_vis.w;
-  scaled_vis.units = "pixels";
+  scaled_vis.units = utilities::vis_units::pixels;
   scaled_vis.ra = uv_vis.ra;
   scaled_vis.dec = uv_vis.dec;
   scaled_vis.average_frequency = uv_vis.average_frequency;
@@ -376,7 +401,7 @@ utilities::vis_params whiten_vis(const utilities::vis_params &uv_vis) {
   output_uv_vis.vis = uv_vis.vis.array() * uv_vis.weights.array().cwiseAbs().sqrt();
   return output_uv_vis;
 }
-t_real calculate_l2_radius(const Vector<t_complex> &y, const t_real &sigma, const t_real &n_sigma,
+t_real calculate_l2_radius(const t_uint y_size, const t_real &sigma, const t_real &n_sigma,
                            const std::string distirbution) {
   /*
                   Calculates the epsilon, the radius of the l2_ball in sopt
@@ -384,16 +409,16 @@ t_real calculate_l2_radius(const Vector<t_complex> &y, const t_real &sigma, cons
   */
   if(distirbution == "chi^2") {
     if(sigma == 0) {
-      return std::sqrt(2 * y.size() + n_sigma * std::sqrt(4 * y.size()));
+      return std::sqrt(2 * y_size + n_sigma * std::sqrt(4 * y_size));
     }
-    return std::sqrt(2 * y.size() + n_sigma * std::sqrt(4 * y.size())) * sigma;
+    return std::sqrt(2 * y_size + n_sigma * std::sqrt(4 * y_size)) * sigma;
   }
   if(distirbution == "chi") {
-    auto alpha = 1. / (8 * y.size())
-                 - 1. / (128 * y.size() * y.size()); // series expansion for gamma relation
-    auto mean = std::sqrt(2) * std::sqrt(y.size())
+    auto alpha = 1. / (8 * y_size)
+                 - 1. / (128 * y_size * y_size); // series expansion for gamma relation
+    auto mean = std::sqrt(2) * std::sqrt(y_size)
                 * (1 - alpha); // using Gamma(k+1/2)/Gamma(k) asymptotic formula
-    auto standard_deviation = std::sqrt(2 * y.size() * alpha * (2 - alpha));
+    auto standard_deviation = std::sqrt(2 * y_size * alpha * (2 - alpha));
     if(sigma == 0) {
       return mean + n_sigma * standard_deviation;
     }
@@ -677,12 +702,17 @@ Matrix<t_complex> re_sample_ft_grid(const Matrix<t_complex> &input, const t_real
   return output;
 }
 Matrix<t_complex> re_sample_image(const Matrix<t_complex> &input, const t_real &re_sample_ratio) {
-  t_int fft_flag = (FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
-  auto fftop = purify::FFTOperator().fftw_flag(fft_flag);
-  auto const ft_grid = fftop.forward(input);
-  auto const new_ft_grid = utilities::re_sample_ft_grid(ft_grid, re_sample_ratio);
-  auto const output = fftop.inverse(new_ft_grid) * re_sample_ratio * re_sample_ratio;
-  return output;
+const auto ft_plan = operators::fftw_plan::estimate;
+  auto fft 
+      = purify::operators::init_FFT_2d<Vector<t_complex>>(input.rows(), input.cols(), 1., ft_plan);
+  Vector<t_complex> ft_grid = Vector<t_complex>::Zero(input.size());
+  std::get<0>(fft)(ft_grid, Vector<t_complex>::Map(input.data(), input.size()));
+  Matrix<t_complex> const new_ft_grid = utilities::re_sample_ft_grid(Matrix<t_complex>::Map(ft_grid.data(),input.rows(), input.cols()), re_sample_ratio);
+  Vector<t_complex> output = Vector<t_complex>::Zero(input.size());
+  fft 
+      = purify::operators::init_FFT_2d<Vector<t_complex>>(new_ft_grid.rows(), new_ft_grid.cols(), 1., ft_plan);
+  std::get<1>(fft)(output, Vector<t_complex>::Map(new_ft_grid.data(), new_ft_grid.size()));
+  return Matrix<t_complex>::Map(output.data(), new_ft_grid.rows(), new_ft_grid.cols()) * re_sample_ratio;
 }
 } // namespace utilities
 } // namespace purify

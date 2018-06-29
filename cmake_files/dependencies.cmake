@@ -5,6 +5,15 @@ include(PackageLookup)
 # Get the yaml reader
 lookup_package(Yamlcpp REQUIRED)
 
+if(docs)
+  cmake_policy(SET CMP0057 NEW)
+  find_package(Doxygen REQUIRED dot)
+  if(NOT DOXYGEN_FOUND)
+    mesage(STATUS "Could not find Doxygen or dot. No building documentation")
+    set(docs OFF)
+  endif()
+endif()
+
 # Look for external software
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   find_package(Threads)
@@ -47,15 +56,9 @@ endif()
 find_package(TIFF REQUIRED)
 
 
-if(data AND tests)
-  lookup_package(Boost REQUIRED COMPONENTS filesystem)
-elseif(examples AND dompi)
-  lookup_package(Boost REQUIRED COMPONENTS filesystem)
-else()
-  lookup_package(Boost REQUIRED)
-endif()
+lookup_package(Boost REQUIRED COMPONENTS filesystem)
 
-lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS URL "https://bitbucket.org/LukePratley/eigen/get/3.2.tar.gz" MD5 "66eda8ad0cce49e539bd2755e417b653")
+lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS URL "http://bitbucket.org/eigen/eigen/get/3.2.tar.gz" MD5 "035ccc791f046f48e90bb1fb42ce227e")
 
 set(PURIFY_ARRAYFIRE FALSE)
 if(doaf)
@@ -88,7 +91,6 @@ else()
 endif()
 
 lookup_package(CFitsIO REQUIRED 3.41 EXACT ARGUMENTS CHECKCASA URL "ftp://heasarc.gsfc.nasa.gov/software/fitsio/c/cfitsio3410.tar.gz")
-lookup_package(CCFits REQUIRED)
 if(docimg)
   set(PURIFY_CImg TRUE)
   find_package(X11)
@@ -96,6 +98,10 @@ if(docimg)
 endif()
 if(docasa)
   find_package(CasaCore OPTIONAL_COMPONENTS ms)
+  if(NOT CasaCore_FOUND)
+    lookup_package(CasaCore REQUIRED)
+  endif()
+  set(PURIFY_CASACORE TRUE)
 endif()
 
 # Add script to execute to make sure libraries in the build tree can be found

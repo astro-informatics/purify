@@ -5,19 +5,23 @@
 #include <fstream>
 #include <string>
 #include <type_traits>
-#include "purify/FFTOperator.h"
 #include "purify/types.h"
 
 namespace purify {
 
 namespace utilities {
+enum class vis_source { measurements, simulation };  
+enum class vis_units { lambda, radians, pixels };
 struct vis_params {
   Vector<t_real> u; // u coordinates
   Vector<t_real> v; // v coordinates
   Vector<t_real> w;
+  Vector<t_real> time;
+  Vector<t_uint> baseline;
+  Vector<t_real> frequencies;
   Vector<t_complex> vis;     // complex visiblities
   Vector<t_complex> weights; // weights for visibilities
-  std::string units = "lambda";
+  vis_units units = vis_units::lambda;
   t_real ra = 0.;  // decimal degrees
   t_real dec = 0.; // decimal degrees
   t_real average_frequency = 0.;
@@ -35,8 +39,8 @@ struct vis_params {
   //! constructor
   vis_params(const Vector<t_real> &u_, const Vector<t_real> &v_, const Vector<t_real> &w_,
              const Vector<t_complex> &vis_, const Vector<t_complex> &weights_,
-             const std::string &units_ = "lambda", const t_real &ra_ = 0, const t_real &dec_ = 0,
-             const t_real &average_frequency_ = 0)
+             const vis_units units_ = vis_units::lambda, const t_real &ra_ = 0,
+             const t_real &dec_ = 0, const t_real &average_frequency_ = 0)
       : u(u_), v(v_), w(w_), vis(vis_), weights(weights_), ra(ra_), dec(dec_), units(units_),
         average_frequency(average_frequency_){};
   //! return number of measurements
@@ -53,8 +57,16 @@ Matrix<t_real> generate_antennas(const t_uint N);
 utilities::vis_params antenna_to_coverage(const t_uint N);
 //! Provided antenna positions generate a coverage
 utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B);
+//! Reading reals from visibility file (including nan's and inf's)
+ t_real streamtoreal(std::ifstream& stream);
 //! Reads in visibility file
 utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term = false);
+//! Read visibility files from name of vector
+utilities::vis_params
+read_visibility(const std::vector<std::string> &names, const bool w_term = false);
+//! Reads in two visibility files
+utilities::vis_params
+read_visibility(const std::string &vis_name2, const utilities::vis_params &u1);
 //! Writes visibilities to txt
 void write_visibility(const utilities::vis_params &uv_vis, const std::string &file_name,
                       const bool w_term = false);
@@ -97,7 +109,7 @@ Image<t_complex> convolution_operator(const Image<t_complex> &a, const Image<t_c
 //! A vector that whiten's the visibilities given the weights.
 utilities::vis_params whiten_vis(const utilities::vis_params &uv_vis);
 //! A function that calculates the l2 ball radius for sopt
-t_real calculate_l2_radius(const Vector<t_complex> &y, const t_real &sigma = 0,
+t_real calculate_l2_radius(const t_uint y_size, const t_real &sigma = 0,
                            const t_real &n_sigma = 2., const std::string distirbution = "chi");
 //! Converts SNR to RMS noise
 t_real SNR_to_standard_deviation(const Vector<t_complex> &y0, const t_real &SNR = 30.);

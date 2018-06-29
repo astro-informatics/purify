@@ -54,6 +54,58 @@ template <class T = t_real> using CImageList = cimg_library::CImgList<T>;
 typedef cimg_library::CImgDisplay CDisplay;
 #endif
 
+enum class stokes {I, Q, U, V, XX, YY, XY, YX, LL, RR, LR, RL, P};
+const std::map<stokes, t_int> stokes_int = {
+  {stokes::I, 1}, 
+  {stokes::Q, 2}, 
+  {stokes::U, 3}, 
+  {stokes::V, 4}, 
+  {stokes::RR, -1}, 
+  {stokes::LL, -2}, 
+  {stokes::RL, -3}, 
+  {stokes::LR, -4}, 
+  {stokes::XX, -5}, 
+  {stokes::YY, -6}, 
+  {stokes::XY, -7}, 
+  {stokes::YX, -8}
+};
+const std::map<std::string, stokes> stokes_string = {
+  {"I", stokes::I}, 
+  {"i", stokes::I}, 
+  {"Q", stokes::Q}, 
+  {"q", stokes::Q}, 
+  {"U", stokes::U}, 
+  {"u", stokes::U}, 
+  {"V", stokes::V}, 
+  {"v", stokes::V}, 
+  {"XX", stokes::XX}, 
+  {"xx", stokes::XX}, 
+  {"YY", stokes::YY}, 
+  {"yy", stokes::YY}, 
+  {"XY", stokes::XY}, 
+  {"xy", stokes::XY}, 
+  {"YX", stokes::YX}, 
+  {"yx", stokes::YX}, 
+  {"LL", stokes::LL}, 
+  {"ll", stokes::LL}, 
+  {"RR", stokes::RR}, 
+  {"rr", stokes::RR}, 
+  {"LR", stokes::LR}, 
+  {"lr", stokes::LR}, 
+  {"RL", stokes::RL}, 
+  {"rl", stokes::RL}, 
+  {"P", stokes::P}, 
+  {"p", stokes::P} 
+};
+
+
+namespace wproj_utilities {
+namespace expansions {
+//! Type of series approximation
+enum class series { none, taylor, chebyshev };
+} // namespace expansions
+
+} // namespace wproj_utilities
 namespace constant {
 //! mathematical constant
 const t_real pi = 3.14159265358979323846;

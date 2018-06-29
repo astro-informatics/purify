@@ -9,7 +9,7 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include "purify/MeasurementOperator.h"
+#include "purify/operators.h"
 #include "purify/directories.h"
 #include "purify/logging.h"
 #include "purify/pfitsio.h"
@@ -30,7 +30,7 @@ int main(int nargs, char const **args) {
   purify::logging::set_level("debug");
 
   std::string const test_type = args[1];
-  std::string const kernel = args[2];
+  const std::string kernel = args[2];
   t_real const over_sample = std::stod(static_cast<std::string>(args[3]));
   t_int const J = static_cast<t_int>(std::stod(static_cast<std::string>(args[4])));
   t_real const m_over_n = std::stod(static_cast<std::string>(args[5]));
@@ -52,15 +52,18 @@ int main(int nargs, char const **args) {
   t_real const sigma_m = constant::pi / 3;
 
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
-  uv_data.units = "radians";
+  uv_data.units = utilities::vis_units::radians;
   PURIFY_MEDIUM_LOG("Number of measurements: {}", uv_data.u.size());
 
-  MeasurementOperator sky_measurements(uv_data, 8, 8, "kb", sky_model.cols(), sky_model.rows(), 100,
-                                       over_sample);
-  uv_data.vis = sky_measurements.degrid(sky_model);
-  auto const measurements = std::make_shared<MeasurementOperator>(
-      uv_data, J, J, kernel, sky_model.cols(), sky_model.rows(), 100, over_sample);
-  auto measurements_transform = linear_transform(measurements, uv_data.vis.size());
+  auto measurements_sky
+      = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
+          over_sample, 100, 1e-4,kernels::kernel_from_string.at(kernel) , 8, 8);
+  uv_data.vis = measurements_sky * Vector<t_complex>::Map(sky_model.data(), sky_model.size());
+  auto measurements_transform
+      = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
+          over_sample, 100, 1e-4, kernels::kernel_from_string.at(kernel), J, J);
 
   std::vector<std::tuple<std::string, t_uint>> wavelets;
 
@@ -81,7 +84,7 @@ int main(int nargs, char const **args) {
   }
   sopt::wavelets::SARA const sara(wavelets.begin(), wavelets.end());
   auto const Psi
-      = sopt::linear_transform<t_complex>(sara, measurements->imsizey(), measurements->imsizex());
+      = sopt::linear_transform<t_complex>(sara, sky_model.rows(), sky_model.cols());
 
   // working out value of sigma given SNR of 30
   t_real sigma = utilities::SNR_to_standard_deviation(uv_data.vis, ISNR);
@@ -93,7 +96,7 @@ int main(int nargs, char const **args) {
   dimage = dimage / max_val;
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
 
-  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
+  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
   auto const purify_gamma
       = (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).real().maxCoeff() * 1e-3;
   t_int iters = 0;
@@ -134,8 +137,8 @@ int main(int nargs, char const **args) {
   }
   const t_uint maxiters = iters;
 
-  Image<t_complex> image
-      = Image<t_complex>::Map(diagnostic.x.data(), measurements->imsizey(), measurements->imsizex());
+  Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), sky_model.rows(),
+                                                 sky_model.cols());
 
   Vector<t_complex> original = Vector<t_complex>::Map(sky_model.data(), sky_model.size(), 1);
   Image<t_complex> res = sky_model - image;

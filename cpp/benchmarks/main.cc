@@ -16,12 +16,13 @@ public:
 // The main is rewritten to allow for MPI initializing and for selecting a
 // reporter according to the process rank
 int main(int argc, char const **argv) {
-
+#ifdef PURIFY_MPI
   auto const session = sopt::mpi::init(argc, argv);
   auto const world = sopt::mpi::Communicator::World();
-
+#endif
   ::benchmark::Initialize(&argc, const_cast<char**>(argv));
 
+#ifdef PURIFY_MPI
   if(world.is_root())
     // root process will use a reporter from the usual set provided by
     // ::benchmark
@@ -31,6 +32,6 @@ int main(int argc, char const **argv) {
     NullReporter null;
     ::benchmark::RunSpecifiedBenchmarks(&null);
   }
-
+#endif
   return 0;
 }

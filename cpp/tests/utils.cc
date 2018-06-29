@@ -1,6 +1,5 @@
 #include <random>
 #include "catch.hpp"
-#include "purify/FFTOperator.h"
 #include "purify/directories.h"
 #include "purify/utilities.h"
 
@@ -511,6 +510,39 @@ TEST_CASE("utilities [read_write_vis]", "[read_write_vis]") {
   CHECK(new_random_uv_data.vis.isApprox(random_uv_data.vis, 1e-8));
   CHECK(new_random_uv_data.weights.isApprox(random_uv_data.weights, 1e-8));
 }
+TEST_CASE("read_mutiple_vis") {
+  std::string vis_file = vla_filename("at166B.3C129.c0.vis");
+  SECTION("one file") {
+    const std::vector<std::string> names = {vis_file};
+    const auto uv_data = utilities::read_visibility(vis_file);
+    const auto uv_multi = utilities::read_visibility(names);
+    CAPTURE(names.size());
+    CAPTURE(uv_data.size());
+    CHECK(uv_data.size() * names.size() == uv_multi.size());
+    for(int i = 0; i < names.size(); i++) {
+      CHECK(uv_data.u.isApprox(uv_multi.u.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.v.isApprox(uv_multi.v.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.w.isApprox(uv_multi.w.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.vis.isApprox(uv_multi.vis.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.weights.isApprox(uv_multi.weights.segment(i * uv_data.size(), uv_data.size())));
+    }
+  }
+  SECTION("many files") {
+    const std::vector<std::string> names = {vis_file, vis_file, vis_file};
+    const auto uv_data = utilities::read_visibility(vis_file);
+    const auto uv_multi = utilities::read_visibility(names);
+    CAPTURE(names.size());
+    CAPTURE(uv_data.size());
+    CHECK(uv_data.size() * names.size() == uv_multi.size());
+    for(int i = 0; i < names.size(); i++) {
+      CHECK(uv_data.u.isApprox(uv_multi.u.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.v.isApprox(uv_multi.v.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.w.isApprox(uv_multi.w.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.vis.isApprox(uv_multi.vis.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.weights.isApprox(uv_multi.weights.segment(i * uv_data.size(), uv_data.size())));
+    }
+  }
+}
 TEST_CASE("utilities [file exists]", "[file exists]") {
   std::string vis_file = vla_filename("at166B.3C129.c0.vis");
   // File should exist
@@ -583,18 +615,6 @@ TEST_CASE("utilities [sparse multiply]", "[sparse multiply]") {
   }
 }
 
-TEST_CASE("utilities [resample]", "[resample]") {
-  // up samples random matrix
-  Matrix<t_complex> const image = Matrix<t_complex>::Random(1024, 1024);
-  FFTOperator fftop = purify::FFTOperator().fftw_flag((FFTW_ESTIMATE | FFTW_PRESERVE_INPUT));
-
-  auto const ft_grid = fftop.forward(image);
-  auto const new_ft_grid = utilities::re_sample_ft_grid(ft_grid, 4.) * 4. * 4.;
-  Matrix<t_complex> const image_resample = fftop.inverse(new_ft_grid);
-  Matrix<t_complex> const image_resample_alt = utilities::re_sample_image(image, 4.);
-  CHECK(image_resample.isApprox(image_resample_alt, 1e-13));
-  CHECK(image_resample(0) == image_resample_alt(0));
-}
 
 TEST_CASE("generate_baseline") {
   // testing if randomly generating a uvcoverage from baseline configuration works

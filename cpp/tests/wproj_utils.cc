@@ -1,19 +1,139 @@
 #include "purify/config.h"
 #include <iostream>
 #include "catch.hpp"
-#include "purify/directories.h"
 #include "purify/logging.h"
+
 #include "purify/types.h"
+
+#include "purify/convolution.h"
+#include "purify/directories.h"
+#include "purify/kernels.h"
+#include "purify/projection_kernels.h"
+#include "purify/utilities.h"
 #include "purify/wproj_utilities.h"
+
+#include "purify/operators.h"
+
 using namespace purify;
 using namespace purify::notinstalled;
+
+TEST_CASE("kernel") {
+  const t_int Ju = 4;
+  const t_int Jv = 4;
+  const t_int Jw = 6;
+  const t_uint imsize = 2048;
+  const t_real cell = 30; // arcseconds
+  const t_real oversample_ratio = 2;
+  const auto uvkernels
+      = purify::create_kernels(kernels::kernel::kb, Ju, Jv, imsize, imsize, oversample_ratio);
+  const auto kernelu = std::get<0>(uvkernels);
+  const auto kernelv = std::get<1>(uvkernels);
+  const auto kernelw = projection_kernels::w_projection_kernel_sphere(cell, cell, imsize, imsize,
+                                                                      oversample_ratio);
+  const Vector<t_real> u = Vector<t_real>::Random(5);
+  const Vector<t_real> v = Vector<t_real>::Random(5);
+  const Vector<t_real> w = Vector<t_real>::Random(5) * 100;
+  for(t_uint m = 0; m < u.size(); m++) {
+    const Matrix<t_complex> output
+        = projection_kernels::projection(kernelv, kernelu, kernelw, u(m), v(m), w(m), Ju, Jv, Jw);
+    break;
+  }
+}
+
+TEST_CASE("w_projection") {
+
+  const t_int Ju = 5;
+  const t_int Jv = 5;
+  const t_uint imsize = 10;
+  const t_real cell = 30; // arcseconds
+  const t_real oversample_ratio = 2;
+  const auto uvkernels
+      = purify::create_kernels(kernels::kernel::kb, Ju, Jv, imsize, imsize, oversample_ratio);
+  const auto kernelu = std::get<0>(uvkernels);
+  const auto kernelv = std::get<1>(uvkernels);
+  const t_uint M = 5;
+  const Vector<t_real> u = Vector<t_real>::Random(M);
+  const Vector<t_real> v = Vector<t_real>::Random(M);
+  const Vector<t_real> w = Vector<t_real>::Random(M) * 100;
+  const Vector<t_complex> weights = Vector<t_complex>::Ones(M);
+  SECTION("small angle approximation") {
+    const t_int Jw = 10;
+    const auto kernelw = projection_kernels::w_projection_kernel_approx(cell, cell, imsize, imsize,
+                                                                        oversample_ratio);
+    const Sparse<t_complex> G
+        = details::init_gridding_matrix_2d(u, v, w, weights, imsize, imsize, oversample_ratio,
+                                           kernelu, kernelv, kernelw, Ju, Jv, Jw, true);
+    const Vector<t_complex> output
+        = G * Vector<t_complex>::Random(imsize * imsize * oversample_ratio * oversample_ratio);
+  }
+  SECTION("delta") {
+    const t_int Jw = 1;
+    const auto kernelw = projection_kernels::box_proj();
+    const Sparse<t_complex> G
+        = details::init_gridding_matrix_2d(u, v, w, weights, imsize, imsize, oversample_ratio,
+                                           kernelu, kernelv, kernelw, Ju, Jv, Jw, true);
+    const Vector<t_complex> output
+        = G * Vector<t_complex>::Random(imsize * imsize * oversample_ratio * oversample_ratio);
+    const Sparse<t_complex> G_id = details::init_gridding_matrix_2d(
+        u, v, w, weights, imsize, imsize, oversample_ratio, kernelu, kernelv, kernelw, Ju, Jv);
+    CHECK(G.nonZeros() == G_id.nonZeros());
+    CAPTURE(G.row(0));
+    CAPTURE(G_id.row(0));
+    CHECK(G.isApprox(G_id));
+  }
+}
+
+TEST_CASE("uvw units") {
+  const t_uint imsizex = 128;
+  const t_uint imsizey = 128;
+  const t_real oversample_ratio = 2;
+
+  SECTION("1arcsec") {
+
+    const utilities::vis_params uv_lambda(Vector<t_real>::Ones(5), Vector<t_real>::Ones(5),
+                                          Vector<t_real>::Ones(5), Vector<t_complex>::Ones(5),
+                                          Vector<t_complex>::Ones(5));
+    auto const uv_radians = utilities::set_cell_size(uv_lambda, 1., 1.);
+    auto const uv_pixels = utilities::uv_scale(uv_radians, std::floor(oversample_ratio * imsizex),
+                                               std::floor(oversample_ratio * imsizey));
+    CHECK(uv_radians.units == utilities::vis_units::radians);
+    CHECK(uv_lambda.units == utilities::vis_units::lambda);
+    CHECK(uv_pixels.units == utilities::vis_units::pixels);
+    // const t_real scale = 60. * 60. * 180. / std::floor(oversample_ratio * imsizex) /
+    // constant::pi;
+    const t_real scale = projection_kernels::pixel_to_lambda(1., imsizex, oversample_ratio);
+    CAPTURE(1. / scale);
+    CAPTURE(uv_pixels.u.transpose());
+    CHECK(uv_lambda.u.isApprox(uv_pixels.u * scale, 1e-6));
+  }
+  SECTION("arcsec") {
+
+    const t_real cell = 3;
+    const utilities::vis_params uv_lambda(Vector<t_real>::Ones(5), Vector<t_real>::Ones(5),
+                                          Vector<t_real>::Ones(5), Vector<t_complex>::Ones(5),
+                                          Vector<t_complex>::Ones(5));
+    auto const uv_radians = utilities::set_cell_size(uv_lambda, cell, cell);
+    auto const uv_pixels = utilities::uv_scale(uv_radians, std::floor(oversample_ratio * imsizex),
+                                               std::floor(oversample_ratio * imsizey));
+    CHECK(uv_radians.units == utilities::vis_units::radians);
+    CHECK(uv_lambda.units == utilities::vis_units::lambda);
+    CHECK(uv_pixels.units == utilities::vis_units::pixels);
+    // const t_real scale
+    //    = 60. * 60. * 180. / cell / std::floor(oversample_ratio * imsizex) / constant::pi;
+    const t_real scale = projection_kernels::pixel_to_lambda(cell, imsizex, oversample_ratio);
+    CAPTURE(1. / scale);
+    CAPTURE(uv_pixels.u.transpose());
+    CHECK(uv_lambda.u.isApprox(uv_pixels.u * scale, 1e-6));
+  }
+}
 
 TEST_CASE("Calcuate Chirp Image") {
   const t_int imsizex = 128;
   const t_int imsizey = 128;
   SECTION("w is zero") {
     const t_real w_rate = 0;
-    const auto chirp_image = wproj_utilities::generate_chirp(w_rate, 1, 1, imsizex, imsizey);
+    const Image<t_complex> chirp_image
+        = wproj_utilities::generate_chirp(w_rate, 1, 1, imsizex, imsizey);
     CHECK((chirp_image.array().cwiseAbs() - 1. / (imsizex * imsizey)).matrix().norm() < 1e-12);
   }
 }
@@ -56,8 +176,8 @@ TEST_CASE("Calculate Threshold") {
 }
 
 TEST_CASE("simple convolution") {
-  const t_uint Nx = 12;
-  const t_uint Ny = 12;
+  const t_int Nx = 12;
+  const t_int Ny = 12;
   const Sparse<t_complex> G_row = Matrix<t_complex>::Random(1, Nx * Ny).sparseView(1e-2);
   const Sparse<t_complex> C_row = Matrix<t_complex>::Random(1, Nx * Ny).sparseView(1e-2);
   const Sparse<t_complex> kernel = wproj_utilities::row_wise_convolution(G_row, C_row, Nx, Ny);
@@ -72,10 +192,10 @@ TEST_CASE("wprojection_matrix") {
   // purify::logging::set_level("debug");
   const Vector<t_real> w_components = Vector<t_real>::Random(12);
   const Vector<t_real> w_components_zero = w_components * 0;
-  const t_int Nx = 12;
-  const t_int Ny = 12;
-  const t_real cellx = 1.;
-  const t_real celly = 1.;
+  const t_int Nx = 32;
+  const t_int Ny = 32;
+  const t_real cellx = 60;
+  const t_real celly = 60;
   const t_int rows = w_components.size();
   const t_int cols = Nx * Ny;
 
@@ -92,14 +212,15 @@ TEST_CASE("wprojection_matrix") {
   CHECK(G.nonZeros() >= I.nonZeros());
   for(t_int k = 0; k < G_id.outerSize(); ++k)
     for(Sparse<t_complex>::InnerIterator it(G_id, k); it; ++it) {
+      CAPTURE(it.value() * static_cast<t_real>(Nx));
       CHECK(std::abs(it.value() - 1.) < 1e-12);
       CHECK(it.row() == k); // row index
       CHECK(it.col() == k); // col index
     }
 }
 TEST_CASE("convolution even") {
-  const t_uint Nx = 4;
-  const t_uint Ny = 4;
+  const t_int Nx = 4;
+  const t_int Ny = 4;
   Matrix<t_complex> G_data(1, Nx * Ny);
   Matrix<t_complex> C_data(1, Nx * Ny);
   Matrix<t_complex> K_data(1, Nx * Ny);
@@ -134,8 +255,8 @@ TEST_CASE("convolution even") {
 }
 
 TEST_CASE("convolution odd") {
-  const t_uint Nx = 5;
-  const t_uint Ny = 5;
+  const t_int Nx = 5;
+  const t_int Ny = 5;
   Matrix<t_complex> G_data(1, Nx * Ny);
   Matrix<t_complex> C_data(1, Nx * Ny);
   Matrix<t_complex> K_data(1, Nx * Ny);

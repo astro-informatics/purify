@@ -12,7 +12,6 @@ int main(int nargs, char const **args) {
   auto const oversample_ratio = 2;
   auto const power_iters = 0;
   auto const power_tol = 1e-4;
-  std::string ft_plan = "measure";
   auto const Ju = 4;
   auto const Jv = 4;
   auto const imsizex = 256;
@@ -25,11 +24,11 @@ int main(int nargs, char const **args) {
   // Generating random uv(w) coverage
   t_real const sigma_m = constant::pi / 3;
   auto uv_vis = utilities::random_sample_density(number_of_vis, 0, sigma_m);
-  uv_vis.units = "radians";
+  uv_vis.units = utilities::vis_units::radians;
   const Vector<t_complex> image = Vector<t_complex>::Random(number_of_pixels);
   const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
-      power_tol, kernel, Ju, Jv, ft_plan);
+      power_tol, kernels::kernel_from_string.at(kernel), Ju, Jv);
   for(t_uint i = 0; i < 100; i++) {
     PURIFY_LOW_LOG("Iteration: {}", i);
     Vector<t_complex> const measurements = *measure_op * image;

@@ -2,7 +2,7 @@
 #include <array>
 #include <memory>
 #include <random>
-#include "purify/MeasurementOperator.h"
+#include "purify/operators.h"
 #include "purify/directories.h"
 #include "purify/logging.h"
 #include "purify/pfitsio.h"
@@ -18,7 +18,7 @@ int main(int nargs, char const **args) {
   std::string const fitsfile = image_filename("M31.fits");
   std::string const inputfile = output_filename("M31_input.fits");
 
-  std::string const kernel = "kb";
+  const std::string kernel = "kb";
   t_real const over_sample = 5.;
   t_int const J = 24;
   t_real const m_over_n = std::stod(static_cast<std::string>(args[1]));
@@ -36,11 +36,13 @@ int main(int nargs, char const **args) {
   t_int const number_of_vis = std::floor(m_over_n * M31.size());
   // Generating random uv(w) coverage
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
-  uv_data.units = "radians";
+  uv_data.units = utilities::vis_units::radians;
 
   PURIFY_HIGH_LOG("Number of measurements: {}", uv_data.u.size());
-  // uv_data = utilities::uv_symmetry(uv_data); //reflect uv measurements
-  MeasurementOperator measurements(uv_data, J, J, kernel, M31.cols(), M31.rows(), 20, over_sample);
-  uv_data.vis = measurements.degrid(M31);
+  auto measurements_transform 
+      = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data.u, uv_data.v, uv_data.w, uv_data.weights, M31.cols(), M31.rows(),
+          over_sample, 100, 1e-4, kernels::kernel_from_string.at(kernel), J, J);
+  uv_data.vis = *measurements_transform * Vector<t_complex>::Map(M31.data(), M31.size());
   utilities::write_visibility(uv_data, vis_file);
 }

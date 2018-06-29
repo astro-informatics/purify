@@ -27,8 +27,7 @@ TEST_CASE("GPU Operators") {
   const t_uint Jv = 4;
   const t_uint power_iters = 100;
   const t_real power_tol = 1e-9;
-  const std::string &kernel = "kb";
-  const std::string &ft_plan = "estimate";
+  const kernels::kernel kernel = kernels::kernel::kb;
   const std::string &weighting_type = "natural";
   const t_real R = 0;
   auto u = Vector<t_real>::Random(M);
@@ -39,7 +38,7 @@ TEST_CASE("GPU Operators") {
   uv_vis.w = u * 0.;
   uv_vis.weights = Vector<t_complex>::Random(M);
   uv_vis.vis = Vector<t_complex>::Random(M);
-  uv_vis.units = "pixel";
+  uv_vis.units = utilities::vis_units::pixels;
   std::function<t_real(t_real)> kbu, kbv, ftkbu, ftkbv;
   std::tie(kbu, kbv, ftkbu, ftkbv)
       = create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
@@ -56,10 +55,11 @@ TEST_CASE("GPU Operators") {
         = gpu::host_wrapper(indirect_gpu_fft, input.size(), input.size());
     fft(output, input);
     ifft(new_input, output);
+    CAPTURE(input.transpose().array() / new_input.transpose().array());
     CHECK(input.isApprox(new_input, 1e-6));
     sopt::OperatorFunction<Vector<t_complex>> direct_fft, indirect_fft;
     std::tie(direct_fft, indirect_fft)
-        = operators::init_FFT_2d<Vector<t_complex>>(imsizey, imsizex, oversample_ratio, ft_plan);
+        = operators::init_FFT_2d<Vector<t_complex>>(imsizey, imsizex, oversample_ratio);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     const Vector<t_complex> indirect_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     Vector<t_complex> output_new;
@@ -72,10 +72,12 @@ TEST_CASE("GPU Operators") {
     CHECK(output_old.isApprox(output_new, 1e-6));
   }
   SECTION("Gridding") {
+    std::function<t_complex(t_real, t_real, t_real)> kernelw
+        = projection_kernels::w_projection_kernel_approx(1, 1, imsizex, imsizey, oversample_ratio);
     sopt::OperatorFunction<af::array> direct_gpu_G, indirect_gpu_G;
     std::tie(direct_gpu_G, indirect_gpu_G) = gpu::operators::init_af_gridding_matrix_2d(
         uv_vis.u, uv_vis.v, uv_vis.w, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex,
-        oversample_ratio, kbu, kbv, Ju, Jv);
+        oversample_ratio, kbu, kbv, kernelw, Ju, Jv, 6, false);
     const sopt::OperatorFunction<Vector<t_complex>> gpu_direct_G
         = gpu::host_wrapper(direct_gpu_G, ftsizeu * ftsizev, M);
     const sopt::OperatorFunction<Vector<t_complex>> gpu_indirect_G
@@ -83,7 +85,7 @@ TEST_CASE("GPU Operators") {
     sopt::OperatorFunction<Vector<t_complex>> direct_G, indirect_G;
     std::tie(direct_G, indirect_G) = operators::init_gridding_matrix_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, uv_vis.w, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex,
-        oversample_ratio, kbv, kbu, Ju, Jv);
+        oversample_ratio, kbv, kbu, kernelw, Ju, Jv, 6, false);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     const Vector<t_complex> indirect_input = Vector<t_complex>::Random(M);
     Vector<t_complex> output_new;
@@ -96,8 +98,8 @@ TEST_CASE("GPU Operators") {
     CHECK(output_new.isApprox(output_old, 1e-6));
   }
   SECTION("Zero Padding") {
-    const Image<t_real> S
-        = details::init_correction2d(oversample_ratio, imsizey, imsizex, ftkbu, ftkbv);
+    const Image<t_complex> S
+        = details::init_correction2d(oversample_ratio, imsizey, imsizex, ftkbu, ftkbv, 0, 1, 1);
     CHECK(imsizex == S.cols());
     CHECK(imsizey == S.rows());
     sopt::OperatorFunction<Vector<t_complex>> directZ, indirectZ;
@@ -105,7 +107,7 @@ TEST_CASE("GPU Operators") {
         = operators::init_zero_padding_2d<Vector<t_complex>>(S, oversample_ratio);
     sopt::OperatorFunction<af::array> directZgpu, indirectZgpu;
     std::tie(directZgpu, indirectZgpu)
-        = gpu::operators::init_af_zero_padding_2d(S.cast<float>(), oversample_ratio);
+        = gpu::operators::init_af_zero_padding_2d(S.cast<t_complexf>(), oversample_ratio);
     sopt::OperatorFunction<Vector<t_complex>> directZ_gpu
         = gpu::host_wrapper(directZgpu, imsizex * imsizey, ftsizeu * ftsizev);
     sopt::OperatorFunction<Vector<t_complex>> indirectZ_gpu
@@ -128,7 +130,7 @@ TEST_CASE("GPU Operators") {
   SECTION("Serial Operator") {
     const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv, ft_plan);
+        power_iters, power_tol, kernel, Ju, Jv);
 
     const auto measure_op_gpu = gpu::measurementoperator::init_degrid_operator_2d(
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
@@ -162,7 +164,7 @@ TEST_CASE("GPU Operators") {
   SECTION("Compact Operator") {
     const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv, ft_plan);
+        power_iters, power_tol, kernel, Ju, Jv);
 
     const auto phiTphi = gpu::operators::init_grid_degrid_operator_2d(
         uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,

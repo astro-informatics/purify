@@ -35,13 +35,14 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
                    const std::tuple<bool, t_real> &w_term) {
   auto uv_data
       = utilities::random_sample_density(number_of_vis, 0, constant::pi / 3, std::get<0>(w_term));
-  uv_data.units = "radians";
+  uv_data.units = utilities::vis_units::radians;
   PURIFY_HIGH_LOG("Number of measurements / number of pixels: {}",
                   uv_data.u.size() / ground_truth_image.size());
   // creating operator to generate measurements
   auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_data, ground_truth_image.rows(), ground_truth_image.cols(), std::get<1>(w_term),
-      std::get<1>(w_term), 2, 100, 1e-4, "kb", 8, 8, "measure", std::get<0>(w_term));
+      std::get<1>(w_term), 2, 100, 1e-4, kernels::kernel::kb, 8, 8,
+      std::get<0>(w_term));
   // Generates measurements from image
   uv_data.vis = (*sky_measurements)
                 * Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);
@@ -62,7 +63,7 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
     auto result = dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term);
     comm.broadcast(std::get<1>(result));
     auto const order
-        = distribute::distribute_measurements(std::get<0>(result), comm, "distance_distribution");
+        = distribute::distribute_measurements(std::get<0>(result), comm, distribute::plan::radial);
     std::get<0>(result) = utilities::regroup_and_scatter(std::get<0>(result), order, comm);
     return result;
   }
@@ -81,14 +82,16 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
 
 #if PURIFY_PADMM_ALGORITHM == 2
   auto const epsilon = std::sqrt(
-      comm.all_sum_all(std::pow(utilities::calculate_l2_radius(uv_data.vis, sigma), 2)));
+      comm.all_sum_all(std::pow(utilities::calculate_l2_radius(uv_data.vis.size(), sigma), 2)));
 #elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
-  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
+  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
 #endif
-  auto const gamma
-      = (Psi.adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3;
-  PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
-  PURIFY_MEDIUM_LOG("Gamma {}", gamma);
+  PURIFY_LOW_LOG("SARA Size = {}, Rank = {}", sara.size(), comm.rank());
+  const t_real gamma
+      = utilities::step_size(uv_data.vis, measurements, 
+          std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(Psi), sara.size()) * 1e-3;
+  PURIFY_LOW_LOG("Epsilon {}, Rank = {}", epsilon, comm.rank());
+  PURIFY_LOW_LOG("Gamma {}, SARA Size = {}, Rank = {}", gamma, sara.size(), comm.rank());
 
   // shared pointer because the convergence function need access to some data that we would rather
   // not reproduce. E.g. padmm definition is self-referential.
@@ -177,26 +180,26 @@ int main(int nargs, char const **args) {
 #ifndef PURIFY_GPU
   auto const measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernel, 4, 4, "measure", w_term);
+      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, w_term);
 
 #else
   af::setDevice(0);
   auto const measurements = gpu::measurementoperator::init_degrid_operator_2d(
       world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernel, 8, 8, w_term);
+      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, w_term);
 
 #endif
 #elif PURIFY_PADMM_ALGORITHM == 1
 #ifndef PURIFY_GPU
   auto const measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
       world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernel, 8, 8, "measure", w_term);
+      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, w_term);
 
 #else
   af::setDevice(0);
   auto const measurements = gpu::measurementoperator::init_degrid_operator_2d_mpi(
       world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernel, 8, 8, w_term);
+      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, w_term);
 
 #endif
 #endif
@@ -204,7 +207,8 @@ int main(int nargs, char const **args) {
       sopt::wavelets::SARA{
           std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
           std::make_tuple("DB3", 3u), std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
-          std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)},
+          std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)
+          },
       world);
 
   // Create the padmm solver
