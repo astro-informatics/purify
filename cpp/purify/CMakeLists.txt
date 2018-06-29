@@ -27,7 +27,7 @@ set(HEADERS
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(SOURCES utilities.cc pfitsio.cc
-  kernels.cc distribute.cc wproj_utilities.cc operators.cc uvfits.cc projection_kernels.cc yaml-parser.cc
+  kernels.cc wproj_utilities.cc operators.cc uvfits.cc projection_kernels.cc yaml-parser.cc
   read_measurements.cc)
 
 if(TARGET casacore::ms)
