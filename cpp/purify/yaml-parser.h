@@ -61,7 +61,7 @@ class YamlParser
   void parseAndSetSARA(const YAML::Node& node);
 
   /** 
-    Translate the waveket basis string into a vector
+    Translate the waveket basis string t_into a vector
   */
   std::vector<std::string> getWavelets(const std::string &values_str);
 
@@ -94,32 +94,31 @@ class YamlParser
   YAML_MACRO(purify::utilities::vis_source, source, purify::utilities::vis_source::measurements)
   YAML_MACRO(bool, realValueConstraint, true)
   YAML_MACRO(bool, positiveValueConstraint, true)
-  YAML_MACRO(int, iterations, 0)
-  YAML_MACRO(int, powMethod_iter, 0)
-  YAML_MACRO(int, x, 0)
-  YAML_MACRO(int, y, 0)
-  YAML_MACRO(int, wavelet_levels, 0)
-  YAML_MACRO(int, epsilonConvergenceScaling, 0)
-  YAML_MACRO(unsigned int, Jx, 0)
-  YAML_MACRO(unsigned int, Jy, 0)
-  YAML_MACRO(float, oversampling, 0)
-  YAML_MACRO(float, powMethod_tolerance, 0)
-  YAML_MACRO(double, epsilonScaling, 0)
-  YAML_MACRO(double, Dx, 0)
-  YAML_MACRO(double, Dy, 0)
-  YAML_MACRO(double, measurements_sigma, 1)
-  YAML_MACRO(double, signal_to_noise, 30)
-  YAML_MACRO(double, relVarianceConvergence, 0)
+  YAML_MACRO(t_int, iterations, 0)
+  YAML_MACRO(t_int, powMethod_iter, 0)
+  YAML_MACRO(t_int, width, 0)
+  YAML_MACRO(t_int, height, 0)
+  YAML_MACRO(t_int, wavelet_levels, 0)
+  YAML_MACRO(t_uint, Jx, 0)
+  YAML_MACRO(t_uint, Jy, 0)
+  YAML_MACRO(t_real, oversampling, 0)
+  YAML_MACRO(t_real, powMethod_tolerance, 0)
+  YAML_MACRO(t_real, epsilonScaling, 0)
+  YAML_MACRO(t_real, cellsizex, 0)
+  YAML_MACRO(t_real, cellsizey, 0)
+  YAML_MACRO(t_real, measurements_sigma, 1)
+  YAML_MACRO(t_real, signal_to_noise, 30)
+  YAML_MACRO(t_real, relVarianceConvergence, 0)
+  YAML_MACRO(t_real, epsilonConvergenceScaling, 0)
   YAML_MACRO(std::vector<std::string>, wavelet_basis, {})
-  YAML_MACRO(std::string, gamma, "")
+  YAML_MACRO(t_int, update_iters, 0)
+  YAML_MACRO(t_real, update_tolerance, 0)
   YAML_MACRO(std::string, output_prefix, "")
   YAML_MACRO(std::string, skymodel, "")
   YAML_MACRO(std::vector<std::string>, measurements, {})
   YAML_MACRO(stokes, measurements_polarization, stokes::I)
   YAML_MACRO(utilities::vis_units, measurements_units, utilities::vis_units::radians)
-  YAML_MACRO(std::string, noise_estimate, "")
-  YAML_MACRO(std::string, polarization_noise, "")
-  YAML_MACRO(std::string, Jweights, "")
+  YAML_MACRO(std::string, kernel, "")
 
 #undef YAML_MACRO
   private:

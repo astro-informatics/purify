@@ -43,19 +43,20 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser.logging() == "debug");
       REQUIRE(yaml_parser.iterations() == 100);
       REQUIRE(yaml_parser.epsilonScaling() == 1);
-      REQUIRE(yaml_parser.gamma() == "default");
+      REQUIRE(yaml_parser.update_iters() == 0);
+      REQUIRE(yaml_parser.update_tolerance() == 1e-1);
       REQUIRE(yaml_parser.output_prefix() == "/path/to/output/dir");
     }
   SECTION("Check the MeasureOperators node variables")
     {
-      REQUIRE(yaml_parser.Jweights() == "kb");
+      REQUIRE(yaml_parser.kernel() == "kb");
       REQUIRE(yaml_parser.oversampling() == 2);
       REQUIRE(yaml_parser.powMethod_iter() == 100);
       REQUIRE(yaml_parser.powMethod_tolerance() == float(1e-4));
-      REQUIRE(yaml_parser.Dx() == 1);
-      REQUIRE(yaml_parser.Dy() == 1);
-      REQUIRE(yaml_parser.x() == 1024);
-      REQUIRE(yaml_parser.y() == 1024);
+      REQUIRE(yaml_parser.cellsizex() == 1);
+      REQUIRE(yaml_parser.cellsizey() == 1);
+      REQUIRE(yaml_parser.height() == 1024);
+      REQUIRE(yaml_parser.width() == 1024);
       REQUIRE(yaml_parser.Jx() == 4);
       REQUIRE(yaml_parser.Jy() == 4);
     }
@@ -83,7 +84,8 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser_check.logging() == yaml_parser_m.logging());
       REQUIRE(yaml_parser_check.iterations() == yaml_parser_m.iterations());
       REQUIRE(yaml_parser_check.epsilonScaling() == yaml_parser_m.epsilonScaling());
-      REQUIRE(yaml_parser_check.gamma() == yaml_parser_m.gamma());
+      REQUIRE(yaml_parser_check.update_tolerance() == yaml_parser_m.update_tolerance());
+      REQUIRE(yaml_parser_check.update_iters() == yaml_parser_m.update_iters());
       REQUIRE(yaml_parser_check.output_prefix() == yaml_parser_m.output_prefix());
       REQUIRE(yaml_parser_check.source() == yaml_parser_m.source());
       REQUIRE(yaml_parser_check.measurements() == yaml_parser_m.measurements());
@@ -92,14 +94,14 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser_check.measurements_sigma() == yaml_parser_m.measurements_sigma());
       REQUIRE(yaml_parser_check.skymodel() == yaml_parser_m.skymodel());
       REQUIRE(yaml_parser_check.signal_to_noise() == yaml_parser_m.signal_to_noise());
-      REQUIRE(yaml_parser_check.Jweights() == yaml_parser_m.Jweights());
+      REQUIRE(yaml_parser_check.kernel() == yaml_parser_m.kernel());
       REQUIRE(yaml_parser_check.oversampling() == yaml_parser_m.oversampling());
       REQUIRE(yaml_parser_check.powMethod_iter() == yaml_parser_m.powMethod_iter());
       REQUIRE(yaml_parser_check.powMethod_tolerance() == yaml_parser_m.powMethod_tolerance());
-      REQUIRE(yaml_parser_check.Dx() == yaml_parser_m.Dx());
-      REQUIRE(yaml_parser_check.Dy() == yaml_parser_m.Dy());
-      REQUIRE(yaml_parser_check.x() == yaml_parser_m.x());
-      REQUIRE(yaml_parser_check.y() == yaml_parser_m.y());
+      REQUIRE(yaml_parser_check.cellsizex() == yaml_parser_m.cellsizex());
+      REQUIRE(yaml_parser_check.cellsizey() == yaml_parser_m.cellsizey());
+      REQUIRE(yaml_parser_check.width() == yaml_parser_m.width());
+      REQUIRE(yaml_parser_check.height() == yaml_parser_m.height());
       REQUIRE(yaml_parser_check.Jx() == yaml_parser_m.Jx());
       REQUIRE(yaml_parser_check.Jy() == yaml_parser_m.Jy());
       REQUIRE(yaml_parser.wavelet_basis() == yaml_parser_m.wavelet_basis());

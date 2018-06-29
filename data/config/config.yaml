@@ -22,21 +22,23 @@ GeneralConfiguration:
   logging: debug # How much logging you want (debug, critical, ..)# FIXME: add the options, compile?
   iterations: 100 # number of iterations (>= 0)
   epsilonScaling: 1 # RMS noise (> 0)
-  gamma: default # Stepsize, choose value between: default, variable, 100, x
+  stepsize:  # Stepsize, choose value between: default, variable, 100, x
+    update_tolerance: 1e-1 #when predicted stepsize is greater than this value, it will be updated
+    update_iters: 0 #how many iterations to allow updating of step size
   ## modelImage:  # If none epsilonL2 * RealImage # FIXME - maybe to delete
 
 ########## Measure Operators ##########
 MeasureOperators:
   pixelSize:
-    Dx: 1
-    Dy: 1
+    cellsizex: 1
+    cellsizey: 1
   imageSize: # for the moment: power of two
-    x: 1024
-    y: 1024
+    width: 1024
+    height: 1024
   J: # Interpolation pixels (default 4x4). Input either a value or pair
     Jx: 4
     Jy: 4
-  Jweights: kb # kernel, choose between: kb, Gauss, box
+  kernel: kb # kernel, choose between: kb, Gauss, box
   oversampling: 2 # value > 1
   powMethod_iter: 100 # value > 0
   powMethod_tolerance: 1e-4 # value > 0
@@ -52,14 +54,10 @@ AlgorithmOptions:
   algorithm: padmm # will just read the options of that one.
   ########## PADMM ##########
   padmm:
-    epsilonConvergenceScaling: 1 # Default 1 (>0)
     realValueConstraint: True # Boolean
     positiveValueConstraint: True #boolean
     # Following is only accepted when MPI is used
     mpiAlgorithm:  fully-distributed # one of none, serial-equivalent, fully-distributed
     # Be careful changing the following unless you know what you are doing
-    relVarianceConvergence: 1e-3 # (>0)
-
-  pd: # this is ignored if not chosen in algorithm.
-    param1: none # something
-    param2: none # something else
+    relVarianceConvergence: 1e-3 # (>0) relative converegence tolerance of solution
+    epsilonConvergenceScaling: 1 # (>0) l2 convergence tolerance for residuals
