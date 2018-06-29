@@ -78,6 +78,24 @@ matrix:
         - openMP=OFF
         - DOCS=OFF
 
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+            - *all_deps
+            - openmpi-bin # Version 1.6.5-8
+
+      env:
+        - TITLE="All dependencies - GCC - MPI"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - MPI=ON
+        - openMP=ON
+        - DOCS=OFF
+
 before_install:
   - if [ $TRAVIS_OS_NAME = osx ]; then brew update; brew install gcc@7 fftw open-mpi yaml-cpp; fi
   - if [ $TRAVIS_OS_NAME = linux ]; then ClangVer="-5.0"; fi
