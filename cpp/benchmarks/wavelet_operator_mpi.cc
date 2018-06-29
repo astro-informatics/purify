@@ -1,9 +1,7 @@
 #include <chrono>
 #include <benchmark/benchmark.h>
-#include "purify/operators.h"
 #include "benchmarks/utilities.h"
-#include <sopt/wavelets.h>
-#include <sopt/wavelets/sara.h>
+#include "purify/wavelet_operator_factory.h"
 
 using namespace purify;
 
