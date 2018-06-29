@@ -21,7 +21,7 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser_m.measurements() == expected_measurements);
       REQUIRE(yaml_parser_m.measurements_polarization() == stokes::I);
       REQUIRE(yaml_parser_m.measurements_units() == purify::utilities::vis_units::pixels);
-      REQUIRE(yaml_parser_m.measurements_sigma() == 0.1f);
+      REQUIRE(yaml_parser_m.measurements_sigma() == 0.1);
       REQUIRE(yaml_parser_m.skymodel() == "");
       REQUIRE(yaml_parser_m.signal_to_noise() == 30);
     }
@@ -44,7 +44,7 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser.iterations() == 100);
       REQUIRE(yaml_parser.epsilonScaling() == 1);
       REQUIRE(yaml_parser.gamma() == "default");
-      REQUIRE(yaml_parser.output_path() == "/path/to/output/dir");
+      REQUIRE(yaml_parser.output_prefix() == "/path/to/output/dir");
     }
   SECTION("Check the MeasureOperators node variables")
     {
@@ -73,20 +73,18 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser.positiveValueConstraint() == true);
       REQUIRE(yaml_parser.mpiAlgorithm() == factory::algo_distribution::mpi_distributed);
       REQUIRE(yaml_parser.relVarianceConvergence() == 1e-3);
-      REQUIRE(yaml_parser.param1() == "none");
-      REQUIRE(yaml_parser.param2() == "none");
     }
   SECTION("Check the writeOutput method")
     {
       yaml_parser_m.writeOutput(); // This test config file has a relative path for output, for testing purposes
-      std::string file_path_save = yaml_parser_m.output_path() + "/output_" + yaml_parser_m.timestamp() + "/test_measurements_config_save.yaml";
+      std::string file_path_save = yaml_parser_m.output_prefix() + "/output_" + yaml_parser_m.timestamp() + "/test_measurements_config_save.yaml";
       YamlParser yaml_parser_check(file_path_save);
       REQUIRE(yaml_parser_check.filepath() == file_path_save);
       REQUIRE(yaml_parser_check.logging() == yaml_parser_m.logging());
       REQUIRE(yaml_parser_check.iterations() == yaml_parser_m.iterations());
       REQUIRE(yaml_parser_check.epsilonScaling() == yaml_parser_m.epsilonScaling());
       REQUIRE(yaml_parser_check.gamma() == yaml_parser_m.gamma());
-      REQUIRE(yaml_parser_check.output_path() == yaml_parser_m.output_path());
+      REQUIRE(yaml_parser_check.output_prefix() == yaml_parser_m.output_prefix());
       REQUIRE(yaml_parser_check.source() == yaml_parser_m.source());
       REQUIRE(yaml_parser_check.measurements() == yaml_parser_m.measurements());
       REQUIRE(yaml_parser_check.measurements_polarization() == yaml_parser_m.measurements_polarization());
@@ -112,8 +110,6 @@ TEST_CASE("Yaml parser and setting variables test")
       REQUIRE(yaml_parser.positiveValueConstraint() == yaml_parser_m.positiveValueConstraint());
       REQUIRE(yaml_parser.mpiAlgorithm() == yaml_parser_m.mpiAlgorithm());
       REQUIRE(yaml_parser.relVarianceConvergence() == yaml_parser_m.relVarianceConvergence());
-      REQUIRE(yaml_parser.param1() == yaml_parser_m.param1());
-      REQUIRE(yaml_parser.param2() == yaml_parser_m.param2());
      std::remove(file_path_save.c_str());
     }
 }

@@ -32,7 +32,6 @@ class YamlParser
     @param filepath path to config file
   */
   YamlParser(const std::string& filepath);
-
   /** 
     Read configuration file in memory
   */
@@ -93,8 +92,6 @@ class YamlParser
   YAML_MACRO(factory::algo_distribution, mpiAlgorithm,
       factory::algo_distribution::serial)
   YAML_MACRO(purify::utilities::vis_source, source, purify::utilities::vis_source::measurements)
-  YAML_MACRO(std::string, param1, "")
-  YAML_MACRO(std::string, param2, "")
   YAML_MACRO(bool, realValueConstraint, true)
   YAML_MACRO(bool, positiveValueConstraint, true)
   YAML_MACRO(int, iterations, 0)
@@ -115,7 +112,7 @@ class YamlParser
   YAML_MACRO(double, relVarianceConvergence, 0)
   YAML_MACRO(std::vector<std::string>, wavelet_basis, {})
   YAML_MACRO(std::string, gamma, "")
-  YAML_MACRO(std::string, output_path, "")
+  YAML_MACRO(std::string, output_prefix, "")
   YAML_MACRO(std::string, skymodel, "")
   YAML_MACRO(std::vector<std::string>, measurements, {})
   YAML_MACRO(stokes, measurements_polarization, stokes::I)
@@ -125,8 +122,11 @@ class YamlParser
   YAML_MACRO(std::string, Jweights, "")
 
 #undef YAML_MACRO
-
+  private:
   YAML::Node config_file;
+
+template <typename T>
+T get(const YAML::Node& node_map, const std::initializer_list<const char*> indicies);
 };
 }
 #endif /* YAML_PARSER_H */

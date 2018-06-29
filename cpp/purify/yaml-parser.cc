@@ -3,7 +3,7 @@
     @author Roland Guichard
     @version 1.0
 */
-
+#include <boost/filesystem.hpp>
 #include <typeinfo>
 #include <chrono>
 #include <ctime>
@@ -39,11 +39,74 @@ YamlParser::YamlParser (const std::string& filepath)
 
 void YamlParser::readFile ()
 {
-  YAML::Node config = YAML::LoadFile(this->filepath_);
-  // A bit of defensive programming
-  assert(config.Type() == YAML::NodeType::Map);
-  this->config_file = config;
+  try
+    {
+      YAML::Node config = YAML::LoadFile(this->filepath());
+      // A bit of defensive programming
+      assert(config.Type() == YAML::NodeType::Map);
+      this->config_file = config;
+    }
+  catch(YAML::BadFile& exception)
+    {
+      const std::string current_path = boost::filesystem::current_path().native();
+      throw (std::runtime_error("Runtime error while trying to find config.yaml. The input file path " + this->filepath() + " could not be found from " + current_path));
+    }
 }
+
+template <typename T>
+T YamlParser::get(const YAML::Node& node_map, const std::initializer_list<const char*> indicies)
+{
+  YAML::Node node = YAML::Clone (node_map);
+  std::string faulty_variable;
+  for (const char* index : indicies)
+    {
+      faulty_variable = std::string(index);	  
+      node = node[index];
+      if (!node.IsDefined())
+	{
+	  throw std::runtime_error("The initialisation of " + faulty_variable + " is wrong in config " + this->filepath());
+	}
+    }
+  try
+    {
+      if(node.size() > 1)
+	throw std::runtime_error("The node has more than one element.");
+      return node.as<T>();
+    }
+  catch (std::exception e)
+    {
+      throw std::runtime_error("There is a mismatch in the type conversion of " + faulty_variable + " of "+this->filepath());
+    }
+}
+
+
+template <typename T>
+T get_vector(const YAML::Node& node_map, const std::initializer_list<const char*> indicies)
+{
+  YAML::Node node = YAML::Clone (node_map);
+  std::string faulty_variable;
+  for (const char* index : indicies)
+    {
+      faulty_variable = std::string(index);	  
+      node = node[index];
+      if (!node.IsDefined())
+	{
+	  throw std::runtime_error("The initialisation of " + faulty_variable + " is wrong.");
+	}
+    }
+  try
+    {
+      T output;
+      for (int i=0; i < node.size(); i++)
+	output.push_back(node[i].as<typename T::value_type>());
+      return output;
+    }
+  catch (std::exception e)
+    {
+      throw std::runtime_error("There is a mismatch in the type conversion of " + faulty_variable);
+    }
+}
+
 
 void YamlParser::setParserVariablesFromYaml ()
 {
@@ -55,26 +118,23 @@ void YamlParser::setParserVariablesFromYaml ()
 }
 
 void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfigNode)
-{  
-  this->logging_ = generalConfigNode["logging"].as<std::string>();
-  this->iterations_ = generalConfigNode["iterations"].as<int>();
-  this->epsilonScaling_ = generalConfigNode["epsilonScaling"].as<int>();
-  this->gamma_ = generalConfigNode["gamma"].as<std::string>();
+{
+  this->logging_ = get<std::string>(generalConfigNode, {"logging"});
+  this->iterations_ = get<int>(generalConfigNode, {"iterations"});
+  this->epsilonScaling_ = get<int>(generalConfigNode, {"epsilonScaling"});
+  this->gamma_ = get<std::string>(generalConfigNode, {"gamma"});
+  this->output_prefix_ = get<std::string>(generalConfigNode, {"InputOutput", "output_prefix"});
+
   
-  this->output_path_ = generalConfigNode["InputOutput"]["output_path"].as<std::string>();
-  
-  std::string source_str = generalConfigNode["InputOutput"]["input"]["source"].as<std::string>();
+  const std::string source_str = get<std::string>(generalConfigNode, {"InputOutput", "input", "source"});  
   if (source_str=="measurements") {
-    if (generalConfigNode["InputOutput"]["input"]["simulation"])
+  this->measurements_polarization_ = stokes_string.at(get<std::string>(generalConfigNode, {"InputOutput", "input", "measurements", "measurements_polarization"}));
+    if(generalConfigNode["InputOutput"]["input"]["simulation"])
       throw std::runtime_error("Expecting only the input measurements block in the configuration file. Please remove simulation block!");
     this->source_ = purify::utilities::vis_source::measurements;
-    YAML::Node measurement_seq = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_files"];
-    for (int i=0; i < measurement_seq.size(); i++)
-      // TODO: check if files exist, and remove from list if they don't (see read_measurements.cc)
-      this->measurements_.push_back(measurement_seq[i].as<std::string>());
+  this->measurements_ = get_vector<std::vector<std::string>>(generalConfigNode, {"InputOutput", "input", "measurements", "measurements_files"});
     // TODO: use the enum instead of string.
-    this->measurements_polarization_ = stokes_string.at(generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_polarization"].as<std::string>());
-    std::string units_measurement_str = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_units"].as<std::string>();
+   const std::string units_measurement_str = get<std::string>(generalConfigNode,{"InputOutput", "input", "measurements", "measurements_units"});
     if (units_measurement_str=="lambda")
       this->measurements_units_ = purify::utilities::vis_units::lambda;
     else if (units_measurement_str=="radians")
@@ -83,14 +143,14 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
       this->measurements_units_ = purify::utilities::vis_units::pixels;
     else
       throw std::runtime_error("Visibility units \""+units_measurement_str+"\" not recognised. Check your config file.");
-    this->measurements_sigma_ = generalConfigNode["InputOutput"]["input"]["measurements"]["measurements_sigma"].as<float>();
+    this->measurements_sigma_ = get<t_real>(generalConfigNode, {"InputOutput", "input", "measurements", "measurements_sigma"});
   }
   else if (source_str=="simulation") {
     if (generalConfigNode["InputOutput"]["input"]["measurements"])
       throw std::runtime_error("Expecting only the input simulation block in the configuration file. Please remove measurements block!");
     this->source_ = purify::utilities::vis_source::simulation;
-    this->skymodel_ = generalConfigNode["InputOutput"]["input"]["simulation"]["skymodel"].as<std::string>();
-    this->signal_to_noise_ = generalConfigNode["InputOutput"]["input"]["simulation"]["signal_to_noise"].as<float>();
+    this->skymodel_ = get<std::string>(generalConfigNode, {"InputOutput", "input", "simulation", "skymodel"});
+    this->signal_to_noise_ = get<t_real>(generalConfigNode, {"InputOutput", "input", "simulation", "signal_to_noise"});
   }
   else
     throw std::runtime_error("Visibility source \""+source_str+"\" not recognised. Check your config file.");
@@ -98,37 +158,35 @@ void YamlParser::parseAndSetGeneralConfiguration (const YAML::Node& generalConfi
 
 void YamlParser::parseAndSetMeasureOperators (const YAML::Node& measureOperatorsNode)
 {
-  this->Jweights_ = measureOperatorsNode["Jweights"].as<std::string>();
-  this->oversampling_ = measureOperatorsNode["oversampling"].as<float>();
-  this->powMethod_iter_ = measureOperatorsNode["powMethod_iter"].as<int>();
-  this->powMethod_tolerance_ = measureOperatorsNode["powMethod_tolerance"].as<float>();
-  this->Dx_ = measureOperatorsNode["pixelSize"]["Dx"].as<double>();
-  this->Dy_ = measureOperatorsNode["pixelSize"]["Dy"].as<double>();
-  this->x_ = measureOperatorsNode["imageSize"]["x"].as<int>();
-  this->y_ = measureOperatorsNode["imageSize"]["y"].as<int>();
-  this->Jx_ = measureOperatorsNode["J"]["Jx"].as<unsigned int>();
-  this->Jy_ = measureOperatorsNode["J"]["Jy"].as<unsigned int>();
+  this->Jweights_ = get<std::string>(measureOperatorsNode, {"Jweights"});
+  this->oversampling_ = get<float>(measureOperatorsNode, {"oversampling"});
+  this->powMethod_iter_ = get<int>(measureOperatorsNode, {"powMethod_iter"});
+  this->powMethod_tolerance_ =get<float>(measureOperatorsNode, {"powMethod_tolerance"});
+  this->Dx_ = get<double>(measureOperatorsNode, {"pixelSize", "Dx"});
+  this->Dy_ = get<double>(measureOperatorsNode, {"pixelSize", "Dy"});
+  this->x_ = get<int>(measureOperatorsNode, {"imageSize", "x"});
+  this->y_ = get<int>(measureOperatorsNode, {"imageSize", "y"});
+  this->Jx_ = get<unsigned int>(measureOperatorsNode, {"J", "Jx"});
+  this->Jy_ = get<unsigned int>(measureOperatorsNode, {"J", "Jy"});
 }
 
 void YamlParser::parseAndSetSARA (const YAML::Node& SARANode)
 {
-  const std::string values_str = SARANode["wavelet_dict"].as<std::string>();
+  const std::string values_str = get<std::string>(SARANode, {"wavelet_dict"});
   this->wavelet_basis_ = this->getWavelets(values_str);
-  this->wavelet_levels_ = SARANode["wavelet_levels"].as<int>();
+  this->wavelet_levels_ = get<t_int>(SARANode, {"wavelet_levels"});
 }
 
 void YamlParser::parseAndSetAlgorithmOptions (const YAML::Node& algorithmOptionsNode)
 {
-  this->algorithm_ = algorithmOptionsNode["algorithm"].as<std::string>();
+  this->algorithm_ = get<std::string>(algorithmOptionsNode, {"algorithm"});
   if (this->algorithm_ != "padmm")
     throw std::runtime_error("Only padmm algorithm configured for now. Please fill the appropriate block in the configuration file.");
-  this->epsilonConvergenceScaling_ = algorithmOptionsNode["padmm"]["epsilonConvergenceScaling"].as<int>();
-  this->realValueConstraint_ = algorithmOptionsNode["padmm"]["realValueConstraint"].as<bool>();
-  this->positiveValueConstraint_ = algorithmOptionsNode["padmm"]["positiveValueConstraint"].as<bool>();
-  this->mpiAlgorithm_ = factory::algo_distribution_string.at(algorithmOptionsNode["padmm"]["mpiAlgorithm"].as<std::string>());
-  this->relVarianceConvergence_ = algorithmOptionsNode["padmm"]["relVarianceConvergence"].as<double>();  
-  this->param1_ = algorithmOptionsNode["pd"]["param1"].as<std::string>();
-  this->param2_ = algorithmOptionsNode["pd"]["param2"].as<std::string>();
+  this->epsilonConvergenceScaling_ = get<t_int>(algorithmOptionsNode, {"padmm","epsilonConvergenceScaling"});
+  this->realValueConstraint_ = get<bool>(algorithmOptionsNode, {"padmm","realValueConstraint"});
+  this->positiveValueConstraint_ = get<bool>(algorithmOptionsNode, {"padmm", "positiveValueConstraint"});
+  this->mpiAlgorithm_ = factory::algo_distribution_string.at(get<std::string>(algorithmOptionsNode, {"padmm", "mpiAlgorithm"})); 
+  this->relVarianceConvergence_ = get<t_real>(algorithmOptionsNode, {"padmm", "relVarianceConvergence"});
 }
 
 std::vector<std::string> YamlParser::getWavelets(const std::string &values_str)
@@ -172,14 +230,14 @@ void YamlParser::writeOutput()
 {
 
   // Get base file name (without path or extension)
-  std::size_t file_begin = filepath_.find_last_of("/");
+  std::size_t file_begin = this->filepath_.find_last_of("/");
   if (file_begin==std::string::npos) file_begin=0;
   std::string file_path = filepath_.substr(0,file_begin);
   std::string extension = ".yaml";
   std::string base_file_name = this->filepath_.erase(this->filepath_.size()-extension.size());
   base_file_name = base_file_name.substr((file_path.size() ? file_path.size()+1 : 0), base_file_name.size());
   // Construct output directory structure and file name
-  boost::filesystem::path const path(this->output_path_);
+  boost::filesystem::path const path(this->output_prefix_);
   auto const out_path = path / ("output_" + std::string(this->timestamp()));
   boost::filesystem::create_directories(out_path);
   std::string out_filename = (out_path / base_file_name).native() + "_save.yaml";
