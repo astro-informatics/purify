@@ -95,6 +95,7 @@ matrix:
         - MPI=ON
         - openMP=ON
         - DOCS=OFF
+        - MPI_PROCS=4
 
 before_install:
   - if [ $TRAVIS_OS_NAME = osx ]; then brew update; brew install gcc@7 fftw open-mpi yaml-cpp; fi
