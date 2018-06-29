@@ -13,7 +13,7 @@ GeneralConfiguration:
         measurements_polarization: I # one from I Q V XX LL
         measurements_units: pixels # one from lambda, radians, pixels
         measurements_sigma: 0.1 # the noise level in the data
-    output_path: path/to/output/dir # results directory will be created inside this path, and called output_<timestamp>
+    output_prefix: path/to/output/dir # results directory will be created inside this path, and called output_<timestamp>
 
   ### Execution parameters
   logging: debug # How much logging you want (debug, critical, ..)# FIXME: add the options, compile?
