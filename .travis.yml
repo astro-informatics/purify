@@ -104,7 +104,7 @@ matrix:
             - *native_deps
             - *all_deps
             - openmpi-bin # Version 1.6.5-8
-
+            - libopenmpi-dev
       env:
         - TITLE="All dependencies - GCC - MPI"
         - DEBUG=True
@@ -156,6 +156,7 @@ matrix:
           packages:
             - *native_deps
             - openmpi-bin # Version 1.6.5-8
+            - libopenmpi-dev
       env:
         - TITLE="No dependencies - GCC - MPI"
         - DEBUG=True
