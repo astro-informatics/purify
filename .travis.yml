@@ -228,7 +228,7 @@ script:
     ${CMAKE_CMD_EXTRA}
   - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
   - eval $BUILD_CMD
-  - tail -n +1 /home/travis/build/astro-informatics/purify/build/external/src/Lookup-Sopt-stamp/Lookup-Sopt*.log
+  - if [[ $DOCS = OFF ]]; then tail -n +1 /home/travis/build/astro-informatics/purify/build/external/src/Lookup-CFitsIO-stamp/Lookup-CFitsIO-download-*.log; fi
   - eval $TEST_CMD
 
 after_success:
