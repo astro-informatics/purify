@@ -90,7 +90,7 @@ else()
     GIT_TAG ${Sopt_GIT_TAG})
 endif()
 
-lookup_package(CFitsIO REQUIRED 3.41 EXACT ARGUMENTS CHECKCASA URL "ftp://heasarc.gsfc.nasa.gov/software/fitsio/c/cfitsio3410.tar.gz")
+lookup_package(CFitsIO REQUIRED 3.45 EXACT ARGUMENTS CHECKCASA URL "ftp://heasarc.gsfc.nasa.gov/software/fitsio/c/cfitsio3450.tar.gz")
 if(docimg)
   set(PURIFY_CImg TRUE)
   find_package(X11)
