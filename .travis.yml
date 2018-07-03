@@ -33,7 +33,6 @@ matrix:
         - TITLE="Who knows - GCC"
         - MPI=OFF
         - openMP=OFF
-        - DOCS=OFF
 
     - os: osx
       osx_image: xcode8
@@ -41,7 +40,6 @@ matrix:
         - TITLE="Who knows - GCC - OMP"
         - MPI=OFF
         - openMP=ON
-        - DOCS=OFF
 
     - os: osx
       osx_image: xcode8
@@ -49,7 +47,6 @@ matrix:
         - TITLE="Who knows - GCC - MPI"
         - MPI=ON
         - openMP=ON
-        - DOCS=OFF
         - MPI_PROCS=2
 
     - os: osx
@@ -58,7 +55,6 @@ matrix:
         - TITLE="Who knows - Clang"
         - MPI=OFF
         - openMP=OFF
-        - DOCS=OFF
 
     - os: linux
       addons:
@@ -77,7 +73,6 @@ matrix:
         - LDFLAGS='-pthread'
         - MPI=OFF
         - openMP=OFF
-        - DOCS=OFF
 
     - os: linux
       addons:
@@ -93,7 +88,6 @@ matrix:
         - LDFLAGS='-pthread'
         - MPI=OFF
         - openMP=ON
-        - DOCS=OFF
 
     - os: linux
       addons:
@@ -111,7 +105,6 @@ matrix:
         - LDFLAGS='-pthread'
         - MPI=ON
         - openMP=ON
-        - DOCS=OFF
         - MPI_PROCS=4
 
     - os: linux
@@ -129,7 +122,6 @@ matrix:
         - LDFLAGS='-pthread'
         - MPI=ON
         - openMP=ON
-        - DOCS=OFF
         - MPI_PROCS=4
 
     - os: linux
@@ -146,7 +138,6 @@ matrix:
         - LDFLAGS='-pthread'
         - MPI=OFF
         - openMP=OFF
-        - DOCS=OFF
 
     - os: linux
       addons:
@@ -163,7 +154,6 @@ matrix:
         - LDFLAGS='-pthread'
         - MPI=ON
         - openMP=ON
-        - DOCS=OFF
         - MPI_PROCS=4
 
     - os: linux
@@ -223,14 +213,14 @@ script:
     -Ddompi=${MPI} \
     -Dexamples=OFF \
     -Dopenmp=${openMP} \
-    -Ddocs=${DOCS} \
+    -Ddocs=${DOCS-OFF} \
     -Dbenchmarks=${Benchmarks-OFF} \
     -DSopt_GIT_REPOSITORY=https://github.com/astro-informatics/sopt.git \
     -DSopt_GIT_TAG=development \
     ${CMAKE_CMD_EXTRA}
   - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
   - eval $BUILD_CMD
-  - if [[ $DOCS = OFF ]]; then tail -n +1 /home/travis/build/astro-informatics/purify/build/external/src/Lookup-CFitsIO-stamp/Lookup-CFitsIO-download-*.log; fi
+  - if [ -z $DOCS ]; then tail -n +1 /home/travis/build/astro-informatics/purify/build/external/src/Lookup-CFitsIO-stamp/Lookup-CFitsIO-download-*.log; fi
   - eval $TEST_CMD
 
 after_success:
