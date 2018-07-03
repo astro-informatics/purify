@@ -180,6 +180,7 @@ matrix:
         - TITLE="Documentation - GCC"
         - DEBUG=True
         - LDFLAGS='-pthread'
+        - Tests=OFF
         - MPI=OFF
         - openMP=OFF
         - DOCS=ON
@@ -218,6 +219,7 @@ script:
   - cd build
   - |
     cmake .. -DCMAKE_BUILD_TYPE=Release \
+    -Dtests=${Tests-ON} \
     -Ddompi=${MPI} \
     -Dexamples=OFF \
     -Dopenmp=${openMP} \
