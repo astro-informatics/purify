@@ -20,7 +20,7 @@ endif()
 if(NOT CFitsIO_URL AND NOT using_casa)
     set(CFitsIO_URL
         ftp://heasarc.gsfc.nasa.gov/software/fitsio/c/cfitsio3410.tar.gz)
-elseif(NOT CFistIO_URL)
+elseif(NOT CFitsIO_URL)
     set(CFitsIO_URL
         https://svn.cv.nrao.edu/casa/devel/cfitsio+patch.tar.gz)
 endif()
