@@ -33,6 +33,7 @@ matrix:
         - TITLE="Who knows - GCC"
         - MPI=OFF
         - openMP=OFF
+        - LDFLAGS='-lyaml-cpp'
 
     - os: osx
       osx_image: xcode8
