@@ -45,7 +45,6 @@ set(version "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}.${Purify_VERSION_PA
 set(soversion "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}")
 set_target_properties(libpurify PROPERTIES VERSION ${version} SOVERSION ${soversion})
 set_target_properties(libpurify PROPERTIES OUTPUT_NAME purify)
-set_target_properties(libpurify PROPERTIES POSITION_INDEPENDENT_CODE ON)
 if(PURIFY_MPI)
   target_link_libraries(libpurify ${MPI_LIBRARIES})
   target_include_directories(libpurify SYSTEM PUBLIC ${MPI_CXX_INCLUDE_PATH})
