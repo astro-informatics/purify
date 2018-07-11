@@ -219,6 +219,7 @@ script:
   - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
   - eval $BUILD_CMD
   - eval $TEST_CMD
+  - if [ $TRAVIS_OS_NAME = osx ]; then echo $(pwd); ls -lh ../data/atca; fi
 
 after_success:
 
