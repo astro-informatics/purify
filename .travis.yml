@@ -98,8 +98,6 @@ matrix:
           packages:
             - *native_deps
             - *all_deps
-            - openmpi-bin # Version 1.6.5-8
-            - libopenmpi-dev
       env:
         - TITLE="All dependencies - GCC - MPI"
         - DEBUG=True
@@ -116,7 +114,6 @@ matrix:
           packages:
             - *native_deps
             - *all_deps
-            - mpich # version 3.0.4-6
       env:
         - TITLE="All dependencies - GCC - MPI - mpich"
         - DEBUG=True
@@ -147,8 +144,6 @@ matrix:
             - *basic_sources
           packages:
             - *native_deps
-            - openmpi-bin # Version 1.6.5-8
-            - libopenmpi-dev
       env:
         - TITLE="No dependencies - GCC - MPI"
         - DEBUG=True
@@ -197,12 +192,13 @@ before_install:
   - if [[ ${TITLE} = *GCC* ]]; then CXX=g++-7; else CXX=clang++${ClangVer}; fi
   # As MPI is not installed already, this variable is not set properly; this
   # way is set up for all the jobs in the same manner.
-  - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; fi
   - echo "==================== ${TITLE} ====================="
 
 install:
 
 before_script:
+  - if [[ $MPI = ON ]]; then if [ $TRAVIS_OS_NAME = linux ]; then  if [[ ${TITLE} != *mpich* ]]; then bash .ci/build_openmpi.sh; else bash .ci/build_mpich.sh; fi; fi; fi;
+  - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; echo $CMAKE_CMD_EXTRA;  fi
 
 script:
   - pwd
