@@ -7,7 +7,7 @@ curl -O http://www.mpich.org/static/downloads/3.2.1/mpich-3.2.1.tar.gz
 tar zxf mpich-3.2.1.tar.gz
 
 cd mpich-3.2.1
-./configure --prefix=/usr/local
+./configure --prefix=/usr/local  --disable-fortran
 make
-make install
+sudo make install
 cd $cwd

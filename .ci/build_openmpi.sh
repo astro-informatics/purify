@@ -8,5 +8,5 @@ tar jxf openmpi-3.1.1.tar.bz2
 
 cd openmpi-3.1.1
 ./configure --prefix=/usr/local
-make all install
+sudo make all install
 cd $cwd
