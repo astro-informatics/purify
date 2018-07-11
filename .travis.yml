@@ -192,6 +192,7 @@ before_install:
   # As MPI is not installed already, this variable is not set properly; this
   # way is set up for all the jobs in the same manner.
   - echo "==================== ${TITLE} ====================="
+  - if [ $TRAVIS_OS_NAME = osx ]; then echo $(pwd); ls -lh data/atca; fi
 
 install:
 
