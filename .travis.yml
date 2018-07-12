@@ -197,7 +197,7 @@ before_install:
 install:
 
 before_script:
-  - if [[ $MPI = ON ]]; then if [ $TRAVIS_OS_NAME = linux ]; then  if [[ ${TITLE} != *mpich* ]]; then bash .ci/build_openmpi.sh; MPI_CONFIG=${MPI_CONFIG}"\" -DMPI_C_COMPILER=/usr/local/bin/mpicc  -DMPI_CXX_COMPILER=/usr/local/bin/mpicxx -DMPI_C_INCLUDE_PATH=/usr/local/include -DMPI_CXX_INCLUDE_PATH=/usr/local/include -DMPI_C_LIBRARIES=/usr/local/lib/libmpi.so -DMPI_CXX_LIBRARIES=/usr/local/lib/libmpi.so\""; else bash .ci/build_mpich.sh; fi; fi; fi;
+  - if [[ $MPI = ON ]]; then if [ $TRAVIS_OS_NAME = linux ]; then  if [[ ${TITLE} != *mpich* ]]; then bash .ci/build_openmpi.sh; else bash .ci/build_mpich.sh; fi; fi; fi;
   - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; echo $CMAKE_CMD_EXTRA;  fi
 
 script:
