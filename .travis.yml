@@ -103,7 +103,7 @@ matrix:
         - LDFLAGS='-pthread'
         - MPI=ON
         - openMP=ON
-        - MPI_PROCS=4
+        - MPI_PROCS=2
 
     - os: linux
       addons:
@@ -149,7 +149,7 @@ matrix:
         - LDFLAGS='-pthread'
         - MPI=ON
         - openMP=ON
-        - MPI_PROCS=4
+        - MPI_PROCS=2
 
     - os: linux
       addons:
