@@ -3,6 +3,7 @@ include(EnvironmentScript)
 # Look up packages: if not found, installs them
 include(PackageLookup)
 # Get the yaml reader
+find_package(Yamlcpp REQUIRED)
 lookup_package(Yamlcpp REQUIRED)
 
 if(docs)
