@@ -79,7 +79,7 @@ int main(int nargs, char const **args) {
       Image<t_real>::Map(dimage.data(), sky_model.rows(), sky_model.cols()),
       dirty_image_fits);
 
-  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
+  auto const epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
   PURIFY_MEDIUM_LOG("Using epsilon of {}", epsilon);
   auto const sdmm
       = sopt::algorithm::SDMM<t_complex>()

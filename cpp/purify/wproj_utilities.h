@@ -4,7 +4,9 @@
 #include "purify/config.h"
 #include <fstream>
 #include <iostream>
+#ifdef PURIFY_OPENMP
 #include <omp.h>
+#endif
 #include <random>
 #include <set>
 #include <stdio.h>

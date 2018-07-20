@@ -50,11 +50,11 @@ void forward_backward(const std::string &name, const Image<t_complex> &M31,
 #else
   auto const measurements_transform = operators::init_grid_degrid_operator_2d<Vector<t_complex>>(
       uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 500, 0.0001,
-      kernels::kernel_from_string.at(kernel), J, J, operators::fftw_plan::measure, std::get<0>(w_term));
+      kernels::kernel_from_string.at(kernel), J, J, std::get<0>(w_term));
   auto const measurements_dirty_map
       = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 500,
-          0.0001, kernels::kernel_from_string.at(kernel), J, J, operators::fftw_plan::measure, std::get<0>(w_term));
+          0.0001, kernels::kernel_from_string.at(kernel), J, J, std::get<0>(w_term));
 #endif
   const Vector<t_complex> dimage = measurements_dirty_map->adjoint() * uv_data.vis;
   pfitsio::write2d(Image<t_complex>::Map(dimage.data(), imsizey, imsizex).real(), dirty_image_fits);
@@ -181,7 +181,7 @@ int main(int, char **) {
 #else
   auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 500, 0.0001, kernels::kernel_from_string.at("kb"), 8,
-      8, operators::fftw_plan::measure, w_term);
+      8, w_term);
 #endif
   uv_data.vis = (*sky_measurements) * Vector<t_complex>::Map(M31.data(), M31.size());
   Vector<t_complex> const y0 = uv_data.vis;

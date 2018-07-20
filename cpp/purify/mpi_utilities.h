@@ -3,10 +3,12 @@
 
 #include "purify/config.h"
 #include <vector>
-#include <sopt/mpi/communicator.h>
 #include <sopt/linear_transform.h>
 #include "purify/utilities.h"
 
+#ifdef PURIFY_MPI
+#include <sopt/mpi/communicator.h>
+#endif
 namespace purify {
 namespace utilities {
 #ifdef PURIFY_MPI
@@ -33,12 +35,6 @@ distribute_params(utilities::vis_params const &params, sopt::mpi::Communicator c
 utilities::vis_params set_cell_size(const sopt::mpi::Communicator &comm,
                                     utilities::vis_params const &uv_vis, const t_real &cell_x,
                                     const t_real &cell_y);
-#else
-void regroup(utilities::vis_params &, std::vector<t_int> const &) {}
-vis_params scatter_visibilities(vis_params const &params, std::vector<t_int> const &,
-                                sopt::Communicator const &) {
-  return params;
-}
 #endif
 //! \brief Calculate step size using MPI (does not include factor of 1e-3)
 //! \param[in] vis: Vector of measurement data
@@ -51,7 +47,7 @@ vis_params scatter_visibilities(vis_params const &params, std::vector<t_int> con
 //! When there are more nodes than wavelets, there will be nodes with an empty Vector<T> 
 //! of wavelet coefficients. This can cause some functions to break, like .maxCoeff().
 template <class T>
-t_real step_size(Vector<t_complex> const & vis,
+t_real step_size(T const & vis,
     const std::shared_ptr<sopt::LinearTransform<T> const> &measurements,
     const std::shared_ptr<sopt::LinearTransform<T> const> &wavelets,
     const t_uint sara_size){

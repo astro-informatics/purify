@@ -11,7 +11,6 @@ include(LookUp-GreatCMakeCookOff)
 option(tests          "Enable testing"                                  on)
 option(examples       "Compile examples"                                on)
 option(benchmarks     "Enable benchmarking"                             on)
-option(data           "Download measurement set for testing"            off)
 option(openmp         "Enable OpenMP"                                   on)
 option(logging        "Enable logging"                                  on)
 option(dompi          "Enable MPI"                                      on)
@@ -19,6 +18,12 @@ option(doaf           "Enable ArrayFire"                                off)
 option(docimg         "Enable CImg"                                     off)
 option(docasa         "Enable CASA"                                     off)
 option(docs           "Build documentation"                             off)
+
+if(NOT CMAKE_BUILD_TYPE)
+  message(STATUS "Setting build type to 'Relese' as none was specified.")
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build Type" FORCE)
+endif()
+message(STATUS "Building purify in ${CMAKE_BUILD_TYPE} mode")
 
 # Set version and build id of this package
 include(version)
@@ -35,9 +40,6 @@ include(logging)
 # include exernal dependencies
 include(dependencies)
 
-if(tests AND data)
-  include(data_dependencies)
-endif()
 
 if(tests)  # Adds ctest
   enable_testing()

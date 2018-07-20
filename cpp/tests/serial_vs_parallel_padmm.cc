@@ -147,7 +147,7 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
 
   auto const sigma = world.broadcast(utilities::SNR_to_standard_deviation(uv_data.vis, ISNR));
-  auto const epsilon = world.broadcast(utilities::calculate_l2_radius(uv_data.vis, sigma));
+  auto const epsilon = world.broadcast(utilities::calculate_l2_radius(uv_data.vis.size(), sigma));
   auto const purify_gamma
       = world.is_root() ?
             world.broadcast((Psi.adjoint() * (Phi.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff()

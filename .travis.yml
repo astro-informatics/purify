@@ -21,6 +21,7 @@ addons:
       - clang-5.0
       - libtiff5-dev # version 5 ?
       - libgomp1 # version 4.8.4-2
+      - libfftw3-dev # version 3.3.3
 
 matrix:
   fast_finish: true
@@ -32,32 +33,28 @@ matrix:
         - TITLE="Who knows - GCC"
         - MPI=OFF
         - openMP=OFF
-        - DOCS=OFF
 
-    # - os: osx
-    #   osx_image: xcode8
-    #   env:
-    #     - TITLE="Who knows - GCC - OMP"
-    #     - MPI=OFF
-    #     - openMP=ON
-    #     - DOCS=OFF
+    - os: osx
+      osx_image: xcode8
+      env:
+        - TITLE="Who knows - GCC - OMP"
+        - MPI=OFF
+        - openMP=ON
 
-    # - os: osx
-    #   osx_image: xcode8
-    #   env:
-    #     - TITLE="Who knows - GCC - MPI"
-    #     - MPI=ON
-    #     - openMP=ON
-    #     - DOCS=OFF
-    #     - MPI_PROCS=2
+    - os: osx
+      osx_image: xcode8
+      env:
+        - TITLE="Who knows - GCC - MPI"
+        - MPI=ON
+        - openMP=ON
+        - MPI_PROCS=2
 
-    # - os: osx
-    #   osx_image: xcode8
-    #   env:
-    #     - TITLE="Who knows - Clang"
-    #     - MPI=OFF
-    #     - openMP=OFF
-    #     - DOCS=OFF
+    - os: osx
+      osx_image: xcode8
+      env:
+        - TITLE="Who knows - Clang"
+        - MPI=OFF
+        - openMP=OFF
 
     - os: linux
       addons:
@@ -66,31 +63,164 @@ matrix:
             - *basic_sources
           packages:
             - *native_deps
+<<<<<<< HEAD
             - &all_deps [ libfftw3-dev, libboost-all-dev, libeigen3-dev, libyaml-cpp-dev ]
             # libfftw3 version 3.3.3; libboost-all-dev version 1.54; libeigen3-dev version 3.2.0
             # libcfitsio3-dev version 3.34; libyaml-cpp-dev version 0.5.1
             # We need 3.41, this could help to install other dependencies...
+=======
+            - &all_deps [ libboost-all-dev, libeigen3-dev, libyaml-cpp-dev ]
+            # libboost-all-dev version 1.54; libeigen3-dev version 3.2.0
+            # libcfitsio3-dev version 3.34; libyaml-cpp-dev version 0.5.1
+            #   \-> We need CFITSIO 3.41, this could help to install other dependencies...
+>>>>>>> ce3c23aedc799d6bcd99f23e80079dde4549e6c9
       env:
         - TITLE="All dependencies - GCC"
         - DEBUG=True
         - LDFLAGS='-pthread'
         - MPI=OFF
         - openMP=OFF
+<<<<<<< HEAD
         - DOCS=OFF
 
 before_install:
   - if [ $TRAVIS_OS_NAME = osx ]; then brew update; brew install gcc@7 fftw open-mpi yaml-cpp; fi
+=======
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+            - *all_deps
+      env:
+        - TITLE="All dependencies - GCC - OMP"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - MPI=OFF
+        - openMP=ON
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+            - *all_deps
+      env:
+        - TITLE="All dependencies - GCC - MPI"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - MPI=ON
+        - openMP=ON
+        - MPI_PROCS=2
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+            - *all_deps
+      env:
+        - TITLE="All dependencies - GCC - MPI - mpich"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - MPI=ON
+        - openMP=ON
+        - MPI_PROCS=4
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+            - *all_deps
+      env:
+        - TITLE="All dependencies - Clang"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - MPI=OFF
+        - openMP=OFF
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+      env:
+        - TITLE="No dependencies - GCC - MPI"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - MPI=ON
+        - openMP=ON
+        - MPI_PROCS=2
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+            - *all_deps
+            - doxygen # version 1.8.6-2
+            - graphviz # version 2.36.0
+      env:
+        - TITLE="Documentation - GCC"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - Tests=OFF
+        - MPI=OFF
+        - openMP=OFF
+        - DOCS=ON
+        - BUILD_CMD='make doc VERBOSE=1'
+        - TEST_CMD=''
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+  keep-history: true
+  local-dir: build/cpp/docs/html
+  target-branch: website # FIXME: Default gh-pages, set this for now to have both.
+  verbose: true # FIXME: just at first to see logs
+  on:
+    branch: development
+    condition: $TITLE = "Documentation - GCC"
+
+before_install:
+  - if [ $TRAVIS_OS_NAME = osx ]; then brew update; brew install gcc@7 fftw open-mpi; fi
+>>>>>>> ce3c23aedc799d6bcd99f23e80079dde4549e6c9
   - if [ $TRAVIS_OS_NAME = linux ]; then ClangVer="-5.0"; fi
   - if [[ ${TITLE} = *GCC* ]]; then CC=gcc-7; else CC=clang${ClangVer}; fi
   - if [[ ${TITLE} = *GCC* ]]; then CXX=g++-7; else CXX=clang++${ClangVer}; fi
   # As MPI is not installed already, this variable is not set properly; this
   # way is set up for all the jobs in the same manner.
+<<<<<<< HEAD
   - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; fi
   - echo "==================== ${TITLE} ====================="
+=======
+  - echo "==================== ${TITLE} ====================="
+  - if [ $TRAVIS_OS_NAME = osx ]; then echo $(pwd); ls -lh data/atca; fi
+>>>>>>> ce3c23aedc799d6bcd99f23e80079dde4549e6c9
 
 install:
 
 before_script:
+<<<<<<< HEAD
+=======
+  - if [[ $MPI = ON ]]; then if [ $TRAVIS_OS_NAME = linux ]; then  if [[ ${TITLE} != *mpich* ]]; then bash .ci/build_openmpi.sh; else bash .ci/build_mpich.sh; fi; fi; fi;
+  - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; echo $CMAKE_CMD_EXTRA;  fi
+>>>>>>> ce3c23aedc799d6bcd99f23e80079dde4549e6c9
 
 script:
   - pwd
@@ -98,6 +228,7 @@ script:
   - cd build
   - |
     cmake .. -DCMAKE_BUILD_TYPE=Release \
+<<<<<<< HEAD
     -Ddompi=${MPI} \
     -Dexamples=OFF \
     -Dopenmp=${openMP} \
@@ -110,6 +241,22 @@ script:
   - eval $BUILD_CMD
   - tail -n +1 /home/travis/build/astro-informatics/purify/build/external/src/Lookup-Sopt-stamp/Lookup-Sopt*.log
   - eval $TEST_CMD
+=======
+    -Dtests=${Tests-ON} \
+    -Ddompi=${MPI} \
+    -Dexamples=OFF \
+    -Dopenmp=${openMP} \
+    -Ddocs=${DOCS-OFF} \
+    -Dbenchmarks=${Benchmarks-OFF} \
+    -DSopt_GIT_REPOSITORY=https://github.com/astro-informatics/sopt.git \
+    -DSopt_GIT_TAG=development \
+    -DCFitsIO_URL=https://github.com/UCL-RITS/BinaryBlobs-dependencies/raw/master/Astronomy/cfitsio3410.tar.gz \
+    ${CMAKE_CMD_EXTRA}
+  - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
+  - eval $BUILD_CMD
+  - eval $TEST_CMD
+  - if [ $TRAVIS_OS_NAME = osx ]; then echo $(pwd); ls -lh ../data/atca; fi
+>>>>>>> ce3c23aedc799d6bcd99f23e80079dde4549e6c9
 
 after_success:
 

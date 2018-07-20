@@ -32,8 +32,10 @@ add_catch_test(wproj_utils LIBRARIES libpurify)
 add_catch_test(parser_test LIBRARIES libpurify)
 add_catch_test(measurement_factory LIBRARIES libpurify)
 add_catch_test(wavelet_factory LIBRARIES libpurify)
+add_catch_test(algo_factory LIBRARIES libpurify)
+add_catch_test(read_measurements LIBRARIES libpurify)
 
-if(data AND TARGET casacore::ms)
+if(TARGET casacore::ms)
   add_catch_test(casacore LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 endif()
 
@@ -44,10 +46,16 @@ endif()
 
 if(PURIFY_MPI)
   add_library(common_mpi_catch_main_object OBJECT common_mpi_catch_main.cc)
+  add_dependencies(common_mpi_catch_main_object lookup_dependencies)
   target_include_directories(common_mpi_catch_main_object
     PUBLIC ${Sopt_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/cpp
     ${PROJECT_BINARY_DIR}/include ${MPI_CXX_INCLUDE_PATH})
-  add_dependencies(common_mpi_catch_main_object lookup_dependencies)
+  if(SPDLOG_INCLUDE_DIR)
+    target_include_directories(common_mpi_catch_main_object SYSTEM PUBLIC ${SPDLOG_INCLUDE_DIR})
+  endif()
+  if(CATCH_INCLUDE_DIR)
+    target_include_directories(common_mpi_catch_main_object SYSTEM PUBLIC ${CATCH_INCLUDE_DIR})
+  endif()
 
   function(add_mpi_test testname)
     add_catch_test(${testname} COMMON_MAIN common_mpi_catch_main_object NOTEST ${ARGN})
@@ -61,15 +69,17 @@ if(PURIFY_MPI)
     add_test(NAME ${testname}
       COMMAND
       ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS}
-      test_${testname} ${arguments})
+      $<TARGET_FILE:test_${testname}> ${arguments})
     set_tests_properties(${testname} PROPERTIES LABELS "catch;mpi")
   endfunction()
 
   add_catch_test(mpi_utilities LIBRARIES libpurify)
   add_mpi_test(parallel_mpi_utilities LIBRARIES libpurify)
   add_mpi_test(serial_vs_parallel_padmm LIBRARIES libpurify)
+  add_mpi_test(mpi_algo_factory LIBRARIES libpurify)
   add_mpi_test(mpi_measurement_operator LIBRARIES libpurify)
   add_mpi_test(mpi_measurement_factory LIBRARIES libpurify)
   add_mpi_test(mpi_wavelet_factory LIBRARIES libpurify)
   add_mpi_test(distribute_sparse_vector LIBRARIES libpurify)
+  add_mpi_test(mpi_read_measurements LIBRARIES libpurify)
 endif()

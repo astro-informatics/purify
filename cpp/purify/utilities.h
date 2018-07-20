@@ -10,6 +10,7 @@
 namespace purify {
 
 namespace utilities {
+enum class vis_source { measurements, simulation };  
 enum class vis_units { lambda, radians, pixels };
 struct vis_params {
   Vector<t_real> u; // u coordinates
@@ -108,7 +109,7 @@ Image<t_complex> convolution_operator(const Image<t_complex> &a, const Image<t_c
 //! A vector that whiten's the visibilities given the weights.
 utilities::vis_params whiten_vis(const utilities::vis_params &uv_vis);
 //! A function that calculates the l2 ball radius for sopt
-t_real calculate_l2_radius(const Vector<t_complex> &y, const t_real &sigma = 0,
+t_real calculate_l2_radius(const t_uint y_size, const t_real &sigma = 0,
                            const t_real &n_sigma = 2., const std::string distirbution = "chi");
 //! Converts SNR to RMS noise
 t_real SNR_to_standard_deviation(const Vector<t_complex> &y0, const t_real &SNR = 30.);

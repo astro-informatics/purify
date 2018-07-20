@@ -23,9 +23,6 @@ ExternalProject_Add(
   ${EXTERNAL_ROOT}/src/Lookup-CImg/CImg.h ${EXTERNAL_ROOT}/include/CImg.h
   LOG_DOWNLOAD ON
   )
-set(CImg_DIR ${EXTERNAL_ROOT} CACHE PATH "Directory with include/CImg.h" FORCE)
-set(CImg_INCLUDE_DIR ${EXTERNAL_ROOT}/include CACHE PATH "Directory with CImg.h")
-set(CImg_FOUND TRUE CACHE BOOL "True if CImg was found." FORCE)
-set(CImg_LOOKUP_BUILD TRUE CACHE BOOL "" FORCE)
 
+add_recursive_cmake_step(Lookup-CImg DEPENDEES install)
 

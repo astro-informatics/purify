@@ -167,20 +167,20 @@ init_grid_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v,
                              const t_real &power_tol = 1e-4,
                              const kernels::kernel kernel = kernels::kernel::kb,
                              const t_uint Ju = 4, const t_uint Jv = 4,
-                             const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                              const bool w_term = false, const t_uint Jw = 6,
                              const t_real &cellx = 1, const t_real &celly = 1) {
 
   /*
    *  Returns operator that degrids and grids
    */
+  const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   const sopt::OperatorFunction<T> phiTphi = purify::operators::base_grid_degrid_operator_2d<T>(
       u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, w_term, Jw,
       cellx, celly);
   auto direct = phiTphi;
   auto id = [](T &out, const T &in) { out = in; };
-  const t_real op_norm = details::power_method<T>({direct, N, id, N}, power_iters, power_tol,
+  const t_real op_norm = sopt::algorithm::power_method<T>({direct, N, id, N}, power_iters, power_tol,
                                                   T::Random(imsizex * imsizey));
   const auto operator_norm = purify::operators::init_normalise<T>(op_norm * op_norm);
   direct = sopt::chained_operators<T>(direct, operator_norm);
@@ -194,7 +194,6 @@ init_grid_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_
                              const t_real &power_tol = 1e-4,
                              const kernels::kernel kernel = kernels::kernel::kb,
                              const t_uint Ju = 4, const t_uint Jv = 4,
-                             const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                              const bool w_term = false, const t_uint Jw = 6) {
 
   auto uv_vis = uv_vis_input;
@@ -205,7 +204,7 @@ init_grid_degrid_operator_2d(const utilities::vis_params &uv_vis_input, const t_
                                  std::floor(oversample_ratio * imsizey));
   return init_grid_degrid_operator_2d<T>(uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey,
                                          imsizex, oversample_ratio, power_iters, power_tol, kernel,
-                                         Ju, Jv, ft_plan, w_term, Jw, cell_x, cell_y);
+                                         Ju, Jv, w_term, Jw, cell_x, cell_y);
 }
 #ifdef PURIFY_MPI
 template <class T>
@@ -217,13 +216,13 @@ init_grid_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t
                              const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
                              const kernels::kernel kernel = kernels::kernel::kb,
                              const t_uint Ju = 4, const t_uint Jv = 4,
-                             const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                              const bool w_term = false, const t_uint Jw = 6,
                              const t_real &cellx = 1, const t_real &celly = 1) {
   /*
    *  Returns linear transform that is the weighted degridding operator with mpi all sum all
    */
 
+  const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   const sopt::OperatorFunction<T> phiTphi = purify::operators::base_grid_degrid_operator_2d<T>(
       u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, w_term, Jw,
@@ -231,7 +230,7 @@ init_grid_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t
   const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
   auto direct = sopt::chained_operators<T>(allsumall, phiTphi);
   auto id = [](T &out, const T &in) { out = in; };
-  const t_real op_norm = details::power_method<T>({direct, N, id, N}, power_iters, power_tol,
+  const t_real op_norm = sopt::algorithm::power_method<T>({direct, N, id, N}, power_iters, power_tol,
                                                   comm.broadcast<T>(T::Random(imsizex * imsizey)));
   auto const operator_norm = purify::operators::init_normalise<T>(op_norm * op_norm);
   direct = sopt::chained_operators<T>(direct, operator_norm);
@@ -247,7 +246,6 @@ init_grid_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                              const t_real &power_tol = 1e-4,
                              const kernels::kernel kernel = kernels::kernel::kb,
                              const t_uint Ju = 4, const t_uint Jv = 4,
-                             const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                              const bool w_term = false, const t_uint Jw = 6) {
 
   auto uv_vis = uv_vis_input;
@@ -258,7 +256,7 @@ init_grid_degrid_operator_2d(const sopt::mpi::Communicator &comm,
                                  std::floor(oversample_ratio * imsizey));
   return init_grid_degrid_operator_2d<T>(comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights,
                                          imsizey, imsizex, oversample_ratio, power_iters, power_tol,
-                                         kernel, Ju, Jv, ft_plan, w_term, Jw, cell_x, cell_y);
+                                         kernel, Ju, Jv, w_term, Jw, cell_x, cell_y);
 }
 template <class T>
 sopt::OperatorFunction<T>
@@ -269,7 +267,6 @@ init_grid_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vect
                                  const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
                                  const kernels::kernel kernel = kernels::kernel::kb,
                                  const t_uint Ju = 4, const t_uint Jv = 4,
-                                 const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                                  const bool w_term = false, const t_uint Jw = 6,
                                  const t_real &cellx = 1, const t_real &celly = 1) {
   /*
@@ -277,6 +274,7 @@ init_grid_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vect
    * grid
    */
 
+  const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   auto Broadcast = purify::operators::init_broadcaster<T>(comm);
   const sopt::OperatorFunction<T> phiTphi = purify::operators::base_mpi_grid_degrid_operator_2d<T>(
@@ -285,7 +283,7 @@ init_grid_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm, const Vect
 
   auto direct = sopt::chained_operators<T>(Broadcast, phiTphi);
   auto id = [](T &out, const T &in) { out = in; };
-  const t_real op_norm = details::power_method<T>({direct, N, id, N}, power_iters, power_tol,
+  const t_real op_norm = sopt::algorithm::power_method<T>({direct, N, id, N}, power_iters, power_tol,
                                                   comm.broadcast<T>(T::Random(imsizex * imsizey)));
   const auto operator_norm = purify::operators::init_normalise<T>(op_norm * op_norm);
   direct = sopt::chained_operators<T>(direct, operator_norm);
@@ -301,7 +299,6 @@ init_grid_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
                                  const t_real &power_tol = 1e-4,
                                  const kernels::kernel kernel = kernels::kernel::kb,
                                  const t_uint Ju = 4, const t_uint Jv = 4,
-                                 const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
                                  const bool w_term = false, const t_uint Jw = 6) {
   auto uv_vis = uv_vis_input;
   if(uv_vis.units == utilities::vis_units::lambda)
@@ -311,7 +308,7 @@ init_grid_degrid_operator_2d_mpi(const sopt::mpi::Communicator &comm,
                                  std::floor(oversample_ratio * imsizey));
   return init_grid_degrid_operator_2d_mpi<T>(
       comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-      power_iters, power_tol, kernel, Ju, Jv, ft_plan, w_term, Jw, cell_x, cell_y);
+      power_iters, power_tol, kernel, Ju, Jv, w_term, Jw, cell_x, cell_y);
 }
 #endif
 template <class T>
@@ -339,7 +336,7 @@ init_psf_convolve_2d(const std::shared_ptr<sopt::LinearTransform<T> const> &degr
   };
   const auto psf_convolve = sopt::chained_operators<T>(ifftop, ft_psf_multiply, fftop);
   const auto id = [](T &out, const T &in) { out = in; };
-  const t_real op_norm = details::power_method<T>({psf_convolve, N, id, N}, power_iters, power_tol,
+  const t_real op_norm = sopt::algorithm::power_method<T>({psf_convolve, N, id, N}, power_iters, power_tol,
                                                   T::Random(imsizex * imsizey));
   const auto operator_norm = purify::operators::init_normalise<T>(op_norm * op_norm);
   return sopt::chained_operators<T>(psf_convolve, operator_norm);
