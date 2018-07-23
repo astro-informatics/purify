@@ -153,7 +153,6 @@ matrix:
         - openMP=ON
 	- MPI_PROCS=4
 
-
     - os: linux
       addons:
         apt:
