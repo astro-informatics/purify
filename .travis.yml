@@ -1,5 +1,3 @@
-# Making Travis work
-
 language: cpp
 sudo: required
 dist: trusty
