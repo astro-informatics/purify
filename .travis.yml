@@ -29,34 +29,34 @@ matrix:
   fast_finish: true
 
   include:
-    - os: osx
-      osx_image: xcode8
-      env:
-        - TITLE="Who knows - GCC"
-        - MPI=OFF
-        - openMP=OFF
+#    - os: osx
+#      osx_image: xcode8
+#      env:
+#        - TITLE="Who knows - GCC"
+#        - MPI=OFF
+#        - openMP=OFF
+#
+#    - os: osx
+#      osx_image: xcode8
+#      env:
+#        - TITLE="Who knows - GCC - OMP"
+#        - MPI=OFF
+#        - openMP=ON
 
-    - os: osx
-      osx_image: xcode8
-      env:
-        - TITLE="Who knows - GCC - OMP"
-        - MPI=OFF
-        - openMP=ON
+    # - os: osx
+    #   osx_image: xcode8
+    #   env:
+    #     - TITLE="Who knows - GCC - MPI"
+    #     - MPI=ON
+    #     - openMP=ON
+    #     - MPI_PROCS=2
 
-    - os: osx
-      osx_image: xcode8
-      env:
-        - TITLE="Who knows - GCC - MPI"
-        - MPI=ON
-        - openMP=ON
-        - MPI_PROCS=2
-
-    - os: osx
-      osx_image: xcode8
-      env:
-        - TITLE="Who knows - Clang"
-        - MPI=OFF
-        - openMP=OFF
+    # - os: osx
+    #   osx_image: xcode8
+    #   env:
+    #     - TITLE="Who knows - Clang"
+    #     - MPI=OFF
+    #     - openMP=OFF
 
     - os: linux
       addons:
@@ -100,7 +100,7 @@ matrix:
             - *native_deps
             - *all_deps
       env:
-        - TITLE="All dependencies - GCC - MPI"
+        - TITLE="All dependencies - GCC - MPI - mpich"
         - DEBUG=True
         - LDFLAGS='-pthread'
         - MPI=ON
@@ -146,7 +146,7 @@ matrix:
           packages:
             - *native_deps
       env:
-        - TITLE="No dependencies - GCC - MPI"
+        - TITLE="No dependencies - GCC - MPI - mpich"
         - DEBUG=True
         - LDFLAGS='-pthread'
         - MPI=ON
