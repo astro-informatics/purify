@@ -22,7 +22,8 @@ addons:
       - g++-7
       - clang-5.0
       - libtiff5-dev # version 5 ?
-      - libgomp1 # version 4.8.4-2
+      # - libgomp1 # version 4.8.4-2
+      - libiomp5
       - libfftw3-dev # version 3.3.3
 
 matrix:
