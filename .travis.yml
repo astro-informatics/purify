@@ -221,7 +221,9 @@ script:
     -DCFitsIO_URL=https://github.com/UCL-RITS/BinaryBlobs-dependencies/raw/master/Astronomy/cfitsio3410.tar.gz \
     ${CMAKE_CMD_EXTRA} \
     -DOpenMP_CXX_FLAGS="-fopenmp=libiomp5" \
-    -DOpenMP_C_FLAGS="-fopenmp=libiomp5"
+    -DOpenMP_C_FLAGS="-fopenmp=libiomp5" \
+    -DMPI_C=/usr/local/lib/libmpich.so \
+    -DMPI_CXX=/usr/local/lib/libmpichcxx.so
   - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
   - eval $BUILD_CMD
   - eval $TEST_CMD
