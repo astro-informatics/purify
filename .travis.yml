@@ -132,7 +132,7 @@ matrix:
             - *native_deps
             - *all_deps
       env:
-        - TITLE="All dependencies - Clang"
+        - TITLE="All dependencies - Clang - mpich"
         - DEBUG=True
         - LDFLAGS='-pthread'
         - MPI=ON
