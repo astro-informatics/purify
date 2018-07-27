@@ -130,7 +130,7 @@ matrix:
             - *basic_sources
           packages:
             - *native_deps
-            - *all_deps
+            - &all_deps [ libboost-all-dev, libeigen3-dev, libyaml-cpp-dev ]
       env:
         - TITLE="All dependencies - Clang - mpich"
         - DEBUG=True
