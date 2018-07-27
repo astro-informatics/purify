@@ -29,99 +29,99 @@ matrix:
   fast_finish: true
 
   include:
-#    - os: osx
-#      osx_image: xcode8
-#      env:
-#        - TITLE="Who knows - GCC"
-#        - MPI=OFF
-#        - openMP=OFF
-#
-#    - os: osx
-#      osx_image: xcode8
-#      env:
-#        - TITLE="Who knows - GCC - OMP"
-#        - MPI=OFF
-#        - openMP=ON
+   # - os: osx
+   #   osx_image: xcode8
+   #   env:
+   #     - TITLE="Who knows - GCC"
+   #     - MPI=OFF
+   #     - openMP=OFF
 
-    # - os: osx
-    #   osx_image: xcode8
+   # - os: osx
+   #   osx_image: xcode8
+   #   env:
+   #     - TITLE="Who knows - GCC - OMP"
+   #     - MPI=OFF
+   #     - openMP=ON
+
+   #  - os: osx
+   #    osx_image: xcode8
+   #    env:
+   #      - TITLE="Who knows - GCC - MPI"
+   #      - MPI=ON
+   #      - openMP=ON
+   #      - MPI_PROCS=2
+
+   #  - os: osx
+   #    osx_image: xcode8
+   #    env:
+   #      - TITLE="Who knows - Clang"
+   #      - MPI=OFF
+   #      - openMP=OFF
+
+    # - os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - *basic_sources
+    #       packages:
+    #         - *native_deps
+    #         - &all_deps [ libboost-all-dev, libeigen3-dev, libyaml-cpp-dev ]
+    #         # libboost-all-dev version 1.54; libeigen3-dev version 3.2.0
+    #         # libcfitsio3-dev version 3.34; libyaml-cpp-dev version 0.5.1
+    #         #   \-> We need CFITSIO 3.41, this could help to install other dependencies...
     #   env:
-    #     - TITLE="Who knows - GCC - MPI"
+    #     - TITLE="All dependencies - GCC"
+    #     - DEBUG=True
+    #     - LDFLAGS='-pthread'
+    #     - MPI=OFF
+    #     - openMP=OFF
+
+    # - os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - *basic_sources
+    #       packages:
+    #         - *native_deps
+    #         - *all_deps
+    #   env:
+    #     - TITLE="All dependencies - GCC - OMP"
+    #     - DEBUG=True
+    #     - LDFLAGS='-pthread'
+    #     - MPI=OFF
+    #     - openMP=ON
+
+    # - os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - *basic_sources
+    #       packages:
+    #         - *native_deps
+    #         - *all_deps
+    #   env:
+    #     - TITLE="All dependencies - GCC - MPI - mpich"
+    #     - DEBUG=True
+    #     - LDFLAGS='-pthread'
     #     - MPI=ON
     #     - openMP=ON
     #     - MPI_PROCS=2
 
-    # - os: osx
-    #   osx_image: xcode8
+    # - os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - *basic_sources
+    #       packages:
+    #         - *native_deps
+    #         - *all_deps
     #   env:
-    #     - TITLE="Who knows - Clang"
-    #     - MPI=OFF
-    #     - openMP=OFF
-
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - *basic_sources
-          packages:
-            - *native_deps
-            - &all_deps [ libboost-all-dev, libeigen3-dev, libyaml-cpp-dev ]
-            # libboost-all-dev version 1.54; libeigen3-dev version 3.2.0
-            # libcfitsio3-dev version 3.34; libyaml-cpp-dev version 0.5.1
-            #   \-> We need CFITSIO 3.41, this could help to install other dependencies...
-      env:
-        - TITLE="All dependencies - GCC"
-        - DEBUG=True
-        - LDFLAGS='-pthread'
-        - MPI=OFF
-        - openMP=OFF
-
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - *basic_sources
-          packages:
-            - *native_deps
-            - *all_deps
-      env:
-        - TITLE="All dependencies - GCC - OMP"
-        - DEBUG=True
-        - LDFLAGS='-pthread'
-        - MPI=OFF
-        - openMP=ON
-
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - *basic_sources
-          packages:
-            - *native_deps
-            - *all_deps
-      env:
-        - TITLE="All dependencies - GCC - MPI - mpich"
-        - DEBUG=True
-        - LDFLAGS='-pthread'
-        - MPI=ON
-        - openMP=ON
-        - MPI_PROCS=2
-
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - *basic_sources
-          packages:
-            - *native_deps
-            - *all_deps
-      env:
-        - TITLE="All dependencies - GCC - MPI - mpich"
-        - DEBUG=True
-        - LDFLAGS='-pthread'
-        - MPI=ON
-        - openMP=ON
-        - MPI_PROCS=4
+    #     - TITLE="All dependencies - GCC - MPI - mpich"
+    #     - DEBUG=True
+    #     - LDFLAGS='-pthread'
+    #     - MPI=ON
+    #     - openMP=ON
+    #     - MPI_PROCS=4
 
     - os: linux
       addons:
@@ -135,44 +135,44 @@ matrix:
         - TITLE="All dependencies - Clang"
         - DEBUG=True
         - LDFLAGS='-pthread'
-        - MPI=OFF
-        - openMP=OFF
-
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - *basic_sources
-          packages:
-            - *native_deps
-      env:
-        - TITLE="No dependencies - GCC - MPI - mpich"
-        - DEBUG=True
-        - LDFLAGS='-pthread'
         - MPI=ON
         - openMP=ON
-        - MPI_PROCS=2
 
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - *basic_sources
-          packages:
-            - *native_deps
-            - *all_deps
-            - doxygen # version 1.8.6-2
-            - graphviz # version 2.36.0
-      env:
-        - TITLE="Documentation - GCC"
-        - DEBUG=True
-        - LDFLAGS='-pthread'
-        - Tests=OFF
-        - MPI=OFF
-        - openMP=OFF
-        - DOCS=ON
-        - BUILD_CMD='make doc VERBOSE=1'
-        - TEST_CMD=''
+    # - os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - *basic_sources
+    #       packages:
+    #         - *native_deps
+    #   env:
+    #     - TITLE="No dependencies - GCC - MPI - mpich"
+    #     - DEBUG=True
+    #     - LDFLAGS='-pthread'
+    #     - MPI=ON
+    #     - openMP=ON
+    #     - MPI_PROCS=2
+
+    # - os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - *basic_sources
+    #       packages:
+    #         - *native_deps
+    #         - *all_deps
+    #         - doxygen # version 1.8.6-2
+    #         - graphviz # version 2.36.0
+    #   env:
+    #     - TITLE="Documentation - GCC"
+    #     - DEBUG=True
+    #     - LDFLAGS='-pthread'
+    #     - Tests=OFF
+    #     - MPI=OFF
+    #     - openMP=OFF
+    #     - DOCS=ON
+    #     - BUILD_CMD='make doc VERBOSE=1'
+    #     - TEST_CMD=''
 
 deploy:
   provider: pages
