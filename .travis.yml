@@ -4,7 +4,7 @@ dist: trusty
 
 env:
   global:
-    - BUILD_CMD='mpirun --help' # make VERBOSE=1'
+    - BUILD_CMD='mpirun --help oversubscribe' # make VERBOSE=1'
     - TEST_CMD='mpirun --version' # ctest -T test --output-on-failure -V'
     - OMP_NUM_THREADS=4
     - MPI_CONFIG='CMAKE_CMD_EXTRA="-DMPIEXEC:FILEPATH=$(which mpirun) -DMPIEXEC_MAX_NUMPROCS=${MPI_PROCS}"'
