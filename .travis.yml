@@ -129,6 +129,7 @@ matrix:
           packages:
             - *native_deps
             - *all_deps
+            - libiomp-dev
       env:
         - TITLE="All dependencies - Clang"
         - DEBUG=True
