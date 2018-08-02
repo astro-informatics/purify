@@ -194,12 +194,12 @@ before_install:
   # way is set up for all the jobs in the same manner.
   - echo "==================== ${TITLE} ====================="
   - if [ $TRAVIS_OS_NAME = osx ]; then echo $(pwd); ls -lh data/atca; fi
+  - if [[ $MPI = ON ]]; then if [ $TRAVIS_OS_NAME = linux ]; then  if [[ ${TITLE} != *mpich* ]]; then bash .ci/build_openmpi.sh; MPI_EXTRA="--oversubscribe"; else bash .ci/build_mpich.sh; fi; fi; fi;
+  - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; echo $CMAKE_CMD_EXTRA;  fi
 
 install:
 
 before_script:
-  - if [[ $MPI = ON ]]; then if [ $TRAVIS_OS_NAME = linux ]; then  if [[ ${TITLE} != *mpich* ]]; then bash .ci/build_openmpi.sh; MPI_EXTRA="--oversubscribe"; else bash .ci/build_mpich.sh; fi; fi; fi;
-  - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; echo $CMAKE_CMD_EXTRA;  fi
 
 script:
   - pwd
