@@ -204,6 +204,7 @@ before_install:
   - if [ $TRAVIS_OS_NAME = osx ]; then echo $(pwd); ls -lh data/atca; fi
   - if [[ $MPI = ON ]]; then if [ $TRAVIS_OS_NAME = linux ]; then  if [[ ${TITLE} != *mpich* ]]; then bash .ci/build_openmpi.sh; MPI_EXTRA="--oversubscribe"; export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH; else bash .ci/build_mpich.sh; fi; fi; fi;
   - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; echo $CMAKE_CMD_EXTRA;  fi
+  - if [ $TRAVIS_OS_NAME = linux ]; then if [[ ${TITLE} = *Clang* ]]; then RETEST_CMD="ctest -T test --output-on-failure -V -R algo_factory --debug"; fi; fi
 
 install:
 
@@ -228,6 +229,7 @@ script:
   - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
   - eval $BUILD_CMD
   - eval $TEST_CMD
+  - eval $RETEST_CMD
 
 after_success:
 
