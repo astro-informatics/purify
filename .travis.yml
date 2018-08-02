@@ -220,11 +220,6 @@ script:
   - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
   - eval $BUILD_CMD
   - eval $TEST_CMD
-  - mkdir -p /tmp/testmpi
-  - printf 'cmake_minimum_required(VERSION 3.5)\n\nproject(findmpi C CXX)\nfind_package(MPI REQUIRED)\n' > /tmp/testmpi/CMakeLists.txt
-  - cd /tmp/testmpi
-  - cmake . --trace-source=FindMPI.cmake 2> /tmp/simple-err
-  - diff /tmp/purify-err /tmp/simple-err
   - if [ $TRAVIS_OS_NAME = osx ]; then echo $(pwd); ls -lh ../data/atca; fi
 
 after_success:
