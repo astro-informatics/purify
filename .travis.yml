@@ -30,31 +30,31 @@ matrix:
     - os: osx
       osx_image: xcode8
       env:
-        - TITLE="Who knows - GCC"
+        - TITLE="XCode 8 - GCC"
         - MPI=OFF
         - openMP=OFF
 
     - os: osx
       osx_image: xcode8
       env:
-        - TITLE="Who knows - GCC - OMP"
+        - TITLE="XCode 8 - Clang"
+        - MPI=OFF
+        - openMP=OFF
+
+    - os: osx
+      osx_image: xcode8
+      env:
+        - TITLE="XCode 8 - Clang - OMP"
         - MPI=OFF
         - openMP=ON
 
     - os: osx
       osx_image: xcode8
       env:
-        - TITLE="Who knows - GCC - MPI"
+        - TITLE="XCode 8 - Clang - MPI"
         - MPI=ON
         - openMP=ON
         - MPI_PROCS=2
-
-    - os: osx
-      osx_image: xcode8
-      env:
-        - TITLE="Who knows - Clang"
-        - MPI=OFF
-        - openMP=OFF
 
     - os: linux
       addons:
@@ -173,6 +173,14 @@ matrix:
         - BUILD_CMD='make doc VERBOSE=1'
         - TEST_CMD=''
 
+  allow_failures:
+    - os: osx
+      osx_image: xcode8
+      env:
+        - TITLE="XCode 8 - GCC"
+        - MPI=OFF
+        - openMP=OFF
+
 deploy:
   provider: pages
   skip-cleanup: true
@@ -220,7 +228,6 @@ script:
   - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
   - eval $BUILD_CMD
   - eval $TEST_CMD
-  - if [ $TRAVIS_OS_NAME = osx ]; then echo $(pwd); ls -lh ../data/atca; fi
 
 after_success:
 
