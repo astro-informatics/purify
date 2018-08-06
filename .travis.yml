@@ -194,7 +194,7 @@ deploy:
     condition: $TITLE = "Documentation - GCC"
 
 before_install:
-  - if [ $TRAVIS_OS_NAME = osx ]; then brew update; brew cask uninstall oclint; brew install llvm gcc@7 open-mpi; brew install fftw; if [[ ${TITLE} = *Clang* ]]; then export PATH="/usr/local/opt/llvm/bin:$PATH"; LDFLAGS='-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib'; CPPFLAGS='-I/usr/local/opt/llvm/include -I/usr/local/opt/llvm/include/c++/v1/'; fi; fi
+  - if [ $TRAVIS_OS_NAME = osx ]; then brew update; brew cask uninstall oclint; brew install llvm gcc@7 open-mpi; brew install fftw; if [[ ${TITLE} = *Clang* ]]; then export PATH="/usr/local/opt/llvm/bin:$PATH"; LDFLAGS='-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib'; CPPFLAGS='-I/usr/local/opt/llvm/include -I/usr/local/opt/llvm/include/c++/v1/'; OpenMPflag="-fopenmp=libiomp5"; fi; fi
   - if [ $TRAVIS_OS_NAME = linux ]; then ClangVer="-5.0"; fi
   - if [[ ${TITLE} = *GCC* ]]; then CC=gcc-7; else CC=clang${ClangVer}; fi
   - if [[ ${TITLE} = *GCC* ]]; then CXX=g++-7; else CXX=clang++${ClangVer}; fi
@@ -225,7 +225,7 @@ script:
     -DSopt_GIT_REPOSITORY=https://github.com/astro-informatics/sopt.git \
     -DSopt_GIT_TAG=development \
     -DCFitsIO_URL=https://github.com/UCL-RITS/BinaryBlobs-dependencies/raw/master/Astronomy/cfitsio3410.tar.gz \
-    ${CMAKE_CMD_EXTRA} -DMPIEXEC_PREFLAGS="${MPI_EXTRA-}"
+    ${CMAKE_CMD_EXTRA} -DMPIEXEC_PREFLAGS="${MPI_EXTRA-}" -DOpenMP_CXX_FLAGS="${OpenMPflag-}" -DOpenMP_C_FLAGS="${OpenMPflag-}"
   - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
   - eval $BUILD_CMD
   - eval $TEST_CMD
