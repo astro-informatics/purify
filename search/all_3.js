@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['data_5fdesc_5fid',['data_desc_id',['../d8/d31/classpurify_1_1casa_1_1MeasurementSet_1_1ChannelWrapper.html#ad1b863b33003b7168b40eb53c9e81e57',1,'purify::casa::MeasurementSet::ChannelWrapper']]],
+  ['declination',['declination',['../d0/d66/classpurify_1_1casa_1_1MeasurementSet.html#a46515b82be319f5af8346c417ae16c75',1,'purify::casa::MeasurementSet']]],
+  ['default_5ffilter',['default_filter',['../d0/d66/classpurify_1_1casa_1_1MeasurementSet.html#a894d32452f89fd9c5bd634cbd3f61d30',1,'purify::casa::MeasurementSet']]],
+  ['default_5flogger_5fname',['default_logger_name',['../db/d8d/namespacepurify.html#a4d58563620e972c279f841f66a8f68ef',1,'purify']]],
+  ['default_5flogging_5flevel',['default_logging_level',['../db/d8d/namespacepurify.html#a0108c76ec3e4a548088e9f5d5f6b4217',1,'purify']]],
+  ['degridoperatoradjointfixture',['DegridOperatorAdjointFixture',['../d6/d86/classDegridOperatorAdjointFixture.html',1,'']]],
+  ['degridoperatoradjointfixturedistr',['DegridOperatorAdjointFixtureDistr',['../d5/da5/classDegridOperatorAdjointFixtureDistr.html',1,'']]],
+  ['degridoperatoradjointfixturempi',['DegridOperatorAdjointFixtureMPI',['../d4/d01/classDegridOperatorAdjointFixtureMPI.html',1,'']]],
+  ['degridoperatoradjointfixturepar',['DegridOperatorAdjointFixturePar',['../d6/d9c/classDegridOperatorAdjointFixturePar.html',1,'']]],
+  ['degridoperatorctorfixturepar',['DegridOperatorCtorFixturePar',['../df/d7b/classDegridOperatorCtorFixturePar.html',1,'']]],
+  ['degridoperatordirectfixture',['DegridOperatorDirectFixture',['../d6/dac/classDegridOperatorDirectFixture.html',1,'']]],
+  ['degridoperatordirectfixturedistr',['DegridOperatorDirectFixtureDistr',['../da/d4a/classDegridOperatorDirectFixtureDistr.html',1,'']]],
+  ['degridoperatordirectfixturempi',['DegridOperatorDirectFixtureMPI',['../d6/dcc/classDegridOperatorDirectFixtureMPI.html',1,'']]],
+  ['degridoperatordirectfixturepar',['DegridOperatorDirectFixturePar',['../d2/d2c/classDegridOperatorDirectFixturePar.html',1,'']]],
+  ['degridoperatorfixture',['DegridOperatorFixture',['../d9/d78/classDegridOperatorFixture.html',1,'']]],
+  ['degridoperatorfixturepar',['DegridOperatorFixturePar',['../d7/d89/classDegridOperatorFixturePar.html',1,'']]],
+  ['direction',['direction',['../d0/d66/classpurify_1_1casa_1_1MeasurementSet.html#a7ad28373fbe2d5ca4023bad173890973',1,'purify::casa::MeasurementSet::direction()'],['../d8/d31/classpurify_1_1casa_1_1MeasurementSet_1_1ChannelWrapper.html#ae3a10fd9b0f11c6bc61c281b67bd4eee',1,'purify::casa::MeasurementSet::ChannelWrapper::direction()'],['../d0/d66/classpurify_1_1casa_1_1MeasurementSet.html#ab42446436227d207bfe3dc9990913188',1,'purify::casa::MeasurementSet::Direction()']]]
+];
