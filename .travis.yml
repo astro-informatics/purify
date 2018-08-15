@@ -19,6 +19,7 @@ addons:
     packages: &native_deps
       - g++-7
       - clang-5.0
+      - clang-format-5.0
       - libtiff5-dev # version 5 ?
       - libgomp1 # version 4.8.4-2
       - libfftw3-dev # version 3.3.3
@@ -149,6 +150,23 @@ matrix:
         - DOCS=ON
         - BUILD_CMD='make doc VERBOSE=1'
         - TEST_CMD=''
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+      env:
+        - TITLE="Lint"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - MPI=OFF
+        - openMP=OFF
+        - DOCS=OFF
+        - BUILD_CMD="find ../ -regex '.*\.\(cc\|h\)' -not -iname '*.in.h' | xargs -I{} -P 10 clang-format -i -style=file {}; git diff"
+        - TEST_CMD='[[ $(git ls-files --modified) ]] && return 1 || return 0'
 
   allow_failures:
     - os: osx
