@@ -95,15 +95,12 @@ Usage
 ------
 
 The main purify executable lives either in the build directory or in the in the `bin` subdirectory
-of the installation directory. `purify` has two required arguments, `--measurement_set` and `--name`, the path of the measurement set and the prefix name of the output files.
+of the installation directory. `purify` has one required argument, it a string for the file path of the config file containg the settings.
 
-`purify --measurement_set path/to/measurements.ms --name output/path/name`.
+`purify path/to/config.yaml`.
 
-It is possible to add other options, such as limited the number of iterations to 100, and save output diagnostic images with each iteration. These
-
-`purify --measurement_set path/to/measurements.ms --name output/path/name --niters 100 --diagnostic`
-
-A more complete list of arguments can be found [here](@ref arguments).
+A template with a description of the settings can be found at https://github.com/astro-informatics/purify/blob/master/data/config/config.yaml. 
+This can also be found in the downloaded repo at `data/config/config.yaml`. When `purify` runs a directory will be created, and the output images will be saved and time-stamped. Additionally, a config file with the settings used will be saved and time-stamped, helping for reproducibility and book-keeping. 
 
 Contributors
 ------------
