@@ -13,7 +13,7 @@ This documentation outlines the necessary and optional [dependencies](#dependenc
 Dependencies installation
 -------------------------
 
-**PURIFY** is written in `C++11`. Pre-requisites and dependencies are listed in following and minimal versions required are tested against `Travis CI` meaning that they come natively with OSX and the Ubuntu Trusty release. These are also the default ones fetched by `CMake`.
+**PURIFY** is written in `C++11`. Pre-requisites and dependencies are listed in following and minimal versions required are tested against `Travis CI` meaning that they come natively with OSX and the Ubuntu Trusty release. These are also the default ones fetched by `CMake` (an internet connection is required for this).
 
 `C++` minimal dependencies:
 
@@ -134,12 +134,13 @@ requested. Some of the more common options are the following:
 
 -  ``CMAKE_PREFIX_PATH``: CMake will look in "CMAKE\_PREFIX\_PATH/lib"
    for libraries, "CMAKE\_PREFIX\_PATH/include" for headers, etc.
--  ``PYTHON_EXECUTABLE``, ``PYTHON_LIBRARIES``, ``PYTHON_INCLUDE_DIRS``
 -  ``FFTW3_LIBRARIES``, ``FFTW3_INCLUDE_DIR``
 -  ``BLAS_INCLUDE_DIRS``, ``BLAS_LIBRARIES``
 
 All these variables and more can be found and modified in the ``CMakeCache.txt`` file in the build
-directory.
+directory. There are extra CMake options sepcific to purify. ``-Ddompi=ON`` will turn MPI on in the build, ``-Dopenmp=ON`` will turn openmp on for the build. ``-Dtests=ON`` will make sure tests are built.
+
+``ctest`` should be run to make sure the unit tests pass.
 
 License
 --------
