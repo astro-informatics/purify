@@ -3,10 +3,12 @@
 
 #include "purify/config.h"
 #include <vector>
-#include <sopt/mpi/communicator.h>
 #include <sopt/linear_transform.h>
 #include "purify/utilities.h"
 
+#ifdef PURIFY_MPI
+#include <sopt/mpi/communicator.h>
+#endif
 namespace purify {
 namespace utilities {
 #ifdef PURIFY_MPI

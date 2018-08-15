@@ -46,10 +46,16 @@ endif()
 
 if(PURIFY_MPI)
   add_library(common_mpi_catch_main_object OBJECT common_mpi_catch_main.cc)
+  add_dependencies(common_mpi_catch_main_object lookup_dependencies)
   target_include_directories(common_mpi_catch_main_object
     PUBLIC ${Sopt_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/cpp
     ${PROJECT_BINARY_DIR}/include ${MPI_CXX_INCLUDE_PATH})
-  add_dependencies(common_mpi_catch_main_object lookup_dependencies)
+  if(SPDLOG_INCLUDE_DIR)
+    target_include_directories(common_mpi_catch_main_object SYSTEM PUBLIC ${SPDLOG_INCLUDE_DIR})
+  endif()
+  if(CATCH_INCLUDE_DIR)
+    target_include_directories(common_mpi_catch_main_object SYSTEM PUBLIC ${CATCH_INCLUDE_DIR})
+  endif()
 
   function(add_mpi_test testname)
     add_catch_test(${testname} COMMON_MAIN common_mpi_catch_main_object NOTEST ${ARGN})
@@ -63,7 +69,7 @@ if(PURIFY_MPI)
     add_test(NAME ${testname}
       COMMAND
       ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS}
-      test_${testname} ${arguments})
+      $<TARGET_FILE:test_${testname}> ${arguments})
     set_tests_properties(${testname} PROPERTIES LABELS "catch;mpi")
   endfunction()
 

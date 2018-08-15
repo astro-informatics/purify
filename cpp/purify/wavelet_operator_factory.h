@@ -9,8 +9,10 @@
 #include <vector>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
+#ifdef PURIFY_MPI
 #include <sopt/mpi/communicator.h>
 #include <sopt/mpi/session.h>
+#endif
 namespace purify {
   namespace factory {
 enum class distributed_wavelet_operator {serial, mpi_sara};
