@@ -215,7 +215,7 @@ script:
     -Dopenmp=${openMP} \
     -Ddocs=${DOCS-OFF} \
     -Dbenchmarks=${Benchmarks-OFF} \
-    -DPURIFY_TEST_LOG_LEVEL={test_level-critical} \
+    -DPURIFY_TEST_LOG_LEVEL=${test_level-critical} \
     -DSopt_GIT_REPOSITORY=https://github.com/astro-informatics/sopt.git \
     -DSopt_GIT_TAG=development \
     -DCFitsIO_URL=https://github.com/UCL-RITS/BinaryBlobs-dependencies/raw/master/Astronomy/cfitsio3410.tar.gz \
