@@ -1,8 +1,8 @@
 PURIFY
-=======
+======
 
 Description
---------------
+-----------
 
 **PURIFY** is an open-source collection of routines written in `C++` available under the [license](#license) below. It implements different tools and high-level to perform radio interferometric imaging, _i.e._ to recover images from the Fourier measurements taken by radio interferometric telescopes. 
 
@@ -106,16 +106,18 @@ It is possible to add other options, such as limited the number of iterations to
 A more complete list of arguments can be found [here](@ref arguments).
 
 Contributors
----------------
+------------
 
 Check the [contributors](@ref contributors) page.
 
 References and citation
------------------------------
+-----------------------
 
 If you use **PURIFY** for work that results in publication, please reference the [webpage](#webpage) and our related academic papers:
 
-1. L. Pratley _et al._ (to be published)
+1. L. Pratley, M. Johnston-Hollitt, J. D. McEwen,
+   "A fast and exact w-stacking and w-projection hybrid algorithm for wide-field interferometric imaging".
+   Submitted to ApJ [arXiv:1807.09239](https://arxiv.org/abs/1807.09239)
 2. L. Pratley, J. D. McEwen, M. d'Avezac, R. E. Carrillo, A. Onose, Y. Wiaux. "Robust sparse image
    reconstruction of radio interferometric observations with PURIFY".
    Accepted (2016) [arxiv:1610.02400](https://arxiv.org/abs/1610.02400v2)
@@ -126,7 +128,7 @@ If you use **PURIFY** for work that results in publication, please reference the
    imaging". _Mon. Not. Roy. Astron. Soc._ **439(4):3591-3604** (2014) [arXiv:1307.4370](http://arxiv.org/abs/1307.4370)
 
 CMake Tips
--------------
+----------
 
 It is possible to tell ``CMake`` exactly which libraries to compile and link against. The general
 idea is to add ``-DVARIABLE=something`` to the command-line arguments of CMake. CMake can be called
@@ -167,13 +169,13 @@ Webpage
 http://astro-informatics.github.io/purify/
 
 Support
----------
+-------
 
-For any questions or comments, feel free to contact [Jason McEwen](jason.mcewen@gmail.com), or add
+For any questions or comments, feel free to contact [Jason McEwen](mailto:jason.mcewen@gmail.com), or add
 an issue to the [issue tracker](https://github.com/astro-informatics/purify/issues).
 
 Notes
-------
+-----
 
 The code is given for educational purpose. The code is in beta and still under development.
 
