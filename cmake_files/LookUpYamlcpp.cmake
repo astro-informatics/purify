@@ -28,6 +28,5 @@ ExternalProject_Add(
     LOG_BUILD ON
     LOG_INSTALL ON
 )
-set(Yamlcpp_DIR ${EXTERNAL_ROOT})
 
 add_recursive_cmake_step(Lookup-Yamlcpp DEPENDEES install)

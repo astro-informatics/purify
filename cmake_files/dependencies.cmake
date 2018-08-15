@@ -3,6 +3,7 @@ include(EnvironmentScript)
 # Look up packages: if not found, installs them
 include(PackageLookup)
 # Get the yaml reader
+find_package(Yamlcpp REQUIRED)
 lookup_package(Yamlcpp REQUIRED)
 
 if(docs)
@@ -73,10 +74,10 @@ endif()
 # Unless otherwise specified, if purify is not on master, then sopt will be
 # downloaded from development branch.
 if(NOT Sopt_GIT_TAG)
-  set(Sopt_GIT_TAG master CACHE STRING "Branch/tag when downloading sopt")
+  set(Sopt_GIT_TAG development CACHE STRING "Branch/tag when downloading sopt")
 endif()
 if(NOT Sopt_GIT_REPOSITORY)
-  set(Sopt_GIT_REPOSITORY https://www.github.com/basp-group/sopt.git
+  set(Sopt_GIT_REPOSITORY https://www.github.com/astro-informatics/sopt.git
     CACHE STRING "Location when downloading sopt")
 endif()
 if(dompi)
@@ -90,7 +91,7 @@ else()
     GIT_TAG ${Sopt_GIT_TAG})
 endif()
 
-lookup_package(CFitsIO REQUIRED 3.41 EXACT ARGUMENTS CHECKCASA URL "ftp://heasarc.gsfc.nasa.gov/software/fitsio/c/cfitsio3410.tar.gz")
+lookup_package(CFitsIO REQUIRED 3.41 EXACT)
 if(docimg)
   set(PURIFY_CImg TRUE)
   find_package(X11)

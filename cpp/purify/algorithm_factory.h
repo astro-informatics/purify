@@ -5,11 +5,13 @@
 
 #include "purify/logging.h"
 #include "purify/types.h"
-
 #include "purify/convergence_factory.h"
-#include "purify/mpi_utilities.h"
+#include "purify/utilities.h"
 
+#ifdef PURIFY_MPI
+#include "purify/mpi_utilities.h"
 #include <sopt/mpi/communicator.h>
+#endif
 
 #include <sopt/imaging_padmm.h>
 #include <sopt/relative_variation.h>
