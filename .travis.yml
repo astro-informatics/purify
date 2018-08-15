@@ -121,22 +121,6 @@ matrix:
             - *basic_sources
           packages:
             - *native_deps
-            - *all_deps
-            - libiomp-dev
-      env:
-        - TITLE="All dependencies - Clang"
-        - DEBUG=True
-        - LDFLAGS='-pthread'
-        - MPI=OFF
-        - openMP=OFF
-
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - *basic_sources
-          packages:
-            - *native_deps
       env:
         - TITLE="No dependencies - GCC - MPI"
         - DEBUG=True
@@ -174,6 +158,15 @@ matrix:
         - MPI=OFF
         - openMP=OFF
 
+    - os: osx
+      osx_image: xcode8
+      env:
+        - TITLE="XCode 8 - Clang - MPI"
+        - MPI=ON
+        - openMP=OFF
+        - MPI_PROCS=2
+
+
 deploy:
   provider: pages
   skip-cleanup: true
@@ -194,7 +187,6 @@ before_install:
   # As MPI is not installed already, this variable is not set properly; this
   # way is set up for all the jobs in the same manner.
   - echo "==================== ${TITLE} ====================="
-  - if [ $TRAVIS_OS_NAME = osx ]; then echo $(pwd); ls -lh data/atca; fi
   - if [[ $MPI = ON ]]; then if [ $TRAVIS_OS_NAME = linux ]; then  if [[ ${TITLE} != *mpich* ]]; then bash .ci/build_openmpi.sh; MPI_EXTRA="--oversubscribe"; export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH; else bash .ci/build_mpich.sh; fi; fi; fi;
   - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; echo $CMAKE_CMD_EXTRA;  fi
   - if [ $TRAVIS_OS_NAME = linux ]; then if [[ ${TITLE} = *Clang* ]]; then test_level='debug'; RETEST_CMD="ctest -T test --output-on-failure -V -R algo_factory --debug"; fi; fi
@@ -219,7 +211,7 @@ script:
     -DSopt_GIT_REPOSITORY=https://github.com/astro-informatics/sopt.git \
     -DSopt_GIT_TAG=development \
     -DCFitsIO_URL=https://github.com/UCL-RITS/BinaryBlobs-dependencies/raw/master/Astronomy/cfitsio3410.tar.gz \
-    ${CMAKE_CMD_EXTRA} -DMPIEXEC_PREFLAGS="${MPI_EXTRA-}" -DOpenMP_CXX_FLAGS="${OpenMPflag-}" -DOpenMP_C_FLAGS="${OpenMPflag-}"
+    ${CMAKE_CMD_EXTRA} -DMPIEXEC_PREFLAGS="${MPI_EXTRA-}"
   - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
   - eval $BUILD_CMD
   - eval $TEST_CMD
