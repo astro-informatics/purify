@@ -3,8 +3,8 @@
 
 #include "purify/config.h"
 #include <vector>
-#include <sopt/linear_transform.h>
 #include "purify/utilities.h"
+#include <sopt/linear_transform.h>
 
 #ifdef PURIFY_MPI
 #include <sopt/mpi/communicator.h>
@@ -29,8 +29,8 @@ vis_params scatter_visibilities(vis_params const &params, std::vector<t_int> con
 vis_params scatter_visibilities(sopt::mpi::Communicator const &comm);
 
 //! \brief distribute from root to all comm
-utilities::vis_params
-distribute_params(utilities::vis_params const &params, sopt::mpi::Communicator const &comm);
+utilities::vis_params distribute_params(utilities::vis_params const &params,
+                                        sopt::mpi::Communicator const &comm);
 //! \brief calculate cell size when visibilies are distributed
 utilities::vis_params set_cell_size(const sopt::mpi::Communicator &comm,
                                     utilities::vis_params const &uv_vis, const t_real &cell_x,
@@ -41,24 +41,20 @@ utilities::vis_params set_cell_size(const sopt::mpi::Communicator &comm,
 //! \param[in] measurements: Shared pointer to measurement linear operator
 //! \param[in] wavelets: Shared pointer to SARA wavelet linear operator
 //! \param[in] sara_size: Size of sara dictionary of MPI node.
-//! \details Please use this function to calculate the step size for PADMM, Forward Backward, etc. 
+//! \details Please use this function to calculate the step size for PADMM, Forward Backward, etc.
 //! Especially when using MPI.
 //! \note There is an issue with using the adjoint wavelet transform of the SARA basis.
-//! When there are more nodes than wavelets, there will be nodes with an empty Vector<T> 
+//! When there are more nodes than wavelets, there will be nodes with an empty Vector<T>
 //! of wavelet coefficients. This can cause some functions to break, like .maxCoeff().
 template <class T>
-t_real step_size(T const & vis,
-    const std::shared_ptr<sopt::LinearTransform<T> const> &measurements,
-    const std::shared_ptr<sopt::LinearTransform<T> const> &wavelets,
-    const t_uint sara_size){
-  //measurement operator may use different number of nodes than wavelet operator
-  //so needs to be done separately
-    const T dimage = measurements->adjoint() * vis;
-      return (sara_size > 0) ?
-      (wavelets->adjoint() * dimage).cwiseAbs().maxCoeff(): 
-      0.;
-
+t_real step_size(T const &vis, const std::shared_ptr<sopt::LinearTransform<T> const> &measurements,
+                 const std::shared_ptr<sopt::LinearTransform<T> const> &wavelets,
+                 const t_uint sara_size) {
+  // measurement operator may use different number of nodes than wavelet operator
+  // so needs to be done separately
+  const T dimage = measurements->adjoint() * vis;
+  return (sara_size > 0) ? (wavelets->adjoint() * dimage).cwiseAbs().maxCoeff() : 0.;
 };
-}
-} // namespace purify
+}  // namespace utilities
+}  // namespace purify
 #endif

@@ -1,14 +1,13 @@
-#include <sopt/mpi/session.h>
-#include <sopt/mpi/communicator.h>
 #include <benchmark/benchmark.h>
-
+#include <sopt/mpi/communicator.h>
+#include <sopt/mpi/session.h>
 
 // This reporter does nothing.
 // We can use it to disable output from all but the root process
 class NullReporter : public ::benchmark::BenchmarkReporter {
-public:
+ public:
   NullReporter() {}
-  virtual bool ReportContext(const Context &) {return true;}
+  virtual bool ReportContext(const Context &) { return true; }
   virtual void ReportRuns(const std::vector<Run> &) {}
   virtual void Finalize() {}
 };
@@ -20,10 +19,10 @@ int main(int argc, char const **argv) {
   auto const session = sopt::mpi::init(argc, argv);
   auto const world = sopt::mpi::Communicator::World();
 #endif
-  ::benchmark::Initialize(&argc, const_cast<char**>(argv));
+  ::benchmark::Initialize(&argc, const_cast<char **>(argv));
 
 #ifdef PURIFY_MPI
-  if(world.is_root())
+  if (world.is_root())
     // root process will use a reporter from the usual set provided by
     // ::benchmark
     ::benchmark::RunSpecifiedBenchmarks();

@@ -3,19 +3,19 @@
 #include <random>
 #include <utility>
 
+#include "purify/types.h"
+#include "purify/directories.h"
+#include "purify/distribute.h"
+#include "purify/logging.h"
+#include "purify/mpi_utilities.h"
+#include "purify/operators.h"
+#include "purify/pfitsio.h"
+#include "purify/utilities.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/logging.h>
 #include <sopt/mpi/communicator.h>
 #include <sopt/mpi/utilities.h>
 #include <sopt/wavelets.h>
-#include "purify/directories.h"
-#include "purify/distribute.h"
-#include "purify/logging.h"
-#include "purify/mpi_utilities.h"
-#include "purify/pfitsio.h"
-#include "purify/types.h"
-#include "purify/utilities.h"
-#include "purify/operators.h"
 
 using namespace purify;
 utilities::vis_params dirty_visibilities(t_uint number_of_vis = 10, t_uint width = 20,
@@ -33,8 +33,7 @@ utilities::vis_params dirty_visibilities(sopt::mpi::Communicator const &comm,
                                          t_uint height = 20, t_uint over_sample = 2,
                                          t_real ISNR = 30) {
   utilities::vis_params result;
-  if(comm.is_root())
-    result = dirty_visibilities(number_of_vis, width, height, over_sample, ISNR);
+  if (comm.is_root()) result = dirty_visibilities(number_of_vis, width, height, over_sample, ISNR);
   result.u = comm.broadcast(result.u);
   result.v = comm.broadcast(result.v);
   result.w = comm.broadcast(result.w);
@@ -43,8 +42,8 @@ utilities::vis_params dirty_visibilities(sopt::mpi::Communicator const &comm,
   result.ra = comm.broadcast(result.ra);
   result.dec = comm.broadcast(result.dec);
   result.average_frequency = comm.broadcast(result.average_frequency);
-  result.units
-      = static_cast<utilities::vis_units>(comm.broadcast(static_cast<t_int>(result.units)));
+  result.units =
+      static_cast<utilities::vis_units>(comm.broadcast(static_cast<t_int>(result.units)));
   return result;
 }
 
@@ -55,8 +54,7 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   auto const world = sopt::mpi::Communicator::World();
   // split into serial and parallel
   auto const split_comm = world.split(world.is_root());
-  if(world.size() < 2)
-    return;
+  if (world.size() < 2) return;
 
   auto const nvis = 20;
   auto const width = 32;
@@ -69,42 +67,42 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   // distribute only on processors doing it parallel
   auto const uv_data = distribute_params(uv_serial, split_comm);
 
-
   // auto Phi
   //    = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
   //        uv_data.u, uv_data.v, uv_data.w, uv_data.weights, width, height, over_sample, 100);
- //  const t_real norm = world.broadcast((Phi * Vector<t_complex>::Ones(width * height)).cwiseAbs().maxCoeff());
+  //  const t_real norm = world.broadcast((Phi * Vector<t_complex>::Ones(width *
+  //  height)).cwiseAbs().maxCoeff());
 
- auto   Phi
-      =  *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          split_comm, uv_data.u, uv_data.v, uv_data.w, uv_data.weights, width, height, over_sample, 500, 1e-9);
+  auto Phi = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      split_comm, uv_data.u, uv_data.v, uv_data.w, uv_data.weights, width, height, over_sample, 500,
+      1e-9);
 
   SECTION("Measurement operator parallelization") {
     SECTION("Gridding") {
       Vector<t_complex> const grid = Phi.adjoint() * uv_data.vis;
       auto const serial = world.broadcast(grid);
       CAPTURE(split_comm.is_root());
-      CAPTURE((grid.array()/serial.array()).head(5));
+      CAPTURE((grid.array() / serial.array()).head(5));
       CHECK(grid.isApprox(serial));
     }
 
     SECTION("Degridding") {
-      auto const image
-          = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(width * height));
+      auto const image =
+          world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(width * height));
       Vector<t_complex> const degridded = Phi * image;
       REQUIRE(degridded.size() == uv_data.vis.size());
 
       auto const just_roots = world.split(split_comm.is_root());
-      if(world.is_root())
+      if (world.is_root())
         just_roots.broadcast(degridded);
-      else if(split_comm.is_root() and split_comm.size() > 1) {
+      else if (split_comm.is_root() and split_comm.size() > 1) {
         utilities::vis_params serial = uv_serial;
         serial.vis = just_roots.broadcast<Vector<t_complex>>();
-        auto const order
-            = distribute::distribute_measurements(serial, split_comm, distribute::plan::radial);
+        auto const order =
+            distribute::distribute_measurements(serial, split_comm, distribute::plan::radial);
         auto const from_serial = utilities::regroup_and_scatter(serial, order, split_comm);
         CHECK(from_serial.vis.isApprox(degridded));
-      } else if(split_comm.size() > 1) {
+      } else if (split_comm.size() > 1) {
         auto const from_serial = utilities::scatter_visibilities(split_comm);
         CHECK(from_serial.vis.isApprox(degridded));
       }
@@ -119,8 +117,7 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   auto const startw = start(sara.size(), split_comm.size(), split_comm.rank());
   auto const endw = start(sara.size(), split_comm.size(), split_comm.rank() + 1);
   auto const split_sara = sopt::wavelets::SARA(sara.begin() + startw, sara.begin() + endw);
-  auto const Psi = sopt::linear_transform<t_complex>(split_sara, height,
-                                                     width, split_comm);
+  auto const Psi = sopt::linear_transform<t_complex>(split_sara, height, width, split_comm);
   SECTION("Wavelet operator parallelization") {
     auto const Nx = width;
     auto const Ny = height;
@@ -133,10 +130,10 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
     }
 
     SECTION("Coefficients to Signal") {
-      auto const coefficients
-          = world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(Nx * Ny * sara.size()));
-      Vector<t_complex> const signal
-          = Psi * coefficients.segment(startw * Nx * Ny, (endw - startw) * Nx * Ny);
+      auto const coefficients =
+          world.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(Nx * Ny * sara.size()));
+      Vector<t_complex> const signal =
+          Psi * coefficients.segment(startw * Nx * Ny, (endw - startw) * Nx * Ny);
       CHECK(world.broadcast(signal).isApprox(signal));
     }
   }
@@ -148,11 +145,11 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
 
   auto const sigma = world.broadcast(utilities::SNR_to_standard_deviation(uv_data.vis, ISNR));
   auto const epsilon = world.broadcast(utilities::calculate_l2_radius(uv_data.vis.size(), sigma));
-  auto const purify_gamma
-      = world.is_root() ?
-            world.broadcast((Psi.adjoint() * (Phi.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff()
-                            * 1e-3) :
-            world.broadcast<t_real>();
+  auto const purify_gamma =
+      world.is_root()
+          ? world.broadcast((Psi.adjoint() * (Phi.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() *
+                            1e-3)
+          : world.broadcast<t_real>();
   PURIFY_HIGH_LOG("Starting sopt!");
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
   PURIFY_MEDIUM_LOG("Gamma {}", purify_gamma);
@@ -174,11 +171,11 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
                    .Psi(Psi)
                    .Phi(Phi)
                    .itermax(5);
-  padmm.residual_convergence([&padmm, epsilon, split_comm,
-                              world](Vector<t_complex> const &, Vector<t_complex> const &residual) {
+  padmm.residual_convergence([&padmm, epsilon, split_comm, world](
+                                 Vector<t_complex> const &, Vector<t_complex> const &residual) {
     auto const tolerance = epsilon * 1.001;
-    auto const residual_norm
-        = sopt::mpi::l2_norm(residual, padmm.l2ball_proximal_weights(), split_comm);
+    auto const residual_norm =
+        sopt::mpi::l2_norm(residual, padmm.l2ball_proximal_weights(), split_comm);
     SOPT_LOW_LOG("    - Residuals: epsilon = {}, residual norm = {}", tolerance, residual_norm);
     auto const result = residual_norm < tolerance;
     CHECK(result == (world.broadcast<int>(result, world.root_id()) != 0));
@@ -204,8 +201,8 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   SECTION("Check parameters") {
     CHECK(world.broadcast(padmm.gamma()) == Approx(padmm.gamma()));
     CHECK(world.broadcast(padmm.relative_variation()) == Approx(padmm.relative_variation()));
-    CHECK(world.broadcast(padmm.l2ball_proximal_epsilon())
-          == Approx(padmm.l2ball_proximal_epsilon()));
+    CHECK(world.broadcast(padmm.l2ball_proximal_epsilon()) ==
+          Approx(padmm.l2ball_proximal_epsilon()));
   }
 
   SECTION("Run serial vs parallel") {

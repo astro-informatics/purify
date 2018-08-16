@@ -3,19 +3,17 @@
 #include "purify/directories.h"
 #include "purify/logging.h"
 
-#define CHECK(CONDITION, ERROR)                                                                    \
-  if(not(CONDITION))                                                                               \
-    throw std::runtime_error(ERROR);
-#define CHECK_THROWS(STATEMENT, ERROR)                                                             \
-  {                                                                                                \
-    bool did_throw = false;                                                                        \
-    try {                                                                                          \
-      STATEMENT;                                                                                   \
-    } catch(...) {                                                                                 \
-      did_throw = true;                                                                            \
-    }                                                                                              \
-    if(not did_throw)                                                                              \
-      throw std::runtime_error(ERROR);                                                             \
+#define CHECK(CONDITION, ERROR) \
+  if (not(CONDITION)) throw std::runtime_error(ERROR);
+#define CHECK_THROWS(STATEMENT, ERROR)                  \
+  {                                                     \
+    bool did_throw = false;                             \
+    try {                                               \
+      STATEMENT;                                        \
+    } catch (...) {                                     \
+      did_throw = true;                                 \
+    }                                                   \
+    if (not did_throw) throw std::runtime_error(ERROR); \
   }
 
 int main(int, char **) {
@@ -52,9 +50,8 @@ int main(int, char **) {
     CHECK_THROWS(channel0.declination(), "Can't figure out direction of empty channel");
 
     // It is also possible to loop over channels
-    for(auto const &channel : ngc3256) {
-      if(not channel.is_valid())
-        continue;
+    for (auto const &channel : ngc3256) {
+      if (not channel.is_valid()) continue;
       // although we will stop at the first one
       CHECK(channel.channel() == 17, "First valid channel is #17");
       break;
@@ -67,14 +64,13 @@ int main(int, char **) {
     auto const filtered = ngc3256[std::make_pair(17, filter)];
     CHECK(filtered.lambda_w().size() == 6300, "Incorrect size for filtered data");
     // Loops can also be filtered
-    for(auto i_first = ngc3256.begin(filter); i_first != ngc3256.end(filter); ++i_first) {
-      if(not i_first->is_valid())
-        continue;
+    for (auto i_first = ngc3256.begin(filter); i_first != ngc3256.end(filter); ++i_first) {
+      if (not i_first->is_valid()) continue;
       CHECK(i_first->channel() == 17, "First valid channel is #17");
       CHECK(i_first->V().size() == 6300, "Incorrect size for the filtered V Stokes component");
       break;
     }
-  } catch(std::runtime_error const &e) {
+  } catch (std::runtime_error const &e) {
     std::cerr << "Example did not run as expected:\n" << e.what() << "\n";
     return 1;
   }

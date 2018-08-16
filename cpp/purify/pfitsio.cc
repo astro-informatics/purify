@@ -7,9 +7,9 @@ namespace pfitsio {
 void write_key(fitsfile *fptr, const std::string &key, const std::string &value,
                const std::string &comment, int *status) {
   std::string entry = value;
-  if(fits_write_key(fptr, TSTRING, const_cast<char *>(key.c_str()),
-                    reinterpret_cast<void *>(const_cast<char *>(entry.c_str())),
-                    const_cast<char *>(comment.c_str()), status))
+  if (fits_write_key(fptr, TSTRING, const_cast<char *>(key.c_str()),
+                     reinterpret_cast<void *>(const_cast<char *>(entry.c_str())),
+                     const_cast<char *>(comment.c_str()), status))
     throw std::runtime_error("Problem writing key in fits file: " + key);
 }
 void write_key(fitsfile *fptr, const std::string &key, const char *value,
@@ -19,21 +19,20 @@ void write_key(fitsfile *fptr, const std::string &key, const char *value,
 void write_history(fitsfile *fptr, const std::string &context, const std::string &history,
                    int *status) {
   const std::string entry = context + ": " + history;
-  if(fits_write_history(fptr, const_cast<char *>(entry.c_str()), status))
+  if (fits_write_history(fptr, const_cast<char *>(entry.c_str()), status))
     throw std::runtime_error("Problem writing comments in fits file");
 }
 std::string read_key(fitsfile *fptr, const std::string &key, int *status) {
-
   std::string value = "";
   std::string comment = "";
-  if(fits_read_key(fptr, TSTRING, const_cast<char *>(key.c_str()),
-                   const_cast<char *>(value.c_str()), const_cast<char *>(comment.c_str()), status))
+  if (fits_read_key(fptr, TSTRING, const_cast<char *>(key.c_str()),
+                    const_cast<char *>(value.c_str()), const_cast<char *>(comment.c_str()), status))
     throw std::runtime_error("Error reading value from key " + key);
   return value;
 }
 //! Write image to fits file
 void write2d(const Image<t_real> &eigen_image, const pfitsio::header_params &header,
-                    const bool &overwrite) {
+             const bool &overwrite) {
   /*
     Writes an image to a fits file.
 
@@ -75,8 +74,8 @@ Image<t_complex> read2d(const std::string &fits_name) {
   std::vector<Image<t_complex>> images = read3d(fits_name);
   return images.at(0);
 }
-void write3d(const std::vector<Image<t_real>> &eigen_images,
-                    const pfitsio::header_params &header, const bool &overwrite) {
+void write3d(const std::vector<Image<t_real>> &eigen_images, const pfitsio::header_params &header,
+             const bool &overwrite) {
   /*
      Writes an image to a fits file.
      image:: image data, a 2d Image.
@@ -85,34 +84,34 @@ void write3d(const std::vector<Image<t_real>> &eigen_images,
 */
 
   PURIFY_LOW_LOG("Writing fits file {}", header.fits_name);
-  if(overwrite == true) {
+  if (overwrite == true) {
     remove(header.fits_name.c_str());
   }
   fitsfile *fptr;
   t_int status = 0;
-  std::vector<long> naxes
-      = {static_cast<long>(eigen_images.at(0).rows()), static_cast<long>(eigen_images.at(0).cols()),
-         static_cast<long>(eigen_images.size()), 1};
+  std::vector<long> naxes = {static_cast<long>(eigen_images.at(0).rows()),
+                             static_cast<long>(eigen_images.at(0).cols()),
+                             static_cast<long>(eigen_images.size()), 1};
   std::vector<long> fpixel = {1, 1, 1, 1};
 
   Vector<t_real> image = Vector<t_real>::Zero(naxes.at(0) * naxes.at(1) * naxes.at(2));
-  for(int i = 0; i < eigen_images.size(); i++)
-    image.segment(i * naxes.at(0) * naxes.at(1), naxes.at(0) * naxes.at(1))
-        = Vector<t_real>::Map(eigen_images.at(i).data(), naxes.at(0) * naxes.at(1));
+  for (int i = 0; i < eigen_images.size(); i++)
+    image.segment(i * naxes.at(0) * naxes.at(1), naxes.at(0) * naxes.at(1)) =
+        Vector<t_real>::Map(eigen_images.at(i).data(), naxes.at(0) * naxes.at(1));
 
-  if(fits_create_file(&fptr, header.fits_name.c_str(), &status))
+  if (fits_create_file(&fptr, header.fits_name.c_str(), &status))
     throw std::runtime_error("Problem creating fits file:" + header.fits_name);
-  if(fits_create_img(fptr, DOUBLE_IMG, static_cast<t_int>(naxes.size()), naxes.data(), &status))
+  if (fits_create_img(fptr, DOUBLE_IMG, static_cast<t_int>(naxes.size()), naxes.data(), &status))
     throw std::runtime_error("Problem creating HDU for image in fits file:" + header.fits_name);
-  if(fits_write_pix(fptr, TDOUBLE, fpixel.data(), static_cast<long>(image.size()),
-                    const_cast<t_real *>(image.data()), &status))
+  if (fits_write_pix(fptr, TDOUBLE, fpixel.data(), static_cast<long>(image.size()),
+                     const_cast<t_real *>(image.data()), &status))
     throw std::runtime_error("Problem writing image in fits file:" + header.fits_name);
 
 #define PURIFY_MACRO(KEY, VALUE, COMMENT) write_key(fptr, KEY, VALUE, COMMENT, &status);
 
   // Writing to fits header
-  PURIFY_MACRO("BUNIT", header.pix_units, "");                 // units
-  PURIFY_MACRO("NAXIS", static_cast<t_int>(naxes.size()), ""); // number of axes
+  PURIFY_MACRO("BUNIT", header.pix_units, "");                  // units
+  PURIFY_MACRO("NAXIS", static_cast<t_int>(naxes.size()), "");  // number of axes
   PURIFY_MACRO("NAXIS1", static_cast<t_int>(naxes.at(0)), "");
   PURIFY_MACRO("NAXIS2", static_cast<t_int>(naxes.at(1)), "");
   PURIFY_MACRO("NAXIS3", static_cast<t_int>(naxes.at(2)), "");
@@ -139,7 +138,7 @@ void write3d(const std::vector<Image<t_real>> &eigen_images,
 #undef PURIFY_MACRO
   write_history(fptr, "SOFTWARE", "Purify", &status);
   write_history(fptr, "PURIFY-NITERS", header.niters, &status);
-  if(header.hasconverged) {
+  if (header.hasconverged) {
     write_history(fptr, "PURIFY-CONVERGED", "True", &status);
   } else {
     write_history(fptr, "PURIFY-CONVERGED", "False", &status);
@@ -147,10 +146,10 @@ void write3d(const std::vector<Image<t_real>> &eigen_images,
   write_history(fptr, "PURIFY-RELATIVEVARIATION", header.relative_variation, &status);
   write_history(fptr, "PURIFY-RESIDUALCONVERGENCE", header.residual_convergence, &status);
   write_history(fptr, "PURIFY-EPSILON", header.epsilon, &status);
-  if(fits_write_date(fptr, &status))
+  if (fits_write_date(fptr, &status))
     throw std::runtime_error("Problem writing date in fits file:" + header.fits_name);
 
-  if(fits_close_file(fptr, &status))
+  if (fits_close_file(fptr, &status))
     throw std::runtime_error("Problem closing fits file:" + header.fits_name);
 }
 
@@ -180,11 +179,10 @@ std::vector<Image<t_complex>> read3d(const std::string &fits_name) {
   fitsfile *fptr;
   int status = 0;
   PURIFY_LOW_LOG("Reading fits file {}", fits_name);
-  if(fits_open_image(&fptr, fits_name.c_str(), READONLY, &status))
+  if (fits_open_image(&fptr, fits_name.c_str(), READONLY, &status))
     throw std::runtime_error("Error opening image " + fits_name);
   const t_int naxis = read_key<int>(fptr, "NAXIS", &status);
-  if(naxis < 1)
-    throw std::runtime_error("Image contains zero axes.");
+  if (naxis < 1) throw std::runtime_error("Image contains zero axes.");
   const t_int rows = read_key<int>(fptr, "NAXIS1", &status);
   const t_int cols = (naxis > 1) ? read_key<int>(fptr, "NAXIS2", &status) : 1;
   const t_int channels = (naxis > 2) ? read_key<int>(fptr, "NAXIS3", &status) : 1;
@@ -192,25 +190,23 @@ std::vector<Image<t_complex>> read3d(const std::string &fits_name) {
   PURIFY_LOW_LOG("Axes {}", naxis);
   std::vector<long> fpixel(naxis, 1);
   PURIFY_LOW_LOG("Dimensions {}x{}x{}x{}", rows, cols, channels, pols);
-  if(pols > 1)
-    throw std::runtime_error("Too many polarisations when reading " + fits_name);
+  if (pols > 1) throw std::runtime_error("Too many polarisations when reading " + fits_name);
   std::vector<Image<t_complex>> eigen_images;
   t_real nulval = 0;
   t_int anynul = 0;
   Vector<t_real> image = Vector<t_real>::Zero(rows * cols * channels * pols);
-  if(fits_read_pix(fptr, TDOUBLE, fpixel.data(), static_cast<long>(image.size()), &nulval,
-                   image.data(), &anynul, &status))
+  if (fits_read_pix(fptr, TDOUBLE, fpixel.data(), static_cast<long>(image.size()), &nulval,
+                    image.data(), &anynul, &status))
     throw std::runtime_error("Error reading data from image " + fits_name);
-  if(anynul)
-    PURIFY_LOW_LOG("There are bad values when reading " + fits_name);
-  for(int i = 0; i < channels; i++) {
+  if (anynul) PURIFY_LOW_LOG("There are bad values when reading " + fits_name);
+  for (int i = 0; i < channels; i++) {
     Vector<t_complex> eigen_image = Vector<t_complex>::Zero(rows * cols);
     eigen_image.real() = image.segment(i * rows * cols, rows * cols);
     eigen_images.push_back(Image<t_complex>::Map(eigen_image.data(), rows, cols));
   }
-  if(fits_close_file(fptr, &status))
+  if (fits_close_file(fptr, &status))
     throw std::runtime_error("Problem closing fits file: " + fits_name);
   return eigen_images;
 }
-} // namespace pfitsio
-} // namespace purify
+}  // namespace pfitsio
+}  // namespace purify

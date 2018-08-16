@@ -22,33 +22,32 @@ TEST_CASE("kernel") {
   const t_int Jv = 4;
   const t_int Jw = 6;
   const t_uint imsize = 2048;
-  const t_real cell = 30; // arcseconds
+  const t_real cell = 30;  // arcseconds
   const t_real oversample_ratio = 2;
-  const auto uvkernels
-      = purify::create_kernels(kernels::kernel::kb, Ju, Jv, imsize, imsize, oversample_ratio);
+  const auto uvkernels =
+      purify::create_kernels(kernels::kernel::kb, Ju, Jv, imsize, imsize, oversample_ratio);
   const auto kernelu = std::get<0>(uvkernels);
   const auto kernelv = std::get<1>(uvkernels);
-  const auto kernelw = projection_kernels::w_projection_kernel_sphere(cell, cell, imsize, imsize,
-                                                                      oversample_ratio);
+  const auto kernelw =
+      projection_kernels::w_projection_kernel_sphere(cell, cell, imsize, imsize, oversample_ratio);
   const Vector<t_real> u = Vector<t_real>::Random(5);
   const Vector<t_real> v = Vector<t_real>::Random(5);
   const Vector<t_real> w = Vector<t_real>::Random(5) * 100;
-  for(t_uint m = 0; m < u.size(); m++) {
-    const Matrix<t_complex> output
-        = projection_kernels::projection(kernelv, kernelu, kernelw, u(m), v(m), w(m), Ju, Jv, Jw);
+  for (t_uint m = 0; m < u.size(); m++) {
+    const Matrix<t_complex> output =
+        projection_kernels::projection(kernelv, kernelu, kernelw, u(m), v(m), w(m), Ju, Jv, Jw);
     break;
   }
 }
 
 TEST_CASE("w_projection") {
-
   const t_int Ju = 5;
   const t_int Jv = 5;
   const t_uint imsize = 10;
-  const t_real cell = 30; // arcseconds
+  const t_real cell = 30;  // arcseconds
   const t_real oversample_ratio = 2;
-  const auto uvkernels
-      = purify::create_kernels(kernels::kernel::kb, Ju, Jv, imsize, imsize, oversample_ratio);
+  const auto uvkernels =
+      purify::create_kernels(kernels::kernel::kb, Ju, Jv, imsize, imsize, oversample_ratio);
   const auto kernelu = std::get<0>(uvkernels);
   const auto kernelv = std::get<1>(uvkernels);
   const t_uint M = 5;
@@ -60,20 +59,20 @@ TEST_CASE("w_projection") {
     const t_int Jw = 10;
     const auto kernelw = projection_kernels::w_projection_kernel_approx(cell, cell, imsize, imsize,
                                                                         oversample_ratio);
-    const Sparse<t_complex> G
-        = details::init_gridding_matrix_2d(u, v, w, weights, imsize, imsize, oversample_ratio,
-                                           kernelu, kernelv, kernelw, Ju, Jv, Jw, true);
-    const Vector<t_complex> output
-        = G * Vector<t_complex>::Random(imsize * imsize * oversample_ratio * oversample_ratio);
+    const Sparse<t_complex> G =
+        details::init_gridding_matrix_2d(u, v, w, weights, imsize, imsize, oversample_ratio,
+                                         kernelu, kernelv, kernelw, Ju, Jv, Jw, true);
+    const Vector<t_complex> output =
+        G * Vector<t_complex>::Random(imsize * imsize * oversample_ratio * oversample_ratio);
   }
   SECTION("delta") {
     const t_int Jw = 1;
     const auto kernelw = projection_kernels::box_proj();
-    const Sparse<t_complex> G
-        = details::init_gridding_matrix_2d(u, v, w, weights, imsize, imsize, oversample_ratio,
-                                           kernelu, kernelv, kernelw, Ju, Jv, Jw, true);
-    const Vector<t_complex> output
-        = G * Vector<t_complex>::Random(imsize * imsize * oversample_ratio * oversample_ratio);
+    const Sparse<t_complex> G =
+        details::init_gridding_matrix_2d(u, v, w, weights, imsize, imsize, oversample_ratio,
+                                         kernelu, kernelv, kernelw, Ju, Jv, Jw, true);
+    const Vector<t_complex> output =
+        G * Vector<t_complex>::Random(imsize * imsize * oversample_ratio * oversample_ratio);
     const Sparse<t_complex> G_id = details::init_gridding_matrix_2d(
         u, v, w, weights, imsize, imsize, oversample_ratio, kernelu, kernelv, kernelw, Ju, Jv);
     CHECK(G.nonZeros() == G_id.nonZeros());
@@ -89,7 +88,6 @@ TEST_CASE("uvw units") {
   const t_real oversample_ratio = 2;
 
   SECTION("1arcsec") {
-
     const utilities::vis_params uv_lambda(Vector<t_real>::Ones(5), Vector<t_real>::Ones(5),
                                           Vector<t_real>::Ones(5), Vector<t_complex>::Ones(5),
                                           Vector<t_complex>::Ones(5));
@@ -107,7 +105,6 @@ TEST_CASE("uvw units") {
     CHECK(uv_lambda.u.isApprox(uv_pixels.u * scale, 1e-6));
   }
   SECTION("arcsec") {
-
     const t_real cell = 3;
     const utilities::vis_params uv_lambda(Vector<t_real>::Ones(5), Vector<t_real>::Ones(5),
                                           Vector<t_real>::Ones(5), Vector<t_complex>::Ones(5),
@@ -132,8 +129,8 @@ TEST_CASE("Calcuate Chirp Image") {
   const t_int imsizey = 128;
   SECTION("w is zero") {
     const t_real w_rate = 0;
-    const Image<t_complex> chirp_image
-        = wproj_utilities::generate_chirp(w_rate, 1, 1, imsizex, imsizey);
+    const Image<t_complex> chirp_image =
+        wproj_utilities::generate_chirp(w_rate, 1, 1, imsizex, imsizey);
     CHECK((chirp_image.array().cwiseAbs() - 1. / (imsizex * imsizey)).matrix().norm() < 1e-12);
   }
 }
@@ -145,16 +142,16 @@ TEST_CASE("Calculate Threshold") {
     const t_real threshold = wproj_utilities::sparsify_row_thres(row, expected_sparse_total_energy);
     t_real total_energy = 0;
     t_real sparse_total_energy = 0;
-    for(t_uint i = 0; i < row.rows(); i++) {
+    for (t_uint i = 0; i < row.rows(); i++) {
       total_energy += std::abs(row.coeff(i, 0) * row.coeff(i, 0));
-      if(std::abs(row.coeff(i, 0)) > threshold) {
+      if (std::abs(row.coeff(i, 0)) > threshold) {
         sparse_total_energy += std::abs(row.coeff(i, 0) * row.coeff(i, 0));
       }
     }
     sparse_total_energy = sparse_total_energy / total_energy;
-    CHECK(std::abs(expected_sparse_total_energy - sparse_total_energy)
-              / expected_sparse_total_energy
-          < 1e-1);
+    CHECK(std::abs(expected_sparse_total_energy - sparse_total_energy) /
+              expected_sparse_total_energy <
+          1e-1);
   }
   SECTION("Half Energy") {
     const t_real expected_sparse_total_energy = 0.4;
@@ -162,16 +159,16 @@ TEST_CASE("Calculate Threshold") {
     const t_real threshold = wproj_utilities::sparsify_row_thres(row, expected_sparse_total_energy);
     t_real total_energy = 0;
     t_real sparse_total_energy = 0;
-    for(t_uint i = 0; i < row.rows(); i++) {
+    for (t_uint i = 0; i < row.rows(); i++) {
       total_energy += std::abs(row.coeff(i, 0) * row.coeff(i, 0));
-      if(std::abs(row.coeff(i, 0)) > threshold) {
+      if (std::abs(row.coeff(i, 0)) > threshold) {
         sparse_total_energy += std::abs(row.coeff(i, 0) * row.coeff(i, 0));
       }
     }
     sparse_total_energy = sparse_total_energy / total_energy;
-    CHECK(std::abs(expected_sparse_total_energy - sparse_total_energy)
-              / expected_sparse_total_energy
-          < 1e-1);
+    CHECK(std::abs(expected_sparse_total_energy - sparse_total_energy) /
+              expected_sparse_total_energy <
+          1e-1);
   }
 }
 
@@ -181,8 +178,8 @@ TEST_CASE("simple convolution") {
   const Sparse<t_complex> G_row = Matrix<t_complex>::Random(1, Nx * Ny).sparseView(1e-2);
   const Sparse<t_complex> C_row = Matrix<t_complex>::Random(1, Nx * Ny).sparseView(1e-2);
   const Sparse<t_complex> kernel = wproj_utilities::row_wise_convolution(G_row, C_row, Nx, Ny);
-  const Sparse<t_complex> test_kernel
-      = wproj_utilities::row_wise_sparse_convolution(G_row, C_row, Nx, Ny);
+  const Sparse<t_complex> test_kernel =
+      wproj_utilities::row_wise_sparse_convolution(G_row, C_row, Nx, Ny);
   CHECK(test_kernel.nonZeros() == kernel.nonZeros());
   REQUIRE(test_kernel.isApprox(kernel, 1e-12));
 }
@@ -201,21 +198,20 @@ TEST_CASE("wprojection_matrix") {
 
   Sparse<t_complex> I(rows, cols);
   I.reserve(rows);
-  for(t_int i = 0; i < std::min(rows, cols); i++)
-    I.coeffRef(i, i) = 1.;
-  Sparse<t_complex> const G_id
-      = wproj_utilities::wprojection_matrix(I, Nx, Ny, w_components_zero, cellx, celly, 1, 1);
-  Sparse<t_complex> const G
-      = wproj_utilities::wprojection_matrix(I, Nx, Ny, w_components, cellx, celly, 1, 1);
+  for (t_int i = 0; i < std::min(rows, cols); i++) I.coeffRef(i, i) = 1.;
+  Sparse<t_complex> const G_id =
+      wproj_utilities::wprojection_matrix(I, Nx, Ny, w_components_zero, cellx, celly, 1, 1);
+  Sparse<t_complex> const G =
+      wproj_utilities::wprojection_matrix(I, Nx, Ny, w_components, cellx, celly, 1, 1);
   // Testing if G_id == I
   CHECK(G_id.nonZeros() == I.nonZeros());
   CHECK(G.nonZeros() >= I.nonZeros());
-  for(t_int k = 0; k < G_id.outerSize(); ++k)
-    for(Sparse<t_complex>::InnerIterator it(G_id, k); it; ++it) {
+  for (t_int k = 0; k < G_id.outerSize(); ++k)
+    for (Sparse<t_complex>::InnerIterator it(G_id, k); it; ++it) {
       CAPTURE(it.value() * static_cast<t_real>(Nx));
       CHECK(std::abs(it.value() - 1.) < 1e-12);
-      CHECK(it.row() == k); // row index
-      CHECK(it.col() == k); // col index
+      CHECK(it.row() == k);  // row index
+      CHECK(it.col() == k);  // col index
     }
 }
 TEST_CASE("convolution even") {

@@ -1,7 +1,7 @@
+#include "purify/types.h"
 #include "purify/cimg.h"
 #include "purify/directories.h"
 #include "purify/pfitsio.h"
-#include "purify/types.h"
 using namespace purify;
 using namespace purify::notinstalled;
 
@@ -13,8 +13,8 @@ int main(int nargs, char const **args) {
   Image<t_real> const M31_large = pfitsio::read2d(fitsfile2).real();
 #ifdef PURIFY_CImg
   CDisplay display = cimg::make_display<Image<t_real>>(M31, "M31 small");
-  while(!display.is_closed()) {
-    if(display.is_key())
+  while (!display.is_closed()) {
+    if (display.is_key())
       display = cimg::make_display<Image<t_real>>(M31_large, "Image of M31 large");
   }
 #endif

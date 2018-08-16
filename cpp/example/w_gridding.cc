@@ -11,7 +11,7 @@ int main(int nargs, char const **args) {
   purify::logging::initialize();
   purify::logging::set_level("debug");
   std::srand((unsigned int)std::time(0));
-  const t_real fov = 15; // degrees
+  const t_real fov = 15;  // degrees
   const t_int imsizex = 512;
   const t_int imsizey = imsizex;
   const t_real cell_x = fov / imsizex * 60 * 60;
@@ -47,8 +47,8 @@ int main(int nargs, char const **args) {
   pfitsio::write2d(Matrix<t_complex>::Map(interpchirp.data(), imsizey, imsizex).real().transpose(),
                    interp_image_filename);
 
-  const Matrix<t_complex> chirp
-      = wproj_utilities::generate_chirp(w_components(0), cell_x, cell_y, imsizex, imsizey);
+  const Matrix<t_complex> chirp =
+      wproj_utilities::generate_chirp(w_components(0), cell_x, cell_y, imsizex, imsizey);
   std::string const chirp_filename = output_filename("w_grid_chrip.fits");
   pfitsio::write2d(chirp.real().transpose(), chirp_filename);
 }

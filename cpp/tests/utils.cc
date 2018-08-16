@@ -10,7 +10,7 @@ TEST_CASE("utilities [mod]", "[mod]") {
   Array<t_real> range;
   range.setLinSpaced(201, -100, 100);
   Array<t_real> output(range.size());
-  for(t_int i = 0; i < range.size(); ++i) {
+  for (t_int i = 0; i < range.size(); ++i) {
     output(i) = utilities::mod(range(i), 20);
   }
   Array<t_real> expected(201);
@@ -519,7 +519,7 @@ TEST_CASE("read_mutiple_vis") {
     CAPTURE(names.size());
     CAPTURE(uv_data.size());
     CHECK(uv_data.size() * names.size() == uv_multi.size());
-    for(int i = 0; i < names.size(); i++) {
+    for (int i = 0; i < names.size(); i++) {
       CHECK(uv_data.u.isApprox(uv_multi.u.segment(i * uv_data.size(), uv_data.size())));
       CHECK(uv_data.v.isApprox(uv_multi.v.segment(i * uv_data.size(), uv_data.size())));
       CHECK(uv_data.w.isApprox(uv_multi.w.segment(i * uv_data.size(), uv_data.size())));
@@ -534,7 +534,7 @@ TEST_CASE("read_mutiple_vis") {
     CAPTURE(names.size());
     CAPTURE(uv_data.size());
     CHECK(uv_data.size() * names.size() == uv_multi.size());
-    for(int i = 0; i < names.size(); i++) {
+    for (int i = 0; i < names.size(); i++) {
       CHECK(uv_data.u.isApprox(uv_multi.u.segment(i * uv_data.size(), uv_data.size())));
       CHECK(uv_data.v.isApprox(uv_multi.v.segment(i * uv_data.size(), uv_data.size())));
       CHECK(uv_data.w.isApprox(uv_multi.w.segment(i * uv_data.size(), uv_data.size())));
@@ -563,16 +563,16 @@ TEST_CASE("utilities [fit_fwhm]", "[fit_fwhm]") {
   t_real const sigma_x = fwhm_x / (2 * std::sqrt(2 * std::log(2)));
   t_real const sigma_y = fwhm_y / (2 * std::sqrt(2 * std::log(2)));
   // calculating Gaussian
-  t_real const a = std::pow(std::cos(theta), 2) / (2 * sigma_x * sigma_x)
-                   + std::pow(std::sin(theta), 2) / (2 * sigma_y * sigma_y);
-  t_real const b = -std::sin(2 * theta) / (4 * sigma_x * sigma_x)
-                   + std::sin(2 * theta) / (4 * sigma_y * sigma_y);
-  t_real const c = std::pow(std::sin(theta), 2) / (2 * sigma_x * sigma_x)
-                   + std::pow(std::cos(theta), 2) / (2 * sigma_y * sigma_y);
+  t_real const a = std::pow(std::cos(theta), 2) / (2 * sigma_x * sigma_x) +
+                   std::pow(std::sin(theta), 2) / (2 * sigma_y * sigma_y);
+  t_real const b = -std::sin(2 * theta) / (4 * sigma_x * sigma_x) +
+                   std::sin(2 * theta) / (4 * sigma_y * sigma_y);
+  t_real const c = std::pow(std::sin(theta), 2) / (2 * sigma_x * sigma_x) +
+                   std::pow(std::cos(theta), 2) / (2 * sigma_y * sigma_y);
   auto x0 = imsizex * 0.5;
   auto y0 = imsizey * 0.5;
-  for(t_int i = 0; i < imsizex; ++i) {
-    for(t_int j = 0; j < imsizey; ++j) {
+  for (t_int i = 0; i < imsizex; ++i) {
+    for (t_int j = 0; j < imsizey; ++j) {
       t_real x = i - x0;
       t_real y = j - y0;
       psf(j, i) = std::exp(-a * x * x + 2 * b * x * y - c * y * y);
@@ -601,7 +601,7 @@ TEST_CASE("utilities [sparse multiply]", "[sparse multiply]") {
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> dis_row(0, rows);
   std::uniform_real_distribution<> dis_col(0, cols);
-  for(t_int i = 0; i < nz_values; ++i) {
+  for (t_int i = 0; i < nz_values; ++i) {
     tripletList.emplace_back(std::floor(dis_row(rd)), std::floor(dis_col(rd)), M_values(i));
   }
   Sparse<t_complex> M(rows, cols);
@@ -610,11 +610,10 @@ TEST_CASE("utilities [sparse multiply]", "[sparse multiply]") {
   Vector<t_complex> const parallel_output = utilities::sparse_multiply_matrix(M, x);
   Vector<t_complex> const correct_output = M * x;
 
-  for(t_int i = 0; i < rows; ++i) {
+  for (t_int i = 0; i < rows; ++i) {
     CHECK(std::abs((correct_output(i) - parallel_output(i)) / correct_output(i)) < 1e-13);
   }
 }
-
 
 TEST_CASE("generate_baseline") {
   // testing if randomly generating a uvcoverage from baseline configuration works

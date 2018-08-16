@@ -1,5 +1,5 @@
-#include "catch.hpp"
 #include "purify/mpi_utilities.h"
+#include "catch.hpp"
 
 using namespace purify;
 
@@ -35,8 +35,8 @@ TEST_CASE("re-group visibilities in order of processes") {
     auto actual = params;
     utilities::regroup(actual, order);
     CHECK(params.u(0) == Approx(actual.u(0)));
-    CHECK(params.u(1) == Approx(actual.u(N-2)));
-    CHECK(params.u(2) == Approx(actual.u(N-1)));
+    CHECK(params.u(1) == Approx(actual.u(N - 2)));
+    CHECK(params.u(2) == Approx(actual.u(N - 1)));
     CHECK(params.u(3) == Approx(actual.u(1)));
     CHECK(params.u(4) == Approx(actual.u(2)));
   }

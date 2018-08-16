@@ -1,8 +1,16 @@
+#include "purify/types.h"
 #include <array>
 #include <memory>
 #include <random>
 #include <boost/filesystem.hpp>
 #include <boost/math/special_functions/erf.hpp>
+#include "purify/directories.h"
+#include "purify/distribute.h"
+#include "purify/logging.h"
+#include "purify/mpi_utilities.h"
+#include "purify/operators.h"
+#include "purify/pfitsio.h"
+#include "purify/utilities.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/mpi/communicator.h>
 #include <sopt/mpi/session.h>
@@ -10,14 +18,6 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include "purify/directories.h"
-#include "purify/distribute.h"
-#include "purify/logging.h"
-#include "purify/mpi_utilities.h"
-#include "purify/operators.h"
-#include "purify/pfitsio.h"
-#include "purify/types.h"
-#include "purify/utilities.h"
 
 #ifdef PURIFY_GPU
 #include "purify/operators_gpu.h"
@@ -30,22 +30,21 @@
 using namespace purify;
 using namespace purify::notinstalled;
 
-std::tuple<utilities::vis_params, t_real>
-dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
-                   const std::tuple<bool, t_real> &w_term) {
-  auto uv_data
-      = utilities::random_sample_density(number_of_vis, 0, constant::pi / 3, std::get<0>(w_term));
+std::tuple<utilities::vis_params, t_real> dirty_visibilities(
+    Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
+    const std::tuple<bool, t_real> &w_term) {
+  auto uv_data =
+      utilities::random_sample_density(number_of_vis, 0, constant::pi / 3, std::get<0>(w_term));
   uv_data.units = utilities::vis_units::radians;
   PURIFY_HIGH_LOG("Number of measurements / number of pixels: {}",
                   uv_data.u.size() / ground_truth_image.size());
   // creating operator to generate measurements
   auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_data, ground_truth_image.rows(), ground_truth_image.cols(), std::get<1>(w_term),
-      std::get<1>(w_term), 2, 100, 1e-4, kernels::kernel::kb, 8, 8,
-      std::get<0>(w_term));
+      std::get<1>(w_term), 2, 100, 1e-4, kernels::kernel::kb, 8, 8, std::get<0>(w_term));
   // Generates measurements from image
-  uv_data.vis = (*sky_measurements)
-                * Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);
+  uv_data.vis = (*sky_measurements) *
+                Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);
 
   // working out value of signal given SNR of 30
   auto const sigma = utilities::SNR_to_standard_deviation(uv_data.vis, snr);
@@ -54,16 +53,15 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
   return std::make_tuple(uv_data, sigma);
 }
 
-std::tuple<utilities::vis_params, t_real>
-dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
-                   const std::tuple<bool, t_real> &w_term, sopt::mpi::Communicator const &comm) {
-  if(comm.size() == 1)
-    return dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term);
-  if(comm.is_root()) {
+std::tuple<utilities::vis_params, t_real> dirty_visibilities(
+    Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,
+    const std::tuple<bool, t_real> &w_term, sopt::mpi::Communicator const &comm) {
+  if (comm.size() == 1) return dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term);
+  if (comm.is_root()) {
     auto result = dirty_visibilities(ground_truth_image, number_of_vis, snr, w_term);
     comm.broadcast(std::get<1>(result));
-    auto const order
-        = distribute::distribute_measurements(std::get<0>(result), comm, distribute::plan::radial);
+    auto const order =
+        distribute::distribute_measurements(std::get<0>(result), comm, distribute::plan::radial);
     std::get<0>(result) = utilities::regroup_and_scatter(std::get<0>(result), order, comm);
     return result;
   }
@@ -71,12 +69,10 @@ dirty_visibilities(Image<t_complex> const &ground_truth_image, t_uint number_of_
   return std::make_tuple(utilities::scatter_visibilities(comm), sigma);
 }
 
-std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>>
-padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> const &measurements,
-              const sopt::wavelets::SARA &sara, const Image<t_complex> &ground_truth_image,
-              const utilities::vis_params &uv_data, const t_real sigma,
-              const sopt::mpi::Communicator &comm) {
-
+std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm_factory(
+    std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> const &measurements,
+    const sopt::wavelets::SARA &sara, const Image<t_complex> &ground_truth_image,
+    const utilities::vis_params &uv_data, const t_real sigma, const sopt::mpi::Communicator &comm) {
   auto const Psi = sopt::linear_transform<t_complex>(sara, ground_truth_image.rows(),
                                                      ground_truth_image.cols(), comm);
 
@@ -87,9 +83,11 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
 #endif
   PURIFY_LOW_LOG("SARA Size = {}, Rank = {}", sara.size(), comm.rank());
-  const t_real gamma
-      = utilities::step_size(uv_data.vis, measurements, 
-          std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(Psi), sara.size()) * 1e-3;
+  const t_real gamma =
+      utilities::step_size(uv_data.vis, measurements,
+                           std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(Psi),
+                           sara.size()) *
+      1e-3;
   PURIFY_LOW_LOG("Epsilon {}, Rank = {}", epsilon, comm.rank());
   PURIFY_LOW_LOG("Gamma {}, SARA Size = {}, Rank = {}", gamma, sara.size(), comm.rank());
 
@@ -120,17 +118,17 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
   sopt::ScalarRelativeVariation<t_complex> conv(padmm->relative_variation(),
                                                 padmm->relative_variation(), "Objective function");
   std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
-  padmm->residual_convergence([padmm_weak, conv,
-                               comm](Vector<t_complex> const &x,
-                                     Vector<t_complex> const &residual) mutable -> bool {
+  padmm->residual_convergence([padmm_weak, conv, comm](
+                                  Vector<t_complex> const &x,
+                                  Vector<t_complex> const &residual) mutable -> bool {
     auto const padmm = padmm_weak.lock();
 #if PURIFY_PADMM_ALGORITHM == 2
     auto const residual_norm = sopt::mpi::l2_norm(residual, padmm->l2ball_proximal_weights(), comm);
     auto const result = residual_norm < padmm->residual_tolerance();
 #elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
     auto const residual_norm = sopt::l2_norm(residual, padmm->l2ball_proximal_weights());
-    auto const result
-        = comm.all_reduce<int8_t>(residual_norm < padmm->residual_tolerance(), MPI_LAND);
+    auto const result =
+        comm.all_reduce<int8_t>(residual_norm < padmm->residual_tolerance(), MPI_LAND);
 #endif
     SOPT_LOW_LOG("    - [PADMM] Residuals: {} <? {}", residual_norm, padmm->residual_tolerance());
     return result;
@@ -158,8 +156,8 @@ int main(int nargs, char const **args) {
   auto const session = sopt::mpi::init(nargs, args);
   auto const world = sopt::mpi::Communicator::World();
 
-  const t_real FoV = 1;     // deg
-  const t_real max_w = 100; // lambda
+  const t_real FoV = 1;      // deg
+  const t_real max_w = 100;  // lambda
   const std::string name = "M31";
   const t_real snr = 30;
   auto const kernel = "kb";
@@ -207,8 +205,7 @@ int main(int nargs, char const **args) {
       sopt::wavelets::SARA{
           std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
           std::make_tuple("DB3", 3u), std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
-          std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)
-          },
+          std::make_tuple("DB6", 3u), std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)},
       world);
 
   // Create the padmm solver
@@ -224,7 +221,7 @@ int main(int nargs, char const **args) {
   // then writes stuff to files
   auto const residual_image = (measurements->adjoint() * diagnostic.residual).real();
   auto const dirty_image = (measurements->adjoint() * std::get<0>(data).vis).real();
-  if(world.is_root()) {
+  if (world.is_root()) {
     boost::filesystem::path const path(output_filename(name));
 #if PURIFY_PADMM_ALGORITHM == 3
     auto const pb_path = path / kernel / "local_epsilon_replicated_grids";

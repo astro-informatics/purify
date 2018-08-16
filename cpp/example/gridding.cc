@@ -1,6 +1,6 @@
+#include "purify/types.h"
 #include "purify/logging.h"
 #include "purify/operators.h"
-#include "purify/types.h"
 #include "purify/utilities.h"
 
 using namespace purify;
@@ -20,7 +20,7 @@ int main(int nargs, char const **args) {
   auto const kernel = "kb";
 
   t_uint const number_of_pixels = imsizex * imsizey;
-  t_uint const number_of_vis = 4e6; // std::floor(number_of_pixels * 2);
+  t_uint const number_of_vis = 4e6;  // std::floor(number_of_pixels * 2);
   // Generating random uv(w) coverage
   t_real const sigma_m = constant::pi / 3;
   auto uv_vis = utilities::random_sample_density(number_of_vis, 0, sigma_m);
@@ -29,7 +29,7 @@ int main(int nargs, char const **args) {
   const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
       power_tol, kernels::kernel_from_string.at(kernel), Ju, Jv);
-  for(t_uint i = 0; i < 100; i++) {
+  for (t_uint i = 0; i < 100; i++) {
     PURIFY_LOW_LOG("Iteration: {}", i);
     Vector<t_complex> const measurements = *measure_op * image;
   }
