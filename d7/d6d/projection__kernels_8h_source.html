@@ -99,8 +99,8 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define PURIFY_PROJECTION_KERNELS_H</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;purify/config.h&quot;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;purify/logging.h&quot;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;purify/types.h&quot;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;purify/types.h&quot;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;purify/logging.h&quot;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span>purify {</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">namespace </span>projection_kernels {</div>
@@ -110,20 +110,21 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">inline</span> t_complex w_proj_approx(<span class="keyword">const</span> t_real &amp;u, <span class="keyword">const</span> t_real &amp;v, <span class="keyword">const</span> t_real &amp;w);</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">inline</span> t_complex w_proj_sphere(<span class="keyword">const</span> t_real &amp;u, <span class="keyword">const</span> t_real &amp;v, <span class="keyword">const</span> t_real &amp;w);</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;std::function&lt;t_complex(t_real, t_real, t_real)&gt; <span class="keyword">const</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;w_projection_kernel_approx(<span class="keyword">const</span> t_real &amp;cellx, <span class="keyword">const</span> t_real &amp;celly, <span class="keyword">const</span> t_uint &amp;imsizex,</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;                           <span class="keyword">const</span> t_uint &amp;imsizey, <span class="keyword">const</span> t_real &amp;oversample_ratio);</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;std::function&lt;t_complex(t_real, t_real, t_real)&gt; <span class="keyword">const</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;w_projection_kernel_sphere(<span class="keyword">const</span> t_real &amp;cellx, <span class="keyword">const</span> t_real &amp;celly, <span class="keyword">const</span> t_uint &amp;imsizex,</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;                           <span class="keyword">const</span> t_uint &amp;imsizey, <span class="keyword">const</span> t_real &amp;oversample_ratio);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;Matrix&lt;t_complex&gt;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;projection(<span class="keyword">const</span> std::function&lt;t_real(t_real)&gt; kernelu, <span class="keyword">const</span> std::function&lt;t_real(t_real)&gt; kernelv,</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;           <span class="keyword">const</span> std::function&lt;t_complex(t_real, t_real, t_real)&gt; kernelw, <span class="keyword">const</span> t_real u,</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;           <span class="keyword">const</span> t_real v, <span class="keyword">const</span> t_real w, <span class="keyword">const</span> t_int &amp;Ju, <span class="keyword">const</span> t_int &amp;Jv, <span class="keyword">const</span> t_int &amp;Jw);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;} <span class="comment">// namespace projection_kernels</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;} <span class="comment">// namespace purify</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;std::function&lt;t_complex(t_real, t_real, t_real)&gt; <span class="keyword">const</span> w_projection_kernel_approx(</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keyword">const</span> t_real &amp;cellx, <span class="keyword">const</span> t_real &amp;celly, <span class="keyword">const</span> t_uint &amp;imsizex, <span class="keyword">const</span> t_uint &amp;imsizey,</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keyword">const</span> t_real &amp;oversample_ratio);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;std::function&lt;t_complex(t_real, t_real, t_real)&gt; <span class="keyword">const</span> w_projection_kernel_sphere(</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keyword">const</span> t_real &amp;cellx, <span class="keyword">const</span> t_real &amp;celly, <span class="keyword">const</span> t_uint &amp;imsizex, <span class="keyword">const</span> t_uint &amp;imsizey,</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keyword">const</span> t_real &amp;oversample_ratio);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;Matrix&lt;t_complex&gt; projection(<span class="keyword">const</span> std::function&lt;t_real(t_real)&gt; kernelu,</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                             <span class="keyword">const</span> std::function&lt;t_real(t_real)&gt; kernelv,</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;                             <span class="keyword">const</span> std::function&lt;t_complex(t_real, t_real, t_real)&gt; kernelw,</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;                             <span class="keyword">const</span> t_real u, <span class="keyword">const</span> t_real v, <span class="keyword">const</span> t_real w, <span class="keyword">const</span> t_int &amp;Ju,</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;                             <span class="keyword">const</span> t_int &amp;Jv, <span class="keyword">const</span> t_int &amp;Jw);</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;}  <span class="comment">// namespace projection_kernels</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;}  <span class="comment">// namespace purify</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

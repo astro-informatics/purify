@@ -99,8 +99,8 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#ifndef PURIFY_PUVFITS_H</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define PURIFY_PUVFITS_H</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#include &quot;purify/config.h&quot;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;purify/logging.h&quot;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;purify/types.h&quot;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;purify/types.h&quot;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;purify/logging.h&quot;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;fitsio.h&gt;</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
@@ -110,30 +110,30 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span>pfitsio {</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;utilities::vis_params</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;read_uvfits(<span class="keyword">const</span> std::string &amp;filename, <span class="keyword">const</span> <span class="keywordtype">bool</span> flag = <span class="keyword">true</span>, <span class="keyword">const</span> stokes pol = stokes::I);</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;utilities::vis_params read_uvfits(<span class="keyword">const</span> std::string &amp;filename, <span class="keyword">const</span> <span class="keywordtype">bool</span> flag = <span class="keyword">true</span>,</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;                                  <span class="keyword">const</span> stokes pol = stokes::I);</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;utilities::vis_params read_uvfits(<span class="keyword">const</span> std::vector&lt;std::string&gt; &amp;names, <span class="keyword">const</span> <span class="keywordtype">bool</span> flag = <span class="keyword">true</span>,</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;                                  <span class="keyword">const</span> stokes pol = stokes::I);</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;utilities::vis_params read_uvfits(<span class="keyword">const</span> std::string &amp;vis_name2, <span class="keyword">const</span> utilities::vis_params &amp;u1,</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;                                  <span class="keyword">const</span> <span class="keywordtype">bool</span> flag = <span class="keyword">true</span>, <span class="keyword">const</span> stokes pol = stokes::I);</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;utilities::vis_params</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;filter_and_combine(<span class="keyword">const</span> utilities::vis_params &amp;input, <span class="keyword">const</span> utilities::vis_params &amp;input2,</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;                   <span class="keyword">const</span> Vector&lt;t_complex&gt; stokes_transform,</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;                   <span class="keyword">const</span> std::function&lt;<span class="keywordtype">bool</span>(t_real, t_real, t_real, t_complex, t_complex, t_real,</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;                                            t_real, t_real, t_complex, t_complex)&gt; &amp;filter</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                   = [](<span class="keyword">const</span> t_real, <span class="keyword">const</span> t_real, <span class="keyword">const</span> t_real, <span class="keyword">const</span> t_complex vis1,</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;                        <span class="keyword">const</span> t_complex weight1, <span class="keyword">const</span> t_real, <span class="keyword">const</span> t_real, <span class="keyword">const</span> t_real,</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;                        <span class="keyword">const</span> t_complex vis2, <span class="keyword">const</span> t_complex weight2) {</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;                       <span class="keywordflow">return</span> (weight1.real() &gt; 0.) and (weight2.real() &gt; 0.)</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;                              and (std::abs(vis1) &gt; 1e-20) and (std::abs(vis2) &gt; 1e-20)</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;                              and (!std::isnan(vis1.real()) and !std::isnan(vis1.imag()))</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;                              and (!std::isnan(vis2.real()) and !std::isnan(vis2.imag()));</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;                     });</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;utilities::vis_params filter_and_combine(</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keyword">const</span> utilities::vis_params &amp;input, <span class="keyword">const</span> utilities::vis_params &amp;input2,</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keyword">const</span> Vector&lt;t_complex&gt; stokes_transform,</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">const</span> std::function&lt;<span class="keywordtype">bool</span>(t_real, t_real, t_real, t_complex, t_complex, t_real, t_real, t_real,</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;                             t_complex, t_complex)&gt; &amp;filter =</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        [](<span class="keyword">const</span> t_real, <span class="keyword">const</span> t_real, <span class="keyword">const</span> t_real, <span class="keyword">const</span> t_complex vis1, <span class="keyword">const</span> t_complex weight1,</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;           <span class="keyword">const</span> t_real, <span class="keyword">const</span> t_real, <span class="keyword">const</span> t_real, <span class="keyword">const</span> t_complex vis2,</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;           <span class="keyword">const</span> t_complex weight2) {</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;          <span class="keywordflow">return</span> (weight1.real() &gt; 0.) and (weight2.real() &gt; 0.) and (std::abs(vis1) &gt; 1e-20) and</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;                 (std::abs(vis2) &gt; 1e-20) and</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;                 (!std::isnan(vis1.real()) and !std::isnan(vis1.imag())) and</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;                 (!std::isnan(vis2.real()) and !std::isnan(vis2.imag()));</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        });</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keywordtype">void</span> read_fits_keys(fitsfile *fptr, t_int *status);</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;Vector&lt;t_real&gt; read_uvfits_freq(fitsfile *fptr, t_int *status, const t_int &amp;col);</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keywordtype">void</span> read_uvfits_freq(fitsfile *fptr, t_int *status, Vector&lt;t_real&gt; &amp;output, const t_int &amp;col);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;Matrix&lt;t_real&gt;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;read_uvfits_coords(fitsfile *fptr, t_int *status, const t_int &amp;groups, const t_int &amp;pcount);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;Matrix&lt;t_real&gt; read_uvfits_coords(fitsfile *fptr, t_int *status, const t_int &amp;groups,</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                                  const t_int &amp;pcount);</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keywordtype">void</span> read_uvfits_coords(fitsfile *fptr, t_int *status, const t_int &amp;groups, const t_int &amp;pcount,</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;                        Matrix&lt;t_real&gt; &amp;output);</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;utilities::vis_params read_polarisation(const Vector&lt;t_real&gt; &amp;data, const Matrix&lt;t_real&gt; &amp;coords,</div>
@@ -153,8 +153,8 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;t_complex read_weight_from_data(const Vector&lt;t_real&gt; &amp;data, const t_uint pol, const t_uint pols,</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;                                const t_uint chan, const t_uint chans, const t_uint baseline,</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;                                const t_uint baselines);</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;} <span class="comment">// namespace pfitsio</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;} <span class="comment">// namespace purify</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;}  <span class="comment">// namespace pfitsio</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;}  <span class="comment">// namespace purify</span></div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->

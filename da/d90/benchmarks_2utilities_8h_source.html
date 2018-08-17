@@ -99,8 +99,8 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BENCHMARK_UTILITIES_H</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;chrono&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;purify/utilities.h&quot;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;benchmark/benchmark.h&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;benchmark/benchmark.h&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;purify/utilities.h&quot;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#include &lt;sopt/mpi/communicator.h&gt;</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#endif</span></div>
@@ -109,36 +109,39 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span>b_utilities {</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <span class="keywordtype">void</span> Arguments(benchmark::internal::Benchmark* b);</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keywordtype">void</span> Arguments(benchmark::internal::Benchmark* b);</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keywordtype">double</span> duration(std::chrono::high_resolution_clock::time_point start, std::chrono::high_resolution_clock::time_point end);</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keywordtype">bool</span> updateImage(t_uint newSize, Image&lt;t_complex&gt;&amp; image, t_uint&amp; sizex, t_uint&amp; sizey);</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keywordtype">bool</span> updateEmptyImage(t_uint newSize, Vector&lt;t_complex&gt;&amp; image, t_uint&amp; sizex, t_uint&amp; sizey);</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keywordtype">bool</span> updateMeasurements(t_uint newSize, <a class="code" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a>&amp; data);</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keywordtype">bool</span> updateMeasurements(t_uint newSize, <a class="code" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a>&amp; data, t_real&amp; epsilon, <span class="keywordtype">bool</span> newImage, Image&lt;t_complex&gt;&amp; image);</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  std::tuple&lt;utilities::vis_params, t_real&gt;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    dirty_measurements(Image&lt;t_complex&gt; <span class="keyword">const</span> &amp;ground_truth_image, t_uint number_of_vis, t_real snr,</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;               <span class="keyword">const</span> t_real &amp;cellsize);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <a class="code" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> random_measurements(t_int size);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor"></span>  <span class="keywordtype">double</span> duration(std::chrono::high_resolution_clock::time_point start, std::chrono::high_resolution_clock::time_point end,</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;                  sopt::mpi::Communicator <span class="keyword">const</span> &amp;comm);</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keywordtype">bool</span> updateMeasurements(t_uint newSize, <a class="code" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a>&amp; data, sopt::mpi::Communicator&amp; comm);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keywordtype">bool</span> updateMeasurements(t_uint newSize, <a class="code" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a>&amp; data, t_real&amp; epsilon, <span class="keywordtype">bool</span> newImage, Image&lt;t_complex&gt;&amp; image,</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;              sopt::mpi::Communicator&amp; comm);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  std::tuple&lt;utilities::vis_params, t_real&gt;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    dirty_measurements(Image&lt;t_complex&gt; <span class="keyword">const</span> &amp;ground_truth_image, t_uint number_of_vis, t_real snr,</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;               <span class="keyword">const</span> t_real &amp;cellsize, sopt::mpi::Communicator <span class="keyword">const</span> &amp;comm);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <a class="code" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> random_measurements(t_int size, sopt::mpi::Communicator <span class="keyword">const</span> &amp;comm);</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor"></span>}</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keywordtype">double</span> duration(std::chrono::high_resolution_clock::time_point start,</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;                std::chrono::high_resolution_clock::time_point end);</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keywordtype">bool</span> updateImage(t_uint newSize, Image&lt;t_complex&gt;&amp; image, t_uint&amp; sizex, t_uint&amp; sizey);</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keywordtype">bool</span> updateEmptyImage(t_uint newSize, Vector&lt;t_complex&gt;&amp; image, t_uint&amp; sizex, t_uint&amp; sizey);</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keywordtype">bool</span> updateMeasurements(t_uint newSize, <a class="code" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a>&amp; data);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keywordtype">bool</span> updateMeasurements(t_uint newSize, <a class="code" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a>&amp; data, t_real&amp; epsilon, <span class="keywordtype">bool</span> newImage,</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;                        Image&lt;t_complex&gt;&amp; image);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;std::tuple&lt;utilities::vis_params, t_real&gt; dirty_measurements(</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    Image&lt;t_complex&gt; <span class="keyword">const</span>&amp; ground_truth_image, t_uint number_of_vis, t_real snr,</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">const</span> t_real&amp; cellsize);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<a class="code" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> random_measurements(t_int size);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor"></span><span class="keywordtype">double</span> duration(std::chrono::high_resolution_clock::time_point start,</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;                std::chrono::high_resolution_clock::time_point end,</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;                sopt::mpi::Communicator <span class="keyword">const</span>&amp; comm);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keywordtype">bool</span> updateMeasurements(t_uint newSize, <a class="code" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a>&amp; data, sopt::mpi::Communicator&amp; comm);</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keywordtype">bool</span> updateMeasurements(t_uint newSize, <a class="code" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a>&amp; data, t_real&amp; epsilon, <span class="keywordtype">bool</span> newImage,</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;                        Image&lt;t_complex&gt;&amp; image, sopt::mpi::Communicator&amp; comm);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;std::tuple&lt;utilities::vis_params, t_real&gt; dirty_measurements(</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    Image&lt;t_complex&gt; <span class="keyword">const</span>&amp; ground_truth_image, t_uint number_of_vis, t_real snr,</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">const</span> t_real&amp; cellsize, sopt::mpi::Communicator <span class="keyword">const</span>&amp; comm);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<a class="code" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> random_measurements(t_int size, sopt::mpi::Communicator <span class="keyword">const</span>&amp; comm);</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor"></span>}  <span class="comment">// namespace b_utilities</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="structpurify_1_1utilities_1_1vis__params_html"><div class="ttname"><a href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">purify::utilities::vis_params</a></div><div class="ttdef"><b>Definition:</b> utilities.h:15</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

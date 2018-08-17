@@ -100,8 +100,8 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;purify/config.h&quot;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;sopt/linear_transform.h&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;purify/utilities.h&quot;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;purify/utilities.h&quot;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;sopt/linear_transform.h&gt;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#include &lt;sopt/mpi/communicator.h&gt;</span></div>
@@ -117,28 +117,24 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;vis_params scatter_visibilities(sopt::mpi::Communicator <span class="keyword">const</span> &amp;comm);</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;utilities::vis_params</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;distribute_params(utilities::vis_params <span class="keyword">const</span> &amp;params, sopt::mpi::Communicator <span class="keyword">const</span> &amp;comm);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;utilities::vis_params distribute_params(utilities::vis_params <span class="keyword">const</span> &amp;params,</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;                                        sopt::mpi::Communicator <span class="keyword">const</span> &amp;comm);</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;utilities::vis_params set_cell_size(<span class="keyword">const</span> sopt::mpi::Communicator &amp;comm,</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;                                    utilities::vis_params <span class="keyword">const</span> &amp;uv_vis, <span class="keyword">const</span> t_real &amp;cell_x,</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;                                    <span class="keyword">const</span> t_real &amp;cell_y);</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor"></span><span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;t_real step_size(T <span class="keyword">const</span> &amp; vis,</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">const</span> std::shared_ptr&lt;sopt::LinearTransform&lt;T&gt; <span class="keyword">const</span>&gt; &amp;measurements,</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keyword">const</span> std::shared_ptr&lt;sopt::LinearTransform&lt;T&gt; <span class="keyword">const</span>&gt; &amp;wavelets,</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">const</span> t_uint sara_size){</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="comment">//measurement operator may use different number of nodes than wavelet operator</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="comment">//so needs to be done separately</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">const</span> T dimage = measurements-&gt;adjoint() * vis;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      <span class="keywordflow">return</span> (sara_size &gt; 0) ?</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      (wavelets-&gt;adjoint() * dimage).cwiseAbs().maxCoeff(): </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      0.;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;};</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;}</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;} <span class="comment">// namespace purify</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;t_real step_size(T <span class="keyword">const</span> &amp;vis, <span class="keyword">const</span> std::shared_ptr&lt;sopt::LinearTransform&lt;T&gt; <span class="keyword">const</span>&gt; &amp;measurements,</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                 <span class="keyword">const</span> std::shared_ptr&lt;sopt::LinearTransform&lt;T&gt; <span class="keyword">const</span>&gt; &amp;wavelets,</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;                 <span class="keyword">const</span> t_uint sara_size) {</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="comment">// measurement operator may use different number of nodes than wavelet operator</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="comment">// so needs to be done separately</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keyword">const</span> T dimage = measurements-&gt;adjoint() * vis;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keywordflow">return</span> (sara_size &gt; 0) ? (wavelets-&gt;adjoint() * dimage).cwiseAbs().maxCoeff() : 0.;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;};</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;}  <span class="comment">// namespace utilities</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;}  <span class="comment">// namespace purify</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

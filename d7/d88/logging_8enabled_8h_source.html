@@ -118,48 +118,44 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> set_level(std::string <span class="keyword">const</span> &amp;level, std::string <span class="keyword">const</span> &amp;name) {</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> logger = <span class="keyword">get</span>(name);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keywordflow">if</span>(not logger)</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;No logger by the name of &quot;</span> + std::string(name));</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#define PURIFY_MACRO(LEVEL)                                                                        \</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">  if(level == #LEVEL)                                                                              \</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">  logger-&gt;set_level(spdlog::level::LEVEL)</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor"></span>  PURIFY_MACRO(trace);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(debug);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(info);</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(warn);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(err);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(critical);</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(off);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#undef PURIFY_MACRO</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor"></span>  <span class="keywordflow">else</span> <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Unknown logging level &quot;</span> + std::string(level));</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;}</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> has_level(std::string <span class="keyword">const</span> &amp;level, std::string <span class="keyword">const</span> &amp;name = <span class="stringliteral">&quot;&quot;</span>) {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> logger = <span class="keyword">get</span>(name);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keywordflow">if</span>(not logger)</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#define PURIFY_MACRO(LEVEL)                                                                        \</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">  if(level == #LEVEL)                                                                              \</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">  return logger-&gt;level() &gt;= spdlog::level::LEVEL</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor"></span>  PURIFY_MACRO(trace);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(debug);</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(info);</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(warn);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(err);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(critical);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(off);</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#undef PURIFY_MACRO</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor"></span>  <span class="keywordflow">else</span> <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Unknown logging level &quot;</span> + std::string(level));</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;}</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;}</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;}</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor">#define PURIFY_LOG_(NAME, TYPE, ...)                                                               \</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">  if(auto purify_logging_##__func__##_##__LINE__ = purify::logging::get(NAME))                     \</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">  purify_logging_##__func__##_##__LINE__-&gt;TYPE(__VA_ARGS__)</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keywordflow">if</span> (not logger) <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;No logger by the name of &quot;</span> + std::string(name));</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#define PURIFY_MACRO(LEVEL) \</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">  if (level == #LEVEL) logger-&gt;set_level(spdlog::level::LEVEL)</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor"></span>  PURIFY_MACRO(trace);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(debug);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(info);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(warn);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(err);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(critical);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(off);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#undef PURIFY_MACRO</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor"></span>  <span class="keywordflow">else</span> <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Unknown logging level &quot;</span> + std::string(level));</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;}</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> has_level(std::string <span class="keyword">const</span> &amp;level, std::string <span class="keyword">const</span> &amp;name = <span class="stringliteral">&quot;&quot;</span>) {</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> logger = <span class="keyword">get</span>(name);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keywordflow">if</span> (not logger) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#define PURIFY_MACRO(LEVEL) \</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">  if (level == #LEVEL) return logger-&gt;level() &gt;= spdlog::level::LEVEL</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor"></span>  PURIFY_MACRO(trace);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(debug);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(info);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(warn);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(err);</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(critical);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keywordflow">else</span> PURIFY_MACRO(off);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#undef PURIFY_MACRO</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor"></span>  <span class="keywordflow">else</span> <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Unknown logging level &quot;</span> + std::string(level));</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;}</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;}  <span class="comment">// namespace logging</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;}  <span class="comment">// namespace purify</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#define PURIFY_LOG_(NAME, TYPE, ...)                                            \</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">  if (auto purify_logging_##__func__##_##__LINE__ = purify::logging::get(NAME)) \</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">  purify_logging_##__func__##_##__LINE__-&gt;TYPE(__VA_ARGS__)</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="namespacepurify_html_a4d58563620e972c279f841f66a8f68ef"><div class="ttname"><a href="../../db/d8d/namespacepurify.html#a4d58563620e972c279f841f66a8f68ef">purify::default_logger_name</a></div><div class="ttdeci">std::string default_logger_name()</div><div class="ttdoc">Default logger name. </div><div class="ttdef"><b>Definition:</b> config.in.h:49</div></div>
 <div class="ttc" id="namespacepurify_html_a0108c76ec3e4a548088e9f5d5f6b4217"><div class="ttname"><a href="../../db/d8d/namespacepurify.html#a0108c76ec3e4a548088e9f5d5f6b4217">purify::default_logging_level</a></div><div class="ttdeci">std::string default_logging_level()</div><div class="ttdoc">Default logging level. </div><div class="ttdef"><b>Definition:</b> config.in.h:47</div></div>
 </div><!-- fragment --></div><!-- contents -->

@@ -99,44 +99,45 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define PURIFY_KERNELS_H</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;purify/config.h&quot;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;array&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;map&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;tuple&gt;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;boost/math/special_functions/bessel.hpp&gt;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;boost/math/special_functions/sinc.hpp&gt;</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &quot;purify/types.h&quot;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;purify/types.h&quot;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;array&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;map&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;tuple&gt;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;boost/math/special_functions/bessel.hpp&gt;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;boost/math/special_functions/sinc.hpp&gt;</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">namespace </span>purify {</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span>kernels {</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">enum class</span> kernel { kb, gauss, box, pswf, kbmin, gauss_alt };</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">const</span> std::map&lt;std::string, kernel&gt; kernel_from_string = {{<span class="stringliteral">&quot;kb&quot;</span>, kernel::kb}, {<span class="stringliteral">&quot;gauss&quot;</span>, kernel::gauss}, {<span class="stringliteral">&quot;box&quot;</span>, kernel::box},</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  {<span class="stringliteral">&quot;pswf&quot;</span>, kernel::pswf}, {<span class="stringliteral">&quot;kbmin&quot;</span>, kernel::kbmin}, {<span class="stringliteral">&quot;gauss_alt&quot;</span>, kernel::gauss_alt} };</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;t_real kaiser_bessel(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;t_real kaiser_bessel_general(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J, <span class="keyword">const</span> t_real &amp;alpha);</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;t_real ft_kaiser_bessel_general(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J, <span class="keyword">const</span> t_real &amp;alpha);</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;t_real ft_kaiser_bessel(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;t_real gaussian(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;t_real ft_gaussian(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;t_real calc_for_pswf(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J, <span class="keyword">const</span> t_real &amp;alpha);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;t_real pswf(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;t_real ft_pswf(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;Vector&lt;t_real&gt; kernel_samples(<span class="keyword">const</span> t_int &amp;total_samples,</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                              <span class="keyword">const</span> std::function&lt;t_real(t_real)&gt; kernelu, <span class="keyword">const</span> t_int &amp;J);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;t_real kernel_linear_interp(<span class="keyword">const</span> Vector&lt;t_real&gt; &amp;samples, <span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;t_real pill_box(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;t_real ft_pill_box(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;t_real gaussian_general(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J, <span class="keyword">const</span> t_real &amp;sigma);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;t_real ft_gaussian_general(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J, <span class="keyword">const</span> t_real &amp;sigma);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;} <span class="comment">// namespace kernels</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;std::tuple&lt;std::function&lt;t_real(t_real)&gt;, std::function&lt;t_real(t_real)&gt;,</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;           std::function&lt;t_real(t_real)&gt;, std::function&lt;t_real(t_real)&gt;&gt;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;create_kernels(<span class="keyword">const</span> kernels::kernel kernel_name, <span class="keyword">const</span> t_uint &amp;Ju_, <span class="keyword">const</span> t_uint &amp;Jv_,</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;               <span class="keyword">const</span> t_uint &amp;ftsizeu_, <span class="keyword">const</span> t_uint &amp;ftsizev_, <span class="keyword">const</span> t_real &amp;oversample_ratio);</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;} <span class="comment">// namespace purify</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">const</span> std::map&lt;std::string, kernel&gt; kernel_from_string = {</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    {<span class="stringliteral">&quot;kb&quot;</span>, kernel::kb},     {<span class="stringliteral">&quot;gauss&quot;</span>, kernel::gauss}, {<span class="stringliteral">&quot;box&quot;</span>, kernel::box},</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    {<span class="stringliteral">&quot;pswf&quot;</span>, kernel::pswf}, {<span class="stringliteral">&quot;kbmin&quot;</span>, kernel::kbmin}, {<span class="stringliteral">&quot;gauss_alt&quot;</span>, kernel::gauss_alt}};</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;t_real kaiser_bessel(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;t_real kaiser_bessel_general(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J, <span class="keyword">const</span> t_real &amp;alpha);</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;t_real ft_kaiser_bessel_general(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J, <span class="keyword">const</span> t_real &amp;alpha);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;t_real ft_kaiser_bessel(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;t_real gaussian(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;t_real ft_gaussian(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;t_real calc_for_pswf(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J, <span class="keyword">const</span> t_real &amp;alpha);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;t_real pswf(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;t_real ft_pswf(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;Vector&lt;t_real&gt; kernel_samples(<span class="keyword">const</span> t_int &amp;total_samples,</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                              <span class="keyword">const</span> std::function&lt;t_real(t_real)&gt; kernelu, <span class="keyword">const</span> t_int &amp;J);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;t_real kernel_linear_interp(<span class="keyword">const</span> Vector&lt;t_real&gt; &amp;samples, <span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;t_real pill_box(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;t_real ft_pill_box(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;t_real gaussian_general(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J, <span class="keyword">const</span> t_real &amp;sigma);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;t_real ft_gaussian_general(<span class="keyword">const</span> t_real &amp;x, <span class="keyword">const</span> t_int &amp;J, <span class="keyword">const</span> t_real &amp;sigma);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;}  <span class="comment">// namespace kernels</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;std::tuple&lt;std::function&lt;t_real(t_real)&gt;, std::function&lt;t_real(t_real)&gt;,</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;           std::function&lt;t_real(t_real)&gt;, std::function&lt;t_real(t_real)&gt;&gt;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;create_kernels(<span class="keyword">const</span> kernels::kernel kernel_name, <span class="keyword">const</span> t_uint &amp;Ju_, <span class="keyword">const</span> t_uint &amp;Jv_,</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;               <span class="keyword">const</span> t_uint &amp;ftsizeu_, <span class="keyword">const</span> t_uint &amp;ftsizev_, <span class="keyword">const</span> t_real &amp;oversample_ratio);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;}  <span class="comment">// namespace purify</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

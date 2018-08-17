@@ -104,8 +104,8 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#include &lt;sopt/mpi/communicator.h&gt;</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#include &quot;purify/logging.h&quot;</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;purify/types.h&quot;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#include &quot;purify/types.h&quot;</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;purify/logging.h&quot;</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;purify/utilities.h&quot;</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span>purify {</div>
@@ -117,23 +117,22 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;                                           t_int <span class="keyword">const</span> &amp;grid_size = 128);</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor"></span><span class="keyword">inline</span> std::vector&lt;t_int&gt;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;distribute_measurements(utilities::vis_params <span class="keyword">const</span> &amp;params, sopt::mpi::Communicator <span class="keyword">const</span> &amp;comm,</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;                        distribute::plan <span class="keyword">const</span> distribution_plan = plan::equal,</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;                        t_int <span class="keyword">const</span> &amp;grid_size = 128) {</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keywordflow">return</span> distribute_measurements(params.u, params.v, params.w, comm.size(), distribution_plan,</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;                                 grid_size);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;}</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor"></span>Vector&lt;t_int&gt;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;w_distribution(Vector&lt;t_real&gt; <span class="keyword">const</span> &amp;u, <span class="keyword">const</span> Vector&lt;t_real&gt; &amp;v, <span class="keyword">const</span> Vector&lt;t_real&gt; &amp;w);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;Vector&lt;t_int&gt; w_distribution(Vector&lt;t_real&gt; <span class="keyword">const</span> &amp;w);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;Vector&lt;t_int&gt; distance_distribution(Vector&lt;t_real&gt; <span class="keyword">const</span> &amp;u, Vector&lt;t_real&gt; <span class="keyword">const</span> &amp;v);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;Vector&lt;t_int&gt;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;equal_distribution(Vector&lt;t_real&gt; <span class="keyword">const</span> &amp;u, Vector&lt;t_real&gt; <span class="keyword">const</span> &amp;v, t_int <span class="keyword">const</span> &amp;grid_size);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;} <span class="comment">// namespace distribute</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;} <span class="comment">// namespace purify</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor"></span><span class="keyword">inline</span> std::vector&lt;t_int&gt; distribute_measurements(</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    utilities::vis_params <span class="keyword">const</span> &amp;params, sopt::mpi::Communicator <span class="keyword">const</span> &amp;comm,</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    distribute::plan <span class="keyword">const</span> distribution_plan = plan::equal, t_int <span class="keyword">const</span> &amp;grid_size = 128) {</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keywordflow">return</span> distribute_measurements(params.u, params.v, params.w, comm.size(), distribution_plan,</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;                                 grid_size);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;}</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor"></span>Vector&lt;t_int&gt; w_distribution(Vector&lt;t_real&gt; <span class="keyword">const</span> &amp;u, <span class="keyword">const</span> Vector&lt;t_real&gt; &amp;v,</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;                             <span class="keyword">const</span> Vector&lt;t_real&gt; &amp;w);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;Vector&lt;t_int&gt; w_distribution(Vector&lt;t_real&gt; <span class="keyword">const</span> &amp;w);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;Vector&lt;t_int&gt; distance_distribution(Vector&lt;t_real&gt; <span class="keyword">const</span> &amp;u, Vector&lt;t_real&gt; <span class="keyword">const</span> &amp;v);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;Vector&lt;t_int&gt; equal_distribution(Vector&lt;t_real&gt; <span class="keyword">const</span> &amp;u, Vector&lt;t_real&gt; <span class="keyword">const</span> &amp;v,</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;                                 t_int <span class="keyword">const</span> &amp;grid_size);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;}  <span class="comment">// namespace distribute</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;}  <span class="comment">// namespace purify</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

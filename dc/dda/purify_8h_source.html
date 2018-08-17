@@ -106,11 +106,11 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor"></span><a class="code" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> distribute_measurements(<span class="keyword">const</span> Parameters &amp;params);</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor"></span>std::shared_ptr&lt;sopt::LinearTransform&lt;Vector&lt;t_complex&gt;&gt; <span class="keyword">const</span>&gt;</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;measurement_operator_factory(<span class="keyword">const</span> Parameters &amp;params, <span class="keyword">const</span> <a class="code" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> &amp;uv_data);</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor"></span>std::shared_ptr&lt;sopt::LinearTransform&lt;Vector&lt;t_complex&gt;&gt; <span class="keyword">const</span>&gt; measurement_operator_factory(</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <span class="keyword">const</span> Parameters &amp;params, <span class="keyword">const</span> <a class="code" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> &amp;uv_data);</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;std::shared_ptr&lt;sopt::LinearTransform&lt;Vector&lt;t_complex&gt;&gt; <span class="keyword">const</span>&gt;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;wavelet_operator_factory(<span class="keyword">const</span> Parameters &amp;params);</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;std::shared_ptr&lt;sopt::LinearTransform&lt;Vector&lt;t_complex&gt;&gt; <span class="keyword">const</span>&gt; wavelet_operator_factory(</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keyword">const</span> Parameters &amp;params);</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;std::shared_ptr&lt;sopt::algorithm&gt; algorithm_factory(</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keyword">const</span> Parameters &amp;params,</div>
@@ -129,7 +129,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  header.cell_y = uv_data.cell_y;</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  params.ra = uv_data.ra;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  params.dec = uv_data.dec;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="keywordflow">if</span>(image.size() == 0)</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="keywordflow">if</span> (image.size() == 0)</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Attempting to save empty image cube:&quot;</span> + header.fits_name);</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  pfitsio::write3d_header(image, params.image_width, params.image_height, header);</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;};</div>

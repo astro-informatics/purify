@@ -246,20 +246,10 @@ template&lt;class T  = t_real&gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
-<div class="line">  {stokes::I, 1}, </div>
-<div class="line">  {stokes::Q, 2}, </div>
-<div class="line">  {stokes::U, 3}, </div>
-<div class="line">  {stokes::V, 4}, </div>
-<div class="line">  {stokes::RR, -1}, </div>
-<div class="line">  {stokes::LL, -2}, </div>
-<div class="line">  {stokes::RL, -3}, </div>
-<div class="line">  {stokes::LR, -4}, </div>
-<div class="line">  {stokes::XX, -5}, </div>
-<div class="line">  {stokes::YY, -6}, </div>
-<div class="line">  {stokes::XY, -7}, </div>
-<div class="line">  {stokes::YX, -8}</div>
-<div class="line">}</div>
+<b>Initial value:</b><div class="fragment"><div class="line">= {{stokes::I, 1},   {stokes::Q, 2},   {stokes::U, 3},</div>
+<div class="line">                                            {stokes::V, 4},   {stokes::RR, -1}, {stokes::LL, -2},</div>
+<div class="line">                                            {stokes::RL, -3}, {stokes::LR, -4}, {stokes::XX, -5},</div>
+<div class="line">                                            {stokes::YY, -6}, {stokes::XY, -7}, {stokes::YX, -8}}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -273,33 +263,13 @@ template&lt;class T  = t_real&gt; </div>
       </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">= {</div>
-<div class="line">  {<span class="stringliteral">&quot;I&quot;</span>, stokes::I}, </div>
-<div class="line">  {<span class="stringliteral">&quot;i&quot;</span>, stokes::I}, </div>
-<div class="line">  {<span class="stringliteral">&quot;Q&quot;</span>, stokes::Q}, </div>
-<div class="line">  {<span class="stringliteral">&quot;q&quot;</span>, stokes::Q}, </div>
-<div class="line">  {<span class="stringliteral">&quot;U&quot;</span>, stokes::U}, </div>
-<div class="line">  {<span class="stringliteral">&quot;u&quot;</span>, stokes::U}, </div>
-<div class="line">  {<span class="stringliteral">&quot;V&quot;</span>, stokes::V}, </div>
-<div class="line">  {<span class="stringliteral">&quot;v&quot;</span>, stokes::V}, </div>
-<div class="line">  {<span class="stringliteral">&quot;XX&quot;</span>, stokes::XX}, </div>
-<div class="line">  {<span class="stringliteral">&quot;xx&quot;</span>, stokes::XX}, </div>
-<div class="line">  {<span class="stringliteral">&quot;YY&quot;</span>, stokes::YY}, </div>
-<div class="line">  {<span class="stringliteral">&quot;yy&quot;</span>, stokes::YY}, </div>
-<div class="line">  {<span class="stringliteral">&quot;XY&quot;</span>, stokes::XY}, </div>
-<div class="line">  {<span class="stringliteral">&quot;xy&quot;</span>, stokes::XY}, </div>
-<div class="line">  {<span class="stringliteral">&quot;YX&quot;</span>, stokes::YX}, </div>
-<div class="line">  {<span class="stringliteral">&quot;yx&quot;</span>, stokes::YX}, </div>
-<div class="line">  {<span class="stringliteral">&quot;LL&quot;</span>, stokes::LL}, </div>
-<div class="line">  {<span class="stringliteral">&quot;ll&quot;</span>, stokes::LL}, </div>
-<div class="line">  {<span class="stringliteral">&quot;RR&quot;</span>, stokes::RR}, </div>
-<div class="line">  {<span class="stringliteral">&quot;rr&quot;</span>, stokes::RR}, </div>
-<div class="line">  {<span class="stringliteral">&quot;LR&quot;</span>, stokes::LR}, </div>
-<div class="line">  {<span class="stringliteral">&quot;lr&quot;</span>, stokes::LR}, </div>
-<div class="line">  {<span class="stringliteral">&quot;RL&quot;</span>, stokes::RL}, </div>
-<div class="line">  {<span class="stringliteral">&quot;rl&quot;</span>, stokes::RL}, </div>
-<div class="line">  {<span class="stringliteral">&quot;P&quot;</span>, stokes::P}, </div>
-<div class="line">  {<span class="stringliteral">&quot;p&quot;</span>, stokes::P} </div>
-<div class="line">}</div>
+<div class="line">    {<span class="stringliteral">&quot;I&quot;</span>, stokes::I},   {<span class="stringliteral">&quot;i&quot;</span>, stokes::I},   {<span class="stringliteral">&quot;Q&quot;</span>, stokes::Q},   {<span class="stringliteral">&quot;q&quot;</span>, stokes::Q},</div>
+<div class="line">    {<span class="stringliteral">&quot;U&quot;</span>, stokes::U},   {<span class="stringliteral">&quot;u&quot;</span>, stokes::U},   {<span class="stringliteral">&quot;V&quot;</span>, stokes::V},   {<span class="stringliteral">&quot;v&quot;</span>, stokes::V},</div>
+<div class="line">    {<span class="stringliteral">&quot;XX&quot;</span>, stokes::XX}, {<span class="stringliteral">&quot;xx&quot;</span>, stokes::XX}, {<span class="stringliteral">&quot;YY&quot;</span>, stokes::YY}, {<span class="stringliteral">&quot;yy&quot;</span>, stokes::YY},</div>
+<div class="line">    {<span class="stringliteral">&quot;XY&quot;</span>, stokes::XY}, {<span class="stringliteral">&quot;xy&quot;</span>, stokes::XY}, {<span class="stringliteral">&quot;YX&quot;</span>, stokes::YX}, {<span class="stringliteral">&quot;yx&quot;</span>, stokes::YX},</div>
+<div class="line">    {<span class="stringliteral">&quot;LL&quot;</span>, stokes::LL}, {<span class="stringliteral">&quot;ll&quot;</span>, stokes::LL}, {<span class="stringliteral">&quot;RR&quot;</span>, stokes::RR}, {<span class="stringliteral">&quot;rr&quot;</span>, stokes::RR},</div>
+<div class="line">    {<span class="stringliteral">&quot;LR&quot;</span>, stokes::LR}, {<span class="stringliteral">&quot;lr&quot;</span>, stokes::LR}, {<span class="stringliteral">&quot;RL&quot;</span>, stokes::RL}, {<span class="stringliteral">&quot;rl&quot;</span>, stokes::RL},</div>
+<div class="line">    {<span class="stringliteral">&quot;P&quot;</span>, stokes::P},   {<span class="stringliteral">&quot;p&quot;</span>, stokes::P}}</div>
 </div><!-- fragment -->
 </div>
 </div>
