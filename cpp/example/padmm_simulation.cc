@@ -1,23 +1,23 @@
 #include "purify/config.h"
+#include "purify/types.h"
 #include <array>
 #include <ctime>
 #include <memory>
 #include <random>
 #include <boost/math/special_functions/erf.hpp>
+#include "purify/directories.h"
+#include "purify/logging.h"
+#include "purify/operators.h"
+#include "purify/pfitsio.h"
+#include "purify/utilities.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/relative_variation.h>
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include "purify/operators.h"
-#include "purify/directories.h"
-#include "purify/logging.h"
-#include "purify/pfitsio.h"
-#include "purify/types.h"
-#include "purify/utilities.h"
 
 int main(int nargs, char const **args) {
-  if(nargs != 9) {
+  if (nargs != 9) {
     std::cerr << " Wrong number of arguments! " << '\n';
     return 1;
   }
@@ -40,10 +40,10 @@ int main(int nargs, char const **args) {
 
   std::string const fitsfile = image_filename(name + ".fits");
 
-  std::string const dirty_image_fits
-      = output_filename(name + "_dirty_" + kernel + "_" + test_number + ".fits");
-  std::string const results
-      = output_filename(name + "_results_" + kernel + "_" + test_number + ".txt");
+  std::string const dirty_image_fits =
+      output_filename(name + "_dirty_" + kernel + "_" + test_number + ".fits");
+  std::string const results =
+      output_filename(name + "_results_" + kernel + "_" + test_number + ".txt");
 
   auto sky_model = pfitsio::read2d(fitsfile);
   auto sky_model_max = sky_model.array().abs().maxCoeff();
@@ -55,23 +55,19 @@ int main(int nargs, char const **args) {
   uv_data.units = utilities::vis_units::radians;
   PURIFY_MEDIUM_LOG("Number of measurements: {}", uv_data.u.size());
 
-  auto measurements_sky
-      = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
-          over_sample, 100, 1e-4,kernels::kernel_from_string.at(kernel) , 8, 8);
+  auto measurements_sky = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
+      over_sample, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8);
   uv_data.vis = measurements_sky * Vector<t_complex>::Map(sky_model.data(), sky_model.size());
-  auto measurements_transform
-      = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
-          over_sample, 100, 1e-4, kernels::kernel_from_string.at(kernel), J, J);
+  auto measurements_transform = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
+      over_sample, 100, 1e-4, kernels::kernel_from_string.at(kernel), J, J);
 
   std::vector<std::tuple<std::string, t_uint>> wavelets;
 
-  if(test_type == "clean")
-    wavelets.push_back(std::make_tuple("Dirac", 3u));
-  if(test_type == "ms_clean")
-    wavelets.push_back(std::make_tuple("DB4", 3u));
-  if(test_type == "padmm") {
+  if (test_type == "clean") wavelets.push_back(std::make_tuple("Dirac", 3u));
+  if (test_type == "ms_clean") wavelets.push_back(std::make_tuple("DB4", 3u));
+  if (test_type == "padmm") {
     wavelets.push_back(std::make_tuple("Dirac", 3u));
     wavelets.push_back(std::make_tuple("DB1", 3u));
     wavelets.push_back(std::make_tuple("DB2", 3u));
@@ -83,8 +79,7 @@ int main(int nargs, char const **args) {
     wavelets.push_back(std::make_tuple("DB8", 3u));
   }
   sopt::wavelets::SARA const sara(wavelets.begin(), wavelets.end());
-  auto const Psi
-      = sopt::linear_transform<t_complex>(sara, sky_model.rows(), sky_model.cols());
+  auto const Psi = sopt::linear_transform<t_complex>(sara, sky_model.rows(), sky_model.cols());
 
   // working out value of sigma given SNR of 30
   t_real sigma = utilities::SNR_to_standard_deviation(uv_data.vis, ISNR);
@@ -97,8 +92,8 @@ int main(int nargs, char const **args) {
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
-  auto const purify_gamma
-      = (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).real().maxCoeff() * 1e-3;
+  auto const purify_gamma =
+      (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).real().maxCoeff() * 1e-3;
   t_int iters = 0;
   auto convergence_function = [&iters](const Vector<t_complex> &x) {
     iters = iters + 1;
@@ -132,20 +127,20 @@ int main(int nargs, char const **args) {
 
   // Reading if algo has converged
   t_int converged = 0;
-  if(diagnostic.good) {
+  if (diagnostic.good) {
     converged = 1;
   }
   const t_uint maxiters = iters;
 
-  Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), sky_model.rows(),
-                                                 sky_model.cols());
+  Image<t_complex> image =
+      Image<t_complex>::Map(diagnostic.x.data(), sky_model.rows(), sky_model.cols());
 
   Vector<t_complex> original = Vector<t_complex>::Map(sky_model.data(), sky_model.size(), 1);
   Image<t_complex> res = sky_model - image;
   Vector<t_complex> residual = Vector<t_complex>::Map(res.data(), image.size(), 1);
 
-  auto snr = 20. * std::log10(original.norm() / residual.norm()); // SNR of reconstruction
-  auto total_time = (c_end - c_start) / CLOCKS_PER_SEC; // total time for solver to run in seconds
+  auto snr = 20. * std::log10(original.norm() / residual.norm());  // SNR of reconstruction
+  auto total_time = (c_end - c_start) / CLOCKS_PER_SEC;  // total time for solver to run in seconds
   // writing snr and time to a file
   std::ofstream out(results);
   out.precision(13);

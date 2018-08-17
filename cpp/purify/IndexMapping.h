@@ -2,14 +2,14 @@
 #define PURIFY_MAPPING_OPERATOR_H
 
 #include "purify/config.h"
+#include "purify/types.h"
 #include <set>
 #include <vector>
-#include "purify/types.h"
 
 namespace purify {
 
 class IndexMapping {
-public:
+ public:
   IndexMapping(const std::vector<t_int> &indices, const t_int N) : indices(indices), N(N){};
   template <class ITER>
   IndexMapping(const ITER &first, const ITER &end, const t_int N)
@@ -23,7 +23,7 @@ public:
     auto &derived = output.const_cast_derived();
     derived.resize(indices.size());
     typename T0::Index i(0);
-    for(auto const &index : indices) {
+    for (auto const &index : indices) {
       assert(index >= 0 and index < input.size());
       assert(derived.size() > i);
       derived(i++) = input(index);
@@ -37,7 +37,7 @@ public:
     auto &derived = output.const_cast_derived();
     derived = T1::Zero(N, 1);
     typename T0::Index i(0);
-    for(auto const &index : indices) {
+    for (auto const &index : indices) {
       assert(index >= 0 and index < output.size());
       derived(index) += input(i++);
     }
@@ -46,17 +46,17 @@ public:
   t_int rows() const { return indices.size(); }
   t_int cols() const { return N; }
 
-private:
+ private:
   std::vector<t_int> indices;
   t_int N;
 };
 
 //! Indices of non empty outer indices
-template <class T0> std::set<t_int> non_empty_outers(Eigen::SparseMatrixBase<T0> const &matrix) {
+template <class T0>
+std::set<t_int> non_empty_outers(Eigen::SparseMatrixBase<T0> const &matrix) {
   std::set<t_int> result;
-  for(typename T0::StorageIndex k = 0; k < matrix.derived().outerSize(); ++k)
-    for(typename T0::InnerIterator it(matrix.derived(), k); it; ++it)
-      result.insert(it.col());
+  for (typename T0::StorageIndex k = 0; k < matrix.derived().outerSize(); ++k)
+    for (typename T0::InnerIterator it(matrix.derived(), k); it; ++it) result.insert(it.col());
   return result;
 }
 
@@ -68,16 +68,15 @@ Sparse<typename T0::Scalar> compress_outer(T0 const &matrix) {
 
   std::vector<t_int> mapping(matrix.cols(), 0);
   t_int i(0);
-  for(auto const &index : indices)
-    mapping[index] = i++;
+  for (auto const &index : indices) mapping[index] = i++;
 
   std::vector<t_int> rows(matrix.rows() + 1, 0);
   std::vector<t_int> cols(matrix.nonZeros(), 0);
   rows[matrix.rows()] = matrix.nonZeros();
   t_int index = 0;
-  for(t_int k = 0; k < matrix.outerSize(); ++k) {
+  for (t_int k = 0; k < matrix.outerSize(); ++k) {
     rows[k] = index;
-    for(typename Sparse<typename T0::Scalar>::InnerIterator it(matrix, k); it; ++it) {
+    for (typename Sparse<typename T0::Scalar>::InnerIterator it(matrix, k); it; ++it) {
       cols[index] = mapping[it.col()];
       index++;
     }
@@ -86,5 +85,5 @@ Sparse<typename T0::Scalar> compress_outer(T0 const &matrix) {
       matrix.rows(), indices.size(), matrix.nonZeros(), rows.data(), cols.data(),
       const_cast<typename T0::Scalar *>(matrix.derived().valuePtr()));
 }
-} // namespace purify
+}  // namespace purify
 #endif

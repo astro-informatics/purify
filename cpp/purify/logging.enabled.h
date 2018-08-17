@@ -33,11 +33,9 @@ inline std::shared_ptr<spdlog::logger> get(std::string const &name = "") {
 //!     - "off"
 inline void set_level(std::string const &level, std::string const &name) {
   auto const logger = get(name);
-  if(not logger)
-    throw std::runtime_error("No logger by the name of " + std::string(name));
-#define PURIFY_MACRO(LEVEL)                                                                        \
-  if(level == #LEVEL)                                                                              \
-  logger->set_level(spdlog::level::LEVEL)
+  if (not logger) throw std::runtime_error("No logger by the name of " + std::string(name));
+#define PURIFY_MACRO(LEVEL) \
+  if (level == #LEVEL) logger->set_level(spdlog::level::LEVEL)
   PURIFY_MACRO(trace);
   else PURIFY_MACRO(debug);
   else PURIFY_MACRO(info);
@@ -51,12 +49,10 @@ inline void set_level(std::string const &level, std::string const &name) {
 
 inline bool has_level(std::string const &level, std::string const &name = "") {
   auto const logger = get(name);
-  if(not logger)
-    return false;
+  if (not logger) return false;
 
-#define PURIFY_MACRO(LEVEL)                                                                        \
-  if(level == #LEVEL)                                                                              \
-  return logger->level() >= spdlog::level::LEVEL
+#define PURIFY_MACRO(LEVEL) \
+  if (level == #LEVEL) return logger->level() >= spdlog::level::LEVEL
   PURIFY_MACRO(trace);
   else PURIFY_MACRO(debug);
   else PURIFY_MACRO(info);
@@ -67,12 +63,12 @@ inline bool has_level(std::string const &level, std::string const &name = "") {
 #undef PURIFY_MACRO
   else throw std::runtime_error("Unknown logging level " + std::string(level));
 }
-}
-}
+}  // namespace logging
+}  // namespace purify
 
 //! \macro For internal use only
-#define PURIFY_LOG_(NAME, TYPE, ...)                                                               \
-  if(auto purify_logging_##__func__##_##__LINE__ = purify::logging::get(NAME))                     \
+#define PURIFY_LOG_(NAME, TYPE, ...)                                            \
+  if (auto purify_logging_##__func__##_##__LINE__ = purify::logging::get(NAME)) \
   purify_logging_##__func__##_##__LINE__->TYPE(__VA_ARGS__)
 
 #endif

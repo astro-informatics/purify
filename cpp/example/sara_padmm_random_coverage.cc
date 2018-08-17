@@ -1,7 +1,12 @@
+#include "purify/types.h"
 #include <array>
 #include <memory>
 #include <random>
 #include <boost/math/special_functions/erf.hpp>
+#include "purify/directories.h"
+#include "purify/operators.h"
+#include "purify/pfitsio.h"
+#include "purify/utilities.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/positive_quadrant.h>
 #include <sopt/relative_variation.h>
@@ -9,11 +14,6 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include "purify/operators.h"
-#include "purify/directories.h"
-#include "purify/pfitsio.h"
-#include "purify/types.h"
-#include "purify/utilities.h"
 
 int main(int, char **) {
   using namespace purify;
@@ -45,22 +45,20 @@ int main(int, char **) {
   uv_data.units = utilities::vis_units::radians;
   utilities::write_visibility(uv_data, output_vis_file);
   SOPT_NOTICE("Number of measurements / number of pixels: {}", uv_data.u.size() * 1. / M31.size());
-  auto measurements_transform
-      = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data.u, uv_data.v, uv_data.w, uv_data.weights, M31.cols(), M31.rows(),
-          over_sample, 100, 1e-4, kernels::kernel_from_string.at("kb"), 4, 4);
+  auto measurements_transform = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      uv_data.u, uv_data.v, uv_data.w, uv_data.weights, M31.cols(), M31.rows(), over_sample, 100,
+      1e-4, kernels::kernel_from_string.at("kb"), 4, 4);
 
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
-  auto const Psi
-      = sopt::linear_transform<t_complex>(sara, M31.rows(), M31.cols());
+  auto const Psi = sopt::linear_transform<t_complex>(sara, M31.rows(), M31.cols());
 
   std::mt19937_64 mersenne;
-  Vector<t_complex> const y0
-      = (measurements_transform * Vector<t_complex>::Map(M31.data(), M31.size()));
+  Vector<t_complex> const y0 =
+      (measurements_transform * Vector<t_complex>::Map(M31.data(), M31.size()));
   // working out value of signal given SNR of 30
   t_real sigma = utilities::SNR_to_standard_deviation(y0, 30.);
   // adding noise to visibilities
@@ -69,17 +67,14 @@ int main(int, char **) {
   t_real const max_val = dimage.array().abs().maxCoeff();
   dimage = dimage / max_val;
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
-  sopt::utilities::write_tiff(
-      Image<t_real>::Map(dimage.data(), M31.rows(), M31.cols()),
-      dirty_image);
-  pfitsio::write2d(
-      Image<t_real>::Map(dimage.data(), M31.rows(), M31.cols()),
-      dirty_image_fits);
+  sopt::utilities::write_tiff(Image<t_real>::Map(dimage.data(), M31.rows(), M31.cols()),
+                              dirty_image);
+  pfitsio::write2d(Image<t_real>::Map(dimage.data(), M31.rows(), M31.cols()), dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
-  auto const purify_gamma
-      = (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff()
-        * beta;
+  auto const purify_gamma =
+      (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() *
+      beta;
 
   // auto purify_gamma = 3 * utilities::median((Psi.adjoint() * (measurements_transform.adjoint() *
   // (uv_data.vis - y0))).real().cwiseAbs())/0.6745;
@@ -106,16 +101,20 @@ int main(int, char **) {
   auto const min_delta = sigma * std::sqrt(y0.size()) / std::sqrt(9 * M31.size());
   // Sets weight after each padmm iteration.
   // In practice, this means replacing the proximal of the l1 objective function.
-  auto const reweighted
-      = sopt::algorithm::reweighted(padmm).itermax(10).min_delta(min_delta).is_converged(
+  auto const reweighted =
+      sopt::algorithm::reweighted(padmm).itermax(10).min_delta(min_delta).is_converged(
           sopt::RelativeVariation<std::complex<t_real>>(1e-3));
   auto const diagnostic = reweighted();
   assert(diagnostic.algo.x.size() == M31.size());
-  Image<t_complex> image = Image<t_complex>::Map(diagnostic.algo.x.data(), M31.rows(),
-                                                 M31.cols());
+  Image<t_complex> image = Image<t_complex>::Map(diagnostic.algo.x.data(), M31.rows(), M31.cols());
   sopt::utilities::write_tiff(image.real(), outfile);
   pfitsio::write2d(image.real(), outfile_fits);
-  Image<t_complex> residual = Image<t_complex>::Map((measurements_transform.adjoint() * (y0 - measurements_transform * Vector<t_complex>::Map(image.data(), image.size()))).eval().data(), M31.rows(), M31.cols() );
+  Image<t_complex> residual = Image<t_complex>::Map(
+      (measurements_transform.adjoint() *
+       (y0 - measurements_transform * Vector<t_complex>::Map(image.data(), image.size())))
+          .eval()
+          .data(),
+      M31.rows(), M31.cols());
   pfitsio::write2d(residual.real(), residual_fits);
   return 0;
 }

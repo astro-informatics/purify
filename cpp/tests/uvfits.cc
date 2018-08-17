@@ -1,7 +1,7 @@
 #include "purify/config.h"
+#include "purify/types.h"
 #include "catch.hpp"
 #include "purify/logging.h"
-#include "purify/types.h"
 
 #include <iostream>
 #include "purify/directories.h"
@@ -21,7 +21,7 @@ TEST_CASE("readfile") {
     CHECK(uvfits.size() / 22675 == 10);
     CHECK(vis.size() / 22675 == 10);
     CHECK(uvfits.size() == vis.size());
-    for(int i = 0; i < uvfits.size(); i++) {
+    for (int i = 0; i < uvfits.size(); i++) {
       CAPTURE(i);
       CAPTURE(vis.u(i));
       CAPTURE(uvfits.u(i));
@@ -36,13 +36,13 @@ TEST_CASE("readfile") {
       REQUIRE(std::abs((uvfits.u(i) - vis.u(i)) / vis.u(i)) < 1e-4);
       REQUIRE(std::abs((uvfits.v(i) - vis.v(i)) / vis.v(i)) < 1e-4);
       REQUIRE(std::abs((uvfits.w(i) - vis.w(i)) / vis.w(i)) < 1e-4);
-      if(std::abs(vis.weights(i)) > 0)
+      if (std::abs(vis.weights(i)) > 0)
         REQUIRE(std::abs((uvfits.weights(i) - vis.weights(i)) / vis.weights(i)) < 1e-4);
-      if(std::abs(uvfits.weights(i)) > 0)
+      if (std::abs(uvfits.weights(i)) > 0)
         REQUIRE(std::abs((uvfits.weights(i) - vis.weights(i)) / uvfits.weights(i)) < 1e-4);
-      if(std::abs(vis.vis(i)) > 0)
+      if (std::abs(vis.vis(i)) > 0)
         REQUIRE(std::abs((uvfits.vis(i) - vis.vis(i)) / vis.vis(i)) < 1e-4);
-      if(std::abs(uvfits.vis(i)) > 0)
+      if (std::abs(uvfits.vis(i)) > 0)
         REQUIRE(std::abs((uvfits.vis(i) - vis.vis(i)) / uvfits.vis(i)) < 1e-4);
     }
   }
@@ -52,7 +52,7 @@ TEST_CASE("readfile") {
     REQUIRE(299792458. == constant::c);
     REQUIRE(1431999959.5 == uvfits.frequencies(0));
     REQUIRE(uvfits.size() == vis.size());
-    for(int i = 0; i < uvfits.size(); i++) {
+    for (int i = 0; i < uvfits.size(); i++) {
       CAPTURE(i);
       CAPTURE(vis.u(i));
       CAPTURE(uvfits.u(i));

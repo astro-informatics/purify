@@ -1,12 +1,12 @@
 #include "purify/config.h"
+#include "purify/types.h"
 #include <array>
 #include <memory>
 #include <random>
-#include "purify/operators.h"
 #include "purify/directories.h"
 #include "purify/logging.h"
+#include "purify/operators.h"
 #include "purify/pfitsio.h"
-#include "purify/types.h"
 #include "purify/utilities.h"
 
 int main(int nargs, char const **args) {
@@ -39,10 +39,9 @@ int main(int nargs, char const **args) {
   uv_data.units = utilities::vis_units::radians;
 
   PURIFY_HIGH_LOG("Number of measurements: {}", uv_data.u.size());
-  auto measurements_transform 
-      = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data.u, uv_data.v, uv_data.w, uv_data.weights, M31.cols(), M31.rows(),
-          over_sample, 100, 1e-4, kernels::kernel_from_string.at(kernel), J, J);
+  auto measurements_transform = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      uv_data.u, uv_data.v, uv_data.w, uv_data.weights, M31.cols(), M31.rows(), over_sample, 100,
+      1e-4, kernels::kernel_from_string.at(kernel), J, J);
   uv_data.vis = *measurements_transform * Vector<t_complex>::Map(M31.data(), M31.size());
   utilities::write_visibility(uv_data, vis_file);
 }

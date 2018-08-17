@@ -1,8 +1,16 @@
+#include "purify/types.h"
 #include <array>
 #include <memory>
 #include <random>
 #include <boost/filesystem.hpp>
 #include <boost/math/special_functions/erf.hpp>
+#include "purify/directories.h"
+#include "purify/distribute.h"
+#include "purify/logging.h"
+#include "purify/mpi_utilities.h"
+#include "purify/operators.h"
+#include "purify/pfitsio.h"
+#include "purify/utilities.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/mpi/communicator.h>
 #include <sopt/mpi/session.h>
@@ -10,14 +18,6 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include "purify/directories.h"
-#include "purify/distribute.h"
-#include "purify/logging.h"
-#include "purify/mpi_utilities.h"
-#include "purify/operators.h"
-#include "purify/pfitsio.h"
-#include "purify/types.h"
-#include "purify/utilities.h"
 
 #ifdef PURIFY_ARRAYFIRE
 #include "purify/operators_gpu.h"
@@ -30,8 +30,8 @@
 using namespace purify;
 using namespace purify::notinstalled;
 
-std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const>
-measurement_operator_factory(const Parameters &params, const utilities::vis_params &uv_data) {
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurement_operator_factory(
+    const Parameters &params, const utilities::vis_params &uv_data) {
 #ifdef PURIFY_MPI
 #if PURIFY_PADMM_ALGORITHM == 2 || PURIFY_PADMM_ALGORITHM == 3
 #ifdef PURIFY_GPU
@@ -84,8 +84,8 @@ measurement_operator_factory(const Parameters &params, const utilities::vis_para
 #endif
   return measurements;
 };
-std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const>
-wavelet_operator_factory(const Parameters &params) {
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> wavelet_operator_factory(
+    const Parameters &params) {
   auto const sara = sopt::wavelets::distribute_sara(
       sopt::wavelets::SARA{
           std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
@@ -102,29 +102,28 @@ std::vector<utilities::vis_params> read_measurements(const Parameters &params) {
   std::size_t found = params.visfile.find_last_of(".");
   std::string format = "." + params.visfile.substr(found + 1);
   std::transform(format.begin(), format.end(), format.begin(), ::tolower);
-  return (format == ".ms") ?
-             purify::casa::read_measurementset_channels(params.visfile, params.stokes_val, 0) :
-             std::vector<utilities::vis_params>{
-                 utilities::read_visibility(params.visfile, params.use_w_term)};
+  return (format == ".ms")
+             ? purify::casa::read_measurementset_channels(params.visfile, params.stokes_val, 0)
+             : std::vector<utilities::vis_params>{
+                   utilities::read_visibility(params.visfile, params.use_w_term)};
 }
 
 std::vector<utilities::vis_params> distribute_measurements(const Parameters &params) {
-  if(params.comm.size() == 1)
-    return read_measurements(params);
-  if(params.comm.is_root()) {
+  if (params.comm.size() == 1) return read_measurements(params);
+  if (params.comm.is_root()) {
     const auto uv_data = read_measurements(params);
     const t_uint channels = params.comm.broadcast(uv_data.size());
     std::vector<utilities::vis_params> distributed_channels(channels);
-    for(t_int i = 0; i < channels; i++) {
-      auto const order
-          = distribute::distribute_measurements(uv_data[i], params.comm, distribute::plan::radial);
+    for (t_int i = 0; i < channels; i++) {
+      auto const order =
+          distribute::distribute_measurements(uv_data[i], params.comm, distribute::plan::radial);
       distributed_channels[i] = utilities::regroup_and_scatter(uv_data[i], order, params.comm);
     }
     return distributed_channels;
   }
   const t_uint channels = params.comm.broadcast();
   std::vector<utilities::vis_params> distributed_channels(channels);
-  for(t_int i = 0; i < channels; i++) {
+  for (t_int i = 0; i < channels; i++) {
     distributed_channels[i] = utilities::scatter_visibilities(params.comm);
   }
   return distributed_channels;
@@ -135,25 +134,24 @@ std::shared_ptr<sopt::algorithm> algorithm_factory(
     std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> const &measurements,
     std::shared_ptr < sopt::LinearTransform<Vector<t_complex>> const &psi,
     const utilities::vis_params &uv_data) {
-  if(params.sopt_algorithm == algorithm::padmm)
+  if (params.sopt_algorithm == algorithm::padmm)
     return padmm_factory(measurements, psi, uv_data, params.comm);
   else
     throw std::runtime_error("Algorithm not implimented for purify yet.");
 }
 
-std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>>
-padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> const &measurements,
-              std::shared_ptr < sopt::LinearTransform<Vector<t_complex>> const &psi,
-              const utilities::vis_params &uv_data, const sopt::mpi::Communicator &comm) {
-
+std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm_factory(
+    std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> const &measurements,
+    std::shared_ptr < sopt::LinearTransform<Vector<t_complex>> const &psi,
+    const utilities::vis_params &uv_data, const sopt::mpi::Communicator &comm) {
 #if PURIFY_PADMM_ALGORITHM == 2
-  auto const epsilon = std::sqrt(
-      comm.all_sum_all(std::pow(utilities::calculate_l2_radius(uv_data.vis, sigma), 2)));
+  auto const epsilon =
+      std::sqrt(comm.all_sum_all(std::pow(utilities::calculate_l2_radius(uv_data.vis, sigma), 2)));
 #elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis, sigma);
 #endif
-  auto const gamma
-      = (psi->adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3;
+  auto const gamma =
+      (psi->adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() * 1e-3;
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
   PURIFY_MEDIUM_LOG("Gamma {}", gamma);
 
@@ -184,17 +182,17 @@ padmm_factory(std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> co
   sopt::ScalarRelativeVariation<t_complex> conv(padmm->relative_variation(),
                                                 padmm->relative_variation(), "Objective function");
   std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
-  padmm->residual_convergence([padmm_weak, conv,
-                               comm](Vector<t_complex> const &x,
-                                     Vector<t_complex> const &residual) mutable -> bool {
+  padmm->residual_convergence([padmm_weak, conv, comm](
+                                  Vector<t_complex> const &x,
+                                  Vector<t_complex> const &residual) mutable -> bool {
     auto const padmm = padmm_weak.lock();
 #if PURIFY_PADMM_ALGORITHM == 2
     auto const residual_norm = sopt::mpi::l2_norm(residual, padmm->l2ball_proximal_weights(), comm);
     auto const result = residual_norm < padmm->residual_tolerance();
 #elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
     auto const residual_norm = sopt::l2_norm(residual, padmm->l2ball_proximal_weights());
-    auto const result
-        = comm.all_reduce<int8_t>(residual_norm < padmm->residual_tolerance(), MPI_LAND);
+    auto const result =
+        comm.all_reduce<int8_t>(residual_norm < padmm->residual_tolerance(), MPI_LAND);
 #endif
     SOPT_LOW_LOG("    - [PADMM] Residuals: {} <? {}", residual_norm, padmm->residual_tolerance());
     return result;
@@ -230,7 +228,7 @@ int main(int nargs, char const **args) {
   auto std::vector<Vector<t_real>> dirty_images;
   auto std::vector<Vector<t_real>> residual_images;
   auto std::vector<Vector<t_real>> solution_images;
-  for(t_int i = 0; i < uv_channels.size(); i++) {
+  for (t_int i = 0; i < uv_channels.size(); i++) {
     // Select the data
     auto const &uv_data = uv_channels[i];
     // Create measurement operator

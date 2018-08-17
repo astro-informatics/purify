@@ -1,9 +1,9 @@
 #include "purify/config.h"
+#include "purify/types.h"
 #include <numeric>
 #include <random>
 #include "catch.hpp"
 #include "purify/IndexMapping.h"
-#include "purify/types.h"
 #include "purify/utilities.h"
 
 using namespace purify;
@@ -21,15 +21,14 @@ TEST_CASE("Index mapping operator") {
     SECTION("Direct application") {
       CHECK(output.size() == indices.size());
       decltype(output)::Index i(0);
-      for(auto const &index : indices)
-        CHECK(output(i++) == index);
+      for (auto const &index : indices) CHECK(output(i++) == index);
     }
 
     Vector<t_int> adjoint;
     mapper.adjoint(output, adjoint);
     SECTION("Adjoint application") {
       CHECK(adjoint.size() == input.size());
-      for(auto const &index : indices) {
+      for (auto const &index : indices) {
         CHECK(adjoint(index) == index);
         adjoint(index) = 0;
       }
@@ -48,15 +47,14 @@ TEST_CASE("Index mapping operator") {
     SECTION("Direct application") {
       CHECK(output.size() == indices.size());
       decltype(output)::Index i(0);
-      for(auto const &index : indices)
-        CHECK(output(i++) == index);
+      for (auto const &index : indices) CHECK(output(i++) == index);
     }
 
     SECTION("Adjoint application") {
       Vector<t_int> adjoint;
       mapper.adjoint(output, adjoint);
       CHECK(adjoint.size() == input.size());
-      for(auto const &index : std::set<t_int>(indices.begin(), indices.end())) {
+      for (auto const &index : std::set<t_int>(indices.begin(), indices.end())) {
         CHECK(adjoint(index) == (index == 2 ? 2 * index : index));
         adjoint(index) = 0;
       }
@@ -93,9 +91,9 @@ TEST_CASE("Vector-shrinked matrix multiplication") {
   extern std::unique_ptr<std::mt19937_64> mersenne;
   std::uniform_int_distribution<sopt::t_int> uniform_dist(0, N - 1);
   Matrix<t_int> matrix = (Image<uint8_t>::Random(N, N) < uint8_t(64))
-    .matrix()
-    .select(Matrix<uint8_t>::Random(N, N), Matrix<uint8_t>::Zero(N, N))
-    .cast<t_int>();
+                             .matrix()
+                             .select(Matrix<uint8_t>::Random(N, N), Matrix<uint8_t>::Zero(N, N))
+                             .cast<t_int>();
 
   matrix.row(uniform_dist(*mersenne)).fill(0);
   matrix.row(uniform_dist(*mersenne)).fill(0);

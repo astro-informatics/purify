@@ -1,3 +1,4 @@
+#include "purify/casacore.h"
 #include <boost/filesystem.hpp>
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
 #include <casacore/tables/TaQL/TableParse.h>
@@ -8,7 +9,6 @@
 #include <casacore/tables/Tables/ScalarColumn.h>
 #include <casacore/tables/Tables/SetupNewTab.h>
 #include <casacore/tables/Tables/TableColumn.h>
-#include "purify/casacore.h"
 #include "purify/directories.h"
 
 #include "purify/types.h"
@@ -49,22 +49,21 @@ TEST_CASE("Casacore") {
 }
 
 class TmpPath {
-public:
+ public:
   TmpPath()
-      : path_(boost::filesystem::unique_path(boost::filesystem::temp_directory_path()
-                                             / "%%%%-%%%%-%%%%-%%%%.ms")) {}
+      : path_(boost::filesystem::unique_path(boost::filesystem::temp_directory_path() /
+                                             "%%%%-%%%%-%%%%-%%%%.ms")) {}
   ~TmpPath() {
-    if(boost::filesystem::exists(path()))
-      boost::filesystem::remove_all(path());
+    if (boost::filesystem::exists(path())) boost::filesystem::remove_all(path());
   }
   boost::filesystem::path const &path() const { return path_; }
 
-private:
+ private:
   boost::filesystem::path path_;
 };
 
 class TmpMS : public TmpPath {
-public:
+ public:
   TmpMS() : TmpPath() {
     casa::TableDesc simpleDesc = casa::MS::requiredTableDesc();
     casa::SetupNewTable newTab(path().string(), simpleDesc, casa::Table::New);
@@ -77,7 +76,7 @@ public:
   casa::MeasurementSet const *operator->() const { return ms_.get(); }
   casa::MeasurementSet *operator->() { return ms_.get(); }
 
-protected:
+ protected:
   std::unique_ptr<casa::MeasurementSet> ms_;
 };
 
@@ -94,8 +93,8 @@ TEST_CASE("Single channel") {
     CHECK(pc::MeasurementSet::const_iterator::value_type(0, ms).is_valid());
     CHECK(pc::MeasurementSet::const_iterator::value_type(4, ms).is_valid());
   }
-  // Raw data from the measurement set "0332-391.ms" was read out using CASA's casabrowser executable. 
-  // Then it was copied into this test.
+  // Raw data from the measurement set "0332-391.ms" was read out using CASA's casabrowser
+  // executable. Then it was copied into this test.
   SECTION("Raw UVW") {
     auto const channel = pc::MeasurementSet::const_iterator::value_type(11, ms);
     REQUIRE(channel.size() == 20541);
@@ -132,8 +131,8 @@ TEST_CASE("Single channel") {
     using namespace purify;
     auto const I = pc::MeasurementSet::const_iterator::value_type(11, ms).I();
     REQUIRE(I.size() == 20541);
-    CHECK(std::abs(I(0) - t_complex(0.1666463911533,-0.05232101678848)) < 1e-12);
-    CHECK(std::abs(I(10) - t_complex(0.1421023607254,-0.04858251661062)) < 1e-12);
+    CHECK(std::abs(I(0) - t_complex(0.1666463911533, -0.05232101678848)) < 1e-12);
+    CHECK(std::abs(I(10) - t_complex(0.1421023607254, -0.04858251661062)) < 1e-12);
 
     REQUIRE(pc::MeasurementSet::const_iterator::value_type(0, ms).I().size() == 20490);
   }
@@ -163,24 +162,22 @@ TEST_CASE("Measurement channel") {
   REQUIRE(channel.is_valid());
   auto const I = channel.I();
   REQUIRE(I.size() == 20490);
-  CHECK(std::abs(I(0) - t_complex(-0.01469034608454,-0.00434834882617)) < 1e-12);
-  CHECK(std::abs(I(10) - t_complex(-0.09461227059364,-0.01139064785093)) < 1e-12);
+  CHECK(std::abs(I(0) - t_complex(-0.01469034608454, -0.00434834882617)) < 1e-12);
+  CHECK(std::abs(I(10) - t_complex(-0.09461227059364, -0.01139064785093)) < 1e-12);
 }
 
 TEST_CASE("Channel iteration") {
-  std::vector<int> const valids{0, 1, 2, 3, 4, 5, 6, 7,
-    8, 9, 10, 11, 12};
+  std::vector<int> const valids{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
   auto const ms = purify::casa::MeasurementSet(test_file);
   auto i_channel = ms.begin();
   auto const i_end = ms.end();
-  for(; i_channel < i_end; i_channel += 5) {
+  for (; i_channel < i_end; i_channel += 5) {
     CHECK(i_channel->channel() < 13);
-    bool const is_valid
-        = std::find(valids.begin(), valids.end(), i_channel->channel()) != valids.end();
+    bool const is_valid =
+        std::find(valids.begin(), valids.end(), i_channel->channel()) != valids.end();
     CHECK(is_valid == i_channel->is_valid());
   }
 }
-
 
 TEST_CASE("Direction") {
   auto const ms = purify::casa::MeasurementSet(test_file);

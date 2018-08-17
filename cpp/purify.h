@@ -12,12 +12,12 @@ utilities::vis_params read_measurements(const Parameters &params);
 utilities::vis_params distribute_measurements(const Parameters &params);
 #endif
 //! Takes in parameters and returns measurement operator
-std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const>
-measurement_operator_factory(const Parameters &params, const utilities::vis_params &uv_data);
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurement_operator_factory(
+    const Parameters &params, const utilities::vis_params &uv_data);
 
 //! Takes in parameters and returns wavelet transform
-std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const>
-wavelet_operator_factory(const Parameters &params);
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> wavelet_operator_factory(
+    const Parameters &params);
 
 //! Takes in parameters and measurement operator, and returns sopt algorithm
 std::shared_ptr<sopt::algorithm> algorithm_factory(
@@ -39,7 +39,7 @@ void save_image(const std::string &name, const std::vector<Vector<T>> &image,
   header.cell_y = uv_data.cell_y;
   params.ra = uv_data.ra;
   params.dec = uv_data.dec;
-  if(image.size() == 0)
+  if (image.size() == 0)
     throw std::runtime_error("Attempting to save empty image cube:" + header.fits_name);
   pfitsio::write3d_header(image, params.image_width, params.image_height, header);
 };
