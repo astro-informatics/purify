@@ -147,6 +147,7 @@ matrix:
         - MPI=ON
         - openMP=ON
         - CASA=ON
+        - EXAMPLES=ON
 
     - os: linux
       addons:
@@ -240,7 +241,7 @@ script:
     cmake .. -DCMAKE_BUILD_TYPE=Release \
     -Dtests=${Tests-ON} \
     -Ddompi=${MPI} \
-    -Dexamples=OFF \
+    -Dexamples=${EXAMPLES-OFF} \
     -Dopenmp=${openMP} \
     -Ddocs=${DOCS-OFF} \
     -Ddocasa=${CASA-OFF} \
