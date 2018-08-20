@@ -253,6 +253,7 @@ script:
   - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
   - eval $BUILD_CMD
   - eval $TEST_CMD
+  - if [[ ${TITLE} != *Documentation* ]] && [[ ${TITLE} != *Lint* ]]; then sudo make install; fi
 
 after_success:
 
