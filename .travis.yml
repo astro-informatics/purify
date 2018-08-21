@@ -157,6 +157,23 @@ matrix:
           packages:
             - *native_deps
             - *all_deps
+      env:
+        - TITLE="All dependencies - GCC - MPI - examples"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - Tests=ON
+        - MPI=ON
+        - openMP=ON
+        - EXAMPLES=ON
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+            - *all_deps
             - doxygen # version 1.8.6-2
             - graphviz # version 2.36.0
       env:
