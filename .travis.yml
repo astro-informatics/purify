@@ -165,7 +165,7 @@ matrix:
         - MPI=ON
         - openMP=ON
         - EXAMPLES=ON
-        - TEST_CMD='cd cpp/example; find ./ -type f -perm /u=x -not -iname "*mpi" -printf "Executing %p\n" -exec  {} \; find ./ -type f -perm /u=x -iname "*mpi" -printf "Executing with mpi %p\n" -exec  mpirun -n 2 {} \; '
+        - TEST_CMD='cd cpp/example; find ./ -type f -perm /u=x -not -iname "*mpi" -printf "Executing %p\n" -exec  {} \;; find ./ -type f -perm /u=x -iname "*mpi" -printf "Executing with mpi %p\n" -exec  mpirun -n 2 {} \; '
 
     - os: linux
       addons:
