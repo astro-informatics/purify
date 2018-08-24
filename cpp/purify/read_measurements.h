@@ -33,6 +33,10 @@ utilities::vis_params read_measurements(
     const distribute::plan plan = distribute::plan::radial, const bool w_term = false,
     const stokes pol = stokes::I, const utilities::vis_units units = utilities::vis_units::lambda);
 #endif
+//! check that file path exists
+bool file_exists(const std::string & path);
+//! check that directory path exists
+bool dir_exists(const std::string & path);
 }  // namespace read_measurements
 }  // namespace purify
 #endif
