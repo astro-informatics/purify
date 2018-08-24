@@ -238,7 +238,7 @@ deploy:
 
 before_install:
   - if [ $TRAVIS_OS_NAME = osx ]; then brew update; brew cask uninstall oclint; brew install gcc@7 open-mpi; brew install fftw; fi;
-  - if [[ $TRAVIS_OS_NAME = osx ]] && [[ ${TITLE} = *GCC* ]]; then brew install cmake boost; fi;
+  - if [[ $TRAVIS_OS_NAME = osx ]] && [[ ${TITLE} = *GCC* ]]; then brew upgrade cmake boost; fi;
   - if [ $TRAVIS_OS_NAME = linux ]; then ClangVer="-5.0"; fi
   - if [[ ${TITLE} = *GCC* ]]; then CC=gcc-7; else CC=clang${ClangVer}; fi
   - if [[ ${TITLE} = *GCC* ]]; then CXX=g++-7; else CXX=clang++${ClangVer}; fi
