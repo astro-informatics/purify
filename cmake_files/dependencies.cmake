@@ -55,11 +55,8 @@ if(dompi)
 endif()
 find_package(TIFF REQUIRED)
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND ${CMAKE_HOST_APPLE})
-    lookup_package(Boost REQUIRED DOWNLOAD_BY_DEFAULT COMPONENTS filesystem)
-else()
-    lookup_package(Boost REQUIRED COMPONENTS filesystem)
-endif()
+
+lookup_package(Boost REQUIRED COMPONENTS filesystem)
 
 lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS URL "http://bitbucket.org/eigen/eigen/get/3.2.tar.gz" MD5 "035ccc791f046f48e90bb1fb42ce227e")
 
