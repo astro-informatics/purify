@@ -3,14 +3,12 @@
 namespace purify {
 namespace utilities {
 vis_params sort_by_w(const vis_params &uv_data) {
-
   vis_params output = uv_data;
   std::vector<t_uint> ind;
-  for(t_uint i = 0; i < uv_data.size(); i++)
-    ind.push_back(i);
+  for (t_uint i = 0; i < uv_data.size(); i++) ind.push_back(i);
   std::sort(ind.begin(), ind.end(),
             [&](const t_uint a, const t_uint b) { return uv_data.w(a) < uv_data.w(b); });
-  for(t_uint i = 0; i < uv_data.size(); i++) {
+  for (t_uint i = 0; i < uv_data.size(); i++) {
     output.u(i) = uv_data.u(ind.at(i));
     output.v(i) = uv_data.v(ind.at(i));
     output.w(i) = uv_data.w(ind.at(i));
@@ -19,16 +17,15 @@ vis_params sort_by_w(const vis_params &uv_data) {
   }
   return output;
 }
-} // namespace utilities
+}  // namespace utilities
 namespace wproj_utilities {
 std::vector<t_uint> w_rows(const Sparse<t_complex> &w_degrider) {
-
   std::set<t_uint> w_rows_set;
-  for(t_int k = 0; k < w_degrider.outerSize(); ++k) {
+  for (t_int k = 0; k < w_degrider.outerSize(); ++k) {
     t_uint index = 0;
-    for(Sparse<t_complex>::InnerIterator it(w_degrider, k); it; ++it) {
+    for (Sparse<t_complex>::InnerIterator it(w_degrider, k); it; ++it) {
       index++;
-      if(index > 0) {
+      if (index > 0) {
         w_rows_set.insert(it.col());
       }
     }
@@ -54,7 +51,6 @@ std::tuple<t_real, t_real> fov_cosines(t_real const &cell_x, t_real const &cell_
 Matrix<t_complex> generate_dde(const std::function<t_complex(t_real, t_real)> &dde,
                                const t_real &cell_x, const t_real &cell_y, const t_uint &x_size,
                                const t_uint &y_size) {
-
   // celly:: size of y pixel in arcseconds
   // cellx:: size of x pixel in arcseconds
   // x_size:: number of pixels along x-axis
@@ -68,8 +64,8 @@ Matrix<t_complex> generate_dde(const std::function<t_complex(t_real, t_real)> &d
   const t_real delt_y = M / y_size;
   Image<t_complex> chirp(y_size, x_size);
 
-  for(t_int l = 0; l < x_size; ++l)
-    for(t_int m = 0; m < y_size; ++m) {
+  for (t_int l = 0; l < x_size; ++l)
+    for (t_int m = 0; m < y_size; ++m) {
       const t_real x = (l + 0.5 - x_size * 0.5) * delt_x;
       const t_real y = (m + 0.5 - y_size * 0.5) * delt_y;
       chirp(l, m) = dde(y, x);
@@ -80,7 +76,6 @@ Matrix<t_complex> generate_dde(const std::function<t_complex(t_real, t_real)> &d
 Matrix<t_complex> generate_chirp(const std::function<t_complex(t_real, t_real)> &dde,
                                  const t_real &w_rate, const t_real &cell_x, const t_real &cell_y,
                                  const t_uint &x_size, const t_uint &y_size) {
-
   // return chirp image fourier transform for w component
   // w:: w-term in units of lambda
   // celly:: size of y pixel in arcseconds
@@ -93,8 +88,9 @@ Matrix<t_complex> generate_chirp(const std::function<t_complex(t_real, t_real)> 
   const auto chirp = [=](const t_real &y, const t_real &x) {
     return dde(y, x) * (std::exp(-2 * pi * I * w_rate * (std::sqrt(1 - x * x - y * y) - 1))) / nz;
   };
-  auto primary_beam
-      = [=](const t_real &x, const t_real &y) { return 1. / std::sqrt(1 - x * x - y * y); };
+  auto primary_beam = [=](const t_real &x, const t_real &y) {
+    return 1. / std::sqrt(1 - x * x - y * y);
+  };
   const auto chirp_approx = [=](const t_real &y, const t_real &x) {
     return dde(y, x) * (std::exp(2 * pi * I * w_rate * (x * x + y * y))) / nz;
   };
@@ -102,7 +98,6 @@ Matrix<t_complex> generate_chirp(const std::function<t_complex(t_real, t_real)> 
 }
 Matrix<t_complex> generate_chirp(const t_real &w_rate, const t_real &cell_x, const t_real &cell_y,
                                  const t_uint &x_size, const t_uint &y_size) {
-
   // return chirp image fourier transform for w component
   // w:: w-term in units of lambda
   // celly:: size of y pixel in arcseconds
@@ -116,9 +111,8 @@ Sparse<t_complex> create_chirp_row(const t_real &w_rate, const t_real &cell_x, c
                                    const t_uint &ftsizev, const t_uint &ftsizeu,
                                    const t_real &energy_fraction,
                                    const sopt::OperatorFunction<Vector<t_complex>> &fftop) {
-
-  const Matrix<t_complex> chirp
-      = wproj_utilities::generate_chirp(w_rate, cell_x, cell_y, ftsizeu, ftsizev);
+  const Matrix<t_complex> chirp =
+      wproj_utilities::generate_chirp(w_rate, cell_x, cell_y, ftsizeu, ftsizev);
   return create_chirp_row(Vector<t_complex>::Map(chirp.data(), chirp.size()), energy_fraction,
                           fftop);
 }
@@ -135,19 +129,19 @@ Sparse<t_complex> create_chirp_row(const Vector<t_complex> &chirp_image,
   return convert_sparse(chirp, thres).transpose();
 }
 
-Sparse<t_complex>
-wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uint &y_size,
-                   const Vector<t_real> &w_components, const t_real &cell_x, const t_real &cell_y,
-                   const t_real &energy_fraction_chirp, const t_real &energy_fraction_wproj,
-                   const expansions::series series, const t_uint order,
-                   const t_real &interpolation_error) {
-
+Sparse<t_complex> wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size,
+                                     const t_uint &y_size, const Vector<t_real> &w_components,
+                                     const t_real &cell_x, const t_real &cell_y,
+                                     const t_real &energy_fraction_chirp,
+                                     const t_real &energy_fraction_wproj,
+                                     const expansions::series series, const t_uint order,
+                                     const t_real &interpolation_error) {
   const t_uint Npix = x_size * y_size;
   const t_uint Nvis = w_components.size();
 
   PURIFY_HIGH_LOG("Spread of w components {} ",
-                  std::sqrt(std::pow(w_components.norm(), 2) / Nvis
-                            - std::pow(w_components.array().mean(), 2)));
+                  std::sqrt(std::pow(w_components.norm(), 2) / Nvis -
+                            std::pow(w_components.array().mean(), 2)));
   PURIFY_HIGH_LOG("Mean of w components {} ", w_components.array().mean());
   PURIFY_HIGH_LOG("Hard-thresholding of the chirp kernels: energy [{}] ", energy_fraction_chirp);
   PURIFY_HIGH_LOG("Hard-thresholding of the rows of G: energy [{}]  ", energy_fraction_wproj);
@@ -160,10 +154,10 @@ wprojection_matrix(const Sparse<t_complex> &G, const t_uint &x_size, const t_uin
   t_uint total_non_zero = 0;
   GW.reserve(G.nonZeros() * 1e3);
 #pragma omp parallel for
-  for(t_int m = 0; m < G.rows(); m++) {
-    const Sparse<t_complex> chirp
-        = create_chirp_row(w_components(m), cell_x, cell_y, x_size, y_size, energy_fraction_chirp,
-                           std::get<0>(fftop_));
+  for (t_int m = 0; m < G.rows(); m++) {
+    const Sparse<t_complex> chirp =
+        create_chirp_row(w_components(m), cell_x, cell_y, x_size, y_size, energy_fraction_chirp,
+                         std::get<0>(fftop_));
 
     Sparse<t_complex> kernel = row_wise_sparse_convolution(G.row(m), chirp, x_size, y_size);
     const t_real thres = sparsify_row_thres(kernel, energy_fraction_wproj);
@@ -216,9 +210,8 @@ t_real mr_metric(const Image<t_real> &model, const Image<t_real> &solution) {
   return val;
 }
 
-Sparse<t_complex>
-generate_vect(const t_uint &x_size, const t_uint &y_size, const t_real &sigma, const t_real &mean) {
-
+Sparse<t_complex> generate_vect(const t_uint &x_size, const t_uint &y_size, const t_real &sigma,
+                                const t_real &mean) {
   // t_real sigma = 3;
   // const t_real pi = constant::pi;
   t_int W = x_size;
@@ -228,17 +221,16 @@ generate_vect(const t_uint &x_size, const t_uint &y_size, const t_real &sigma, c
   t_real step = W / 2;
 
   // t_complex sum = 0.0; // For accumulating the kernel values
-  for(int x = 0; x < W; ++x) {
-    for(int y = 0; y < W; ++y) {
+  for (int x = 0; x < W; ++x) {
+    for (int y = 0; y < W; ++y) {
       t_int xx = x - step;
       xx = xx * xx;
       t_int yy = y - step;
       yy = yy * yy;
-      t_complex val
-          = exp(-0.5
-                * (xx / (sigma * sigma)
-                   + yy / (sigma * sigma))); //* std::exp(- 2 * pi * I * (x * 0.5 + y * 0.5));
-      if(std::abs(val) > 1e-5)
+      t_complex val =
+          exp(-0.5 * (xx / (sigma * sigma) +
+                      yy / (sigma * sigma)));  //* std::exp(- 2 * pi * I * (x * 0.5 + y * 0.5));
+      if (std::abs(val) > 1e-5)
         chirp(x, y) = val;
       else
         chirp(x, y) = 0.0;
@@ -250,5 +242,5 @@ generate_vect(const t_uint &x_size, const t_uint &y_size, const t_real &sigma, c
   return chirp_;
 }
 
-} // namespace wproj_utilities
-} // namespace purify
+}  // namespace wproj_utilities
+}  // namespace purify

@@ -16,17 +16,16 @@ TEST_CASE("Distribution of visibility data") {
 
   std::vector<t_int> order(N);
 
-  if(world.size() == 1)
-    return;
+  if (world.size() == 1) return;
   order[0] = 1;
   std::fill(order.begin() + 1, order.end(), 0);
 
   auto actual = utilities::regroup_and_scatter(params, order, world);
-  if(world.rank() == 0) {
+  if (world.rank() == 0) {
     CHECK(actual.u.size() == 4);
     CHECK(actual.u(0) == Approx(params.u(N - 1)));
     CHECK(actual.u.tail(N - 2).isApprox(params.u.segment(1, N - 2)));
-  } else if(world.rank() == 1) {
+  } else if (world.rank() == 1) {
     CHECK(actual.u.size() == 1);
     CHECK(actual.u(0) == Approx(params.u(0)));
   } else

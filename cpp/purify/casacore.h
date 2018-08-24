@@ -2,6 +2,7 @@
 #define PURIFY_CASACORE_H
 
 #include "purify/config.h"
+#include "purify/types.h"
 #include <exception>
 #include <map>
 #include <memory>
@@ -12,9 +13,8 @@
 #include <casacore/tables/Tables/ArrayColumn.h>
 #include <casacore/tables/Tables/ScalarColumn.h>
 #include <casacore/tables/Tables/Table.h>
-#include <sopt/utilities.h>
-#include "purify/types.h"
 #include "purify/utilities.h"
+#include <sopt/utilities.h>
 
 namespace purify {
 namespace casa {
@@ -25,7 +25,7 @@ Matrix<T> table_column(::casacore::Table const &table, std::string const &column
 
 //! Interface around measurement sets
 class MeasurementSet {
-public:
+ public:
   //! Iterates over channels
   class const_iterator;
   class ChannelWrapper;
@@ -50,14 +50,14 @@ public:
 
   //! Gets scalar column from table
   template <class T>
-  ::casacore::ScalarColumn<T>
-  scalar_column(std::string const &col, std::string const &tabname = "") const {
+  ::casacore::ScalarColumn<T> scalar_column(std::string const &col,
+                                            std::string const &tabname = "") const {
     return get_column<T, ::casacore::ScalarColumn>(col, tabname);
   }
   //! \brief Gets array column from table
   template <class T>
-  ::casacore::ArrayColumn<T>
-  array_column(std::string const &col, std::string const &tabname = "") const {
+  ::casacore::ArrayColumn<T> array_column(std::string const &col,
+                                          std::string const &tabname = "") const {
     return get_column<T, ::casacore::ArrayColumn>(col, tabname);
   }
   //! Clear memory
@@ -91,7 +91,7 @@ public:
     return direction(tolerance, filter)(1);
   }
 
-private:
+ private:
   //! Gets stokes of given array/object
   template <class T, template <class> class TYPE>
   TYPE<T> get_column(std::string const &col, std::string const &tabname) const {
@@ -106,16 +106,18 @@ private:
 };
 
 namespace details {
-template <class C> Matrix<C> get_taql_array(::casacore::TaQLResult const &taql) {
+template <class C>
+Matrix<C> get_taql_array(::casacore::TaQLResult const &taql) {
   auto const col = ::casacore::ArrayColumn<C>(taql, "R");
   auto const data_column = col.getColumn();
   auto const shape = col.shape(0);
-  auto nsize
-      = std::accumulate(shape.begin(), shape.end(), 1, [](ssize_t a, ssize_t b) { return a * b; });
+  auto nsize =
+      std::accumulate(shape.begin(), shape.end(), 1, [](ssize_t a, ssize_t b) { return a * b; });
   typedef Eigen::Matrix<C, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Matrix;
   return Matrix::Map(data_column.data(), col.nrow(), nsize);
 }
-template <class C> Matrix<C> get_taql_scalar(::casacore::TaQLResult const &taql) {
+template <class C>
+Matrix<C> get_taql_scalar(::casacore::TaQLResult const &taql) {
   auto const col = ::casacore::ScalarColumn<C>(taql, "R");
   auto const data_column = col.getColumn();
   typedef Eigen::Matrix<C, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Matrix;
@@ -125,23 +127,21 @@ template <class C> Matrix<C> get_taql_scalar(::casacore::TaQLResult const &taql)
 template <class T>
 Matrix<T> table_column(::casacore::Table const &table, std::string const &column,
                        std::string const &filter, std::integral_constant<bool, true> const &) {
-  if(table.nrow() == 0)
-    return Matrix<T>::Zero(0, 1);
+  if (table.nrow() == 0) return Matrix<T>::Zero(0, 1);
   auto const taql_table = ::casacore::tableCommand(
       "USING STYLE PYTHON SELECT " + column + " as R FROM $1 " + filter, table);
   auto const vtable = taql_table.table();
-  if(vtable.nrow() == 0)
-    return Matrix<T>(0, 1);
+  if (vtable.nrow() == 0) return Matrix<T>(0, 1);
 
-  switch(vtable.tableDesc().columnDesc("R").trueDataType()) {
-#define PURIFY_MACRO(NAME, TYPE)                                                                   \
-  case ::casacore::Tp##NAME:                                                                       \
+  switch (vtable.tableDesc().columnDesc("R").trueDataType()) {
+#define PURIFY_MACRO(NAME, TYPE) \
+  case ::casacore::Tp##NAME:     \
     return details::get_taql_scalar<::casacore::TYPE>(vtable).template cast<T>();
     PURIFY_MACRO(Complex, Complex);
     PURIFY_MACRO(DComplex, DComplex);
 #undef PURIFY_MACRO
-#define PURIFY_MACRO(NAME, TYPE)                                                                   \
-  case ::casacore::TpArray##NAME:                                                                  \
+#define PURIFY_MACRO(NAME, TYPE)  \
+  case ::casacore::TpArray##NAME: \
     return details::get_taql_array<::casacore::TYPE>(vtable).template cast<T>();
     PURIFY_MACRO(Complex, Complex);
     PURIFY_MACRO(DComplex, DComplex);
@@ -157,17 +157,15 @@ Matrix<T> table_column(::casacore::Table const &table, std::string const &column
 template <class T>
 Matrix<T> table_column(::casacore::Table const &table, std::string const &column,
                        std::string const &filter, std::integral_constant<bool, false> const &) {
-  if(table.nrow() == 0)
-    return Matrix<T>::Zero(0, 1);
+  if (table.nrow() == 0) return Matrix<T>::Zero(0, 1);
   auto const taql_table = ::casacore::tableCommand(
       "USING STYLE PYTHON SELECT " + column + " as R FROM $1 " + filter, table);
   auto const vtable = taql_table.table();
-  if(vtable.nrow() == 0)
-    return Matrix<T>(0, 1);
+  if (vtable.nrow() == 0) return Matrix<T>(0, 1);
 
-  switch(vtable.tableDesc().columnDesc("R").trueDataType()) {
-#define PURIFY_MACRO(NAME, TYPE)                                                                   \
-  case ::casacore::Tp##NAME:                                                                       \
+  switch (vtable.tableDesc().columnDesc("R").trueDataType()) {
+#define PURIFY_MACRO(NAME, TYPE) \
+  case ::casacore::Tp##NAME:     \
     return details::get_taql_scalar<::casacore::TYPE>(vtable).template cast<T>();
     PURIFY_MACRO(Bool, Bool);
     PURIFY_MACRO(Char, Char);
@@ -179,8 +177,8 @@ Matrix<T> table_column(::casacore::Table const &table, std::string const &column
     PURIFY_MACRO(Float, Float);
     PURIFY_MACRO(Double, Double);
 #undef PURIFY_MACRO
-#define PURIFY_MACRO(NAME, TYPE)                                                                   \
-  case ::casacore::TpArray##NAME:                                                                  \
+#define PURIFY_MACRO(NAME, TYPE)  \
+  case ::casacore::TpArray##NAME: \
     return details::get_taql_array<::casacore::TYPE>(vtable).template cast<T>();
     PURIFY_MACRO(Bool, Bool);
     PURIFY_MACRO(Char, Char);
@@ -199,17 +197,17 @@ Matrix<T> table_column(::casacore::Table const &table, std::string const &column
   throw std::runtime_error("Array type is not handled");
   return Matrix<T>::Zero(0, 1);
 }
-} // namespace details
+}  // namespace details
 
 template <class T>
-Matrix<T>
-table_column(::casacore::Table const &table, std::string const &column, std::string const &filter) {
+Matrix<T> table_column(::casacore::Table const &table, std::string const &column,
+                       std::string const &filter) {
   return details::table_column<T>(table, column, filter,
                                   std::integral_constant<bool, sopt::is_complex<T>::value>());
 }
 
 class MeasurementSet::ChannelWrapper {
-public:
+ public:
   //! Possible locations for SIGMA
   enum class Sigma { OVERALL, SPECTRUM };
   ChannelWrapper(t_uint channel, MeasurementSet const &ms, std::string const &filter = "")
@@ -217,14 +215,14 @@ public:
 
   //! Channel this object is associated with
   t_uint channel() const { return channel_; }
-#define PURIFY_MACRO(NAME, INDEX)                                                                  \
-  /** Stokes component in meters **/                                                               \
-  Vector<t_real> raw_##NAME() const {                                                              \
-    return table_column<t_real>(ms_.table(), "UVW[" #INDEX "]", filter());                         \
-  }                                                                                                \
-  /** \brief U scaled to purify values of wavelengths **/                                          \
-  Vector<t_real> lambda_##NAME() const {                                                           \
-    return (raw_##NAME().array() * frequencies().array()).matrix() / constant::c;                  \
+#define PURIFY_MACRO(NAME, INDEX)                                                 \
+  /** Stokes component in meters **/                                              \
+  Vector<t_real> raw_##NAME() const {                                             \
+    return table_column<t_real>(ms_.table(), "UVW[" #INDEX "]", filter());        \
+  }                                                                               \
+  /** \brief U scaled to purify values of wavelengths **/                         \
+  Vector<t_real> lambda_##NAME() const {                                          \
+    return (raw_##NAME().array() * frequencies().array()).matrix() / constant::c; \
   }
   PURIFY_MACRO(u, 0);
   PURIFY_MACRO(v, 1);
@@ -250,16 +248,16 @@ public:
   //! Frequencies from SPECTRAL_WINDOW for a this channel
   Vector<t_real> raw_frequencies() const { return raw_spectral_window("CHAN_FREQ"); }
 
-#define PURIFY_MACRO(NAME)                                                                         \
-  /** Stokes component */                                                                          \
-  Vector<t_complex> NAME(std::string const &col = "DATA") const {                                  \
-    return ms_.column<t_complex>(stokes(#NAME, index(col)), filter());                             \
-  }                                                                                                \
-  /** Standard deviation for the Stokes component */                                               \
-  Vector<t_real> w##NAME(Sigma const &col = Sigma::OVERALL) const {                                \
-    return table_column<t_real>(                                                                   \
-        ms_.table(), stokes(#NAME, col == Sigma::OVERALL ? "SIGMA" : index("SIGMA_SPECTRUM")),     \
-        filter());                                                                                 \
+#define PURIFY_MACRO(NAME)                                                                     \
+  /** Stokes component */                                                                      \
+  Vector<t_complex> NAME(std::string const &col = "DATA") const {                              \
+    return ms_.column<t_complex>(stokes(#NAME, index(col)), filter());                         \
+  }                                                                                            \
+  /** Standard deviation for the Stokes component */                                           \
+  Vector<t_real> w##NAME(Sigma const &col = Sigma::OVERALL) const {                            \
+    return table_column<t_real>(                                                               \
+        ms_.table(), stokes(#NAME, col == Sigma::OVERALL ? "SIGMA" : index("SIGMA_SPECTRUM")), \
+        filter());                                                                             \
   }
   // Stokes parameters
   PURIFY_MACRO(I);
@@ -293,7 +291,7 @@ public:
   //! Check if channel has any data
   bool is_valid() const;
 
-protected:
+ protected:
   //! Composes filter for current channel
   std::string filter() const;
   //! Composes "<variable>[<channel>,]"
@@ -315,7 +313,7 @@ protected:
 };
 
 class MeasurementSet::const_iterator {
-public:
+ public:
   //! Convenience wrapper to access values associated with a single channel
   typedef MeasurementSet::ChannelWrapper value_type;
   typedef std::shared_ptr<value_type const> pointer;
@@ -323,7 +321,9 @@ public:
   typedef t_int difference_type;
 
   const_iterator(t_int channel, MeasurementSet const &ms, std::string const &filter = "")
-      : channel_(channel), ms_(ms), filter_(filter),
+      : channel_(channel),
+        ms_(ms),
+        filter_(filter),
         wrapper_(new value_type(channel_, ms_, filter_)){};
 
   pointer operator->() const { return wrapper_; }
@@ -350,33 +350,29 @@ public:
     return &ms_.table() == &c.ms_.table();
   }
 
-protected:
+ protected:
   difference_type channel_;
   MeasurementSet ms_;
   std::string const filter_;
   std::shared_ptr<value_type> wrapper_;
 };
 //! Read measurement set into vis_params structure
-utilities::vis_params read_measurementset(std::string const &filename,
-                                          const stokes pol
-                                          = stokes::I,
+utilities::vis_params read_measurementset(std::string const &filename, const stokes pol = stokes::I,
                                           const std::vector<t_int> &channels = std::vector<t_int>(),
                                           std::string const &filter = "");
 //! Read measurement set object into vis_params structure
 utilities::vis_params read_measurementset(MeasurementSet const &ms_file,
-                                          const stokes pol
-                                          = stokes::I,
+                                          const stokes pol = stokes::I,
                                           const std::vector<t_int> &channels = std::vector<t_int>(),
                                           std::string const &filter = "");
 //! Read measurement set object then combine it with a uv_params structure
-utilities::vis_params read_measurementset(std::string const &filename, const utilities::vis_params &uv1,
-                                          const stokes pol,
+utilities::vis_params read_measurementset(std::string const &filename,
+                                          const utilities::vis_params &uv1, const stokes pol,
                                           const std::vector<t_int> &channels,
                                           std::string const &filter);
 //! Read multiple measurement sets into one vis_params structure
 utilities::vis_params read_measurementset(std::vector<std::string> const &filename,
-                                          const stokes pol
-                                          = stokes::I,
+                                          const stokes pol = stokes::I,
                                           const std::vector<t_int> &channels = std::vector<t_int>(),
                                           std::string const &filter = "");
 
@@ -384,11 +380,10 @@ utilities::vis_params read_measurementset(std::vector<std::string> const &filena
 t_real average_frequency(const purify::casa::MeasurementSet &ms_file, std::string const &filter,
                          const std::vector<t_int> &channels);
 //! Read meassurement set into a vector of vis_params
-std::vector<utilities::vis_params>
-read_measurementset_channels(std::string const &filename,
-                             const stokes pol
-                             = stokes::I,
-                             const t_int &channel_width = 1, std::string const &filter = "");
+std::vector<utilities::vis_params> read_measurementset_channels(std::string const &filename,
+                                                                const stokes pol = stokes::I,
+                                                                const t_int &channel_width = 1,
+                                                                std::string const &filter = "");
 
 inline MeasurementSet::const_iterator operator+(MeasurementSet::const_iterator::difference_type n,
                                                 MeasurementSet::const_iterator const &c) {
@@ -398,7 +393,7 @@ inline MeasurementSet::const_iterator operator-(MeasurementSet::const_iterator::
                                                 MeasurementSet::const_iterator const &c) {
   return c.operator-(n);
 }
-} // namespace casa
-} // namespace purify
+}  // namespace casa
+}  // namespace purify
 
 #endif

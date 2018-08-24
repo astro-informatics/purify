@@ -8,18 +8,17 @@ using namespace purify;
 // -------------- Constructor benchmark -------------------------//
 
 void degrid_operator_ctor(benchmark::State &state) {
-
   // Generating random uv(w) coverage
   t_int const rows = state.range(0);
   t_int const cols = state.range(0);
   t_int const number_of_vis = state.range(1);
   auto uv_data = b_utilities::random_measurements(number_of_vis);
 
-  const t_real FoV = 1; // deg
+  const t_real FoV = 1;  // deg
   const t_real cellsize = FoV / cols * 60. * 60.;
   const bool w_term = false;
   // benchmark the creation of measurement operator
-  while(state.KeepRunning()) {
+  while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     auto sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
         uv_data, rows, cols, cellsize, cellsize, 2, 0, 0.0001, kernels::kernel::kb, state.range(2),
@@ -29,8 +28,8 @@ void degrid_operator_ctor(benchmark::State &state) {
     state.SetIterationTime(b_utilities::duration(start, end));
   }
 
-  state.SetBytesProcessed(int64_t(state.iterations()) * (number_of_vis + rows * cols)
-                          * sizeof(t_complex));
+  state.SetBytesProcessed(int64_t(state.iterations()) * (number_of_vis + rows * cols) *
+                          sizeof(t_complex));
 }
 
 BENCHMARK(degrid_operator_ctor)
@@ -45,7 +44,7 @@ BENCHMARK(degrid_operator_ctor)
 // ----------------- Application benchmarks -----------------------//
 
 class DegridOperatorFixture : public ::benchmark::Fixture {
-public:
+ public:
   void SetUp(const ::benchmark::State &state) {
     // Keep count of the benchmark repetitions
     m_counter++;
@@ -58,8 +57,8 @@ public:
 
     // Create measurement operator
     bool newKernel = m_kernel != state.range(2);
-    if(newImage || newMeasurements || newKernel) {
-      const t_real FoV = 1; // deg
+    if (newImage || newMeasurements || newKernel) {
+      const t_real FoV = 1;  // deg
       const t_real cellsize = FoV / m_imsizex * 60. * 60.;
       const bool w_term = false;
       m_kernel = state.range(2);
@@ -85,7 +84,7 @@ public:
 };
 
 class DegridOperatorDirectFixture : public DegridOperatorFixture {
-public:
+ public:
   virtual bool updateImage(t_uint newSize) {
     return b_utilities::updateImage(newSize, m_image, m_imsizex, m_imsizey);
   }
@@ -94,7 +93,7 @@ public:
 };
 
 class DegridOperatorAdjointFixture : public DegridOperatorFixture {
-public:
+ public:
   virtual bool updateImage(t_uint newSize) {
     return b_utilities::updateEmptyImage(newSize, m_image, m_imsizex, m_imsizey);
   }
@@ -104,34 +103,34 @@ public:
 
 BENCHMARK_DEFINE_F(DegridOperatorDirectFixture, Apply)(benchmark::State &state) {
   // Benchmark the application of the operator
-  if((m_counter % 10) == 1) {
+  if ((m_counter % 10) == 1) {
     m_uv_data.vis = (*m_degridOperator) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
   }
-  while(state.KeepRunning()) {
+  while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     m_uv_data.vis = (*m_degridOperator) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
     auto end = std::chrono::high_resolution_clock::now();
     state.SetIterationTime(b_utilities::duration(start, end));
   }
 
-  state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizey * m_imsizex)
-                          * sizeof(t_complex));
+  state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizey * m_imsizex) *
+                          sizeof(t_complex));
 }
 
 BENCHMARK_DEFINE_F(DegridOperatorAdjointFixture, Apply)(benchmark::State &state) {
   // Benchmark the application of the adjoint operator
-  if((m_counter % 10) == 1) {
+  if ((m_counter % 10) == 1) {
     m_image = m_degridOperator->adjoint() * m_uv_data.vis;
   }
-  while(state.KeepRunning()) {
+  while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     m_image = m_degridOperator->adjoint() * m_uv_data.vis;
     auto end = std::chrono::high_resolution_clock::now();
     state.SetIterationTime(b_utilities::duration(start, end));
   }
 
-  state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizey * m_imsizex)
-                          * sizeof(t_complex));
+  state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizey * m_imsizex) *
+                          sizeof(t_complex));
 }
 
 BENCHMARK_REGISTER_F(DegridOperatorDirectFixture, Apply)

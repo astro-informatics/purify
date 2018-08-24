@@ -3,17 +3,16 @@
 
 #include "purify/config.h"
 #ifdef PURIFY_MPI
-#include <numeric>
-#include "sopt/mpi/communicator.h"
-#include "purify/IndexMapping.h"
 #include "purify/types.h"
+#include <numeric>
+#include "purify/IndexMapping.h"
+#include "sopt/mpi/communicator.h"
 
 namespace purify {
 //! \brief Gathers and scatters a vector
 //! \details Only the root node will ever have the full vector. Other nodes only get those indices
 //! they ask for.
 class DistributeSparseVector {
-
   DistributeSparseVector(const IndexMapping &_mapping, const std::vector<t_int> &_sizes,
                          const t_int _local_size, const sopt::mpi::Communicator &_comm)
       : mapping(_mapping), sizes(_sizes), local_size(_local_size), comm(_comm) {}
@@ -22,7 +21,7 @@ class DistributeSparseVector {
       : DistributeSparseVector(IndexMapping(_comm.gather(local_indices, _sizes), global_size),
                                _sizes, static_cast<t_int>(local_indices.size()), _comm) {}
 
-public:
+ public:
   //! Constructs a functor to distribute and gather a vector
   //! \param[in] local_indices: indices that will be received by this process
   //! \param[in] global_size: Size of the vector as a whole
@@ -44,41 +43,39 @@ public:
   template <class T0, class T1>
   void scatter(Eigen::MatrixBase<T0> const &input, Eigen::MatrixBase<T1> const &output) const {
     assert(input.cols() == 1);
-    if(not comm.is_root())
-      return scatter(output);
+    if (not comm.is_root()) return scatter(output);
     Vector<typename T0::Scalar> buffer;
     mapping(input, buffer);
     assert(buffer.size() == std::accumulate(sizes.begin(), sizes.end(), 0));
     output.const_cast_derived() = comm.scatterv(buffer, sizes);
   }
 
-  template <class T1> void scatter(Eigen::MatrixBase<T1> const &output) const {
-    if(comm.is_root())
-      throw std::runtime_error("This function should not be called by root");
+  template <class T1>
+  void scatter(Eigen::MatrixBase<T1> const &output) const {
+    if (comm.is_root()) throw std::runtime_error("This function should not be called by root");
     output.const_cast_derived() = comm.scatterv<typename T1::Scalar>(local_size);
   }
 
   template <class T0, class T1>
   void gather(Eigen::MatrixBase<T0> const &input, Eigen::MatrixBase<T1> const &output) const {
     assert(input.cols() == 1);
-    if(not comm.is_root())
-      return gather(input);
+    if (not comm.is_root()) return gather(input);
     auto const buffer = comm.gather<typename T0::Scalar>(input, sizes);
     mapping.adjoint(buffer, output.derived());
   }
 
-  template <class T1> void gather(Eigen::MatrixBase<T1> const &input) const {
-    if(comm.is_root())
-      throw std::runtime_error("This function should not be called by root");
+  template <class T1>
+  void gather(Eigen::MatrixBase<T1> const &input) const {
+    if (comm.is_root()) throw std::runtime_error("This function should not be called by root");
     comm.gather<typename T1::Scalar>(input);
   }
 
-private:
+ private:
   IndexMapping mapping;
   std::vector<t_int> sizes;
   t_int local_size;
   sopt::mpi::Communicator comm;
 };
-} // namespace purify
+}  // namespace purify
 #endif
 #endif
