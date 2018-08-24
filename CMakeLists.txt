@@ -10,7 +10,7 @@ include(LookUp-GreatCMakeCookOff)
 
 option(tests          "Enable testing"                                  off)
 option(examples       "Compile examples"                                off)
-option(benchmarks     "Enable benchmarking"                             on)
+option(benchmarks     "Enable benchmarking"                             off)
 option(openmp         "Enable OpenMP"                                   on)
 option(logging        "Enable logging"                                  on)
 option(dompi          "Enable MPI"                                      on)
