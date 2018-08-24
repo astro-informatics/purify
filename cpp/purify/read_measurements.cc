@@ -7,6 +7,7 @@
 #endif
 #include <iostream>
 #include <boost/filesystem.hpp>
+#include <sys/stat.h>
 
 #ifdef PURIFY_MPI
 #include "purify/mpi_utilities.h"
@@ -23,7 +24,7 @@ utilities::vis_params read_measurements(const std::vector<std::string> &names, c
   format format_type = format::uvfits;
   for (t_int i = 0; i < names.size(); i++) {
     const boost::filesystem::path file_path(names.at(i));
-    if (not boost::filesystem::exists(file_path)) {
+    if (not file_exists(file_path.native())) {
       PURIFY_HIGH_LOG("Missing file will be removed from list: {}", names.at(i));
     } else {
       found_files.emplace_back(names.at(i));
@@ -34,16 +35,16 @@ utilities::vis_params read_measurements(const std::vector<std::string> &names, c
       std::transform(format.begin(), format.end(), format.begin(), ::tolower);
       if (format == ".ms") {
         format_check = format::ms;
-        if (not boost::filesystem::is_directory(file_path))
+        if (not dir_exists(file_path.native()))
           throw std::runtime_error(names.at(i) +
                                    " is not a directory, as expected for a measurement set.");
       } else if (format == ".vis") {
         format_check = format::vis;
-        if (not boost::filesystem::is_regular_file(file_path))
+        if (not file_exists(file_path.native()))
           throw std::runtime_error(names.at(i) + " is not a regular file.");
       } else if (format == ".uvfits") {
         format_check = format::uvfits;
-        if (not boost::filesystem::is_regular_file(file_path))
+        if (not file_exists(file_path.native()))
           throw std::runtime_error(names.at(i) + " is not a regular file.");
       } else
         throw std::runtime_error("File extention for " + names.at(i) +
@@ -117,6 +118,16 @@ utilities::vis_params read_measurements(const std::vector<std::string> &names,
   return result;
 }
 #endif
+//! check that file path exists
+bool file_exists(const std::string & path){
+  struct stat buf;
+  return (stat(path.c_str(), &buf) == 0);
+}
+//! check that directory path exists
+bool dir_exists(const std::string & path){
+  struct stat buf;
+  return (stat(path.c_str(), &buf) == 0 && S_ISDIR(buf.st_mode));
+}
 
 }  // namespace read_measurements
 }  // namespace purify
