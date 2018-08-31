@@ -1,8 +1,10 @@
 PURIFY
-======
+=======
+
+[![Build Status](https://travis-ci.com/astro-informatics/purify.svg?branch=development)](https://travis-ci.com/astro-informatics/purify)
 
 Description
------------
+-------------
 
 **PURIFY** is an open-source collection of routines written in `C++` available under the [license](#license) below. It implements different tools and high-level to perform radio interferometric imaging, _i.e._ to recover images from the Fourier measurements taken by radio interferometric telescopes. 
 
@@ -33,10 +35,10 @@ Dependencies installation
 - [casacore](http://casacore.github.io/casacore/) - Optional - Needed to interface with measurement
   sets. The main purify program requires this library (and its dependencies)
 - [OpenMP](http://openmp.org/wp/) v4.8.4 (Trusty) - Optional - Speeds up some of the operations.
-- [MPI](https://www.open-mpi.org) v* (Trusty) - Optional - Parallelisation paradigm to speed up operations. 
+- [MPI](https://www.open-mpi.org) v3.1.1 (Trusty) - Optional - Parallelisation paradigm to speed up operations.
 - [spdlog](https://github.com/gabime/spdlog) v* - Optional - Logging library. Downloaded automatically if
   absent.
-- [philsquared/Catch](https://github.com/philsquared/Catch) v2.2.3 - Optional -  A `C++`
+- [Catch2](https://github.com/catchorg/Catch2) v2.2.3 - Optional -  A `C++`
   unit-testing framework only needed for testing. Downloaded automatically if absent.
 - [google/benchmark](https://github.com/google/benchmark) - Optional - A `C++`
   micro-benchmarking framework only needed for benchmarks. Downloaded automatically if absent.
@@ -132,8 +134,8 @@ idea is to add ``-DVARIABLE=something`` to the command-line arguments of CMake. 
 any number of times: previous settings will not be overwritten unless specifically
 requested. Some of the more common options are the following:
 
--  ``CMAKE_PREFIX_PATH``: CMake will look in "CMAKE\_PREFIX\_PATH/lib"
-   for libraries, "CMAKE\_PREFIX\_PATH/include" for headers, etc.
+-  ``CMAKE_PREFIX_PATH``: CMake will look in "CMAKE_PREFIX_PATH/lib"
+   for libraries, "CMAKE_PREFIX_PATH/include" for headers, etc.
 -  ``FFTW3_LIBRARIES``, ``FFTW3_INCLUDE_DIR``
 -  ``BLAS_INCLUDE_DIRS``, ``BLAS_LIBRARIES``
 
