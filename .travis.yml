@@ -275,7 +275,7 @@ script:
   - eval $BUILD_CMD
   - if [[ ${TITLE} = *CASA* ]]; then eval $BUILD_CMD; fi
   - if [[ ${TITLE} = *CASA* ]]; then make preinstall; fi
-  - if [[ ${TITLE} = *CASA* ]]; then make install; fi
+  - if [[ ${TITLE} = *CASA* ]]; then sudo make install; fi
   - eval $TEST_CMD
   - if [[ ${TITLE} != *Documentation* ]] && [[ ${TITLE} != *Lint* ]]; then sudo make install; fi
 
