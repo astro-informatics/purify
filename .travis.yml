@@ -273,6 +273,7 @@ script:
     ${CMAKE_CMD_EXTRA} -DMPIEXEC_PREFLAGS="${MPI_EXTRA-}"
   - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
   - eval $BUILD_CMD
+  - if [[ ${TITLE} = *CASA* ]]; then echo "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"; fi
   - if [[ ${TITLE} = *CASA* ]]; then eval $BUILD_CMD; fi
   - if [[ ${TITLE} = *CASA* ]]; then make preinstall; fi
   - if [[ ${TITLE} = *CASA* ]]; then sudo make install; fi
