@@ -35,7 +35,7 @@ add_catch_test(wavelet_factory LIBRARIES libpurify)
 add_catch_test(algo_factory LIBRARIES libpurify)
 add_catch_test(read_measurements LIBRARIES libpurify)
 
-if(TARGET casacore::ms)
+if(docasa)
   add_catch_test(casacore LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} DEPENDS lookup_dependencies)
 endif()
 

@@ -101,7 +101,6 @@ if(docasa)
   if(NOT CasaCore_FOUND)
     lookup_package(CasaCore REQUIRED)
   endif()
-  find_package(CasaCore OPTIONAL_COMPONENTS ms)
   set(PURIFY_CASACORE TRUE)
 endif()
 
