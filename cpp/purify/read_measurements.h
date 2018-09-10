@@ -40,6 +40,11 @@ bool dir_exists(const std::string & path);
 }  // namespace read_measurements
 //! recursively create directories when they do not exist
 void mkdir_recursive(const std::string &path);
+//! boost wrapper
+template <class T>
+void mkdir_recursive(const T& path){
+mkdir_recursive(path.native());
+}
 //! adds split string to container
 template <typename T>
 void split(const std::string &s, char delim, T result) {

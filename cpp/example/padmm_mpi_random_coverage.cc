@@ -11,6 +11,7 @@
 #include "purify/operators.h"
 #include "purify/pfitsio.h"
 #include "purify/utilities.h"
+#include "purify/read_measurements.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/mpi/communicator.h>
 #include <sopt/mpi/session.h>
@@ -232,7 +233,7 @@ int main(int nargs, char const **args) {
 #else
 #error Unknown or unimplemented algorithm
 #endif
-    boost::filesystem::create_directories(pb_path);
+    mkdir_recursive(pb_path);
 
     pfitsio::write2d(ground_truth_image.real(), (path / "input.fits").native());
     pfitsio::write2d(dirty_image, ground_truth_image.rows(), ground_truth_image.cols(),
