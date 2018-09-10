@@ -130,4 +130,29 @@ bool dir_exists(const std::string & path){
 }
 
 }  // namespace read_measurements
+std::vector<std::string> split(const std::string &s, char delim) {
+  std::vector<std::string> elems;
+  split(s, delim, std::back_inserter(elems));
+  return elems;
+}
+void mkdir_recursive(const std::string &path) {
+  if (read_measurements::dir_exists(path)) return;
+  const auto folders = split(path, '/');
+  std::string current_path = "";
+  for (const auto f : folders) {
+    if (f == "") {
+      current_path += "/";
+      continue;
+    }
+    current_path += f;
+    if (not read_measurements::dir_exists(current_path)) {
+      const t_int status = mkdir(current_path.c_str(), ACCESSPERMS);
+      if (status != 0)
+        throw std::runtime_error("Error making recursive directory: " +
+                                 current_path);
+    }
+    current_path += "/";
+  }
+  return;
+}
 }  // namespace purify

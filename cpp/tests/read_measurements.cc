@@ -10,6 +10,14 @@
 using namespace purify;
 using namespace purify::notinstalled;
 
+TEST_CASE("mkdir") {
+  const std::string dirs = "test/mkdir/recursive";
+  const std::string path = output_filename(dirs);
+  CAPTURE(path);
+  mkdir_recursive(path);
+  REQUIRE(read_measurements::dir_exists(path));
+}
+
 TEST_CASE("uvfits") {
   purify::logging::set_level("debug");
   const std::string filename = atca_filename("0332-391");

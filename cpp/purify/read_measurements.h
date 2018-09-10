@@ -38,5 +38,18 @@ bool file_exists(const std::string & path);
 //! check that directory path exists
 bool dir_exists(const std::string & path);
 }  // namespace read_measurements
+//! recursively create directories when they do not exist
+void mkdir_recursive(const std::string &path);
+//! adds split string to container
+template <typename T>
+void split(const std::string &s, char delim, T result) {
+  std::stringstream ss(s);
+  std::string item;
+  while (std::getline(ss, item, delim)) {
+    *(result++) = item;
+  }
+};
+//! splits string into vector
+std::vector<std::string> split(const std::string &s, char delim);
 }  // namespace purify
 #endif
