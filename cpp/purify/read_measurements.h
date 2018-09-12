@@ -34,16 +34,16 @@ utilities::vis_params read_measurements(
     const stokes pol = stokes::I, const utilities::vis_units units = utilities::vis_units::lambda);
 #endif
 //! check that file path exists
-bool file_exists(const std::string & path);
+bool file_exists(const std::string &path);
 //! check that directory path exists
-bool dir_exists(const std::string & path);
+bool dir_exists(const std::string &path);
 }  // namespace read_measurements
 //! recursively create directories when they do not exist
 void mkdir_recursive(const std::string &path);
 //! boost wrapper
 template <class T>
-void mkdir_recursive(const T& path){
-mkdir_recursive(path.native());
+void mkdir_recursive(const T &path) {
+  mkdir_recursive(path.native());
 }
 //! adds split string to container
 template <typename T>

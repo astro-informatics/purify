@@ -4,7 +4,6 @@
     @version 1.0
 */
 #include "purify/yaml-parser.h"
-#include "purify/read_measurements.h"
 #include <algorithm>
 #include <assert.h>
 #include <chrono>
@@ -14,6 +13,7 @@
 #include <typeinfo>
 #include <boost/filesystem.hpp>
 #include <yaml-cpp/yaml.h>
+#include "purify/read_measurements.h"
 
 namespace purify {
 YamlParser::YamlParser(const std::string& filepath) : filepath_(filepath) {
@@ -230,9 +230,9 @@ void YamlParser::writeOutput() {
       base_file_name.substr((file_path.size() ? file_path.size() + 1 : 0), base_file_name.size());
   // Construct output directory structure and file name
   boost::filesystem::path const path(this->output_prefix_);
-  std::string const out_path = output_prefix_  +"/output_" + std::string(this->timestamp());
+  std::string const out_path = output_prefix_ + "/output_" + std::string(this->timestamp());
   mkdir_recursive(out_path);
-  std::string out_filename = out_path +"/" +base_file_name + "_save.yaml";
+  std::string out_filename = out_path + "/" + base_file_name + "_save.yaml";
 
   // Write out the yaml info
   YAML::Emitter out;

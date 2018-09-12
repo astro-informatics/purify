@@ -119,12 +119,12 @@ utilities::vis_params read_measurements(const std::vector<std::string> &names,
 }
 #endif
 //! check that file path exists
-bool file_exists(const std::string & path){
+bool file_exists(const std::string &path) {
   struct stat buf;
   return (stat(path.c_str(), &buf) == 0);
 }
 //! check that directory path exists
-bool dir_exists(const std::string & path){
+bool dir_exists(const std::string &path) {
   struct stat buf;
   return (stat(path.c_str(), &buf) == 0 && S_ISDIR(buf.st_mode));
 }
@@ -148,8 +148,7 @@ void mkdir_recursive(const std::string &path) {
     if (not read_measurements::dir_exists(current_path)) {
       const t_int status = mkdir(current_path.c_str(), ACCESSPERMS);
       if (status != 0)
-        throw std::runtime_error("Error making recursive directory: " +
-                                 current_path);
+        throw std::runtime_error("Error making recursive directory: " + current_path);
     }
     current_path += "/";
   }
