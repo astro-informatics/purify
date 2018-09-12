@@ -19,7 +19,6 @@ addons:
     packages: &native_deps
       - g++-7
       - clang-5.0
-      - clang-format-5.0
       - libtiff5-dev # version 5 ?
       - libgomp1 # version 4.8.4-2
       - libfftw3-dev # version 3.3.3
@@ -156,8 +155,10 @@ matrix:
         apt:
           sources:
             - *basic_sources
+            - llvm-toolchain-trusty-6.0
           packages:
             - *native_deps
+            - clang-format-6.0
       env:
         - TITLE="Lint"
         - DEBUG=True
@@ -165,8 +166,8 @@ matrix:
         - MPI=OFF
         - openMP=OFF
         - DOCS=OFF
-        - BUILD_CMD="find ../ -regex '.*\.\(cc\|h\)' -not -iname '*.in.h' | xargs -I{} -P 10 clang-format -i -style=file {}; git diff"
-        - TEST_CMD='[[ $(git ls-files --modified) ]] && return 1 || return 0'
+        - BUILD_CMD="find ../ -regex '.*\.\(cc\|h\)' -not -iname '*.in.h' | xargs -I{} -P 10 clang-format-6.0 -i -style=file {}; git diff"
+        - TEST_CMD="git diff --exit-code || (echo '## NOTE: your code is not linted properly - fix the above'; false)"
 
   allow_failures:
     - os: osx
@@ -233,7 +234,6 @@ script:
   - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
   - eval $BUILD_CMD
   - eval $TEST_CMD
-  - eval $RETEST_CMD
 
 after_success:
 
