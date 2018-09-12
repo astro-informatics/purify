@@ -249,7 +249,7 @@ before_install:
   - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; echo $CMAKE_CMD_EXTRA;  fi
 
 install:
-  - cd /tmp/ && git clone --single-branch -b catchVersion https://github.com/dpshelio/GreatCMakeCookOff.git && cd -
+
 before_script:
 
 script:
