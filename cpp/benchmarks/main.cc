@@ -1,6 +1,7 @@
 #include <benchmark/benchmark.h>
 #include <sopt/mpi/communicator.h>
 #include <sopt/mpi/session.h>
+#include "purify/config.h"
 
 // This reporter does nothing.
 // We can use it to disable output from all but the root process
