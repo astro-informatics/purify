@@ -155,10 +155,10 @@ matrix:
         apt:
           sources:
             - *basic_sources
-            - llvm-toolchain-trusty-6.0
+            - llvm-toolchain-trusty-7
           packages:
             - *native_deps
-            - clang-format-6.0
+            - clang-format-7
       env:
         - TITLE="Lint"
         - DEBUG=True
@@ -166,7 +166,7 @@ matrix:
         - MPI=OFF
         - openMP=OFF
         - DOCS=OFF
-        - BUILD_CMD="find ../ -regex '.*\.\(cc\|h\)' -not -iname '*.in.h' | xargs -I{} -P 10 clang-format-6.0 -i -style=file {}; git diff"
+        - BUILD_CMD="find ../ -regex '.*\.\(cc\|h\)' -not -iname '*.in.h' | xargs -I{} -P 10 clang-format-7 -i -style=file {}; git diff"
         - TEST_CMD="git diff --exit-code || (echo '## NOTE: your code is not linted properly - fix the above'; false)"
 
   allow_failures:
