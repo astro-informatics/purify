@@ -26,29 +26,29 @@ if(PURIFY_ARRAYFIRE)
   target_compile_definitions(example_fb_random_coverage_gpu PRIVATE PURIFY_GPU=1)
 endif()
 if(PURIFY_MPI)
-  add_example(global_epsilon_replicated_grids padmm_mpi_random_coverage.cc NOTEST
+  add_example(global_epsilon_replicated_grids_mpi padmm_mpi_random_coverage.cc NOTEST
     LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
-  target_compile_definitions(example_global_epsilon_replicated_grids
+  target_compile_definitions(example_global_epsilon_replicated_grids_mpi
     PRIVATE PURIFY_PADMM_ALGORITHM=2)
-  add_example(local_epsilon_replicated_grids padmm_mpi_random_coverage.cc NOTEST
+  add_example(local_epsilon_replicated_grids_mpi padmm_mpi_random_coverage.cc NOTEST
     LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
-  target_compile_definitions(example_local_epsilon_replicated_grids
+  target_compile_definitions(example_local_epsilon_replicated_grids_mpi
     PRIVATE PURIFY_PADMM_ALGORITHM=3)
-  add_example(local_epsilon_distributed_grids padmm_mpi_random_coverage.cc NOTEST
+  add_example(local_epsilon_distributed_grids_mpi padmm_mpi_random_coverage.cc NOTEST
     LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
-  target_compile_definitions(example_local_epsilon_distributed_grids
+  target_compile_definitions(example_local_epsilon_distributed_grids_mpi
     PRIVATE PURIFY_PADMM_ALGORITHM=1)
-  add_example(global_epsilon_replicated_grids_real_data padmm_mpi_real_data.cc NOTEST
+  add_example(global_epsilon_replicated_grids_real_data_mpi padmm_mpi_real_data.cc NOTEST
     LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
-  target_compile_definitions(example_global_epsilon_replicated_grids_real_data
+  target_compile_definitions(example_global_epsilon_replicated_grids_real_data_mpi
     PRIVATE PURIFY_PADMM_ALGORITHM=2)
-  add_example(local_epsilon_replicated_grids_real_data padmm_mpi_real_data.cc NOTEST
+  add_example(local_epsilon_replicated_grids_real_data_mpi padmm_mpi_real_data.cc NOTEST
     LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
-  target_compile_definitions(example_local_epsilon_replicated_grids_real_data
+  target_compile_definitions(example_local_epsilon_replicated_grids_real_data_mpi
     PRIVATE PURIFY_PADMM_ALGORITHM=3)
-  add_example(local_epsilon_distributed_grids_real_data padmm_mpi_real_data.cc NOTEST
+  add_example(local_epsilon_distributed_grids_real_data_mpi padmm_mpi_real_data.cc NOTEST
     LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
-  target_compile_definitions(example_local_epsilon_distributed_grids_real_data
+  target_compile_definitions(example_local_epsilon_distributed_grids_real_data_mpi
     PRIVATE PURIFY_PADMM_ALGORITHM=1)
 endif()
 if(PURIFY_MPI AND PURIFY_ARRAYFIRE)
