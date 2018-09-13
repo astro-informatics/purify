@@ -38,9 +38,9 @@ Dependencies installation
 - [MPI](https://www.open-mpi.org) v3.1.1 (Trusty) - Optional - Parallelisation paradigm to speed up operations.
 - [spdlog](https://github.com/gabime/spdlog) v* - Optional - Logging library. Downloaded automatically if
   absent.
-- [Catch2](https://github.com/catchorg/Catch2) v2.2.3 - Optional -  A `C++`
+- [Catch2](https://github.com/catchorg/Catch2) v2.3.0 - Optional -  A `C++`
   unit-testing framework only needed for testing. Downloaded automatically if absent.
-- [google/benchmark](https://github.com/google/benchmark) - Optional - A `C++`
+- [google/benchmark](https://github.com/google/benchmark) `v1.3.0` - Optional - A `C++`
   micro-benchmarking framework only needed for benchmarks. Downloaded automatically if absent.
 
 Installing and building PURIFY
