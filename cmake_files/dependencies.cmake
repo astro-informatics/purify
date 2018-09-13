@@ -3,7 +3,7 @@ include(EnvironmentScript)
 # Look up packages: if not found, installs them
 include(PackageLookup)
 # Get the yaml reader
-lookup_package(Yamlcpp REQUIRED)
+lookup_package(Yamlcpp REQUIRED  ARGUMENTS GIT_TAG "yaml-cpp-0.6.2")
 
 if(docs)
   cmake_policy(SET CMP0057 NEW)

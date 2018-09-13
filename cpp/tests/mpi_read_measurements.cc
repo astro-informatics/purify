@@ -48,7 +48,7 @@ TEST_CASE("uvfits") {
 #ifdef PURIFY_CASACORE
       const auto ms = read_measurements::read_measurements(filename + ".ms", comm);
       CAPTURE(comm.rank());
-      CHECK(comm.all_sum_all(ms.size()) == 245886);
+      CHECK(comm.all_sum_all(ms.size()) == 245994);
 #endif
     }
     SECTION("two") {
@@ -56,7 +56,7 @@ TEST_CASE("uvfits") {
       const auto ms = read_measurements::read_measurements(
           std::vector<std::string>{filename + ".ms", filename + ".ms"}, comm);
       CAPTURE(comm.rank());
-      CHECK(comm.all_sum_all(ms.size()) == 245886 * 2);
+      CHECK(comm.all_sum_all(ms.size()) == 245994 * 2);
 #endif
     }
   }

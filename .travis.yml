@@ -138,6 +138,43 @@ matrix:
           packages:
             - *native_deps
             - *all_deps
+            - &all_casa [ flex, bison, libblas-dev, liblapack-dev, libcfitsio3-dev, wcslib-dev, gfortran, libncurses5-dev, libreadline6-dev, libhdf5-serial-dev, python-numpy, python3-numpy ]
+      env:
+        - TITLE="CASA: All dependencies - GCC - MPI"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - Tests=ON
+        - MPI=ON
+        - openMP=ON
+        - CASA=ON
+        - EXAMPLES=ON
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+            - *all_deps
+      env:
+        - TITLE="All dependencies - GCC - MPI - examples"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - Tests=ON
+        - MPI=ON
+        - openMP=ON
+        - EXAMPLES=ON
+        - TEST_CMD=''
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+            - *all_deps
             - doxygen # version 1.8.6-2
             - graphviz # version 2.36.0
       env:
@@ -169,6 +206,7 @@ matrix:
         - TEST_CMD='[[ $(git ls-files --modified) ]] && return 1 || return 0'
 
   allow_failures:
+    # Because boost error on finding files
     - os: osx
       osx_image: xcode8
       env:
@@ -176,6 +214,7 @@ matrix:
         - MPI=OFF
         - openMP=OFF
 
+    # Because less precision running tests.
     - os: osx
       osx_image: xcode8
       env:
@@ -199,6 +238,7 @@ deploy:
 
 before_install:
   - if [ $TRAVIS_OS_NAME = osx ]; then brew update; brew cask uninstall oclint; brew install gcc@7 open-mpi; brew install fftw; fi;
+  - if [[ $TRAVIS_OS_NAME = osx ]] && [[ ${TITLE} = *GCC* ]]; then brew upgrade cmake boost; fi;
   - if [ $TRAVIS_OS_NAME = linux ]; then ClangVer="-5.0"; fi
   - if [[ ${TITLE} = *GCC* ]]; then CC=gcc-7; else CC=clang${ClangVer}; fi
   - if [[ ${TITLE} = *GCC* ]]; then CXX=g++-7; else CXX=clang++${ClangVer}; fi
@@ -207,7 +247,6 @@ before_install:
   - echo "==================== ${TITLE} ====================="
   - if [[ $MPI = ON ]]; then if [ $TRAVIS_OS_NAME = linux ]; then  if [[ ${TITLE} != *mpich* ]]; then bash .ci/build_openmpi.sh; MPI_EXTRA="--oversubscribe"; export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH; else bash .ci/build_mpich.sh; fi; fi; fi;
   - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; echo $CMAKE_CMD_EXTRA;  fi
-  - if [ $TRAVIS_OS_NAME = linux ]; then if [[ ${TITLE} = *Clang* ]]; then test_level='debug'; RETEST_CMD="ctest -T test --output-on-failure -V -R algo_factory --debug"; fi; fi
 
 install:
 
@@ -221,19 +260,21 @@ script:
     cmake .. -DCMAKE_BUILD_TYPE=Release \
     -Dtests=${Tests-ON} \
     -Ddompi=${MPI} \
-    -Dexamples=OFF \
+    -Dexamples=${EXAMPLES-OFF} \
     -Dopenmp=${openMP} \
     -Ddocs=${DOCS-OFF} \
+    -Ddocasa=${CASA-OFF} \
     -Dbenchmarks=${Benchmarks-OFF} \
     -DPURIFY_TEST_LOG_LEVEL=${test_level-critical} \
     -DSopt_GIT_REPOSITORY=https://github.com/astro-informatics/sopt.git \
     -DSopt_GIT_TAG=development \
+    -DGreatCMakeCookOff_DIR:PATH=/tmp/GreatCMakeCookOff/cmake \
     -DCFitsIO_URL=https://github.com/UCL-RITS/BinaryBlobs-dependencies/raw/master/Astronomy/cfitsio3410.tar.gz \
     ${CMAKE_CMD_EXTRA} -DMPIEXEC_PREFLAGS="${MPI_EXTRA-}"
   - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
   - eval $BUILD_CMD
   - eval $TEST_CMD
-  - eval $RETEST_CMD
+  - if [[ ${TITLE} != *Documentation* ]] && [[ ${TITLE} != *Lint* ]]; then sudo make install; fi
 
 after_success:
 
