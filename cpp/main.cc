@@ -35,10 +35,14 @@ int main(int argc, const char **argv) {
   factory::distributed_wavelet_operator wop_algo = factory::distributed_wavelet_operator::serial;
   bool using_mpi = false;
 
-  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
-    sopt::mpi::init(argc, argv);
-    auto const world = sopt::mpi::Communicator::World();
+  auto const session = sopt::mpi::init(argc, argv);
+#endif
+
+if (params.mpiAlgorithm() != factory::algo_distribution::serial)
+{
+#ifdef PURIFY_MPI
+  auto const world = sopt::mpi::Communicator::World();
 #else
     throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
