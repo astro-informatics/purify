@@ -10,6 +10,7 @@
 #include "purify/mpi_utilities.h"
 #include "purify/operators.h"
 #include "purify/pfitsio.h"
+#include "purify/read_measurements.h"
 #include "purify/utilities.h"
 #include "purify/uvfits.h"
 #include <sopt/imaging_padmm.h>
@@ -220,7 +221,7 @@ int main(int nargs, char const **args) {
 #else
 #error Unknown or unimplemented algorithm
 #endif
-    boost::filesystem::create_directories(pb_path);
+    mkdir_recursive(pb_path);
 
     pfitsio::write2d(dirty_image, imsizey, imsizex, (pb_path / "dirty.fits").native());
   }
@@ -246,7 +247,7 @@ int main(int nargs, char const **args) {
 #else
 #error Unknown or unimplemented algorithm
 #endif
-    boost::filesystem::create_directories(pb_path);
+    mkdir_recursive(pb_path);
 
     pfitsio::write2d(dirty_image, imsizey, imsizex, (pb_path / "dirty.fits").native());
     pfitsio::write2d(diagnostic.x.real(), imsizey, imsizex, (pb_path / "solution.fits").native());

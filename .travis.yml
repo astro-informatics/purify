@@ -19,7 +19,6 @@ addons:
     packages: &native_deps
       - g++-7
       - clang-5.0
-      - clang-format-5.0
       - libtiff5-dev # version 5 ?
       - libgomp1 # version 4.8.4-2
       - libfftw3-dev # version 3.3.3
@@ -202,19 +201,11 @@ matrix:
         - MPI=OFF
         - openMP=OFF
         - DOCS=OFF
-        - BUILD_CMD="find ../ -regex '.*\.\(cc\|h\)' -not -iname '*.in.h' | xargs -I{} -P 10 clang-format -i -style=file {}; git diff"
-        - TEST_CMD='[[ $(git ls-files --modified) ]] && return 1 || return 0'
+        - BUILD_CMD="find ../ -regex '.*\.\(cc\|h\)' -not -iname '*.in.h' | xargs -I{} -P 10 clang-format-7 -i -style=file {}; git diff"
+        - TEST_CMD="git diff --exit-code || (echo '## NOTE: your code is not linted properly - fix the above'; false)"
 
   allow_failures:
     # Because boost error on finding files
-    - os: osx
-      osx_image: xcode8
-      env:
-        - TITLE="XCode 8 - GCC"
-        - MPI=OFF
-        - openMP=OFF
-
-    # Because less precision running tests.
     - os: osx
       osx_image: xcode8
       env:
@@ -251,6 +242,13 @@ before_install:
 install:
 
 before_script:
+  - |
+    if [[ ${TITLE} = *Lint* ]]; then
+        curl https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        echo "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-7 main" | sudo tee -a /etc/apt/sources.list
+        sudo apt-get update -y -qq
+        sudo apt-get install clang-format-7
+    fi
 
 script:
   - pwd

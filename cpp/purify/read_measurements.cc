@@ -119,15 +119,39 @@ utilities::vis_params read_measurements(const std::vector<std::string> &names,
 }
 #endif
 //! check that file path exists
-bool file_exists(const std::string & path){
+bool file_exists(const std::string &path) {
   struct stat buf;
   return (stat(path.c_str(), &buf) == 0);
 }
 //! check that directory path exists
-bool dir_exists(const std::string & path){
+bool dir_exists(const std::string &path) {
   struct stat buf;
   return (stat(path.c_str(), &buf) == 0 && S_ISDIR(buf.st_mode));
 }
 
 }  // namespace read_measurements
+std::vector<std::string> split(const std::string &s, char delim) {
+  std::vector<std::string> elems;
+  split(s, delim, std::back_inserter(elems));
+  return elems;
+}
+void mkdir_recursive(const std::string &path) {
+  if (read_measurements::dir_exists(path)) return;
+  const auto folders = split(path, '/');
+  std::string current_path = "";
+  for (const auto f : folders) {
+    if (f == "") {
+      current_path += "/";
+      continue;
+    }
+    current_path += f;
+    if (not read_measurements::dir_exists(current_path)) {
+      const t_int status = mkdir(current_path.c_str(), ACCESSPERMS);
+      if (status != 0)
+        throw std::runtime_error("Error making recursive directory: " + current_path);
+    }
+    current_path += "/";
+  }
+  return;
+}
 }  // namespace purify
