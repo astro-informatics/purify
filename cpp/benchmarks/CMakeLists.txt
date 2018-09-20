@@ -3,6 +3,9 @@ include_directories("${PROJECT_SOURCE_DIR}/cpp" "${CMAKE_CURRENT_BINARY_DIR}/inc
 add_benchmark(measurement_operator utilities.cc LIBRARIES libpurify)
 add_benchmark(padmm utilities.cc LIBRARIES libpurify)
 add_benchmark(wavelet_operator utilities.cc LIBRARIES libpurify)
+if(doaf)
+  add_benchmark(measurement_operator_af utilities.cc LIBRARIES libpurify)
+endif()
 
 if(dompi)
   add_executable(mpi_benchmark_MO main.cc utilities.cc measurement_operator_mpi.cc)
