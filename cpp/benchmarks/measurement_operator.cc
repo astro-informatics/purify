@@ -17,7 +17,15 @@ void degrid_operator_ctor(benchmark::State &state) {
   const t_real FoV = 1;  // deg
   const t_real cellsize = FoV / cols * 60. * 60.;
   const bool w_term = false;
+  // Keep count of the benchmark repetitions
+  static t_uint counter = 0;
+  counter++;
   // benchmark the creation of measurement operator
+  if ((counter % 10) == 1) {
+    auto sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+        uv_data, rows, cols, cellsize, cellsize, 2, 0, 0.0001, kernels::kernel::kb, state.range(2),
+        state.range(2), w_term);
+  }
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     auto sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
@@ -38,7 +46,7 @@ BENCHMARK(degrid_operator_ctor)
     ->Args({1024, 10000000, 4})
     ->UseManualTime()
     ->Repetitions(10)
-    ->ReportAggregatesOnly(true)
+//->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 // ----------------- Application benchmarks -----------------------//
@@ -139,7 +147,7 @@ BENCHMARK_REGISTER_F(DegridOperatorDirectFixture, Apply)
     ->Args({1024, 10000000, 4})
     ->UseManualTime()
     ->Repetitions(10)
-    ->ReportAggregatesOnly(true)
+//->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorAdjointFixture, Apply)
@@ -148,7 +156,7 @@ BENCHMARK_REGISTER_F(DegridOperatorAdjointFixture, Apply)
     ->Args({1024, 10000000, 4})
     ->UseManualTime()
     ->Repetitions(10)
-    ->ReportAggregatesOnly(true)
+//->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();
