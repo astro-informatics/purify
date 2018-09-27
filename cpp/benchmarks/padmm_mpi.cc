@@ -164,18 +164,18 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo1)
     //->Apply(b_utilities::Arguments)
-    //->Args({1024, 1000000, 4})
-    //->Args({1024, 10000000, 4})
-    ->Args({128, 1000, 4})
+    ->Args({1024, 1000000, 4})
+    ->Args({1024, 10000000, 4})
+//->Args({128, 1000, 4})
     ->UseManualTime()
-    //->Repetitions(10) //->ReportAggregatesOnly(true)
+    ->Repetitions(10) //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo3)
     //->Apply(b_utilities::Arguments)
-    //->Args({1024, 1000000, 4})
-    //->Args({1024, 10000000, 4})
-    ->Args({128, 1000, 4})
+    ->Args({1024, 1000000, 4})
+    ->Args({1024, 10000000, 4})
+//->Args({128, 1000, 4})
     ->UseManualTime()
-    //->Repetitions(10) //->ReportAggregatesOnly(true)
+    ->Repetitions(10) //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
