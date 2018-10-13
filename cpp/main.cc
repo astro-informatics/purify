@@ -9,6 +9,7 @@
 #include "purify/logging.h"
 #include "purify/measurement_operator_factory.h"
 #include "purify/pfitsio.h"
+#include "purify/cimg.h"
 #include "purify/read_measurements.h"
 #include "purify/update_factory.h"
 #include "purify/wavelet_operator_factory.h"
