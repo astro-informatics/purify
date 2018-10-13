@@ -1,3 +1,5 @@
+#include "purify/config.h"
+
 #include "purify/types.h"
 #include <array>
 #include <cstddef>
