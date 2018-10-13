@@ -100,6 +100,7 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
           params.cellsizex(), params.oversampling(), params.powMethod_iter(),
           params.powMethod_tolerance(), kernels::kernel_from_string.at(params.kernel()),
           params.Jy(), params.Jx());
+  // TODO need to scale data (uv_data.vis) by u and v cell size 
   // create wavelet operator
   std::vector<std::tuple<std::string, t_uint>> sara;
   for (size_t i = 0; i < params.wavelet_basis().size(); i++)
@@ -140,24 +141,6 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
   const pfitsio::header_params def_header = pfitsio::header_params(
       "", "Jy/Pixel", 1, uv_data.ra, uv_data.dec, params.measurements_polarization(),
       params.cellsizex(), params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
-  // the dirty image
-  pfitsio::header_params dirty_header = def_header;
-  dirty_header.fits_name = out_dir + "/dirty.fits";
-  dirty_header.pix_units = "Jy/Beam";
-  const Vector<t_complex> dimage = measurements_transform->adjoint() * uv_data.vis;
-  const Image<t_real> dirty_image =
-      Image<t_complex>::Map(dimage.data(), params.height(), params.width()).real();
-  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
-#ifdef PURIFY_MPI
-    auto const world = sopt::mpi::Communicator::World();
-    if (world.is_root())
-#else
-    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
-#endif
-      pfitsio::write2d(dirty_image / dirty_image.maxCoeff(), dirty_header, true);
-  } else {
-    pfitsio::write2d(dirty_image / dirty_image.maxCoeff(), dirty_header, true);
-  }
   // the psf
   pfitsio::header_params psf_header = def_header;
   psf_header.fits_name = out_dir + "/psf.fits";
@@ -175,6 +158,24 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
       pfitsio::write2d(psf_image / psf_image.maxCoeff(), psf_header, true);
   } else {
     pfitsio::write2d(psf_image / psf_image.maxCoeff(), psf_header, true);
+  }
+  // the dirty image
+  pfitsio::header_params dirty_header = def_header;
+  dirty_header.fits_name = out_dir + "/dirty.fits";
+  dirty_header.pix_units = "Jy/Beam";
+  const Vector<t_complex> dimage = measurements_transform->adjoint() * uv_data.vis;
+  const Image<t_real> dirty_image =
+      Image<t_complex>::Map(dimage.data(), params.height(), params.width()).real();
+  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
+#ifdef PURIFY_MPI
+    auto const world = sopt::mpi::Communicator::World();
+    if (world.is_root())
+#else
+    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
+#endif
+      pfitsio::write2d(dirty_image / psf_image.maxCoeff(), dirty_header, true);
+  } else {
+    pfitsio::write2d(dirty_image / psf_image.maxCoeff(), dirty_header, true);
   }
 
   PURIFY_HIGH_LOG("Starting sopt!");
