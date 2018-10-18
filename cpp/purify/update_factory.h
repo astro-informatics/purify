@@ -90,7 +90,8 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
       const t_real new_gamma = alpha.real().cwiseAbs().maxCoeff() * step_size_scale;
       PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
       // updating parameter
-      algo->gamma(((std::abs(algo->gamma() - new_gamma) > update_tol) and *iter < update_iters)
+      algo->gamma(((std::abs((algo->gamma() - new_gamma) / algo->gamma()) > update_tol) and
+                   *iter < update_iters)
                       ? new_gamma
                       : algo->gamma());
 
