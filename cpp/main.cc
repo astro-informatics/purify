@@ -92,6 +92,16 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
     sigma = utilities::SNR_to_standard_deviation(y0, params.signal_to_noise());
     uv_data.vis = utilities::add_noise(y0, 0., sigma);
   }
+  // need to scale data (uv_data.vis) by u and v cell size
+  auto pixel_to_lambda = [](const t_real cell, const t_uint imsize, const t_real oversample_ratio) {
+    return 1. / (2 * oversample_ratio *
+                 std::sin(0.5 * cell * std::floor(imsize) * constant::pi / (60. * 60. * 180.)));
+  };
+  const t_real flux_scale =
+      (pixel_to_lambda(params.cellsizex(), params.width(), params.oversampling()) *
+       pixel_to_lambda(params.cellsizey(), params.height(), params.oversampling()));
+  uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale /
+                uv_data.weights.norm() * uv_data.weights.size();
 
   // create measurement operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
@@ -100,11 +110,6 @@ if (params.mpiAlgorithm() != factory::algo_distribution::serial)
           params.cellsizex(), params.oversampling(), params.powMethod_iter(),
           params.powMethod_tolerance(), kernels::kernel_from_string.at(params.kernel()),
           params.Jy(), params.Jx());
-  //need to scale data (uv_data.vis) by u and v cell size 
-auto pixel_to_lambda = [](const t_real cell, const t_uint imsize, const t_real oversample_ratio) {
-  return 1./(2 * oversample_ratio * std::sin(0.5 * cell * std::floor(imsize) * constant::pi / (60. * 60. * 180.)));
-};
-  uv_data.vis = uv_data.vis/(pixel_to_lambda(params.cellsizex(), params.width(), params.oversampling()) * pixel_to_lambda(params.cellsizey(), params.height(), params.oversampling()));
   // create wavelet operator
   std::vector<std::tuple<std::string, t_uint>> sara;
   for (size_t i = 0; i < params.wavelet_basis().size(); i++)
