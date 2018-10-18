@@ -208,8 +208,7 @@ auto pixel_to_lambda = [](const t_real cell, const t_uint imsize, const t_real o
   // the residuals
   pfitsio::header_params residuals_header = purified_header;
   residuals_header.fits_name = out_dir + "/residuals.fits";
-  const Vector<t_complex> residuals = measurements_transform->adjoint() *
-                                      (uv_data.vis - ((*measurements_transform) * diagnostic.x));
+  const Vector<t_complex> residuals = measurements_transform->adjoint() * diagnostic.residual;
   const Image<t_real> residual_image =
       Image<t_complex>::Map(residuals.data(), params.height(), params.width()).real();
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
