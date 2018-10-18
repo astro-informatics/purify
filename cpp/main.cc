@@ -6,10 +6,10 @@
 #include <ctime>
 #include <random>
 #include "purify/algorithm_factory.h"
+#include "purify/cimg.h"
 #include "purify/logging.h"
 #include "purify/measurement_operator_factory.h"
 #include "purify/pfitsio.h"
-#include "purify/cimg.h"
 #include "purify/read_measurements.h"
 #include "purify/update_factory.h"
 #include "purify/wavelet_operator_factory.h"
@@ -42,10 +42,9 @@ int main(int argc, const char **argv) {
   auto const session = sopt::mpi::init(argc, argv);
 #endif
 
-if (params.mpiAlgorithm() != factory::algo_distribution::serial)
-{
+  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
-  auto const world = sopt::mpi::Communicator::World();
+    auto const world = sopt::mpi::Communicator::World();
 #else
     throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
