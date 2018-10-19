@@ -181,6 +181,8 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
       get<std::string>(algorithmOptionsNode, {"padmm", "mpiAlgorithm"}));
   this->relVarianceConvergence_ =
       get<t_real>(algorithmOptionsNode, {"padmm", "relVarianceConvergence"});
+  this->dualFBVarianceConvergence_ =
+      get<t_real>(algorithmOptionsNode, {"padmm", "dualFBVarianceConvergence"});
 }
 
 std::vector<std::string> YamlParser::getWavelets(const std::string& values_str) {

@@ -70,6 +70,7 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser.positiveValueConstraint() == true);
     REQUIRE(yaml_parser.mpiAlgorithm() == factory::algo_distribution::mpi_distributed);
     REQUIRE(yaml_parser.relVarianceConvergence() == 1e-3);
+    REQUIRE(yaml_parser.dualFBVarianceConvergence() == 1e-3);
   }
   SECTION("Check the writeOutput method") {
     yaml_parser_m.writeOutput();  // This test config file has a relative path for output, for

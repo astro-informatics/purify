@@ -106,6 +106,7 @@ class YamlParser {
   YAML_MACRO(t_real, measurements_sigma, 1)
   YAML_MACRO(t_real, signal_to_noise, 30)
   YAML_MACRO(t_real, relVarianceConvergence, 0)
+  YAML_MACRO(t_real, dualFBVarianceConvergence, 0)
   YAML_MACRO(t_real, epsilonConvergenceScaling, 0)
   YAML_MACRO(std::vector<std::string>, wavelet_basis, {})
   YAML_MACRO(t_int, update_iters, 0)
