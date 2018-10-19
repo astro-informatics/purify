@@ -1,9 +1,12 @@
+#include "purify/config.h"
+
 #include "purify/types.h"
 #include <array>
 #include <cstddef>
 #include <ctime>
 #include <random>
 #include "purify/algorithm_factory.h"
+#include "purify/cimg.h"
 #include "purify/logging.h"
 #include "purify/measurement_operator_factory.h"
 #include "purify/pfitsio.h"
@@ -88,6 +91,16 @@ int main(int argc, const char **argv) {
     sigma = utilities::SNR_to_standard_deviation(y0, params.signal_to_noise());
     uv_data.vis = utilities::add_noise(y0, 0., sigma);
   }
+  // need to scale data (uv_data.vis) by u and v cell size
+  auto pixel_to_lambda = [](const t_real cell, const t_uint imsize, const t_real oversample_ratio) {
+    return 1. / (2 * oversample_ratio *
+                 std::sin(0.5 * cell * std::floor(imsize) * constant::pi / (60. * 60. * 180.)));
+  };
+  const t_real flux_scale =
+      (pixel_to_lambda(params.cellsizex(), params.width(), params.oversampling()) *
+       pixel_to_lambda(params.cellsizey(), params.height(), params.oversampling()));
+  uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale /
+                uv_data.weights.norm() * uv_data.weights.size();
 
   // create measurement operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
@@ -107,9 +120,9 @@ int main(int argc, const char **argv) {
   // Create algorithm
   auto algo = factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
       factory::algorithm::padmm, params.mpiAlgorithm(), measurements_transform, wavelets_transform,
-      uv_data, sigma * params.epsilonScaling(), params.height(), params.width(), sara.size(),
-      params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
-      (sara.size() < 2), params.relVarianceConvergence(), 50);
+      uv_data, sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(),
+      sara.size(), params.iterations(), params.realValueConstraint(),
+      params.positiveValueConstraint(), (sara.size() < 2), params.relVarianceConvergence(), 1e-3, 50);
 
   // Save some things before applying the algorithm
   // the config yaml file - this also generates the output directory and the timestamp
@@ -136,24 +149,6 @@ int main(int argc, const char **argv) {
   const pfitsio::header_params def_header = pfitsio::header_params(
       "", "Jy/Pixel", 1, uv_data.ra, uv_data.dec, params.measurements_polarization(),
       params.cellsizex(), params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
-  // the dirty image
-  pfitsio::header_params dirty_header = def_header;
-  dirty_header.fits_name = out_dir + "/dirty.fits";
-  dirty_header.pix_units = "Jy/Beam";
-  const Vector<t_complex> dimage = measurements_transform->adjoint() * uv_data.vis;
-  const Image<t_real> dirty_image =
-      Image<t_complex>::Map(dimage.data(), params.height(), params.width()).real();
-  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
-#ifdef PURIFY_MPI
-    auto const world = sopt::mpi::Communicator::World();
-    if (world.is_root())
-#else
-    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
-#endif
-      pfitsio::write2d(dirty_image / dirty_image.maxCoeff(), dirty_header, true);
-  } else {
-    pfitsio::write2d(dirty_image / dirty_image.maxCoeff(), dirty_header, true);
-  }
   // the psf
   pfitsio::header_params psf_header = def_header;
   psf_header.fits_name = out_dir + "/psf.fits";
@@ -171,6 +166,24 @@ int main(int argc, const char **argv) {
       pfitsio::write2d(psf_image / psf_image.maxCoeff(), psf_header, true);
   } else {
     pfitsio::write2d(psf_image / psf_image.maxCoeff(), psf_header, true);
+  }
+  // the dirty image
+  pfitsio::header_params dirty_header = def_header;
+  dirty_header.fits_name = out_dir + "/dirty.fits";
+  dirty_header.pix_units = "Jy/Beam";
+  const Vector<t_complex> dimage = measurements_transform->adjoint() * uv_data.vis;
+  const Image<t_real> dirty_image =
+      Image<t_complex>::Map(dimage.data(), params.height(), params.width()).real();
+  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
+#ifdef PURIFY_MPI
+    auto const world = sopt::mpi::Communicator::World();
+    if (world.is_root())
+#else
+    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
+#endif
+      pfitsio::write2d(dirty_image / psf_image.maxCoeff(), dirty_header, true);
+  } else {
+    pfitsio::write2d(dirty_image / psf_image.maxCoeff(), dirty_header, true);
   }
 
   PURIFY_HIGH_LOG("Starting sopt!");
@@ -199,8 +212,7 @@ int main(int argc, const char **argv) {
   // the residuals
   pfitsio::header_params residuals_header = purified_header;
   residuals_header.fits_name = out_dir + "/residuals.fits";
-  const Vector<t_complex> residuals = measurements_transform->adjoint() *
-                                      (uv_data.vis - ((*measurements_transform) * diagnostic.x));
+  const Vector<t_complex> residuals = measurements_transform->adjoint() * diagnostic.residual;
   const Image<t_real> residual_image =
       Image<t_complex>::Map(residuals.data(), params.height(), params.width()).real();
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {

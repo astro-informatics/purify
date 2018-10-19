@@ -101,7 +101,7 @@ void YamlParser::setParserVariablesFromYaml() {
 void YamlParser::parseAndSetGeneralConfiguration(const YAML::Node& generalConfigNode) {
   this->logging_ = get<std::string>(generalConfigNode, {"logging"});
   this->iterations_ = get<int>(generalConfigNode, {"iterations"});
-  this->epsilonScaling_ = get<int>(generalConfigNode, {"epsilonScaling"});
+  this->epsilonScaling_ = get<t_real>(generalConfigNode, {"epsilonScaling"});
   this->update_iters_ = get<t_int>(generalConfigNode, {"stepsize", "update_iters"});
   this->update_tolerance_ = get<t_real>(generalConfigNode, {"stepsize", "update_tolerance"});
   this->output_prefix_ = get<std::string>(generalConfigNode, {"InputOutput", "output_prefix"});
