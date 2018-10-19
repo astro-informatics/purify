@@ -46,7 +46,7 @@ BENCHMARK(degrid_operator_ctor)
     ->Args({1024, 10000000, 4})
     ->UseManualTime()
     ->Repetitions(10)
-//->ReportAggregatesOnly(true)
+    //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 // ----------------- Application benchmarks -----------------------//
@@ -147,7 +147,7 @@ BENCHMARK_REGISTER_F(DegridOperatorDirectFixture, Apply)
     ->Args({1024, 10000000, 4})
     ->UseManualTime()
     ->Repetitions(10)
-//->ReportAggregatesOnly(true)
+    //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorAdjointFixture, Apply)
@@ -156,7 +156,7 @@ BENCHMARK_REGISTER_F(DegridOperatorAdjointFixture, Apply)
     ->Args({1024, 10000000, 4})
     ->UseManualTime()
     ->Repetitions(10)
-//->ReportAggregatesOnly(true)
+    //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();

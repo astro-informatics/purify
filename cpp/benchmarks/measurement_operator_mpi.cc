@@ -20,7 +20,7 @@ class DegridOperatorCtorFixturePar : public ::benchmark::Fixture {
   void SetUp(const ::benchmark::State &state) {
     // Keep count of the benchmark repetitions
     m_counter++;
-    
+
     m_imsizex = state.range(0);
     m_imsizey = state.range(0);
 
@@ -72,7 +72,7 @@ BENCHMARK_DEFINE_F(DegridOperatorCtorFixturePar, MPI)(benchmark::State &state) {
     auto sky_measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
         m_world, m_uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 0, 0.0001,
         kernels::kernel::kb, state.range(2), state.range(2), m_w_term);
-  }    
+  }
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     auto sky_measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
@@ -261,7 +261,7 @@ BENCHMARK_REGISTER_F(DegridOperatorCtorFixturePar, Distr)
     ->Args({1024, 10000000, 4})
     ->UseManualTime()
     ->Repetitions(10)
-//->ReportAggregatesOnly(true)
+    //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorDirectFixtureDistr, Apply)
@@ -270,7 +270,7 @@ BENCHMARK_REGISTER_F(DegridOperatorDirectFixtureDistr, Apply)
     ->Args({1024, 10000000, 4})
     ->UseManualTime()
     ->Repetitions(10)
-//->ReportAggregatesOnly(true)
+    //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorAdjointFixtureDistr, Apply)
@@ -279,7 +279,7 @@ BENCHMARK_REGISTER_F(DegridOperatorAdjointFixtureDistr, Apply)
     ->Args({1024, 10000000, 4})
     ->UseManualTime()
     ->Repetitions(10)
-//->ReportAggregatesOnly(true)
+    //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorCtorFixturePar, MPI)
@@ -288,7 +288,7 @@ BENCHMARK_REGISTER_F(DegridOperatorCtorFixturePar, MPI)
     ->Args({1024, 10000000, 4})
     ->UseManualTime()
     ->Repetitions(10)
-//->ReportAggregatesOnly(true)
+    //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorDirectFixtureMPI, Apply)
@@ -297,7 +297,7 @@ BENCHMARK_REGISTER_F(DegridOperatorDirectFixtureMPI, Apply)
     ->Args({1024, 10000000, 4})
     ->UseManualTime()
     ->Repetitions(10)
-//->ReportAggregatesOnly(true)
+    //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorAdjointFixtureMPI, Apply)
@@ -306,5 +306,5 @@ BENCHMARK_REGISTER_F(DegridOperatorAdjointFixtureMPI, Apply)
     ->Args({1024, 10000000, 4})
     ->UseManualTime()
     ->Repetitions(10)
-//->ReportAggregatesOnly(true)
+    //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
