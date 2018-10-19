@@ -39,10 +39,9 @@ int main(int argc, const char **argv) {
   auto const session = sopt::mpi::init(argc, argv);
 #endif
 
-if (params.mpiAlgorithm() != factory::algo_distribution::serial)
-{
+  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
-  auto const world = sopt::mpi::Communicator::World();
+    auto const world = sopt::mpi::Communicator::World();
 #else
     throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
