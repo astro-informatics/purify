@@ -31,7 +31,6 @@ void degrid_operator_ctor(benchmark::State &state) {
   state.SetBytesProcessed(int64_t(state.iterations()) * (number_of_vis + rows * cols) *
                           sizeof(t_complex));
 }
-
 BENCHMARK(degrid_operator_ctor)
     //->Apply(b_utilities::Arguments)
     ->Args({1024, 1000, 4})
@@ -46,6 +45,9 @@ BENCHMARK(degrid_operator_ctor)
 class DegridOperatorFixture : public ::benchmark::Fixture {
  public:
   void SetUp(const ::benchmark::State &state) {
+	  af::setDevice(1);
+	  af::info();
+af::setBackend(AF_BACKEND_CUDA);
     // Keep count of the benchmark repetitions
     m_counter++;
 
