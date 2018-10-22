@@ -122,7 +122,8 @@ int main(int argc, const char **argv) {
       factory::algorithm::padmm, params.mpiAlgorithm(), measurements_transform, wavelets_transform,
       uv_data, sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(),
       sara.size(), params.iterations(), params.realValueConstraint(),
-      params.positiveValueConstraint(), (sara.size() < 2), params.relVarianceConvergence(), params.dualFBVarianceConvergence(), 50);
+      params.positiveValueConstraint(), (sara.size() < 2), params.relVarianceConvergence(),
+      params.dualFBVarianceConvergence(), 50);
 
   // Save some things before applying the algorithm
   // the config yaml file - this also generates the output directory and the timestamp
