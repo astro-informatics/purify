@@ -142,7 +142,7 @@ TEST_CASE("GPU Operators") {
     const Vector<t_complex> indirect_output = measure_op_gpu->adjoint() * indirect_input;
     CHECK(indirect_output.size() == imsizex * imsizey);
     SECTION("Power Method") {
-      auto op_norm = details::power_method<Vector<t_complex>>(
+      auto op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
           *measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
       CHECK(std::abs(op_norm - 1.) < power_tol);
     }
@@ -175,7 +175,7 @@ TEST_CASE("GPU Operators") {
     const Vector<t_complex> direct_output = op_gpu * direct_input;
     CHECK(direct_output.size() == N);
     SECTION("Power Method") {
-      auto op_norm = details::power_method<Vector<t_complex>>(
+      auto op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
           op_gpu, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
       CHECK(std::abs(op_norm - 1.) < std::max(power_tol, 1e-7));
     }
