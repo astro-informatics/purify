@@ -117,7 +117,7 @@ Image<t_complex> init_correction2d(const t_real &oversample_ratio, const t_uint 
          t_complex(1., 0.) *
          wproj_utilities::generate_chirp(primary_beam, 0., cellx, celly, imsizex_, imsizey_)
              .array()
-             .conjugate() *
+              *
          imsizex_ * imsizey_;
 }
 }  // namespace details
