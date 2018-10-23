@@ -5,6 +5,8 @@ add_benchmark(padmm utilities.cc LIBRARIES libpurify)
 add_benchmark(wavelet_operator utilities.cc LIBRARIES libpurify)
 if(doaf)
   add_benchmark(measurement_operator_af utilities.cc LIBRARIES libpurify)
+  add_benchmark(measurement_operator_cpu measurement_operator_af.cc utilities.cc LIBRARIES libpurify)
+  target_compile_definitions(benchmark_measurement_operator_cpu PRIVATE PURIFY_CPU)
 endif()
 
 if(dompi)

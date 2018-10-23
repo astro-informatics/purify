@@ -20,9 +20,16 @@ void degrid_operator_ctor(benchmark::State &state) {
   // benchmark the creation of measurement operator
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
+#ifdef PURIFY_CPU
+    auto sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+        uv_data, rows, cols, cellsize, cellsize, 2, 0, 0.0001, kernels::kernel::kb, state.range(2),
+        state.range(2), w_term);
+#else
     auto sky_measurements = gpu::measurementoperator::init_degrid_operator_2d(
         uv_data, rows, cols, cellsize, cellsize, 2, 0, 0.0001, kernels::kernel::kb, state.range(2),
         state.range(2), w_term);
+
+#endif
     auto end = std::chrono::high_resolution_clock::now();
 
     state.SetIterationTime(b_utilities::duration(start, end));
@@ -31,23 +38,23 @@ void degrid_operator_ctor(benchmark::State &state) {
   state.SetBytesProcessed(int64_t(state.iterations()) * (number_of_vis + rows * cols) *
                           sizeof(t_complex));
 }
+/*
 BENCHMARK(degrid_operator_ctor)
     //->Apply(b_utilities::Arguments)
-    ->Args({1024, 1000, 4})
-    ->Args({1024, 1000, 4})
+    ->Args({128, 1000, 4})
+ //   ->Args({128, 1000, 4})
     ->UseManualTime()
     ->Repetitions(10)
     ->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
-
+*/
 // ----------------- Application benchmarks -----------------------//
 
 class DegridOperatorFixture : public ::benchmark::Fixture {
  public:
   void SetUp(const ::benchmark::State &state) {
-	  af::setDevice(1);
-	  af::info();
-af::setBackend(AF_BACKEND_CUDA);
+    af::setDevice(0);
+    af::setBackend(AF_BACKEND_CUDA);
     // Keep count of the benchmark repetitions
     m_counter++;
 
@@ -64,9 +71,15 @@ af::setBackend(AF_BACKEND_CUDA);
       const t_real cellsize = FoV / m_imsizex * 60. * 60.;
       const bool w_term = false;
       m_kernel = state.range(2);
+#ifdef PURIFY_CPU
+      m_degridOperator = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, kernels::kernel::kb,
+          m_kernel, m_kernel, w_term);
+#else
       m_degridOperator = gpu::measurementoperator::init_degrid_operator_2d(
           m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, kernels::kernel::kb,
           m_kernel, m_kernel, w_term);
+#endif
     }
   }
 
@@ -137,8 +150,10 @@ BENCHMARK_DEFINE_F(DegridOperatorAdjointFixture, Apply)(benchmark::State &state)
 
 BENCHMARK_REGISTER_F(DegridOperatorDirectFixture, Apply)
     //->Apply(b_utilities::Arguments)
-    ->Args({128, 10000, 4})
-    ->Args({256, 10000, 4})
+    ->Args({512, 500000, 4})
+    ->Args({1024, 500000, 4})
+    ->Args({2048, 500000, 4})
+  //  ->Args({4096, 100000, 4})
     ->UseManualTime()
     ->Repetitions(10)
     ->ReportAggregatesOnly(true)
@@ -146,8 +161,10 @@ BENCHMARK_REGISTER_F(DegridOperatorDirectFixture, Apply)
 
 BENCHMARK_REGISTER_F(DegridOperatorAdjointFixture, Apply)
     //->Apply(b_utilities::Arguments)
-    ->Args({128, 10000, 4})
-    ->Args({256, 10000, 4})
+    ->Args({512, 500000, 4})
+    ->Args({1024, 500000, 4})
+    ->Args({2048, 500000, 4})
+  //  ->Args({4096, 100000, 4})
     ->UseManualTime()
     ->Repetitions(10)
     ->ReportAggregatesOnly(true)
