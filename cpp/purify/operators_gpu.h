@@ -177,13 +177,11 @@ std::tuple<sopt::OperatorFunction<af::array>, sopt::OperatorFunction<af::array>>
   auto const ftsizeu_ = std::floor(imsizex_ * oversample_factor_);
   auto const ftsizev_ = std::floor(imsizey_ * oversample_factor_);
   auto direct = [=](af::array &output, const af::array &input) {
-    output = af::moddims(input, ftsizev_, ftsizeu_);
-    output = af::fft2(output, ftsizev_, ftsizeu_);
+    output = af::fft2(af::moddims(input, ftsizev_, ftsizeu_), ftsizev_, ftsizeu_);
     output = af::flat(output) / std::sqrt(ftsizeu_ * ftsizev_);
   };
   auto indirect = [=](af::array &output, const af::array &input) {
-    output = af::moddims(input, ftsizev_, ftsizeu_);
-    output = af::ifft2(output, ftsizev_, ftsizeu_);
+    output = af::ifft2(af::moddims(input, ftsizev_, ftsizeu_), ftsizev_, ftsizeu_);
     output = af::flat(output) * std::sqrt(ftsizeu_ * ftsizev_);
   };
   return std::make_tuple(direct, indirect);
