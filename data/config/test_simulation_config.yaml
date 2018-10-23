@@ -55,6 +55,7 @@ AlgorithmOptions:
     mpiAlgorithm:  fully-distributed # one of none, serial-equivalent, fully-distributed
     # Be careful changing the following unless you know what you are doing
     relVarianceConvergence: 1e-3 # (>0)
+    dualFBVarianceConvergence: 1e-3 # (>0) relative convergence tolerance of l1 proximal
 
   pd: # this is ignored if not chosen in algorithm.
     param1: none # something
