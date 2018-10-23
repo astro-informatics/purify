@@ -1,3 +1,4 @@
+#include "purify/config.h"
 #include "purify/types.h"
 #include "purify/logging.h"
 #include "purify/operators.h"
