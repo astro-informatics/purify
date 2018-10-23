@@ -1,7 +1,6 @@
 #ifndef PURIFY_TYPES_H
 #define PURIFY_TYPES_H
 
-
 #include "purify/config.h"
 #include <complex>
 #include <Eigen/Core>
@@ -29,7 +28,6 @@ template <class T = t_real>
 using Sparse = Eigen::SparseMatrix<T, Eigen::RowMajor>;
 template <class T = t_real>
 using SparseVector = Eigen::SparseVector<T>;
-
 
 enum class stokes { I, Q, U, V, XX, YY, XY, YX, LL, RR, LR, RL, P };
 const std::map<stokes, t_int> stokes_int = {{stokes::I, 1},   {stokes::Q, 2},   {stokes::U, 3},
