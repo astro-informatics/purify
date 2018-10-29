@@ -1,25 +1,6 @@
 #ifndef PURIFY_TYPES_H
 #define PURIFY_TYPES_H
 
-#ifdef PURIFY_CImg
-#include <CImg.h>
-#ifdef Success
-#undef Success
-#endif
-#ifdef Complex
-#undef Complex
-#endif
-#ifdef Bool
-#undef Bool
-#endif
-#ifdef None
-#undef None
-#endif
-#ifdef Status
-#undef Status
-#endif
-#endif
-
 #include "purify/config.h"
 #include <complex>
 #include <Eigen/Core>
@@ -47,16 +28,6 @@ template <class T = t_real>
 using Sparse = Eigen::SparseMatrix<T, Eigen::RowMajor>;
 template <class T = t_real>
 using SparseVector = Eigen::SparseVector<T>;
-
-#ifdef PURIFY_CImg
-//! Image type of CImg library
-template <class T = t_real>
-using CImage = cimg_library::CImg<T>;
-template <class T = t_real>
-using CImageList = cimg_library::CImgList<T>;
-//! Display used to display CImg images
-typedef cimg_library::CImgDisplay CDisplay;
-#endif
 
 enum class stokes { I, Q, U, V, XX, YY, XY, YX, LL, RR, LR, RL, P };
 const std::map<stokes, t_int> stokes_int = {{stokes::I, 1},   {stokes::Q, 2},   {stokes::U, 3},

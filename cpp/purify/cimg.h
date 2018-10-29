@@ -1,11 +1,38 @@
 #ifndef PURIFY_CIMG_H
 #define PURIFY_CIMG_H
+#ifdef PURIFY_CImg
+#include <CImg.h>
+#ifdef Success
+#undef Success
+#endif
+#ifdef Complex
+#undef Complex
+#endif
+#ifdef Bool
+#undef Bool
+#endif
+#ifdef None
+#undef None
+#endif
+#ifdef Status
+#undef Status
+#endif
+#endif
 
 #include "purify/config.h"
 #include "purify/types.h"
 #ifdef PURIFY_CImg
 
 namespace purify {
+#ifdef PURIFY_CImg
+//! Image type of CImg library
+template <class T = t_real>
+using CImage = cimg_library::CImg<T>;
+template <class T = t_real>
+using CImageList = cimg_library::CImgList<T>;
+//! Display used to display CImg images
+typedef cimg_library::CImgDisplay CDisplay;
+#endif
 namespace cimg {
 
 //! Create image for displaying
