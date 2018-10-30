@@ -89,8 +89,6 @@ BENCHMARK_DEFINE_F(WaveletOperatorAdjointFixture, Apply)(benchmark::State& state
   sopt::LinearTransform<Vector<t_complex>> m_Psi =
       sopt::linear_transform<t_complex>(m_sara, m_imsizey, m_imsizex);
 
-
-
   // Get the number of wavelet coefs
   t_uint const n_wave_coeff = m_sara.size() * m_imsizex * m_imsizey;
 
