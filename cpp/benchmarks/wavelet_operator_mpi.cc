@@ -74,10 +74,10 @@ BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Apply)(benchmark::State& state) {
   // MPI communicator
   sopt::mpi::Communicator m_world = sopt::mpi::Communicator::World();
 
-  sopt::wavelets::SARA m_sara{std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
-                              std::make_tuple("DB3", 3u), std::make_tuple("DB4", 3u),
-                              std::make_tuple("DB5", 3u), std::make_tuple("DB6", 3u),
-                              std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
+  sopt::wavelets::SARA m_sara{
+      std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
+      std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
+      std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
   sopt::wavelets::SARA const saraDistr = sopt::wavelets::distribute_sara(m_sara, m_world);
 
@@ -109,10 +109,10 @@ BENCHMARK_DEFINE_F(WaveletOperatorAdjointMPIFixture, Apply)(benchmark::State& st
   // MPI communicator
   sopt::mpi::Communicator m_world = sopt::mpi::Communicator::World();
 
-  sopt::wavelets::SARA m_sara{std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
-                              std::make_tuple("DB3", 3u), std::make_tuple("DB4", 3u),
-                              std::make_tuple("DB5", 3u), std::make_tuple("DB6", 3u),
-                              std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
+  sopt::wavelets::SARA m_sara{
+      std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
+      std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
+      std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
   sopt::wavelets::SARA const saraDistr = sopt::wavelets::distribute_sara(m_sara, m_world);
 

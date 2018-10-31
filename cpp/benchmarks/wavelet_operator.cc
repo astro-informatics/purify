@@ -65,10 +65,10 @@ class WaveletOperatorAdjointFixture : public ::benchmark::Fixture {
 BENCHMARK_DEFINE_F(WaveletOperatorFixture, Apply)(benchmark::State& state) {
   t_uint m_imsizex = state.range(0);
   t_uint m_imsizey = state.range(0);
-  sopt::wavelets::SARA m_sara{std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
-                              std::make_tuple("DB3", 3u), std::make_tuple("DB4", 3u),
-                              std::make_tuple("DB5", 3u), std::make_tuple("DB6", 3u),
-                              std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
+  sopt::wavelets::SARA m_sara{
+      std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
+      std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
+      std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
   sopt::LinearTransform<Vector<t_complex>> m_Psi =
       sopt::linear_transform<t_complex>(m_sara, m_imsizey, m_imsizex);
@@ -91,10 +91,10 @@ BENCHMARK_DEFINE_F(WaveletOperatorFixture, Apply)(benchmark::State& state) {
 BENCHMARK_DEFINE_F(WaveletOperatorAdjointFixture, Apply)(benchmark::State& state) {
   t_uint m_imsizex = state.range(0);
   t_uint m_imsizey = state.range(0);
-  sopt::wavelets::SARA m_sara{std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
-                              std::make_tuple("DB3", 3u), std::make_tuple("DB4", 3u),
-                              std::make_tuple("DB5", 3u), std::make_tuple("DB6", 3u),
-                              std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
+  sopt::wavelets::SARA m_sara{
+      std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
+      std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
+      std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
 
   sopt::LinearTransform<Vector<t_complex>> m_Psi =
       sopt::linear_transform<t_complex>(m_sara, m_imsizey, m_imsizex);
