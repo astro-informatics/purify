@@ -52,6 +52,16 @@ class WaveletOperatorFixture : public ::benchmark::Fixture {
   t_uint m_counter;
 };
 
+class WaveletOperatorAdjointFixture : public ::benchmark::Fixture {
+ public:
+  void SetUp(const ::benchmark::State& state) {}
+
+  void TearDown(const ::benchmark::State& state) {}
+
+  // A bunch of useful variables
+  t_uint m_counter;
+};
+
 BENCHMARK_DEFINE_F(WaveletOperatorFixture, Apply)(benchmark::State& state) {
   t_uint m_imsizex = state.range(0);
   t_uint m_imsizey = state.range(0);
@@ -113,7 +123,7 @@ BENCHMARK_REGISTER_F(WaveletOperatorFixture, Apply)
     ->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
-BENCHMARK_REGISTER_F(WaveletOperatorAdjointMPIFixture, Apply)
+BENCHMARK_REGISTER_F(WaveletOperatorAdjointFixture, Apply)
     //->Apply(b_utilities::Arguments)
     ->RangeMultiplier(2)
     ->Range(1024, 1024 << 10)
