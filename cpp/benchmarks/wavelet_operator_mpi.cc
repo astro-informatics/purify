@@ -101,7 +101,7 @@ BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Apply)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Apply)(benchmark::State& state) {
+BENCHMARK_DEFINE_F(WaveletOperatorAdjointMPIFixture, Apply)(benchmark::State& state) {
   // Image size
   t_uint m_imsizex = state.range(0);
   t_uint m_imsizey = state.range(0);
