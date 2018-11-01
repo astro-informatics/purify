@@ -165,7 +165,7 @@ sopt::OperatorFunction<Vector<t_complex>> init_grid_degrid_operator_2d(
   sopt::OperatorFunction<Vector<t_complex>> direct =
       purify::gpu::operators::base_grid_degrid_operator_2d(
           u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, w_term, Jw);
-  const t_real op_norm = purify::details::power_method<Vector<t_complex>>(
+  const t_real op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
       {direct, N, [](Vector<t_complex> &out, const Vector<t_complex> &in) { out = in; }, N},
       power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
   auto operator_norm = purify::operators::init_normalise<Vector<t_complex>>(op_norm * op_norm);
@@ -207,7 +207,7 @@ sopt::OperatorFunction<Vector<t_complex>> init_grid_degrid_operator_2d_mpi(
           comm, u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, w_term, Jw);
   auto Broadcast = purify::operators::init_broadcaster<Vector<t_complex>>(comm);
   direct = sopt::chained_operators<Vector<t_complex>>(Broadcast, direct);
-  const t_real op_norm = purify::details::power_method<Vector<t_complex>>(
+  const t_real op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
       {direct, N, [](Vector<t_complex> &out, const Vector<t_complex> &in) { out = in; }, N},
       power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
   auto operator_norm = purify::operators::init_normalise<Vector<t_complex>>(op_norm * op_norm);
@@ -248,7 +248,7 @@ sopt::OperatorFunction<Vector<t_complex>> init_grid_degrid_operator_2d(
                                                            Jw, cellx, celly);
   const auto allsumall = purify::operators::init_all_sum_all<Vector<t_complex>>(comm);
   direct = sopt::chained_operators<Vector<t_complex>>(allsumall, direct);
-  const t_real op_norm = purify::details::power_method<Vector<t_complex>>(
+  const t_real op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
       {direct, N, [](Vector<t_complex> &out, const Vector<t_complex> &in) { out = in; }, N},
       power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
   auto operator_norm = purify::operators::init_normalise<Vector<t_complex>>(op_norm * op_norm);
