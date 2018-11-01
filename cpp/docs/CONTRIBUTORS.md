@@ -37,7 +37,7 @@ Dr. David Perez-Suarez <br> [website](https://dpshelio.github.io)
 
 ![](photo_luke.jpg)
 <div class="text">
- Mr. Luke Pratley <br> [website](https://aboutme.luke.pratley)
+ Mr. Luke Pratley <br> [website](https://www.lukepratley.com)
 </div>
 
 ![](photo_yves.jpg)
