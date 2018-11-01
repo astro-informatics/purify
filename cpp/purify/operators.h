@@ -175,7 +175,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_zero_paddi
       for (t_uint i = 0; i < imsizex_; i++) {
         const t_uint output_index = utilities::sub2ind(j, i, imsizey_, imsizex_);
         const t_uint input_index = utilities::sub2ind(y_start + j, x_start + i, ftsizev_, ftsizeu_);
-        output(output_index) = S(j, i) * x(input_index);
+        output(output_index) = std::conj(S(j, i)) * x(input_index);
       }
     }
   };
