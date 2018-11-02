@@ -104,6 +104,36 @@ of the installation directory. `purify` has one required argument, it a string f
 A template with a description of the settings can be found at https://github.com/astro-informatics/purify/blob/master/data/config/config.yaml. 
 This can also be found in the downloaded repo at `data/config/config.yaml`. When `purify` runs a directory will be created, and the output images will be saved and time-stamped. Additionally, a config file with the settings used will be saved and time-stamped, helping for reproducibility and book-keeping. 
 
+Docker
+-------
+
+If you want to use Docker instead, you can build an image using the Dockerfile
+available in the repository or pulling it from
+[DockerHub](https://hub.docker.com/r/uclrits/purify).
+
+```
+docker build -t purify .
+```
+
+or
+
+```
+docker pull uclrits/purify
+```
+
+Then to use it, you should mount the directory with your data and config files
+to `/mydata` in the container. To run the container and mount the directory is
+with:
+
+```
+docker run -it --name purify -v /full/path/to/data:/mydata uclrits/purify
+```
+
+That will start a shell inside the container in the `/mydata` directory where
+you can see all the files from your `/full/path/to/data`. There you can run
+`purify` as shown above.`
+
+
 Contributors
 ------------
 
