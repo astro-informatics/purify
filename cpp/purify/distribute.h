@@ -34,6 +34,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(const Vector<t_r
                                                                 const t_int iters);
 #ifdef PURIFY_MPI
 //! patition w terms using k-means over MPI
+//!Details returns a tuple (indices for group, centre mean for each group) 
 std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters,
     sopt::mpi::Communicator const &comm);
