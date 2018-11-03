@@ -73,7 +73,40 @@ vis_params regroup_and_scatter(vis_params const &params, std::vector<t_int> cons
   regroup(copy, groups);
   return scatter_visibilities(copy, sizes, comm);
 }
+vis_params regroup_and_all_to_all(vis_params const &params, std::vector<t_int> const &groups,
+                                  sopt::mpi::Communicator const &comm) {
+  if(comm.size() == 1)
+    return params;
+  vis_params copy = params;
+  regroup(copy, groups, comm.size());
 
+  std::vector<t_int> sizes(comm.size());
+  std::fill(sizes.begin(), sizes.end(), 0);
+  for(auto const &group : groups) {
+    if(group > static_cast<t_int>(comm.size()))
+      throw std::out_of_range("groups should go from 0 to comm.size()");
+    ++sizes[group];
+  }
+
+  return all_to_all_visibilities(copy, sizes, comm);
+}
+
+vis_params all_to_all_visibilities(vis_params const &params, std::vector<t_int> const &sizes,
+                                   sopt::mpi::Communicator const &comm) {
+  if(comm.size() == 1)
+    return params;
+  vis_params result;
+  result.u = comm.all_to_allv(params.u, sizes);
+  result.v = comm.all_to_allv(params.v, sizes);
+  result.w = comm.all_to_allv(params.w, sizes);
+  result.vis = comm.all_to_allv(params.vis, sizes);
+  result.weights = comm.all_to_allv(params.weights, sizes);
+  result.units = static_cast<utilities::vis_units>(comm.broadcast(static_cast<int>(params.units)));
+  result.ra = comm.broadcast(params.ra);
+  result.dec = comm.broadcast(params.dec);
+  result.average_frequency = comm.broadcast(params.average_frequency);
+  return result;
+}
 vis_params scatter_visibilities(vis_params const &params, std::vector<t_int> const &sizes,
                                 sopt::mpi::Communicator const &comm) {
   if (comm.size() == 1) return params;
@@ -131,6 +164,12 @@ utilities::vis_params set_cell_size(const sopt::mpi::Communicator &comm,
   const t_real max_u = comm.all_reduce<t_real>(uv_vis.u.array().cwiseAbs().maxCoeff(), MPI_MAX);
   const t_real max_v = comm.all_reduce<t_real>(uv_vis.v.array().cwiseAbs().maxCoeff(), MPI_MAX);
   return utilities::set_cell_size(uv_vis, max_u, max_v, cell_x, cell_y);
+}
+utilities::vis_params w_stacking(utilities::vis_params const &params,
+                                 sopt::mpi::Communicator const &comm, const t_int iters) {
+
+  const std::vector<t_int> w_stacks = std::get<0>(distribute::kmeans_algo(params.w, comm.size(), iters, comm));
+  return utilities::regroup_and_all_to_all(params, w_stacks, comm);
 }
 }  // namespace utilities
 }  // namespace purify
