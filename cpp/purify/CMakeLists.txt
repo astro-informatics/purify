@@ -24,11 +24,12 @@ set(HEADERS
   algorithm_factory.h
   read_measurements.h
   yaml-parser.h
+  integration.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(SOURCES utilities.cc pfitsio.cc
   kernels.cc wproj_utilities.cc operators.cc uvfits.cc projection_kernels.cc yaml-parser.cc
-  read_measurements.cc distribute.cc)
+  read_measurements.cc distribute.cc integration.cc)
 
 if(TARGET casacore::ms)
   list(APPEND SOURCES casacore.cc)
@@ -65,10 +66,11 @@ add_include_dir(
   ${Boost_INCLUDE_DIR}
   ${CFitsIO_INCLUDE_DIR}
   ${Yamlcpp_INCLUDE_DIR}
+  ${Cubature_INCLUDE_DIR}
   ${CImg_INCLUDE_DIR}
 )
 target_link_libraries(libpurify
-  ${FFTW3_DOUBLE_LIBRARY}  ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY} ${X11_X11_LIB} ${Yamlcpp_LIBRARY}
+  ${FFTW3_DOUBLE_LIBRARY}  ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY} ${X11_X11_LIB} ${Yamlcpp_LIBRARY} ${Cubature_LIBRARIES}
   ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY}
   )
 if(TARGET casacore::casa)
