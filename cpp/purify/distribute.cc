@@ -143,6 +143,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(const Vector<t_r
 
   return std::make_tuple(w_node, w_centre);
 }
+#ifdef PURIFY_MPI
 std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters,
     sopt::mpi::Communicator const &comm) {
@@ -192,5 +193,6 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
 
   return std::make_tuple(w_node, w_centre);
 }
+#endif
 }  // namespace distribute
 }  // namespace purify
