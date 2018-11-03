@@ -6,45 +6,59 @@
 
 namespace purify {
 namespace utilities {
-void regroup(vis_params &uv_params, std::vector<t_int> const &groups_) {
+void regroup(vis_params &uv_params, std::vector<t_int> const &groups_, const t_int max_groups) {
   std::vector<t_int> groups = groups_;
   // Figure out size of each group
   std::map<t_int, t_int> sizes;
-  for (auto const &group : groups)
-    if (sizes.count(group) == 0)
-      sizes[group] = 1;
-    else
-      ++sizes[group];
+  for(auto g = 0; g < max_groups; g++)
+    sizes[g] = 0;
+  for(auto const &group : groups)
+    ++sizes[group];
 
   std::map<t_int, t_int> indices, ends;
   auto i = 0;
-  for (auto const &item : sizes) {
+  for(auto const &item : sizes) {
     indices[item.first] = i;
     i += item.second;
     ends[item.first] = i;
   }
+  const auto minmax = std::minmax_element(ends.begin(), ends.end());
+  if(std::get<1>(*std::get<0>(minmax)) < 0)
+    throw std::runtime_error("segment end " + std::to_string(std::get<1>(*std::get<0>(minmax)))
+                             + " less than 0. Not a valid end.");
+  if(std::get<1>(*std::get<1>(minmax)) > uv_params.size())
+    throw std::runtime_error("segment end " + std::to_string(std::get<1>(*std::get<1>(minmax)))
+                             + " larger than data vector "
+                             + std::to_string(static_cast<t_int>(uv_params.size()))
+                             + ". End not valid.");
 
   auto const expected = [&ends](t_int i) {
     t_int j = 0;
-    for (auto const end : ends) {
-      if (i < end.second) return j;
+    for(auto const end : ends) {
+      if(i < end.second)
+        return j;
       ++j;
     }
     return j;
   };
 
   i = 0;
-  while (i < uv_params.u.size()) {
+  while(i < uv_params.u.size()) {
     auto const expected_proc = expected(i);
-    if (groups[i] == expected_proc) {
+    if(groups[i] == expected_proc) {
       ++i;
       continue;
     }
     auto &swapper = indices[groups[i]];
-    if (groups[swapper] == expected(swapper)) {
+    if(groups[swapper] == expected(swapper)) {
       ++swapper;
       continue;
     }
+    if(swapper >= uv_params.u.size())
+      throw std::runtime_error("regroup (groups, " + std::to_string(groups[swapper]) + ", "
+                               + std::to_string(groups[i]) + ") index out of bounds "
+                               + std::to_string(i) + " " + std::to_string(swapper)
+                               + " >= " + std::to_string(uv_params.u.size()));
     std::swap(groups[i], groups[swapper]);
     std::swap(uv_params.u(i), uv_params.u(swapper));
     std::swap(uv_params.v(i), uv_params.v(swapper));
@@ -70,7 +84,7 @@ vis_params regroup_and_scatter(vis_params const &params, std::vector<t_int> cons
   }
 
   vis_params copy = params;
-  regroup(copy, groups);
+  regroup(copy, groups, comm.size());
   return scatter_visibilities(copy, sizes, comm);
 }
 vis_params regroup_and_all_to_all(vis_params const &params, std::vector<t_int> const &groups,

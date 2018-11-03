@@ -15,7 +15,8 @@ namespace utilities {
 //! \brief Regroups visibilities data according to input groups
 //! \details All data for group with smallest key comes first, then next
 //! smallest key, etc.
-void regroup(utilities::vis_params &params, std::vector<t_int> const &groups);
+void regroup(utilities::vis_params &params, std::vector<t_int> const &groups,
+             const t_int max_groups);
 //! \brief regroup and distributes data
 vis_params regroup_and_scatter(vis_params const &params, std::vector<t_int> const &groups,
                                sopt::mpi::Communicator const &comm);
