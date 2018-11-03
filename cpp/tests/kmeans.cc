@@ -49,8 +49,8 @@ TEST_CASE("k-means") {
     CAPTURE(start + j);
     REQUIRE(serial_index.at(start + j) == mpi_index.at(j));
   }
-  for(t_int g = 0; g < number_of_groups; g++)
-  REQUIRE(mpi_means.at(g) == Approx(serial_means.at(g)));
+  for (t_int g = 0; g < number_of_groups; g++)
+    REQUIRE(mpi_means.at(g) == Approx(serial_means.at(g)));
   // Check that mean values are the same
   auto uv_dist_all =
       utilities::regroup_and_all_to_all(uv_data.segment(start, length), mpi_index, world);
