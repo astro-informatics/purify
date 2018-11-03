@@ -97,8 +97,9 @@ Vector<t_int> equal_distribution(Vector<t_real> const &u, Vector<t_real> const &
             });
   return index;
 }
-std::tuple<std::vector<t_int>, std::vector<t_real>>
-kmeans_algo(const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters) {
+std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(const Vector<t_real> &w,
+                                                                const t_int number_of_nodes,
+                                                                const t_int iters) {
   std::vector<t_int> w_node(w.size(), 0);
   std::vector<t_real> w_centre(number_of_nodes, 0);
   std::vector<t_real> w_sum(number_of_nodes, 0);
@@ -106,16 +107,16 @@ kmeans_algo(const Vector<t_real> &w, const t_int number_of_nodes, const t_int it
   t_real diff = 1;
   t_real const wmin = w.minCoeff();
   t_real const wmax = w.maxCoeff();
-  for(int i = 0; i < w_centre.size(); i++)
+  for (int i = 0; i < w_centre.size(); i++)
     w_centre[i] = i * (wmax - wmin) / number_of_nodes + wmin;
   // lopp through even nodes to reduces w-term
-  for(int n = 0; n < iters; n++) {
+  for (int n = 0; n < iters; n++) {
     PURIFY_DEBUG("clustering iteration {}", n);
-    for(int i = 0; i < w.size(); i++) {
+    for (int i = 0; i < w.size(); i++) {
       t_real min = 1e10;
-      for(int node = 0; node < number_of_nodes; node++) {
+      for (int node = 0; node < number_of_nodes; node++) {
         const t_real cost = std::abs(w(i) - w_centre.at(node));
-        if(cost < min) {
+        if (cost < min) {
           min = cost;
           w_node[i] = node;
         }
@@ -123,7 +124,7 @@ kmeans_algo(const Vector<t_real> &w, const t_int number_of_nodes, const t_int it
       w_sum[w_node[i]] += w(i);
       w_count[w_node[i]]++;
     }
-    for(int j = 0; j < number_of_nodes; j++) {
+    for (int j = 0; j < number_of_nodes; j++) {
       diff += std::abs(w_sum.at(j) / w_count.at(j) - w_centre.at(j)) / std::abs(w_centre.at(j));
       w_centre[j] = w_sum.at(j) / w_count.at(j);
       PURIFY_DEBUG("Node {} has {} visibilities, using w-stack w = {}.", j, w_count.at(j),
@@ -131,7 +132,7 @@ kmeans_algo(const Vector<t_real> &w, const t_int number_of_nodes, const t_int it
       w_sum[j] = 0;
       w_count[j] = 0;
     }
-    if((diff / number_of_nodes) < 1e-3) {
+    if ((diff / number_of_nodes) < 1e-3) {
       PURIFY_DEBUG("Converged!");
       break;
     } else {
@@ -142,9 +143,9 @@ kmeans_algo(const Vector<t_real> &w, const t_int number_of_nodes, const t_int it
 
   return std::make_tuple(w_node, w_centre);
 }
-std::tuple<std::vector<t_int>, std::vector<t_real>>
-kmeans_algo(const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters,
-            sopt::mpi::Communicator const &comm) {
+std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
+    const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters,
+    sopt::mpi::Communicator const &comm) {
   std::vector<t_int> w_node(w.size(), 0);
   std::vector<t_real> w_centre(number_of_nodes, 0);
   std::vector<t_real> w_sum(number_of_nodes, 0);
@@ -152,17 +153,16 @@ kmeans_algo(const Vector<t_real> &w, const t_int number_of_nodes, const t_int it
   t_real diff = 1;
   t_real const wmin = comm.all_reduce<t_real>(w.minCoeff(), MPI_MIN);
   t_real const wmax = comm.all_reduce<t_real>(w.maxCoeff(), MPI_MAX);
-  for(int i = 0; i < w_centre.size(); i++)
+  for (int i = 0; i < w_centre.size(); i++)
     w_centre[i] = i * (wmax - wmin) / number_of_nodes + wmin;
   // lopp through even nodes to reduces w-term
-  for(int n = 0; n < iters; n++) {
-    if(comm.is_root())
-      PURIFY_DEBUG("clustering iteration {}", n);
-    for(int i = 0; i < w.size(); i++) {
+  for (int n = 0; n < iters; n++) {
+    if (comm.is_root()) PURIFY_DEBUG("clustering iteration {}", n);
+    for (int i = 0; i < w.size(); i++) {
       t_real min = 1e10;
-      for(int node = 0; node < number_of_nodes; node++) {
+      for (int node = 0; node < number_of_nodes; node++) {
         const t_real cost = std::abs(w(i) - w_centre.at(node));
-        if(cost < min) {
+        if (cost < min) {
           min = cost;
           w_node[i] = node;
         }
@@ -170,24 +170,22 @@ kmeans_algo(const Vector<t_real> &w, const t_int number_of_nodes, const t_int it
       w_sum[w_node[i]] += w(i);
       w_count[w_node[i]]++;
     }
-    for(int j = 0; j < number_of_nodes; j++) {
+    for (int j = 0; j < number_of_nodes; j++) {
       const t_real global_w_sum = comm.all_sum_all<t_real>(w_sum.at(j));
       const t_real global_w_count = comm.all_sum_all<t_real>(w_count.at(j));
       diff += std::abs(global_w_sum / global_w_count - w_centre.at(j)) / std::abs(w_centre.at(j));
       w_centre[j] = global_w_sum / global_w_count;
-      if(comm.is_root())
+      if (comm.is_root())
         PURIFY_DEBUG("Node {} has {} visibilities, using w-stack w = {}.", j, global_w_count,
                      w_centre[j]);
       w_sum[j] = 0;
       w_count[j] = 0;
     }
-    if((diff / number_of_nodes) < 1e-3) {
-      if(comm.is_root())
-        PURIFY_DEBUG("Converged!");
+    if ((diff / number_of_nodes) < 1e-3) {
+      if (comm.is_root()) PURIFY_DEBUG("Converged!");
       break;
     } else {
-      if(comm.is_root())
-        PURIFY_DEBUG("relative_diff = {}", diff);
+      if (comm.is_root()) PURIFY_DEBUG("relative_diff = {}", diff);
       diff = 0;
     }
   }
