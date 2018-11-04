@@ -35,7 +35,7 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 100,
-          1e-4, kernels::kernel_from_string.at(kernel), J, J, std::get<0>(w_term), 12);
+          1e-4, kernels::kernel_from_string.at(kernel), J, J, std::get<0>(w_term));
   t_uint const M = uv_data.size();
   t_uint const N = imsizex * imsizey;
   sopt::wavelets::SARA const sara{

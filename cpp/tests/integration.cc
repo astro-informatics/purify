@@ -7,7 +7,6 @@
 
 #include "purify/integration.h"
 #include "purify/kernels.h"
-#include "purify/projection_kernels.h"
 using namespace purify;
 using namespace purify::notinstalled;
 
