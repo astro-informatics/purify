@@ -6,12 +6,15 @@ include_directories("${PROJECT_SOURCE_DIR}/cpp")
 add_example(gridding LIBRARIES libpurify NOTEST)
 add_example(generate_vis_data LIBRARIES libpurify NOTEST)
 
+add_example(plot_wkernel LIBRARIES libpurify NOTEST)
 
 add_example(show_image LIBRARIES libpurify NOTEST)
 add_example(sdmm_m31_simulation LIBRARIES libpurify NOTEST)
 
 add_example(padmm_simulation LIBRARIES libpurify NOTEST)
 add_example(padmm_reweighted_simulation LIBRARIES libpurify NOTEST)
+add_example(sara_padmm_random_coverage LIBRARIES libpurify NOTEST)
+
 
 
 add_example(padmm_real_data LIBRARIES libpurify NOTEST )
@@ -79,7 +82,6 @@ if(PURIFY_MPI AND PURIFY_ARRAYFIRE)
       PRIVATE PURIFY_PADMM_ALGORITHM=1 PURIFY_GPU)
   endif()
 endif()
-add_example(sara_padmm_random_coverage LIBRARIES libpurify NOTEST)
 
 
 if(data AND TARGET casacore::ms)
