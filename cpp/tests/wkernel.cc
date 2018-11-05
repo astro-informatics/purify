@@ -25,9 +25,9 @@ TEST_CASE("calculating zero") {
   const t_real relative_error = 0;
   t_uint e;
   const t_real norm2d = std::sqrt(std::abs(projection_kernels::exact_w_projection_integration(
-      0, 0, 0, du, du,oversample_ratio, normu, normu, 1e9, 0, 1e-12, integration::method::h,  e)));
+      0, 0, 0, du, du, oversample_ratio, normu, normu, 1e9, 0, 1e-12, integration::method::h, e)));
   const t_real norm1d = std::abs(projection_kernels::exact_w_projection_integration_1d(
-      0, 0, 0, du,oversample_ratio, normu, 1e9, 0, 1e-12, integration::method::h, e));
+      0, 0, 0, du, oversample_ratio, normu, 1e9, 0, 1e-12, integration::method::h, e));
   auto const ftkernelu = [=](const t_real l) -> t_real {
     return kernels::ft_kaiser_bessel(l, J) / norm2d;
   };
@@ -47,10 +47,10 @@ TEST_CASE("calculating zero") {
       const t_real u = j / upsample;
       CAPTURE(u);
       const t_complex kernel2d = projection_kernels::exact_w_projection_integration(
-          u, 0, 0, du, du,oversample_ratio, ftkernelu, ftkernelu, max_evaluations, absolute_error, absolute_error,
-          integration::method::h,  evaluations);
+          u, 0, 0, du, du, oversample_ratio, ftkernelu, ftkernelu, max_evaluations, absolute_error,
+          absolute_error, integration::method::h, evaluations);
       const t_complex kernel1d = projection_kernels::exact_w_projection_integration_1d(
-          u, 0, 0, du,oversample_ratio, ftkernelv, max_evaluations, absolute_error, absolute_error,
+          u, 0, 0, du, oversample_ratio, ftkernelv, max_evaluations, absolute_error, absolute_error,
           integration::method::h, evaluations);
       CHECK(kernel2d.real() ==
             Approx(kernels::kaiser_bessel(0, J) * kernels::kaiser_bessel(u, J)).margin(1e-4));
@@ -66,8 +66,8 @@ TEST_CASE("calculating zero") {
       const t_real u = j / upsample;
       CAPTURE(u);
       const t_complex kernel2d = projection_kernels::exact_w_projection_integration(
-          -u, 0, 0, du, du,oversample_ratio, ftkernelu, ftkernelu, max_evaluations, absolute_error, absolute_error,
-          integration::method::h, evaluations);
+          -u, 0, 0, du, du, oversample_ratio, ftkernelu, ftkernelu, max_evaluations, absolute_error,
+          absolute_error, integration::method::h, evaluations);
       CHECK(kernel2d.real() ==
             Approx(kernels::kaiser_bessel(0, J) * kernels::kaiser_bessel(-u, J)).margin(1e-4));
       CHECK(kernel2d.imag() == Approx(0.).margin(1e-5));
@@ -82,17 +82,17 @@ TEST_CASE("calculating zero") {
       const t_real u = j / upsample;
       CAPTURE(u);
       const t_complex kernel2d = projection_kernels::exact_w_projection_integration(
-          u, 0, w, du, du,oversample_ratio, ftkernelu, ftkernelu, max_evaluations, absolute_error, absolute_error,
-          integration::method::h,  evaluations);
+          u, 0, w, du, du, oversample_ratio, ftkernelu, ftkernelu, max_evaluations, absolute_error,
+          absolute_error, integration::method::h, evaluations);
       const t_complex kernel1d = projection_kernels::exact_w_projection_integration_1d(
-          u, 0, w, du,oversample_ratio, ftkernelv, max_evaluations, absolute_error, absolute_error,
+          u, 0, w, du, oversample_ratio, ftkernelv, max_evaluations, absolute_error, absolute_error,
           integration::method::h, evaluations);
       const t_complex kernel2d_conj = projection_kernels::exact_w_projection_integration(
-          u, 0, -w, du, du,oversample_ratio, ftkernelu, ftkernelu, max_evaluations, absolute_error, absolute_error,
-          integration::method::h, evaluations);
+          u, 0, -w, du, du, oversample_ratio, ftkernelu, ftkernelu, max_evaluations, absolute_error,
+          absolute_error, integration::method::h, evaluations);
       const t_complex kernel1d_conj = projection_kernels::exact_w_projection_integration_1d(
-          u, 0, -w, du,oversample_ratio, ftkernelv, max_evaluations, absolute_error, absolute_error,
-          integration::method::h, evaluations);
+          u, 0, -w, du, oversample_ratio, ftkernelv, max_evaluations, absolute_error,
+          absolute_error, integration::method::h, evaluations);
       CHECK(kernel2d.real() == Approx(kernel2d_conj.real()).margin(1e-4));
       CHECK(kernel2d.imag() == Approx(-kernel2d_conj.imag()).margin(1e-4));
       CHECK(kernel1d.real() == Approx(kernel1d_conj.real()).margin(1e-4));
@@ -107,14 +107,15 @@ TEST_CASE("calculating zero") {
       const t_real u = j / upsample;
       CAPTURE(u);
       const t_complex kernel2d = projection_kernels::exact_w_projection_integration(
-          u, 0, 0, du, du,oversample_ratio, [](t_real) { return 1.; }, [](t_real) { return 1.; }, max_evaluations,
-          1e-5, 1e-5, integration::method::h, evaluations);
+          u, 0, 0, du, du, oversample_ratio, [](t_real) { return 1.; }, [](t_real) { return 1.; },
+          max_evaluations, 1e-5, 1e-5, integration::method::h, evaluations);
       const t_complex kernel1d = projection_kernels::exact_w_projection_integration_1d(
-          u + 1e-4, 0, 0, du,oversample_ratio, [](t_real) { return 1.; }, max_evaluations, 1e-5, 1e-5,
-          integration::method::h, evaluations);
-      const t_real expected2d = boost::math::sinc_pi(2 * constant::pi * u);
+          u + 1e-4, 0, 0, du, oversample_ratio, [](t_real) { return 1.; }, max_evaluations, 1e-5,
+          1e-5, integration::method::h, evaluations);
+      const t_real expected2d = boost::math::sinc_pi(2 * constant::pi * u * oversample_ratio / 2.);
       const t_real expected1d =
-          boost::math::cyl_bessel_j(1, 2 * constant::pi * (u + 1e-4) * du) / ((u + 1e-4) * du);
+          boost::math::cyl_bessel_j(1, 2 * constant::pi * (u + 1e-4) * 2. / oversample_ratio) /
+          ((u + 1e-4) * 2. / oversample_ratio);
       CAPTURE(du);
       CAPTURE(kernel2d / expected2d);
       CAPTURE(kernel1d / expected1d);
