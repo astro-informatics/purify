@@ -99,4 +99,29 @@ TEST_CASE("calculating zero") {
       CHECK(kernel1d.imag() == Approx(-kernel1d_conj.imag()).margin(1e-4));
     }
   }
+  SECTION("window function") {
+    for (int j = 0; j < Ju_max; j++) {
+      t_uint evaluations = 0;
+      t_uint revaluations = 0;
+      t_uint e;
+      const t_real u = j / upsample;
+      CAPTURE(u);
+      const t_complex kernel2d = projection_kernels::exact_w_projection_integration(
+          u, 0, 0, du, du,oversample_ratio, [](t_real) { return 1.; }, [](t_real) { return 1.; }, max_evaluations,
+          1e-5, 1e-5, integration::method::h, evaluations);
+      const t_complex kernel1d = projection_kernels::exact_w_projection_integration_1d(
+          u + 1e-4, 0, 0, du,oversample_ratio, [](t_real) { return 1.; }, max_evaluations, 1e-5, 1e-5,
+          integration::method::h, evaluations);
+      const t_real expected2d = boost::math::sinc_pi(2 * constant::pi * u);
+      const t_real expected1d =
+          boost::math::cyl_bessel_j(1, 2 * constant::pi * (u + 1e-4) * du) / ((u + 1e-4) * du);
+      CAPTURE(du);
+      CAPTURE(kernel2d / expected2d);
+      CAPTURE(kernel1d / expected1d);
+      CHECK(kernel2d.real() == Approx(expected2d).margin(1e-4));
+      CHECK(kernel2d.imag() == Approx(0).margin(1e-4));
+      CHECK(kernel1d.real() == Approx(expected1d).margin(1e-4));
+      CHECK(kernel1d.imag() == Approx(0).margin(1e-4));
+    }
+  }
 }
