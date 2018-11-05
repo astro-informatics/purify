@@ -48,10 +48,12 @@ int main(int nargs, char const **args) {
   const t_real relative_error = 0;
   t_uint e;
   const t_real norm =
-      (not radial) ? std::abs(projection_kernels::exact_w_projection_integration(
-                     0, 0, 0, du, du, normu, normu, 1e9, 0, 1e-8, integration::method::h, false, e))
-               : std::abs(projection_kernels::exact_w_projection_integration_1d(
-                     0, 0, 0, du, normu, 1e9, 0, 1e-7, integration::method::h, e));
+      (not radial)
+          ? std::abs(projection_kernels::exact_w_projection_integration(
+                0, 0, 0, du, du, oversample_ratio, normu, normu, 1e9, 0, 1e-8,
+                integration::method::h, e))
+          : std::abs(projection_kernels::exact_w_projection_integration_1d(
+                0, 0, 0, du, oversample_ratio, normu, 1e9, 0, 1e-7, integration::method::h, e));
   auto const ftkernelu = [=](const t_real l) -> t_real {
     return kernels::ft_kaiser_bessel(l, J) / norm;
   };
@@ -79,11 +81,11 @@ int main(int nargs, char const **args) {
       kernel(j * Jw_max + i) =
           (not radial)
               ? projection_kernels::exact_w_projection_integration(
-                    j / upsample, 0, w * i / Jw_max, du, du, ftkernelu, ftkernelv, max_evaluations,
-                    absolute_error, 0, integration::method::h, false, evaluations)
+                    j / upsample, 0, w * i / Jw_max, du, du, oversample_ratio, ftkernelu, ftkernelv,
+                    max_evaluations, absolute_error, 0, integration::method::h, evaluations)
               : projection_kernels::exact_w_projection_integration_1d(
-                    j / upsample, 0, w * i / Jw_max, du, ftkernelu, max_evaluations, absolute_error,
-                    0, integration::method::h, evaluations);
+                    j / upsample, 0, w * i / Jw_max, du, oversample_ratio, ftkernelu,
+                    max_evaluations, absolute_error, 0, integration::method::h, evaluations);
       evals(j * Jw_max + i) = evaluations;
 #pragma omp critical(print)
       {
