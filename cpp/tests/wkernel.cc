@@ -11,7 +11,13 @@
 
 using namespace purify;
 using namespace purify::notinstalled;
-
+TEST_CASE("test transform kernels") {
+  SECTION("horizon bound check for 2d transform") {
+    REQUIRE(projection_kernels::fourier_wproj_kernel(0, 0, 0, 0, 0, 1, 1).real() == Approx(1));
+    REQUIRE(std::abs(projection_kernels::fourier_wproj_kernel(2, 2, 0, 0, 0, 1, 1)) == Approx(0));
+    REQUIRE(std::abs(projection_kernels::fourier_wproj_kernel(0.4, 0, 0, 0, 0, 0.3, 0.3)) == Approx(0));
+  }
+}
 TEST_CASE("calculating zero") {
   const t_real cell = 30;
   const t_int imsize = 1024;
@@ -112,7 +118,8 @@ TEST_CASE("calculating zero") {
       const t_complex kernel1d = projection_kernels::exact_w_projection_integration_1d(
           u + 1e-4, 0, 0, du, oversample_ratio, [](t_real) { return 1.; }, max_evaluations, 1e-5,
           1e-5, integration::method::h, evaluations);
-      const t_real expected2d = boost::math::sinc_pi(2 * constant::pi * u * oversample_ratio / 2.);
+      //analytical results from theory
+      const t_real expected2d = boost::math::sinc_pi(2 * constant::pi * u * 2./oversample_ratio);
       const t_real expected1d =
           boost::math::cyl_bessel_j(1, 2 * constant::pi * (u + 1e-4) * 2. / oversample_ratio) /
           ((u + 1e-4) * 2. / oversample_ratio);

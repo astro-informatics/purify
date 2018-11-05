@@ -8,10 +8,12 @@
 #include "purify/integration.h"
 namespace purify {
 namespace projection_kernels {
-//! exact fourier phase
-t_complex phase(const t_real u, const t_real v, const t_real l, const t_real m);
-//! exact chirp expression
-t_complex chirp(const t_real w, const t_real l, const t_real m);
+//! integration kernel for 2d fourier transform of chirp, bounded to a circle of radius x/du < 1
+t_complex fourier_wproj_kernel(const t_real x, const t_real y, const t_real w, const t_real u,
+                               const t_real v, const t_real du, const t_real dv);
+//! integration kernel for hankel transform with chirp
+t_complex hankel_wproj_kernel(const t_real r, const t_real w, const t_real u, const t_real v,
+                              const t_real du);
 //! numerical integration of chirp and radial symmetric kernel in the image domain using
 //! hankel transform
 t_complex exact_w_projection_integration_1d(const t_real u, const t_real v, const t_real w,
