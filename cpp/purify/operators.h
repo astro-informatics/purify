@@ -59,14 +59,11 @@ namespace operators {
 
 #ifdef PURIFY_MPI
 //! Constructs degridding operator using MPI
-template <class T>
+template <class T, class... ARGS>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_gridding_matrix_2d(
-    const sopt::mpi::Communicator &comm, const Vector<t_real> &u, const Vector<t_real> &v,
-    const Vector<t_complex> &weights, const t_uint &imsizey_, const t_uint &imsizex_,
-    const t_real oversample_ratio, const std::function<t_real(t_real)> kernelu,
-    const std::function<t_real(t_real)> kernelv, const t_uint Ju = 4, const t_uint Jv = 4) {
-  Sparse<t_complex> interpolation_matrix_original = details::init_gridding_matrix_2d(
-      u, v, weights, imsizey_, imsizex_, oversample_ratio, kernelu, kernelv, Ju, Jv);
+    const sopt::mpi::Communicator &comm, ARGS &&... args) {
+  Sparse<t_complex> interpolation_matrix_original =
+      details::init_gridding_matrix_2d(std::forward<ARGS>(args)...);
   const DistributeSparseVector distributor(interpolation_matrix_original, comm);
   const std::shared_ptr<const Sparse<t_complex>> interpolation_matrix =
       std::make_shared<const Sparse<t_complex>>(
@@ -105,16 +102,13 @@ sopt::OperatorFunction<T> init_all_sum_all(const sopt::mpi::Communicator &comm) 
   return [=](T &output, const T &input) { output = comm.all_sum_all<T>(input); };
 }
 #endif
-
-template <class T>
+//! constructs lambdas that apply degridding matrix with adjoint
+template <class T, class... ARGS>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_gridding_matrix_2d(
-    const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_complex> &weights,
-    const t_uint &imsizey_, const t_uint &imsizex_, const t_uint &oversample_ratio,
-    const std::function<t_real(t_real)> kernelu, const std::function<t_real(t_real)> kernelv,
-    const t_uint Ju = 4, const t_uint Jv = 4) {
+    ARGS &&... args) {
   const std::shared_ptr<const Sparse<t_complex>> interpolation_matrix =
-      std::make_shared<const Sparse<t_complex>>(details::init_gridding_matrix_2d(
-          u, v, weights, imsizey_, imsizex_, oversample_ratio, kernelu, kernelv, Ju, Jv));
+      std::make_shared<const Sparse<t_complex>>(
+          details::init_gridding_matrix_2d(std::forward<ARGS>(args)...));
   const std::shared_ptr<const Sparse<t_complex>> adjoint =
       std::make_shared<const Sparse<t_complex>>(interpolation_matrix->adjoint());
 
