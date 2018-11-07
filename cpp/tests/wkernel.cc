@@ -126,10 +126,10 @@ TEST_CASE("calculating zero") {
       CAPTURE(du);
       CAPTURE(kernel2d / expected2d);
       CAPTURE(kernel1d / expected1d);
-      CHECK(kernel2d.real() == Approx(expected2d).margin(1e-4));
-      CHECK(kernel2d.imag() == Approx(0).margin(1e-4));
-      CHECK(kernel1d.real() == Approx(expected1d).margin(1e-4));
-      CHECK(kernel1d.imag() == Approx(0).margin(1e-4));
+      CHECK(kernel2d.real() == Approx(expected2d).margin(1e-6));
+      CHECK(kernel2d.imag() == Approx(0).margin(1e-6));
+      CHECK(kernel1d.real() == Approx(expected1d).margin(1e-6));
+      CHECK(kernel1d.imag() == Approx(0).margin(1e-6));
     }
   }
 }
