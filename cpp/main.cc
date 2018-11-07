@@ -103,12 +103,17 @@ int main(int argc, const char **argv) {
                 uv_data.weights.norm() * uv_data.weights.size();
 
   // create measurement operator
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform = (not params.wprojection())?
       factory::measurement_operator_factory<Vector<t_complex>>(
           mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
           params.cellsizex(), params.oversampling(), params.powMethod_iter(),
           params.powMethod_tolerance(), kernels::kernel_from_string.at(params.kernel()),
-          params.Jy(), params.Jx());
+          params.Jy(), params.Jx(), params.mpi_wstacking() ):
+      factory::measurement_operator_factory<Vector<t_complex>>(
+          mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
+          params.cellsizex(), params.oversampling(), params.powMethod_iter(),
+          params.powMethod_tolerance(), kernels::kernel_from_string.at(params.kernel()),
+          params.Jy(), params.Jw(), 1e-6, 1e-6);
   // create wavelet operator
   std::vector<std::tuple<std::string, t_uint>> sara;
   for (size_t i = 0; i < params.wavelet_basis().size(); i++)
