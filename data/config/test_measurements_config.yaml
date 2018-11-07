@@ -35,10 +35,13 @@ MeasureOperators:
   J: # Interpolation pixels (default 4x4). Input either a value or pair
     Jx: 4
     Jy: 4
+    Jw: 30
   kernel: kb # kernel, choose between: kb, Gauss, box
   oversampling: 2 # value > 1
   powMethod_iter: 100 # value > 0
   powMethod_tolerance: 1e-4 # value > 0
+  wprojection: False # using radially symmetric w projection kernel
+  mpi_wstacking: True # applies average w-stack correction on each node (always True with wprojection)
   # TODO: Add others like weighting. (at the moment natural)
 
 ########## SARA ##########
