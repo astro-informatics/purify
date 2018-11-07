@@ -10,7 +10,6 @@ namespace purify {
 
 namespace details {
 
-
 //! Given the Fourier transform of a radially symmetric gridding kernel, creates the scaling image
 //! for gridding correction.
 Image<t_complex> init_correction_radial_2d(const t_real oversample_ratio, const t_uint imsizey_,
@@ -63,20 +62,18 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
     const t_real oversample_ratio, const kernels::kernel kernel, const t_uint Ju, const t_uint Jw,
     const fftw_plan ft_plan, const t_real cellx, const t_real celly, const t_real absolute_error,
     const t_real relative_error) {
-  std::function<t_real(t_real)> kernelu, kernelv, ftkernelu, ftkernelv;
-  std::tie(kernelu, kernelv, ftkernelu, ftkernelv) =
-      purify::create_kernels(kernel, Ju, Ju, imsizey, imsizex, oversample_ratio);
+  auto const ftkerneluv = purify::create_radial_ftkernel(kernel, Ju);
   sopt::OperatorFunction<T> directFZ, indirectFZ;
   t_real const w_mean = w.array().mean();
   std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(
-      ftkernelu, imsizey, imsizex, oversample_ratio, ft_plan, w_mean, cellx, celly);
+      ftkerneluv, imsizey, imsizex, oversample_ratio, ft_plan, w_mean, cellx, celly);
   sopt::OperatorFunction<T> directG, indirectG;
   PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
                     imsizey * celly / (60. * 60.));
   PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
-      u, v, w, weights, imsizey, imsizex, oversample_ratio, ftkernelu, Ju, Jw, cellx, celly,
+      u, v, w, weights, imsizey, imsizex, oversample_ratio, ftkerneluv, Ju, Jw, cellx, celly,
       absolute_error, relative_error);
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
@@ -161,9 +158,9 @@ template <class T>
 std::shared_ptr<sopt::LinearTransform<T> const> init_degrid_operator_2d(
     const sopt::mpi::Communicator &comm, const utilities::vis_params &uv_vis_input,
     const t_uint imsizey, const t_uint imsizex, const t_real cell_x, const t_real cell_y,
-    const t_real oversample_ratio, const t_uint power_iters,
-    const t_real power_tol, const kernels::kernel kernel,
-    const t_uint Ju, const t_uint Jw, const t_real absolute_error, const t_real relative_error) {
+    const t_real oversample_ratio, const t_uint power_iters, const t_real power_tol,
+    const kernels::kernel kernel, const t_uint Ju, const t_uint Jw, const t_real absolute_error,
+    const t_real relative_error) {
   auto uv_vis = uv_vis_input;
   if (uv_vis.units == utilities::vis_units::lambda)
     uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
