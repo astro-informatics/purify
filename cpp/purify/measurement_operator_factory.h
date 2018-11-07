@@ -7,6 +7,7 @@
 #include "purify/logging.h"
 
 #include "purify/operators.h"
+#include "purify/wproj_operators.h"
 #include "purify/operators_gpu.h"
 
 #ifdef PURIFY_MPI
