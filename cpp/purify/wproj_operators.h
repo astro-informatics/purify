@@ -154,8 +154,55 @@ std::shared_ptr<sopt::LinearTransform<T> const> init_degrid_operator_2d(
   return std::make_shared<sopt::LinearTransform<T> const>(direct, M, indirect, N);
 }
 
+
 template <class T>
 std::shared_ptr<sopt::LinearTransform<T> const> init_degrid_operator_2d(
+    const sopt::mpi::Communicator &comm, const utilities::vis_params &uv_vis_input,
+    const t_uint imsizey, const t_uint imsizex, const t_real cell_x, const t_real cell_y,
+    const t_real oversample_ratio, const t_uint power_iters, const t_real power_tol,
+    const kernels::kernel kernel, const t_uint Ju, const t_uint Jw, const t_real absolute_error,
+    const t_real relative_error) {
+  auto uv_vis = uv_vis_input;
+  if (uv_vis.units == utilities::vis_units::lambda)
+    uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
+  if (uv_vis.units == utilities::vis_units::radians)
+    uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
+                                 std::floor(oversample_ratio * imsizey));
+  return init_degrid_operator_2d<T>(comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey,
+                                    imsizex, oversample_ratio, power_iters, power_tol, kernel, Ju,
+                                    Jw, cell_x, cell_y, absolute_error, relative_error);
+}
+
+template <class T>
+std::shared_ptr<sopt::LinearTransform<T> const> init_degrid_operator_2d_mpi(
+    const sopt::mpi::Communicator &comm, const Vector<t_real> &u, const Vector<t_real> &v,
+    const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint imsizey,
+    const t_uint imsizex, const t_real oversample_ratio, const t_uint power_iters,
+    const t_real power_tol, const kernels::kernel kernel, const t_uint Ju, const t_uint Jw,
+    const t_real cellx, const t_real celly, const t_real absolute_error,
+    const t_real relative_error) {
+  throw std::runtime_error("Under construction!");
+  const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
+  std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
+  std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
+  sopt::OperatorFunction<T> directDegrid, indirectDegrid;
+  std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_2d<T>(
+      u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jw, ft_plan, cellx, celly,
+      absolute_error, relative_error);
+  const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
+  auto direct = directDegrid;
+  auto indirect = sopt::chained_operators<T>(allsumall, indirectDegrid);
+  const t_real op_norm =
+      sopt::algorithm::power_method<T>({direct, M, indirect, N}, power_iters, power_tol,
+                                       comm.broadcast<T>(T::Random(imsizex * imsizey)));
+  auto const operator_norm = purify::operators::init_normalise<T>(op_norm);
+  direct = sopt::chained_operators<T>(direct, operator_norm);
+  indirect = sopt::chained_operators<T>(operator_norm, indirect);
+  return std::make_shared<sopt::LinearTransform<T> const>(direct, M, indirect, N);
+}
+
+template <class T>
+std::shared_ptr<sopt::LinearTransform<T> const> init_degrid_operator_2d_mpi(
     const sopt::mpi::Communicator &comm, const utilities::vis_params &uv_vis_input,
     const t_uint imsizey, const t_uint imsizex, const t_real cell_x, const t_real cell_y,
     const t_real oversample_ratio, const t_uint power_iters, const t_real power_tol,
