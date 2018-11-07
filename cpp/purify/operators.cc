@@ -56,12 +56,11 @@ Image<t_complex> init_correction2d(const t_real &oversample_ratio, const t_uint 
 
   Array<t_real> range;
   range.setLinSpaced(std::max(ftsizeu_, ftsizev_), 0.5, std::max(ftsizeu_, ftsizev_) - 0.5);
-  auto primary_beam = [=](const t_real &x, const t_real &y) { return 1.; };
   return ((1e0 / range.segment(y_start, imsizey_).unaryExpr(ftkernelv)).matrix() *
           (1e0 / range.segment(x_start, imsizex_).unaryExpr(ftkernelu)).matrix().transpose())
              .array() *
          t_complex(1., 0.) *
-        widefield::generate_chirp(primary_beam, 0., cellx, celly, imsizex_, imsizey_)
+        widefield::generate_chirp(w_mean, cellx, celly, imsizex_, imsizey_)
              .array() *
          imsizex_ * imsizey_;
 }
