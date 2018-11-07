@@ -56,6 +56,9 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser.width() == 1024);
     REQUIRE(yaml_parser.Jx() == 4);
     REQUIRE(yaml_parser.Jy() == 4);
+    REQUIRE(yaml_parser.Jw() == 30);
+    REQUIRE(yaml_parser.wprojection() == false);
+    REQUIRE(yaml_parser.mpi_wstacking() == true);
   }
   SECTION("Check the SARA node variables") {
     std::vector<std::string> expected_wavelets = {"Dirac", "DB1", "DB2", "DB3", "DB4",

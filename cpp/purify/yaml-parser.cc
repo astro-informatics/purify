@@ -158,6 +158,9 @@ void YamlParser::parseAndSetMeasureOperators(const YAML::Node& measureOperatorsN
   this->height_ = get<int>(measureOperatorsNode, {"imageSize", "height"});
   this->Jx_ = get<unsigned int>(measureOperatorsNode, {"J", "Jx"});
   this->Jy_ = get<unsigned int>(measureOperatorsNode, {"J", "Jy"});
+  this->Jw_ = get<unsigned int>(measureOperatorsNode, {"J", "Jw"});
+  this->wprojection_ = get<bool>(measureOperatorsNode, {"wprojection"});
+  this->mpi_wstacking_ = get<bool>(measureOperatorsNode, {"mpi_wstacking"});
 }
 
 void YamlParser::parseAndSetSARA(const YAML::Node& SARANode) {
