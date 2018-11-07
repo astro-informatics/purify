@@ -321,4 +321,33 @@ create_kernels(const kernels::kernel kernel_name_, const t_uint &Ju_, const t_ui
     throw std::runtime_error("Did not choose valid kernel.");
   }
 }
+
+std::function<t_real(t_real)> create_radial_ftkernel(const kernels::kernel kernel_name_, const t_uint Ju_){
+  // PURIFY_MEDIUM_LOG("Kernel Name: {}", kernel_name_.c_str());
+  PURIFY_MEDIUM_LOG("Radial Kernel Support: {}", Ju_);
+  if ((kernel_name_ == kernels::kernel::pswf) and (Ju_ != 6)) {
+    PURIFY_ERROR("Error: Only a support of 6 is implemented for PSWFs.");
+    throw std::runtime_error("Incorrect input: PSWF requires a support of 6");
+  }
+  switch (kernel_name_) {
+  case kernels::kernel::kb: {
+    return [=](const t_real &x) { return kernels::ft_kaiser_bessel(x, Ju_); };
+    break;
+  }
+  case kernels::kernel::pswf: {
+    return [=](const t_real &x) { return kernels::ft_pswf(x, Ju_); };
+    break;
+  }
+  case kernels::kernel::gauss: {
+    return [=](const t_real &x) { return kernels::ft_gaussian(x, Ju_); };
+    break;
+  }
+  case kernels::kernel::box: {
+    return [=](const t_real &x) { return kernels::ft_pill_box(x, Ju_); };
+    break;
+  }
+  default:
+    throw std::runtime_error("Did not choose valid radial kernel.");
+  }
+}
 }  // namespace purify

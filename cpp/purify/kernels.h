@@ -60,6 +60,7 @@ std::tuple<std::function<t_real(t_real)>, std::function<t_real(t_real)>,
            std::function<t_real(t_real)>, std::function<t_real(t_real)>>
 create_kernels(const kernels::kernel kernel_name, const t_uint &Ju_, const t_uint &Jv_,
                const t_uint &ftsizeu_, const t_uint &ftsizev_, const t_real &oversample_ratio);
+std::function<t_real(t_real)> create_radial_ftkernel(const kernels::kernel kernel_name_, const t_uint Ju_);
 }  // namespace purify
 
 #endif
