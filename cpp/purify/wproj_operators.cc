@@ -66,7 +66,6 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
 
   auto const ftkernel_radial = [&](const t_real l) -> t_real { return ftkerneluv(l) / norm; };
 
-
   t_int coeffs_done = 0;
   t_uint total = 0;
 
@@ -99,8 +98,9 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
     }
     if (total % 1000 == 0) {
 #pragma omp critical(print)
-      PURIFY_HIGH_LOG("Rows: {} of {} (w = {}, support = {}x{}, coeffs: {} of {})", total, rows,
-                      w_val, Ju_max, Ju_max, coeffs_done, num_of_coeffs);
+      PURIFY_HIGH_LOG("Rows: {} of {} (w = {}, support = {}x{}, coeffs: {} of {}, {}%)", total, rows,
+                      w_val, Ju_max, Ju_max, coeffs_done, num_of_coeffs,
+                      static_cast<t_real>(coeffs_done) / static_cast<t_real>(num_of_coeffs) * 100.);
     }
   }
   interpolation_matrix.makeCompressed();
@@ -109,7 +109,7 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
 
 Image<t_complex> init_correction_radial_2d(const t_real oversample_ratio, const t_uint imsizey_,
                                            const t_uint imsizex_,
-                                           const std::function<t_real(t_real)> & ftkerneluv,
+                                           const std::function<t_real(t_real)> &ftkerneluv,
                                            const t_real w_mean, const t_real cellx,
                                            const t_real celly) {
   const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
