@@ -5,6 +5,7 @@
 #include "purify/directories.h"
 #include "purify/logging.h"
 #include "purify/operators.h"
+#include "purify/wproj_operators.h"
 #include <sopt/credible_region.h>
 #include <sopt/imaging_padmm.h>
 #include <sopt/relative_variation.h>
@@ -38,7 +39,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   auto const measurements_transform =
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 1000,
-          0.0001, kernels::kernel_from_string.at(kernel), J, J, std::get<0>(w_term));
+          0.0001, kernels::kernel_from_string.at(kernel), J, 30, 1e-6, 1e-6);
 #else
   af::setDevice(0);
   auto const measurements_transform = gpu::measurementoperator::init_degrid_operator_2d(
@@ -129,14 +130,14 @@ int main(int, char **) {
   // sopt::logging::set_level("debug");
   //  purify::logging::set_level("debug");
   const std::string &name = "M31";
-  const t_real FoV = 1;       // deg
-  const t_real max_w = 100.;  // lambda
-  const t_real snr = 10;
+  const t_real FoV = 15;       // deg
+  const t_real max_w = 15.;  // lambda
+  const t_real snr = 30;
   const bool w_term = false;
   const std::string kernel = "kb";
   std::string const fitsfile = image_filename(name + ".fits");
   auto M31 = pfitsio::read2d(fitsfile);
-  const t_real cellsize = 1;  // FoV / M31.cols() * 60. * 60.;
+  const t_real cellsize = FoV / M31.cols() * 60. * 60.;
   std::string const inputfile = output_filename(name + "_" + "input.fits");
 
   t_real const max = M31.array().abs().maxCoeff();
@@ -144,9 +145,8 @@ int main(int, char **) {
   pfitsio::write2d(M31.real(), inputfile);
 
   t_int const number_of_pxiels = M31.size();
-  t_int const number_of_vis = std::floor(number_of_pxiels * 0.2);
+  t_int const number_of_vis = std::floor(number_of_pxiels * 2);
   // Generating random uv(w) coverage
-  /*
   t_real const sigma_m = constant::pi / 3;
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, max_w);
   uv_data.units = utilities::vis_units::radians;
@@ -156,25 +156,28 @@ int main(int, char **) {
 #ifndef PURIFY_GPU
   auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
       uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 1000, 0.0001,
-kernels::kernel_from_string.at("kb"), 8, 8, w_term); #else auto const sky_measurements =
-gpu::measurementoperator::init_degrid_operator_2d( uv_data, M31.rows(), M31.cols(), cellsize,
-cellsize, 2, 1000, 0.0001, kernels::kernel_from_string.at("kb"), 8, 8, w_term); #endif uv_data.vis =
-(*sky_measurements) * Image<t_complex>::Map(M31.data(), M31.size(), 1); Vector<t_complex> const y0 =
-uv_data.vis;
+      kernels::kernel_from_string.at("kb"), 8, 30, 1e-6, 1e-6);
+#else
+  auto const sky_measurements = gpu::measurementoperator::init_degrid_operator_2d(
+      uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 1000, 0.0001,
+      kernels::kernel_from_string.at("kb"), 8, 8, w_term);
+#endif
+  uv_data.vis = (*sky_measurements) * Image<t_complex>::Map(M31.data(), M31.size(), 1);
+  Vector<t_complex> const y0 = uv_data.vis;
   // working out value of signal given SNR of 30
   t_real const sigma = utilities::SNR_to_standard_deviation(y0, snr);
 
   std::cout << std::setprecision(13) << sigma << std::endl;
   // adding noise to visibilities
   uv_data.vis = utilities::add_noise(y0, 0., sigma);
-  // padmm(name + "30", M31, "box", 1, uv_data, sigma, std::make_tuple(w_term, cellsize));
-  */
-
-  const std::string &test_dir = "expected/padmm_serial/";
-  const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
-  auto uv_data = utilities::read_visibility(input_data_path, false);
-  uv_data.units = utilities::vis_units::radians;
-  t_real const sigma = 0.02378738741225;
-  padmm(name + "10", M31, kernel, 4, uv_data, sigma, std::make_tuple(w_term, cellsize));
+  padmm(name + "30", M31, kernel, 4, uv_data, sigma, std::make_tuple(w_term, cellsize));
+  /*
+    const std::string &test_dir = "expected/padmm_serial/";
+    const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
+    auto uv_data = utilities::read_visibility(input_data_path, false);
+    uv_data.units = utilities::vis_units::radians;
+    t_real const sigma = 0.02378738741225;
+    padmm(name + "10", M31, kernel, 4, uv_data, sigma, std::make_tuple(w_term, cellsize));
+    */
   return 0;
 }
