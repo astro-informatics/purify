@@ -82,10 +82,17 @@ int main(int argc, const char **argv) {
     const t_real max_w = 100.;  // lambda
     uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, max_w);
     uv_data.units = utilities::vis_units::radians;
-    auto const sky_measurements = factory::measurement_operator_factory<Vector<t_complex>>(
-        mop_algo, uv_data, params.height(), params.width(), params.cellsizey(), params.cellsizex(),
-        params.oversampling(), params.powMethod_iter(), params.powMethod_tolerance(),
-        kernels::kernel_from_string.at(params.kernel()), 2 * params.Jy(), 2 * params.Jx());
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> sky_measurements = (not params.wprojection())?
+      factory::measurement_operator_factory<Vector<t_complex>>(
+          mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
+          params.cellsizex(), params.oversampling(), params.powMethod_iter(),
+          params.powMethod_tolerance(), kernels::kernel_from_string.at(params.kernel()),
+          2 * params.Jy(), 2 * params.Jx(), params.mpi_wstacking() ):
+      factory::measurement_operator_factory<Vector<t_complex>>(
+          mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
+          params.cellsizex(), params.oversampling(), params.powMethod_iter(),
+          params.powMethod_tolerance(), kernels::kernel_from_string.at(params.kernel()),
+          params.Jy(), params.Jw(), 1e-6, 1e-6);
     uv_data.vis = (*sky_measurements) * Image<t_complex>::Map(image.data(), image.size(), 1);
     Vector<t_complex> const y0 = uv_data.vis;
     sigma = utilities::SNR_to_standard_deviation(y0, params.signal_to_noise());
