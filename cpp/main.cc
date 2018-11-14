@@ -152,14 +152,14 @@ int main(int argc, const char **argv) {
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
     auto const world = sopt::mpi::Communicator::World();
-    if (world.is_root()){
+    if (world.is_root()) {
 #else
     throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
-  params.writeOutput();
+      params.writeOutput();
     }
   } else {
-  params.writeOutput();
+    params.writeOutput();
   }
   const std::string out_dir = params.output_prefix() + "/output_" + params.timestamp();
   // Creating header for saving output images during iterations
@@ -195,7 +195,7 @@ int main(int argc, const char **argv) {
     auto const world = sopt::mpi::Communicator::World();
     if (world.is_root())
 #else
-    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
+  throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
       pfitsio::write2d(psf_image / psf_image.maxCoeff(), psf_header, true);
   } else {
@@ -213,7 +213,7 @@ int main(int argc, const char **argv) {
     auto const world = sopt::mpi::Communicator::World();
     if (world.is_root())
 #else
-    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
+  throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
       pfitsio::write2d(dirty_image / psf_image.maxCoeff(), dirty_header, true);
   } else {
@@ -237,7 +237,7 @@ int main(int argc, const char **argv) {
     auto const world = sopt::mpi::Communicator::World();
     if (world.is_root())
 #else
-    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
+  throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
       pfitsio::write2d(image, purified_header, true);
   } else {
@@ -254,7 +254,7 @@ int main(int argc, const char **argv) {
     auto const world = sopt::mpi::Communicator::World();
     if (world.is_root())
 #else
-    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
+  throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
       pfitsio::write2d(residual_image, residuals_header, true);
   } else {
