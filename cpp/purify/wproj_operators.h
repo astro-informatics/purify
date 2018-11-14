@@ -72,6 +72,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
                     imsizey * celly / (60. * 60.));
   PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
+  PURIFY_MEDIUM_LOG("Mean w: {}", w_mean);
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
       u, v, w, weights, imsizey, imsizex, oversample_ratio, ftkerneluv, Ju, Jw, cellx, celly,
       absolute_error, relative_error);
@@ -153,7 +154,6 @@ std::shared_ptr<sopt::LinearTransform<T> const> init_degrid_operator_2d(
   indirect = sopt::chained_operators<T>(operator_norm, indirect);
   return std::make_shared<sopt::LinearTransform<T> const>(direct, M, indirect, N);
 }
-
 
 template <class T>
 std::shared_ptr<sopt::LinearTransform<T> const> init_degrid_operator_2d(
