@@ -64,12 +64,8 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
       *iter = *iter + 1;
       return true;
     };
-    auto lambda = [algo_weak, updater](Vector<T> const &x, Vector<T> const &res) {
-      auto algo = algo_weak.lock();
-      return algo->is_converged()(x, res) and updater(x, res);
-    };
     auto algo = algo_weak.lock();
-    algo->is_converged(lambda);
+    algo->is_converged(updater);
 
 #else
     throw std::runtime_error(
@@ -116,12 +112,8 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
       *iter = *iter + 1;
       return true;
     };
-    auto lambda = [algo_weak, updater](Vector<T> const &x, Vector<T> const &res) {
-      auto algo = algo_weak.lock();
-      return updater(x, res);
-    };
     auto algo = algo_weak.lock();
-    algo->is_converged(lambda);
+    algo->is_converged(updater);
   }
 }
 }  // namespace factory
