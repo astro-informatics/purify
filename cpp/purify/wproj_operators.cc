@@ -44,7 +44,7 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
   const t_int num_of_coeffs = total_coeffs.array().sum();
   PURIFY_HIGH_LOG("Using {} rows (coefficients per a row {}), and memory of {} MegaBytes",
                   total_coeffs.size(), total_coeffs.array().mean(),
-                  16 * num_of_coeffs / std::pow(10., 6));
+                  16. * num_of_coeffs / std::pow(10., 6));
   Sparse<t_complex> interpolation_matrix(rows, cols);
   try {
     interpolation_matrix.reserve(total_coeffs);
