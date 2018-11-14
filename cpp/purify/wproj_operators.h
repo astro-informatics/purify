@@ -72,7 +72,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
                     imsizey * celly / (60. * 60.));
   PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
-  PURIFY_MEDIUM_LOG("Mean, Min, Max w: {}", w_mean, w.minCoeff());
+  PURIFY_MEDIUM_LOG("Mean, Min, Max w: {}, {}, {}", w_mean, w.minCoeff());
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
       u, v, w.array() - w_mean, weights, imsizey, imsizex, oversample_ratio, ftkerneluv, Ju, Jw, cellx, celly,
       absolute_error, relative_error);
