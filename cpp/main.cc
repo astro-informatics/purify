@@ -141,7 +141,18 @@ int main(int argc, const char **argv) {
 
   // Save some things before applying the algorithm
   // the config yaml file - this also generates the output directory and the timestamp
+  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
+#ifdef PURIFY_MPI
+    auto const world = sopt::mpi::Communicator::World();
+    if (world.is_root()){
+#else
+    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
+#endif
   params.writeOutput();
+    }
+  } else {
+  params.writeOutput();
+  }
   const std::string out_dir = params.output_prefix() + "/output_" + params.timestamp();
   // Creating header for saving output images during iterations
   const pfitsio::header_params update_header_sol =
