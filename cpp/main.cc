@@ -65,8 +65,16 @@ int main(int argc, const char **argv) {
       PURIFY_HIGH_LOG("{}", params.measurements()[i]);
     sigma = params.measurements_sigma();
     // TODO: use_w_term hardcoded to false for now
-    uv_data = read_measurements::read_measurements(params.measurements(), false, stokes::I,
-                                                   params.measurements_units());
+#ifdef PURIFY_MPI
+    if (using_mpi) {
+      auto const world = sopt::mpi::Communicator::World();
+      uv_data = read_measurements::read_measurements(params.measurements(), world,
+                                                     distribute::plan::w_term, true, stokes::I,
+                                                     params.measurements_units());
+    } else
+#endif
+      uv_data = read_measurements::read_measurements(params.measurements(), true, stokes::I,
+                                                     params.measurements_units());
   } else if (params.source() == purify::utilities::vis_source::simulation) {
     PURIFY_HIGH_LOG("Input visibilities will be generated for random coverage.");
     // TODO: move this to function (in utilities.h?)
