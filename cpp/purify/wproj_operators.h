@@ -74,7 +74,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   PURIFY_MEDIUM_LOG("Mean w: {}", w_mean);
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
-      u, v, w, weights, imsizey, imsizex, oversample_ratio, ftkerneluv, Ju, Jw, cellx, celly,
+      u, v, w - w_mean, weights, imsizey, imsizex, oversample_ratio, ftkerneluv, Ju, Jw, cellx, celly,
       absolute_error, relative_error);
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
