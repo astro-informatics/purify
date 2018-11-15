@@ -10,12 +10,13 @@ namespace purify {
 
 class IndexMapping {
  public:
-  IndexMapping(const std::vector<t_int> &indices, const t_int N) : indices(indices), N(N){};
+  IndexMapping(const std::vector<t_int> &indices, const t_int N, const t_int start = 0)
+      : indices(indices), N(N), start(start){};
   template <class ITER>
-  IndexMapping(const ITER &first, const ITER &end, const t_int N)
-      : IndexMapping(std::vector<t_int>(first, end), N) {}
-  IndexMapping(const std::set<t_int> &indices, const t_int N)
-      : IndexMapping(indices.begin(), indices.end(), N) {}
+  IndexMapping(const ITER &first, const ITER &end, const t_int N, const t_int start = 0)
+      : IndexMapping(std::vector<t_int>(first, end), N, start) {}
+  IndexMapping(const std::set<t_int> &indices, const t_int N, const t_int start = 0)
+      : IndexMapping(indices.begin(), indices.end(), N, start) {}
 
   //! Creates a vector of elements equal to re-indexed inpu
   template <class T0, class T1>
@@ -24,9 +25,9 @@ class IndexMapping {
     derived.resize(indices.size());
     typename T0::Index i(0);
     for (auto const &index : indices) {
-      assert(index >= 0 and index < input.size());
+      assert(index >= start and index < (N + start));
       assert(derived.size() > i);
-      derived(i++) = input(index);
+      derived(i++) = input(index - start);
     }
   }
 
@@ -38,8 +39,8 @@ class IndexMapping {
     derived = T1::Zero(N, 1);
     typename T0::Index i(0);
     for (auto const &index : indices) {
-      assert(index >= 0 and index < output.size());
-      derived(index) += input(i++);
+      assert(index >= start and index < (N + start));
+      derived(index - start) += input(i++);
     }
   }
 
@@ -48,6 +49,7 @@ class IndexMapping {
 
  private:
   std::vector<t_int> indices;
+  t_int start;
   t_int N;
 };
 

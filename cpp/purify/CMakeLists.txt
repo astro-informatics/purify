@@ -41,8 +41,9 @@ if(TARGET casacore::ms)
 endif()
 
 if(PURIFY_MPI)
-  list(APPEND HEADERS mpi_utilities.h distribute.h)
-  list(APPEND SOURCES mpi_utilities.cc distribute.cc)
+  list(APPEND HEADERS mpi_utilities.h distribute.h DistributeSparseVector.h
+  AllToAllSparseVector.h)
+  list(APPEND SOURCES mpi_utilities.cc distribute.cc AllToAllSparseVector.cc)
 endif()
 
 add_library(libpurify SHARED ${SOURCES})
