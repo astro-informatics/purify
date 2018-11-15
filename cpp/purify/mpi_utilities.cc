@@ -175,9 +175,10 @@ utilities::vis_params set_cell_size(const sopt::mpi::Communicator &comm,
   return utilities::set_cell_size(uv_vis, max_u, max_v, cell_x, cell_y);
 }
 utilities::vis_params w_stacking(utilities::vis_params const &params,
-                                 sopt::mpi::Communicator const &comm, const t_int iters) {
+                                 sopt::mpi::Communicator const &comm, const t_int iters,
+                                 const std::function<t_real(t_real)> &cost) {
   const std::vector<t_int> w_stacks =
-      std::get<0>(distribute::kmeans_algo(params.w, comm.size(), iters, comm));
+      std::get<0>(distribute::kmeans_algo(params.w, comm.size(), iters, comm, cost));
   return utilities::regroup_and_all_to_all(params, w_stacks, comm);
 }
 }  // namespace utilities

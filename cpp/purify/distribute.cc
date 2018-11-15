@@ -97,9 +97,9 @@ Vector<t_int> equal_distribution(Vector<t_real> const &u, Vector<t_real> const &
             });
   return index;
 }
-std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(const Vector<t_real> &w,
-                                                                const t_int number_of_nodes,
-                                                                const t_int iters) {
+std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
+    const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters,
+    const std::function<t_real(t_real)> &cost) {
   std::vector<t_int> w_node(w.size(), 0);
   std::vector<t_real> w_centre(number_of_nodes, 0);
   std::vector<t_real> w_sum(number_of_nodes, 0);
@@ -115,9 +115,9 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(const Vector<t_r
     for (int i = 0; i < w.size(); i++) {
       t_real min = 1e10;
       for (int node = 0; node < number_of_nodes; node++) {
-        const t_real cost = std::abs(w(i) - w_centre.at(node));
-        if (cost < min) {
-          min = cost;
+        const t_real cost_val = cost(w(i) - w_centre.at(node));
+        if (cost_val < min) {
+          min = cost_val;
           w_node[i] = node;
         }
       }
@@ -146,7 +146,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(const Vector<t_r
 #ifdef PURIFY_MPI
 std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters,
-    sopt::mpi::Communicator const &comm) {
+    sopt::mpi::Communicator const &comm, const std::function<t_real(t_real)> &cost) {
   std::vector<t_int> w_node(w.size(), 0);
   std::vector<t_real> w_centre(number_of_nodes, 0);
   std::vector<t_real> w_sum(number_of_nodes, 0);
@@ -162,9 +162,9 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     for (int i = 0; i < w.size(); i++) {
       t_real min = 1e10;
       for (int node = 0; node < number_of_nodes; node++) {
-        const t_real cost = std::abs(w(i) - w_centre.at(node));
-        if (cost < min) {
-          min = cost;
+        const t_real cost_val = cost(w(i) - w_centre.at(node));
+        if (cost_val < min) {
+          min = cost_val;
           w_node[i] = node;
         }
       }
