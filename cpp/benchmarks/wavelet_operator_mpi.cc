@@ -54,6 +54,8 @@ class WaveletOperatorMPIFixture : public ::benchmark::Fixture {
 
   // A bunch of useful variables
   t_uint m_counter;
+  // MPI communicator
+  sopt::mpi::Communicator m_world;
 };
 
 class WaveletOperatorAdjointMPIFixture : public ::benchmark::Fixture {
@@ -64,15 +66,14 @@ class WaveletOperatorAdjointMPIFixture : public ::benchmark::Fixture {
 
   // A bunch of useful variables
   t_uint m_counter;
+  // MPI communicator
+  sopt::mpi::Communicator m_world;
 };
 
 BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Apply)(benchmark::State& state) {
   // Image size
   t_uint m_imsizex = state.range(0);
   t_uint m_imsizey = state.range(0);
-
-  // MPI communicator
-  sopt::mpi::Communicator m_world = sopt::mpi::Communicator::World();
 
   sopt::wavelets::SARA m_sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
@@ -105,9 +106,6 @@ BENCHMARK_DEFINE_F(WaveletOperatorAdjointMPIFixture, Apply)(benchmark::State& st
   // Image size
   t_uint m_imsizex = state.range(0);
   t_uint m_imsizey = state.range(0);
-
-  // MPI communicator
-  sopt::mpi::Communicator m_world = sopt::mpi::Communicator::World();
 
   sopt::wavelets::SARA m_sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
