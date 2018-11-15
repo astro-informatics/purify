@@ -3,9 +3,11 @@
 cwd=$(pwd)
 cd $HOME
 
-if [ ! -d $HOME/spack ]
-   then
-       git clone https://github.com/spack/spack.git
+# Are we using the cache directory or it's empty?
+if [ ! -f $HOME/spack/README.md ]
+then
+    rm -rf spack
+    git clone https://github.com/spack/spack.git
 fi
 
 . spack/share/spack/setup-env.sh
