@@ -23,6 +23,10 @@ addons:
       - libgomp1 # version 4.8.4-2
       - libfftw3-dev # version 3.3.3
 
+cache:
+  directories:
+    - $HOME/spack
+
 matrix:
   fast_finish: true
 
@@ -228,8 +232,7 @@ deploy:
     condition: $TITLE = "Documentation - GCC"
 
 before_install:
-  - if [ [$TRAVIS_OS_NAME = osx]]; then git clone https://github.com/spack/spack.git; ./spack/bin/spack install gcc@7; ./spack/bin/spack load gcc@7;./spack/bin/spack install openmpi@3.0.0; ./spack/bin/spack load openmpi@3.0.0; ./spack/bin/spack install fftw; ./spack/bin/spack load fftw;./spack/bin/spack install boost; ./spack/bin/spack load boost;fi
-  - if [ [$TRAVIS_OS_NAME = osx] && [$MPI = ON] ]; then  ./spack/bin/spack install openmpi@3.0.0; ./spack/bin/spack load openmpi@3.0.0; fi
+  - if [ $TRAVIS_OS_NAME = osx ]; then bash .ci/install_spack.sh; source .ci/spack_env.sh ;fi
   - if [ $TRAVIS_OS_NAME = linux ]; then ClangVer="-5.0"; fi
   - if [[ ${TITLE} = *GCC* ]]; then CC=gcc-7; else CC=clang${ClangVer}; fi
   - if [[ ${TITLE} = *GCC* ]]; then CXX=g++-7; else CXX=clang++${ClangVer}; fi
