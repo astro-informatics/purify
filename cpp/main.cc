@@ -117,6 +117,14 @@ int main(int argc, const char **argv) {
        pixel_to_lambda(params.cellsizey(), params.height(), params.oversampling()));
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale /
                 uv_data.weights.norm() * uv_data.weights.size();
+#ifdef PURIFY_MPI
+  if (params.mpi_wstacking()) {
+    auto const world = sopt::mpi::Communicator::World();
+    const auto cost = [](t_real x) { return std::abs(x); };
+    const auto kmeans_iters = 40;
+    uv_data = utilities::w_stacking(uv_data, world, kmeans_iters, cost);
+  }
+#endif
 
   // create measurement operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
