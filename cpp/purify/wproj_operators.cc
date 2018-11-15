@@ -75,8 +75,7 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
       for (t_int jv = 1; jv < Jw + 1; ++jv) {
         // w_projection convolution setup
         const t_int Ju_max = widefield::w_support(w(m), du, Ju, Jw);
-        if (ju > Ju_max) continue;
-        if (jv > Ju_max) continue;
+        if ((ju > Ju_max) or (jv > Ju_max)) continue;
 
         t_uint evaluations = 0;
         const t_int kwu = std::floor(u(m) - Ju_max * 0.5);
@@ -94,7 +93,7 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
                 integration::method::h, evaluations);
 #pragma omp critical(add_eval)
         coeffs_done++;
-        if (coeffs_done % num_of_coeffs / 100 == 0) {
+        if ((coeffs_done % (num_of_coeffs / 100)) == 0) {
 #pragma omp critical(print)
           PURIFY_HIGH_LOG(
               "w = {}, support = {}x{}, coeffs: {} of {}, {}%", w_val, Ju_max, Ju_max, coeffs_done,
