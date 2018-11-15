@@ -69,20 +69,20 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
   t_int coeffs_done = 0;
   t_uint total = 0;
 
-#pragma omp parallel for
+#pragma omp parallel for collapse(3)
   for (t_int m = 0; m < rows; ++m) {
-    // w_projection convolution setup
+    for (t_int ju = 1; ju < Jw + 1; ++ju) {
+      for (t_int jv = 1; jv < Jw + 1; ++jv) {
+        // w_projection convolution setup
+        const t_int Ju_max = widefield::w_support(w(m), du, Ju, Jw);
+        if (ju > Ju_max) continue;
+        if (jv > Ju_max) continue;
 
-    t_uint evaluations = 0;
-    const t_int Ju_max = widefield::w_support(w(m), du, Ju, Jw);
-    const t_int kwu = std::floor(u(m) - Ju_max * 0.5);
-    const t_int kwv = std::floor(v(m) - Ju_max * 0.5);
-    const t_real w_val = w(m);  //((0. < w(m)) ? 1: -1) * std::min(Ju_max * du, std::abs(w(m)));
-#pragma omp critical(sum)
-    total++;
+        t_uint evaluations = 0;
+        const t_int kwu = std::floor(u(m) - Ju_max * 0.5);
+        const t_int kwv = std::floor(v(m) - Ju_max * 0.5);
+        const t_real w_val = w(m);  //((0. < w(m)) ? 1: -1) * std::min(Ju_max * du, std::abs(w(m)));
 
-    for (t_int ju = 1; ju < Ju_max + 1; ++ju) {
-      for (t_int jv = 1; jv < Ju_max + 1; ++jv) {
         const t_uint q = utilities::mod(kwu + ju, ftsizeu_);
         const t_uint p = utilities::mod(kwv + jv, ftsizev_);
         const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
@@ -94,13 +94,14 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
                 integration::method::h, evaluations);
 #pragma omp critical(add_eval)
         coeffs_done++;
-      }
-    }
-    if (total % 1000 == 0) {
+        if (coeffs_done % num_of_coeffs / 100 == 0) {
 #pragma omp critical(print)
-      PURIFY_HIGH_LOG("Rows: {} of {} (w = {}, support = {}x{}, coeffs: {} of {}, {}%)", total, rows,
-                      w_val, Ju_max, Ju_max, coeffs_done, num_of_coeffs,
-                      static_cast<t_real>(coeffs_done) / static_cast<t_real>(num_of_coeffs) * 100.);
+          PURIFY_HIGH_LOG(
+              "w = {}, support = {}x{}, coeffs: {} of {}, {}%", w_val, Ju_max, Ju_max, coeffs_done,
+              num_of_coeffs,
+              static_cast<t_real>(coeffs_done) / static_cast<t_real>(num_of_coeffs) * 100.);
+        }
+      }
     }
   }
   interpolation_matrix.makeCompressed();
