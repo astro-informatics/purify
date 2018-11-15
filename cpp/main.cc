@@ -135,17 +135,17 @@ int main(int argc, const char **argv) {
   std::vector<std::tuple<std::string, t_uint>> sara;
   for (size_t i = 0; i < params.wavelet_basis().size(); i++)
     sara.push_back(std::make_tuple(params.wavelet_basis().at(i), params.wavelet_levels()));
-
+  t_uint sara_size = 0;
   auto const wavelets_transform = factory::wavelet_operator_factory<Vector<t_complex>>(
-      wop_algo, sara, params.height(), params.width());
+      wop_algo, sara, params.height(), params.width(), sara_size);
 
   // Create algorithm
   auto algo = factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
       factory::algorithm::padmm, params.mpiAlgorithm(), measurements_transform, wavelets_transform,
       uv_data, sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(),
-      sara.size(), params.iterations(), params.realValueConstraint(),
-      params.positiveValueConstraint(), (sara.size() < 2), params.relVarianceConvergence(), 1e-3,
-      50);
+      sara_size, params.iterations(), params.realValueConstraint(),
+      params.positiveValueConstraint(), (params.wavelet_basis().size() < 2),
+      params.relVarianceConvergence(), 1e-3, 50);
 
   // Save some things before applying the algorithm
   // the config yaml file - this also generates the output directory and the timestamp
@@ -176,7 +176,7 @@ int main(int argc, const char **argv) {
   // Adding step size update to algorithm
   factory::add_updater<t_complex, sopt::algorithm::ImagingProximalADMM<t_complex>>(
       algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
-      update_header_res, params.height(), params.width(), using_mpi);
+      update_header_res, params.height(), params.width(), sara_size, using_mpi);
   // the input measurements, if simulated
   if (params.source() == purify::utilities::vis_source::simulation)
     utilities::write_visibility(uv_data, out_dir + "/input.vis");

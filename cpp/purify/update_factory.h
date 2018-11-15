@@ -21,7 +21,7 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
                  const t_real update_tol, const t_uint update_iters,
                  const pfitsio::header_params &update_solution_header,
                  const pfitsio::header_params &update_residual_header, const t_uint imsizey,
-                 const t_uint imsizex, const bool using_mpi) {
+                 const t_uint imsizex, const t_uint sara_size, const bool using_mpi) {
   if (update_tol < 0)
     throw std::runtime_error("Step size update tolerance must be greater than zero.");
   if (step_size_scale < 0)
@@ -39,13 +39,14 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
     const auto comm = sopt::mpi::Communicator::World();
     const std::shared_ptr<t_int> iter = std::make_shared<t_int>(0);
     const auto updater = [update_tol, update_iters, imsizex, imsizey, algo_weak, iter,
-                          step_size_scale, update_header_sol, update_header_res,
+                          step_size_scale, update_header_sol, update_header_res, sara_size,
                           comm](const Vector<T> &x, const Vector<T> &res) -> bool {
       auto algo = algo_weak.lock();
       if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ {}", algo->gamma());
       Vector<t_complex> const alpha = algo->Psi().adjoint() * x;
       const t_real new_gamma =
-          comm.all_reduce(alpha.real().cwiseAbs().maxCoeff(), MPI_MAX) * step_size_scale;
+          comm.all_reduce((sara_size > 0) ? alpha.real().cwiseAbs().maxCoeff() : 0., MPI_MAX) *
+          step_size_scale;
       if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
       // updating parameter
       algo->gamma(((std::abs(algo->gamma() - new_gamma) > update_tol) and *iter < update_iters)
