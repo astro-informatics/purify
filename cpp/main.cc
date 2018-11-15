@@ -120,7 +120,7 @@ int main(int argc, const char **argv) {
 #ifdef PURIFY_MPI
   if (params.mpi_wstacking()) {
     auto const world = sopt::mpi::Communicator::World();
-    const auto cost = [](t_real x) { return std::abs(x); };
+    const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
     const auto kmeans_iters = 40;
     uv_data = utilities::w_stacking(uv_data, world, kmeans_iters, cost);
   }
