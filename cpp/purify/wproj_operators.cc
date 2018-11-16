@@ -91,7 +91,7 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
             projection_kernels::exact_w_projection_integration_1d(
                 (u(m) - (kwu + ju)), (v(m) - (kwv + jv)), w_val, du, oversample_ratio,
                 ftkernel_radial, max_evaluations, absolute_error, relative_error,
-                integration::method::h, evaluations);
+                integration::method::p, evaluations);
 #pragma omp critical(add_eval)
         coeffs_done++;
         if ((coeffs_done % (num_of_coeffs / 100)) == 0) {
