@@ -77,11 +77,11 @@ int main(int argc, const char **argv) {
       uv_data = read_measurements::read_measurements(params.measurements(), true, stokes::I,
                                                      params.measurements_units());
 #ifdef PURIFY_MPI
-  if (params.mpi_wstacking()) {
-    auto const world = sopt::mpi::Communicator::World();
-    const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
-    uv_data = utilities::w_stacking(uv_data, world, params.kmeans_iters(), cost);
-  }
+    if (params.mpi_wstacking()) {
+      auto const world = sopt::mpi::Communicator::World();
+      const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
+      uv_data = utilities::w_stacking(uv_data, world, params.kmeans_iters(), cost);
+    }
 #endif
   } else if (params.source() == purify::utilities::vis_source::simulation) {
     PURIFY_HIGH_LOG("Input visibilities will be generated for random coverage.");
@@ -99,11 +99,11 @@ int main(int argc, const char **argv) {
     uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, rms_w);
     uv_data.units = utilities::vis_units::radians;
 #ifdef PURIFY_MPI
-  if (params.mpi_wstacking()) {
-    auto const world = sopt::mpi::Communicator::World();
-    const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
-    uv_data = utilities::w_stacking(uv_data, world, params.kmeans_iters(), cost);
-  }
+    if (params.mpi_wstacking()) {
+      auto const world = sopt::mpi::Communicator::World();
+      const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
+      uv_data = utilities::w_stacking(uv_data, world, params.kmeans_iters(), cost);
+    }
 #endif
     std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> sky_measurements =
         (not params.wprojection())
