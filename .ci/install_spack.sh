@@ -12,9 +12,11 @@ fi
 
 . spack/share/spack/setup-env.sh
 
+
+while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
 spack install -y gcc@7.2.0
-spack install -v -y openmpi@3.0.0 %gcc
-spack install -v -y fftw %gcc
-spack install -v -y boost %gcc
+spack install -y openmpi@3.0.0 %gcc@7.2.0
+spack install -y fftw %gcc@7.2.0
+spack install -y boost %gcc@7.2.0
 
 cd $cwd
