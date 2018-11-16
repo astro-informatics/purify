@@ -108,7 +108,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
   t_real const wmin = w.minCoeff();
   t_real const wmax = w.maxCoeff();
   for (int i = 0; i < w_centre.size(); i++)
-    w_centre[i] = i * (wmax - wmin) / number_of_nodes + wmin;
+    w_centre[i] = (i * (wmax - wmin) / number_of_nodes + wmin) * 0.01;
   // lopp through even nodes to reduces w-term
   for (int n = 0; n < iters; n++) {
     PURIFY_DEBUG("clustering iteration {}", n);
@@ -126,7 +126,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     }
     for (int j = 0; j < number_of_nodes; j++) {
       diff += std::abs(w_sum.at(j) / w_count.at(j) - w_centre.at(j)) / std::abs(w_centre.at(j));
-      w_centre[j] = (w_count.at(j) > 0) ? w_sum.at(j) / w_count.at(j): wmax;
+      w_centre[j] = (w_count.at(j) > 0) ? w_sum.at(j) / w_count.at(j) : wmax;
       PURIFY_DEBUG("Node {} has {} visibilities, using w-stack w = {}.", j, w_count.at(j),
                    w_centre.at(j));
       w_sum[j] = 0;
@@ -156,7 +156,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
   t_real const wmax = comm.all_reduce<t_real>(w.maxCoeff(), MPI_MAX);
   for (int i = 0; i < w_centre.size(); i++)
     w_centre[i] =
-        static_cast<t_real>(i) * (wmax - wmin) / static_cast<t_real>(number_of_nodes) + wmin;
+       (static_cast<t_real>(i) * (wmax - wmin) / static_cast<t_real>(number_of_nodes) + wmin) * 0.01;
   // lopp through even nodes to reduces w-term
   for (int n = 0; n < iters; n++) {
     if (comm.is_root()) PURIFY_DEBUG("clustering iteration {}", n);
@@ -195,5 +195,6 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
   return std::make_tuple(w_node, w_centre);
 }
 #endif
+
 }  // namespace distribute
 }  // namespace purify
