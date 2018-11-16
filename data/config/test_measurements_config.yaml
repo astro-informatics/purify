@@ -40,8 +40,10 @@ MeasureOperators:
   oversampling: 2 # value > 1
   powMethod_iter: 100 # value > 0
   powMethod_tolerance: 1e-4 # value > 0
-  wprojection: False # using radially symmetric w projection kernel
-  mpi_wstacking: True # applies average w-stack correction on each node (always True with wprojection)
+  wide-field:
+    wprojection: False # using radially symmetric w projection kernel
+    mpi_wstacking: False # applies average w-stack correction on each node (always True with wprojection)
+    kmeans_iterations: 1000 #number of iterations in w-stacking clustering algorithm
   # TODO: Add others like weighting. (at the moment natural)
 
 ########## SARA ##########
