@@ -70,7 +70,7 @@ int main(int argc, const char **argv) {
     if (using_mpi) {
       auto const world = sopt::mpi::Communicator::World();
       uv_data = read_measurements::read_measurements(params.measurements(), world,
-                                                     distribute::plan::w_term, true, stokes::I,
+                                                     distribute::plan::radial, true, stokes::I,
                                                      params.measurements_units());
     } else
 #endif
