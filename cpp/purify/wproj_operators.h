@@ -62,11 +62,11 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
     const t_real oversample_ratio, const kernels::kernel kernel, const t_uint Ju, const t_uint Jw,
     const fftw_plan ft_plan, const t_real cellx, const t_real celly, const t_real absolute_error,
     const t_real relative_error) {
-  auto const ftkerneluv = purify::create_radial_ftkernel(kernel, Ju);
+  auto const kerneluvs = purify::create_radial_ftkernel(kernel, Ju);
   sopt::OperatorFunction<T> directFZ, indirectFZ;
   t_real const w_mean = w.array().mean();
   std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(
-      ftkerneluv, imsizey, imsizex, oversample_ratio, ft_plan, w_mean, cellx, celly);
+      std::get<0>(kerneluvs), imsizey, imsizex, oversample_ratio, ft_plan, w_mean, cellx, celly);
   sopt::OperatorFunction<T> directG, indirectG;
   PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
                     imsizey * celly / (60. * 60.));
@@ -74,8 +74,8 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   PURIFY_MEDIUM_LOG("Mean, w: {}, +/- {}", w_mean, (w.maxCoeff() - w.minCoeff()) * 0.5);
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
-      u, v, w.array() - w_mean, weights, imsizey, imsizex, oversample_ratio, ftkerneluv, Ju, Jw, cellx, celly,
-      absolute_error, relative_error);
+      u, v, w.array() - w_mean, weights, imsizey, imsizex, oversample_ratio, std::get<0>(kerneluvs),
+      std::get<1>(kerneluvs), Ju, Jw, cellx, celly, absolute_error, relative_error);
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
   PURIFY_LOW_LOG("Finished consturction of Φ.");

@@ -12,6 +12,7 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
                                           const t_uint imsizey_, const t_uint imsizex_,
                                           const t_real oversample_ratio,
                                           const std::function<t_real(t_real)> &ftkerneluv,
+                                          const std::function<t_real(t_real)> &kerneluv,
                                           const t_uint Ju, const t_uint Jw, const t_real cellx,
                                           const t_real celly, const t_real abs_error,
                                           const t_real rel_error) {

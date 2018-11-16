@@ -4,7 +4,7 @@
 namespace purify {
 
 namespace kernels {
-t_real kaiser_bessel(const t_real &x, const t_int &J) {
+t_real kaiser_bessel(const t_real x, const t_real J) {
   /*
      kaiser bessel gridding kernel
      */
@@ -12,16 +12,18 @@ t_real kaiser_bessel(const t_real &x, const t_int &J) {
   return kaiser_bessel_general(x, J, alpha);
 }
 
-t_real kaiser_bessel_general(const t_real &x, const t_int &J, const t_real &alpha) {
+t_real kaiser_bessel_general(const t_real x, const t_real J, const t_real alpha) {
   /*
      kaiser bessel gridding kernel
      */
+  if(2 * x > J)
+    return 0;
   t_real a = 2 * x / J;
   return boost::math::cyl_bessel_i(0, std::real(alpha * std::sqrt(1 - a * a))) /
          boost::math::cyl_bessel_i(0, alpha);
 }
 
-t_real ft_kaiser_bessel_general(const t_real &x, const t_int &J, const t_real &alpha) {
+t_real ft_kaiser_bessel_general(const t_real x, const t_real J, const t_real alpha) {
   /*
      Fourier transform of kaiser bessel gridding kernel
      */
@@ -37,7 +39,7 @@ t_real ft_kaiser_bessel_general(const t_real &x, const t_int &J, const t_real &a
   // complex valued arguments
 }
 
-t_real ft_kaiser_bessel(const t_real &x, const t_int &J) {
+t_real ft_kaiser_bessel(const t_real x, const t_real J) {
   /*
      Fourier transform of kaiser bessel gridding kernel
      */
@@ -46,7 +48,7 @@ t_real ft_kaiser_bessel(const t_real &x, const t_int &J) {
   return ft_kaiser_bessel_general(x, J, alpha);
 }
 
-t_real gaussian(const t_real &x, const t_int &J) {
+t_real gaussian(const t_real x, const t_real J) {
   /*
      Guassian gridding kernel
 
@@ -57,7 +59,7 @@ t_real gaussian(const t_real &x, const t_int &J) {
   return gaussian_general(x, J, sigma);
 }
 
-t_real ft_gaussian(const t_real &x, const t_int &J) {
+t_real ft_gaussian(const t_real x, const t_real J) {
   /*
      Fourier transform of guassian gridding kernel
 
@@ -68,7 +70,7 @@ t_real ft_gaussian(const t_real &x, const t_int &J) {
   return ft_gaussian_general(x, J, sigma);
 }
 
-t_real calc_for_pswf(const t_real &eta0, const t_int &J, const t_real &alpha) {
+t_real calc_for_pswf(const t_real eta0, const t_real J, const t_real alpha) {
   // polynomial coefficients for prolate spheriodal wave function rational approximation
   const std::array<t_real, 6> p1 = {
       {8.203343e-2, -3.644705e-1, 6.278660e-1, -5.335581e-1, 2.312756e-1, 2 * 0.0}};
@@ -104,7 +106,7 @@ t_real calc_for_pswf(const t_real &eta0, const t_int &J, const t_real &alpha) {
   return 0;
 }
 
-t_real pswf(const t_real &x, const t_int &J) {
+t_real pswf(const t_real x, const t_real J) {
   /*
      Calculates the standard PSWF for radio astronomy, with a support of J = 6 and alpha = 1.
 
@@ -121,7 +123,7 @@ t_real pswf(const t_real &x, const t_int &J) {
   return calc_for_pswf(eta0, J, alpha) * std::pow(1 - eta0 * eta0, alpha);
 }
 
-t_real ft_pswf(const t_real &x, const t_int &J) {
+t_real ft_pswf(const t_real x, const t_real J) {
   /*
      Calculates the fourier transform of the standard PSWF for radio astronomy, with a support of J
      = 6 and alpha = 1.
@@ -141,8 +143,8 @@ t_real ft_pswf(const t_real &x, const t_int &J) {
   return calc_for_pswf(eta0, J, alpha);
 }
 
-Vector<t_real> kernel_samples(const t_int &total_samples,
-                              const std::function<t_real(t_real)> kernelu, const t_int &J) {
+Vector<t_real> kernel_samples(const t_real total_samples,
+                              const std::function<t_real(t_real)> kernelu, const t_real J) {
   /*
      Pre-calculates samples of a kernel, that can be used with linear interpolation (see Rapid
      gridding reconstruction with a minimal oversampling ratio, Beatty et. al. 2005)
@@ -154,7 +156,7 @@ Vector<t_real> kernel_samples(const t_int &total_samples,
   return samples;
 }
 
-t_real kernel_linear_interp(const Vector<t_real> &samples, const t_real &x, const t_int &J) {
+t_real kernel_linear_interp(const Vector<t_real> &samples, const t_real x, const t_real J) {
   /*
      Calculates kernel using linear interpolation between pre-calculated samples. (see Rapid
      gridding reconstruction with a minimal oversampling ratio, Beatty et. al. 2005)
@@ -185,7 +187,7 @@ t_real kernel_linear_interp(const Vector<t_real> &samples, const t_real &x, cons
   t_real output = y_0 + (y_1 - y_0) / (i_1 - i_0) * (i_effective - i_0);
   return output;
 }
-t_real pill_box(const t_real &x, const t_int &J) {
+t_real pill_box(const t_real x, const t_real J) {
   /*
      Gaussian gridding kernel
 
@@ -194,7 +196,7 @@ t_real pill_box(const t_real &x, const t_int &J) {
      */
   return 1. / static_cast<t_real>(J);
 }
-t_real ft_pill_box(const t_real &x, const t_int &J) {
+t_real ft_pill_box(const t_real x, const t_real J) {
   /*
      Gaussian gridding kernel
 
@@ -203,7 +205,7 @@ t_real ft_pill_box(const t_real &x, const t_int &J) {
      */
   return boost::math::sinc_pi(J * x * constant::pi);
 }
-t_real gaussian_general(const t_real &x, const t_int &J, const t_real &sigma) {
+t_real gaussian_general(const t_real x, const t_real J, const t_real sigma) {
   /*
      Gaussian gridding kernel
 
@@ -216,7 +218,7 @@ t_real gaussian_general(const t_real &x, const t_int &J, const t_real &sigma) {
   return std::exp(-a * a * 0.5);
 }
 
-t_real ft_gaussian_general(const t_real &x, const t_int &J, const t_real &sigma) {
+t_real ft_gaussian_general(const t_real x, const t_real J, const t_real sigma) {
   /*
      Fourier transform of Gaussian gridding kernel
 
@@ -232,8 +234,8 @@ t_real ft_gaussian_general(const t_real &x, const t_int &J, const t_real &sigma)
 
 std::tuple<std::function<t_real(t_real)>, std::function<t_real(t_real)>,
            std::function<t_real(t_real)>, std::function<t_real(t_real)>>
-create_kernels(const kernels::kernel kernel_name_, const t_uint &Ju_, const t_uint &Jv_,
-               const t_uint &imsizey_, const t_uint &imsizex_, const t_real &oversample_ratio) {
+create_kernels(const kernels::kernel kernel_name_, const t_uint Ju_, const t_uint Jv_,
+               const t_real imsizey_, const t_real imsizex_, const t_real oversample_ratio) {
   // PURIFY_MEDIUM_LOG("Kernel Name: {}", kernel_name_.c_str());
   PURIFY_MEDIUM_LOG("Kernel Support: {} x {}", Ju_, Jv_);
   const t_uint ftsizev_ = std::floor(imsizey_ * oversample_ratio);
@@ -244,14 +246,10 @@ create_kernels(const kernels::kernel kernel_name_, const t_uint &Ju_, const t_ui
   }
   switch (kernel_name_) {
   case kernels::kernel::kb: {
-    auto kbu = [=](const t_real &x) { return kernels::kaiser_bessel(x, Ju_); };
-    auto kbv = [=](const t_real &x) { return kernels::kaiser_bessel(x, Jv_); };
-    auto ftkbu = [=](const t_real &x) {
-      return kernels::ft_kaiser_bessel(x / ftsizeu_ - 0.5, Ju_);
-    };
-    auto ftkbv = [=](const t_real &x) {
-      return kernels::ft_kaiser_bessel(x / ftsizev_ - 0.5, Jv_);
-    };
+    auto kbu = [=](const t_real x) { return kernels::kaiser_bessel(x, Ju_); };
+    auto kbv = [=](const t_real x) { return kernels::kaiser_bessel(x, Jv_); };
+    auto ftkbu = [=](const t_real x) { return kernels::ft_kaiser_bessel(x / ftsizeu_ - 0.5, Ju_); };
+    auto ftkbv = [=](const t_real x) { return kernels::ft_kaiser_bessel(x / ftsizev_ - 0.5, Jv_); };
     return std::make_tuple(kbu, kbv, ftkbu, ftkbv);
     break;
   }
@@ -264,54 +262,54 @@ create_kernels(const kernels::kernel kernel_name_, const t_uint &Ju_, const t_ui
         constant::pi * std::sqrt(Jv_ * Jv_ / (oversample_ratio * oversample_ratio) *
                                      (oversample_ratio - 0.5) * (oversample_ratio - 0.5) -
                                  0.8);
-    auto kbu = [=](const t_real &x) {
+    auto kbu = [=](const t_real x) {
       return kernels::kaiser_bessel_general(x, Ju_, kb_interp_alpha_Ju);
     };
-    auto kbv = [=](const t_real &x) {
+    auto kbv = [=](const t_real x) {
       return kernels::kaiser_bessel_general(x, Jv_, kb_interp_alpha_Jv);
     };
-    auto ftkbu = [=](const t_real &x) {
+    auto ftkbu = [=](const t_real x) {
       return kernels::ft_kaiser_bessel_general(x / ftsizeu_ - 0.5, Ju_, kb_interp_alpha_Ju);
     };
-    auto ftkbv = [=](const t_real &x) {
+    auto ftkbv = [=](const t_real x) {
       return kernels::ft_kaiser_bessel_general(x / ftsizev_ - 0.5, Jv_, kb_interp_alpha_Jv);
     };
     return std::make_tuple(kbu, kbv, ftkbu, ftkbv);
     break;
   }
   case kernels::kernel::pswf: {
-    auto pswfu = [=](const t_real &x) { return kernels::pswf(x, Ju_); };
-    auto pswfv = [=](const t_real &x) { return kernels::pswf(x, Jv_); };
-    auto ftpswfu = [=](const t_real &x) { return kernels::ft_pswf(x / ftsizeu_ - 0.5, Ju_); };
-    auto ftpswfv = [=](const t_real &x) { return kernels::ft_pswf(x / ftsizev_ - 0.5, Jv_); };
+    auto pswfu = [=](const t_real x) { return kernels::pswf(x, Ju_); };
+    auto pswfv = [=](const t_real x) { return kernels::pswf(x, Jv_); };
+    auto ftpswfu = [=](const t_real x) { return kernels::ft_pswf(x / ftsizeu_ - 0.5, Ju_); };
+    auto ftpswfv = [=](const t_real x) { return kernels::ft_pswf(x / ftsizev_ - 0.5, Jv_); };
     return std::make_tuple(pswfu, pswfv, ftpswfu, ftpswfv);
     break;
   }
   case kernels::kernel::gauss: {
-    auto gaussu = [=](const t_real &x) { return kernels::gaussian(x, Ju_); };
-    auto gaussv = [=](const t_real &x) { return kernels::gaussian(x, Jv_); };
-    auto ftgaussu = [=](const t_real &x) { return kernels::ft_gaussian(x / ftsizeu_ - 0.5, Ju_); };
-    auto ftgaussv = [=](const t_real &x) { return kernels::ft_gaussian(x / ftsizev_ - 0.5, Jv_); };
+    auto gaussu = [=](const t_real x) { return kernels::gaussian(x, Ju_); };
+    auto gaussv = [=](const t_real x) { return kernels::gaussian(x, Jv_); };
+    auto ftgaussu = [=](const t_real x) { return kernels::ft_gaussian(x / ftsizeu_ - 0.5, Ju_); };
+    auto ftgaussv = [=](const t_real x) { return kernels::ft_gaussian(x / ftsizev_ - 0.5, Jv_); };
     return std::make_tuple(gaussu, gaussv, ftgaussu, ftgaussv);
     break;
   }
   case kernels::kernel::box: {
-    auto boxu = [=](const t_real &x) { return kernels::pill_box(x, Ju_); };
-    auto boxv = [=](const t_real &x) { return kernels::pill_box(x, Jv_); };
-    auto ftboxu = [=](const t_real &x) { return kernels::ft_pill_box(x / ftsizeu_ - 0.5, Ju_); };
-    auto ftboxv = [=](const t_real &x) { return kernels::ft_pill_box(x / ftsizev_ - 0.5, Jv_); };
+    auto boxu = [=](const t_real x) { return kernels::pill_box(x, Ju_); };
+    auto boxv = [=](const t_real x) { return kernels::pill_box(x, Jv_); };
+    auto ftboxu = [=](const t_real x) { return kernels::ft_pill_box(x / ftsizeu_ - 0.5, Ju_); };
+    auto ftboxv = [=](const t_real x) { return kernels::ft_pill_box(x / ftsizev_ - 0.5, Jv_); };
     return std::make_tuple(boxu, boxv, ftboxu, ftboxv);
     break;
   }
   case kernels::kernel::gauss_alt: {
     const t_real sigma = 1;  // In units of radians, Rafael uses sigma = 2 * pi / ftsizeu_. However,
     // this should be 1 in units of pixels.
-    auto gaussu = [=](const t_real &x) { return kernels::gaussian_general(x, Ju_, sigma); };
-    auto gaussv = [=](const t_real &x) { return kernels::gaussian_general(x, Jv_, sigma); };
-    auto ftgaussu = [=](const t_real &x) {
+    auto gaussu = [=](const t_real x) { return kernels::gaussian_general(x, Ju_, sigma); };
+    auto gaussv = [=](const t_real x) { return kernels::gaussian_general(x, Jv_, sigma); };
+    auto ftgaussu = [=](const t_real x) {
       return kernels::ft_gaussian_general(x / ftsizeu_ - 0.5, Ju_, sigma);
     };
-    auto ftgaussv = [=](const t_real &x) {
+    auto ftgaussv = [=](const t_real x) {
       return kernels::ft_gaussian_general(x / ftsizev_ - 0.5, Jv_, sigma);
     };
     return std::make_tuple(gaussu, gaussv, ftgaussu, ftgaussv);
@@ -322,7 +320,8 @@ create_kernels(const kernels::kernel kernel_name_, const t_uint &Ju_, const t_ui
   }
 }
 
-std::function<t_real(t_real)> create_radial_ftkernel(const kernels::kernel kernel_name_, const t_uint Ju_){
+std::tuple<std::function<t_real(t_real)>, std::function<t_real(t_real)>> create_radial_ftkernel(
+    const kernels::kernel kernel_name_, const t_uint Ju_) {
   // PURIFY_MEDIUM_LOG("Kernel Name: {}", kernel_name_.c_str());
   PURIFY_MEDIUM_LOG("Radial Kernel Support: {}", Ju_);
   if ((kernel_name_ == kernels::kernel::pswf) and (Ju_ != 6)) {
@@ -331,19 +330,29 @@ std::function<t_real(t_real)> create_radial_ftkernel(const kernels::kernel kerne
   }
   switch (kernel_name_) {
   case kernels::kernel::kb: {
-    return [=](const t_real &x) { return kernels::ft_kaiser_bessel(x, Ju_); };
+    return std::make_tuple(
+        [=](const t_real x) {
+          return kernels::ft_kaiser_bessel(x, static_cast<t_real>(Ju_));
+        },
+        [=](const t_real x) { return kernels::kaiser_bessel(x, static_cast<t_real>(Ju_)); });
     break;
   }
   case kernels::kernel::pswf: {
-    return [=](const t_real &x) { return kernels::ft_pswf(x, Ju_); };
+    return std::make_tuple(
+        [=](const t_real x) { return kernels::ft_pswf(x, static_cast<t_real>(Ju_)); },
+        [=](const t_real x) { return kernels::pswf(x, Ju_); });
     break;
   }
   case kernels::kernel::gauss: {
-    return [=](const t_real &x) { return kernels::ft_gaussian(x, Ju_); };
+    return std::make_tuple(
+        [=](const t_real x) { return kernels::ft_gaussian(x, static_cast<t_real>(Ju_)); },
+        [=](const t_real x) { return kernels::gaussian(x, Ju_); });
     break;
   }
   case kernels::kernel::box: {
-    return [=](const t_real &x) { return kernels::ft_pill_box(x, Ju_); };
+    return std::make_tuple(
+        [=](const t_real x) { return kernels::ft_pill_box(x, static_cast<t_real>(Ju_)); },
+        [=](const t_real x) { return kernels::pill_box(x, Ju_); });
     break;
   }
   default:
