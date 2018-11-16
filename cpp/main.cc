@@ -92,11 +92,18 @@ int main(int argc, const char **argv) {
                                std::to_string(params.width()) + "x" +
                                std::to_string(params.height()) + ").");
     t_int const number_of_pixels = image.size();
-    t_int const number_of_vis = std::floor(number_of_pixels * 0.2);
+    t_int const number_of_vis = params.number_of_measurements();
     t_real const sigma_m = constant::pi / 3;
-    const t_real max_w = 100.;  // lambda
-    uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, max_w);
+    const t_real rms_w = params.w_rms();  // lambda
+    uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, rms_w);
     uv_data.units = utilities::vis_units::radians;
+#ifdef PURIFY_MPI
+  if (params.mpi_wstacking()) {
+    auto const world = sopt::mpi::Communicator::World();
+    const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
+    uv_data = utilities::w_stacking(uv_data, world, params.kmeans_iters(), cost);
+  }
+#endif
     std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> sky_measurements =
         (not params.wprojection())
             ? factory::measurement_operator_factory<Vector<t_complex>>(
@@ -124,14 +131,6 @@ int main(int argc, const char **argv) {
        pixel_to_lambda(params.cellsizey(), params.height(), params.oversampling()));
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale /
                 uv_data.weights.norm() * uv_data.weights.size();
-#ifdef PURIFY_MPI
-  if (params.mpi_wstacking()) {
-    auto const world = sopt::mpi::Communicator::World();
-    const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
-    const auto kmeans_iters = 40;
-    uv_data = utilities::w_stacking(uv_data, world, kmeans_iters, cost);
-  }
-#endif
 
   // create measurement operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
