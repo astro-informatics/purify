@@ -75,6 +75,13 @@ int main(int argc, const char **argv) {
 #endif
       uv_data = read_measurements::read_measurements(params.measurements(), true, stokes::I,
                                                      params.measurements_units());
+#ifdef PURIFY_MPI
+  if (params.mpi_wstacking()) {
+    auto const world = sopt::mpi::Communicator::World();
+    const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
+    uv_data = utilities::w_stacking(uv_data, world, params.kmeans_iters(), cost);
+  }
+#endif
   } else if (params.source() == purify::utilities::vis_source::simulation) {
     PURIFY_HIGH_LOG("Input visibilities will be generated for random coverage.");
     // TODO: move this to function (in utilities.h?)
@@ -101,7 +108,7 @@ int main(int argc, const char **argv) {
                   mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
                   params.cellsizex(), params.oversampling(), params.powMethod_iter(),
                   params.powMethod_tolerance(), kernels::kernel_from_string.at(params.kernel()),
-                  params.Jy(), params.Jw(), 1e-6, 1e-6);
+                  2 * params.Jx(), params.Jw(), 1e-6, 1e-6);
     uv_data.vis = (*sky_measurements) * Image<t_complex>::Map(image.data(), image.size(), 1);
     Vector<t_complex> const y0 = uv_data.vis;
     sigma = utilities::SNR_to_standard_deviation(y0, params.signal_to_noise());
