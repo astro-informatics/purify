@@ -12,13 +12,9 @@ fi
 
 . spack/share/spack/setup-env.sh
 
-spack install -y gcc@7
-spack load gcc@7
-spack install -v -y openmpi@3.0.0
-spack load openmpi@3.0.0
-spack install -v -y fftw
-spack load fftw
-spack install -v -y boost
-spack load boost
+spack install -y gcc@7.2.0
+spack install -v -y openmpi@3.0.0 %gcc
+spack install -v -y fftw %gcc
+spack install -v -y boost %gcc
 
 cd $cwd
