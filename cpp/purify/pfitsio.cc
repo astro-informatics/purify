@@ -122,7 +122,7 @@ void write3d(const std::vector<Image<t_real>> &eigen_images, const pfitsio::head
   PURIFY_MACRO("CRPIX4", 1, "");
   PURIFY_MACRO("CRVAL1", static_cast<t_real>(header.ra * 180. / purify::constant::pi), "");
   PURIFY_MACRO("CRVAL2", static_cast<t_real>(header.dec * 180. / purify::constant::pi), "");
-  PURIFY_MACRO("CRVAL3", static_cast<t_real>(header.mean_frequency * std::pow(10, 6) * 1.), "");
+  PURIFY_MACRO("CRVAL3", static_cast<t_real>(header.mean_frequency * 1.), "");
   PURIFY_MACRO("CRVAL4", static_cast<t_real>(header.polarisation), "");
   PURIFY_MACRO("CTYPE1", "RA--SIN", "");
   PURIFY_MACRO("CTYPE2", "DEC--SIN", "");
