@@ -85,7 +85,7 @@ int main(int nargs, char const **args) {
                     max_evaluations, absolute_error, 0, integration::method::h, evaluations)
               : projection_kernels::exact_w_projection_integration_1d(
                     j / upsample, 0, w * i / Jw_max, du, oversample_ratio, ftkernelu,
-                    max_evaluations, absolute_error, 0, integration::method::h, evaluations);
+                    max_evaluations, absolute_error, 0, integration::method::p, evaluations);
       evals(j * Jw_max + i) = evaluations;
 #pragma omp critical(print)
       {
