@@ -23,6 +23,8 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser_m.measurements_sigma() == 0.1);
     REQUIRE(yaml_parser_m.skymodel() == "");
     REQUIRE(yaml_parser_m.signal_to_noise() == 30);
+    REQUIRE(yaml_parser_m.number_of_measurements() == 100000);
+    REQUIRE(yaml_parser_m.w_rms() == 100.);
   }
   SECTION("Check the GeneralConfiguration simulation input variables") {
     std::string file_path_s =
@@ -58,7 +60,8 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser.Jy() == 4);
     REQUIRE(yaml_parser.Jw() == 30);
     REQUIRE(yaml_parser.wprojection() == false);
-    REQUIRE(yaml_parser.mpi_wstacking() == true);
+    REQUIRE(yaml_parser.mpi_wstacking() == false);
+    REQUIRE(yaml_parser.kmeans_iters() == 1000);
   }
   SECTION("Check the SARA node variables") {
     std::vector<std::string> expected_wavelets = {"Dirac", "DB1", "DB2", "DB3", "DB4",
@@ -96,6 +99,8 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser_check.measurements_sigma() == yaml_parser_m.measurements_sigma());
     REQUIRE(yaml_parser_check.skymodel() == yaml_parser_m.skymodel());
     REQUIRE(yaml_parser_check.signal_to_noise() == yaml_parser_m.signal_to_noise());
+    REQUIRE(yaml_parser_check.number_of_measurements() == yaml_parser_m.number_of_measurements());
+    REQUIRE(yaml_parser_check.w_rms() == yaml_parser_m.w_rms());
     REQUIRE(yaml_parser_check.kernel() == yaml_parser_m.kernel());
     REQUIRE(yaml_parser_check.oversampling() == yaml_parser_m.oversampling());
     REQUIRE(yaml_parser_check.powMethod_iter() == yaml_parser_m.powMethod_iter());
