@@ -232,6 +232,7 @@ deploy:
     condition: $TITLE = "Documentation - GCC"
 
 before_install:
+  - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
   # - if [ $TRAVIS_OS_NAME = osx ]; then bash .ci/install_spack.sh; source .ci/spack_env.sh ;fi
   # - if [ $TRAVIS_OS_NAME = linux ]; then ClangVer="-5.0"; fi
   # - if [[ ${TITLE} = *GCC* ]]; then CC=gcc-7; else CC=clang${ClangVer}; fi
