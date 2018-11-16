@@ -14,7 +14,9 @@ fi
 
 
 while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
+spack compiler remove clang@8.0.0-apple
 spack install -y gcc@7.2.0
+spack compiler add `spack location -i gcc@7.2.0`
 spack install -y openmpi@3.0.0 %gcc@7.2.0
 spack install -y fftw %gcc@7.2.0
 spack install -y boost %gcc@7.2.0
