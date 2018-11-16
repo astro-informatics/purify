@@ -14,6 +14,7 @@
 #include "purify/update_factory.h"
 #include "purify/wavelet_operator_factory.h"
 #include "purify/yaml-parser.h"
+#include "purify/wide_field_utilities.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/positive_quadrant.h>
 #include <sopt/relative_variation.h>
@@ -121,16 +122,13 @@ int main(int argc, const char **argv) {
     sigma = utilities::SNR_to_standard_deviation(y0, params.signal_to_noise());
     uv_data.vis = utilities::add_noise(y0, 0., sigma);
   }
-  // need to scale data (uv_data.vis) by u and v cell size
-  auto pixel_to_lambda = [](const t_real cell, const t_uint imsize, const t_real oversample_ratio) {
-    return 1. / (2 * oversample_ratio *
-                 std::sin(0.5 * cell * std::floor(imsize) * constant::pi / (60. * 60. * 180.)));
-  };
-  const t_real flux_scale =
-      (pixel_to_lambda(params.cellsizex(), params.width(), params.oversampling()) *
-       pixel_to_lambda(params.cellsizey(), params.height(), params.oversampling()));
-  uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale /
-                uv_data.weights.norm() * uv_data.weights.size();
+  t_real const flux_scale =
+      (uv_data.units == utilities::vis_units::lambda)
+          ? widefield::pixel_to_lambda(params.cellsizex(), params.width(), params.oversampling()) *
+                widefield::pixel_to_lambda(params.cellsizey(), params.height(),
+                                           params.oversampling())
+          : 1.;
+  uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale;
 
   // create measurement operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
