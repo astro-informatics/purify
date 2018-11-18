@@ -43,7 +43,7 @@ TEST_CASE("calculating zero") {
   t_uint total = 0;
   t_uint rtotal = 0;
   t_int const Ju = J;
-  t_real const upsample = 10;
+  t_real const upsample = 2;
   const t_int Ju_max = std::floor(Ju * upsample * 0.5);
   SECTION("+u") {
     for (int j = 0; j < Ju_max; j++) {
