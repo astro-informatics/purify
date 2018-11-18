@@ -10,6 +10,8 @@ namespace widefield {
 t_int w_support(const t_real w, const t_real du, const t_int min, const t_int max);
 //! return factors to convert between arcsecond pixel size image space and lambda for uv space
 t_real pixel_to_lambda(const t_real cell, const t_uint imsize, const t_real oversample_ratio);
+//! return cell size from the bandwidth
+t_real estimate_cell_size(const t_real max_u, const t_uint imsize, const t_real oversample_ratio);
 //! Work out max L and M directional cosines from image parameters
 t_real fov_cosine(t_real const cell, t_uint const imsize);
 //! Generate image of DDE for aw-stacking

@@ -13,8 +13,8 @@
 #include "purify/read_measurements.h"
 #include "purify/update_factory.h"
 #include "purify/wavelet_operator_factory.h"
-#include "purify/yaml-parser.h"
 #include "purify/wide_field_utilities.h"
+#include "purify/yaml-parser.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/positive_quadrant.h>
 #include <sopt/relative_variation.h>
@@ -122,6 +122,25 @@ int main(int argc, const char **argv) {
     sigma = utilities::SNR_to_standard_deviation(y0, params.signal_to_noise());
     uv_data.vis = utilities::add_noise(y0, 0., sigma);
   }
+  t_real ideal_cell_x = widefield::estimate_cell_size(uv_data.u.cwiseAbs().maxCoeff(),
+                                                      params.width(), params.oversampling());
+  t_real ideal_cell_y = widefield::estimate_cell_size(uv_data.v.cwiseAbs().maxCoeff(),
+                                                      params.height(), params.oversampling());
+#ifndef PURIFY_MPI
+  if (using_mpi) {
+    auto const comm = sopt::mpi::Communicator::World();
+    ideal_cell_x = widefield::estimate_cell_size(
+        comm.all_reduce<t_real>(uv_data.u.cwiseAbs().maxCoeff(), MPI_MAX), params.width(),
+        params.oversampling());
+    ideal_cell_y = widefield::estimate_cell_size(
+        comm.all_reduce<t_real>(uv_data.v.cwiseAbs().maxCoeff(), MPI_MAX), params.height(),
+        params.oversampling());
+  }
+#endif
+  PURIFY_HIGH_LOG(
+      "Using cell size {}\" x {}\", recommended from the uv coverage and field of view is "
+      "{}\"x{}\".",
+      params.cellsizey(), params.cellsizex(), ideal_cell_y, ideal_cell_x);
   t_real const flux_scale =
       (uv_data.units == utilities::vis_units::lambda)
           ? widefield::pixel_to_lambda(params.cellsizex(), params.width(), params.oversampling()) *
