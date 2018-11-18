@@ -321,7 +321,7 @@ create_kernels(const kernels::kernel kernel_name_, const t_uint Ju_, const t_uin
 }
 
 std::tuple<std::function<t_real(t_real)>, std::function<t_real(t_real)>> create_radial_ftkernel(
-    const kernels::kernel kernel_name_, const t_uint Ju_) {
+    const kernels::kernel kernel_name_, const t_uint Ju_, const t_real oversample_ratio) {
   // PURIFY_MEDIUM_LOG("Kernel Name: {}", kernel_name_.c_str());
   PURIFY_MEDIUM_LOG("Radial Kernel Support: {}", Ju_);
   if ((kernel_name_ == kernels::kernel::pswf) and (Ju_ != 6)) {
@@ -335,6 +335,20 @@ std::tuple<std::function<t_real(t_real)>, std::function<t_real(t_real)>> create_
           return kernels::ft_kaiser_bessel(x, static_cast<t_real>(Ju_));
         },
         [=](const t_real x) { return kernels::kaiser_bessel(x, static_cast<t_real>(Ju_)); });
+    break;
+  }
+  case kernels::kernel::kbmin: {
+    const t_real kb_interp_alpha_Ju =
+        constant::pi * std::sqrt(Ju_ * Ju_ / (oversample_ratio * oversample_ratio) *
+                                     (oversample_ratio - 0.5) * (oversample_ratio - 0.5) -
+                                 0.8);
+    auto kbuv = [=](const t_real x) {
+      return kernels::kaiser_bessel_general(x, Ju_, kb_interp_alpha_Ju);
+    };
+    auto ftkbuv = [=](const t_real x) {
+      return kernels::ft_kaiser_bessel_general(x, Ju_, kb_interp_alpha_Ju);
+    };
+    return std::make_tuple(ftkbuv, kbuv);
     break;
   }
   case kernels::kernel::pswf: {

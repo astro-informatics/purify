@@ -62,7 +62,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
     const t_real oversample_ratio, const kernels::kernel kernel, const t_uint Ju, const t_uint Jw,
     const fftw_plan ft_plan, const t_real cellx, const t_real celly, const t_real absolute_error,
     const t_real relative_error) {
-  auto const kerneluvs = purify::create_radial_ftkernel(kernel, Ju);
+  auto const kerneluvs = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
   sopt::OperatorFunction<T> directFZ, indirectFZ;
   t_real const w_mean = w.array().mean();
   std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(

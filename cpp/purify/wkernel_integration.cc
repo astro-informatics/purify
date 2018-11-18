@@ -27,8 +27,6 @@ t_complex exact_w_projection_integration_1d(const t_real u, const t_real v, cons
                                             const t_real &absolute_error,
                                             const t_real &relative_error,
                                             const integration::method method, t_uint &evaluations) {
-  if (std::abs(oversample_ratio - 2) > 1e-9)
-    throw std::runtime_error("Oversample ratio != 2 not tested for wproj.");
   evaluations = 0;
   const auto func = [&](const Vector<t_real> &x) -> t_complex {
     evaluations++;
@@ -51,8 +49,6 @@ t_complex exact_w_projection_integration(const t_real u, const t_real v, const t
                                          const t_uint &max_evaluations,
                                          const t_real &absolute_error, const t_real &relative_error,
                                          const integration::method method, t_uint &evaluations) {
-  if (std::abs(oversample_ratio - 2) > 1e-9)
-    throw std::runtime_error("Oversample ratio != 2 not tested for wproj.");
   auto const func = [&](const Vector<t_real> &x) -> t_complex {
     evaluations++;
     return ftkernelu(x(0)) * ftkernelv(x(1)) * fourier_wproj_kernel(x(0), x(1), w, u, v, du, dv);
