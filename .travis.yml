@@ -69,7 +69,6 @@ matrix:
         homebrew:
           packages:
             - *osx_sources
-            - open-mpi
 
     - os: linux
       addons:
