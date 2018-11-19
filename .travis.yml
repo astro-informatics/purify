@@ -65,10 +65,6 @@ matrix:
         - MPI=ON
         - openMP=OFF
         - MPI_PROCS=2
-      addons:
-        homebrew:
-          packages:
-            - *osx_sources
 
     - os: linux
       addons:
