@@ -42,10 +42,6 @@ matrix:
         - TITLE="XCode 10.1 - GCC"
         - MPI=OFF
         - openMP=OFF
-      addons:
-        homebrew:
-          packages:
-            - *osx_sources
 
     - os: osx
       osx_image: xcode10.1
@@ -53,10 +49,6 @@ matrix:
         - TITLE="XCode 10.1 - Clang"
         - MPI=OFF
         - openMP=OFF
-      addons:
-        homebrew:
-          packages:
-            - *osx_sources
 
     - os: osx
       osx_image: xcode10.1
@@ -65,6 +57,11 @@ matrix:
         - MPI=ON
         - openMP=OFF
         - MPI_PROCS=2
+      addons:
+        homebrew:
+          packages:
+            - *osx_sources
+            - modules
 
     - os: linux
       addons:
