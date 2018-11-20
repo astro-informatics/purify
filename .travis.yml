@@ -22,32 +22,47 @@ addons:
       - libtiff5-dev # version 5 ?
       - libgomp1 # version 4.8.4-2
       - libfftw3-dev # version 3.3.3
+  homebrew:
+    packages: &osx_sources
+      - gcc@7
+      - fftw
+    update: true
+
+cache:
+  directories:
+    - $HOME/spack
 
 matrix:
   fast_finish: true
 
   include:
     - os: osx
-      osx_image: xcode8
+      osx_image: xcode10.1
       env:
-        - TITLE="XCode 8 - GCC"
+        - TITLE="XCode 10.1 - GCC"
         - MPI=OFF
         - openMP=OFF
 
     - os: osx
-      osx_image: xcode8
+      osx_image: xcode10.1
       env:
-        - TITLE="XCode 8 - Clang"
+        - TITLE="XCode 10.1 - Clang"
         - MPI=OFF
         - openMP=OFF
 
     - os: osx
-      osx_image: xcode8
+      osx_image: xcode10.1
       env:
-        - TITLE="XCode 8 - Clang - MPI"
+        - TITLE="XCode 10.1 - GCC - MPI"
         - MPI=ON
         - openMP=OFF
         - MPI_PROCS=2
+      addons:
+        homebrew:
+          packages:
+            - *osx_sources
+            - modules
+            - lmod
 
     - os: linux
       addons:
@@ -207,13 +222,12 @@ matrix:
   allow_failures:
     # Because boost error on finding files
     - os: osx
-      osx_image: xcode8
+      osx_image: xcode10.1
       env:
-        - TITLE="XCode 8 - Clang - MPI"
+        - TITLE="XCode 10.1 - GCC - MPI"
         - MPI=ON
         - openMP=OFF
         - MPI_PROCS=2
-
 
 deploy:
   provider: pages
@@ -228,12 +242,11 @@ deploy:
     condition: $TITLE = "Documentation - GCC"
 
 before_install:
-  - if [ $TRAVIS_OS_NAME = osx ]; then brew update; brew cask uninstall oclint; brew install gcc@7; brew install fftw; fi;
-  - if [[ $TRAVIS_OS_NAME = osx ]] && [[ ${TITLE} = *GCC* ]]; then brew upgrade cmake boost; fi;
-  - if [[ $TRAVIS_OS_NAME = osx ]] && [[ ${TITLE} = *MPI* ]]; then brew install -v open-mpi; fi;
+  - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
   - if [ $TRAVIS_OS_NAME = linux ]; then ClangVer="-5.0"; fi
   - if [[ ${TITLE} = *GCC* ]]; then CC=gcc-7; else CC=clang${ClangVer}; fi
   - if [[ ${TITLE} = *GCC* ]]; then CXX=g++-7; else CXX=clang++${ClangVer}; fi
+  - if [ $TRAVIS_OS_NAME = osx ] && [[ $MPI = ON ]]; then bash .ci/install_spack.sh; source $(brew --prefix modules)/init/bash; source .ci/spack_env.sh ;fi
   # As MPI is not installed already, this variable is not set properly; this
   # way is set up for all the jobs in the same manner.
   - echo "==================== ${TITLE} ====================="
