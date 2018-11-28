@@ -20,8 +20,6 @@ add_example(sara_padmm_random_coverage LIBRARIES libpurify NOTEST)
 add_example(padmm_real_data LIBRARIES libpurify NOTEST )
 
 add_example(padmm_random_coverage LIBRARIES libpurify NOTEST )
-add_example(fb_random_coverage LIBRARIES libpurify NOTEST )
-target_compile_definitions(example_fb_random_coverage PRIVATE PURIFY_GPU=0)
 if(PURIFY_ARRAYFIRE)
   add_example(padmm_random_coverage_gpu padmm_random_coverage.cc LIBRARIES libpurify NOTEST )
   target_compile_definitions(example_padmm_random_coverage_gpu PRIVATE PURIFY_GPU)
