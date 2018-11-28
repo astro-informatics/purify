@@ -7,6 +7,7 @@ add_example(gridding LIBRARIES libpurify NOTEST)
 add_example(generate_vis_data LIBRARIES libpurify NOTEST)
 
 add_example(plot_wkernel LIBRARIES libpurify NOTEST)
+add_example(wavelet_decomposition LIBRARIES libpurify NOTEST)
 
 add_example(show_image LIBRARIES libpurify NOTEST)
 add_example(sdmm_m31_simulation LIBRARIES libpurify NOTEST)
