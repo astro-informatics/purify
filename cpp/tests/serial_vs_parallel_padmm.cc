@@ -15,6 +15,7 @@
 #include <sopt/logging.h>
 #include <sopt/mpi/communicator.h>
 #include <sopt/mpi/utilities.h>
+#include <sopt/power_method.h>
 #include <sopt/wavelets.h>
 
 using namespace purify;
@@ -73,9 +74,10 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   //  const t_real norm = world.broadcast((Phi * Vector<t_complex>::Ones(width *
   //  height)).cwiseAbs().maxCoeff());
 
-  auto Phi = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      split_comm, uv_data.u, uv_data.v, uv_data.w, uv_data.weights, width, height, over_sample, 500,
-      1e-9);
+  auto Phi = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          split_comm, uv_data.u, uv_data.v, uv_data.w, uv_data.weights, width, height, over_sample),
+      500, 1e-9, Vector<t_complex>::Ones(width * height)));
 
   SECTION("Measurement operator parallelization") {
     SECTION("Gridding") {

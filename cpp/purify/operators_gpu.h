@@ -9,7 +9,6 @@
 #include "purify/operators.h"
 #include <sopt/chained_operators.h>
 #include <sopt/linear_transform.h>
-#include <sopt/power_method.h>
 #ifdef PURIFY_ARRAYFIRE
 #include <arrayfire.h>
 #endif
@@ -277,11 +276,11 @@ base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_
 
 namespace measurementoperator {
 
-std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> init_degrid_operator_2d(
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2d(
     const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
     const Vector<t_complex> &weights, const t_uint &imsizey, const t_uint &imsizex,
-    const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
-    const t_real &power_tol = 1e-4, const kernels::kernel kernel = kernels::kernel::kb,
+    const t_real &oversample_ratio = 2, 
+     const kernels::kernel kernel = kernels::kernel::kb,
     const t_uint Ju = 4, const t_uint Jv = 4, const bool w_term = false, 
     const t_real cellx = 1, const t_real &celly = 1, const t_uint &idx = 0) {
   /*
@@ -292,20 +291,13 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> init_degrid_oper
   sopt::OperatorFunction<Vector<t_complex>> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::gpu::operators::base_degrid_operator_2d(
       u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, w_term, idx);
-  auto direct = directDegrid;
-  auto indirect = indirectDegrid;
-  const t_real op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
-      {direct, M, indirect, N}, power_iters, power_tol,
-      Vector<t_complex>::Random(imsizex * imsizey));
-  auto operator_norm = purify::operators::init_normalise<Vector<t_complex>>(op_norm);
-  direct = sopt::chained_operators<Vector<t_complex>>(direct, operator_norm);
-  indirect = sopt::chained_operators<Vector<t_complex>>(operator_norm, indirect);
+  auto & direct = directDegrid;
+  auto & indirect = indirectDegrid;
   return std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(direct, M, indirect, N);
 }
-std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> init_degrid_operator_2d(
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2d(
     const utilities::vis_params &uv_vis_input, const t_uint &imsizey, const t_uint &imsizex,
     const t_real &cell_x, const t_real &cell_y, const t_real &oversample_ratio = 2,
-    const t_uint &power_iters = 100, const t_real &power_tol = 1e-4,
     const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
     const bool w_term = false, const t_uint &idx = 0) {
   auto uv_vis = uv_vis_input;
@@ -315,16 +307,15 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> init_degrid_oper
     uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
                                  std::floor(oversample_ratio * imsizey));
   return gpu::measurementoperator::init_degrid_operator_2d(
-      uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio, power_iters,
-      power_tol, kernel, Ju, Jv, w_term, cell_x, cell_y, idx);
+      uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,  kernel, Ju, Jv, w_term, cell_x, cell_y, idx);
 }
 
 #ifdef PURIFY_MPI
-std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> init_degrid_operator_2d_mpi(
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2d_mpi(
     const sopt::mpi::Communicator &comm, const Vector<t_real> &u, const Vector<t_real> &v,
     const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint &imsizey,
-    const t_uint &imsizex, const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
-    const t_real &power_tol = 1e-4, const kernels::kernel kernel = kernels::kernel::kb,
+    const t_uint &imsizex, const t_real &oversample_ratio = 2, 
+     const kernels::kernel kernel = kernels::kernel::kb,
     const t_uint Ju = 4, const t_uint Jv = 4, const bool w_term = false, 
     const t_real cellx = 1, const t_real &celly = 1, const t_uint &idx = 0) {
   /*
@@ -339,19 +330,12 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> init_degrid_oper
   auto Broadcast = purify::operators::init_broadcaster<Vector<t_complex>>(comm);
   auto direct = directDegrid;
   auto indirect = sopt::chained_operators<Vector<t_complex>>(Broadcast, indirectDegrid);
-  const t_real op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
-      {direct, M, indirect, N}, power_iters, power_tol,
-      comm.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(imsizex * imsizey)));
-  auto operator_norm = purify::operators::init_normalise<Vector<t_complex>>(op_norm);
-  direct = sopt::chained_operators<Vector<t_complex>>(direct, operator_norm);
-  indirect = sopt::chained_operators<Vector<t_complex>>(operator_norm, indirect);
   return std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(direct, M, indirect, N);
 }
-std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> init_degrid_operator_2d_mpi(
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2d_mpi(
     const sopt::mpi::Communicator &comm, const utilities::vis_params &uv_vis_input,
     const t_uint &imsizey, const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
-    const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
-    const t_real &power_tol = 1e-4, const kernels::kernel kernel = kernels::kernel::kb,
+    const t_real &oversample_ratio = 2,  const kernels::kernel kernel = kernels::kernel::kb,
     const t_uint Ju = 4, const t_uint Jv = 4, const bool w_term = false, 
     const t_uint &idx = 0) {
   auto uv_vis = uv_vis_input;
@@ -362,13 +346,13 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> init_degrid_oper
                                  std::floor(oversample_ratio * imsizey));
   return gpu::measurementoperator::init_degrid_operator_2d_mpi(
       comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-      power_iters, power_tol, kernel, Ju, Jv, w_term, cell_x, cell_y, idx);
+       kernel, Ju, Jv, w_term, cell_x, cell_y, idx);
 }
-std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> init_degrid_operator_2d(
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2d(
     const sopt::mpi::Communicator &comm, const Vector<t_real> &u, const Vector<t_real> &v,
     const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint &imsizey,
-    const t_uint &imsizex, const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
-    const t_real &power_tol = 1e-4, const kernels::kernel kernel = kernels::kernel::kb,
+    const t_uint &imsizex, const t_real &oversample_ratio = 2, 
+     const kernels::kernel kernel = kernels::kernel::kb,
     const t_uint Ju = 4, const t_uint Jv = 4, const bool w_term = false, 
     const t_real cellx = 1, const t_real &celly = 1, const t_uint &idx = 0) {
   /*
@@ -384,19 +368,12 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> init_degrid_oper
   const auto allsumall = purify::operators::init_all_sum_all<Vector<t_complex>>(comm);
   auto direct = directDegrid;
   auto indirect = sopt::chained_operators<Vector<t_complex>>(allsumall, indirectDegrid);
-  const t_real op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
-      {direct, M, indirect, N}, power_iters, power_tol,
-      Vector<t_complex>::Random(imsizex * imsizey));
-  auto operator_norm = purify::operators::init_normalise<Vector<t_complex>>(op_norm);
-  direct = sopt::chained_operators<Vector<t_complex>>(direct, operator_norm);
-  indirect = sopt::chained_operators<Vector<t_complex>>(operator_norm, indirect);
   return std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(direct, M, indirect, N);
 }
-std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> init_degrid_operator_2d(
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2d(
     const sopt::mpi::Communicator &comm, const utilities::vis_params &uv_vis_input,
     const t_uint &imsizey, const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
-    const t_real &oversample_ratio = 2, const t_uint &power_iters = 100,
-    const t_real &power_tol = 1e-4, const kernels::kernel kernel = kernels::kernel::kb,
+    const t_real &oversample_ratio = 2,  const kernels::kernel kernel = kernels::kernel::kb,
     const t_uint Ju = 4, const t_uint Jv = 4, const bool w_term = false, 
     const t_uint &idx = 0) {
   auto uv_vis = uv_vis_input;
@@ -407,7 +384,7 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> init_degrid_oper
                                  std::floor(oversample_ratio * imsizey));
   return gpu::measurementoperator::init_degrid_operator_2d(
       comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-      power_iters, power_tol, kernel, Ju, Jv, w_term, idx);
+       kernel, Ju, Jv, w_term, idx);
 }
 #endif
 }  // namespace measurementoperator

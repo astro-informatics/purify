@@ -2,7 +2,6 @@
 #include "purify/config.h"
 #include "purify/types.h"
 #include "catch.hpp"
-#include "purify/compact_operators.h"
 #include "purify/directories.h"
 #include "purify/kernels.h"
 #include "purify/logging.h"
@@ -63,8 +62,8 @@ TEST_CASE("Operators") {
   SECTION("Gridding") {
     sopt::OperatorFunction<Vector<t_complex>> directG, indirectG;
     std::tie(directG, indirectG) = operators::init_gridding_matrix_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex,
-        oversample_ratio, kbv, kbu, Ju, Jv);
+        uv_vis.u, uv_vis.v, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex, oversample_ratio,
+        kbv, kbu, Ju, Jv);
     Vector<t_complex> direct_output;
     directG(direct_output,
             Vector<t_complex>::Map(operators_test::direct_input.data(), ftsizeu * ftsizev));
@@ -134,81 +133,12 @@ TEST_CASE("Operators") {
     const Vector<t_real> w = Vector<t_real>::Random(M_measures);
     const Vector<t_complex> weights = Vector<t_complex>::Random(M_measures);
     const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        u, v, w, weights, imsizey, imsizex, oversample_ratio, power_iters, power_tol, kernel, Ju,
-        Jv);
+        u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
     const Vector<t_complex> direct_output = *measure_op * direct_input;
     CHECK(direct_output.size() == M_measures);
     const Vector<t_complex> indirect_input = Vector<t_complex>::Random(M);
     const Vector<t_complex> indirect_output = measure_op->adjoint() * indirect_input;
     CHECK(indirect_output.size() == imsizex * imsizey);
-    SECTION("Power Method") {
-      auto op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
-          *measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
-      CHECK(std::abs(op_norm - 1.) < power_tol);
-      auto op_norm2 = sopt::algorithm::power_method<Vector<t_complex>>(
-          *measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
-      CHECK(std::abs(op_norm - op_norm2) < power_tol);
-    }
-    SECTION("Norm Accuracy") {
-      const auto measure_op2 = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          u, v, w, weights, imsizey, imsizex, oversample_ratio, power_iters, power_tol, kernel, Ju,
-          Jv);
-      const Vector<t_complex> input = Vector<t_complex>::Random(imsizey * imsizex);
-      Vector<t_complex> buff1 = input;
-      Vector<t_complex> buff2 = input;
-      for (int i = 0; i < 100; i++) {
-        buff1 = measure_op->adjoint() * (*measure_op * buff1);
-        buff2 = measure_op->adjoint() * (*measure_op2 * buff2);
-      }
-      CAPTURE((buff1.array() / buff2.array()).cwiseAbs().maxCoeff());
-      CHECK(buff1.isApprox(buff2, 1e-12));
-    }
-  }
-
-  SECTION("Create Weighted Compact Measurement Operator") {
-    const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv);
-    const auto phiTphi = operators::init_grid_degrid_operator_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv);
-    const auto id = [](Vector<t_complex> &out, const Vector<t_complex> &in) { out = in; };
-    const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
-    const Vector<t_complex> direct_output = measure_op->adjoint()(*measure_op * direct_input);
-    auto const phiTphi_op = sopt::LinearTransform<Vector<t_complex>>({phiTphi, id});
-    CHECK(direct_output.size() == imsizex * imsizey);
-    SECTION("Power Method") {
-      auto op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
-          phiTphi_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
-      CHECK(std::abs(op_norm - 1.) < power_tol);
-      auto op_norm2 = sopt::algorithm::power_method<Vector<t_complex>>(
-          phiTphi_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
-      CHECK(std::abs(op_norm - op_norm2) < power_tol);
-    }
-    SECTION("operation") {
-      const Vector<t_complex> input = Vector<t_complex>::Random(imsizex * imsizey);
-      const Vector<t_complex> expected_output = measure_op->adjoint()(*measure_op * direct_input);
-      const Vector<t_complex> actual_output = phiTphi_op * direct_input;
-
-      CHECK(expected_output.size() == actual_output.size());
-      CHECK(actual_output.isApprox(expected_output, 1e-4));
-    }
-  }
-
-  SECTION("Create convolution operator") {
-    const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv);
-    const auto phiTphi =
-        operators::init_psf_convolve_2d<Vector<t_complex>>(measure_op, imsizey, imsizex);
-    const auto id = [](Vector<t_complex> &out, const Vector<t_complex> &in) { out = in; };
-    const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
-    auto const phiTphi_op = sopt::LinearTransform<Vector<t_complex>>({phiTphi, id});
-    SECTION("Power Method") {
-      auto op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
-          phiTphi_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
-      CHECK(std::abs(op_norm - 1.) < power_tol);
-    }
   }
 }

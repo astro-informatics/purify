@@ -11,6 +11,7 @@
 #include "purify/pfitsio.h"
 #include "purify/utilities.h"
 #include <sopt/imaging_padmm.h>
+#include <sopt/power_method.h>
 #include <sopt/relative_variation.h>
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
@@ -55,13 +56,17 @@ int main(int nargs, char const **args) {
   uv_data.units = utilities::vis_units::radians;
   PURIFY_MEDIUM_LOG("Number of measurements: {}", uv_data.u.size());
 
-  auto measurements_sky = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
-      over_sample, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8);
+  auto measurements_sky = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
+          over_sample, kernels::kernel_from_string.at(kernel), 8, 8),
+      100, 1e-4, Vector<t_complex>::Random(sky_model.size())));
   uv_data.vis = measurements_sky * Vector<t_complex>::Map(sky_model.data(), sky_model.size());
-  auto measurements_transform = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
-      over_sample, 100, 1e-4, kernels::kernel_from_string.at(kernel), J, J);
+  auto measurements_transform = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
+          over_sample,  kernels::kernel_from_string.at(kernel), J, J),
+      100, 1e-4, Vector<t_complex>::Random(sky_model.size())));
 
   std::vector<std::tuple<std::string, t_uint>> wavelets;
 

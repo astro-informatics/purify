@@ -8,6 +8,7 @@
 #include "purify/wproj_operators.h"
 #include <sopt/credible_region.h>
 #include <sopt/imaging_padmm.h>
+#include <sopt/power_method.h>
 #include <sopt/relative_variation.h>
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
@@ -37,14 +38,19 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   utilities::write_visibility(uv_data, output_filename("input_data.vis"));
 #ifndef PURIFY_GPU
   auto const measurements_transform =
-      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 1000,
-          0.0001, kernels::kernel_from_string.at(kernel), J, 30, 1e-6, 1e-6);
+      std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+          measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+              uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample,
+              kernels::kernel_from_string.at(kernel), J, 30, 1e-6, 1e-6),
+          1000, 1e-4, Vector<t_complex>::Random(imsizex * imsizey)));
 #else
   af::setDevice(0);
-  auto const measurements_transform = gpu::measurementoperator::init_degrid_operator_2d(
-      uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample, 1000,
-      0.0001, kernels::kernel_from_string.at(kernel), J, J, std::get<0>(w_term));
+  auto const measurements_transform =
+      std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+          gpu::measurementoperator::init_degrid_operator_2d(
+              uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample,
+              kernels::kernel_from_string.at(kernel), J, J, std::get<0>(w_term)),
+          1000, 1e-4, Vector<t_complex>::Random(imsizex * imsizey)));
 #endif
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
@@ -130,7 +136,7 @@ int main(int, char **) {
   // sopt::logging::set_level("debug");
   //  purify::logging::set_level("debug");
   const std::string &name = "M31";
-  const t_real FoV = 15;       // deg
+  const t_real FoV = 15;     // deg
   const t_real max_w = 15.;  // lambda
   const t_real snr = 30;
   const bool w_term = false;
@@ -154,13 +160,18 @@ int main(int, char **) {
                     uv_data.u.size() * 1. / number_of_pxiels);
 
 #ifndef PURIFY_GPU
-  auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 1000, 0.0001,
-      kernels::kernel_from_string.at("kb"), 8, 30, 1e-6, 1e-6);
+  auto const sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2,
+          kernels::kernel_from_string.at("kb"), 8, 30, 1e-6, 1e-6),
+      1000, 0.0001, Vector<t_complex>::Random(M31.size())));
 #else
-  auto const sky_measurements = gpu::measurementoperator::init_degrid_operator_2d(
-      uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2, 1000, 0.0001,
-      kernels::kernel_from_string.at("kb"), 8, 8, w_term);
+  auto const sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      gpu::measurementoperator::init_degrid_operator_2d(
+          uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2,
+          kernels::kernel_from_string.at("kb"), 8, 8, w_term),
+      1000, 0.0001, Vector<t_complex>::Random(M31.size())));
+
 #endif
   uv_data.vis = (*sky_measurements) * Image<t_complex>::Map(M31.data(), M31.size(), 1);
   Vector<t_complex> const y0 = uv_data.vis;

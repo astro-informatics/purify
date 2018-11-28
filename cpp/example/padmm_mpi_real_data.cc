@@ -20,6 +20,7 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
+#include <sopt/power_method.h>
 
 #ifdef PURIFY_GPU
 #include "purify/operators_gpu.h"
@@ -180,23 +181,31 @@ int main(int nargs, char const **args) {
              world.all_reduce(data.weights.array().cwiseAbs().maxCoeff(), MPI_MAX);
 #if PURIFY_PADMM_ALGORITHM == 2 || PURIFY_PADMM_ALGORITHM == 3
 #ifndef PURIFY_GPU
-  auto const measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      world, data, imsizey, imsizex, cellsize, cellsize, 2, 100, 1e-4, kernel, 4, 4, w_term);
+  auto const measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          world, data, imsizey, imsizex, cellsize, cellsize, 2, kernel, 4, 4, w_term),
+      100, 1e-4, world.broadcast(Vector<t_complex>::Random(imsizex * imsizey).eval())));
 #else
   af::setDevice(0);
-  auto const measurements = gpu::measurementoperator::init_degrid_operator_2d(
-      world, data, imsizey, imsizex, cellsize, cellsize, 2, 100, 1e-4, kernel, 4, 4, w_term);
+  auto const measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      gpu::measurementoperator::init_degrid_operator_2d(world, data, imsizey, imsizex, cellsize,
+                                                        cellsize, 2, kernel, 4, 4, w_term),
+      100, 1e-4, world.broadcast(Vector<t_complex>::Random(imsizex * imsizey).eval())));
 
 #endif
 #elif PURIFY_PADMM_ALGORITHM == 1
 #ifndef PURIFY_GPU
-  auto const measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-      world, data, imsizey, imsizex, cellsize, cellsize, 2, 100, 1e-4, kernel, 4, 4, w_term);
+  auto const measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+          world, data, imsizey, imsizex, cellsize, cellsize, 2, kernel, 4, 4, w_term),
+      100, 1e-4, world.broadcast(Vector<t_complex>::Random(imsizex * imsizey).eval())));
 
 #else
   af::setDevice(0);
-  auto const measurements = gpu::measurementoperator::init_degrid_operator_2d_mpi(
-      world, data, imsizey, imsizex, cellsize, cellsize, 2, 100, 1e-4, kernel, 4, 4, w_term);
+  auto const measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      gpu::measurementoperator::init_degrid_operator_2d_mpi(world, data, imsizey, imsizex, cellsize,
+                                                            cellsize, 2, kernel, 4, 4, w_term),
+      100, 1e-4, world.broadcast(Vector<t_complex>::Random(imsizex * imsizey).eval())));
 
 #endif
 #endif

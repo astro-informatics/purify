@@ -2,6 +2,7 @@
 #include "purify/logging.h"
 #include "purify/measurement_operator_factory.h"
 #include "purify/utilities.h"
+#include <sopt/power_method.h>
 using namespace purify;
 
 TEST_CASE("Serial vs Distributed Operator") {
@@ -16,10 +17,10 @@ TEST_CASE("Serial vs Distributed Operator") {
   auto const width = 128;
   auto const height = 128;
   const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
+      uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample);
   const auto op = factory::measurement_operator_factory<Vector<t_complex>>(
       factory::distributed_measurement_operator::serial, uv_serial.u, uv_serial.v, uv_serial.w,
-      uv_serial.weights, height, width, over_sample, 100);
+      uv_serial.weights, height, width, over_sample);
 
   SECTION("Degridding") {
     Vector<t_complex> const image = Vector<t_complex>::Random(width * height);
@@ -48,15 +49,15 @@ TEST_CASE("GPU Serial vs Distributed Operator") {
   auto const width = 128;
   auto const height = 128;
   const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
+      uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample);
 #ifndef PURIFY_ARRAYFIRE
   REQUIRE_THROWS(factory::measurement_operator_factory<Vector<t_complex>>(
       factory::distributed_measurement_operator::gpu_serial, uv_serial.u, uv_serial.v, uv_serial.w,
-      uv_serial.weights, height, width, over_sample, 100));
+      uv_serial.weights, height, width, over_sample));
 #else
   const auto op = factory::measurement_operator_factory<Vector<t_complex>>(
       factory::distributed_measurement_operator::gpu_serial, uv_serial.u, uv_serial.v, uv_serial.w,
-      uv_serial.weights, height, width, over_sample, 100);
+      uv_serial.weights, height, width, over_sample);
 
   SECTION("Degridding") {
     Vector<t_complex> const image = Vector<t_complex>::Random(width * height);

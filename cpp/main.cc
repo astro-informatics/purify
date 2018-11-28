@@ -17,6 +17,7 @@
 #include "purify/yaml-parser.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/positive_quadrant.h>
+#include <sopt/power_method.h>
 #include <sopt/relative_variation.h>
 #include <sopt/reweighted.h>
 using namespace purify;
@@ -60,6 +61,8 @@ int main(int argc, const char **argv) {
   // Read or generate input data
   utilities::vis_params uv_data;
   t_real sigma;
+  Vector<t_complex> measurement_op_eigen_vector =
+      Vector<t_complex>::Ones(params.width() * params.height());
   if (params.source() == purify::utilities::vis_source::measurements) {
     PURIFY_HIGH_LOG("Input visibilities are from files:");
     for (size_t i = 0; i < params.measurements().size(); i++)
@@ -105,18 +108,28 @@ int main(int argc, const char **argv) {
       uv_data = utilities::w_stacking(uv_data, world, params.kmeans_iters(), cost);
     }
 #endif
-    std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> sky_measurements =
+    std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> sky_measurements =
         (not params.wprojection())
             ? factory::measurement_operator_factory<Vector<t_complex>>(
                   mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
-                  params.cellsizex(), params.oversampling(), params.powMethod_iter(),
-                  params.powMethod_tolerance(), kernels::kernel_from_string.at(params.kernel()),
-                  2 * params.Jy(), 2 * params.Jx(), params.mpi_wstacking())
+                  params.cellsizex(), params.oversampling(),
+                  kernels::kernel_from_string.at(params.kernel()), 2 * params.Jy(), 2 * params.Jx(),
+                  params.mpi_wstacking())
             : factory::measurement_operator_factory<Vector<t_complex>>(
                   mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
-                  params.cellsizex(), params.oversampling(), params.powMethod_iter(),
-                  params.powMethod_tolerance(), kernels::kernel_from_string.at(params.kernel()),
-                  2 * params.Jx(), params.Jw(), 1e-6, 1e-6);
+                  params.cellsizex(), params.oversampling(),
+                  kernels::kernel_from_string.at(params.kernel()), 2 * params.Jx(), params.Jw(),
+                  1e-6, 1e-6);
+#ifndef PURIFY_MPI
+    auto const comm = sopt::mpi::Communicator::World();
+    sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+        sky_measurements, params.powMethod_iter(), params.powMethod_tolerance(),
+        comm.broadcast(measurement_op_eigen_vector)));
+#else
+    sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+        sky_measurements, params.powMethod_iter(), params.powMethod_tolerance(),
+        measurement_op_eigen_vector));
+#endif
     uv_data.vis = (*sky_measurements) * Image<t_complex>::Map(image.data(), image.size(), 1);
     Vector<t_complex> const y0 = uv_data.vis;
     sigma = utilities::SNR_to_standard_deviation(y0, params.signal_to_noise());
@@ -150,18 +163,32 @@ int main(int argc, const char **argv) {
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale;
 
   // create measurement operator
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurements_transform =
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measurements_transform =
       (not params.wprojection())
           ? factory::measurement_operator_factory<Vector<t_complex>>(
                 mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
-                params.cellsizex(), params.oversampling(), params.powMethod_iter(),
-                params.powMethod_tolerance(), kernels::kernel_from_string.at(params.kernel()),
-                params.Jy(), params.Jx(), params.mpi_wstacking())
+                params.cellsizex(), params.oversampling(),
+                kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jx(),
+                params.mpi_wstacking())
           : factory::measurement_operator_factory<Vector<t_complex>>(
                 mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
-                params.cellsizex(), params.oversampling(), params.powMethod_iter(),
-                params.powMethod_tolerance(), kernels::kernel_from_string.at(params.kernel()),
-                params.Jy(), params.Jw(), 1e-6, 1e-6);
+                params.cellsizex(), params.oversampling(),
+                kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jw(), 1e-6,
+                1e-6);
+#ifndef PURIFY_MPI
+  auto const comm = sopt::mpi::Communicator::World();
+  auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      measurements_transform, params.powMethod_iter(), params.powMethod_tolerance(),
+      comm.broadcast(measurement_op_eigen_vector));
+  measurements_transform = std::get<2>(power_method_result);
+  measurement_op_eigen_vector = std::get<1>(power_method_result);
+#else
+  auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      measurements_transform, params.powMethod_iter(), params.powMethod_tolerance(),
+      measurement_op_eigen_vector);
+  measurements_transform = std::get<2>(power_method_result);
+  measurement_op_eigen_vector = std::get<1>(power_method_result);
+#endif
   // create wavelet operator
   std::vector<std::tuple<std::string, t_uint>> sara;
   for (size_t i = 0; i < params.wavelet_basis().size(); i++)
