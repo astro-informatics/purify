@@ -235,7 +235,6 @@ deploy:
   github-token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
   keep-history: true
   local-dir: build/cpp/docs/html
-  target-branch: website # FIXME: Default gh-pages, set this for now to have both.
   verbose: true # FIXME: just at first to see logs
   on:
     branch: development
