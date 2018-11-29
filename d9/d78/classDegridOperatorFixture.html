@@ -20,6 +20,7 @@
 });
 </script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css" />
+<link href="../../style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -27,10 +28,11 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="../../logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">PURIFY
    </div>
-   <div id="projectbrief">PURIFY</div>
+   <div id="projectbrief">Next-generation radio interferometric imaging</div>
   </td>
  </tr>
  </tbody>
@@ -98,16 +100,20 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="title">DegridOperatorFixture Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="dynheader">
-Inheritance diagram for DegridOperatorFixture:</div>
-<div class="dyncontent">
+<div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-0-trigger" src="../../closed.png" alt="+"/> Inheritance diagram for DegridOperatorFixture:</div>
+<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../d3/d32/classDegridOperatorFixture__inherit__graph.png" border="0" usemap="#DegridOperatorFixture_inherit__map" alt="Inheritance graph"/></div>
 <map name="DegridOperatorFixture_inherit__map" id="DegridOperatorFixture_inherit__map">
 <area shape="rect" id="node3" href="../../d6/d86/classDegridOperatorAdjointFixture.html" title="DegridOperatorAdjointFixture" alt="" coords="5,155,195,181"/><area shape="rect" id="node4" href="../../d6/dac/classDegridOperatorDirectFixture.html" title="DegridOperatorDirectFixture" alt="" coords="219,155,404,181"/></map>
 <center><span class="legend">[<a href="../../graph_legend.html">legend</a>]</span></center></div>
-<div class="dynheader">
-Collaboration diagram for DegridOperatorFixture:</div>
-<div class="dyncontent">
+<div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-1-trigger" src="../../closed.png" alt="+"/> Collaboration diagram for DegridOperatorFixture:</div>
+<div id="dynsection-1-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-1-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="../../d2/d8e/classDegridOperatorFixture__coll__graph.png" border="0" usemap="#DegridOperatorFixture_coll__map" alt="Collaboration graph"/></div>
 <map name="DegridOperatorFixture_coll__map" id="DegridOperatorFixture_coll__map">
 <area shape="rect" id="node4" href="../../dc/dfd/structpurify_1_1utilities_1_1vis__params.html" title="purify::utilities::\lvis_params" alt="" coords="217,155,327,197"/></map>
@@ -115,6 +121,15 @@ Collaboration diagram for DegridOperatorFixture:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a55d320618ffba8209c78119e909838f7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a55d320618ffba8209c78119e909838f7"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetUp</b> (const ::benchmark::State &amp;state)</td></tr>
+<tr class="separator:a55d320618ffba8209c78119e909838f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f7a12464eb325f6508899fd6f40b68f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4f7a12464eb325f6508899fd6f40b68f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>TearDown</b> (const ::benchmark::State &amp;state)</td></tr>
+<tr class="separator:a4f7a12464eb325f6508899fd6f40b68f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a086983a1783bc67e4b63a6f5603e711d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a086983a1783bc67e4b63a6f5603e711d"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>updateImage</b> (t_uint newSize)=0</td></tr>
+<tr class="separator:a086983a1783bc67e4b63a6f5603e711d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a55d320618ffba8209c78119e909838f7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a55d320618ffba8209c78119e909838f7"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetUp</b> (const ::benchmark::State &amp;state)</td></tr>
 <tr class="separator:a55d320618ffba8209c78119e909838f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -142,14 +157,18 @@ t_uint&#160;</td><td class="memItemRight" valign="bottom"><b>m_imsizey</b></td><
 <tr class="memitem:a598bca021971bdf025d86f4175cffc5f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a598bca021971bdf025d86f4175cffc5f"></a>
 t_uint&#160;</td><td class="memItemRight" valign="bottom"><b>m_kernel</b></td></tr>
 <tr class="separator:a598bca021971bdf025d86f4175cffc5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34ff26e4b0b0a53292d12ed44c3f1a5c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a34ff26e4b0b0a53292d12ed44c3f1a5c"></a>
+<tr class="memitem:af147e6a5f170b53837f3ae187caefea8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af147e6a5f170b53837f3ae187caefea8"></a>
 std::shared_ptr<br class="typebreak"/>
 &lt; sopt::LinearTransform<br class="typebreak"/>
 &lt; Vector&lt; t_complex &gt; &gt; const  &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_degridOperator</b></td></tr>
-<tr class="separator:a34ff26e4b0b0a53292d12ed44c3f1a5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:af147e6a5f170b53837f3ae187caefea8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li>/home/travis/build/astro-informatics/purify/cpp/benchmarks/measurement_operator.cc</li>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock">
+<p>Definition at line <a class="el" href="../../d9/d55/benchmarks_2measurement__operator_8cc_source.html#l00054">54</a> of file <a class="el" href="../../d9/d55/benchmarks_2measurement__operator_8cc_source.html">measurement_operator.cc</a>.</p>
+</div><hr/>The documentation for this class was generated from the following files:<ul>
+<li>/home/travis/build/astro-informatics/purify/cpp/benchmarks/<a class="el" href="../../d9/d55/benchmarks_2measurement__operator_8cc_source.html">measurement_operator.cc</a></li>
+<li>/home/travis/build/astro-informatics/purify/cpp/benchmarks/<a class="el" href="../../db/d0a/measurement__operator__af_8cc_source.html">measurement_operator_af.cc</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

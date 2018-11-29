@@ -20,6 +20,7 @@
 });
 </script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css" />
+<link href="../../style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -27,10 +28,11 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="../../logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">PURIFY
    </div>
-   <div id="projectbrief">PURIFY</div>
+   <div id="projectbrief">Next-generation radio interferometric imaging</div>
   </td>
  </tr>
  </tbody>
@@ -263,7 +265,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;      <span class="keywordflow">for</span> (t_uint i = 0; i &lt; imsizex_; i++) {</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        <span class="keyword">const</span> t_uint output_index = utilities::sub2ind(j, i, imsizey_, imsizex_);</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        <span class="keyword">const</span> t_uint input_index = utilities::sub2ind(y_start + j, x_start + i, ftsizev_, ftsizeu_);</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        output(output_index) = S(j, i) * x(input_index);</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        output(output_index) = std::conj(S(j, i)) * x(input_index);</div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;      }</div>
 <div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    }</div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  };</div>
@@ -660,7 +662,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;</div>
 <div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;};  <span class="comment">// namespace purify</span></div>
 <div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="namespacepurify_html_ae5a8e573961b3d00cc5603cf4e5e647f"><div class="ttname"><a href="../../db/d8d/namespacepurify.html#ae5a8e573961b3d00cc5603cf4e5e647f">purify::compress_outer</a></div><div class="ttdeci">Sparse&lt; typename T0::Scalar &gt; compress_outer(T0 const &amp;matrix)</div><div class="ttdoc">Indices of non empty outer indices. </div><div class="ttdef"><b>Definition:</b> IndexMapping.h:65</div></div>
+<div class="ttc" id="namespacepurify_html_ae5a8e573961b3d00cc5603cf4e5e647f"><div class="ttname"><a href="../../db/d8d/namespacepurify.html#ae5a8e573961b3d00cc5603cf4e5e647f">purify::compress_outer</a></div><div class="ttdeci">Sparse&lt; typename T0::Scalar &gt; compress_outer(T0 const &amp;matrix)</div><div class="ttdoc">Indices of non empty outer indices. </div><div class="ttdef"><b>Definition:</b> <a href="../../d9/d03/IndexMapping_8h_source.html#l00065">IndexMapping.h:65</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

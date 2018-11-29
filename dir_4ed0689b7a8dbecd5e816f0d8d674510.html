@@ -20,6 +20,7 @@
 });
 </script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -27,10 +28,11 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">PURIFY
    </div>
-   <div id="projectbrief">PURIFY</div>
+   <div id="projectbrief">Next-generation radio interferometric imaging</div>
   </td>
  </tr>
  </tbody>
@@ -90,9 +92,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">purify Directory Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="dynheader">
-Directory dependency graph for purify:</div>
-<div class="dyncontent">
+<div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Directory dependency graph for purify:</div>
+<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="dir_4ed0689b7a8dbecd5e816f0d8d674510_dep.png" border="0" usemap="#dir__4ed0689b7a8dbecd5e816f0d8d674510__dep" alt="/home/travis/build/astro-informatics/purify/cpp/purify"/></div>
 <map name="dir__4ed0689b7a8dbecd5e816f0d8d674510__dep" id="dir__4ed0689b7a8dbecd5e816f0d8d674510__dep">
 <area shape="rect" id="node1" href="dir_4ed0689b7a8dbecd5e816f0d8d674510.html" title="purify" alt="" coords="27,52,99,100"/><area shape="rect" id="clust1" href="dir_df511e5bd85cec96854b39d5e1c27aa8.html" title="cpp" alt="" coords="16,16,109,111"/></map>
@@ -102,7 +106,7 @@ Directory dependency graph for purify:</div>
 Files</h2></td></tr>
 <tr class="memitem:dd/d80/algorithm__factory_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>algorithm_factory.h</b> <a href="dd/d80/algorithm__factory_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:d0/d64/purify_2casacore_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>casacore.cc</b></td></tr>
+<tr class="memitem:d0/d64/purify_2casacore_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>casacore.cc</b> <a href="d0/d64/purify_2casacore_8cc_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:d4/dcd/casacore_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>casacore.h</b> <a href="d4/dcd/casacore_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -118,7 +122,7 @@ Files</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:df/d9b/convolution_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>convolution.h</b> <a href="df/d9b/convolution_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:d2/db0/purify_2distribute_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>distribute.cc</b></td></tr>
+<tr class="memitem:d2/db0/purify_2distribute_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>distribute.cc</b> <a href="d2/db0/purify_2distribute_8cc_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:d5/d75/distribute_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>distribute.h</b> <a href="d5/d75/distribute_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -126,13 +130,9 @@ Files</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:d9/d03/IndexMapping_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>IndexMapping.h</b> <a href="d9/d03/IndexMapping_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:dd/daa/purify_2kernels_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>kernels.cc</b></td></tr>
+<tr class="memitem:dd/daa/purify_2kernels_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>kernels.cc</b> <a href="dd/daa/purify_2kernels_8cc_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:d0/d01/kernels_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>kernels.h</b> <a href="d0/d01/kernels_8h_source.html">[code]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:d9/d1c/leastsquares_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>leastsquares.cc</b></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:db/d69/leastsquares_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>leastsquares.h</b> <a href="db/d69/leastsquares_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:dc/dc5/logging_8disabled_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>logging.disabled.h</b> <a href="dc/dc5/logging_8disabled_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -142,25 +142,25 @@ Files</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:df/d67/measurement__operator__factory_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>measurement_operator_factory.h</b> <a href="df/d67/measurement__operator__factory_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:d4/d63/purify_2mpi__utilities_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>mpi_utilities.cc</b></td></tr>
+<tr class="memitem:d4/d63/purify_2mpi__utilities_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>mpi_utilities.cc</b> <a href="d4/d63/purify_2mpi__utilities_8cc_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:d6/d64/mpi__utilities_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>mpi_utilities.h</b> <a href="d6/d64/mpi__utilities_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:d9/d18/purify_2operators_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>operators.cc</b></td></tr>
+<tr class="memitem:d9/d18/purify_2operators_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>operators.cc</b> <a href="d9/d18/purify_2operators_8cc_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:d7/d79/operators_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>operators.h</b> <a href="d7/d79/operators_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:d0/df5/operators__gpu_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>operators_gpu.h</b> <a href="d0/df5/operators__gpu_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:d2/d35/pfitsio_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>pfitsio.cc</b></td></tr>
+<tr class="memitem:d2/d35/pfitsio_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>pfitsio.cc</b> <a href="d2/d35/pfitsio_8cc_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:d9/d1c/pfitsio_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>pfitsio.h</b> <a href="d9/d1c/pfitsio_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:dd/dd2/projection__kernels_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>projection_kernels.cc</b></td></tr>
+<tr class="memitem:dd/dd2/projection__kernels_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>projection_kernels.cc</b> <a href="dd/dd2/projection__kernels_8cc_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:d7/d6d/projection__kernels_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>projection_kernels.h</b> <a href="d7/d6d/projection__kernels_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:d5/d4f/purify_2read__measurements_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>read_measurements.cc</b></td></tr>
+<tr class="memitem:d5/d4f/purify_2read__measurements_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>read_measurements.cc</b> <a href="d5/d4f/purify_2read__measurements_8cc_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:dd/dc8/read__measurements_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>read_measurements.h</b> <a href="dd/dc8/read__measurements_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -168,21 +168,21 @@ Files</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:d4/d20/update__factory_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>update_factory.h</b> <a href="d4/d20/update__factory_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:dd/d77/purify_2utilities_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>utilities.cc</b></td></tr>
+<tr class="memitem:dd/d77/purify_2utilities_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>utilities.cc</b> <a href="dd/d77/purify_2utilities_8cc_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:db/d1a/purify_2utilities_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>utilities.h</b> <a href="db/d1a/purify_2utilities_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:d4/d95/purify_2uvfits_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>uvfits.cc</b></td></tr>
+<tr class="memitem:d4/d95/purify_2uvfits_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>uvfits.cc</b> <a href="d4/d95/purify_2uvfits_8cc_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:d2/da0/uvfits_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>uvfits.h</b> <a href="d2/da0/uvfits_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:dd/d12/wavelet__operator__factory_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>wavelet_operator_factory.h</b> <a href="dd/d12/wavelet__operator__factory_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:d6/d7a/wproj__utilities_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>wproj_utilities.cc</b></td></tr>
+<tr class="memitem:d6/d7a/wproj__utilities_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>wproj_utilities.cc</b> <a href="d6/d7a/wproj__utilities_8cc_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:da/d4a/wproj__utilities_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>wproj_utilities.h</b> <a href="da/d4a/wproj__utilities_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:d0/d24/yaml-parser_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>yaml-parser.cc</b></td></tr>
+<tr class="memitem:d0/d24/yaml-parser_8cc"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>yaml-parser.cc</b> <a href="d0/d24/yaml-parser_8cc_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:d1/d48/yaml-parser_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><b>yaml-parser.h</b> <a href="d1/d48/yaml-parser_8h_source.html">[code]</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>

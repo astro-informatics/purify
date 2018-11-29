@@ -1,0 +1,32 @@
+.contributors{
+    content: "";
+    clear: both;
+    display: table;
+    width: 500px;
+    padding-bottom: 50px;
+}
+
+.contributors .image {
+    width: 100px;
+    float: left;
+}
+
+.contributors .image img{
+    width: 100px;
+}
+
+.contributors .text {
+
+    width: 75%; /* three boxes (use 25% for four, and 50% for two, etc) */
+    padding-left: 10px; /* if you want space between the images */
+    float:right;
+}
+
+#titlearea img{
+    height: 150px;
+}
+
+.headertitle {
+    font-size: xx-large;
+    font-weight: bolder;
+}

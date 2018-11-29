@@ -20,6 +20,7 @@
 });
 </script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css" />
+<link href="../../style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -27,10 +28,11 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="../../logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">PURIFY
    </div>
-   <div id="projectbrief">PURIFY</div>
+   <div id="projectbrief">Next-generation radio interferometric imaging</div>
   </td>
  </tr>
  </tbody>
@@ -261,7 +263,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  sopt::OperatorFunction&lt;Vector&lt;t_complex&gt;&gt; direct =</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      purify::gpu::operators::base_grid_degrid_operator_2d(</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;          u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, w_term, Jw);</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  <span class="keyword">const</span> t_real op_norm = purify::details::power_method&lt;Vector&lt;t_complex&gt;&gt;(</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  <span class="keyword">const</span> t_real op_norm = sopt::algorithm::power_method&lt;Vector&lt;t_complex&gt;&gt;(</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      {direct, N, [](Vector&lt;t_complex&gt; &amp;out, <span class="keyword">const</span> Vector&lt;t_complex&gt; &amp;in) { out = in; }, N},</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      power_iters, power_tol, Vector&lt;t_complex&gt;::Random(imsizex * imsizey));</div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  <span class="keyword">auto</span> operator_norm = purify::operators::init_normalise&lt;Vector&lt;t_complex&gt;&gt;(op_norm * op_norm);</div>
@@ -303,7 +305,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;          comm, u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, w_term, Jw);</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;  <span class="keyword">auto</span> Broadcast = purify::operators::init_broadcaster&lt;Vector&lt;t_complex&gt;&gt;(comm);</div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;  direct = sopt::chained_operators&lt;Vector&lt;t_complex&gt;&gt;(Broadcast, direct);</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <span class="keyword">const</span> t_real op_norm = purify::details::power_method&lt;Vector&lt;t_complex&gt;&gt;(</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <span class="keyword">const</span> t_real op_norm = sopt::algorithm::power_method&lt;Vector&lt;t_complex&gt;&gt;(</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;      {direct, N, [](Vector&lt;t_complex&gt; &amp;out, <span class="keyword">const</span> Vector&lt;t_complex&gt; &amp;in) { out = in; }, N},</div>
 <div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;      power_iters, power_tol, Vector&lt;t_complex&gt;::Random(imsizex * imsizey));</div>
 <div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  <span class="keyword">auto</span> operator_norm = purify::operators::init_normalise&lt;Vector&lt;t_complex&gt;&gt;(op_norm * op_norm);</div>
@@ -344,7 +346,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;                                                           Jw, cellx, celly);</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> allsumall = purify::operators::init_all_sum_all&lt;Vector&lt;t_complex&gt;&gt;(comm);</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  direct = sopt::chained_operators&lt;Vector&lt;t_complex&gt;&gt;(allsumall, direct);</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  <span class="keyword">const</span> t_real op_norm = purify::details::power_method&lt;Vector&lt;t_complex&gt;&gt;(</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  <span class="keyword">const</span> t_real op_norm = sopt::algorithm::power_method&lt;Vector&lt;t_complex&gt;&gt;(</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;      {direct, N, [](Vector&lt;t_complex&gt; &amp;out, <span class="keyword">const</span> Vector&lt;t_complex&gt; &amp;in) { out = in; }, N},</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;      power_iters, power_tol, Vector&lt;t_complex&gt;::Random(imsizex * imsizey));</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <span class="keyword">auto</span> operator_norm = purify::operators::init_normalise&lt;Vector&lt;t_complex&gt;&gt;(op_norm * op_norm);</div>
@@ -372,7 +374,7 @@ var searchBox = new SearchBox("searchBox", "../../search",false,'Search');
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;}  <span class="comment">// namespace purify</span></div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="namespacepurify_html_ae5a8e573961b3d00cc5603cf4e5e647f"><div class="ttname"><a href="../../db/d8d/namespacepurify.html#ae5a8e573961b3d00cc5603cf4e5e647f">purify::compress_outer</a></div><div class="ttdeci">Sparse&lt; typename T0::Scalar &gt; compress_outer(T0 const &amp;matrix)</div><div class="ttdoc">Indices of non empty outer indices. </div><div class="ttdef"><b>Definition:</b> IndexMapping.h:65</div></div>
+<div class="ttc" id="namespacepurify_html_ae5a8e573961b3d00cc5603cf4e5e647f"><div class="ttname"><a href="../../db/d8d/namespacepurify.html#ae5a8e573961b3d00cc5603cf4e5e647f">purify::compress_outer</a></div><div class="ttdeci">Sparse&lt; typename T0::Scalar &gt; compress_outer(T0 const &amp;matrix)</div><div class="ttdoc">Indices of non empty outer indices. </div><div class="ttdef"><b>Definition:</b> <a href="../../d9/d03/IndexMapping_8h_source.html#l00065">IndexMapping.h:65</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

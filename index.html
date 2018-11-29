@@ -20,6 +20,7 @@
 });
 </script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -27,10 +28,11 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">PURIFY
    </div>
-   <div id="projectbrief">PURIFY</div>
+   <div id="projectbrief">Next-generation radio interferometric imaging</div>
   </td>
  </tr>
  </tbody>
@@ -86,7 +88,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">PURIFY Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h2>Description </h2>
+<div class="textblock"><p><a href="https://travis-ci.com/astro-informatics/purify">![Build Status](https://travis-ci.com/astro-informatics/purify.svg?branch=development)</a></p>
+<h2>Description </h2>
 <p><b>PURIFY</b> is an open-source collection of routines written in <code>C++</code> available under the <a href="#license">license</a> below. It implements different tools and high-level to perform radio interferometric imaging, <em>i.e.</em> to recover images from the Fourier measurements taken by radio interferometric telescopes.</p>
 <p><b>PURIFY</b> leverages recent developments in the field of compressive sensing and convex optimization. Low-level functionality to solve the resulting convex optimisation is factored into the open-source companion code, <a href="https://github.com/astro-informatics/sopt">**SOPT**</a>, also written by the authors of <b>PURIFY</b>. For further background please see the <a href="#references-and-citation">reference</a> section.</p>
 <p>This documentation outlines the necessary and optional <a href="#dependencies-installation">dependencies</a> upon which <b>PURIFY</b> should be built, before describing <a href="#installing-and-building-PURIFY">installation</a>, <a href="#testing">testing</a> and <a href="#usage">usage</a> details. <a href="#contributors">Contributors</a>, <a href="#references-and-citation">references</a> and <a href="#license">license</a> information then follows.</p>
@@ -104,10 +107,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li><a href="http://heasarc.gsfc.nasa.gov/fitsio/fitsio.html">cfitsio</a> v* Library of <code>C</code> and <code>Fortran</code> subroutines for reading and writing data files in FITS (Flexible Image Transport System) data format. Downloaded automatically if absent.</li>
 <li><a href="http://casacore.github.io/casacore/">casacore</a> - Optional - Needed to interface with measurement sets. The main purify program requires this library (and its dependencies)</li>
 <li><a href="http://openmp.org/wp/">OpenMP</a> v4.8.4 (Trusty) - Optional - Speeds up some of the operations.</li>
-<li><a href="https://www.open-mpi.org">MPI</a> v* (Trusty) - Optional - Parallelisation paradigm to speed up operations.</li>
+<li><a href="https://www.open-mpi.org">MPI</a> v3.1.1 (Trusty) - Optional - Parallelisation paradigm to speed up operations.</li>
 <li><a href="https://github.com/gabime/spdlog">spdlog</a> v* - Optional - Logging library. Downloaded automatically if absent.</li>
-<li><a href="https://github.com/philsquared/Catch">philsquared/Catch</a> v2.2.3 - Optional - A <code>C++</code> unit-testing framework only needed for testing. Downloaded automatically if absent.</li>
-<li><a href="https://github.com/google/benchmark">google/benchmark</a> - Optional - A <code>C++</code> micro-benchmarking framework only needed for benchmarks. Downloaded automatically if absent.</li>
+<li><a href="https://github.com/catchorg/Catch2">Catch2</a> v2.3.0 - Optional - A <code>C++</code> unit-testing framework only needed for testing. Downloaded automatically if absent.</li>
+<li><a href="https://github.com/google/benchmark">google/benchmark</a> <code>v1.3.0</code> - Optional - A <code>C++</code> micro-benchmarking framework only needed for benchmarks. Downloaded automatically if absent.</li>
 </ul>
 <h2>Installing and building PURIFY </h2>
 <p><b>PURIFY</b> can be installed through the software packet manager on Linux Debian distributions:</p>
@@ -127,6 +130,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>The main purify executable lives either in the build directory or in the in the <code>bin</code> subdirectory of the installation directory. <code>purify</code> has one required argument, it a string for the file path of the config file containg the settings.</p>
 <p><code>purify path/to/config.yaml</code>.</p>
 <p>A template with a description of the settings can be found at <a href="https://github.com/astro-informatics/purify/blob/master/data/config/config.yaml">https://github.com/astro-informatics/purify/blob/master/data/config/config.yaml</a>. This can also be found in the downloaded repo at <code>data/config/config.yaml</code>. When <code>purify</code> runs a directory will be created, and the output images will be saved and time-stamped. Additionally, a config file with the settings used will be saved and time-stamped, helping for reproducibility and book-keeping.</p>
+<h2>Docker </h2>
+<p>If you want to use Docker instead, you can build an image using the Dockerfile available in the repository or pulling it from <a href="https://hub.docker.com/r/uclrits/purify">DockerHub</a>.</p>
+<p>``` docker build -t purify . ```</p>
+<p>or</p>
+<p>``` docker pull uclrits/purify ```</p>
+<p>Then to use it, you should mount the directory with your data and config files to <code>/mydata</code> in the container. To run the container and mount the directory is with:</p>
+<p>``` docker run -it &ndash;name purify -v /full/path/to/data:/mydata uclrits/purify ```</p>
+<p>That will start a shell inside the container in the <code>/mydata</code> directory where you can see all the files from your <code>/full/path/to/data</code>. There you can run <code>purify</code> as shown above.`</p>
 <h2>Contributors </h2>
 <p>Check the <a class="el" href="de/df6/contributors.html">contributors</a> page.</p>
 <h2>References and citation </h2>
@@ -142,7 +153,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <h2>CMake Tips </h2>
 <p>It is possible to tell <code>CMake</code> exactly which libraries to compile and link against. The general idea is to add <code>-DVARIABLE=something</code> to the command-line arguments of CMake. CMake can be called any number of times: previous settings will not be overwritten unless specifically requested. Some of the more common options are the following:</p>
 <ul>
-<li><code>CMAKE_PREFIX_PATH</code>: CMake will look in "CMAKE\_PREFIX\_PATH/lib" for libraries, "CMAKE\_PREFIX\_PATH/include" for headers, etc.</li>
+<li><code>CMAKE_PREFIX_PATH</code>: CMake will look in "CMAKE_PREFIX_PATH/lib" for libraries, "CMAKE_PREFIX_PATH/include" for headers, etc.</li>
 <li><code>FFTW3_LIBRARIES</code>, <code>FFTW3_INCLUDE_DIR</code></li>
 <li><code>BLAS_INCLUDE_DIRS</code>, <code>BLAS_LIBRARIES</code></li>
 </ul>
