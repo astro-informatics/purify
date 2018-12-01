@@ -2,6 +2,8 @@
 #include <benchmark/benchmark.h>
 #include "benchmarks/utilities.h"
 #include "purify/wavelet_operator_factory.h"
+#include <sopt/mpi/communicator.h>
+#include <sopt/mpi/session.h>
 
 using namespace purify;
 
@@ -48,7 +50,22 @@ using namespace purify;
 
 class WaveletOperatorMPIFixture : public ::benchmark::Fixture {
  public:
-  void SetUp(const ::benchmark::State& state) {}
+  WaveletOperatorMPIFixture(){};
+  void SetUp(const ::benchmark::State& state) {
+    m_imsizex = state.range(0);
+    m_imsizey = state.range(0);
+
+    sopt::wavelets::SARA m_sara{
+        std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
+        std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
+        std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
+
+    sopt::wavelets::SARA const saraDistr = sopt::wavelets::distribute_sara(m_sara, m_world);
+
+    // Get the number of wavelet coefs
+    n_wave_coeff = saraDistr.size() * m_imsizey * m_imsizex;
+    m_Psi = sopt::linear_transform<t_complex>(saraDistr, m_imsizey, m_imsizex, m_world);
+  }
 
   void TearDown(const ::benchmark::State& state) {}
 
@@ -56,39 +73,15 @@ class WaveletOperatorMPIFixture : public ::benchmark::Fixture {
   t_uint m_counter;
   // MPI communicator
   sopt::mpi::Communicator m_world;
-};
-
-class WaveletOperatorAdjointMPIFixture : public ::benchmark::Fixture {
- public:
-  void SetUp(const ::benchmark::State& state) {}
-
-  void TearDown(const ::benchmark::State& state) {}
-
-  // A bunch of useful variables
-  t_uint m_counter;
-  // MPI communicator
-  sopt::mpi::Communicator m_world;
-};
-
-BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Apply)(benchmark::State& state) {
-  // Image size
-  t_uint m_imsizex = state.range(0);
-  t_uint m_imsizey = state.range(0);
-
-  sopt::wavelets::SARA m_sara{
-      std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
-      std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
-      std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
-
-  sopt::wavelets::SARA const saraDistr = sopt::wavelets::distribute_sara(m_sara, m_world);
-
-  sopt::LinearTransform<Vector<t_complex>> m_Psi =
-      sopt::linear_transform<t_complex>(saraDistr, m_imsizey, m_imsizex, m_world);
-
-  // Benchmark the application of the operator
-
+  sopt::LinearTransform<Vector<t_complex>> m_Psi = sopt::linear_transform_identity<t_complex>();
+  t_uint m_imsizex;
+  t_uint m_imsizey;
   // Get the number of wavelet coefs
-  t_uint const n_wave_coeff = saraDistr.size() * m_imsizey * m_imsizex;
+  t_uint n_wave_coeff;
+};
+
+BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Forward)(benchmark::State& state) {
+  // Benchmark the application of the operator
 
   // Apply Psi to a temporary vector
   Vector<t_complex> image = Vector<t_complex>::Random(m_imsizey * m_imsizex);
@@ -102,25 +95,8 @@ BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Apply)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_DEFINE_F(WaveletOperatorAdjointMPIFixture, Apply)(benchmark::State& state) {
-  // Image size
-  t_uint m_imsizex = state.range(0);
-  t_uint m_imsizey = state.range(0);
+BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Adjoint)(benchmark::State& state) {
 
-  sopt::wavelets::SARA m_sara{
-      std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
-      std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
-      std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
-
-  sopt::wavelets::SARA const saraDistr = sopt::wavelets::distribute_sara(m_sara, m_world);
-
-  sopt::LinearTransform<Vector<t_complex>> m_Psi =
-      sopt::linear_transform<t_complex>(saraDistr, m_imsizey, m_imsizex, m_world);
-
-  // Benchmark the application of the operator
-
-  // Get the number of wavelet coefs
-  t_uint const n_wave_coeff = saraDistr.size() * m_imsizey * m_imsizex;
 
   // Apply Psi to a temporary vector
   Vector<t_complex> const image = Vector<t_complex>::Ones(m_imsizey * m_imsizex);
@@ -134,7 +110,7 @@ BENCHMARK_DEFINE_F(WaveletOperatorAdjointMPIFixture, Apply)(benchmark::State& st
   }
 }
 
-BENCHMARK_REGISTER_F(WaveletOperatorMPIFixture, Apply)
+BENCHMARK_REGISTER_F(WaveletOperatorMPIFixture, Forward)
     // //->Apply(b_utilities::Arguments)
     ->RangeMultiplier(2)
     ->Range(128, 128 << 3)
@@ -143,7 +119,7 @@ BENCHMARK_REGISTER_F(WaveletOperatorMPIFixture, Apply)
     ->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
-BENCHMARK_REGISTER_F(WaveletOperatorAdjointMPIFixture, Apply)
+BENCHMARK_REGISTER_F(WaveletOperatorMPIFixture, Adjoint)
     // //->Apply(b_utilities::Arguments)
     ->RangeMultiplier(2)
     ->Range(128, 128 << 3)
