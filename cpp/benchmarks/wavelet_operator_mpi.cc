@@ -87,11 +87,11 @@ BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Forward)(benchmark::State& state) 
   Vector<t_complex> image = Vector<t_complex>::Random(m_imsizey * m_imsizex);
   Vector<t_complex> const wavelet_coeff = Vector<t_complex>::Ones(n_wave_coeff);
 
-  while (state.KeepRunning()) {
+  while (m_world.broadcast<int>(state.KeepRunning())) {
     auto start = std::chrono::high_resolution_clock::now();
     image = m_Psi * wavelet_coeff;
     auto end = std::chrono::high_resolution_clock::now();
-    state.SetIterationTime(b_utilities::duration(start, end));
+    state.SetIterationTime(b_utilities::duration(start, end, m_world));
   }
 }
 
@@ -102,11 +102,11 @@ BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Adjoint)(benchmark::State& state) 
   Vector<t_complex> const image = Vector<t_complex>::Ones(m_imsizey * m_imsizex);
   Vector<t_complex> wavelet_coeff = Vector<t_complex>::Zero(n_wave_coeff);
 
-  while (state.KeepRunning()) {
+  while (m_world.broadcast<int>(state.KeepRunning())) {
     auto start = std::chrono::high_resolution_clock::now();
     wavelet_coeff = m_Psi.adjoint() * image;
     auto end = std::chrono::high_resolution_clock::now();
-    state.SetIterationTime(b_utilities::duration(start, end));
+    state.SetIterationTime(b_utilities::duration(start, end, m_world));
   }
 }
 
