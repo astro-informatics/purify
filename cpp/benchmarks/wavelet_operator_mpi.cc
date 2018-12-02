@@ -54,7 +54,7 @@ class WaveletOperatorMPIFixture : public ::benchmark::Fixture {
   void SetUp(const ::benchmark::State& state) {
     m_imsizex = state.range(0);
     m_imsizey = state.range(0);
-
+    b_utilities::update_comm(m_world);
     sopt::wavelets::SARA m_sara{
         std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
         std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),

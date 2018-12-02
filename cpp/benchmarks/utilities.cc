@@ -178,5 +178,6 @@ std::tuple<utilities::vis_params, t_real> dirty_measurements(
   auto const sigma = comm.broadcast<t_real>();
   return std::make_tuple(utilities::scatter_visibilities(comm), sigma);
 }
+void update_comm(sopt::mpi::Communicator &comm) { comm = sopt::mpi::Communicator::World(); }
 #endif
 }  // namespace b_utilities
