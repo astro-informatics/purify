@@ -96,8 +96,6 @@ BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Forward)(benchmark::State& state) 
 }
 
 BENCHMARK_DEFINE_F(WaveletOperatorMPIFixture, Adjoint)(benchmark::State& state) {
-
-
   // Apply Psi to a temporary vector
   Vector<t_complex> const image = Vector<t_complex>::Ones(m_imsizey * m_imsizex);
   Vector<t_complex> wavelet_coeff = Vector<t_complex>::Zero(n_wave_coeff);

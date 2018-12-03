@@ -41,7 +41,7 @@ std::tuple<utilities::vis_params, t_real> dirty_measurements(
     const t_real& cellsize, sopt::mpi::Communicator const& comm);
 utilities::vis_params random_measurements(t_int size, sopt::mpi::Communicator const& comm);
 
-void update_comm(sopt::mpi::Communicator & comm);
+void update_comm(sopt::mpi::Communicator& comm);
 
 #endif
 }  // namespace b_utilities
