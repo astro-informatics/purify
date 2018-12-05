@@ -38,11 +38,11 @@ class PadmmFixtureMPI : public ::benchmark::Fixture {
       const bool w_term = false;
       // algorithm 1
       m_measurements1 = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-          m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2, 0, 1e-4,
+          m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2,
           kernels::kernel::kb, m_kernel, m_kernel, w_term);
       // algorithm 3
       m_measurements3 = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2, 0, 1e-4,
+          m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2,
           kernels::kernel::kb, m_kernel, m_kernel, w_term);
     }
   }

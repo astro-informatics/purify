@@ -31,7 +31,7 @@ class PadmmFixture : public ::benchmark::Fixture {
       const t_real cellsize = FoV / m_imsizex * 60. * 60.;
       const bool w_term = false;
       m_measurements_transform = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, kernels::kernel::kb,
+          m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, kernels::kernel::kb,
           m_kernel, m_kernel, w_term);
       m_gamma = (m_measurements_transform->adjoint() * m_uv_data.vis).real().maxCoeff() * 1e-3;
 
