@@ -57,7 +57,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
           factory::measurement_operator_factory<Vector<t_complex>>(
               factory::distributed_measurement_operator::mpi_distribute_image, uv_data, imsizey,
               imsizex, 1, 1, 2, kernels::kernel_from_string.at("kb"), 4, 4),
-          100, 1e-4, world.broadcast(Vector<t_complex>::Random(imsizex * imsizey).eval())));
+          1000, 1e-5, world.broadcast(Vector<t_complex>::Ones(imsizex * imsizey).eval())));
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),

@@ -43,7 +43,7 @@ TEST_CASE("padmm_factory") {
           factory::measurement_operator_factory<Vector<t_complex>>(
               factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2,
               kernels::kernel_from_string.at("kb"), 4, 4),
-          100, 1e-4, Vector<t_complex>::Random(imsizex * imsizey)));
+          1000, 1e-5, Vector<t_complex>::Ones(imsizex * imsizey)));
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
