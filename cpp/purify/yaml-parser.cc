@@ -156,6 +156,8 @@ void YamlParser::parseAndSetMeasureOperators(const YAML::Node& measureOperatorsN
   this->oversampling_ = get<float>(measureOperatorsNode, {"oversampling"});
   this->powMethod_iter_ = get<int>(measureOperatorsNode, {"powMethod_iter"});
   this->powMethod_tolerance_ = get<float>(measureOperatorsNode, {"powMethod_tolerance"});
+  this->eigenvector_real_ = get<std::string>(measureOperatorsNode, {"eigenvector", "real"});
+  this->eigenvector_imag_ = get<std::string>(measureOperatorsNode, {"eigenvector", "imag"});
   this->cellsizex_ = get<double>(measureOperatorsNode, {"pixelSize", "cellsizex"});
   this->cellsizey_ = get<double>(measureOperatorsNode, {"pixelSize", "cellsizey"});
   this->width_ = get<int>(measureOperatorsNode, {"imageSize", "width"});

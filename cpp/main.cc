@@ -63,6 +63,23 @@ int main(int argc, const char **argv) {
   t_real sigma;
   Vector<t_complex> measurement_op_eigen_vector =
       Vector<t_complex>::Ones(params.width() * params.height());
+  // read eigen vector for power method
+  if (params.eigenvector_real() != "" and params.eigenvector_imag() != "") {
+    t_int rows;
+    t_int cols;
+    t_int pols;
+    t_int chans;
+    Vector<t_real> temp_real;
+    Vector<t_real> temp_imag;
+    pfitsio::read3d(params.eigenvector_real(), temp_real, rows, cols, chans, pols);
+    if (rows != params.height() or cols != params.width() or chans != 1 or pols != 1)
+      throw std::runtime_error("Image of measurement operator eigenvector is wrong size.");
+    pfitsio::read3d(params.eigenvector_imag(), temp_imag, rows, cols, chans, pols);
+    if (rows != params.height() or cols != params.width() or chans != 1 or pols != 1)
+      throw std::runtime_error("Image of measurement operator eigenvector is wrong size.");
+    measurement_op_eigen_vector.real() = temp_real;
+    measurement_op_eigen_vector.imag() = temp_imag;
+  }
   if (params.source() == purify::utilities::vis_source::measurements) {
     PURIFY_HIGH_LOG("Input visibilities are from files:");
     for (size_t i = 0; i < params.measurements().size(); i++)
@@ -241,6 +258,24 @@ int main(int argc, const char **argv) {
   const pfitsio::header_params def_header = pfitsio::header_params(
       "", "Jy/Pixel", 1, uv_data.ra, uv_data.dec, params.measurements_polarization(),
       params.cellsizex(), params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
+  // the eigenvector
+  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
+#ifdef PURIFY_MPI
+    auto const world = sopt::mpi::Communicator::World();
+    if (world.is_root())
+#else
+  throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
+#endif
+      pfitsio::write2d(measurement_op_eigen_vector.real(), params.height(), params.width(),
+                       out_dir + "/eigenvector_real.fits", "pix", true);
+      pfitsio::write2d(measurement_op_eigen_vector.imag(), params.height(), params.width(),
+                       out_dir + "/eigenvector_imag.fits", "pix", true);
+  } else {
+    pfitsio::write2d(measurement_op_eigen_vector.real(), params.height(), params.width(),
+                     out_dir + "/eigenvector_real.fits", "pix", true);
+      pfitsio::write2d(measurement_op_eigen_vector.imag(), params.height(), params.width(),
+                       out_dir + "/eigenvector_imag.fits", "pix", true);
+  }
   // the psf
   pfitsio::header_params psf_header = def_header;
   psf_header.fits_name = out_dir + "/psf.fits";
