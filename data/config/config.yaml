@@ -45,6 +45,9 @@ MeasureOperators:
   oversampling: 2 # value > 1
   powMethod_iter: 100 # value > 0
   powMethod_tolerance: 1e-4 # value > 0
+  eigenvector: 
+    real:  ""
+    imag:  ""
   wide-field:
     wprojection: False # using radially symmetric w projection kernel
     mpi_wstacking: False # applies average w-stack correction on each node (always True with wprojection)
