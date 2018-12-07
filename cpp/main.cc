@@ -230,12 +230,21 @@ int main(int argc, const char **argv) {
       wop_algo, sara, params.height(), params.width(), sara_size);
 
   // Create algorithm
-  auto algo = factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
-      factory::algorithm::padmm, params.mpiAlgorithm(), measurements_transform, wavelets_transform,
-      uv_data, sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(),
-      sara_size, params.iterations(), params.realValueConstraint(),
-      params.positiveValueConstraint(), (params.wavelet_basis().size() < 2),
-      params.relVarianceConvergence(), 1e-3, 50);
+  std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm;
+  std::shared_ptr<sopt::algorithm::ImagingForwardBackward<t_complex>> fb;
+  if (params.algorithm() == "padmm")
+    padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
+        params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
+        sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(), sara_size,
+        params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
+        (params.wavelet_basis().size() < 2), params.relVarianceConvergence(), 1e-3, 50);
+  if (params.algorithm() == "fb")
+    fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
+        params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
+        sigma * params.epsilonScaling() / flux_scale, params.stepsize(),
+        params.regularisation_parameter(), params.height(), params.width(), sara_size,
+        params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
+        (params.wavelet_basis().size() < 2), params.relVarianceConvergence(), 1e-3, 50);
 
   // Save some things before applying the algorithm
   // the config yaml file - this also generates the output directory and the timestamp
@@ -261,12 +270,13 @@ int main(int argc, const char **argv) {
       pfitsio::header_params(out_dir + "/res_update.fits", "Jy/Pixel", 1, uv_data.ra, uv_data.dec,
                              params.measurements_polarization(), params.cellsizex(),
                              params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
-  // TODO: allow for other algorithm types
-  const std::weak_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> algo_weak(algo);
-  // Adding step size update to algorithm
-  factory::add_updater<t_complex, sopt::algorithm::ImagingProximalADMM<t_complex>>(
-      algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
-      update_header_res, params.height(), params.width(), sara_size, using_mpi);
+  if (params.algorithm() == "padmm") {
+    const std::weak_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> algo_weak(padmm);
+    // Adding step size update to algorithm
+    factory::add_updater<t_complex, sopt::algorithm::ImagingProximalADMM<t_complex>>(
+        algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
+        update_header_res, params.height(), params.width(), sara_size, using_mpi);
+  }
   // the input measurements, if simulated
   if (params.source() == purify::utilities::vis_source::simulation)
     utilities::write_visibility(uv_data, out_dir + "/input.vis");
@@ -329,17 +339,36 @@ int main(int argc, const char **argv) {
   }
 
   PURIFY_HIGH_LOG("Starting sopt!");
-  // Apply algorithm
-  auto const diagnostic = (*algo)();
-
-  // Save the rest of the output
-  // the clean image
-  const Image<t_real> image =
-      Image<t_complex>::Map(diagnostic.x.data(), params.height(), params.width()).real();
+  Image<t_real> image;
+  Image<t_real> residual_image;
   pfitsio::header_params purified_header = def_header;
   purified_header.fits_name = out_dir + "/purified.fits";
-  purified_header.hasconverged = diagnostic.good;
-  purified_header.niters = diagnostic.niters;
+  if (params.algorithm() == "padmm") {
+    // Apply algorithm
+    auto const diagnostic = (*padmm)();
+
+    // Save the rest of the output
+    // the clean image
+    image = Image<t_complex>::Map(diagnostic.x.data(), params.height(), params.width()).real();
+    const Vector<t_complex> residuals = measurements_transform->adjoint() * diagnostic.residual;
+    residual_image =
+        Image<t_complex>::Map(residuals.data(), params.height(), params.width()).real();
+    purified_header.hasconverged = diagnostic.good;
+    purified_header.niters = diagnostic.niters;
+  }
+  if (params.algorithm() == "fb") {
+    // Apply algorithm
+    auto const diagnostic = (*fb)();
+
+    // Save the rest of the output
+    // the clean image
+    image = Image<t_complex>::Map(diagnostic.x.data(), params.height(), params.width()).real();
+    const Vector<t_complex> residuals = measurements_transform->adjoint() * diagnostic.residual;
+    residual_image =
+        Image<t_complex>::Map(residuals.data(), params.height(), params.width()).real();
+    purified_header.hasconverged = diagnostic.good;
+    purified_header.niters = diagnostic.niters;
+  }
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
     auto const world = sopt::mpi::Communicator::World();
@@ -354,9 +383,6 @@ int main(int argc, const char **argv) {
   // the residuals
   pfitsio::header_params residuals_header = purified_header;
   residuals_header.fits_name = out_dir + "/residuals.fits";
-  const Vector<t_complex> residuals = measurements_transform->adjoint() * diagnostic.residual;
-  const Image<t_real> residual_image =
-      Image<t_complex>::Map(residuals.data(), params.height(), params.width()).real();
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
     auto const world = sopt::mpi::Communicator::World();

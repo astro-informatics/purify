@@ -125,6 +125,9 @@ class YamlParser {
   YAML_MACRO(stokes, measurements_polarization, stokes::I)
   YAML_MACRO(utilities::vis_units, measurements_units, utilities::vis_units::radians)
   YAML_MACRO(std::string, kernel, "")
+  YAML_MACRO(t_real, regularisation_parameter, 0)
+  YAML_MACRO(t_real, step_size, 1)
+  YAML_MACRO(bool, joint_map, false)
 
 #undef YAML_MACRO
  private:
