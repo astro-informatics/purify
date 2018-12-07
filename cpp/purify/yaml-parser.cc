@@ -142,10 +142,24 @@ void YamlParser::parseAndSetGeneralConfiguration(const YAML::Node& generalConfig
         get<std::string>(generalConfigNode, {"InputOutput", "input", "simulation", "skymodel"});
     this->signal_to_noise_ =
         get<t_real>(generalConfigNode, {"InputOutput", "input", "simulation", "signal_to_noise"});
-    this->number_of_measurements_ =
-        get<t_int>(generalConfigNode, {"InputOutput", "input", "simulation", "number_of_measurements"});
-    this->w_rms_ =
-        get<t_real>(generalConfigNode, {"InputOutput", "input", "simulation", "number_of_measurements"});
+    this->number_of_measurements_ = get<t_int>(
+        generalConfigNode, {"InputOutput", "input", "simulation", "number_of_measurements"});
+    this->w_rms_ = get<t_real>(generalConfigNode,
+                               {"InputOutput", "input", "simulation", "number_of_measurements"});
+    this->measurements_ = get_vector<std::vector<std::string>>(
+        generalConfigNode, {"InputOutput", "input", "simulation", "coverage_files"});
+    // TODO: use the enum instead of string.
+    const std::string units_measurement_str = get<std::string>(
+        generalConfigNode, {"InputOutput", "input", "simulation", "coverage_units"});
+    if (units_measurement_str == "lambda")
+      this->measurements_units_ = purify::utilities::vis_units::lambda;
+    else if (units_measurement_str == "radians")
+      this->measurements_units_ = purify::utilities::vis_units::radians;
+    else if (units_measurement_str == "pixels")
+      this->measurements_units_ = purify::utilities::vis_units::pixels;
+    else
+      throw std::runtime_error("Visibility units \"" + units_measurement_str +
+                               "\" not recognised. Check your config file.");
   } else
     throw std::runtime_error("Visibility source \"" + source_str +
                              "\" not recognised. Check your config file.");
