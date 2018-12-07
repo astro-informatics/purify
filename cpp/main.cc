@@ -139,7 +139,7 @@ int main(int argc, const char **argv) {
                   params.cellsizex(), params.oversampling(),
                   kernels::kernel_from_string.at(params.kernel()), 2 * params.Jx(), params.Jw(),
                   1e-6, 1e-6);
-#ifndef PURIFY_MPI
+#ifdef PURIFY_MPI
     auto const comm = sopt::mpi::Communicator::World();
     sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
         sky_measurements, params.powMethod_iter(), params.powMethod_tolerance(),
@@ -158,7 +158,7 @@ int main(int argc, const char **argv) {
                                                       params.width(), params.oversampling());
   t_real ideal_cell_y = widefield::estimate_cell_size(uv_data.v.cwiseAbs().maxCoeff(),
                                                       params.height(), params.oversampling());
-#ifndef PURIFY_MPI
+#ifdef PURIFY_MPI
   if (using_mpi) {
     auto const comm = sopt::mpi::Communicator::World();
     ideal_cell_x = widefield::estimate_cell_size(
@@ -194,7 +194,7 @@ int main(int argc, const char **argv) {
                 params.cellsizex(), params.oversampling(),
                 kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jw(), 1e-6,
                 1e-6);
-#ifndef PURIFY_MPI
+#ifdef PURIFY_MPI
   auto const comm = sopt::mpi::Communicator::World();
   auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
       measurements_transform, params.powMethod_iter(), params.powMethod_tolerance(),
