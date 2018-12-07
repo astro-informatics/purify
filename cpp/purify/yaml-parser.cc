@@ -188,6 +188,9 @@ void YamlParser::parseAndSetSARA(const YAML::Node& SARANode) {
   const std::string values_str = get<std::string>(SARANode, {"wavelet_dict"});
   this->wavelet_basis_ = this->getWavelets(values_str);
   this->wavelet_levels_ = get<t_int>(SARANode, {"wavelet_levels"});
+  this->dualFBVarianceConvergence_ = get<t_real>(SARANode, {"dualFBVarianceConvergence"});
+  this->realValueConstraint_ = get<bool>(SARANode, {"realValueConstraint"});
+  this->positiveValueConstraint_ = get<bool>(SARANode, {"positiveValueConstraint"});
 }
 
 void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsNode) {
@@ -198,15 +201,10 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
         "configuration file.");
   this->epsilonConvergenceScaling_ =
       get<t_int>(algorithmOptionsNode, {"padmm", "epsilonConvergenceScaling"});
-  this->realValueConstraint_ = get<bool>(algorithmOptionsNode, {"padmm", "realValueConstraint"});
-  this->positiveValueConstraint_ =
-      get<bool>(algorithmOptionsNode, {"padmm", "positiveValueConstraint"});
   this->mpiAlgorithm_ = factory::algo_distribution_string.at(
       get<std::string>(algorithmOptionsNode, {"padmm", "mpiAlgorithm"}));
   this->relVarianceConvergence_ =
       get<t_real>(algorithmOptionsNode, {"padmm", "relVarianceConvergence"});
-  this->dualFBVarianceConvergence_ =
-      get<t_real>(algorithmOptionsNode, {"padmm", "dualFBVarianceConvergence"});
 }
 
 std::vector<std::string> YamlParser::getWavelets(const std::string& values_str) {
