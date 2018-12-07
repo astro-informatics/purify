@@ -13,7 +13,9 @@
 #include <sopt/mpi/communicator.h>
 #endif
 
+#include <sopt/imaging_forward_backward.h>
 #include <sopt/imaging_padmm.h>
+#include <sopt/joint_map.h>
 #include <sopt/relative_variation.h>
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
@@ -31,7 +33,6 @@ const std::map<std::string, algo_distribution> algo_distribution_string = {
 //! return chosen algorithm given parameters
 template <class Algorithm, class... ARGS>
 std::shared_ptr<Algorithm> algorithm_factory(const factory::algorithm algo, ARGS &&... args);
-namespace {
 //! return shared pointer to padmm object
 template <class Algorithm>
 typename std::enable_if<
@@ -121,7 +122,61 @@ padmm_factory(const algo_distribution dist,
   return padmm;
 }
 
-}  // namespace
+//! return shared pointer to forward backward object
+template <class Algorithm>
+typename std::enable_if<
+    std::is_same<Algorithm, sopt::algorithm::ImagingForwardBackward<t_complex>>::value,
+    std::shared_ptr<Algorithm>>::type
+fb_factory(const algo_distribution dist,
+           std::shared_ptr<sopt::LinearTransform<Vector<typename Algorithm::Scalar>> const> const
+               &measurements,
+           std::shared_ptr<sopt::LinearTransform<Vector<typename Algorithm::Scalar>> const> const
+               &wavelets,
+           const utilities::vis_params &uv_data, const t_real sigma, const t_real step_size,
+           const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex,
+           const t_uint sara_size, const t_uint max_iterations = 500,
+           const bool real_constraint = true, const bool positive_constraint = true,
+           const bool tight_frame = false, const t_real relative_variation = 1e-3,
+           const t_real l1_proximal_tolerance = 1e-2,
+           const t_uint maximum_proximal_iterations = 50) {
+  typedef typename Algorithm::Scalar t_scalar;
+  if (sara_size > 1 and tight_frame)
+    throw std::runtime_error(
+        "l1 proximal not consistent: You say you are using a tight frame, but you have more than "
+        "one wavelet basis.");
+  auto fb = std::make_shared<Algorithm>(uv_data.vis);
+  fb->itermax(max_iterations)
+      .gamma(reg_parameter)
+      .sigma(sigma)
+      .beta(step_size)
+      .relative_variation(relative_variation)
+      .tight_frame(tight_frame)
+      .l1_proximal_tolerance(l1_proximal_tolerance)
+      .l1_proximal_nu(1.)
+      .l1_proximal_itermax(maximum_proximal_iterations)
+      .l1_proximal_positivity_constraint(positive_constraint)
+      .l1_proximal_real_constraint(real_constraint)
+      .nu(1e0)
+      .Psi(*wavelets)
+      .Phi(*measurements);
+  switch (dist) {
+  case (algo_distribution::serial): {
+  }
+#ifdef PURIFY_MPI
+  case (algo_distribution::mpi_serial): {
+  //  auto const comm = sopt::mpi::Communicator::World();
+  //  fb->l1_proximal_adjoint_space_comm(comm);
+ //   fb->obj_comm(comm);
+    break;
+  }
+#endif
+  default:
+    throw std::runtime_error(
+        "Type of distributed Forward Backward algorithm not recognised. You might not have compiled "
+        "with MPI.");
+  }
+  return fb;
+}
 
 template <class Algorithm, class... ARGS>
 std::shared_ptr<Algorithm> algorithm_factory(const factory::algorithm algo, ARGS &&... args) {
