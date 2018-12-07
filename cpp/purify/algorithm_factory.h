@@ -161,18 +161,20 @@ fb_factory(const algo_distribution dist,
       .Phi(*measurements);
   switch (dist) {
   case (algo_distribution::serial): {
+    break;
   }
 #ifdef PURIFY_MPI
   case (algo_distribution::mpi_serial): {
-  //  auto const comm = sopt::mpi::Communicator::World();
-  //  fb->l1_proximal_adjoint_space_comm(comm);
- //   fb->obj_comm(comm);
+    auto const comm = sopt::mpi::Communicator::World();
+    fb->l1_proximal_adjoint_space_comm(comm);
+    fb->obj_comm(comm);
     break;
   }
 #endif
   default:
     throw std::runtime_error(
-        "Type of distributed Forward Backward algorithm not recognised. You might not have compiled "
+        "Type of distributed Forward Backward algorithm not recognised. You might not have "
+        "compiled "
         "with MPI.");
   }
   return fb;
