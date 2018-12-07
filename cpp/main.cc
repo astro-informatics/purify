@@ -87,7 +87,6 @@ int main(int argc, const char **argv) {
     for (size_t i = 0; i < params.measurements().size(); i++)
       PURIFY_HIGH_LOG("{}", params.measurements()[i]);
     sigma = params.measurements_sigma();
-    // TODO: use_w_term hardcoded to false for now
 #ifdef PURIFY_MPI
     if (using_mpi) {
       auto const world = sopt::mpi::Communicator::World();
@@ -118,8 +117,22 @@ int main(int argc, const char **argv) {
     t_int const number_of_vis = params.number_of_measurements();
     t_real const sigma_m = constant::pi / 3;
     const t_real rms_w = params.w_rms();  // lambda
-    uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, rms_w);
-    uv_data.units = utilities::vis_units::radians;
+    if (params.measurements().at(0) == "") {
+      uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, rms_w);
+      uv_data.units = utilities::vis_units::radians;
+    } else {
+#ifdef PURIFY_MPI
+      if (using_mpi) {
+        auto const world = sopt::mpi::Communicator::World();
+        uv_data = read_measurements::read_measurements(params.measurements(), world,
+                                                       distribute::plan::radial, true, stokes::I,
+                                                       params.measurements_units());
+      } else
+#endif
+        uv_data = read_measurements::read_measurements(params.measurements(), true, stokes::I,
+                                                       params.measurements_units());
+      uv_data.weights = Vector<t_complex>::Ones(uv_data.weights.size());
+    }
 #ifdef PURIFY_MPI
     if (params.mpi_wstacking()) {
       auto const world = sopt::mpi::Communicator::World();
