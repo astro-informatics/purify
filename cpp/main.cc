@@ -163,7 +163,7 @@ int main(int argc, const char **argv) {
         measurement_op_eigen_vector));
 #endif
     uv_data.vis = (*sky_measurements) * Image<t_complex>::Map(image.data(), image.size(), 1);
-    Vector<t_complex> const y0 = uv_data.vis;
+    Vector<t_complex> const &y0 = uv_data.vis;
     sigma = utilities::SNR_to_standard_deviation(y0, params.signal_to_noise());
     uv_data.vis = utilities::add_noise(y0, 0., sigma);
   }
@@ -283,13 +283,13 @@ int main(int argc, const char **argv) {
 #endif
       pfitsio::write2d(measurement_op_eigen_vector.real(), params.height(), params.width(),
                        out_dir + "/eigenvector_real.fits", "pix", true);
-      pfitsio::write2d(measurement_op_eigen_vector.imag(), params.height(), params.width(),
-                       out_dir + "/eigenvector_imag.fits", "pix", true);
+    pfitsio::write2d(measurement_op_eigen_vector.imag(), params.height(), params.width(),
+                     out_dir + "/eigenvector_imag.fits", "pix", true);
   } else {
     pfitsio::write2d(measurement_op_eigen_vector.real(), params.height(), params.width(),
                      out_dir + "/eigenvector_real.fits", "pix", true);
-      pfitsio::write2d(measurement_op_eigen_vector.imag(), params.height(), params.width(),
-                       out_dir + "/eigenvector_imag.fits", "pix", true);
+    pfitsio::write2d(measurement_op_eigen_vector.imag(), params.height(), params.width(),
+                     out_dir + "/eigenvector_imag.fits", "pix", true);
   }
   // the psf
   pfitsio::header_params psf_header = def_header;
