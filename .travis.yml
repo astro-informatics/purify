@@ -187,6 +187,8 @@ matrix:
         - DOCS=ON
         - BUILD_CMD='make doc VERBOSE=1'
         - TEST_CMD=''
+      script:
+        - docker run --rm -v $(pwd):/mydata uclrits/sopt /bin/sh -c "mkdir build; cd build; cmake .. -Ddocs=${DOCS}; eval ${BUILD_CMD}"
 
     - os: linux
       addons:
@@ -240,7 +242,6 @@ before_install:
   - |
     if [[ ${TITLE} = *Documentation* ]]; then
         docker pull uclrits/sopt
-        docker run -it --name sopt -v $(pwd):/mydata uclrits/sopt
     fi
 
 
@@ -278,7 +279,6 @@ script:
   - eval $BUILD_CMD
   - eval $TEST_CMD
   - if [[ ${TITLE} != *Documentation* ]] && [[ ${TITLE} != *Lint* ]]; then sudo make install; fi
-  - if [[ ${TITLE} = *Documentation* ]]; then exit; fi
 
 after_success:
 
