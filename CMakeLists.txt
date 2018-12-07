@@ -18,6 +18,7 @@ option(doaf           "Enable ArrayFire"                                off)
 option(docimg         "Enable CImg"                                     off)
 option(docasa         "Enable CASA"                                     off)
 option(docs           "Build documentation"                             off)
+option(coverage       "Build coverage"                                  off)
 
 if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "Setting build type to 'Relese' as none was specified.")
@@ -45,6 +46,15 @@ if(tests)  # Adds ctest
   enable_testing()
   find_package(Catch 2.3.0 EXACT)
   include(AddCatchTest)
+endif()
+
+if(tests AND coverage)
+  # Enable code coverage.
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+	# Build with debugging information to make the output meaningful.
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+	# Disable optimizations to get the most accurate results.
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 endif()
 
 if(benchmarks)
