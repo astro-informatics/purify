@@ -66,9 +66,9 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
       factory::distributed_wavelet_operator::mpi_sara, sara, imsizey, imsizex);
   t_real const sigma = world.broadcast(0.02378738741225);  // see test_parameters file
   SECTION("global") {
-    auto const padmm = factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
-        factory::algorithm::padmm, factory::algo_distribution::mpi_serial, measurements_transform,
-        wavelets, uv_data, sigma, imsizey, imsizex, sara.size(), 500);
+    auto const padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
+        factory::algo_distribution::mpi_serial, measurements_transform, wavelets, uv_data, sigma,
+        imsizey, imsizex, sara.size(), 500);
 
     auto const diagnostic = (*padmm)();
     CHECK(diagnostic.niters == 139);
@@ -96,9 +96,9 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
     CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
   }
   SECTION("local") {
-    auto const padmm = factory::algorithm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
-        factory::algorithm::padmm, factory::algo_distribution::mpi_distributed,
-        measurements_transform, wavelets, uv_data, sigma, imsizey, imsizex, sara.size(), 500);
+    auto const padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
+        factory::algo_distribution::mpi_distributed, measurements_transform, wavelets, uv_data,
+        sigma, imsizey, imsizex, sara.size(), 500);
 
     auto const diagnostic = (*padmm)();
     t_real const epsilon = utilities::calculate_l2_radius(world.all_sum_all(uv_data.vis.size()),
