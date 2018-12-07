@@ -12,16 +12,6 @@ env:
 # The apt packages below are needed but can no longer be installed with
 # sudo apt-get.
 addons:
-  apt:
-    sources: &basic_sources
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-trusty-5.0
-    packages: &native_deps
-      - g++-7
-      - clang-5.0
-      - libtiff5-dev # version 5 ?
-      - libgomp1 # version 4.8.4-2
-      - libfftw3-dev # version 3.3.3
   homebrew:
     packages: &osx_sources
       - gcc@7
@@ -67,10 +57,13 @@ matrix:
     - os: linux
       addons:
         apt:
-          sources:
-            - *basic_sources
+          sources: &basic_sources
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
           packages:
-            - *native_deps
+            - &native_deps [ g++-7, clang-5.0, libtiff5-dev, libgomp1, libfftw3-dev ]
+            # libtiff5-dev version 5 ?; libgomp1 version 4.8.4-2
+            # libfftw3-dev version 3.3.3
             - &all_deps [ libboost-all-dev, libeigen3-dev, libyaml-cpp-dev ]
             # libboost-all-dev version 1.54; libeigen3-dev version 3.2.0
             # libcfitsio3-dev version 3.34; libyaml-cpp-dev version 0.5.1
