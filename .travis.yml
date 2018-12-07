@@ -153,6 +153,7 @@ matrix:
             - *native_deps
             - *all_deps
             - &all_casa [ flex, bison, libblas-dev, liblapack-dev, libcfitsio3-dev, wcslib-dev, gfortran, libncurses5-dev, libreadline6-dev, libhdf5-serial-dev, python-numpy, python3-numpy ]
+            - lcov
       env:
         - TITLE="CASA: All dependencies - GCC - MPI"
         - DEBUG=True
@@ -162,6 +163,7 @@ matrix:
         - openMP=ON
         - CASA=ON
         - EXAMPLES=ON
+        - COVERAGE=ON
 
     - os: linux
       addons:
@@ -276,6 +278,7 @@ script:
     -Ddocs=${DOCS-OFF} \
     -Ddocasa=${CASA-OFF} \
     -Dbenchmarks=${Benchmarks-OFF} \
+    -Dcoverage=${COVERAGE-OFF} \
     -DPURIFY_TEST_LOG_LEVEL=${test_level-critical} \
     -DSopt_GIT_REPOSITORY=https://github.com/astro-informatics/sopt.git \
     -DSopt_GIT_TAG=development \
@@ -288,4 +291,4 @@ script:
   - if [[ ${TITLE} != *Documentation* ]] && [[ ${TITLE} != *Lint* ]]; then sudo make install; fi
 
 after_success:
-
+  - if [ "${TITLE}" = "All dependencies - GCC - MPI" ]; then cd ..; bash .ci/coverage.sh; fi
