@@ -1,4 +1,5 @@
 ### Config file for Purify
+Version: 3.0.0
 GeneralConfiguration:
   InputOutput:
     input:
@@ -18,6 +19,9 @@ GeneralConfiguration:
       #  signal_to_noise: 30 # signal-to-noise ratio to be added to the sky model
       #  number_of_measurements: 10000 # number of measurements per a node
       #  w_rms: 30. # RMS w value in random uvw coverage
+      #  coverage_files:  #path to converage units. This is only used if it is not an empty string
+      #    - path/to/coverage/measurement/file
+      #  coverage_units: lambda # one from lambda, radians, pixels
     output_prefix: /path/to/output/dir # results directory will be created inside this path, and called output_<timestamp>
 
   ### Execution parameters
@@ -27,7 +31,6 @@ GeneralConfiguration:
   stepsize:  # Stepsize, choose value between: default, variable, 100, x
     update_tolerance: 1e-1 #when predicted stepsize is greater than this value, it will be updated
     update_iters: 0 #how many iterations to allow updating of step size
-  ## modelImage:  # If none epsilonL2 * RealImage # FIXME - maybe to delete
 
 ########## Measure Operators ##########
 MeasureOperators:
@@ -51,7 +54,7 @@ MeasureOperators:
   wide-field:
     wprojection: False # using radially symmetric w projection kernel
     mpi_wstacking: False # applies average w-stack correction on each node (always True with wprojection)
-    kmeans_iterations: 1000 #number of iterations in w-stacking clustering algorithm
+    kmeans_iterations: 100 #number of iterations in w-stacking clustering algorithm
   # TODO: Add others like weighting. (at the moment natural)
 
 ########## SARA ##########
@@ -59,16 +62,16 @@ SARA:
   # wavelet bases, to choose from: Dirac, DB1, ..., DBn (where n=0 is dirac, and 1 <= n <= 35 is DB basis)
   wavelet_dict: 0..8 # sequence of desired basis: 0,23,31 or 0,12..16,20
   wavelet_levels: 4 # value for all
+  dualFBVarianceConvergence: 1e-3 # (>0) relative convergence tolerance of l1 proximal
+  realValueConstraint: True # Boolean
+  positiveValueConstraint: True #boolean
 
 AlgorithmOptions:
   algorithm: padmm # will just read the options of that one.
   ########## PADMM ##########
-  padmm:
-    realValueConstraint: True # Boolean
-    positiveValueConstraint: True #boolean
+  padmm: #solve the constrained problem
     # Following is only accepted when MPI is used
     mpiAlgorithm:  fully-distributed # one of none, serial-equivalent, fully-distributed
     # Be careful changing the following unless you know what you are doing
-    relVarianceConvergence: 1e-3 # (>0) relative converegence tolerance of solution
+    relVarianceConvergence: 1e-3 # (>0) relative converegence tolerance of objective function
     epsilonConvergenceScaling: 1 # (>0) l2 convergence tolerance for residuals
-    dualFBVarianceConvergence: 1e-3 # (>0) relative convergence tolerance of l1 proximal
