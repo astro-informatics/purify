@@ -23,6 +23,8 @@
 using namespace purify;
 
 int main(int argc, const char **argv) {
+  std::srand(static_cast<t_uint>(std::time(0)));
+  std::mt19937 mersnne(std::time(0));
   sopt::logging::initialize();
   purify::logging::initialize();
 
