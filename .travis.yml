@@ -188,6 +188,7 @@ matrix:
         - BUILD_CMD='make doc VERBOSE=1'
         - TEST_CMD=''
       script:
+        - chmod o+w . # To allow docker to create the build directory
         - docker run --rm -v $(pwd):/mydata uclrits/sopt /bin/sh -c "mkdir build; cd build; cmake .. -Ddocs=${DOCS}; eval ${BUILD_CMD}"
 
     - os: linux
