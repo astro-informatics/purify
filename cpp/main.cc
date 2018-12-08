@@ -351,9 +351,15 @@ int main(int argc, const char **argv) {
   Image<t_real> residual_image;
   pfitsio::header_params purified_header = def_header;
   purified_header.fits_name = out_dir + "/purified.fits";
+  const auto estimate_image =
+      (params.warm_start() != "")
+          ? Vector<t_complex>::Map(pfitsio::read2d(params.warm_start()).data(),
+                                   params.height() * params.width())
+          : dimage;
+  const auto estimate_res = (*measurements_transform) * estimate_image - uv_data.vis;
   if (params.algorithm() == "padmm") {
     // Apply algorithm
-    auto const diagnostic = (*padmm)();
+    auto const diagnostic = (*padmm)(std::make_tuple(estimate_image.eval(), estimate_res.eval()));
 
     // Save the rest of the output
     // the clean image
@@ -366,7 +372,7 @@ int main(int argc, const char **argv) {
   }
   if (params.algorithm() == "fb") {
     // Apply algorithm
-    auto const diagnostic = (*fb)();
+    auto const diagnostic = (*fb)(std::make_tuple(estimate_image.eval(), estimate_res.eval()));
 
     // Save the rest of the output
     // the clean image
