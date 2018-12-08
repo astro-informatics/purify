@@ -276,6 +276,14 @@ int main(int argc, const char **argv) {
     factory::add_updater<t_complex, sopt::algorithm::ImagingProximalADMM<t_complex>>(
         algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
         update_header_res, params.height(), params.width(), sara_size, using_mpi);
+  } else {
+  
+    const std::weak_ptr<sopt::algorithm::ImagingForwardBackward<t_complex>> algo_weak(fb);
+    // Adding step size update to algorithm
+    factory::add_updater<t_complex, sopt::algorithm::ImagingForwardBackward<t_complex>>(
+        algo_weak, 0, params.update_tolerance(), 0, update_header_sol,
+        update_header_res, params.height(), params.width(), sara_size, using_mpi);
+  
   }
   // the input measurements, if simulated
   if (params.source() == purify::utilities::vis_source::simulation)
