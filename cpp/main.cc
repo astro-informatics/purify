@@ -237,14 +237,16 @@ int main(int argc, const char **argv) {
         params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
         sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(), sara_size,
         params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
-        (params.wavelet_basis().size() < 2), params.relVarianceConvergence(), 1e-3, 50);
+        (params.wavelet_basis().size() < 2), params.relVarianceConvergence(),
+        params.dualFBVarianceConvergence(), 50);
   if (params.algorithm() == "fb")
     fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
         params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
         sigma * params.epsilonScaling() / flux_scale, params.stepsize(),
         params.regularisation_parameter(), params.height(), params.width(), sara_size,
         params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
-        (params.wavelet_basis().size() < 2), params.relVarianceConvergence(), 1e-3, 50);
+        (params.wavelet_basis().size() < 2), params.relVarianceConvergence(),
+        params.dualFBVarianceConvergence(), 50);
 
   // Save some things before applying the algorithm
   // the config yaml file - this also generates the output directory and the timestamp
