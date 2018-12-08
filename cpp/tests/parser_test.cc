@@ -25,15 +25,16 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser_m.signal_to_noise() == 30);
     REQUIRE(yaml_parser_m.number_of_measurements() == 100000);
     REQUIRE(yaml_parser_m.w_rms() == 100.);
+    REQUIRE(yaml_parser_m.warm_start() == "/path/to/warm/start/image");
   }
   SECTION("Check the GeneralConfiguration simulation input variables") {
     std::string file_path_s =
         purify::notinstalled::data_filename("config/test_simulation_config.yaml");
     YamlParser yaml_parser_s = YamlParser(file_path_s);
     REQUIRE(yaml_parser_s.source() == purify::utilities::vis_source::simulation);
-    REQUIRE(yaml_parser_s.measurements() == std::vector<std::string>());
+    REQUIRE(yaml_parser_s.measurements() == std::vector<std::string>({"path/to/coverage/measurement/file"}));
     REQUIRE(yaml_parser_s.measurements_polarization() == stokes::I);
-    REQUIRE(yaml_parser_s.measurements_units() == purify::utilities::vis_units::radians);
+    REQUIRE(yaml_parser_s.measurements_units() == purify::utilities::vis_units::lambda);
     REQUIRE(yaml_parser_s.measurements_sigma() == 1);
     REQUIRE(yaml_parser_s.skymodel() == "/path/to/sky/image");
     REQUIRE(yaml_parser_s.signal_to_noise() == 10);
@@ -61,7 +62,7 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser.Jw() == 30);
     REQUIRE(yaml_parser.wprojection() == false);
     REQUIRE(yaml_parser.mpi_wstacking() == false);
-    REQUIRE(yaml_parser.kmeans_iters() == 1000);
+    REQUIRE(yaml_parser.kmeans_iters() == 100);
   }
   SECTION("Check the SARA node variables") {
     std::vector<std::string> expected_wavelets = {"Dirac", "DB1", "DB2", "DB3", "DB4",

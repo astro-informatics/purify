@@ -84,11 +84,13 @@ class YamlParser {
   TYPE NAME() { return NAME##_; };
 
   YAML_MACRO(std::string, filepath, "")
+  YAML_MACRO(std::string, version, "")
   YAML_MACRO(std::string, timestamp, "")
   YAML_MACRO(std::string, logging, "")
   YAML_MACRO(std::string, algorithm, "")
   YAML_MACRO(factory::algo_distribution, mpiAlgorithm, factory::algo_distribution::serial)
   YAML_MACRO(purify::utilities::vis_source, source, purify::utilities::vis_source::measurements)
+  YAML_MACRO(std::string, warm_start, "")
   YAML_MACRO(bool, realValueConstraint, true)
   YAML_MACRO(bool, positiveValueConstraint, true)
   YAML_MACRO(t_int, iterations, 0)
@@ -126,8 +128,13 @@ class YamlParser {
   YAML_MACRO(utilities::vis_units, measurements_units, utilities::vis_units::radians)
   YAML_MACRO(std::string, kernel, "")
   YAML_MACRO(t_real, regularisation_parameter, 0)
-  YAML_MACRO(t_real, step_size, 1)
-  YAML_MACRO(bool, joint_map, false)
+  YAML_MACRO(t_real, stepsize, 1)
+  YAML_MACRO(t_uint, jmap_iters, 100)
+  YAML_MACRO(t_real, jmap_relVarianceConvergence, 0)
+  YAML_MACRO(t_real, jmap_objVarianceConvergence, 0)
+  YAML_MACRO(t_real, jmap_alpha, 1)
+  YAML_MACRO(t_real, jmap_beta, 1)
+
 
 #undef YAML_MACRO
  private:
