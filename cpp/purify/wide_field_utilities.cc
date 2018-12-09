@@ -8,7 +8,7 @@ t_int w_support(const t_real w, const t_real du, const t_int min, const t_int ma
 }
 
 t_real pixel_to_lambda(const t_real cell, const t_uint imsize, const t_real oversample_ratio) {
-  return 1. / ( oversample_ratio * fov_cosine(cell, imsize));
+  return 1. / (oversample_ratio * fov_cosine(cell, imsize));
 }
 
 t_real estimate_cell_size(const t_real max_u, const t_uint imsize, const t_real oversample_ratio) {

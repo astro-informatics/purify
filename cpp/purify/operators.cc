@@ -60,9 +60,8 @@ Image<t_complex> init_correction2d(const t_real &oversample_ratio, const t_uint 
           (1e0 / range.segment(x_start, imsizex_).unaryExpr(ftkernelu)).matrix().transpose())
              .array() *
          t_complex(1., 0.) *
-        widefield::generate_chirp(w_mean, cellx, celly, imsizex_, imsizey_)
-             .array() *
-         imsizex_ * imsizey_;
+         widefield::generate_chirp(w_mean, cellx, celly, imsizex_, imsizey_).array() * imsizex_ *
+         imsizey_;
 }
 }  // namespace details
 }  // namespace purify

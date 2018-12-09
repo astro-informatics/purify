@@ -91,7 +91,7 @@ utilities::vis_params random_sample_density(const t_int vis_num, const t_real me
     uv_vis.v(i) = sample();
     uv_vis.w(i) = sample();
   }
-  uv_vis.w = uv_vis.w/standard_deviation * rms_w;
+  uv_vis.w = uv_vis.w / standard_deviation * rms_w;
   uv_vis.weights = Vector<t_complex>::Constant(vis_num, 1);
   uv_vis.vis = Vector<t_complex>::Constant(vis_num, 1);
   uv_vis.ra = 0;

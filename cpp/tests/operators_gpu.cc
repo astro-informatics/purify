@@ -74,16 +74,16 @@ TEST_CASE("GPU Operators") {
   SECTION("Gridding") {
     sopt::OperatorFunction<af::array> direct_gpu_G, indirect_gpu_G;
     std::tie(direct_gpu_G, indirect_gpu_G) = gpu::operators::init_af_gridding_matrix_2d(
-        uv_vis.u, uv_vis.v, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex,
-        oversample_ratio, kbu, kbv, Ju, Jv);
+        uv_vis.u, uv_vis.v, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex, oversample_ratio,
+        kbu, kbv, Ju, Jv);
     const sopt::OperatorFunction<Vector<t_complex>> gpu_direct_G =
         gpu::host_wrapper(direct_gpu_G, ftsizeu * ftsizev, M);
     const sopt::OperatorFunction<Vector<t_complex>> gpu_indirect_G =
         gpu::host_wrapper(indirect_gpu_G, M, ftsizeu * ftsizev);
     sopt::OperatorFunction<Vector<t_complex>> direct_G, indirect_G;
     std::tie(direct_G, indirect_G) = operators::init_gridding_matrix_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v,  Vector<t_complex>::Constant(M, 1.), imsizey, imsizex,
-        oversample_ratio, kbv, kbu, Ju, Jv);
+        uv_vis.u, uv_vis.v, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex, oversample_ratio,
+        kbv, kbu, Ju, Jv);
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
     const Vector<t_complex> indirect_input = Vector<t_complex>::Random(M);
     Vector<t_complex> output_new;

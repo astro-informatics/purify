@@ -7,8 +7,8 @@
 #include "purify/logging.h"
 
 #include "purify/operators.h"
-#include "purify/wproj_operators.h"
 #include "purify/operators_gpu.h"
+#include "purify/wproj_operators.h"
 
 #ifdef PURIFY_MPI
 #include <sopt/mpi/communicator.h>

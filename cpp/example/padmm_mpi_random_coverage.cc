@@ -186,7 +186,8 @@ int main(int nargs, char const **args) {
           cellsize, 2, kernels::kernel_from_string.at(kernel), 8, 8, w_term),
       100, 1e-4,
       world.broadcast(
-          Vector<t_complex>::Random(ground_truth_image.rows() * ground_truth_image.cols()).eval())));
+          Vector<t_complex>::Random(ground_truth_image.rows() * ground_truth_image.cols())
+              .eval())));
 
 #else
   af::setDevice(0);
@@ -196,7 +197,8 @@ int main(int nargs, char const **args) {
           cellsize, 2, kernels::kernel_from_string.at(kernel), 8, 8, w_term),
       100, 1e-4,
       world.broadcast(
-          Vector<t_complex>::Random(ground_truth_image.rows() * ground_truth_image.cols()).eval())));
+          Vector<t_complex>::Random(ground_truth_image.rows() * ground_truth_image.cols())
+              .eval())));
 
 #endif
 #elif PURIFY_PADMM_ALGORITHM == 1
@@ -207,7 +209,8 @@ int main(int nargs, char const **args) {
           cellsize, 2, kernels::kernel_from_string.at(kernel), 8, 8, w_term),
       100, 1e-4,
       world.broadcast(
-          Vector<t_complex>::Random(ground_truth_image.rows() * ground_truth_image.cols()).eval())));
+          Vector<t_complex>::Random(ground_truth_image.rows() * ground_truth_image.cols())
+              .eval())));
 
 #else
   af::setDevice(0);
@@ -217,7 +220,8 @@ int main(int nargs, char const **args) {
           cellsize, 2, kernels::kernel_from_string.at(kernel), 8, 8, w_term),
       100, 1e-4,
       world.broadcast(
-          Vector<t_complex>::Random(ground_truth_image.rows() * ground_truth_image.cols()).eval())));
+          Vector<t_complex>::Random(ground_truth_image.rows() * ground_truth_image.cols())
+              .eval())));
 
 #endif
 #endif

@@ -16,8 +16,7 @@ t_real kaiser_bessel_general(const t_real x, const t_real J, const t_real alpha)
   /*
      kaiser bessel gridding kernel
      */
-  if(2 * x > J)
-    return 0;
+  if (2 * x > J) return 0;
   t_real a = 2 * x / J;
   return boost::math::cyl_bessel_i(0, std::real(alpha * std::sqrt(1 - a * a))) /
          boost::math::cyl_bessel_i(0, alpha);
@@ -331,9 +330,7 @@ std::tuple<std::function<t_real(t_real)>, std::function<t_real(t_real)>> create_
   switch (kernel_name_) {
   case kernels::kernel::kb: {
     return std::make_tuple(
-        [=](const t_real x) {
-          return kernels::ft_kaiser_bessel(x, static_cast<t_real>(Ju_));
-        },
+        [=](const t_real x) { return kernels::ft_kaiser_bessel(x, static_cast<t_real>(Ju_)); },
         [=](const t_real x) { return kernels::kaiser_bessel(x, static_cast<t_real>(Ju_)); });
     break;
   }

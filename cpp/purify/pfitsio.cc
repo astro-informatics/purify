@@ -32,7 +32,7 @@ std::string read_key(fitsfile *fptr, const std::string &key, int *status) {
 }
 //! Write image to fits file
 void write2d(const Image<t_real> &eigen_image, const pfitsio::header_params &header,
-                    const bool &overwrite) {
+             const bool &overwrite) {
   /*
     Writes an image to a fits file.
 
@@ -75,18 +75,17 @@ Image<t_complex> read2d(const std::string &fits_name) {
   return images.at(0);
 }
 
-void write3d(const std::vector<Image<t_real>> &eigen_images,
-                    const pfitsio::header_params &header, const bool &overwrite) {
-
-  std::vector<long> naxes
-      = {static_cast<long>(eigen_images.at(0).rows()), static_cast<long>(eigen_images.at(0).cols()),
-         static_cast<long>(eigen_images.size()), 1};
+void write3d(const std::vector<Image<t_real>> &eigen_images, const pfitsio::header_params &header,
+             const bool &overwrite) {
+  std::vector<long> naxes = {static_cast<long>(eigen_images.at(0).rows()),
+                             static_cast<long>(eigen_images.at(0).cols()),
+                             static_cast<long>(eigen_images.size()), 1};
   std::vector<long> fpixel = {1, 1, 1, 1};
 
   Vector<t_real> image = Vector<t_real>::Zero(naxes.at(0) * naxes.at(1) * naxes.at(2));
-  for(int i = 0; i < eigen_images.size(); i++)
-    image.segment(i * naxes.at(0) * naxes.at(1), naxes.at(0) * naxes.at(1))
-        = Vector<t_real>::Map(eigen_images.at(i).data(), naxes.at(0) * naxes.at(1));
+  for (int i = 0; i < eigen_images.size(); i++)
+    image.segment(i * naxes.at(0) * naxes.at(1), naxes.at(0) * naxes.at(1)) =
+        Vector<t_real>::Map(eigen_images.at(i).data(), naxes.at(0) * naxes.at(1));
   write3d<Vector<t_real>>(image, naxes.at(0), naxes.at(1), naxes.at(2), header, overwrite);
 }
 
@@ -108,12 +107,11 @@ void write3d(const std::vector<Image<t_real>> &eigen_images, const std::string &
 }
 
 std::vector<Image<t_complex>> read3d(const std::string &fits_name) {
-
   std::vector<Image<t_complex>> eigen_images;
   Vector<t_real> image;
   t_int rows, cols, channels, pols = 1;
   read3d<Vector<t_real>>(fits_name, image, rows, cols, channels, pols);
-  for(int i = 0; i < channels; i++) {
+  for (int i = 0; i < channels; i++) {
     Vector<t_complex> eigen_image = Vector<t_complex>::Zero(rows * cols);
     eigen_image.real() = image.segment(i * rows * cols, rows * cols);
     eigen_images.push_back(Image<t_complex>::Map(eigen_image.data(), rows, cols));

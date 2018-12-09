@@ -170,19 +170,22 @@ TEST_CASE("joint_map_factory") {
       sopt::algorithm::JointMAP<sopt::algorithm::ImagingForwardBackward<t_complex>>(
           fb, l1_norm, imsizex * imsizey * sara.size())
           .relative_variation(1e-3)
-          .objective_variation(1e-3).beta(1.).alpha(1.);
+          .objective_variation(1e-3)
+          .beta(1.)
+          .alpha(1.);
   auto const diagnostic = joint_map();
-//  CHECK(diagnostic.reg_niters == 13);
+  //  CHECK(diagnostic.reg_niters == 13);
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
-//  CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
-//  CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
-//  CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
- // CHECK(image.isApprox(solution, 1e-6));
+  //  CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
+  //  CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
+  //  CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(),
+  //  image.size()).real().head(10));
+  // CHECK(image.isApprox(solution, 1e-6));
 
   const Vector<t_complex> residuals = measurements_transform->adjoint() *
                                       (uv_data.vis - ((*measurements_transform) * diagnostic.x));
   const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
-//  CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
-//  CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
- // CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
+  //  CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
+  //  CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
+  // CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
 }

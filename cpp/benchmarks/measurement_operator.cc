@@ -71,8 +71,8 @@ class DegridOperatorFixture : public ::benchmark::Fixture {
       const bool w_term = false;
       m_kernel = state.range(2);
       m_degridOperator = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, kernels::kernel::kb,
-          m_kernel, m_kernel, w_term);
+          m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, kernels::kernel::kb, m_kernel,
+          m_kernel, w_term);
     }
   }
 

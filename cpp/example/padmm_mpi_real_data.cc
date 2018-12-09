@@ -16,11 +16,11 @@
 #include <sopt/imaging_padmm.h>
 #include <sopt/mpi/communicator.h>
 #include <sopt/mpi/session.h>
+#include <sopt/power_method.h>
 #include <sopt/relative_variation.h>
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include <sopt/power_method.h>
 
 #ifdef PURIFY_GPU
 #include "purify/operators_gpu.h"

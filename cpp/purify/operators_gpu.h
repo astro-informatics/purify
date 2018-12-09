@@ -91,15 +91,13 @@ init_af_zero_padding_2d(const Image<t_complexf> &S, const t_real &oversample_rat
 }
 std::tuple<sopt::OperatorFunction<af::array>, sopt::OperatorFunction<af::array>>
 init_af_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v,
-                           const Vector<t_complex> weights,
-                           const t_uint &imsizey_, const t_uint &imsizex_,
-                           const t_real oversample_ratio,
+                           const Vector<t_complex> weights, const t_uint &imsizey_,
+                           const t_uint &imsizex_, const t_real oversample_ratio,
                            const std::function<t_real(t_real)> kernelu,
-                           const std::function<t_real(t_real)> kernelv,
-                           const t_uint Ju = 4, const t_uint Jv = 4) {
-  const Sparse<t_complex> interpolation_matrix =
-      details::init_gridding_matrix_2d(u, v, weights, imsizey_, imsizex_, oversample_ratio,
-                                       kernelu, kernelv, Ju, Jv);
+                           const std::function<t_real(t_real)> kernelv, const t_uint Ju = 4,
+                           const t_uint Jv = 4) {
+  const Sparse<t_complex> interpolation_matrix = details::init_gridding_matrix_2d(
+      u, v, weights, imsizey_, imsizex_, oversample_ratio, kernelu, kernelv, Ju, Jv);
   const Sparse<t_complex> adjoint = interpolation_matrix.adjoint();
   const std::shared_ptr<const af::array> G =
       std::make_shared<const af::array>(gpu::init_af_G_2d(interpolation_matrix));
@@ -115,17 +113,16 @@ init_af_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v,
 //! Constructs degridding operator with mpi and arrayfire
 std::tuple<sopt::OperatorFunction<Vector<t_complex>>, sopt::OperatorFunction<Vector<t_complex>>>
 init_af_gridding_matrix_2d(const sopt::mpi::Communicator &comm, const Vector<t_real> &u,
-                           const Vector<t_real> &v, 
-                           const Vector<t_complex> &weights, const t_uint &imsizey_,
-                           const t_uint &imsizex_, const t_real oversample_ratio,
+                           const Vector<t_real> &v, const Vector<t_complex> &weights,
+                           const t_uint &imsizey_, const t_uint &imsizex_,
+                           const t_real oversample_ratio,
                            const std::function<t_real(t_real)> kernelu,
-                           const std::function<t_real(t_real)> kernelv,
-                           const t_uint Ju = 4, const t_uint Jv = 4) {
+                           const std::function<t_real(t_real)> kernelv, const t_uint Ju = 4,
+                           const t_uint Jv = 4) {
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   PURIFY_LOW_LOG("Constructing MPI Gridding Operator: G");
-  Sparse<t_complex> interpolation_matrix =
-      details::init_gridding_matrix_2d(u, v, weights, imsizey_, imsizex_, oversample_ratio,
-                                       kernelu, kernelv, Ju, Jv);
+  Sparse<t_complex> interpolation_matrix = details::init_gridding_matrix_2d(
+      u, v, weights, imsizey_, imsizex_, oversample_ratio, kernelu, kernelv, Ju, Jv);
   const DistributeSparseVector distributor(interpolation_matrix, comm);
   interpolation_matrix = purify::compress_outer(interpolation_matrix);
   const Sparse<t_complex> adjoint = interpolation_matrix.adjoint();
@@ -209,8 +206,8 @@ base_degrid_operator_2d(const Vector<t_real> &u, const Vector<t_real> &v, const 
                         const Vector<t_complex> &weights, const t_uint &imsizey,
                         const t_uint &imsizex, const t_real oversample_ratio = 2,
                         const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
-                        const t_uint Jv = 4, const bool w_term = false, 
-                        const t_real cellx = 1, const t_real &celly = 1, const t_uint &idx = 0) {
+                        const t_uint Jv = 4, const bool w_term = false, const t_real cellx = 1,
+                        const t_real &celly = 1, const t_uint &idx = 0) {
   af::setDevice(idx);
   std::function<t_real(t_real)> kernelu, kernelv, ftkernelu, ftkernelv;
   std::tie(kernelu, kernelv, ftkernelu, ftkernelv) =
@@ -240,9 +237,8 @@ base_mpi_degrid_operator_2d(const sopt::mpi::Communicator &comm, const Vector<t_
                             const Vector<t_complex> &weights, const t_uint &imsizey,
                             const t_uint &imsizex, const t_real &oversample_ratio = 2,
                             const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
-                            const t_uint Jv = 4, const bool w_term = false,
-                            const t_real cellx = 1, const t_real &celly = 1,
-                            const t_uint &idx = 0) {
+                            const t_uint Jv = 4, const bool w_term = false, const t_real cellx = 1,
+                            const t_real &celly = 1, const t_uint &idx = 0) {
   af::setDevice(idx);
   std::function<t_real(t_real)> kernelu, kernelv, ftkernelu, ftkernelv;
   std::tie(kernelu, kernelv, ftkernelu, ftkernelv) =
@@ -279,10 +275,9 @@ namespace measurementoperator {
 std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2d(
     const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
     const Vector<t_complex> &weights, const t_uint &imsizey, const t_uint &imsizex,
-    const t_real &oversample_ratio = 2, 
-     const kernels::kernel kernel = kernels::kernel::kb,
-    const t_uint Ju = 4, const t_uint Jv = 4, const bool w_term = false, 
-    const t_real cellx = 1, const t_real &celly = 1, const t_uint &idx = 0) {
+    const t_real &oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
+    const t_uint Ju = 4, const t_uint Jv = 4, const bool w_term = false, const t_real cellx = 1,
+    const t_real &celly = 1, const t_uint &idx = 0) {
   /*
    *  Returns linear transform that is the standard degridding operator
    */
@@ -291,8 +286,8 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2
   sopt::OperatorFunction<Vector<t_complex>> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::gpu::operators::base_degrid_operator_2d(
       u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, w_term, idx);
-  auto & direct = directDegrid;
-  auto & indirect = indirectDegrid;
+  auto &direct = directDegrid;
+  auto &indirect = indirectDegrid;
   return std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(direct, M, indirect, N);
 }
 std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2d(
@@ -307,17 +302,18 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2
     uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
                                  std::floor(oversample_ratio * imsizey));
   return gpu::measurementoperator::init_degrid_operator_2d(
-      uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,  kernel, Ju, Jv, w_term, cell_x, cell_y, idx);
+      uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio, kernel, Ju,
+      Jv, w_term, cell_x, cell_y, idx);
 }
 
 #ifdef PURIFY_MPI
 std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2d_mpi(
     const sopt::mpi::Communicator &comm, const Vector<t_real> &u, const Vector<t_real> &v,
     const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint &imsizey,
-    const t_uint &imsizex, const t_real &oversample_ratio = 2, 
-     const kernels::kernel kernel = kernels::kernel::kb,
-    const t_uint Ju = 4, const t_uint Jv = 4, const bool w_term = false, 
-    const t_real cellx = 1, const t_real &celly = 1, const t_uint &idx = 0) {
+    const t_uint &imsizex, const t_real &oversample_ratio = 2,
+    const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
+    const bool w_term = false, const t_real cellx = 1, const t_real &celly = 1,
+    const t_uint &idx = 0) {
   /*
    *  Returns linear transform that is the standard degridding operator
    */
@@ -335,9 +331,8 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2
 std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2d_mpi(
     const sopt::mpi::Communicator &comm, const utilities::vis_params &uv_vis_input,
     const t_uint &imsizey, const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
-    const t_real &oversample_ratio = 2,  const kernels::kernel kernel = kernels::kernel::kb,
-    const t_uint Ju = 4, const t_uint Jv = 4, const bool w_term = false, 
-    const t_uint &idx = 0) {
+    const t_real &oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
+    const t_uint Ju = 4, const t_uint Jv = 4, const bool w_term = false, const t_uint &idx = 0) {
   auto uv_vis = uv_vis_input;
   if (uv_vis.units == utilities::vis_units::lambda)
     uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
@@ -346,15 +341,15 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2
                                  std::floor(oversample_ratio * imsizey));
   return gpu::measurementoperator::init_degrid_operator_2d_mpi(
       comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-       kernel, Ju, Jv, w_term, cell_x, cell_y, idx);
+      kernel, Ju, Jv, w_term, cell_x, cell_y, idx);
 }
 std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2d(
     const sopt::mpi::Communicator &comm, const Vector<t_real> &u, const Vector<t_real> &v,
     const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint &imsizey,
-    const t_uint &imsizex, const t_real &oversample_ratio = 2, 
-     const kernels::kernel kernel = kernels::kernel::kb,
-    const t_uint Ju = 4, const t_uint Jv = 4, const bool w_term = false, 
-    const t_real cellx = 1, const t_real &celly = 1, const t_uint &idx = 0) {
+    const t_uint &imsizex, const t_real &oversample_ratio = 2,
+    const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
+    const bool w_term = false, const t_real cellx = 1, const t_real &celly = 1,
+    const t_uint &idx = 0) {
   /*
    *  Returns linear transform that is the standard degridding operator
    */
@@ -363,8 +358,8 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2
   std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
   sopt::OperatorFunction<Vector<t_complex>> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::gpu::operators::base_degrid_operator_2d(
-      u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, w_term, cellx,
-      celly, idx);
+      u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, w_term, cellx, celly,
+      idx);
   const auto allsumall = purify::operators::init_all_sum_all<Vector<t_complex>>(comm);
   auto direct = directDegrid;
   auto indirect = sopt::chained_operators<Vector<t_complex>>(allsumall, indirectDegrid);
@@ -373,9 +368,8 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2
 std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2d(
     const sopt::mpi::Communicator &comm, const utilities::vis_params &uv_vis_input,
     const t_uint &imsizey, const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
-    const t_real &oversample_ratio = 2,  const kernels::kernel kernel = kernels::kernel::kb,
-    const t_uint Ju = 4, const t_uint Jv = 4, const bool w_term = false, 
-    const t_uint &idx = 0) {
+    const t_real &oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
+    const t_uint Ju = 4, const t_uint Jv = 4, const bool w_term = false, const t_uint &idx = 0) {
   auto uv_vis = uv_vis_input;
   if (uv_vis.units == utilities::vis_units::lambda)
     uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
@@ -384,7 +378,7 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2
                                  std::floor(oversample_ratio * imsizey));
   return gpu::measurementoperator::init_degrid_operator_2d(
       comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-       kernel, Ju, Jv, w_term, idx);
+      kernel, Ju, Jv, w_term, idx);
 }
 #endif
 }  // namespace measurementoperator

@@ -32,7 +32,8 @@ TEST_CASE("Yaml parser and setting variables test") {
         purify::notinstalled::data_filename("config/test_simulation_config.yaml");
     YamlParser yaml_parser_s = YamlParser(file_path_s);
     REQUIRE(yaml_parser_s.source() == purify::utilities::vis_source::simulation);
-    REQUIRE(yaml_parser_s.measurements() == std::vector<std::string>({"path/to/coverage/measurement/file"}));
+    REQUIRE(yaml_parser_s.measurements() ==
+            std::vector<std::string>({"path/to/coverage/measurement/file"}));
     REQUIRE(yaml_parser_s.measurements_polarization() == stokes::I);
     REQUIRE(yaml_parser_s.measurements_units() == purify::utilities::vis_units::lambda);
     REQUIRE(yaml_parser_s.measurements_sigma() == 1);

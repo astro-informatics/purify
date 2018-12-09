@@ -11,7 +11,6 @@
 #include "purify/utilities.h"
 #include "purify/wide_field_utilities.h"
 
-
 using namespace purify;
 using namespace purify::notinstalled;
 

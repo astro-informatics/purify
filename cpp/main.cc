@@ -279,13 +279,11 @@ int main(int argc, const char **argv) {
         algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
         update_header_res, params.height(), params.width(), sara_size, using_mpi);
   } else {
-  
     const std::weak_ptr<sopt::algorithm::ImagingForwardBackward<t_complex>> algo_weak(fb);
     // Adding step size update to algorithm
     factory::add_updater<t_complex, sopt::algorithm::ImagingForwardBackward<t_complex>>(
-        algo_weak, 0, params.update_tolerance(), 0, update_header_sol,
-        update_header_res, params.height(), params.width(), sara_size, using_mpi);
-  
+        algo_weak, 0, params.update_tolerance(), 0, update_header_sol, update_header_res,
+        params.height(), params.width(), sara_size, using_mpi);
   }
   // the input measurements, if simulated
   if (params.source() == purify::utilities::vis_source::simulation)
@@ -364,7 +362,6 @@ int main(int argc, const char **argv) {
     auto const diagnostic = (*padmm)(std::make_tuple(estimate_image.eval(), estimate_res.eval()));
 
     // Save the rest of the output
-    // the clean image
     image = Image<t_complex>::Map(diagnostic.x.data(), params.height(), params.width()).real();
     const Vector<t_complex> residuals = measurements_transform->adjoint() * diagnostic.residual;
     residual_image =
