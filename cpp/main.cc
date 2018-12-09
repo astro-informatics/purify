@@ -242,7 +242,8 @@ int main(int argc, const char **argv) {
   if (params.algorithm() == "fb")
     fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
         params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
-        sigma * params.epsilonScaling() / flux_scale, params.stepsize(),
+        sigma * params.epsilonScaling() / flux_scale,
+        params.stepsize() * std::pow(sigma * params.epsilonScaling() / flux_scale, 2),
         params.regularisation_parameter(), params.height(), params.width(), sara_size,
         params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
         (params.wavelet_basis().size() < 2), params.relVarianceConvergence(),
