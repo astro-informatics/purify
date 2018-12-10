@@ -43,15 +43,17 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
                           comm](const Vector<T> &x, const Vector<T> &res) -> bool {
       auto algo = algo_weak.lock();
       if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ {}", algo->gamma());
-      Vector<t_complex> const alpha = algo->Psi().adjoint() * x;
-      const t_real new_gamma =
-          comm.all_reduce((sara_size > 0) ? alpha.real().cwiseAbs().maxCoeff() : 0., MPI_MAX) *
-          step_size_scale;
-      if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
-      // updating parameter
-      algo->gamma(((std::abs(algo->gamma() - new_gamma) > update_tol) and *iter < update_iters)
-                      ? new_gamma
-                      : algo->gamma());
+      if (algo->gamma() > 0) {
+        Vector<t_complex> const alpha = algo->Psi().adjoint() * x;
+        const t_real new_gamma =
+            comm.all_reduce((sara_size > 0) ? alpha.real().cwiseAbs().maxCoeff() : 0., MPI_MAX) *
+            step_size_scale;
+        if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
+        // updating parameter
+        algo->gamma(((std::abs(algo->gamma() - new_gamma) > update_tol) and *iter < update_iters)
+                        ? new_gamma
+                        : algo->gamma());
+      }
       Vector<t_complex> const residual = algo->Phi().adjoint() * res;
 
       if (comm.is_root()) {
@@ -82,16 +84,17 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
 #endif
     ](const Vector<T> &x, const Vector<T> &res) -> bool {
       auto algo = algo_weak.lock();
-      PURIFY_MEDIUM_LOG("Step size γ {}", algo->gamma());
-      Vector<T> const alpha = algo->Psi().adjoint() * x;
-      const t_real new_gamma = alpha.real().cwiseAbs().maxCoeff() * step_size_scale;
-      PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
-      // updating parameter
-      algo->gamma(((std::abs((algo->gamma() - new_gamma) / algo->gamma()) > update_tol) and
-                   *iter < update_iters)
-                      ? new_gamma
-                      : algo->gamma());
-
+      if (algo->gamma() > 0) {
+        PURIFY_MEDIUM_LOG("Step size γ {}", algo->gamma());
+        Vector<T> const alpha = algo->Psi().adjoint() * x;
+        const t_real new_gamma = alpha.real().cwiseAbs().maxCoeff() * step_size_scale;
+        PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
+        // updating parameter
+        algo->gamma(((std::abs((algo->gamma() - new_gamma) / algo->gamma()) > update_tol) and
+                     *iter < update_iters)
+                        ? new_gamma
+                        : algo->gamma());
+      }
       Vector<t_complex> const residual = algo->Phi().adjoint() * res;
 #ifdef PURIFY_CImg
       const auto img1 = cimg::make_image(x.real().eval(), imsizey, imsizex)

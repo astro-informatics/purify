@@ -156,7 +156,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
   t_real const wmax = comm.all_reduce<t_real>(w.maxCoeff(), MPI_MAX);
   for (int i = 0; i < w_centre.size(); i++)
     w_centre[i] =
-       (static_cast<t_real>(i) * (wmax - wmin) / static_cast<t_real>(number_of_nodes) + wmin);
+        (static_cast<t_real>(i) * (wmax - wmin) / static_cast<t_real>(number_of_nodes) + wmin);
   // lopp through even nodes to reduces w-term
   for (int n = 0; n < iters; n++) {
     if (comm.is_root()) PURIFY_DEBUG("clustering iteration {}", n);
