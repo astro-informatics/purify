@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['purify',['PURIFY',['../index.html',1,'']]],
   ['padmmfixture',['PadmmFixture',['../dc/d5b/classPadmmFixture.html',1,'']]],
   ['padmmfixturempi',['PadmmFixtureMPI',['../d1/dd2/classPadmmFixtureMPI.html',1,'']]],
   ['parseandsetalgorithmoptions',['parseAndSetAlgorithmOptions',['../df/d55/classpurify_1_1YamlParser.html#a660692be951d62f30a553193757b288b',1,'purify::YamlParser']]],
