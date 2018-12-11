@@ -59,15 +59,10 @@ namespace cimg {
 template <class T>
 CImage<typename T::Scalar> make_image(const Eigen::DenseBase<T> &x, const t_uint &rows,
                                       const t_uint &cols) {
+  assert(x.size() == rows * cols);
   auto image = CImage<typename T::Scalar>(rows, cols, 1, 1);
-  const Vector<typename T::Scalar> input =
-      Vector<typename T::Scalar>::Map(x.derived().data(), x.size(), 1);
-  for (t_uint i = 0; i < cols; i++) {
-    for (t_uint j = 0; j < rows; j++) {
-      const t_uint index = j + rows * i;
-      image(j, cols - i - 1) = input(index);
-    }
-  }
+  Vector<typename T::Scalar>::Map(image.data(), x.size()) =
+      Vector<typename T::Scalar>::Map(x.derived().data(), x.size());
   return image;
 };
 template <class T>
