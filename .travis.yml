@@ -12,16 +12,6 @@ env:
 # The apt packages below are needed but can no longer be installed with
 # sudo apt-get.
 addons:
-  apt:
-    sources: &basic_sources
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-trusty-5.0
-    packages: &native_deps
-      - g++-7
-      - clang-5.0
-      - libtiff5-dev # version 5 ?
-      - libgomp1 # version 4.8.4-2
-      - libfftw3-dev # version 3.3.3
   homebrew:
     packages: &osx_sources
       - gcc@7
@@ -67,10 +57,13 @@ matrix:
     - os: linux
       addons:
         apt:
-          sources:
-            - *basic_sources
+          sources: &basic_sources
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
           packages:
-            - *native_deps
+            - &native_deps [ g++-7, clang-5.0, libtiff5-dev, libgomp1, libfftw3-dev ]
+            # libtiff5-dev version 5 ?; libgomp1 version 4.8.4-2
+            # libfftw3-dev version 3.3.3
             - &all_deps [ libboost-all-dev, libeigen3-dev, libyaml-cpp-dev ]
             # libboost-all-dev version 1.54; libeigen3-dev version 3.2.0
             # libcfitsio3-dev version 3.34; libyaml-cpp-dev version 0.5.1
@@ -184,25 +177,15 @@ matrix:
         - TEST_CMD=''
 
     - os: linux
-      addons:
-        apt:
-          sources:
-            - *basic_sources
-          packages:
-            - *native_deps
-            - *all_deps
-            - doxygen # version 1.8.6-2
-            - graphviz # version 2.36.0
+      services:
+        - docker
       env:
         - TITLE="Documentation - GCC"
-        - DEBUG=True
-        - LDFLAGS='-pthread'
-        - Tests=OFF
-        - MPI=OFF
-        - openMP=OFF
         - DOCS=ON
         - BUILD_CMD='make doc VERBOSE=1'
-        - TEST_CMD=''
+      script:
+        - chmod o+w . # To allow docker to create the build directory
+        - docker run --rm -v $(pwd):/mydata uclrits/sopt /bin/sh -c "mkdir build; cd build; cmake .. -Ddocs=${DOCS}; eval ${BUILD_CMD}"
 
     - os: linux
       addons:
@@ -253,6 +236,8 @@ before_install:
   - echo "==================== ${TITLE} ====================="
   - if [[ $MPI = ON ]]; then if [ $TRAVIS_OS_NAME = linux ]; then  if [[ ${TITLE} != *mpich* ]]; then bash .ci/build_openmpi.sh; MPI_EXTRA="--oversubscribe"; export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH; else bash .ci/build_mpich.sh; fi; fi; fi;
   - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; echo $CMAKE_CMD_EXTRA;  fi
+  - if [[ ${TITLE} = *Documentation* ]]; then docker pull uclrits/sopt; fi
+
 
 install:
 
