@@ -65,7 +65,7 @@ int main(int nargs, char const **args) {
   auto measurements_transform = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
-          over_sample,  kernels::kernel_from_string.at(kernel), J, J),
+          over_sample, kernels::kernel_from_string.at(kernel), J, J),
       100, 1e-4, Vector<t_complex>::Random(sky_model.size())));
 
   std::vector<std::tuple<std::string, t_uint>> wavelets;
