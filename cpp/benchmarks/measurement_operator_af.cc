@@ -22,11 +22,11 @@ void degrid_operator_ctor(benchmark::State &state) {
     auto start = std::chrono::high_resolution_clock::now();
 #ifdef PURIFY_CPU
     auto sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        uv_data, rows, cols, cellsize, cellsize, 2, 0, 0.0001, kernels::kernel::kb, state.range(2),
+        uv_data, rows, cols, cellsize, cellsize, 2, kernels::kernel::kb, state.range(2),
         state.range(2), w_term);
 #else
     auto sky_measurements = gpu::measurementoperator::init_degrid_operator_2d(
-        uv_data, rows, cols, cellsize, cellsize, 2, 0, 0.0001, kernels::kernel::kb, state.range(2),
+        uv_data, rows, cols, cellsize, cellsize, 2, kernels::kernel::kb, state.range(2),
         state.range(2), w_term);
 
 #endif

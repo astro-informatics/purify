@@ -10,6 +10,7 @@
 #include "purify/utilities.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/positive_quadrant.h>
+#include <sopt/power_method.h>
 #include <sopt/relative_variation.h>
 #include <sopt/reweighted.h>
 #include <sopt/utilities.h>
@@ -46,9 +47,11 @@ int main(int, char **) {
   uv_data.units = utilities::vis_units::radians;
   utilities::write_visibility(uv_data, output_vis_file);
   SOPT_NOTICE("Number of measurements / number of pixels: {}", uv_data.u.size() * 1. / M31.size());
-  auto measurements_transform = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_data.u, uv_data.v, uv_data.w, uv_data.weights, M31.cols(), M31.rows(), over_sample, 100,
-      1e-4, kernels::kernel_from_string.at("kb"), 4, 4);
+  auto measurements_transform = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data.u, uv_data.v, uv_data.w, uv_data.weights, M31.cols(), M31.rows(), over_sample,
+          kernels::kernel_from_string.at("kb"), 4, 4),
+      100, 1e-4, Vector<t_complex>::Random(M31.size())));
 
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),

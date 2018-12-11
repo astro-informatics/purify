@@ -21,11 +21,12 @@ template <class T>
 std::shared_ptr<sopt::LinearTransform<T> const> wavelet_operator_factory(
     const distributed_wavelet_operator distribute,
     const std::vector<std::tuple<std::string, t_uint>>& wavelets, const t_uint imsizey,
-    const t_uint imsizex) {
+    const t_uint imsizex, t_uint& sara_size) {
   const auto sara = sopt::wavelets::SARA(wavelets.begin(), wavelets.end());
   switch (distribute) {
   case (distributed_wavelet_operator::serial): {
     PURIFY_LOW_LOG("Using serial wavelet operator.");
+    sara_size = sara.size();
     return std::make_shared<sopt::LinearTransform<T>>(
         sopt::linear_transform<typename T::Scalar>(sara, imsizey, imsizex));
   }
@@ -33,7 +34,8 @@ std::shared_ptr<sopt::LinearTransform<T> const> wavelet_operator_factory(
   case (distributed_wavelet_operator::mpi_sara): {
     auto const comm = sopt::mpi::Communicator::World();
     PURIFY_LOW_LOG("Using distributed image MPI wavelet operator.");
-    auto const dsara = sopt::wavelets::distribute_sara(sara, comm);
+    const auto dsara = sopt::wavelets::distribute_sara(sara, comm);
+    sara_size = dsara.size();
     return std::make_shared<sopt::LinearTransform<T>>(
         sopt::linear_transform<typename T::Scalar>(dsara, imsizey, imsizex, comm));
   }
@@ -42,6 +44,14 @@ std::shared_ptr<sopt::LinearTransform<T> const> wavelet_operator_factory(
     throw std::runtime_error(
         "Distributed method not found for Wavelet Operator. Are you sure you compiled with MPI?");
   }
+}
+template <class T>
+std::shared_ptr<sopt::LinearTransform<T> const> wavelet_operator_factory(
+    const distributed_wavelet_operator distribute,
+    const std::vector<std::tuple<std::string, t_uint>>& wavelets, const t_uint imsizey,
+    const t_uint imsizex) {
+  t_uint size = 0;
+  return wavelet_operator_factory<T>(distribute, wavelets, imsizey, imsizex, size);
 }
 }  // namespace factory
 }  // namespace purify

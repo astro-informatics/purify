@@ -55,9 +55,9 @@ struct vis_params {
 };
 
 //! Generates a random visibility coverage
-utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &mean,
-                                            const t_real &standard_deviation,
-                                            const t_real &max_w = 0);
+utilities::vis_params random_sample_density(const t_int vis_num, const t_real mean,
+                                            const t_real standard_deviation,
+                                            const t_real rms_w = 0);
 //! Generate guassianly distributed (sigma = pi) antenna positions
 Matrix<t_real> generate_antennas(const t_uint N);
 //! Using guassianly distributed (sigma = pi) antenna positions generate a coverage

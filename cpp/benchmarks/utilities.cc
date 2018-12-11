@@ -82,7 +82,7 @@ std::tuple<utilities::vis_params, t_real> dirty_measurements(
   auto uv_data = random_measurements(number_of_vis);
   // creating operator to generate measurements
   auto measurement_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_data, ground_truth_image.rows(), ground_truth_image.cols(), cellsize, cellsize, 2, 0, 1e-4,
+      uv_data, ground_truth_image.rows(), ground_truth_image.cols(), cellsize, cellsize, 2,
       kernels::kernel::kb, 8, 8, false);
   // Generates measurements from image
   uv_data.vis = (*measurement_op) *

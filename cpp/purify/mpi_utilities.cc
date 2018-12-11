@@ -6,15 +6,12 @@
 
 namespace purify {
 namespace utilities {
-void regroup(vis_params &uv_params, std::vector<t_int> const &groups_) {
+void regroup(vis_params &uv_params, std::vector<t_int> const &groups_, const t_int max_groups) {
   std::vector<t_int> groups = groups_;
   // Figure out size of each group
   std::map<t_int, t_int> sizes;
-  for (auto const &group : groups)
-    if (sizes.count(group) == 0)
-      sizes[group] = 1;
-    else
-      ++sizes[group];
+  for (auto g = 0; g < max_groups; g++) sizes[g] = 0;
+  for (auto const &group : groups) ++sizes[group];
 
   std::map<t_int, t_int> indices, ends;
   auto i = 0;
@@ -23,6 +20,15 @@ void regroup(vis_params &uv_params, std::vector<t_int> const &groups_) {
     i += item.second;
     ends[item.first] = i;
   }
+  const auto minmax = std::minmax_element(ends.begin(), ends.end());
+  if (std::get<1>(*std::get<0>(minmax)) < 0)
+    throw std::runtime_error("segment end " + std::to_string(std::get<1>(*std::get<0>(minmax))) +
+                             " less than 0. Not a valid end.");
+  if (std::get<1>(*std::get<1>(minmax)) > uv_params.size())
+    throw std::runtime_error("segment end " + std::to_string(std::get<1>(*std::get<1>(minmax))) +
+                             " larger than data vector " +
+                             std::to_string(static_cast<t_int>(uv_params.size())) +
+                             ". End not valid.");
 
   auto const expected = [&ends](t_int i) {
     t_int j = 0;
@@ -45,6 +51,11 @@ void regroup(vis_params &uv_params, std::vector<t_int> const &groups_) {
       ++swapper;
       continue;
     }
+    if (swapper >= uv_params.u.size())
+      throw std::runtime_error("regroup (groups, " + std::to_string(groups[swapper]) + ", " +
+                               std::to_string(groups[i]) + ") index out of bounds " +
+                               std::to_string(i) + " " + std::to_string(swapper) +
+                               " >= " + std::to_string(uv_params.u.size()));
     std::swap(groups[i], groups[swapper]);
     std::swap(uv_params.u(i), uv_params.u(swapper));
     std::swap(uv_params.v(i), uv_params.v(swapper));
@@ -70,10 +81,41 @@ vis_params regroup_and_scatter(vis_params const &params, std::vector<t_int> cons
   }
 
   vis_params copy = params;
-  regroup(copy, groups);
+  regroup(copy, groups, comm.size());
   return scatter_visibilities(copy, sizes, comm);
 }
+vis_params regroup_and_all_to_all(vis_params const &params, std::vector<t_int> const &groups,
+                                  sopt::mpi::Communicator const &comm) {
+  if (comm.size() == 1) return params;
+  vis_params copy = params;
+  regroup(copy, groups, comm.size());
 
+  std::vector<t_int> sizes(comm.size());
+  std::fill(sizes.begin(), sizes.end(), 0);
+  for (auto const &group : groups) {
+    if (group > static_cast<t_int>(comm.size()))
+      throw std::out_of_range("groups should go from 0 to comm.size()");
+    ++sizes[group];
+  }
+
+  return all_to_all_visibilities(copy, sizes, comm);
+}
+
+vis_params all_to_all_visibilities(vis_params const &params, std::vector<t_int> const &sizes,
+                                   sopt::mpi::Communicator const &comm) {
+  if (comm.size() == 1) return params;
+  vis_params result;
+  result.u = comm.all_to_allv(params.u, sizes);
+  result.v = comm.all_to_allv(params.v, sizes);
+  result.w = comm.all_to_allv(params.w, sizes);
+  result.vis = comm.all_to_allv(params.vis, sizes);
+  result.weights = comm.all_to_allv(params.weights, sizes);
+  result.units = static_cast<utilities::vis_units>(comm.broadcast(static_cast<int>(params.units)));
+  result.ra = comm.broadcast(params.ra);
+  result.dec = comm.broadcast(params.dec);
+  result.average_frequency = comm.broadcast(params.average_frequency);
+  return result;
+}
 vis_params scatter_visibilities(vis_params const &params, std::vector<t_int> const &sizes,
                                 sopt::mpi::Communicator const &comm) {
   if (comm.size() == 1) return params;
@@ -131,6 +173,13 @@ utilities::vis_params set_cell_size(const sopt::mpi::Communicator &comm,
   const t_real max_u = comm.all_reduce<t_real>(uv_vis.u.array().cwiseAbs().maxCoeff(), MPI_MAX);
   const t_real max_v = comm.all_reduce<t_real>(uv_vis.v.array().cwiseAbs().maxCoeff(), MPI_MAX);
   return utilities::set_cell_size(uv_vis, max_u, max_v, cell_x, cell_y);
+}
+utilities::vis_params w_stacking(utilities::vis_params const &params,
+                                 sopt::mpi::Communicator const &comm, const t_int iters,
+                                 const std::function<t_real(t_real)> &cost) {
+  const std::vector<t_int> w_stacks =
+      std::get<0>(distribute::kmeans_algo(params.w, comm.size(), iters, comm, cost));
+  return utilities::regroup_and_all_to_all(params, w_stacks, comm);
 }
 }  // namespace utilities
 }  // namespace purify

@@ -21,6 +21,7 @@ add_include_dir(
   ${EIGEN3_INCLUDE_DIR}
   ${CFitsIO_INCLUDE_DIR}
   ${CImg_INCLUDE_DIR}
+  ${Cubature_INCLUDE_DIR}
   ${Yamlcpp_INCLUDE_DIR}
 )
 

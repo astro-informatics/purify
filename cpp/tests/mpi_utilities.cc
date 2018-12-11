@@ -20,7 +20,7 @@ TEST_CASE("re-group visibilities in order of processes") {
     std::fill(order.begin() + 1, order.end(), 0);
 
     auto actual = params;
-    utilities::regroup(actual, order);
+    utilities::regroup(actual, order, 2);
     CHECK(params.u(0) == Approx(actual.u(N - 1)));
     CHECK(params.u(N - 1) == Approx(actual.u(0)));
     CHECK(params.u.segment(1, N - 2).isApprox(actual.u.segment(1, N - 2)));
@@ -33,7 +33,7 @@ TEST_CASE("re-group visibilities in order of processes") {
     std::fill(order.begin() + 3, order.end(), 0);
 
     auto actual = params;
-    utilities::regroup(actual, order);
+    utilities::regroup(actual, order, 2);
     CHECK(params.u(0) == Approx(actual.u(0)));
     CHECK(params.u(1) == Approx(actual.u(N - 2)));
     CHECK(params.u(2) == Approx(actual.u(N - 1)));
@@ -44,7 +44,7 @@ TEST_CASE("re-group visibilities in order of processes") {
   SECTION("Three procs") {
     order = {1, 0, 2, 2, 0};
     auto actual = params;
-    utilities::regroup(actual, order);
+    utilities::regroup(actual, order, 3);
     CHECK(actual.u(0) == Approx(params.u(N - 1)));
     CHECK(actual.u(1) == Approx(params.u(1)));
     CHECK(actual.u(2) == Approx(params.u(0)));

@@ -10,6 +10,7 @@
 #include "purify/operators.h"
 #include "purify/pfitsio.h"
 #include "purify/utilities.h"
+#include <sopt/power_method.h>
 #include <sopt/relative_variation.h>
 #include <sopt/sdmm.h>
 #include <sopt/utilities.h>
@@ -48,14 +49,18 @@ int main(int nargs, char const **args) {
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m);
   uv_data.units = utilities::vis_units::radians;
   PURIFY_MEDIUM_LOG("Number of measurements: {}", uv_data.u.size());
-  auto simulate_measurements = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(), 2, 100,
-      1e-4, kernels::kernel_from_string.at("kb"), 8, 8);
+  auto simulate_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(), 2,
+          kernels::kernel_from_string.at("kb"), 8, 8),
+      100, 1e-4, Vector<t_complex>::Random(sky_model.size())));
   uv_data.vis = simulate_measurements * sky_model;
 
-  auto measurements_transform = *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
-      over_sample, 100, 1e-4, kernels::kernel_from_string.at(kernel), J, J);
+  auto measurements_transform = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
+          over_sample, kernels::kernel_from_string.at(kernel), J, J),
+      100, 1e-4, Vector<t_complex>::Random(sky_model.size())));
 
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),

@@ -8,6 +8,7 @@
 
 #include "purify/operators.h"
 #include "purify/operators_gpu.h"
+#include "purify/wproj_operators.h"
 
 #ifdef PURIFY_MPI
 #include <sopt/mpi/communicator.h>
@@ -36,7 +37,7 @@ void check_complex_for_gpu() {
 
 //! distributed measurement operator factory
 template <class T, class... ARGS>
-std::shared_ptr<sopt::LinearTransform<T> const> measurement_operator_factory(
+std::shared_ptr<sopt::LinearTransform<T>> measurement_operator_factory(
     const distributed_measurement_operator distribute, ARGS &&... args) {
   switch (distribute) {
   case (distributed_measurement_operator::serial): {

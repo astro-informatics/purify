@@ -104,5 +104,7 @@ if(docasa)
   set(PURIFY_CASACORE TRUE)
 endif()
 
+lookup_package(Cubature REQUIRED)
+
 # Add script to execute to make sure libraries in the build tree can be found
 add_to_ld_path("${EXTERNAL_ROOT}/lib")

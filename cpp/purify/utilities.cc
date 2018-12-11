@@ -60,8 +60,8 @@ utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B) {
   utilities::vis_params coverage(u, v, w, vis, weights, utilities::vis_units::radians);
   return coverage;
 };
-utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &mean,
-                                            const t_real &standard_deviation, const t_real &max_w) {
+utilities::vis_params random_sample_density(const t_int vis_num, const t_real mean,
+                                            const t_real standard_deviation, const t_real rms_w) {
   /*
           Generates a random sampling density for visibility coverage
           vis_num:: number of visibilities
@@ -91,7 +91,7 @@ utilities::vis_params random_sample_density(const t_int &vis_num, const t_real &
     uv_vis.v(i) = sample();
     uv_vis.w(i) = sample();
   }
-  uv_vis.w = uv_vis.w / uv_vis.w.maxCoeff() * max_w;
+  uv_vis.w = uv_vis.w / standard_deviation * rms_w;
   uv_vis.weights = Vector<t_complex>::Constant(vis_num, 1);
   uv_vis.vis = Vector<t_complex>::Constant(vis_num, 1);
   uv_vis.ra = 0;

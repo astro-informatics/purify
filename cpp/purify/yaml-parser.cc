@@ -96,14 +96,13 @@ void YamlParser::setParserVariablesFromYaml() {
   this->parseAndSetMeasureOperators(this->config_file["MeasureOperators"]);
   this->parseAndSetSARA(this->config_file["SARA"]);
   this->parseAndSetAlgorithmOptions(this->config_file["AlgorithmOptions"]);
+  this->version_ = get<std::string>(this->config_file, {"Version"});
 }
 
 void YamlParser::parseAndSetGeneralConfiguration(const YAML::Node& generalConfigNode) {
   this->logging_ = get<std::string>(generalConfigNode, {"logging"});
   this->iterations_ = get<int>(generalConfigNode, {"iterations"});
   this->epsilonScaling_ = get<t_real>(generalConfigNode, {"epsilonScaling"});
-  this->update_iters_ = get<t_int>(generalConfigNode, {"stepsize", "update_iters"});
-  this->update_tolerance_ = get<t_real>(generalConfigNode, {"stepsize", "update_tolerance"});
   this->output_prefix_ = get<std::string>(generalConfigNode, {"InputOutput", "output_prefix"});
 
   const std::string source_str =
@@ -111,6 +110,8 @@ void YamlParser::parseAndSetGeneralConfiguration(const YAML::Node& generalConfig
   if (source_str == "measurements") {
     this->measurements_polarization_ = stokes_string.at(get<std::string>(
         generalConfigNode, {"InputOutput", "input", "measurements", "measurements_polarization"}));
+    this->warm_start_ =
+        get<std::string>(generalConfigNode, {"InputOutput", "input", "measurements", "warm_start"});
     if (generalConfigNode["InputOutput"]["input"]["simulation"])
       throw std::runtime_error(
           "Expecting only the input measurements block in the configuration file. Please remove "
@@ -142,6 +143,24 @@ void YamlParser::parseAndSetGeneralConfiguration(const YAML::Node& generalConfig
         get<std::string>(generalConfigNode, {"InputOutput", "input", "simulation", "skymodel"});
     this->signal_to_noise_ =
         get<t_real>(generalConfigNode, {"InputOutput", "input", "simulation", "signal_to_noise"});
+    this->number_of_measurements_ = get<t_int>(
+        generalConfigNode, {"InputOutput", "input", "simulation", "number_of_measurements"});
+    this->w_rms_ = get<t_real>(generalConfigNode,
+                               {"InputOutput", "input", "simulation", "number_of_measurements"});
+    this->measurements_ = get_vector<std::vector<std::string>>(
+        generalConfigNode, {"InputOutput", "input", "simulation", "coverage_files"});
+    // TODO: use the enum instead of string.
+    const std::string units_measurement_str = get<std::string>(
+        generalConfigNode, {"InputOutput", "input", "simulation", "coverage_units"});
+    if (units_measurement_str == "lambda")
+      this->measurements_units_ = purify::utilities::vis_units::lambda;
+    else if (units_measurement_str == "radians")
+      this->measurements_units_ = purify::utilities::vis_units::radians;
+    else if (units_measurement_str == "pixels")
+      this->measurements_units_ = purify::utilities::vis_units::pixels;
+    else
+      throw std::runtime_error("Visibility units \"" + units_measurement_str +
+                               "\" not recognised. Check your config file.");
   } else
     throw std::runtime_error("Visibility source \"" + source_str +
                              "\" not recognised. Check your config file.");
@@ -150,39 +169,65 @@ void YamlParser::parseAndSetGeneralConfiguration(const YAML::Node& generalConfig
 void YamlParser::parseAndSetMeasureOperators(const YAML::Node& measureOperatorsNode) {
   this->kernel_ = get<std::string>(measureOperatorsNode, {"kernel"});
   this->oversampling_ = get<float>(measureOperatorsNode, {"oversampling"});
-  this->powMethod_iter_ = get<int>(measureOperatorsNode, {"powMethod_iter"});
-  this->powMethod_tolerance_ = get<float>(measureOperatorsNode, {"powMethod_tolerance"});
+  this->powMethod_iter_ = get<int>(measureOperatorsNode, {"powermethod", "iters"});
+  this->powMethod_tolerance_ = get<float>(measureOperatorsNode, {"powermethod", "tolerance"});
+  this->eigenvector_real_ =
+      get<std::string>(measureOperatorsNode, {"powermethod", "eigenvector", "real"});
+  this->eigenvector_imag_ =
+      get<std::string>(measureOperatorsNode, {"powermethod", "eigenvector", "imag"});
   this->cellsizex_ = get<double>(measureOperatorsNode, {"pixelSize", "cellsizex"});
   this->cellsizey_ = get<double>(measureOperatorsNode, {"pixelSize", "cellsizey"});
   this->width_ = get<int>(measureOperatorsNode, {"imageSize", "width"});
   this->height_ = get<int>(measureOperatorsNode, {"imageSize", "height"});
   this->Jx_ = get<unsigned int>(measureOperatorsNode, {"J", "Jx"});
   this->Jy_ = get<unsigned int>(measureOperatorsNode, {"J", "Jy"});
+  this->Jw_ = get<unsigned int>(measureOperatorsNode, {"J", "Jw"});
+  this->wprojection_ = get<bool>(measureOperatorsNode, {"wide-field", "wprojection"});
+  this->mpi_wstacking_ = get<bool>(measureOperatorsNode, {"wide-field", "mpi_wstacking"});
+  this->kmeans_iters_ = get<t_int>(measureOperatorsNode, {"wide-field", "kmeans_iterations"});
 }
 
 void YamlParser::parseAndSetSARA(const YAML::Node& SARANode) {
   const std::string values_str = get<std::string>(SARANode, {"wavelet_dict"});
   this->wavelet_basis_ = this->getWavelets(values_str);
   this->wavelet_levels_ = get<t_int>(SARANode, {"wavelet_levels"});
+  this->dualFBVarianceConvergence_ = get<t_real>(SARANode, {"dualFBVarianceConvergence"});
+  this->realValueConstraint_ = get<bool>(SARANode, {"realValueConstraint"});
+  this->positiveValueConstraint_ = get<bool>(SARANode, {"positiveValueConstraint"});
 }
 
 void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsNode) {
   this->algorithm_ = get<std::string>(algorithmOptionsNode, {"algorithm"});
-  if (this->algorithm_ != "padmm")
+  if (this->algorithm_ == "padmm") {
+    this->epsilonConvergenceScaling_ =
+        get<t_int>(algorithmOptionsNode, {"padmm", "epsilonConvergenceScaling"});
+    this->mpiAlgorithm_ = factory::algo_distribution_string.at(
+        get<std::string>(algorithmOptionsNode, {"padmm", "mpiAlgorithm"}));
+    this->relVarianceConvergence_ =
+        get<t_real>(algorithmOptionsNode, {"padmm", "relVarianceConvergence"});
+    this->update_iters_ = get<t_int>(algorithmOptionsNode, {"padmm", "stepsize", "update_iters"});
+    this->update_tolerance_ =
+        get<t_real>(algorithmOptionsNode, {"padmm", "stepsize", "update_tolerance"});
+  } else if (this->algorithm_ == "fb") {
+    this->mpiAlgorithm_ = factory::algo_distribution_string.at(
+        get<std::string>(algorithmOptionsNode, {"fb", "mpiAlgorithm"}));
+    this->relVarianceConvergence_ =
+        get<t_real>(algorithmOptionsNode, {"fb", "relVarianceConvergence"});
+    this->stepsize_ = get<t_real>(algorithmOptionsNode, {"fb", "stepsize"});
+    this->regularisation_parameter_ =
+        get<t_real>(algorithmOptionsNode, {"fb", "regularisation_parameter"});
+    this->jmap_iters_ = get<t_uint>(algorithmOptionsNode, {"fb", "joint_map_estimation", "iters"});
+    this->jmap_relVarianceConvergence_ =
+        get<t_real>(algorithmOptionsNode, {"fb", "joint_map_estimation", "relVarianceConvergence"});
+    this->jmap_objVarianceConvergence_ =
+        get<t_real>(algorithmOptionsNode, {"fb", "joint_map_estimation", "objVarianceConvergence"});
+    this->jmap_alpha_ = get<t_real>(algorithmOptionsNode, {"fb", "joint_map_estimation", "alpha"});
+    this->jmap_beta_ = get<t_real>(algorithmOptionsNode, {"fb", "joint_map_estimation", "beta"});
+  } else {
     throw std::runtime_error(
         "Only padmm algorithm configured for now. Please fill the appropriate block in the "
         "configuration file.");
-  this->epsilonConvergenceScaling_ =
-      get<t_int>(algorithmOptionsNode, {"padmm", "epsilonConvergenceScaling"});
-  this->realValueConstraint_ = get<bool>(algorithmOptionsNode, {"padmm", "realValueConstraint"});
-  this->positiveValueConstraint_ =
-      get<bool>(algorithmOptionsNode, {"padmm", "positiveValueConstraint"});
-  this->mpiAlgorithm_ = factory::algo_distribution_string.at(
-      get<std::string>(algorithmOptionsNode, {"padmm", "mpiAlgorithm"}));
-  this->relVarianceConvergence_ =
-      get<t_real>(algorithmOptionsNode, {"padmm", "relVarianceConvergence"});
-  this->dualFBVarianceConvergence_ =
-      get<t_real>(algorithmOptionsNode, {"padmm", "dualFBVarianceConvergence"});
+  }
 }
 
 std::vector<std::string> YamlParser::getWavelets(const std::string& values_str) {
@@ -239,6 +284,8 @@ void YamlParser::writeOutput() {
   // Write out the yaml info
   YAML::Emitter out;
   out << YAML::BeginMap;
+  out << YAML::Key << "Version";
+  out << this->version_;
   out << YAML::Key << "GeneralConfiguration";
   out << this->config_file["GeneralConfiguration"];
   out << YAML::Key << "MeasureOperators";

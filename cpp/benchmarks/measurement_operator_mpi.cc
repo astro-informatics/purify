@@ -50,14 +50,14 @@ BENCHMARK_DEFINE_F(DegridOperatorCtorFixturePar, Distr)(benchmark::State &state)
   // benchmark the creation of the distributed measurement operator
   if ((m_counter % 10) == 1) {
     auto sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        m_world, m_uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 0, 0.0001,
-        kernels::kernel::kb, state.range(2), state.range(2), m_w_term);
+        m_world, m_uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, kernels::kernel::kb,
+        state.range(2), state.range(2), m_w_term);
   }
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     auto sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        m_world, m_uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 0, 0.0001,
-        kernels::kernel::kb, state.range(2), state.range(2), m_w_term);
+        m_world, m_uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, kernels::kernel::kb,
+        state.range(2), state.range(2), m_w_term);
     auto end = std::chrono::high_resolution_clock::now();
     state.SetIterationTime(b_utilities::duration(start, end, m_world));
   }
@@ -70,14 +70,14 @@ BENCHMARK_DEFINE_F(DegridOperatorCtorFixturePar, MPI)(benchmark::State &state) {
   // benchmark the creation of the distributed MPI measurement operator
   if ((m_counter % 10) == 1) {
     auto sky_measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-        m_world, m_uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 0, 0.0001,
-        kernels::kernel::kb, state.range(2), state.range(2), m_w_term);
+        m_world, m_uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, kernels::kernel::kb,
+        state.range(2), state.range(2), m_w_term);
   }
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     auto sky_measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-        m_world, m_uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, 0, 0.0001,
-        kernels::kernel::kb, state.range(2), state.range(2), m_w_term);
+        m_world, m_uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, kernels::kernel::kb,
+        state.range(2), state.range(2), m_w_term);
     auto end = std::chrono::high_resolution_clock::now();
     state.SetIterationTime(b_utilities::duration(start, end, m_world));
   }
@@ -152,8 +152,8 @@ class DegridOperatorDirectFixtureDistr : public DegridOperatorDirectFixturePar {
   virtual std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurementOperator(
       t_real cellsize, bool w_term) {
     return measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        m_world, m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001,
-        kernels::kernel::kb, m_kernel, m_kernel, w_term);
+        m_world, m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, kernels::kernel::kb,
+        m_kernel, m_kernel, w_term);
   }
 };
 
@@ -162,8 +162,8 @@ class DegridOperatorDirectFixtureMPI : public DegridOperatorDirectFixturePar {
   virtual std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurementOperator(
       t_real cellsize, bool w_term) {
     return measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-        m_world, m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001,
-        kernels::kernel::kb, m_kernel, m_kernel, w_term);
+        m_world, m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, kernels::kernel::kb,
+        m_kernel, m_kernel, w_term);
   }
 };
 
@@ -172,8 +172,8 @@ class DegridOperatorAdjointFixtureDistr : public DegridOperatorAdjointFixturePar
   virtual std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurementOperator(
       t_real cellsize, bool w_term) {
     return measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        m_world, m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001,
-        kernels::kernel::kb, m_kernel, m_kernel, w_term);
+        m_world, m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, kernels::kernel::kb,
+        m_kernel, m_kernel, w_term);
   }
 };
 
@@ -182,8 +182,8 @@ class DegridOperatorAdjointFixtureMPI : public DegridOperatorAdjointFixturePar {
   virtual std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurementOperator(
       t_real cellsize, bool w_term) {
     return measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-        m_world, m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001,
-        kernels::kernel::kb, m_kernel, m_kernel, w_term);
+        m_world, m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, kernels::kernel::kb,
+        m_kernel, m_kernel, w_term);
   }
 };
 

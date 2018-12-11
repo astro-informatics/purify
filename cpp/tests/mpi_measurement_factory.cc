@@ -6,6 +6,7 @@
 #include "purify/operators.h"
 #include "purify/utilities.h"
 #include <sopt/mpi/communicator.h>
+#include <sopt/power_method.h>
 using namespace purify;
 
 TEST_CASE("Serial vs Distributed Operator") {
@@ -35,14 +36,18 @@ TEST_CASE("Serial vs Distributed Operator") {
   auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
-  const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
+  const auto op_serial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample),
+      100, 1e-4, Vector<t_complex>::Random(width * height)));
   CAPTURE(world.size());
 
   for (auto method : {factory::distributed_measurement_operator::mpi_distribute_image,
                       factory::distributed_measurement_operator::mpi_distribute_grid}) {
-    const auto op = factory::measurement_operator_factory<Vector<t_complex>>(
-        method, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
+    const auto op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+        factory::measurement_operator_factory<Vector<t_complex>>(
+            method, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample),
+        100, 1e-4, Vector<t_complex>::Ones(width * height)));
     if (uv_serial.u.size() == uv_mpi.u.size()) {
       REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
       CHECK(uv_serial.v.isApprox(uv_mpi.v));
@@ -99,18 +104,22 @@ TEST_CASE("GPU Serial vs Distributed Operator") {
   auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
-  const auto op_serial = purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample, 100);
+  const auto op_serial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample),
+      100, 1e-4, Vector<t_complex>::Random(width * height)));
   CAPTURE(world.size());
 
   for (auto method : {factory::distributed_measurement_operator::gpu_mpi_distribute_image,
                       factory::distributed_measurement_operator::gpu_mpi_distribute_grid}) {
 #ifndef PURIFY_ARRAYFIRE
     REQUIRE_THROWS(factory::measurement_operator_factory<Vector<t_complex>>(
-        method, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100));
+        method, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample));
 #else
-    const auto op = factory::measurement_operator_factory<Vector<t_complex>>(
-        method, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample, 100);
+    const auto op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+        factory::measurement_operator_factory<Vector<t_complex>>(
+            method, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample),
+        100, 1e-4, Vector<t_complex>::Ones(width * height)));
 
     if (uv_serial.u.size() == uv_mpi.u.size()) {
       REQUIRE(uv_serial.u.isApprox(uv_mpi.u));

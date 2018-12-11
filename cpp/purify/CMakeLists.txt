@@ -20,15 +20,20 @@ configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 set(HEADERS
   logging.h kernels.h pfitsio.h  logging.disabled.h types.h
   IndexMapping.h logging.enabled.h utilities.h operators.h operators_gpu.h wproj_utilities.h
-  cimg.h uvfits.h convolution.h projection_kernels.h measurement_operator_factory.h wavelet_operator_factory.h distribute.h
+  cimg.h uvfits.h convolution.h measurement_operator_factory.h wavelet_operator_factory.h distribute.h
   algorithm_factory.h
   read_measurements.h
   yaml-parser.h
+  integration.h
+  wide_field_utilities.h
+  wkernel_integration.h
+  wproj_operators.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(SOURCES utilities.cc pfitsio.cc
-  kernels.cc wproj_utilities.cc operators.cc uvfits.cc projection_kernels.cc yaml-parser.cc
-  read_measurements.cc distribute.cc)
+  kernels.cc wproj_utilities.cc operators.cc uvfits.cc yaml-parser.cc
+  read_measurements.cc distribute.cc integration.cc wide_field_utilities.cc wkernel_integration.cc 
+  wproj_operators.cc)
 
 if(TARGET casacore::ms)
   list(APPEND SOURCES casacore.cc)
@@ -36,8 +41,9 @@ if(TARGET casacore::ms)
 endif()
 
 if(PURIFY_MPI)
-  list(APPEND HEADERS mpi_utilities.h distribute.h)
-  list(APPEND SOURCES mpi_utilities.cc distribute.cc)
+  list(APPEND HEADERS mpi_utilities.h distribute.h DistributeSparseVector.h
+  AllToAllSparseVector.h)
+  list(APPEND SOURCES mpi_utilities.cc distribute.cc AllToAllSparseVector.cc)
 endif()
 
 add_library(libpurify SHARED ${SOURCES})
@@ -65,10 +71,11 @@ add_include_dir(
   ${Boost_INCLUDE_DIR}
   ${CFitsIO_INCLUDE_DIR}
   ${Yamlcpp_INCLUDE_DIR}
+  ${Cubature_INCLUDE_DIR}
   ${CImg_INCLUDE_DIR}
 )
 target_link_libraries(libpurify
-  ${FFTW3_DOUBLE_LIBRARY}  ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY} ${X11_X11_LIB} ${Yamlcpp_LIBRARY}
+  ${FFTW3_DOUBLE_LIBRARY}  ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY} ${X11_X11_LIB} ${Yamlcpp_LIBRARY} ${Cubature_LIBRARIES}
   ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY}
   )
 if(TARGET casacore::casa)

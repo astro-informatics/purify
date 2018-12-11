@@ -15,6 +15,7 @@
 #include <sopt/imaging_padmm.h>
 #include <sopt/mpi/communicator.h>
 #include <sopt/mpi/session.h>
+#include <sopt/power_method.h>
 #include <sopt/relative_variation.h>
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
@@ -40,9 +41,11 @@ std::tuple<utilities::vis_params, t_real> dirty_visibilities(
   PURIFY_HIGH_LOG("Number of measurements / number of pixels: {}",
                   uv_data.u.size() / ground_truth_image.size());
   // creating operator to generate measurements
-  auto const sky_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      uv_data, ground_truth_image.rows(), ground_truth_image.cols(), std::get<1>(w_term),
-      std::get<1>(w_term), 2, 100, 1e-4, kernels::kernel::kb, 8, 8, std::get<0>(w_term));
+  auto const sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          uv_data, ground_truth_image.rows(), ground_truth_image.cols(), std::get<1>(w_term),
+          std::get<1>(w_term), 2, kernels::kernel::kb, 8, 8, std::get<0>(w_term)),
+      100, 1e-4, Vector<t_complex>::Random(ground_truth_image.size())));
   // Generates measurements from image
   uv_data.vis = (*sky_measurements) *
                 Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);
@@ -177,28 +180,48 @@ int main(int nargs, char const **args) {
                                        std::make_tuple(w_term, cellsize), world);
 #if PURIFY_PADMM_ALGORITHM == 2 || PURIFY_PADMM_ALGORITHM == 3
 #ifndef PURIFY_GPU
-  auto const measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-      world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, w_term);
+  auto const measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
+          cellsize, 2, kernels::kernel_from_string.at(kernel), 8, 8, w_term),
+      100, 1e-4,
+      world.broadcast(
+          Vector<t_complex>::Random(ground_truth_image.rows() * ground_truth_image.cols())
+              .eval())));
 
 #else
   af::setDevice(0);
-  auto const measurements = gpu::measurementoperator::init_degrid_operator_2d(
-      world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, w_term);
+  auto const measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      gpu::measurementoperator::init_degrid_operator_2d(
+          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
+          cellsize, 2, kernels::kernel_from_string.at(kernel), 8, 8, w_term),
+      100, 1e-4,
+      world.broadcast(
+          Vector<t_complex>::Random(ground_truth_image.rows() * ground_truth_image.cols())
+              .eval())));
 
 #endif
 #elif PURIFY_PADMM_ALGORITHM == 1
 #ifndef PURIFY_GPU
-  auto const measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-      world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, w_term);
+  auto const measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
+          cellsize, 2, kernels::kernel_from_string.at(kernel), 8, 8, w_term),
+      100, 1e-4,
+      world.broadcast(
+          Vector<t_complex>::Random(ground_truth_image.rows() * ground_truth_image.cols())
+              .eval())));
 
 #else
   af::setDevice(0);
-  auto const measurements = gpu::measurementoperator::init_degrid_operator_2d_mpi(
-      world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
-      cellsize, 2, 100, 1e-4, kernels::kernel_from_string.at(kernel), 8, 8, w_term);
+  auto const measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+      gpu::measurementoperator::init_degrid_operator_2d_mpi(
+          world, std::get<0>(data), ground_truth_image.rows(), ground_truth_image.cols(), cellsize,
+          cellsize, 2, kernels::kernel_from_string.at(kernel), 8, 8, w_term),
+      100, 1e-4,
+      world.broadcast(
+          Vector<t_complex>::Random(ground_truth_image.rows() * ground_truth_image.cols())
+              .eval())));
 
 #endif
 #endif
