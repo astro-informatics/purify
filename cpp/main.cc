@@ -287,10 +287,10 @@ int main(int argc, const char **argv) {
   }
   // the input measurements, if simulated
   if (params.source() == purify::utilities::vis_source::simulation)
-    utilities::write_visibility(uv_data, out_dir + "/input.vis");
-  const pfitsio::header_params def_header = pfitsio::header_params(
-      "", "Jy/Pixel", 1, uv_data.ra, uv_data.dec, params.measurements_polarization(),
-      params.cellsizex(), params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
+    //  utilities::write_visibility(uv_data, out_dir + "/input.vis");
+    const pfitsio::header_params def_header = pfitsio::header_params(
+        "", "Jy/Pixel", 1, uv_data.ra, uv_data.dec, params.measurements_polarization(),
+        params.cellsizex(), params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
   // the eigenvector
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
@@ -299,10 +299,12 @@ int main(int argc, const char **argv) {
 #else
     throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
+    {
       pfitsio::write2d(measurement_op_eigen_vector.real(), params.height(), params.width(),
                        out_dir + "/eigenvector_real.fits", "pix", true);
-    pfitsio::write2d(measurement_op_eigen_vector.imag(), params.height(), params.width(),
-                     out_dir + "/eigenvector_imag.fits", "pix", true);
+      pfitsio::write2d(measurement_op_eigen_vector.imag(), params.height(), params.width(),
+                       out_dir + "/eigenvector_imag.fits", "pix", true);
+    }
   } else {
     pfitsio::write2d(measurement_op_eigen_vector.real(), params.height(), params.width(),
                      out_dir + "/eigenvector_real.fits", "pix", true);
