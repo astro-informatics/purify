@@ -285,9 +285,6 @@ int main(int argc, const char **argv) {
         algo_weak, 0, params.update_tolerance(), 0, update_header_sol, update_header_res,
         params.height(), params.width(), sara_size, using_mpi);
   }
-  // the input measurements, if simulated
-  // if (params.source() == purify::utilities::vis_source::simulation)
-  //  utilities::write_visibility(uv_data, out_dir + "/input.vis");
   const pfitsio::header_params def_header = pfitsio::header_params(
       "", "Jy/Pixel", 1, uv_data.ra, uv_data.dec, params.measurements_polarization(),
       params.cellsizex(), params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
