@@ -146,7 +146,7 @@ void YamlParser::parseAndSetGeneralConfiguration(const YAML::Node& generalConfig
     this->number_of_measurements_ = get<t_int>(
         generalConfigNode, {"InputOutput", "input", "simulation", "number_of_measurements"});
     this->w_rms_ = get<t_real>(generalConfigNode,
-                               {"InputOutput", "input", "simulation", "number_of_measurements"});
+                               {"InputOutput", "input", "simulation", "w_rms"});
     this->measurements_ = get_vector<std::vector<std::string>>(
         generalConfigNode, {"InputOutput", "input", "simulation", "coverage_files"});
     // TODO: use the enum instead of string.
