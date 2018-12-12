@@ -98,6 +98,7 @@ matrix:
           packages:
             - *native_deps
             - *all_deps
+            - lcov
       env:
         - TITLE="All dependencies - GCC - MPI"
         - DEBUG=True
@@ -114,7 +115,6 @@ matrix:
           packages:
             - *native_deps
             - *all_deps
-            - lcov
       env:
         - TITLE="All dependencies - GCC - MPI - mpich"
         - DEBUG=True
