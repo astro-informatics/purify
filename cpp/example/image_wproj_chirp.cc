@@ -6,6 +6,7 @@
 #include "purify/pfitsio.h"
 #include "purify/utilities.h"
 #include "purify/wproj_operators.h"
+#include "purify/wide_field_utilities.h"
 #include <sopt/power_method.h>
 
 using namespace purify;
@@ -32,7 +33,10 @@ int main(int nargs, char const **args) {
   auto const imsizex = imsize;
   auto const imsizey = imsize;
   const t_real wval = w;
-  const t_int Jw = (Jw_max > 0) ? Jw_max : widefield::w_support(w, widefield::pixel_to_lambda(cell, imsize, oversample_ratio), Ju, 1000);
+  const t_int Jw =
+      (Jw_max > 0) ? Jw_max
+                   : widefield::w_support(
+                         w, widefield::pixel_to_lambda(cell, imsize, oversample_ratio), Ju, 1000);
   const std::string suffix = "_" + std::to_string(static_cast<int>(wval)) + "_" +
                              std::to_string(static_cast<int>(imsize)) + "_" +
                              std::to_string(static_cast<int>(cell)) + "_" +
