@@ -39,7 +39,8 @@ Sparse<t_complex> init_gridding_matrix_2d(
   // count gridding coefficients with variable support size
   Vector<t_int> total_coeffs = Vector<t_int>::Zero(w.size());
   for (int i = 0; i < w.size(); i++) {
-    const t_int Ju_max = widefield::w_support(w(i), du, static_cast<t_int>(Ju), static_cast<t_int>(Jw));
+    const t_int Ju_max =
+        widefield::w_support(w(i), du, static_cast<t_int>(Ju), static_cast<t_int>(Jw));
     total_coeffs(i) = Ju_max * Ju_max;
   }
   const t_real num_of_coeffs = total_coeffs.array().cast<t_real>().sum();
