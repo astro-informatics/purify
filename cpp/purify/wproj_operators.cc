@@ -88,13 +88,16 @@ Sparse<t_complex> init_gridding_matrix_2d(
                 ftkernel_radial, max_evaluations, absolute_error, relative_error,
                 integration::method::p, evaluations);
 #pragma omp critical(add_eval)
-        coeffs_done++;
-        if ((coeffs_done % (static_cast<t_int>(num_of_coeffs / 100)) == 0)) {
-#pragma omp critical(print)
-          PURIFY_LOW_LOG(
-              "w = {}, support = {}x{}, coeffs: {} of {}, {}%", w_val, Ju_max, Ju_max, coeffs_done,
-              num_of_coeffs,
-              static_cast<t_real>(coeffs_done) / static_cast<t_real>(num_of_coeffs) * 100.);
+        {
+          coeffs_done++;
+          if (num_of_coeffs > 100) {
+            if ((coeffs_done % (static_cast<t_int>(num_of_coeffs / 100)) == 0)) {
+              PURIFY_LOW_LOG(
+                  "w = {}, support = {}x{}, coeffs: {} of {}, {}%", w_val, Ju_max, Ju_max,
+                  coeffs_done, num_of_coeffs,
+                  static_cast<t_real>(coeffs_done) / static_cast<t_real>(num_of_coeffs) * 100.);
+            }
+          }
         }
       }
     }
