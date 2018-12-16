@@ -33,6 +33,9 @@ Sparse<t_complex> init_gridding_matrix_2d(
   if (u.size() != weights.size())
     throw std::runtime_error(
         "Size of u and w vectors are not the same for creating gridding matrix.");
+  if (Ju > Jw)
+    throw std::runtime_error(
+        "w kernel size must be at least the size of w=0 kernel, must have Ju <= Jw.");
   // count gridding coefficients with variable support size
   Vector<t_int> total_coeffs = Vector<t_int>::Zero(w.size());
   for (int i = 0; i < w.size(); i++) {
