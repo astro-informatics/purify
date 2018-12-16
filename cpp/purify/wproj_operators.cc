@@ -67,19 +67,17 @@ Sparse<t_complex> init_gridding_matrix_2d(
   t_int coeffs_done = 0;
   t_uint total = 0;
 
-#pragma omp parallel for collapse(3)
+#pragma omp parallel for
   for (t_int m = 0; m < rows; ++m) {
-    for (t_int ju = 1; ju < Jw + 1; ++ju) {
-      for (t_int jv = 1; jv < Jw + 1; ++jv) {
-        // w_projection convolution setup
-        const t_int Ju_max = widefield::w_support(w(m), du, Ju, Jw);
-        if ((ju > Ju_max) or (jv > Ju_max)) continue;
+    // w_projection convolution setup
+    const t_int Ju_max = widefield::w_support(w(m), du, Ju, Jw);
+    t_uint evaluations = 0;
+    const t_int kwu = std::floor(u(m) - Ju_max * 0.5);
+    const t_int kwv = std::floor(v(m) - Ju_max * 0.5);
+    const t_real w_val = w(m);  //((0. < w(m)) ? 1: -1) * std::min(Ju_max * du, std::abs(w(m)));
 
-        t_uint evaluations = 0;
-        const t_int kwu = std::floor(u(m) - Ju_max * 0.5);
-        const t_int kwv = std::floor(v(m) - Ju_max * 0.5);
-        const t_real w_val = w(m);  //((0. < w(m)) ? 1: -1) * std::min(Ju_max * du, std::abs(w(m)));
-
+    for (t_int ju = 1; ju < Ju_max + 1; ++ju) {
+      for (t_int jv = 1; jv < Ju_max + 1; ++jv) {
         const t_uint q = utilities::mod(kwu + ju, ftsizeu_);
         const t_uint p = utilities::mod(kwv + jv, ftsizev_);
         const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
