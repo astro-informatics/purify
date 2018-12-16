@@ -40,7 +40,7 @@ int main(int nargs, char const **args) {
   const std::string suffix = "_" + std::to_string(static_cast<int>(wval)) + "_" +
                              std::to_string(static_cast<int>(imsize)) + "_" +
                              std::to_string(static_cast<int>(cell)) + "_" +
-                             std::to_string(static_cast<int>(Jw_max));
+                             std::to_string(static_cast<int>(Jw));
 
   auto const kernel = "kb";
 
