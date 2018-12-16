@@ -36,12 +36,12 @@ Sparse<t_complex> init_gridding_matrix_2d(
   // count gridding coefficients with variable support size
   Vector<t_int> total_coeffs = Vector<t_int>::Zero(w.size());
   for (int i = 0; i < w.size(); i++) {
-    const t_int Ju_max = widefield::w_support(abs(w(i)), du, Ju, Jw);
+    const t_int Ju_max = widefield::w_support(w(i), du, static_cast<t_int>(Ju), static_cast<t_int>(Jw));
     total_coeffs(i) = Ju_max * Ju_max;
   }
-  const t_int num_of_coeffs = total_coeffs.array().sum();
+  const t_real num_of_coeffs = total_coeffs.array().cast<t_real>().sum();
   PURIFY_HIGH_LOG("Using {} rows (coefficients per a row {}), and memory of {} MegaBytes",
-                  total_coeffs.size(), total_coeffs.array().mean(),
+                  total_coeffs.size(), total_coeffs.array().cast<t_real>().mean(),
                   16. * num_of_coeffs / std::pow(10., 6));
   Sparse<t_complex> interpolation_matrix(rows, cols);
   try {
@@ -89,7 +89,7 @@ Sparse<t_complex> init_gridding_matrix_2d(
                 integration::method::p, evaluations);
 #pragma omp critical(add_eval)
         coeffs_done++;
-        if ((coeffs_done % (num_of_coeffs / 100)) == 0) {
+        if ((coeffs_done % (static_cast<t_int>(num_of_coeffs / 100)) == 0)) {
 #pragma omp critical(print)
           PURIFY_LOW_LOG(
               "w = {}, support = {}x{}, coeffs: {} of {}, {}%", w_val, Ju_max, Ju_max, coeffs_done,
