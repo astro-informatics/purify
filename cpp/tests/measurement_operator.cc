@@ -123,8 +123,8 @@ TEST_CASE("wprojection") {
         power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
     auto mop_wproj = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
         measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-            uv_data, imsizey, imsizex, cell_x, cell_y, oversample_ratio, kernel, Ju, Jw, abs_error,
-            rel_error),
+            uv_data, imsizey, imsizex, cell_x, cell_y, oversample_ratio, kernel, Ju, Jw, w_term,
+            abs_error, rel_error),
         power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
     REQUIRE((mop_wproj->adjoint() * vis).size() == imsizex * imsizey);
     REQUIRE((mop->adjoint() * vis).size() == imsizex * imsizey);
@@ -151,8 +151,8 @@ TEST_CASE("wprojection") {
         power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
     auto mop_wproj = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
         measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-            uv_data, imsizey, imsizex, cell_x, cell_y, oversample_ratio, kernel, Ju, Jw, abs_error,
-            rel_error),
+            uv_data, imsizey, imsizex, cell_x, cell_y, oversample_ratio, kernel, Ju, Jw, w_term,
+            abs_error, rel_error),
         power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
     REQUIRE((mop->adjoint() * vis).size() == imsizex * imsizey);
     REQUIRE((mop_wproj->adjoint() * vis).size() == imsizex * imsizey);

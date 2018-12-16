@@ -41,7 +41,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
       std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
           measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
               uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample,
-              kernels::kernel_from_string.at(kernel), J, 30, 1e-6, 1e-6),
+              kernels::kernel_from_string.at(kernel), J, 30, true, 1e-6, 1e-6),
           1000, 1e-4, Vector<t_complex>::Random(imsizex * imsizey)));
 #else
   af::setDevice(0);
@@ -163,7 +163,7 @@ int main(int, char **) {
   auto const sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2,
-          kernels::kernel_from_string.at("kb"), 8, 30, 1e-6, 1e-6),
+          kernels::kernel_from_string.at("kb"), 8, 30, true, 1e-6, 1e-6),
       1000, 0.0001, Vector<t_complex>::Random(M31.size())));
 #else
   auto const sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
