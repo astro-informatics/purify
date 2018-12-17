@@ -388,12 +388,12 @@ TEST_CASE("Serial vs Distributed Operator Radial WProjection") {
   const t_real rel_error = 1e-8;
   const auto op_serial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          uv_serial, height, width, cellx, celly, over_sample, kernel, J, 4, abs_error, rel_error),
+          uv_serial, height, width, cellx, celly, over_sample, kernel, J, 4, true, abs_error, rel_error),
       10000, 1e-5, Vector<t_complex>::Random(height * width)));
 
   const auto op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          world, uv_mpi, height, width, cellx, celly, over_sample, kernel, J, 4, abs_error,
+          world, uv_mpi, height, width, cellx, celly, over_sample, kernel, J, 4, true, abs_error,
           rel_error),
       10000, 1e-5, world.broadcast(Vector<t_complex>::Random(height * width).eval())));
 
