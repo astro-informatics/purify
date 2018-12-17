@@ -5,8 +5,8 @@
 #include "purify/operators.h"
 #include "purify/pfitsio.h"
 #include "purify/utilities.h"
-#include "purify/wproj_operators.h"
 #include "purify/wide_field_utilities.h"
+#include "purify/wproj_operators.h"
 #include <sopt/power_method.h>
 
 using namespace purify;
@@ -77,6 +77,8 @@ int main(int nargs, char const **args) {
       Image<t_complex>::Map(measurements.data(), imsizey, imsizex) / measurements(max_pos);
   pfitsio::write2d(out.real(), "wproj_real" + suffix + ".fits");
   pfitsio::write2d(out.imag(), "wproj_imag" + suffix + ".fits");
-  pfitsio::write2d((chirp - out).real(), "diff_real" + suffix + ".fits");
-  pfitsio::write2d((chirp - out).imag(), "diff_imag" + suffix + ".fits");
+  pfitsio::write2d(2 * (chirp - out).real() / (chirp.real().abs() + out.real().abs()).array(),
+                   "diff_real" + suffix + ".fits");
+  pfitsio::write2d(2 * (chirp - out).imag() / (chirp.imag().abs() + out.imag().abs()).array(),
+                   "diff_imag" + suffix + ".fits");
 }
