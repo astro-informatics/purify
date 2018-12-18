@@ -26,7 +26,7 @@ int main(int nargs, char const **args) {
   purify::logging::set_level("debug");
   // Gridding example
   auto const oversample_ratio = 2;
-  auto const power_iters = 0;
+  auto const power_iters = 100;
   auto const power_tol = 1e-5;
   auto const Ju = 4;
   auto const Jv = 4;
@@ -56,14 +56,12 @@ int main(int nargs, char const **args) {
   Image<t_complex> chirp = details::init_correction2d(
       2, imsizey, imsizex, [](t_real) { return 1.; }, [](t_real) { return 1.; }, wval, cell, cell);
 
-  pfitsio::write2d(chirp.real() / chirp.real().maxCoeff(),
-                   "chirp_real_" + std::to_string(static_cast<int>(wval)) + "_" +
-                       std::to_string(static_cast<int>(imsize)) + "_" +
-                       std::to_string(static_cast<int>(cell)) + ".fits");
-  pfitsio::write2d(chirp.imag() / chirp.real().maxCoeff(),
-                   "chirp_imag_" + std::to_string(static_cast<int>(wval)) + "_" +
-                       std::to_string(static_cast<int>(imsize)) + "_" +
-                       std::to_string(static_cast<int>(cell)) + ".fits");
+  pfitsio::write2d(chirp.real(), "chirp_real_" + std::to_string(static_cast<int>(wval)) + "_" +
+                                     std::to_string(static_cast<int>(imsize)) + "_" +
+                                     std::to_string(static_cast<int>(cell)) + ".fits");
+  pfitsio::write2d(chirp.imag(), "chirp_imag_" + std::to_string(static_cast<int>(wval)) + "_" +
+                                     std::to_string(static_cast<int>(imsize)) + "_" +
+                                     std::to_string(static_cast<int>(cell)) + ".fits");
   const auto measure_opw = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_vis, imsizey, imsizex, cell, cell, oversample_ratio,
@@ -74,7 +72,7 @@ int main(int nargs, char const **args) {
   t_uint max_pos = 0;
   measurements.array().real().maxCoeff(&max_pos);
   Image<t_complex> out =
-      Image<t_complex>::Map(measurements.data(), imsizey, imsizex) / measurements(max_pos);
+      Image<t_complex>::Map(measurements.data(), imsizey, imsizex) * std::sqrt(imsizex * imsizey);
   pfitsio::write2d(out.real(), "wproj_real" + suffix + ".fits");
   pfitsio::write2d(out.imag(), "wproj_imag" + suffix + ".fits");
   pfitsio::write2d(2 * (chirp - out).real() / (chirp.real().abs() + out.real().abs()).array(),
