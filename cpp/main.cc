@@ -151,7 +151,7 @@ int main(int argc, const char **argv) {
                   mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
                   params.cellsizex(), params.oversampling(),
                   kernels::kernel_from_string.at(params.kernel()), 2 * params.Jx(), params.Jw(),
-                  params.mpi_wstacking(), 1e-6, 1e-6);
+                  params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
 #ifdef PURIFY_MPI
     auto const comm = sopt::mpi::Communicator::World();
     sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
@@ -206,7 +206,7 @@ int main(int argc, const char **argv) {
                 mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
                 params.cellsizex(), params.oversampling(),
                 kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jw(),
-                params.mpi_wstacking(), 1e-6, 1e-6);
+                params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
 #ifdef PURIFY_MPI
   auto const comm = sopt::mpi::Communicator::World();
   auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
