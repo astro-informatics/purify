@@ -7,12 +7,15 @@ namespace purify {
 
 namespace details {
 
-Sparse<t_complex> init_gridding_matrix_2d(
-    const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
-    const Vector<t_complex> &weights, const t_uint imsizey_, const t_uint imsizex_,
-    const t_real oversample_ratio, const std::function<t_real(t_real)> &ftkerneluv,
-    const std::function<t_real(t_real)> &kerneluv, const t_uint Ju, const t_uint Jw,
-    const t_real cellx, const t_real celly, const t_real abs_error, const t_real rel_error) {
+Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v,
+                                          const Vector<t_real> &w, const Vector<t_complex> &weights,
+                                          const t_uint imsizey_, const t_uint imsizex_,
+                                          const t_real oversample_ratio,
+                                          const std::function<t_real(t_real)> &ftkerneluv,
+                                          const std::function<t_real(t_real)> &kerneluv,
+                                          const t_uint Ju, const t_uint Jw, const t_real cellx,
+                                          const t_real celly, const t_real abs_error,
+                                          const t_real rel_error, const dde_type dde) {
   const t_uint ftsizev_ = std::floor(imsizey_ * oversample_ratio);
   const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
   const t_real du = widefield::pixel_to_lambda(cellx, imsizex_, oversample_ratio);
@@ -62,9 +65,11 @@ Sparse<t_complex> init_gridding_matrix_2d(
   const t_real absolute_error = abs_error;
   // normalising kernel
   t_uint e = 0;
-  const t_real norm = std::abs(projection_kernels::exact_w_projection_integration_1d(
-      0, 0, 0, du, oversample_ratio, [&](const t_real l) -> t_real { return ftkerneluv(l); }, 1e9,
-      0, 1e-12, integration::method::h, e));
+  const t_real norm = std::pow(
+      std::abs(projection_kernels::exact_w_projection_integration_1d(
+          0, 0, 0, du, oversample_ratio, [&](const t_real l) -> t_real { return ftkerneluv(l); },
+          1e9, 0, 1e-12, integration::method::h, e)),
+      (dde == dde_type::wkernel_radial) ? 1 : 0.5);
 
   auto const ftkernel_radial = [&](const t_real l) -> t_real { return ftkerneluv(l) / norm; };
 
@@ -87,10 +92,15 @@ Sparse<t_complex> init_gridding_matrix_2d(
         const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
         interpolation_matrix.insert(m, index) =
             std::exp(-2 * constant::pi * I * ((kwu + ju) * 0.5 + (kwv + jv) * 0.5)) * weights(m) *
-            projection_kernels::exact_w_projection_integration_1d(
-                (u(m) - (kwu + ju)), (v(m) - (kwv + jv)), w_val, du, oversample_ratio,
-                ftkernel_radial, max_evaluations, absolute_error, relative_error,
-                integration::method::p, evaluations);
+            ((dde == dde_type::wkernel_radial)
+                 ? projection_kernels::exact_w_projection_integration_1d(
+                       (u(m) - (kwu + ju)), (v(m) - (kwv + jv)), w_val, du, oversample_ratio,
+                       ftkernel_radial, max_evaluations, absolute_error, relative_error,
+                       integration::method::p, evaluations)
+                 : projection_kernels::exact_w_projection_integration(
+                       (u(m) - (kwu + ju)), (v(m) - (kwv + jv)), w_val, du, dv, oversample_ratio,
+                       ftkernel_radial, ftkernel_radial, max_evaluations, absolute_error,
+                       relative_error, integration::method::h, evaluations));
 #pragma omp critical(add_eval)
         {
           coeffs_done++;
