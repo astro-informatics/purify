@@ -21,6 +21,7 @@ int main(int nargs, char const **args) {
   ARGS_MACRO(imsize, 2, 256, t_uint)
   ARGS_MACRO(cell, 3, 2400, t_real)
   ARGS_MACRO(Jw_max, 4, 0, t_uint)
+  ARGS_MACRO(radial, 5, true, bool)
 #undef ARGS_MACRO
   purify::logging::initialize();
   purify::logging::set_level("debug");
@@ -36,11 +37,11 @@ int main(int nargs, char const **args) {
   const t_int Jw =
       (Jw_max > 0) ? Jw_max
                    : widefield::w_support(
-                         w, widefield::pixel_to_lambda(cell, imsize, oversample_ratio), Ju, 1000);
-  const std::string suffix = "_" + std::to_string(static_cast<int>(wval)) + "_" +
-                             std::to_string(static_cast<int>(imsize)) + "_" +
-                             std::to_string(static_cast<int>(cell)) + "_" +
-                             std::to_string(static_cast<int>(Jw));
+                         w, widefield::pixel_to_lambda(cell, imsize, oversample_ratio), Ju, 1200);
+  const std::string suffix =
+      "_" + std::to_string(static_cast<int>(wval)) + "_" +
+      std::to_string(static_cast<int>(imsize)) + "_" + std::to_string(static_cast<int>(cell)) +
+      "_" + std::to_string(static_cast<int>(Jw)) + "_" + ((radial) ? "radial" : "2d");
 
   auto const kernel = "kb";
 
@@ -65,7 +66,8 @@ int main(int nargs, char const **args) {
   const auto measure_opw = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_vis, imsizey, imsizex, cell, cell, oversample_ratio,
-          kernels::kernel_from_string.at(kernel), Ju, Jw, false, 1e-6, 1e-6),
+          kernels::kernel_from_string.at(kernel), Ju, Jw, false, 1e-6, 1e-6,
+          (radial) ? dde_type::wkernel_radial : dde_type::wkernel_2d),
       power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
   Vector<t_complex> const measurements =
       (measure_opw->adjoint() * Vector<t_complex>::Constant(1, 1)).conjugate();
