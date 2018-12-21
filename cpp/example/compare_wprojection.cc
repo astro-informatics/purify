@@ -33,7 +33,7 @@ int main(int nargs, char const **args) {
   auto const imsizex = imsize;
   auto const imsizey = imsize;
   const t_real wval = w;
-  const t_int total = 1;
+  const t_int total = 10;
   auto const kernel = "kb";
   std::vector<t_real> M(10);
   std::vector<t_real> ctor_mop_wr(10);
@@ -42,7 +42,7 @@ int main(int nargs, char const **args) {
   std::vector<t_real> diff_wr_w2d(10);
   std::vector<t_real> diff_mop_w2d(10);
   for (t_int i = 1; i < M.size() + 1; i++) {
-    t_uint const number_of_vis = 10 * i;
+    t_uint const number_of_vis = 100 * i;
     t_uint trial = 0;
     M[i - 1] = number_of_vis;
     // Generating random uv(w) coverage
@@ -99,13 +99,13 @@ int main(int nargs, char const **args) {
       diff_mop_w2d[i - 1] +=
           std::get<0>(sopt::algorithm::power_method<Vector<t_complex>>(
               {[=](Vector<t_complex> &out, const Vector<t_complex> &x) {
-                 out = ((*mop_radial) * x) - ((*mop) * x);
+                 out = ((*mop_2d) * x) - ((*mop) * x);
                },
-               mop_radial->sizes(),
+               mop_2d->sizes(),
                [=](Vector<t_complex> &out, const Vector<t_complex> &x) {
-                 out = (mop_radial->adjoint() * x) - (mop->adjoint() * x);
+                 out = (mop_2d->adjoint() * x) - (mop->adjoint() * x);
                },
-               mop_radial->adjoint().sizes()},
+               mop_2d->adjoint().sizes()},
               power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey))) /
           total;
       trial++;
