@@ -5,6 +5,7 @@ include_directories("${PROJECT_SOURCE_DIR}/cpp")
 
 add_example(gridding LIBRARIES libpurify NOTEST)
 add_example(image_wproj_chirp LIBRARIES libpurify NOTEST)
+add_example(compare_wprojection LIBRARIES libpurify NOTEST)
 add_example(generate_vis_data LIBRARIES libpurify NOTEST)
 
 add_example(plot_wkernel LIBRARIES libpurify NOTEST)
