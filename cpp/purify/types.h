@@ -43,6 +43,9 @@ const std::map<std::string, stokes> stokes_string = {
     {"LR", stokes::LR}, {"lr", stokes::LR}, {"RL", stokes::RL}, {"rl", stokes::RL},
     {"P", stokes::P},   {"p", stokes::P}};
 
+//! Types of DDEs in purify
+enum class dde_type { wkernel_radial, wkernel_2d };
+
 namespace wproj_utilities {
 namespace expansions {
 //! Type of series approximation
