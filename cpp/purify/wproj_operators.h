@@ -9,7 +9,6 @@
 namespace purify {
 
 namespace details {
-
 //! Given the Fourier transform of a radially symmetric gridding kernel, creates the scaling image
 //! for gridding correction.
 Image<t_complex> init_correction_radial_2d(const t_real oversample_ratio, const t_uint imsizey_,
@@ -61,21 +60,47 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
     const Vector<t_complex> &weights, const t_uint &imsizey, const t_uint &imsizex,
     const t_real oversample_ratio, const kernels::kernel kernel, const t_uint Ju, const t_uint Jw,
     const fftw_plan ft_plan, const bool w_stacking, const t_real cellx, const t_real celly,
-    const t_real absolute_error, const t_real relative_error) {
-  auto const kerneluvs = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
+    const t_real absolute_error, const t_real relative_error, const dde_type dde) {
   sopt::OperatorFunction<T> directFZ, indirectFZ;
-  t_real const w_mean = w_stacking ? w.array().mean() : 0;
-  std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(
-      std::get<0>(kerneluvs), imsizey, imsizex, oversample_ratio, ft_plan, w_mean, cellx, celly);
   sopt::OperatorFunction<T> directG, indirectG;
-  PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
-                    imsizey * celly / (60. * 60.));
-  PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
-  PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
-  PURIFY_MEDIUM_LOG("Mean, w: {}, +/- {}", w.array().mean(), (w.maxCoeff() - w.minCoeff()) * 0.5);
-  std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
-      u, v, w.array() - w_mean, weights, imsizey, imsizex, oversample_ratio, std::get<0>(kerneluvs),
-      std::get<1>(kerneluvs), Ju, Jw, cellx, celly, absolute_error, relative_error);
+  t_real const w_mean = w_stacking ? w.array().mean() : 0;
+  switch (dde) {
+  case (dde_type::wkernel_radial): {
+    auto const kerneluvs = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
+    std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(
+        std::get<0>(kerneluvs), imsizey, imsizex, oversample_ratio, ft_plan, w_mean, cellx, celly);
+    PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
+                      imsizey * celly / (60. * 60.));
+    PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
+    PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
+    PURIFY_MEDIUM_LOG("Mean, w: {}, +/- {}", w.array().mean(), (w.maxCoeff() - w.minCoeff()) * 0.5);
+    std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
+        u, v, w.array() - w_mean, weights, imsizey, imsizex, oversample_ratio,
+        std::get<0>(kerneluvs), std::get<1>(kerneluvs), Ju, Jw, cellx, celly, absolute_error,
+        relative_error, dde);
+    break;
+  }
+  case (dde_type::wkernel_2d): {
+    std::function<t_real(t_real)> kernelu, kernelv, ftkernelu, ftkernelv;
+    std::tie(kernelu, kernelv, ftkernelu, ftkernelv) =
+        purify::create_kernels(kernel, Ju, Ju, imsizey, imsizex, oversample_ratio);
+    std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(
+        ftkernelu, ftkernelv, imsizey, imsizex, oversample_ratio, ft_plan, w_mean, cellx, celly);
+    PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
+                      imsizey * celly / (60. * 60.));
+    PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
+    PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
+    PURIFY_MEDIUM_LOG("Mean, w: {}, +/- {}", w.array().mean(), (w.maxCoeff() - w.minCoeff()) * 0.5);
+    auto const kerneluvs = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
+    std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
+        u, v, w.array() - w_mean, weights, imsizey, imsizex, oversample_ratio,
+        std::get<0>(kerneluvs), std::get<1>(kerneluvs), Ju, Jw, cellx, celly, absolute_error,
+        relative_error, dde);
+    break;
+  }
+  default:
+    throw std::runtime_error("DDE is not recognised.");
+  }
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
   PURIFY_LOW_LOG("Finished consturction of Φ.");
@@ -93,14 +118,14 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d(
     const Vector<t_complex> &weights, const t_uint imsizey, const t_uint imsizex,
     const t_real oversample_ratio, const kernels::kernel kernel, const t_uint Ju, const t_uint Jw,
     const bool w_stacking, const t_real cellx, const t_real celly, const t_real absolute_error,
-    const t_real relative_error) {
+    const t_real relative_error, const dde_type dde) {
   const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_2d<T>(
       u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jw, ft_plan, w_stacking,
-      cellx, celly, absolute_error, relative_error);
+      cellx, celly, absolute_error, relative_error, dde);
   auto direct = directDegrid;
   auto indirect = indirectDegrid;
   return std::make_shared<sopt::LinearTransform<T>>(direct, M, indirect, N);
@@ -110,7 +135,7 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d(
     const utilities::vis_params &uv_vis_input, const t_uint imsizey, const t_uint imsizex,
     const t_real cell_x, const t_real cell_y, const t_real oversample_ratio,
     const kernels::kernel kernel, const t_uint Ju, const t_uint Jw, const bool w_stacking,
-    const t_real absolute_error, const t_real relative_error) {
+    const t_real absolute_error, const t_real relative_error, const dde_type dde) {
   auto uv_vis = uv_vis_input;
   if (uv_vis.units == utilities::vis_units::lambda)
     uv_vis = utilities::set_cell_size(uv_vis, cell_x, cell_y);
@@ -119,7 +144,7 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d(
                                  std::floor(oversample_ratio * imsizey));
   return init_degrid_operator_2d<T>(uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex,
                                     oversample_ratio, kernel, Ju, Jw, w_stacking, cell_x, cell_y,
-                                    absolute_error, relative_error);
+                                    absolute_error, relative_error, dde);
 }
 #ifdef PURIFY_MPI
 //! Returns linear transform that is the weighted degridding operator with mpi all sum all
@@ -129,14 +154,14 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d(
     const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint imsizey,
     const t_uint imsizex, const t_real oversample_ratio, const kernels::kernel kernel,
     const t_uint Ju, const t_uint Jw, const bool w_stacking, const t_real cellx, const t_real celly,
-    const t_real absolute_error, const t_real relative_error) {
+    const t_real absolute_error, const t_real relative_error, const dde_type dde) {
   const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
   std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_2d<T>(
       u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jw, ft_plan, w_stacking,
-      cellx, celly, absolute_error, relative_error);
+      cellx, celly, absolute_error, relative_error, dde);
   const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
   auto direct = directDegrid;
   auto indirect = sopt::chained_operators<T>(allsumall, indirectDegrid);
@@ -148,7 +173,8 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d(
     const sopt::mpi::Communicator &comm, const utilities::vis_params &uv_vis_input,
     const t_uint imsizey, const t_uint imsizex, const t_real cell_x, const t_real cell_y,
     const t_real oversample_ratio, const kernels::kernel kernel, const t_uint Ju, const t_uint Jw,
-    const bool w_stacking, const t_real absolute_error, const t_real relative_error) {
+    const bool w_stacking, const t_real absolute_error, const t_real relative_error,
+    const dde_type dde) {
   auto uv_vis = uv_vis_input;
   if (uv_vis.units == utilities::vis_units::lambda)
     uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
@@ -157,7 +183,7 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d(
                                  std::floor(oversample_ratio * imsizey));
   return init_degrid_operator_2d<T>(comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey,
                                     imsizex, oversample_ratio, kernel, Ju, Jw, w_stacking, cell_x,
-                                    cell_y, absolute_error, relative_error);
+                                    cell_y, absolute_error, relative_error, dde);
 }
 
 template <class T>
@@ -166,7 +192,7 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d_mpi(
     const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint imsizey,
     const t_uint imsizex, const t_real oversample_ratio, const kernels::kernel kernel,
     const t_uint Ju, const t_uint Jw, const bool w_stacking, const t_real cellx, const t_real celly,
-    const t_real absolute_error, const t_real relative_error) {
+    const t_real absolute_error, const t_real relative_error, const dde_type dde) {
   throw std::runtime_error("Under construction!");
   const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
@@ -174,7 +200,7 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d_mpi(
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_2d<T>(
       u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jw, ft_plan, w_stacking,
-      cellx, celly, absolute_error, relative_error);
+      cellx, celly, absolute_error, relative_error, dde);
   const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
   auto direct = directDegrid;
   auto indirect = sopt::chained_operators<T>(allsumall, indirectDegrid);
@@ -186,7 +212,8 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d_mpi(
     const sopt::mpi::Communicator &comm, const utilities::vis_params &uv_vis_input,
     const t_uint imsizey, const t_uint imsizex, const t_real cell_x, const t_real cell_y,
     const t_real oversample_ratio, const kernels::kernel kernel, const t_uint Ju, const t_uint Jw,
-    const bool w_stacking, const t_real absolute_error, const t_real relative_error) {
+    const bool w_stacking, const t_real absolute_error, const t_real relative_error,
+    const dde_type dde) {
   auto uv_vis = uv_vis_input;
   if (uv_vis.units == utilities::vis_units::lambda)
     uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
@@ -195,7 +222,7 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d_mpi(
                                  std::floor(oversample_ratio * imsizey));
   return init_degrid_operator_2d<T>(comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey,
                                     imsizex, oversample_ratio, kernel, Ju, Jw, w_stacking, cell_x,
-                                    cell_y, absolute_error, relative_error);
+                                    cell_y, absolute_error, relative_error, dde);
 }
 #endif
 }  // namespace measurementoperator
