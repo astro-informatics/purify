@@ -243,9 +243,9 @@ typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::
   PURIFY_MACRO("CRVAL2", static_cast<t_real>(header.dec * 180. / purify::constant::pi), "");
   PURIFY_MACRO("CRVAL3", static_cast<t_real>(header.mean_frequency * std::pow(10, 6) * 1.), "");
   PURIFY_MACRO("CRVAL4", static_cast<t_real>(1), "");
-  PURIFY_MACRO("CTYPE1", "RA---SIN", "");
-  PURIFY_MACRO("CTYPE2", "DEC---SIN", "");
-  PURIFY_MACRO("CTYPE3", "FREQ-OBS", "");
+  PURIFY_MACRO("CTYPE1", "RA--SIN", "");
+  PURIFY_MACRO("CTYPE2", "DEC--SIN", "");
+  PURIFY_MACRO("CTYPE3", "FREQ", "");
   PURIFY_MACRO("CTYPE4", "STOKES", "");
   PURIFY_MACRO("CDELT1", static_cast<t_real>(-header.cell_x / 3600.), "");
   PURIFY_MACRO("CDELT2", static_cast<t_real>(header.cell_y / 3600.), "");
