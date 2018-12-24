@@ -313,10 +313,11 @@ int main(int argc, const char **argv) {
   // the psf
   pfitsio::header_params psf_header = def_header;
   psf_header.fits_name = out_dir + "/psf.fits";
-  psf_header.pix_units = "Jy/Beam";
+  psf_header.pix_units = "Jy/Pixel";
   const Vector<t_complex> psf = measurements_transform->adjoint() * (uv_data.weights.array());
   const Image<t_real> psf_image =
       Image<t_complex>::Map(psf.data(), params.height(), params.width()).real();
+  PURIFY_LOG_HIGH("Peak of PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)", psf_image.maxCoeff());
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
     auto const world = sopt::mpi::Communicator::World();
@@ -324,9 +325,9 @@ int main(int argc, const char **argv) {
 #else
     throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
-      pfitsio::write2d(psf_image / psf_image.maxCoeff(), psf_header, true);
+      pfitsio::write2d(psf_image, psf_header, true);
   } else {
-    pfitsio::write2d(psf_image / psf_image.maxCoeff(), psf_header, true);
+    pfitsio::write2d(psf_image, psf_header, true);
   }
   // the dirty image
   pfitsio::header_params dirty_header = def_header;
