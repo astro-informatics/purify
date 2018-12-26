@@ -317,7 +317,7 @@ int main(int argc, const char **argv) {
   const Vector<t_complex> psf = measurements_transform->adjoint() * (uv_data.weights.array());
   const Image<t_real> psf_image =
       Image<t_complex>::Map(psf.data(), params.height(), params.width()).real();
-  PURIFY_LOG_HIGH("Peak of PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)", psf_image.maxCoeff());
+  PURIFY_HIGH_LOG("Peak of PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)", psf_image.maxCoeff());
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
     auto const world = sopt::mpi::Communicator::World();
