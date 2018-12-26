@@ -314,7 +314,7 @@ int main(int argc, const char **argv) {
   pfitsio::header_params psf_header = def_header;
   psf_header.fits_name = out_dir + "/psf.fits";
   psf_header.pix_units = "Jy/Pixel";
-  const Vector<t_complex> psf = measurements_transform->adjoint() * (uv_data.weights.array());
+  const Vector<t_complex> psf = measurements_transform->adjoint() * (uv_data.weights.array()/ flux_scale);
   const Image<t_real> psf_image =
       Image<t_complex>::Map(psf.data(), params.height(), params.width()).real();
   PURIFY_HIGH_LOG("Peak of PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)", psf_image.maxCoeff());
