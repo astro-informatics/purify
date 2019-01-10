@@ -20,7 +20,7 @@ def readData(filename, vis_name, pol1, pol2, filter):
     v = np.array([])
     w = np.array([])
     for chan in range(no_chan):
-        freq = hdu[0].header["CRVAL4"] + chan * hdu[0].header["CDELT4"]
+        freq = hdu[0].header["CRVAL4"] + (chan - no_chan * 0.5)* hdu[0].header["CDELT4"]
 
         print "Loading frequency ", freq, chan
         flags1 = data[:, 0, 0, chan, pol1, 2] #I think this gives the flags....
@@ -62,7 +62,7 @@ def readData(filename, vis_name, pol1, pol2, filter):
 
 names = ["0332-391"]
 for i in range(len(names)):
-    uv_fits = "/Users/luke/Radio_Data/" + names[i] +".uvfits"
+    uv_fits = "" + names[i] +".uvfits"
     output_vis = names[i] + ".vis"
     readData(uv_fits, output_vis, 0, 1, True)
     print "saved "+ names[i] + ".vis"
