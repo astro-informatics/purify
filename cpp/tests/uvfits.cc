@@ -16,7 +16,7 @@ TEST_CASE("readfile") {
     const auto uvfits = pfitsio::read_uvfits(filename + ".uvfits", true, stokes::I);
     const auto vis = utilities::read_visibility(filename + ".vis", true);
     REQUIRE(299792458. == constant::c);
-    REQUIRE(1431999959.5 == uvfits.frequencies(0));
+    REQUIRE(1483999958.029309988 == Approx(uvfits.frequencies(0)).epsilon(1e-12));
     REQUIRE(13 == uvfits.frequencies.size());
     CHECK(uvfits.size() / 22675 == 10);
     CHECK(vis.size() / 22675 == 10);
@@ -50,7 +50,7 @@ TEST_CASE("readfile") {
     const auto uvfits = pfitsio::read_uvfits(filename + ".uvfits", false, stokes::I);
     const auto vis = utilities::read_visibility(filename + "_nofilter.vis", true);
     REQUIRE(299792458. == constant::c);
-    REQUIRE(1431999959.5 == uvfits.frequencies(0));
+    REQUIRE(1483999958.029309988 == Approx(uvfits.frequencies(0)).epsilon(1e-12));
     REQUIRE(uvfits.size() == vis.size());
     for (int i = 0; i < uvfits.size(); i++) {
       CAPTURE(i);
@@ -64,9 +64,9 @@ TEST_CASE("readfile") {
       CAPTURE(uvfits.vis(i));
       CAPTURE(vis.weights(i));
       CAPTURE(uvfits.weights(i));
-      REQUIRE(std::abs((uvfits.u(i) - vis.u(i)) / vis.u(i)) < 1e-4);
-      REQUIRE(std::abs((uvfits.v(i) - vis.v(i)) / vis.v(i)) < 1e-4);
-      REQUIRE(std::abs((uvfits.w(i) - vis.w(i)) / vis.w(i)) < 1e-4);
+      REQUIRE(uvfits.u(i) == Approx(vis.u(i)).epsilon(1e-4));
+      REQUIRE(uvfits.v(i) == Approx(vis.v(i)).epsilon(1e-4));
+      REQUIRE(uvfits.w(i) == Approx(vis.w(i)).epsilon(1e-4));
     }
   }
 }
