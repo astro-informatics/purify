@@ -131,7 +131,6 @@ Image<t_complex> init_correction_radial_2d(const t_real oversample_ratio, const 
   const t_uint y_start = std::floor(ftsizev_ * 0.5 - imsizey_ * 0.5);
 
   Image<t_complex> gridding_correction = Image<t_complex>::Zero(imsizey_, imsizex_);
-#pragma omp parallel for collapse(2)
   for (int i = 0; i < gridding_correction.rows(); i++)
     for (int j = 0; j < gridding_correction.cols(); j++)
       gridding_correction(i, j) =
