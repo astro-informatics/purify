@@ -19,7 +19,7 @@ configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(HEADERS
   logging.h kernels.h pfitsio.h  logging.disabled.h types.h
-  IndexMapping.h logging.enabled.h utilities.h operators.h operators_gpu.h wproj_utilities.h
+  IndexMapping.h logging.enabled.h utilities.h operators.h  wproj_utilities.h
   cimg.h uvfits.h convolution.h measurement_operator_factory.h wavelet_operator_factory.h distribute.h
   algorithm_factory.h
   read_measurements.h
@@ -28,7 +28,6 @@ set(HEADERS
   wide_field_utilities.h
   wkernel_integration.h
   wproj_operators.h
-  wproj_operators_gpu.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(SOURCES utilities.cc pfitsio.cc
@@ -58,6 +57,7 @@ if(PURIFY_MPI)
 endif()
 
 if(PURIFY_ARRAYFIRE)
+  list(APPEND HEADERS operators_gpu.h wproj_operators_gpu.h)
   target_link_libraries(libpurify ${ArrayFire_LIBRARIES})
 endif()
 

@@ -4,6 +4,7 @@
 #include "purify/operators_gpu.h"
 #include "purify/wproj_operators.h"
 
+#ifdef PURIFY_ARRAYFIRE
 namespace purify {
 namespace gpu {
 namespace operators {
@@ -192,4 +193,5 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2
 }  // namespace measurementoperator
 }  // namespace gpu
 }  // namespace purify
+#endif
 #endif
