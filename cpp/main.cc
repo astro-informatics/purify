@@ -38,7 +38,8 @@ int main(int argc, const char **argv) {
   YamlParser params = YamlParser(file_path);
 
   factory::distributed_measurement_operator mop_algo =
-      factory::distributed_measurement_operator::serial;
+      (not params.gpu()) ? factory::distributed_measurement_operator::serial
+                         : factory::distributed_measurement_operator::gpu_serial;
   factory::distributed_wavelet_operator wop_algo = factory::distributed_wavelet_operator::serial;
   bool using_mpi = false;
 
@@ -52,7 +53,9 @@ int main(int argc, const char **argv) {
 #else
     throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
-    mop_algo = factory::distributed_measurement_operator::mpi_distribute_image;
+    mop_algo = (not params.gpu())
+                   ? factory::distributed_measurement_operator::mpi_distribute_image
+                   : factory::distributed_measurement_operator::gpu_mpi_distribute_image;
     wop_algo = factory::distributed_wavelet_operator::mpi_sara;
     using_mpi = true;
   }
@@ -314,10 +317,12 @@ int main(int argc, const char **argv) {
   pfitsio::header_params psf_header = def_header;
   psf_header.fits_name = out_dir + "/psf.fits";
   psf_header.pix_units = "Jy/Pixel";
-  const Vector<t_complex> psf = measurements_transform->adjoint() * (uv_data.weights.array()/ flux_scale);
+  const Vector<t_complex> psf =
+      measurements_transform->adjoint() * (uv_data.weights.array() / flux_scale);
   const Image<t_real> psf_image =
       Image<t_complex>::Map(psf.data(), params.height(), params.width()).real();
-  PURIFY_HIGH_LOG("Peak of PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)", psf_image.maxCoeff());
+  PURIFY_HIGH_LOG("Peak of PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)",
+                  psf_image.maxCoeff());
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
     auto const world = sopt::mpi::Communicator::World();

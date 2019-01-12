@@ -110,6 +110,7 @@ class YamlParser {
   YAML_MACRO(t_real, cellsizey, 0)
   YAML_MACRO(bool, wprojection, false)
   YAML_MACRO(bool, mpi_wstacking, true)
+  YAML_MACRO(bool, gpu, false)
   YAML_MACRO(t_int, kmeans_iters, 10)
   YAML_MACRO(t_real, measurements_sigma, 1)
   YAML_MACRO(t_real, signal_to_noise, 30)

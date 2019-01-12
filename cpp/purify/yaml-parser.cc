@@ -181,6 +181,7 @@ void YamlParser::parseAndSetMeasureOperators(const YAML::Node& measureOperatorsN
   this->Jx_ = get<unsigned int>(measureOperatorsNode, {"J", "Jx"});
   this->Jy_ = get<unsigned int>(measureOperatorsNode, {"J", "Jy"});
   this->Jw_ = get<unsigned int>(measureOperatorsNode, {"J", "Jw"});
+  this->gpu_ = get<bool>(measureOperatorsNode, {"gpu"});
   this->wprojection_ = get<bool>(measureOperatorsNode, {"wide-field", "wprojection"});
   this->mpi_wstacking_ = get<bool>(measureOperatorsNode, {"wide-field", "mpi_wstacking"});
   this->kmeans_iters_ = get<t_int>(measureOperatorsNode, {"wide-field", "kmeans_iterations"});

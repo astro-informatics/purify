@@ -64,6 +64,7 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser.wprojection() == false);
     REQUIRE(yaml_parser.mpi_wstacking() == false);
     REQUIRE(yaml_parser.kmeans_iters() == 100);
+    REQUIRE(yaml_parser.gpu() == false);
   }
   SECTION("Check the SARA node variables") {
     std::vector<std::string> expected_wavelets = {"Dirac", "DB1", "DB2", "DB3", "DB4",
@@ -113,6 +114,7 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser_check.height() == yaml_parser_m.height());
     REQUIRE(yaml_parser_check.Jx() == yaml_parser_m.Jx());
     REQUIRE(yaml_parser_check.Jy() == yaml_parser_m.Jy());
+    REQUIRE(yaml_parser_check.gpu() == yaml_parser_m.gpu());
     REQUIRE(yaml_parser.wavelet_basis() == yaml_parser_m.wavelet_basis());
     REQUIRE(yaml_parser.wavelet_levels() == yaml_parser_m.wavelet_levels());
     REQUIRE(yaml_parser.algorithm() == yaml_parser_m.algorithm());
