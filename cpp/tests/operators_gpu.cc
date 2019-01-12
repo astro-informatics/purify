@@ -4,11 +4,12 @@
 #include <arrayfire.h>
 #include <iostream>
 #include "catch.hpp"
-#include "purify/compact_operators_gpu.h"
 #include "purify/directories.h"
 #include "purify/kernels.h"
 #include "purify/logging.h"
 #include "purify/operators.h"
+#include "purify/wproj_operators_gpu.h"
+#include <sopt/power_method.h>
 using namespace purify;
 using namespace purify::notinstalled;
 TEST_CASE("GPU Operators") {
@@ -28,7 +29,7 @@ TEST_CASE("GPU Operators") {
   const t_uint power_iters = 100;
   const t_real power_tol = 1e-9;
   const kernels::kernel kernel = kernels::kernel::kb;
-  const std::string &weighting_type = "natural";
+  const std::string& weighting_type = "natural";
   const t_real R = 0;
   auto u = Vector<t_real>::Random(M);
   auto v = Vector<t_real>::Random(M);
@@ -140,8 +141,8 @@ TEST_CASE("GPU Operators") {
     const Vector<t_complex> indirect_output = measure_op_gpu->adjoint() * indirect_input;
     CHECK(indirect_output.size() == imsizex * imsizey);
     SECTION("Power Method") {
-      auto op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
-          *measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
+      auto op_norm = std::get<0>(sopt::algorithm::power_method<Vector<t_complex>>(
+          *measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
       CHECK(std::abs(op_norm - 1.) < power_tol);
     }
     SECTION("Degrid") {
@@ -159,30 +160,5 @@ TEST_CASE("GPU Operators") {
       CHECK(actual_output.isApprox(expected_output, 1e-4));
     }
   }
-  SECTION("Compact Operator") {
-    const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv);
-
-    const auto phiTphi = gpu::operators::init_grid_degrid_operator_2d(
-        uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv);
-    const auto op_gpu = sopt::LinearTransform<Vector<t_complex>>(
-        {phiTphi, [](Vector<t_complex> &out, const Vector<t_complex> &in) { out = in; }});
-    const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
-    const Vector<t_complex> direct_output = op_gpu * direct_input;
-    CHECK(direct_output.size() == N);
-    SECTION("Power Method") {
-      auto op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
-          op_gpu, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
-      CHECK(std::abs(op_norm - 1.) < std::max(power_tol, 1e-7));
-    }
-    SECTION("operation") {
-      const Vector<t_complex> input = Vector<t_complex>::Random(imsizex * imsizey);
-      const Vector<t_complex> expected_output = measure_op->adjoint() * (*measure_op * input);
-      const Vector<t_complex> actual_output = op_gpu * input;
-      CHECK(expected_output.size() == actual_output.size());
-      CHECK(actual_output.isApprox(expected_output, 1e-4));
-    }
   }
 };
