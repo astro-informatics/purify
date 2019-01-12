@@ -4,7 +4,7 @@
 #include "purify/config.h"
 #include "purify/types.h"
 
-#include "operators.h"
+#include "purify/operators.h"
 
 namespace purify {
 
