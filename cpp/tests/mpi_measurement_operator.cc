@@ -251,11 +251,11 @@ TEST_CASE("Serial vs Distributed GPU Fourier Grid Operator weighted") {
     CHECK(uv_serial.weights.isApprox(uv_mpi.weights));
   }
   SECTION("Power Method") {
-    auto op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
-        *op, 100, 1e-4, Vector<t_complex>::Random(width * height));
+    auto op_norm = std::get<0>(sopt::algorithm::power_method<Vector<t_complex>>(
+        *op, 100, 1e-4, Vector<t_complex>::Random(width * height)));
     CHECK(std::abs(op_norm - 1.) < 1e-4);
-    auto op_norm_old = sopt::algorithm::power_method<Vector<t_complex>>(
-        *op_serial, 100, 1e-4, Vector<t_complex>::Random(width * height));
+    auto op_norm_old = std::get<0>(sopt::algorithm::power_method<Vector<t_complex>>(
+        *op_serial, 100, 1e-4, Vector<t_complex>::Random(width * height)));
     CHECK(std::abs(op_norm_old - 1.) < 1e-4);
   }
   SECTION("Degridding") {
@@ -324,11 +324,11 @@ TEST_CASE("Serial vs Distributed GPU Operator weighted") {
     CHECK(uv_serial.weights.isApprox(uv_mpi.weights));
   }
   SECTION("Power Method") {
-    auto op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
-        *op, 100, 1e-4, Vector<t_complex>::Random(width * height));
+    auto op_norm = std::get<0>(sopt::algorithm::power_method<Vector<t_complex>>(
+        *op, 100, 1e-4, Vector<t_complex>::Random(width * height)));
     CHECK(std::abs(op_norm - 1.) < 1e-4);
-    auto op_norm_old = sopt::algorithm::power_method<Vector<t_complex>>(
-        *op_serial, 100, 1e-4, Vector<t_complex>::Random(width * height));
+    auto op_norm_old = std::get<0>(sopt::algorithm::power_method<Vector<t_complex>>(
+        *op_serial, 100, 1e-4, Vector<t_complex>::Random(width * height)));
     CHECK(std::abs(op_norm_old - 1.) < 1e-4);
   }
   SECTION("Degridding") {
