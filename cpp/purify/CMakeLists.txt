@@ -28,6 +28,7 @@ set(HEADERS
   wide_field_utilities.h
   wkernel_integration.h
   wproj_operators.h
+  wproj_operators_gpu.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(SOURCES utilities.cc pfitsio.cc

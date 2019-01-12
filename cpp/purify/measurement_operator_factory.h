@@ -8,6 +8,7 @@
 
 #include "purify/operators.h"
 #include "purify/operators_gpu.h"
+#include "purify/wproj_operators_gpu.h"
 #include "purify/wproj_operators.h"
 
 #ifdef PURIFY_MPI
