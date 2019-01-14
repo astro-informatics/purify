@@ -212,16 +212,21 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_FFT_2d(
 #ifdef PURIFY_OPENMP_FFTW
   PURIFY_LOW_LOG("Using OpenMP threading with FFTW.");
   fftw_init_threads();
-  fftw_plan_with_nthreads(omp_get_max_threads());
 #endif
   Vector<typename T::Scalar> src = Vector<t_complex>::Zero(ftsizev_ * ftsizeu_);
   Vector<typename T::Scalar> dst = Vector<t_complex>::Zero(ftsizev_ * ftsizeu_);
   // creating plans
   const auto del = [](fftw_plan_s *plan) { fftw_destroy_plan(plan); };
+#ifdef PURIFY_OPENMP_FFTW
+  fftw_plan_with_nthreads(omp_get_max_threads());
+#endif
   const std::shared_ptr<fftw_plan_s> m_plan_forward(
       fftw_plan_dft_2d(ftsizev_, ftsizeu_, reinterpret_cast<fftw_complex *>(src.data()),
                        reinterpret_cast<fftw_complex *>(dst.data()), FFTW_FORWARD, plan_flag),
       del);
+#ifdef PURIFY_OPENMP_FFTW
+  fftw_plan_with_nthreads(omp_get_max_threads());
+#endif
   const std::shared_ptr<fftw_plan_s> m_plan_inverse(
       fftw_plan_dft_2d(ftsizev_, ftsizeu_, reinterpret_cast<fftw_complex *>(src.data()),
                        reinterpret_cast<fftw_complex *>(dst.data()), FFTW_BACKWARD, plan_flag),
