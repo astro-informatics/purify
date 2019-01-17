@@ -6,9 +6,7 @@
 
 using namespace purify;
 
-
 // ----------------- Application benchmarks -----------------------//
-
 
 class FFTOperatorFixture : public ::benchmark::Fixture {
  public:
@@ -25,8 +23,8 @@ BENCHMARK_DEFINE_F(FFTOperatorFixture, Apply)(benchmark::State& state) {
   const t_uint m_imsizey = state.range(0);
   const t_uint N = m_imsizex * m_imsizey;
   const auto fftop = purify::operators::init_FFT_2d<Vector<t_complex>>(m_imsizey, m_imsizex, 1.);
-  const auto &forward = std::get<0>(fftop);
-  
+  const auto& forward = std::get<0>(fftop);
+
   const Vector<t_complex> input = Vector<t_complex>::Random(N);
   Vector<t_complex> output = Vector<t_complex>::Zero(N);
   forward(output, input);
@@ -38,7 +36,6 @@ BENCHMARK_DEFINE_F(FFTOperatorFixture, Apply)(benchmark::State& state) {
   }
 }
 
-
 BENCHMARK_REGISTER_F(FFTOperatorFixture, Apply)
     //->Apply(b_utilities::Arguments)
     ->RangeMultiplier(2)
@@ -47,6 +44,5 @@ BENCHMARK_REGISTER_F(FFTOperatorFixture, Apply)
     ->Repetitions(10)
     ->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
-
 
 BENCHMARK_MAIN();

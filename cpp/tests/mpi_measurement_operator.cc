@@ -392,9 +392,9 @@ TEST_CASE("Serial vs Distributed GPU Operator Radial WProjection") {
       10000, 1e-5, Vector<t_complex>::Random(height * width)));
 
   const auto op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-      gpu::measurementoperator::init_degrid_operator_2d(
-          world, uv_mpi, height, width, cellx, celly, over_sample, kernel, J, 4, true, abs_error,
-          rel_error, dde_type::wkernel_radial),
+      gpu::measurementoperator::init_degrid_operator_2d(world, uv_mpi, height, width, cellx, celly,
+                                                        over_sample, kernel, J, 4, true, abs_error,
+                                                        rel_error, dde_type::wkernel_radial),
       10000, 1e-5, world.broadcast(Vector<t_complex>::Random(height * width).eval())));
 
   if (uv_serial.u.size() == uv_mpi.u.size()) {

@@ -134,10 +134,10 @@ TEST_CASE("GPU Operators") {
         power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
 
     const auto measure_op_gpu = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-            gpu::measurementoperator::init_degrid_operator_2d(uv_vis.u, uv_vis.v, uv_vis.w,
-                                                              uv_vis.weights, imsizey, imsizex,
-                                                              oversample_ratio, kernel, Ju, Jv),
-            power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
+        gpu::measurementoperator::init_degrid_operator_2d(uv_vis.u, uv_vis.v, uv_vis.w,
+                                                          uv_vis.weights, imsizey, imsizex,
+                                                          oversample_ratio, kernel, Ju, Jv),
+        power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
     const Vector<t_complex> direct_output = *measure_op_gpu * direct_input;
     CHECK(direct_output.size() == M);

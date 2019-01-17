@@ -112,7 +112,7 @@ TEST_CASE("fb_factory") {
   auto const diagnostic = (*fb)();
   CHECK(diagnostic.niters == 21);
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
- // pfitsio::write2d(image.real(), expected_solution_path);
+  // pfitsio::write2d(image.real(), expected_solution_path);
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
