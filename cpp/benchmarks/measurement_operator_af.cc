@@ -73,12 +73,12 @@ class DegridOperatorFixture : public ::benchmark::Fixture {
       m_kernel = state.range(2);
 #ifdef PURIFY_CPU
       m_degridOperator = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, kernels::kernel::kb,
-          m_kernel, m_kernel, w_term);
+          m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, kernels::kernel::kb, m_kernel,
+          m_kernel, w_term);
 #else
       m_degridOperator = gpu::measurementoperator::init_degrid_operator_2d(
-          m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, 0, 0.0001, kernels::kernel::kb,
-          m_kernel, m_kernel, w_term);
+          m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, kernels::kernel::kb, m_kernel,
+          m_kernel, w_term);
 #endif
     }
   }

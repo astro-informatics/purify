@@ -266,7 +266,7 @@ void read_uvfits_freq(fitsfile *fptr, t_int *status, Vector<t_real> &output, con
   fits_read_key(fptr, TINT, key.c_str(), &nfreq, comment.get(), status);
   if (nfreq == 0) throw std::runtime_error("Wrong number of channels read from header.");
   output = Vector<t_real>::Zero(nfreq);
-  for (t_int i = 0; i < output.size(); i++) output(i) = i * dfreq + cfreq;
+  for (t_int i = 0; i < output.size(); i++) output(i) = (i - nfreq * 0.5) * dfreq + cfreq;
 }
 Vector<t_real> read_uvfits_data(fitsfile *fptr, t_int *status, const std::vector<t_int> &naxis,
                                 const t_int &baselines) {

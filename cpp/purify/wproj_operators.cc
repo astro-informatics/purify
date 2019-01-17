@@ -7,12 +7,15 @@ namespace purify {
 
 namespace details {
 
-Sparse<t_complex> init_gridding_matrix_2d(
-    const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
-    const Vector<t_complex> &weights, const t_uint imsizey_, const t_uint imsizex_,
-    const t_real oversample_ratio, const std::function<t_real(t_real)> &ftkerneluv,
-    const std::function<t_real(t_real)> &kerneluv, const t_uint Ju, const t_uint Jw,
-    const t_real cellx, const t_real celly, const t_real abs_error, const t_real rel_error) {
+Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v,
+                                          const Vector<t_real> &w, const Vector<t_complex> &weights,
+                                          const t_uint imsizey_, const t_uint imsizex_,
+                                          const t_real oversample_ratio,
+                                          const std::function<t_real(t_real)> &ftkerneluv,
+                                          const std::function<t_real(t_real)> &kerneluv,
+                                          const t_uint Ju, const t_uint Jw, const t_real cellx,
+                                          const t_real celly, const t_real abs_error,
+                                          const t_real rel_error, const dde_type dde) {
   const t_uint ftsizev_ = std::floor(imsizey_ * oversample_ratio);
   const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
   const t_real du = widefield::pixel_to_lambda(cellx, imsizex_, oversample_ratio);
@@ -33,15 +36,19 @@ Sparse<t_complex> init_gridding_matrix_2d(
   if (u.size() != weights.size())
     throw std::runtime_error(
         "Size of u and w vectors are not the same for creating gridding matrix.");
+  if (Ju > Jw)
+    throw std::runtime_error(
+        "w kernel size must be at least the size of w=0 kernel, must have Ju <= Jw.");
   // count gridding coefficients with variable support size
   Vector<t_int> total_coeffs = Vector<t_int>::Zero(w.size());
   for (int i = 0; i < w.size(); i++) {
-    const t_int Ju_max = widefield::w_support(abs(w(i)), du, Ju, Jw);
+    const t_int Ju_max =
+        widefield::w_support(w(i), du, static_cast<t_int>(Ju), static_cast<t_int>(Jw));
     total_coeffs(i) = Ju_max * Ju_max;
   }
-  const t_int num_of_coeffs = total_coeffs.array().sum();
+  const t_real num_of_coeffs = total_coeffs.array().cast<t_real>().sum();
   PURIFY_HIGH_LOG("Using {} rows (coefficients per a row {}), and memory of {} MegaBytes",
-                  total_coeffs.size(), total_coeffs.array().mean(),
+                  total_coeffs.size(), total_coeffs.array().cast<t_real>().mean(),
                   16. * num_of_coeffs / std::pow(10., 6));
   Sparse<t_complex> interpolation_matrix(rows, cols);
   try {
@@ -58,45 +65,53 @@ Sparse<t_complex> init_gridding_matrix_2d(
   const t_real absolute_error = abs_error;
   // normalising kernel
   t_uint e = 0;
-  const t_real norm = std::abs(projection_kernels::exact_w_projection_integration_1d(
-      0, 0, 0, du, oversample_ratio, [&](const t_real l) -> t_real { return ftkerneluv(l); }, 1e9,
-      0, 1e-12, integration::method::h, e));
+  const t_real norm = std::pow(
+      std::abs(projection_kernels::exact_w_projection_integration_1d(
+          0, 0, 0, du, oversample_ratio, [&](const t_real l) -> t_real { return ftkerneluv(l); },
+          1e9, 0, 1e-12, integration::method::h, e)),
+      (dde == dde_type::wkernel_radial) ? 1 : 0.5);
 
   auto const ftkernel_radial = [&](const t_real l) -> t_real { return ftkerneluv(l) / norm; };
 
   t_int coeffs_done = 0;
   t_uint total = 0;
 
-#pragma omp parallel for collapse(3)
+#pragma omp parallel for
   for (t_int m = 0; m < rows; ++m) {
-    for (t_int ju = 1; ju < Jw + 1; ++ju) {
-      for (t_int jv = 1; jv < Jw + 1; ++jv) {
-        // w_projection convolution setup
-        const t_int Ju_max = widefield::w_support(w(m), du, Ju, Jw);
-        if ((ju > Ju_max) or (jv > Ju_max)) continue;
+    // w_projection convolution setup
+    const t_int Ju_max = widefield::w_support(w(m), du, Ju, Jw);
+    t_uint evaluations = 0;
+    const t_int kwu = std::floor(u(m) - Ju_max * 0.5);
+    const t_int kwv = std::floor(v(m) - Ju_max * 0.5);
+    const t_real w_val = w(m);  //((0. < w(m)) ? 1: -1) * std::min(Ju_max * du, std::abs(w(m)));
 
-        t_uint evaluations = 0;
-        const t_int kwu = std::floor(u(m) - Ju_max * 0.5);
-        const t_int kwv = std::floor(v(m) - Ju_max * 0.5);
-        const t_real w_val = w(m);  //((0. < w(m)) ? 1: -1) * std::min(Ju_max * du, std::abs(w(m)));
-
+    for (t_int ju = 1; ju < Ju_max + 1; ++ju) {
+      for (t_int jv = 1; jv < Ju_max + 1; ++jv) {
         const t_uint q = utilities::mod(kwu + ju, ftsizeu_);
         const t_uint p = utilities::mod(kwv + jv, ftsizev_);
         const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
         interpolation_matrix.insert(m, index) =
             std::exp(-2 * constant::pi * I * ((kwu + ju) * 0.5 + (kwv + jv) * 0.5)) * weights(m) *
-            projection_kernels::exact_w_projection_integration_1d(
-                (u(m) - (kwu + ju)), (v(m) - (kwv + jv)), w_val, du, oversample_ratio,
-                ftkernel_radial, max_evaluations, absolute_error, relative_error,
-                integration::method::p, evaluations);
+            ((dde == dde_type::wkernel_radial)
+                 ? projection_kernels::exact_w_projection_integration_1d(
+                       (u(m) - (kwu + ju)), (v(m) - (kwv + jv)), w_val, du, oversample_ratio,
+                       ftkernel_radial, max_evaluations, absolute_error, relative_error,
+                       integration::method::p, evaluations)
+                 : projection_kernels::exact_w_projection_integration(
+                       (u(m) - (kwu + ju)), (v(m) - (kwv + jv)), w_val, du, dv, oversample_ratio,
+                       ftkernel_radial, ftkernel_radial, max_evaluations, absolute_error,
+                       relative_error, integration::method::h, evaluations));
 #pragma omp critical(add_eval)
-        coeffs_done++;
-        if ((coeffs_done % (num_of_coeffs / 100)) == 0) {
-#pragma omp critical(print)
-          PURIFY_LOW_LOG(
-              "w = {}, support = {}x{}, coeffs: {} of {}, {}%", w_val, Ju_max, Ju_max, coeffs_done,
-              num_of_coeffs,
-              static_cast<t_real>(coeffs_done) / static_cast<t_real>(num_of_coeffs) * 100.);
+        {
+          coeffs_done++;
+          if (num_of_coeffs > 100) {
+            if ((coeffs_done % (static_cast<t_int>(num_of_coeffs / 100)) == 0)) {
+              PURIFY_LOW_LOG(
+                  "w = {}, support = {}x{}, coeffs: {} of {}, {}%", w_val, Ju_max, Ju_max,
+                  coeffs_done, num_of_coeffs,
+                  static_cast<t_real>(coeffs_done) / static_cast<t_real>(num_of_coeffs) * 100.);
+            }
+          }
         }
       }
     }
@@ -116,7 +131,6 @@ Image<t_complex> init_correction_radial_2d(const t_real oversample_ratio, const 
   const t_uint y_start = std::floor(ftsizev_ * 0.5 - imsizey_ * 0.5);
 
   Image<t_complex> gridding_correction = Image<t_complex>::Zero(imsizey_, imsizex_);
-#pragma omp parallel for collapse(2)
   for (int i = 0; i < gridding_correction.rows(); i++)
     for (int j = 0; j < gridding_correction.cols(); j++)
       gridding_correction(i, j) =

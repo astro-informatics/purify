@@ -4,11 +4,12 @@
 #include <arrayfire.h>
 #include <iostream>
 #include "catch.hpp"
-#include "purify/compact_operators_gpu.h"
 #include "purify/directories.h"
 #include "purify/kernels.h"
 #include "purify/logging.h"
 #include "purify/operators.h"
+#include "purify/wproj_operators_gpu.h"
+#include <sopt/power_method.h>
 using namespace purify;
 using namespace purify::notinstalled;
 TEST_CASE("GPU Operators") {
@@ -28,7 +29,7 @@ TEST_CASE("GPU Operators") {
   const t_uint power_iters = 100;
   const t_real power_tol = 1e-9;
   const kernels::kernel kernel = kernels::kernel::kb;
-  const std::string &weighting_type = "natural";
+  const std::string& weighting_type = "natural";
   const t_real R = 0;
   auto u = Vector<t_real>::Random(M);
   auto v = Vector<t_real>::Random(M);
@@ -126,13 +127,17 @@ TEST_CASE("GPU Operators") {
     CHECK(indirect_output_old.isApprox(indirect_output_new, 1e-6));
   }
   SECTION("Serial Operator") {
-    const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv);
+    const auto measure_op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+        measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+            uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
+            kernel, Ju, Jv),
+        power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
 
-    const auto measure_op_gpu = gpu::measurementoperator::init_degrid_operator_2d(
-        uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv);
+    const auto measure_op_gpu = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+        gpu::measurementoperator::init_degrid_operator_2d(uv_vis.u, uv_vis.v, uv_vis.w,
+                                                          uv_vis.weights, imsizey, imsizex,
+                                                          oversample_ratio, kernel, Ju, Jv),
+        power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
     const Vector<t_complex> direct_output = *measure_op_gpu * direct_input;
     CHECK(direct_output.size() == M);
@@ -140,8 +145,8 @@ TEST_CASE("GPU Operators") {
     const Vector<t_complex> indirect_output = measure_op_gpu->adjoint() * indirect_input;
     CHECK(indirect_output.size() == imsizex * imsizey);
     SECTION("Power Method") {
-      auto op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
-          *measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
+      auto op_norm = std::get<0>(sopt::algorithm::power_method<Vector<t_complex>>(
+          *measure_op, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
       CHECK(std::abs(op_norm - 1.) < power_tol);
     }
     SECTION("Degrid") {
@@ -159,30 +164,54 @@ TEST_CASE("GPU Operators") {
       CHECK(actual_output.isApprox(expected_output, 1e-4));
     }
   }
-  SECTION("Compact Operator") {
-    const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv);
-
-    const auto phiTphi = gpu::operators::init_grid_degrid_operator_2d(
-        uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
-        power_iters, power_tol, kernel, Ju, Jv);
-    const auto op_gpu = sopt::LinearTransform<Vector<t_complex>>(
-        {phiTphi, [](Vector<t_complex> &out, const Vector<t_complex> &in) { out = in; }});
-    const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
-    const Vector<t_complex> direct_output = op_gpu * direct_input;
-    CHECK(direct_output.size() == N);
-    SECTION("Power Method") {
-      auto op_norm = sopt::algorithm::power_method<Vector<t_complex>>(
-          op_gpu, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey));
-      CHECK(std::abs(op_norm - 1.) < std::max(power_tol, 1e-7));
-    }
-    SECTION("operation") {
-      const Vector<t_complex> input = Vector<t_complex>::Random(imsizex * imsizey);
-      const Vector<t_complex> expected_output = measure_op->adjoint() * (*measure_op * input);
-      const Vector<t_complex> actual_output = op_gpu * input;
-      CHECK(expected_output.size() == actual_output.size());
-      CHECK(actual_output.isApprox(expected_output, 1e-4));
-    }
+}
+TEST_CASE("wprojection") {
+  Image<t_complex> const M31 = Image<t_complex>::Random(256, 256);
+  Vector<t_complex> const input = Vector<t_complex>::Map(M31.data(), M31.size());
+  const Vector<t_complex> vis = Vector<t_complex>::Random(10);
+  const t_uint imsizex = M31.cols();
+  const t_uint imsizey = M31.rows();
+  const t_uint Jw = 30;
+  const t_real cell_x = 1;
+  const t_real cell_y = 1;
+  const t_uint power_iters = 1000;
+  const t_real power_tol = 1e-4;
+  const t_real abs_error = 1e-9;
+  const t_real rel_error = 1e-9;
+  const bool w_term = false;
+  const t_uint M = 10;
+  utilities::vis_params uv_data;
+  uv_data.u = Vector<t_real>::Random(M);
+  uv_data.v = Vector<t_real>::Random(M);
+  uv_data.w = Vector<t_real>::Zero(M);
+  uv_data.weights = Vector<t_complex>::Ones(M);
+  uv_data.vis = Vector<t_complex>::Ones(M);
+  SECTION("oversample 2") {
+    const kernels::kernel kernel = kernels::kernel::kb;
+    const t_real oversample_ratio = 2;
+    const t_uint Ju = 4;
+    const t_uint Jv = 4;
+    auto mop = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+        measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+            uv_data, imsizey, imsizex, cell_x, cell_y, oversample_ratio, kernel, Ju, Jv, w_term),
+        power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
+    auto mop_wproj = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+        measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+            uv_data, imsizey, imsizex, cell_x, cell_y, oversample_ratio, kernel, Ju, Jw, w_term,
+            abs_error, rel_error, dde_type::wkernel_radial),
+        power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
+    REQUIRE((mop_wproj->adjoint() * vis).size() == imsizex * imsizey);
+    REQUIRE((mop->adjoint() * vis).size() == imsizex * imsizey);
+    REQUIRE((*mop * input).size() == M);
+    REQUIRE((*mop_wproj * input).size() == M);
+    const t_real op_norm = std::get<0>(sopt::algorithm::power_method<Vector<t_complex>>(
+        {[=](Vector<t_complex>& output, const Vector<t_complex>& inp) {
+           output = (*mop * inp).eval() - (*mop_wproj * inp).eval();
+         },
+         [=](Vector<t_complex>& output, const Vector<t_complex>& inp) {
+           output = (mop->adjoint() * inp).eval() - (mop_wproj->adjoint() * inp).eval();
+         }},
+        power_iters, power_tol, input));
+    REQUIRE(op_norm == Approx(0).margin(1e-3));
   }
-};
+}

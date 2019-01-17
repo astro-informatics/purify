@@ -44,6 +44,7 @@ MeasureOperators:
     Jw: 30 #Maximum size of w kernel
   kernel: kb # kernel, choose between: kb, Gauss, box
   oversampling: 2 # value > 1
+  gpu: False
   powermethod:
     iters: 100 # value > 0
     tolerance: 1e-4 # value > 0

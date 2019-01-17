@@ -27,9 +27,9 @@ Matrix<t_complex> generate_dde(const DDE &dde, const t_real cell_x, const t_real
 
   for (t_int l = 0; l < x_size; ++l)
     for (t_int m = 0; m < y_size; ++m) {
-      const t_real x = (l + 0.5 - x_size * 0.5) * delt_x;
-      const t_real y = (m + 0.5 - y_size * 0.5) * delt_y;
-      output(l, m) = dde(y, x);
+      const t_real x = (l - x_size * 0.5) * delt_x;
+      const t_real y = (m - y_size * 0.5) * delt_y;
+      output(m, l) = dde(y, x);
     }
 
   return output;

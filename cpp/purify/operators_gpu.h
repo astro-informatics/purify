@@ -89,15 +89,12 @@ init_af_zero_padding_2d(const Image<t_complexf> &S, const t_real &oversample_rat
   };
   return std::make_tuple(direct, indirect);
 }
+
+template <class... ARGS>
 std::tuple<sopt::OperatorFunction<af::array>, sopt::OperatorFunction<af::array>>
-init_af_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v,
-                           const Vector<t_complex> weights, const t_uint &imsizey_,
-                           const t_uint &imsizex_, const t_real oversample_ratio,
-                           const std::function<t_real(t_real)> kernelu,
-                           const std::function<t_real(t_real)> kernelv, const t_uint Ju = 4,
-                           const t_uint Jv = 4) {
-  const Sparse<t_complex> interpolation_matrix = details::init_gridding_matrix_2d(
-      u, v, weights, imsizey_, imsizex_, oversample_ratio, kernelu, kernelv, Ju, Jv);
+init_af_gridding_matrix_2d(const Vector<t_real> &u, ARGS &&... args) {
+  const Sparse<t_complex> interpolation_matrix =
+      details::init_gridding_matrix_2d(u, std::forward<ARGS>(args)...);
   const Sparse<t_complex> adjoint = interpolation_matrix.adjoint();
   const std::shared_ptr<const af::array> G =
       std::make_shared<const af::array>(gpu::init_af_G_2d(interpolation_matrix));

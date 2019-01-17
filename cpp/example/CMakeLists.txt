@@ -4,6 +4,8 @@ include_directories(SYSTEM ${Sopt_INCLUDE_DIRS})
 include_directories("${PROJECT_SOURCE_DIR}/cpp")
 
 add_example(gridding LIBRARIES libpurify NOTEST)
+add_example(image_wproj_chirp LIBRARIES libpurify NOTEST)
+add_example(compare_wprojection LIBRARIES libpurify NOTEST)
 add_example(generate_vis_data LIBRARIES libpurify NOTEST)
 
 add_example(plot_wkernel LIBRARIES libpurify NOTEST)
@@ -25,8 +27,6 @@ add_example(padmm_random_coverage LIBRARIES libpurify NOTEST )
 if(PURIFY_ARRAYFIRE)
   add_example(padmm_random_coverage_gpu padmm_random_coverage.cc LIBRARIES libpurify NOTEST )
   target_compile_definitions(example_padmm_random_coverage_gpu PRIVATE PURIFY_GPU)
-  add_example(fb_random_coverage_gpu fb_random_coverage.cc LIBRARIES libpurify NOTEST)
-  target_compile_definitions(example_fb_random_coverage_gpu PRIVATE PURIFY_GPU=1)
 endif()
 if(PURIFY_MPI)
   add_example(global_epsilon_replicated_grids_mpi padmm_mpi_random_coverage.cc NOTEST

@@ -47,6 +47,7 @@ MeasureOperators:
     wprojection: False # using radially symmetric w projection kernel
     mpi_wstacking: False # applies average w-stack correction on each node (always True with wprojection)
     kmeans_iterations: 100 #number of iterations in w-stacking clustering algorithm
+  gpu: False
   # TODO: Add others like weighting. (at the moment natural)
 
 ########## SARA ##########

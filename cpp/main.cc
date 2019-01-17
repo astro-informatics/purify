@@ -38,7 +38,8 @@ int main(int argc, const char **argv) {
   YamlParser params = YamlParser(file_path);
 
   factory::distributed_measurement_operator mop_algo =
-      factory::distributed_measurement_operator::serial;
+      (not params.gpu()) ? factory::distributed_measurement_operator::serial
+                         : factory::distributed_measurement_operator::gpu_serial;
   factory::distributed_wavelet_operator wop_algo = factory::distributed_wavelet_operator::serial;
   bool using_mpi = false;
 
@@ -52,7 +53,9 @@ int main(int argc, const char **argv) {
 #else
     throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
-    mop_algo = factory::distributed_measurement_operator::mpi_distribute_image;
+    mop_algo = (not params.gpu())
+                   ? factory::distributed_measurement_operator::mpi_distribute_image
+                   : factory::distributed_measurement_operator::gpu_mpi_distribute_image;
     wop_algo = factory::distributed_wavelet_operator::mpi_sara;
     using_mpi = true;
   }
@@ -151,7 +154,7 @@ int main(int argc, const char **argv) {
                   mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
                   params.cellsizex(), params.oversampling(),
                   kernels::kernel_from_string.at(params.kernel()), 2 * params.Jx(), params.Jw(),
-                  1e-6, 1e-6);
+                  params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
 #ifdef PURIFY_MPI
     auto const comm = sopt::mpi::Communicator::World();
     sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
@@ -205,8 +208,8 @@ int main(int argc, const char **argv) {
           : factory::measurement_operator_factory<Vector<t_complex>>(
                 mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
                 params.cellsizex(), params.oversampling(),
-                kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jw(), 1e-6,
-                1e-6);
+                kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jw(),
+                params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
 #ifdef PURIFY_MPI
   auto const comm = sopt::mpi::Communicator::World();
   auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
@@ -237,8 +240,9 @@ int main(int argc, const char **argv) {
         params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
         sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(), sara_size,
         params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
-        (params.wavelet_basis().size() < 2), params.relVarianceConvergence(),
-        params.dualFBVarianceConvergence(), 50);
+        (params.wavelet_basis().size() < 2) and (not params.realValueConstraint()) and
+            (not params.positiveValueConstraint()),
+        params.relVarianceConvergence(), params.dualFBVarianceConvergence(), 50);
   if (params.algorithm() == "fb")
     fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
         params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
@@ -246,8 +250,9 @@ int main(int argc, const char **argv) {
         params.stepsize() * std::pow(sigma * params.epsilonScaling() / flux_scale, 2),
         params.regularisation_parameter(), params.height(), params.width(), sara_size,
         params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
-        (params.wavelet_basis().size() < 2), params.relVarianceConvergence(),
-        params.dualFBVarianceConvergence(), 50);
+        (params.wavelet_basis().size() < 2) and (not params.realValueConstraint()) and
+            (not params.positiveValueConstraint()),
+        params.relVarianceConvergence(), params.dualFBVarianceConvergence(), 50);
 
   // Save some things before applying the algorithm
   // the config yaml file - this also generates the output directory and the timestamp
@@ -311,10 +316,13 @@ int main(int argc, const char **argv) {
   // the psf
   pfitsio::header_params psf_header = def_header;
   psf_header.fits_name = out_dir + "/psf.fits";
-  psf_header.pix_units = "Jy/Beam";
-  const Vector<t_complex> psf = measurements_transform->adjoint() * (uv_data.weights.array());
+  psf_header.pix_units = "Jy/Pixel";
+  const Vector<t_complex> psf =
+      measurements_transform->adjoint() * (uv_data.weights.array() / flux_scale);
   const Image<t_real> psf_image =
       Image<t_complex>::Map(psf.data(), params.height(), params.width()).real();
+  PURIFY_HIGH_LOG("Peak of PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)",
+                  psf_image.maxCoeff());
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
     auto const world = sopt::mpi::Communicator::World();
@@ -322,9 +330,9 @@ int main(int argc, const char **argv) {
 #else
     throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
-      pfitsio::write2d(psf_image / psf_image.maxCoeff(), psf_header, true);
+      pfitsio::write2d(psf_image, psf_header, true);
   } else {
-    pfitsio::write2d(psf_image / psf_image.maxCoeff(), psf_header, true);
+    pfitsio::write2d(psf_image, psf_header, true);
   }
   // the dirty image
   pfitsio::header_params dirty_header = def_header;

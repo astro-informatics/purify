@@ -34,7 +34,7 @@ t_complex exact_w_projection_integration_1d(const t_real u, const t_real v, cons
     return ftkerneluv(x(0)) * hankel_wproj_kernel(x(0), w, u, v, du);
   };
   const Vector<t_real> xmin = Vector<t_real>::Zero(1);
-  const Vector<t_real> xmax = Vector<t_real>::Constant(1, std::min(oversample_ratio / 2., du / 2.));
+  const Vector<t_real> xmax = Vector<t_real>::Constant(1, oversample_ratio / 2.);
   return 2. * constant::pi *
          integration::integrate(xmin, xmax, func, integration::norm_type::paired, absolute_error,
                                 relative_error, max_evaluations, method) /
@@ -54,8 +54,8 @@ t_complex exact_w_projection_integration(const t_real u, const t_real v, const t
     return ftkernelu(x(0)) * ftkernelv(x(1)) * fourier_wproj_kernel(x(0), x(1), w, u, v, du, dv);
   };
   Vector<t_real> xmax = Vector<t_real>::Zero(2);
-  xmax(0) = std::min(oversample_ratio / 2., du / 2.);
-  xmax(1) = std::min(oversample_ratio / 2., dv / 2.);
+  xmax(0) = oversample_ratio / 2.;
+  xmax(1) = oversample_ratio / 2.;
   const Vector<t_real> xmin = -xmax;
   return integration::integrate(xmin, xmax, func, integration::norm_type::paired, absolute_error,
                                 relative_error, max_evaluations, method) /
