@@ -208,7 +208,7 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
     this->update_iters_ = get<t_int>(algorithmOptionsNode, {"padmm", "stepsize", "update_iters"});
     this->update_tolerance_ =
         get<t_real>(algorithmOptionsNode, {"padmm", "stepsize", "update_tolerance"});
-  } else if (this->algorithm_ == "fb") {
+  } else if (this->algorithm_ == "fb" or this->algorithm_ == "fb_joint_map") {
     this->mpiAlgorithm_ = factory::algo_distribution_string.at(
         get<std::string>(algorithmOptionsNode, {"fb", "mpiAlgorithm"}));
     this->relVarianceConvergence_ =
@@ -216,13 +216,17 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
     this->stepsize_ = get<t_real>(algorithmOptionsNode, {"fb", "stepsize"});
     this->regularisation_parameter_ =
         get<t_real>(algorithmOptionsNode, {"fb", "regularisation_parameter"});
-    this->jmap_iters_ = get<t_uint>(algorithmOptionsNode, {"fb", "joint_map_estimation", "iters"});
-    this->jmap_relVarianceConvergence_ =
-        get<t_real>(algorithmOptionsNode, {"fb", "joint_map_estimation", "relVarianceConvergence"});
-    this->jmap_objVarianceConvergence_ =
-        get<t_real>(algorithmOptionsNode, {"fb", "joint_map_estimation", "objVarianceConvergence"});
-    this->jmap_alpha_ = get<t_real>(algorithmOptionsNode, {"fb", "joint_map_estimation", "alpha"});
-    this->jmap_beta_ = get<t_real>(algorithmOptionsNode, {"fb", "joint_map_estimation", "beta"});
+    if (this->algorithm_ == "fb_joint_map") {
+      this->jmap_iters_ =
+          get<t_uint>(algorithmOptionsNode, {"fb", "joint_map_estimation", "iters"});
+      this->jmap_relVarianceConvergence_ = get<t_real>(
+          algorithmOptionsNode, {"fb", "joint_map_estimation", "relVarianceConvergence"});
+      this->jmap_objVarianceConvergence_ = get<t_real>(
+          algorithmOptionsNode, {"fb", "joint_map_estimation", "objVarianceConvergence"});
+      this->jmap_alpha_ =
+          get<t_real>(algorithmOptionsNode, {"fb", "joint_map_estimation", "alpha"});
+      this->jmap_beta_ = get<t_real>(algorithmOptionsNode, {"fb", "joint_map_estimation", "beta"});
+    }
   } else {
     throw std::runtime_error(
         "Only padmm algorithm configured for now. Please fill the appropriate block in the "
