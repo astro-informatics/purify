@@ -141,7 +141,7 @@ you can see all the files from your `/full/path/to/data`. There you can run
 Contributors
 ------------
 
-Check the [contributors](@ref contributors) page.
+Check the [contributors](@ref contributors) page ([github](cpp/docs/CONTRIBUTORS.md)).
 
 References and citation
 -----------------------
