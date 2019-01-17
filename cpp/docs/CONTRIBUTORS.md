@@ -8,7 +8,7 @@ have since been made by a number of others. The full list of contributors is as 
 
 ![](photo_mayeul.jpg)
 <div class="text">
-Dr. Mayeul D'Avezac <br>
+Dr. Mayeul D'Avezac
 
 [website](https://github.com/mdavezac)
 
@@ -16,7 +16,7 @@ Dr. Mayeul D'Avezac <br>
 
 ![](photo_rafael.jpg)
 <div class="text">
-Dr. Rafael Carrillo <br>
+Dr. Rafael Carrillo
 
 [website](https://www.researchgate.net/profile/Rafael_Carrillo2)
 
@@ -24,7 +24,7 @@ Dr. Rafael Carrillo <br>
 
 ![](photo_ilektra.jpg)
 <div class="text">
-Dr. Ilektra Christidi <br>
+Dr. Ilektra Christidi
 
 [website](https://github.com/ilectra)
 
@@ -32,7 +32,7 @@ Dr. Ilektra Christidi <br>
 
 ![](photo_roland.jpg)
 <div class="text">
-Dr. Roland Guichard <br>
+Dr. Roland Guichard
 
 [website](https://github.com/UCLGuichard)
 
@@ -40,7 +40,7 @@ Dr. Roland Guichard <br>
 
 ![](photo_jason.jpg)
 <div class="text">
- Dr. Jason D. McEwen <br>
+ Dr. Jason D. McEwen
  
  [website](http://www.jasonmcewen.org)
  
@@ -48,7 +48,7 @@ Dr. Roland Guichard <br>
 
 ![](photo_david.jpg)
 <div class="text">
-Dr. David Perez-Suarez <br>
+Dr. David Perez-Suarez
 
 [website](https://dpshelio.github.io)
 
@@ -56,7 +56,7 @@ Dr. David Perez-Suarez <br>
 
 ![](photo_luke.jpg)
 <div class="text">
- Mr. Luke Pratley <br>
+ Mr. Luke Pratley
  
  [website](https://www.lukepratley.com)
  
@@ -64,7 +64,7 @@ Dr. David Perez-Suarez <br>
 
 ![](photo_yves.jpg)
 <div class="text">
-Dr. Yves Wiaux <br> 
+Dr. Yves Wiaux
 
 [website](http://basp.eps.hw.ac.uk/)
 
