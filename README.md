@@ -98,12 +98,15 @@ Usage
 ------
 
 The main purify executable lives either in the build directory or in the in the `bin` subdirectory
-of the installation directory. `purify` has one required argument, it a string for the file path of the config file containg the settings.
+of the installation directory. `purify` has one required argument, it a string for the file path of the config file containing the settings.
 
 `purify path/to/config.yaml`.
 
-A template with a description of the settings can be found at https://github.com/astro-informatics/purify/blob/master/data/config/config.yaml. 
-This can also be found in the downloaded repo at `data/config/config.yaml`. When `purify` runs a directory will be created, and the output images will be saved and time-stamped. Additionally, a config file with the settings used will be saved and time-stamped, helping for reproducibility and book-keeping. 
+A [template with a description of the settings](https://github.com/astro-informatics/purify/blob/master/data/config/config.yaml) 
+is included in the `data/config` directory.`
+When `purify` runs a directory will be created, and the output images will be
+saved and time-stamped. Additionally, a config file with the settings used will
+be saved and time-stamped, helping for reproducibility and book-keeping.
 
 Docker
 -------
