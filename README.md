@@ -148,16 +148,19 @@ References and citation
 
 If you use **PURIFY** for work that results in publication, please reference the [webpage](#webpage) and our related academic papers:
 
+1. L. Pratley, et al.
+   "Distributed convex optimization for Radio Interferometry with PURIFY".
+   Link will be here soon!
 1. L. Pratley, M. Johnston-Hollitt, J. D. McEwen,
    "A fast and exact w-stacking and w-projection hybrid algorithm for wide-field interferometric imaging".
    Submitted to ApJ [arXiv:1807.09239](https://arxiv.org/abs/1807.09239)
-2. L. Pratley, J. D. McEwen, M. d'Avezac, R. E. Carrillo, A. Onose, Y. Wiaux. "Robust sparse image
+1. L. Pratley, J. D. McEwen, M. d'Avezac, R. E. Carrillo, A. Onose, Y. Wiaux. "Robust sparse image
    reconstruction of radio interferometric observations with PURIFY".
    Accepted (2016) [arxiv:1610.02400](https://arxiv.org/abs/1610.02400v2)
-3. A. Onose, R. E. Carrillo, A. Repetti, J. D. McEwen, J.-P. Thiran, J.-C. Pesquet, and Y. Wiaux.
+1. A. Onose, R. E. Carrillo, A. Repetti, J. D. McEwen, J.-P. Thiran, J.-C. Pesquet, and Y. Wiaux.
    "Scalable splitting algorithms for big-data interferometric imaging in the SKA era" _Mon. Not.
    Roy. Astron. Soc._ **462(4):4314-4335** (2016) [arXiv:1601.04026](http://arxiv.org/abs/arXiv:1601.04026)
-4. R. E. Carrillo, J. D. McEwen and Y. Wiaux.  "PURIFY: a new approach to radio-interferometric
+1. R. E. Carrillo, J. D. McEwen and Y. Wiaux.  "PURIFY: a new approach to radio-interferometric
    imaging". _Mon. Not. Roy. Astron. Soc._ **439(4):3591-3604** (2014) [arXiv:1307.4370](http://arxiv.org/abs/1307.4370)
 
 CMake Tips
@@ -200,12 +203,13 @@ License
 Webpage
 -------
 
-http://astro-informatics.github.io/purify/
+[documentation](http://astro-informatics.github.io/purify)
+[repository](https://github.com/astro-informatics/purify)
 
 Support
 -------
 
-For any questions or comments, feel free to contact [Jason McEwen](mailto:jason.mcewen@gmail.com), or add
+For any questions or comments, feel free to contact [Jason McEwen](http://www.jasonmcewen.org), or add
 an issue to the [issue tracker](https://github.com/astro-informatics/purify/issues).
 
 Notes
