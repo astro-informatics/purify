@@ -217,6 +217,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_FFT_2d(
   Vector<typename T::Scalar> dst = Vector<t_complex>::Zero(ftsizev_ * ftsizeu_);
   // creating plans
   const auto del = [](fftw_plan_s *plan) { fftw_destroy_plan(plan); };
+  // fftw plan with threads needs to be used before each fftw_plan is created
 #ifdef PURIFY_OPENMP_FFTW
   fftw_plan_with_nthreads(omp_get_max_threads());
 #endif
@@ -224,6 +225,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_FFT_2d(
       fftw_plan_dft_2d(ftsizev_, ftsizeu_, reinterpret_cast<fftw_complex *>(src.data()),
                        reinterpret_cast<fftw_complex *>(dst.data()), FFTW_FORWARD, plan_flag),
       del);
+  // fftw plan with threads needs to be used before each fftw_plan is created
 #ifdef PURIFY_OPENMP_FFTW
   fftw_plan_with_nthreads(omp_get_max_threads());
 #endif
