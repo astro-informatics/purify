@@ -178,7 +178,7 @@ directory. There are extra CMake options sepcific to purify. ``-Ddompi=ON`` will
 License
 --------
 
->    PURIFY Copyright (C) 2013 Rafael Carrillo, Jason McEwen, Yves Wiaux
+>    PURIFY Copyright (C) 2013-2019
 >
 >    This program is free software; you can redistribute it and/or modify it
 >    under the terms of the GNU General Public License as published by the
