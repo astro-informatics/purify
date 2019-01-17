@@ -82,9 +82,3 @@ AlgorithmOptions:
     regularisation_parameter: 1
     stepsize: 1
     relVarianceConvergence: 1e-3 # (>0) relative convergence of the objective function
-    joint_map_estimation:
-      iters: 100
-      relVarianceConvergence: 1e-3
-      objVarianceConvergence: 1e-3
-      alpha: 1.
-      beta: 1.
