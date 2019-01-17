@@ -42,7 +42,7 @@ ExternalProject_Add(
     Lookup-Boost
     PREFIX ${EXTERNAL_ROOT}
     # Downloads boost from url -- much faster than svn
-    URL https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2
+    URL https://dl.bintray.com/boostorg/release/1.65.0/source/boost_1_65_0.tar.bz2
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND ./bootstrap.sh
     BUILD_COMMAND ${configure_command}
