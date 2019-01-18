@@ -106,6 +106,7 @@ matrix:
         - MPI=ON
         - openMP=ON
         - MPI_PROCS=2
+        - COVERAGE=ON
 
     - os: linux
       addons:
@@ -148,15 +149,14 @@ matrix:
             - *all_deps
             - &all_casa [ flex, bison, libblas-dev, liblapack-dev, libcfitsio3-dev, wcslib-dev, gfortran, libncurses5-dev, libreadline6-dev, libhdf5-serial-dev, python-numpy, python3-numpy ]
       env:
-        - TITLE="CASA: All dependencies - GCC - MPI"
+        - TITLE="CASA: All dependencies - GCC"
         - DEBUG=True
         - LDFLAGS='-pthread'
         - Tests=ON
-        - MPI=ON
+        - MPI=OFF
         - openMP=ON
         - CASA=ON
         - EXAMPLES=ON
-        - COVERAGE=ON
 
     - os: linux
       addons:
