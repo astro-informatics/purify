@@ -20,10 +20,13 @@ Dependencies installation
 
 `C++` minimal dependencies:
 
-- [CMake](http://www.cmake.org/) v3.9.2 A free software that allows cross-platform compilation
+- [CMake](http://www.cmake.org/) v3.5.1 (Trusty as `cmake3`) A free software that allows cross-platform compilation
 - [GCC](https://gcc.gnu.org) v7.3.0 GNU compiler for `C++`
 - [UCL/GreatCMakeCookOff](https://github.com/UCL/GreatCMakeCookOff) Collection of `CMake` recipes.
   Downloaded automatically if absent
+- [Boost](https://www.boost.org/) v1.54 (Trusty). A set of free peer-reviewed
+  portable C++ libraries. V1.65 downloaded automatically if absent but needs a
+  cmake >= 3.9.2.
 - [fftw3](www.fftw.org): Fastest Fourier Transform in the West
 - [Eigen3](http://eigen.tuxfamily.org/index.php?title=Main_Page) v3.2.0 (Trusty) Modern `C++` linear algebra.
   Downloaded automatically if absent.
