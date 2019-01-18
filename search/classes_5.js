@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['nullreporter',['NullReporter',['../dc/d47/classNullReporter.html',1,'']]]
+  ['indexmapping',['IndexMapping',['../d0/dca/classpurify_1_1IndexMapping.html',1,'purify']]]
 ];

@@ -1,6 +1,7 @@
 var searchData=
 [
   ['data_5fdesc_5fid',['data_desc_id',['../d8/d31/classpurify_1_1casa_1_1MeasurementSet_1_1ChannelWrapper.html#ac43d590e3d118ed320736233916ae0ba',1,'purify::casa::MeasurementSet::ChannelWrapper']]],
+  ['dde_5ftype',['dde_type',['../db/d8d/namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5',1,'purify']]],
   ['declination',['declination',['../d0/d66/classpurify_1_1casa_1_1MeasurementSet.html#acc99ad834580499123f6174984ce2b8e',1,'purify::casa::MeasurementSet']]],
   ['default_5ffilter',['default_filter',['../d0/d66/classpurify_1_1casa_1_1MeasurementSet.html#a894d32452f89fd9c5bd634cbd3f61d30',1,'purify::casa::MeasurementSet']]],
   ['default_5flogger_5fname',['default_logger_name',['../db/d8d/namespacepurify.html#a4d58563620e972c279f841f66a8f68ef',1,'purify']]],
