@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['parseandsetalgorithmoptions',['parseAndSetAlgorithmOptions',['../df/d55/classpurify_1_1YamlParser.html#a660692be951d62f30a553193757b288b',1,'purify::YamlParser']]],
-  ['parseandsetgeneralconfiguration',['parseAndSetGeneralConfiguration',['../df/d55/classpurify_1_1YamlParser.html#a643189d6794bb074f7a75c91ddaf9d05',1,'purify::YamlParser']]],
-  ['parseandsetmeasureoperators',['parseAndSetMeasureOperators',['../df/d55/classpurify_1_1YamlParser.html#a010d338f823e5d2bcb49805e4cd11ca2',1,'purify::YamlParser']]],
-  ['parseandsetsara',['parseAndSetSARA',['../df/d55/classpurify_1_1YamlParser.html#a167e6e8fae445fe6069f0c3ab2ed846b',1,'purify::YamlParser']]]
+  ['ngc3256_5fms',['ngc3256_ms',['../namespacepurify_1_1notinstalled.html#adec66730b5b17d093151b170b6f954fc',1,'purify::notinstalled']]],
+  ['non_5fempty_5fouters',['non_empty_outers',['../namespacepurify.html#af9469839053b3fb67fdc9d0df0c35eba',1,'purify']]],
+  ['norm_5ferror',['norm_error',['../namespacepurify_1_1integration.html#ad77278105245f570120de72b95222a08',1,'purify::integration']]],
+  ['nullreporter',['NullReporter',['../classNullReporter.html#a362f1a223088b7db18a6caf7bf5a7362',1,'NullReporter']]]
 ];

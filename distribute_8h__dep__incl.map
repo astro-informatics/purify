@@ -1,0 +1,22 @@
+<map id="/mydata/cpp/purify/distribute.h" name="/mydata/cpp/purify/distribute.h">
+<area shape="rect" id="node2" href="$padmm__mpi_8cc.html" title="/mydata/cpp/benchmarks\l/padmm_mpi.cc" alt="" coords="5,95,192,136"/>
+<area shape="rect" id="node3" href="$benchmarks_2utilities_8cc.html" title="/mydata/cpp/benchmarks\l/utilities.cc" alt="" coords="216,95,403,136"/>
+<area shape="rect" id="node4" href="$padmm__mpi__random__coverage_8cc.html" title="/mydata/cpp/example\l/padmm_mpi_random_coverage.cc" alt="" coords="32,184,283,225"/>
+<area shape="rect" id="node5" href="$padmm__mpi__real__data_8cc.html" title="/mydata/cpp/example\l/padmm_mpi_real_data.cc" alt="" coords="307,184,501,225"/>
+<area shape="rect" id="node6" href="$read__measurements_8h.html" title="/mydata/cpp/purify\l/read_measurements.h" alt="" coords="529,95,701,136"/>
+<area shape="rect" id="node12" href="$purify_2distribute_8cc.html" title="/mydata/cpp/purify\l/distribute.cc" alt="" coords="725,95,870,136"/>
+<area shape="rect" id="node13" href="$purify_2mpi__utilities_8cc.html" title="/mydata/cpp/purify\l/mpi_utilities.cc" alt="" coords="894,95,1039,136"/>
+<area shape="rect" id="node14" href="$tests_2distribute_8cc.html" title="/mydata/cpp/tests/distribute.cc" alt="" coords="1063,102,1286,129"/>
+<area shape="rect" id="node15" href="$kmeans_8cc.html" title="/mydata/cpp/tests/kmeans.cc" alt="" coords="1311,102,1524,129"/>
+<area shape="rect" id="node16" href="$mpi__algo__factory_8cc.html" title="/mydata/cpp/tests/mpi\l_algo_factory.cc" alt="" coords="1548,95,1716,136"/>
+<area shape="rect" id="node17" href="$mpi__measurement__factory_8cc.html" title="/mydata/cpp/tests/mpi\l_measurement_factory.cc" alt="" coords="1740,95,1929,136"/>
+<area shape="rect" id="node18" href="$mpi__measurement__operator_8cc.html" title="/mydata/cpp/tests/mpi\l_measurement_operator.cc" alt="" coords="1954,95,2153,136"/>
+<area shape="rect" id="node19" href="$mpi__wavelet__factory_8cc.html" title="/mydata/cpp/tests/mpi\l_wavelet_factory.cc" alt="" coords="2177,95,2345,136"/>
+<area shape="rect" id="node20" href="$serial__vs__parallel__padmm_8cc.html" title="/mydata/cpp/tests/serial\l_vs_parallel_padmm.cc" alt="" coords="2369,95,2548,136"/>
+<area shape="rect" id="node21" href="$wavelet__factory_8cc.html" title="/mydata/cpp/tests/wavelet\l_factory.cc" alt="" coords="2572,95,2767,136"/>
+<area shape="rect" id="node7" href="$main_8cc.html" title="/mydata/cpp/main.cc" alt="" coords="1301,191,1459,218"/>
+<area shape="rect" id="node8" href="$purify_2read__measurements_8cc.html" title="/mydata/cpp/purify\l/read_measurements.cc" alt="" coords="525,184,704,225"/>
+<area shape="rect" id="node9" href="$yaml-parser_8cc.html" title="/mydata/cpp/purify\l/yaml&#45;parser.cc" alt="" coords="729,184,874,225"/>
+<area shape="rect" id="node10" href="$mpi__read__measurements_8cc.html" title="/mydata/cpp/tests/mpi\l_read_measurements.cc" alt="" coords="899,184,1080,225"/>
+<area shape="rect" id="node11" href="$tests_2read__measurements_8cc.html" title="/mydata/cpp/tests/read\l_measurements.cc" alt="" coords="1105,184,1277,225"/>
+</map>

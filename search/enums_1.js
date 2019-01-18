@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['sigma',['Sigma',['../d8/d31/classpurify_1_1casa_1_1MeasurementSet_1_1ChannelWrapper.html#a8a3486e632c38521b251686813425338',1,'purify::casa::MeasurementSet::ChannelWrapper']]]
+  ['convergencetype',['ConvergenceType',['../namespacepurify_1_1factory.html#ae3112c9c2dd6bbf06b1c59b4549f89c6',1,'purify::factory']]]
 ];

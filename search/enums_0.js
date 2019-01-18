@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['dde_5ftype',['dde_type',['../db/d8d/namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5',1,'purify']]]
+  ['algo_5fdistribution',['algo_distribution',['../namespacepurify_1_1factory.html#a862f0cad917b1ba718f965fd508f31f4',1,'purify::factory']]],
+  ['algorithm',['algorithm',['../namespacepurify_1_1factory.html#a61804e4c4f79fa94c6b864535459d5f8',1,'purify::factory']]]
 ];

@@ -1,0 +1,6 @@
+var searchData=
+[
+  ['test_5fdir',['test_dir',['../namespacekernels__test.html#afe7cd15fa169e6cab3e7a372d8ec882f',1,'kernels_test::test_dir()'],['../namespaceoperators__test.html#a165b68aac2b309ea97f327ee188141d1',1,'operators_test::test_dir()']]],
+  ['test_5ffile',['test_file',['../tests_2casacore_8cc.html#a3eed1c320ec34a19c4f87c0e5aa301ed',1,'casacore.cc']]],
+  ['time',['time',['../structpurify_1_1utilities_1_1vis__params.html#a127ac539d520c8daca09c56729dfc27f',1,'purify::utilities::vis_params']]]
+];

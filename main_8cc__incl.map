@@ -1,0 +1,21 @@
+<map id="/mydata/cpp/main.cc" name="/mydata/cpp/main.cc">
+<area shape="rect" id="node3" href="$types_8h.html" title="purify/types.h" alt="" coords="392,512,504,539"/>
+<area shape="rect" id="node13" href="$algorithm__factory_8h.html" title="purify/algorithm_factory.h" alt="" coords="1974,341,2165,367"/>
+<area shape="rect" id="node17" href="$logging_8h.html" title="purify/logging.h" alt="" coords="1531,430,1655,457"/>
+<area shape="rect" id="node29" href="$cimg_8h.html" title="purify/cimg.h" alt="" coords="611,341,719,367"/>
+<area shape="rect" id="node30" href="$measurement__operator__factory_8h.html" title="purify/measurement\l_operator_factory.h" alt="" coords="1055,80,1209,121"/>
+<area shape="rect" id="node37" href="$pfitsio_8h.html" title="purify/pfitsio.h" alt="" coords="1289,341,1405,367"/>
+<area shape="rect" id="node39" href="$read__measurements_8h.html" title="purify/read_measurements.h" alt="" coords="913,259,1124,285"/>
+<area shape="rect" id="node41" href="$update__factory_8h.html" title="purify/update_factory.h" alt="" coords="1385,259,1557,285"/>
+<area shape="rect" id="node42" href="$wavelet__operator__factory_8h.html" title="purify/wavelet_operator\l_factory.h" alt="" coords="2843,333,3021,375"/>
+<area shape="rect" id="node44" href="$wide__field__utilities_8h.html" title="purify/wide_field_utilities.h" alt="" coords="1682,341,1881,367"/>
+<area shape="rect" id="node45" href="$yaml-parser_8h.html" title="purify/yaml&#45;parser.h" alt="" coords="2071,259,2225,285"/>
+<area shape="rect" id="node14" href="$convergence__factory_8h.html" title="purify/convergence\l_factory.h" alt="" coords="2467,423,2613,464"/>
+<area shape="rect" id="node21" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="987,430,1112,457"/>
+<area shape="rect" id="node18" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="1870,512,2053,539"/>
+<area shape="rect" id="node31" href="$operators_8h.html" title="purify/operators.h" alt="" coords="397,341,536,367"/>
+<area shape="rect" id="node34" href="$operators__gpu_8h.html" title="purify/operators_gpu.h" alt="" coords="401,259,570,285"/>
+<area shape="rect" id="node35" href="$wproj__operators_8h.html" title="purify/wproj_operators.h" alt="" coords="195,259,376,285"/>
+<area shape="rect" id="node36" href="$wproj__operators__gpu_8h.html" title="purify/wproj_operators\l_gpu.h" alt="" coords="354,169,523,211"/>
+<area shape="rect" id="node40" href="$distribute_8h.html" title="purify/distribute.h" alt="" coords="1056,341,1195,367"/>
+</map>

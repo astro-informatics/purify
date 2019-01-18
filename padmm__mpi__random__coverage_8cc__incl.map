@@ -1,0 +1,12 @@
+<map id="/mydata/cpp/example/padmm_mpi_random_coverage.cc" name="/mydata/cpp/example/padmm_mpi_random_coverage.cc">
+<area shape="rect" id="node2" href="$types_8h.html" title="purify/types.h" alt="" coords="1383,341,1495,367"/>
+<area shape="rect" id="node15" href="$distribute_8h.html" title="purify/distribute.h" alt="" coords="480,184,619,211"/>
+<area shape="rect" id="node19" href="$logging_8h.html" title="purify/logging.h" alt="" coords="235,259,359,285"/>
+<area shape="rect" id="node21" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="677,259,803,285"/>
+<area shape="rect" id="node24" href="$mpi__utilities_8h.html" title="purify/mpi_utilities.h" alt="" coords="985,184,1143,211"/>
+<area shape="rect" id="node27" href="$operators_8h.html" title="purify/operators.h" alt="" coords="1339,184,1477,211"/>
+<area shape="rect" id="node35" href="$pfitsio_8h.html" title="purify/pfitsio.h" alt="" coords="239,184,355,211"/>
+<area shape="rect" id="node37" href="$read__measurements_8h.html" title="purify/read_measurements.h" alt="" coords="635,102,845,129"/>
+<area shape="rect" id="node20" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="94,341,277,367"/>
+<area shape="rect" id="node29" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="1874,259,1998,285"/>
+</map>

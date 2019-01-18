@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['arguments',['Arguments',['../de/d7d/arguments.html',1,'']]]
+  ['contributors',['Contributors',['../contributors.html',1,'']]]
 ];

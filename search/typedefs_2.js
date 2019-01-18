@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['t_5ftripletlist',['t_tripletList',['../db/d8d/namespacepurify.html#a854f899505b10ffd6c555674141c65cd',1,'purify']]]
+  ['reference',['reference',['../classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html#a297d8194c6e9116a5cdcfea2ba67db49',1,'purify::casa::MeasurementSet::const_iterator']]]
 ];

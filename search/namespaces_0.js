@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['purify',['purify',['../db/d8d/namespacepurify.html',1,'']]]
+  ['b_5futilities',['b_utilities',['../namespaceb__utilities.html',1,'']]]
 ];

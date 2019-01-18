@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['value_5ftype',['value_type',['../dc/df7/classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html#a4068a25accca01f0aa17e487cd777203',1,'purify::casa::MeasurementSet::const_iterator']]]
+  ['sparse',['Sparse',['../namespacepurify.html#a9c5d741f10029a85f2a8e51fda9a4e07',1,'purify']]],
+  ['sparsevector',['SparseVector',['../namespacepurify.html#a75c895e7cb33354e6559085c4cf5571d',1,'purify']]]
 ];

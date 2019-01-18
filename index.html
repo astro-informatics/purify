@@ -80,9 +80,10 @@ $(function() {
 <p><b>PURIFY</b> is written in <code>C++11</code>. Pre-requisites and dependencies are listed in following and minimal versions required are tested against <code>Travis CI</code> meaning that they come natively with OSX and the Ubuntu Trusty release. These are also the default ones fetched by <code>CMake</code> (an internet connection is required for this).</p>
 <p><code>C++</code> minimal dependencies:</p>
 <ul>
-<li><a href="http://www.cmake.org/">CMake</a> v3.9.2 A free software that allows cross-platform compilation</li>
+<li><a href="http://www.cmake.org/">CMake</a> v3.5.1 (Trusty as <code>cmake3</code>) A free software that allows cross-platform compilation</li>
 <li><a href="https://gcc.gnu.org">GCC</a> v7.3.0 GNU compiler for <code>C++</code></li>
 <li><a href="https://github.com/UCL/GreatCMakeCookOff">UCL/GreatCMakeCookOff</a> Collection of <code>CMake</code> recipes. Downloaded automatically if absent</li>
+<li><a href="https://www.boost.org/">Boost</a> v1.54 (Trusty). A set of free peer-reviewed portable C++ libraries. V1.65 downloaded automatically if absent but needs a cmake &gt;= 3.9.2.</li>
 <li><a href="www.fftw.org">fftw3</a>: Fastest Fourier Transform in the West</li>
 <li><a href="http://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen3</a> v3.2.0 (Trusty) Modern <code>C++</code> linear algebra. Downloaded automatically if absent.</li>
 <li><a href="http://www.libtiff.org/">tiff</a> v4.0.3 (Trusty) Tag Image File Format library</li>
@@ -104,23 +105,32 @@ $(function() {
 <div class="fragment"><div class="line">cd /path/to/code/build</div><div class="line">cmake -DCMAKE_INSTALL_PREFIX=/X ..</div><div class="line">make install</div></div><!-- fragment --><h2>Testing </h2>
 <p>To check everything went all right, run the test suite:</p>
 <div class="fragment"><div class="line">cd /path/to/code/build</div><div class="line">ctest .</div></div><!-- fragment --><h2>Usage </h2>
-<p>The main purify executable lives either in the build directory or in the in the <code>bin</code> subdirectory of the installation directory. <code>purify</code> has one required argument, it a string for the file path of the config file containg the settings.</p>
+<p>The main purify executable lives either in the build directory or in the in the <code>bin</code> subdirectory of the installation directory. <code>purify</code> has one required argument, it a string for the file path of the config file containing the settings.</p>
 <p><code>purify path/to/config.yaml</code>.</p>
-<p>A template with a description of the settings can be found at <a href="https://github.com/astro-informatics/purify/blob/master/data/config/config.yaml">https://github.com/astro-informatics/purify/blob/master/data/config/config.yaml</a>. This can also be found in the downloaded repo at <code>data/config/config.yaml</code>. When <code>purify</code> runs a directory will be created, and the output images will be saved and time-stamped. Additionally, a config file with the settings used will be saved and time-stamped, helping for reproducibility and book-keeping.</p>
+<p>A <a href="https://github.com/astro-informatics/purify/blob/master/data/config/config.yaml">template with a description of the settings</a> is included in the <code>data/config</code> directory.<code> When</code>purify` runs a directory will be created, and the output images will be saved and time-stamped. Additionally, a config file with the settings used will be saved and time-stamped, helping for reproducibility and book-keeping.</p>
 <h2>Docker </h2>
 <p>If you want to use Docker instead, you can build an image using the Dockerfile available in the repository or pulling it from <a href="https://hub.docker.com/r/uclrits/purify">DockerHub</a>.</p>
 <div class="fragment"><div class="line">docker build -t purify .</div></div><!-- fragment --><p>or</p>
 <div class="fragment"><div class="line">docker pull uclrits/purify</div></div><!-- fragment --><p>Then to use it, you should mount the directory with your data and config files to <code>/mydata</code> in the container. To run the container and mount the directory is with:</p>
 <div class="fragment"><div class="line">docker run -it --name purify -v /full/path/to/data:/mydata uclrits/purify</div></div><!-- fragment --><p>That will start a shell inside the container in the <code>/mydata</code> directory where you can see all the files from your <code>/full/path/to/data</code>. There you can run <code>purify</code> as shown above.`</p>
 <h2>Contributors </h2>
-<p>Check the <a class="el" href="de/df6/contributors.html">contributors</a> page.</p>
+<p>Check the <a class="el" href="contributors.html">contributors</a> page (<a class="el" href="CONTRIBUTORS_8md.html">github</a>).</p>
 <h2>References and citation </h2>
 <p>If you use <b>PURIFY</b> for work that results in publication, please reference the <a href="#webpage">webpage</a> and our related academic papers:</p>
 <ol type="1">
+<li>L. Pratley, et al. "Distributed convex optimization for Radio Interferometry with PURIFY". Link will be here soon!</li>
+</ol>
+<ol type="1">
 <li>L. Pratley, M. Johnston-Hollitt, J. D. McEwen, "A fast and exact w-stacking and w-projection hybrid algorithm for wide-field interferometric imaging". Submitted to ApJ <a href="https://arxiv.org/abs/1807.09239">arXiv:1807.09239</a></li>
+</ol>
+<ol type="1">
 <li>L. Pratley, J. D. McEwen, M. d'Avezac, R. E. Carrillo, A. Onose, Y. Wiaux. "Robust sparse image
    reconstruction of radio interferometric observations with PURIFY". Accepted (2016) <a href="https://arxiv.org/abs/1610.02400v2">arxiv:1610.02400</a></li>
+</ol>
+<ol type="1">
 <li>A. Onose, R. E. Carrillo, A. Repetti, J. D. McEwen, J.-P. Thiran, J.-C. Pesquet, and Y. Wiaux. "Scalable splitting algorithms for big-data interferometric imaging in the SKA era" <em>Mon. Not. Roy. Astron. Soc.</em> <b>462(4):4314-4335</b> (2016) <a href="http://arxiv.org/abs/arXiv:1601.04026">arXiv:1601.04026</a></li>
+</ol>
+<ol type="1">
 <li>R. E. Carrillo, J. D. McEwen and Y. Wiaux. "PURIFY: a new approach to radio-interferometric
    imaging". <em>Mon. Not. Roy. Astron. Soc.</em> <b>439(4):3591-3604</b> (2014) <a href="http://arxiv.org/abs/1307.4370">arXiv:1307.4370</a></li>
 </ol>
@@ -135,15 +145,15 @@ $(function() {
 <p><code>ctest</code> should be run to make sure the unit tests pass.</p>
 <h2>License </h2>
 <blockquote class="doxtable">
-<p>PURIFY Copyright (C) 2013 Rafael Carrillo, Jason McEwen, Yves Wiaux</p>
+<p>PURIFY Copyright (C) 2013-2019</p>
 <p>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.</p>
 <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details (LICENSE.txt).</p>
 <p>You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. </p>
 </blockquote>
 <h2>Webpage </h2>
-<p><a href="http://astro-informatics.github.io/purify/">http://astro-informatics.github.io/purify/</a></p>
+<p><a href="http://astro-informatics.github.io/purify">documentation</a> <a href="https://github.com/astro-informatics/purify">repository</a></p>
 <h2>Support </h2>
-<p>For any questions or comments, feel free to contact <a href="#" onclick="location.href='mai'+'lto:'+'jas'+'on'+'.mc'+'ew'+'en@'+'gm'+'ail'+'.c'+'om'; return false;">Jason McEwen</a>, or add an issue to the <a href="https://github.com/astro-informatics/purify/issues">issue tracker</a>.</p>
+<p>For any questions or comments, feel free to contact <a href="http://www.jasonmcewen.org">Jason McEwen</a>, or add an issue to the <a href="https://github.com/astro-informatics/purify/issues">issue tracker</a>.</p>
 <h2>Notes </h2>
 <p>The code is given for educational purpose. The code is in beta and still under development. </p>
 </div></div><!-- contents -->

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['sparse',['Sparse',['../db/d8d/namespacepurify.html#a9c5d741f10029a85f2a8e51fda9a4e07',1,'purify']]]
+  ['pointer',['pointer',['../classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html#aa14fc508f069b9dd36a4530d4a92735a',1,'purify::casa::MeasurementSet::const_iterator']]]
 ];

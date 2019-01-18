@@ -1,0 +1,13 @@
+<map id="/mydata/cpp/benchmarks/padmm_mpi.cc" name="/mydata/cpp/benchmarks/padmm_mpi.cc">
+<area shape="rect" id="node2" href="$types_8h.html" title="purify/types.h" alt="" coords="432,266,544,293"/>
+<area shape="rect" id="node11" href="$benchmarks_2utilities_8h.html" title="benchmarks/utilities.h" alt="" coords="1912,102,2078,129"/>
+<area shape="rect" id="node14" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="771,184,896,211"/>
+<area shape="rect" id="node18" href="$convergence__factory_8h.html" title="purify/convergence\l_factory.h" alt="" coords="2250,95,2396,136"/>
+<area shape="rect" id="node22" href="$distribute_8h.html" title="purify/distribute.h" alt="" coords="234,102,372,129"/>
+<area shape="rect" id="node28" href="$mpi__utilities_8h.html" title="purify/mpi_utilities.h" alt="" coords="1675,102,1832,129"/>
+<area shape="rect" id="node31" href="$operators_8h.html" title="purify/operators.h" alt="" coords="1110,102,1248,129"/>
+<area shape="rect" id="node39" href="$pfitsio_8h.html" title="purify/pfitsio.h" alt="" coords="554,102,670,129"/>
+<area shape="rect" id="node25" href="$logging_8h.html" title="purify/logging.h" alt="" coords="329,184,453,211"/>
+<area shape="rect" id="node26" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="225,266,408,293"/>
+<area shape="rect" id="node33" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="1324,184,1448,211"/>
+</map>
