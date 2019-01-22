@@ -182,10 +182,10 @@ matrix:
       env:
         - TITLE="Documentation - GCC"
         - DOCS=ON
-        - BUILD_CMD='make doc VERBOSE=1'
+        - BUILD_CMD='make docweb VERBOSE=1'
       script:
         - chmod o+w . # To allow docker to create the build directory
-        - docker run --rm -v $(pwd):/mydata uclrits/sopt /bin/sh -c "mkdir build; cd build; cmake .. -Ddocs=${DOCS}; eval ${BUILD_CMD}"
+        - docker run --rm -v $(pwd):/mydata uclrits/sopt /bin/sh -c "mkdir build; cd build; cmake .. -Ddocs=${DOCS} -Dweb=ON; eval ${BUILD_CMD}"
 
     - os: linux
       addons:
