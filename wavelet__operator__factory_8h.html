@@ -83,8 +83,8 @@ $(function() {
 <code>#include &quot;<a class="el" href="types_8h_source.html">purify/types.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="logging_8h_source.html">purify/logging.h</a>&quot;</code><br />
 <code>#include &lt;vector&gt;</code><br />
-<code>#include &lt;sopt/wavelets.h&gt;</code><br />
-<code>#include &lt;sopt/wavelets/sara.h&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://astro-informatics.github.io/sopt/wavelets_8h.html">sopt/wavelets.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://astro-informatics.github.io/sopt/sara_8h.html">sopt/wavelets/sara.h</a>&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for wavelet_operator_factory.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
@@ -92,9 +92,12 @@ $(function() {
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="wavelet__operator__factory_8h__incl.png" border="0" usemap="#_2mydata_2cpp_2purify_2wavelet__operator__factory_8h" alt=""/></div>
 <map name="_2mydata_2cpp_2purify_2wavelet__operator__factory_8h" id="_2mydata_2cpp_2purify_2wavelet__operator__factory_8h">
-<area shape="rect" id="node3" href="types_8h.html" title="purify/types.h" alt="" coords="248,95,360,121"/>
-<area shape="rect" id="node9" href="logging_8h.html" title="purify/logging.h" alt="" coords="501,95,625,121"/>
-<area shape="rect" id="node10" href="logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="720,169,902,196"/>
+<area shape="rect" id="node3" href="types_8h.html" title="purify/types.h" alt="" coords="235,95,347,121"/>
+<area shape="rect" id="node9" href="logging_8h.html" title="purify/logging.h" alt="" coords="675,169,799,196"/>
+<area shape="rect" id="node14" href="http://astro-informatics.github.io/sopt/wavelets_8h.html" title="sopt/wavelets.h" alt="" coords="509,95,635,121"/>
+<area shape="rect" id="node15" href="http://astro-informatics.github.io/sopt/sara_8h.html" title="sopt/wavelets/sara.h" alt="" coords="659,95,816,121"/>
+<area shape="rect" id="node8" href="http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="549,169,651,196"/>
+<area shape="rect" id="node10" href="logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="470,244,653,271"/>
 </map>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -134,11 +137,11 @@ Enumerations</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a2ffd3209dbb03d7390df879572cea326"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a2ffd3209dbb03d7390df879572cea326"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; sopt::LinearTransform&lt; T &gt; const  &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1factory.html#a2ffd3209dbb03d7390df879572cea326">purify::factory::wavelet_operator_factory</a> (const distributed_wavelet_operator distribute, const std::vector&lt; std::tuple&lt; std::string, t_uint &gt;&gt; &amp;wavelets, const t_uint imsizey, const t_uint imsizex, t_uint &amp;sara_size)</td></tr>
+<tr class="memitem:a2ffd3209dbb03d7390df879572cea326"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="elRef" href="http://astro-informatics.github.io/sopt/classsopt_1_1LinearTransform.html">sopt::LinearTransform</a>&lt; T &gt; const  &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1factory.html#a2ffd3209dbb03d7390df879572cea326">purify::factory::wavelet_operator_factory</a> (const distributed_wavelet_operator distribute, const std::vector&lt; std::tuple&lt; std::string, <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a96a6515fd2aa0c9f5789d33e09fa6477">t_uint</a> &gt;&gt; &amp;wavelets, const <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a96a6515fd2aa0c9f5789d33e09fa6477">t_uint</a> imsizey, const <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a96a6515fd2aa0c9f5789d33e09fa6477">t_uint</a> imsizex, <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a96a6515fd2aa0c9f5789d33e09fa6477">t_uint</a> &amp;sara_size)</td></tr>
 <tr class="memdesc:a2ffd3209dbb03d7390df879572cea326"><td class="mdescLeft">&#160;</td><td class="mdescRight">construct sara wavelet operator  <a href="namespacepurify_1_1factory.html#a2ffd3209dbb03d7390df879572cea326">More...</a><br /></td></tr>
 <tr class="separator:a2ffd3209dbb03d7390df879572cea326"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5c435fa169cac5a8135922b5558f3ae6"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a5c435fa169cac5a8135922b5558f3ae6"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; sopt::LinearTransform&lt; T &gt; const  &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1factory.html#a5c435fa169cac5a8135922b5558f3ae6">purify::factory::wavelet_operator_factory</a> (const distributed_wavelet_operator distribute, const std::vector&lt; std::tuple&lt; std::string, t_uint &gt;&gt; &amp;wavelets, const t_uint imsizey, const t_uint imsizex)</td></tr>
+<tr class="memitem:a5c435fa169cac5a8135922b5558f3ae6"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="elRef" href="http://astro-informatics.github.io/sopt/classsopt_1_1LinearTransform.html">sopt::LinearTransform</a>&lt; T &gt; const  &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1factory.html#a5c435fa169cac5a8135922b5558f3ae6">purify::factory::wavelet_operator_factory</a> (const distributed_wavelet_operator distribute, const std::vector&lt; std::tuple&lt; std::string, <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a96a6515fd2aa0c9f5789d33e09fa6477">t_uint</a> &gt;&gt; &amp;wavelets, const <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a96a6515fd2aa0c9f5789d33e09fa6477">t_uint</a> imsizey, const <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a96a6515fd2aa0c9f5789d33e09fa6477">t_uint</a> imsizex)</td></tr>
 <tr class="separator:a5c435fa169cac5a8135922b5558f3ae6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->

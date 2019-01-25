@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['v',['v',['../structpurify_1_1utilities_1_1vis__params.html#a069d0ab91900a49f16d16eb41e1df15d',1,'purify::utilities::vis_params::v()'],['../namespaceoperators__test.html#a860ca9fd403e2b071edd997207df63ef',1,'operators_test::v()']]],
-  ['vis',['vis',['../structpurify_1_1utilities_1_1vis__params.html#a00fec6b3490e6c98c4d0befb677bfb09',1,'purify::utilities::vis_params']]]
+  ['test_5fdir',['test_dir',['../namespacekernels__test.html#afe7cd15fa169e6cab3e7a372d8ec882f',1,'kernels_test::test_dir()'],['../namespaceoperators__test.html#a165b68aac2b309ea97f327ee188141d1',1,'operators_test::test_dir()']]],
+  ['test_5ffile',['test_file',['../tests_2casacore_8cc.html#a3eed1c320ec34a19c4f87c0e5aa301ed',1,'casacore.cc']]],
+  ['time',['time',['../structpurify_1_1utilities_1_1vis__params.html#a127ac539d520c8daca09c56729dfc27f',1,'purify::utilities::vis_params']]],
+  ['transform',['transform',['structsopt_1_1CData.html#a3502da4a2b5ca66428f2c156bf7def81',1,'sopt::CData']]]
 ];

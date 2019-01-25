@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['tmpms',['TmpMS',['../classTmpMS.html',1,'']]],
-  ['tmppath',['TmpPath',['../classTmpPath.html',1,'']]]
+  ['jointmap',['JointMAP',['http://astro-informatics.github.io/sopt/classsopt_1_1algorithm_1_1JointMAP.html',1,'sopt::algorithm']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['contributors',['Contributors',['../contributors.html',1,'']]]
+  ['contributors',['Contributors',['http://astro-informatics.github.io/sopt/contributors.html',1,'']]]
 ];

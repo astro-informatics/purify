@@ -1,12 +1,16 @@
 <map id="/mydata/cpp/tests/measurement_factory.cc" name="/mydata/cpp/tests/measurement_factory.cc">
-<area shape="rect" id="node3" href="$logging_8h.html" title="purify/logging.h" alt="" coords="118,423,242,449"/>
-<area shape="rect" id="node8" href="$measurement__operator__factory_8h.html" title="purify/measurement\l_operator_factory.h" alt="" coords="1029,95,1184,136"/>
-<area shape="rect" id="node24" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="1325,423,1451,449"/>
-<area shape="rect" id="node5" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="49,505,231,531"/>
-<area shape="rect" id="node9" href="$types_8h.html" title="purify/types.h" alt="" coords="1552,505,1664,531"/>
-<area shape="rect" id="node15" href="$operators_8h.html" title="purify/operators.h" alt="" coords="919,348,1057,375"/>
-<area shape="rect" id="node29" href="$operators__gpu_8h.html" title="purify/operators_gpu.h" alt="" coords="658,273,827,300"/>
-<area shape="rect" id="node30" href="$wproj__operators_8h.html" title="purify/wproj_operators.h" alt="" coords="1135,273,1316,300"/>
-<area shape="rect" id="node31" href="$wproj__operators__gpu_8h.html" title="purify/wproj_operators\l_gpu.h" alt="" coords="1022,184,1191,225"/>
-<area shape="rect" id="node19" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="934,423,1058,449"/>
+<area shape="rect" id="node3" href="$logging_8h.html" title="purify/logging.h" alt="" coords="1411,505,1535,531"/>
+<area shape="rect" id="node8" href="$measurement__operator__factory_8h.html" title="purify/measurement\l_operator_factory.h" alt="" coords="821,95,976,136"/>
+<area shape="rect" id="node24" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="1104,423,1229,449"/>
+<area shape="rect" id="node32" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/power__method_8h.html" title="sopt/power_method.h" alt="" coords="1555,423,1717,449"/>
+<area shape="rect" id="node5" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="1338,587,1521,613"/>
+<area shape="rect" id="node9" href="$types_8h.html" title="purify/types.h" alt="" coords="837,505,949,531"/>
+<area shape="rect" id="node15" href="$operators_8h.html" title="purify/operators.h" alt="" coords="784,348,923,375"/>
+<area shape="rect" id="node29" href="$operators__gpu_8h.html" title="purify/operators_gpu.h" alt="" coords="659,273,829,300"/>
+<area shape="rect" id="node30" href="$wproj__operators_8h.html" title="purify/wproj_operators.h" alt="" coords="453,273,635,300"/>
+<area shape="rect" id="node31" href="$wproj__operators__gpu_8h.html" title="purify/wproj_operators\l_gpu.h" alt="" coords="641,184,810,225"/>
+<area shape="rect" id="node14" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="959,587,1062,613"/>
+<area shape="rect" id="node19" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="401,423,525,449"/>
+<area shape="rect" id="node26" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/chained__operators_8h.html" title="sopt/chained_operators.h" alt="" coords="651,423,837,449"/>
+<area shape="rect" id="node27" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/linear__transform_8h.html" title="sopt/linear_transform.h" alt="" coords="1305,423,1479,449"/>
 </map>

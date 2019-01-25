@@ -1,8 +1,10 @@
 <map id="/mydata/cpp/purify/mpi_utilities.cc" name="/mydata/cpp/purify/mpi_utilities.cc">
-<area shape="rect" id="node2" href="$mpi__utilities_8h.html" title="purify/mpi_utilities.h" alt="" coords="463,95,621,121"/>
-<area shape="rect" id="node17" href="$distribute_8h.html" title="purify/distribute.h" alt="" coords="877,95,1015,121"/>
-<area shape="rect" id="node5" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="729,169,854,196"/>
-<area shape="rect" id="node6" href="$types_8h.html" title="purify/types.h" alt="" coords="1227,244,1339,271"/>
-<area shape="rect" id="node19" href="$logging_8h.html" title="purify/logging.h" alt="" coords="580,169,704,196"/>
-<area shape="rect" id="node20" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="393,244,576,271"/>
+<area shape="rect" id="node2" href="$mpi__utilities_8h.html" title="purify/mpi_utilities.h" alt="" coords="269,95,427,121"/>
+<area shape="rect" id="node20" href="$distribute_8h.html" title="purify/distribute.h" alt="" coords="473,169,612,196"/>
+<area shape="rect" id="node5" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="460,244,585,271"/>
+<area shape="rect" id="node15" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/linear__transform_8h.html" title="sopt/linear_transform.h" alt="" coords="135,169,310,196"/>
+<area shape="rect" id="node6" href="$types_8h.html" title="purify/types.h" alt="" coords="277,319,389,345"/>
+<area shape="rect" id="node11" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="651,393,754,420"/>
+<area shape="rect" id="node16" href="$logging_8h.html" title="sopt/logging.h" alt="" coords="176,244,291,271"/>
+<area shape="rect" id="node17" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="414,319,597,345"/>
 </map>

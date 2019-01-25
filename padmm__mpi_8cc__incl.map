@@ -1,13 +1,23 @@
 <map id="/mydata/cpp/benchmarks/padmm_mpi.cc" name="/mydata/cpp/benchmarks/padmm_mpi.cc">
-<area shape="rect" id="node2" href="$types_8h.html" title="purify/types.h" alt="" coords="432,266,544,293"/>
-<area shape="rect" id="node11" href="$benchmarks_2utilities_8h.html" title="benchmarks/utilities.h" alt="" coords="1912,102,2078,129"/>
-<area shape="rect" id="node14" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="771,184,896,211"/>
-<area shape="rect" id="node18" href="$convergence__factory_8h.html" title="purify/convergence\l_factory.h" alt="" coords="2250,95,2396,136"/>
-<area shape="rect" id="node22" href="$distribute_8h.html" title="purify/distribute.h" alt="" coords="234,102,372,129"/>
-<area shape="rect" id="node28" href="$mpi__utilities_8h.html" title="purify/mpi_utilities.h" alt="" coords="1675,102,1832,129"/>
-<area shape="rect" id="node31" href="$operators_8h.html" title="purify/operators.h" alt="" coords="1110,102,1248,129"/>
-<area shape="rect" id="node39" href="$pfitsio_8h.html" title="purify/pfitsio.h" alt="" coords="554,102,670,129"/>
-<area shape="rect" id="node25" href="$logging_8h.html" title="purify/logging.h" alt="" coords="329,184,453,211"/>
-<area shape="rect" id="node26" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="225,266,408,293"/>
-<area shape="rect" id="node33" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="1324,184,1448,211"/>
+<area shape="rect" id="node2" href="$types_8h.html" title="purify/types.h" alt="" coords="1659,266,1771,293"/>
+<area shape="rect" id="node11" href="$benchmarks_2utilities_8h.html" title="benchmarks/utilities.h" alt="" coords="2118,102,2285,129"/>
+<area shape="rect" id="node14" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="1241,184,1367,211"/>
+<area shape="rect" id="node18" href="$convergence__factory_8h.html" title="purify/convergence\l_factory.h" alt="" coords="315,95,461,136"/>
+<area shape="rect" id="node19" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/imaging__padmm_8h.html" title="sopt/imaging_padmm.h" alt="" coords="300,184,476,211"/>
+<area shape="rect" id="node23" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/relative__variation_8h.html" title="sopt/relative_variation.h" alt="" coords="95,184,276,211"/>
+<area shape="rect" id="node25" href="$distribute_8h.html" title="purify/distribute.h" alt="" coords="944,102,1083,129"/>
+<area shape="rect" id="node28" href="$mpi__utilities_8h.html" title="purify/mpi_utilities.h" alt="" coords="1395,102,1552,129"/>
+<area shape="rect" id="node31" href="$operators_8h.html" title="purify/operators.h" alt="" coords="1904,102,2043,129"/>
+<area shape="rect" id="node39" href="$pfitsio_8h.html" title="purify/pfitsio.h" alt="" coords="698,102,814,129"/>
+<area shape="rect" id="node41" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/communicator_8h.html" title="sopt/mpi/communicator.h" alt="" coords="2575,102,2763,129"/>
+<area shape="rect" id="node42" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/session_8h.html" title="sopt/mpi/session.h" alt="" coords="2788,102,2932,129"/>
+<area shape="rect" id="node43" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/utilities_8h.html" title="sopt/utilities.h" alt="" coords="1765,102,1880,129"/>
+<area shape="rect" id="node44" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/wavelets_8h.html" title="sopt/wavelets.h" alt="" coords="2956,102,3081,129"/>
+<area shape="rect" id="node45" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/sara_8h.html" title="sopt/wavelets/sara.h" alt="" coords="5,102,163,129"/>
+<area shape="rect" id="node8" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="1781,348,1883,375"/>
+<area shape="rect" id="node20" href="$logging_8h.html" title="sopt/logging.h" alt="" coords="705,266,820,293"/>
+<area shape="rect" id="node21" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="743,348,926,375"/>
+<area shape="rect" id="node30" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/linear__transform_8h.html" title="sopt/linear_transform.h" alt="" coords="1529,184,1703,211"/>
+<area shape="rect" id="node33" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="2334,184,2458,211"/>
+<area shape="rect" id="node37" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/chained__operators_8h.html" title="sopt/chained_operators.h" alt="" coords="1880,184,2067,211"/>
 </map>

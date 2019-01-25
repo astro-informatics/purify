@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['u',['u',['../structpurify_1_1utilities_1_1vis__params.html#a561d75ad12718981faf6d846d7a6bd3c',1,'purify::utilities::vis_params::u()'],['../namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5',1,'operators_test::u()']]],
-  ['units',['units',['../structpurify_1_1utilities_1_1vis__params.html#aadff757058a3bc040f9ddfc78ad47b1c',1,'purify::utilities::vis_params']]]
+  ['stokes_5fint',['stokes_int',['../namespacepurify.html#a28dc6ce59ab78004234888df0d8ba64f',1,'purify']]],
+  ['stokes_5fstring',['stokes_string',['../namespacepurify.html#a563072861363d38f71744c9e817705c3',1,'purify']]]
 ];

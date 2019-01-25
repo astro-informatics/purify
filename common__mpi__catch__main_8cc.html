@@ -71,122 +71,12 @@ $(function() {
 </div>
 </div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#define-members">Macros</a> &#124;
-<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">common_mpi_catch_main.cc File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;purify/config.h&gt;</code><br />
-<code>#include &lt;catch.hpp&gt;</code><br />
-<code>#include &lt;memory&gt;</code><br />
-<code>#include &lt;mpi.h&gt;</code><br />
-<code>#include &lt;random&gt;</code><br />
-<code>#include &lt;regex&gt;</code><br />
-<code>#include &lt;vector&gt;</code><br />
-<code>#include &lt;<a class="el" href="logging_8h_source.html">purify/logging.h</a>&gt;</code><br />
-<code>#include &lt;sopt/logging.h&gt;</code><br />
-<code>#include &lt;sopt/mpi/session.h&gt;</code><br />
-</div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for common_mpi_catch_main.cc:</div>
-<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
-</div>
-<div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="common__mpi__catch__main_8cc__incl.png" border="0" usemap="#_2mydata_2cpp_2tests_2common__mpi__catch__main_8cc" alt=""/></div>
-<map name="_2mydata_2cpp_2tests_2common__mpi__catch__main_8cc" id="_2mydata_2cpp_2tests_2common__mpi__catch__main_8cc">
-<area shape="rect" id="node9" href="logging_8h.html" title="purify/logging.h" alt="" coords="139,95,263,121"/>
-<area shape="rect" id="node10" href="logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="174,169,357,196"/>
-</map>
-</div>
-</div>
+
 <p><a href="common__mpi__catch__main_8cc_source.html">Go to the source code of this file.</a></p>
-<table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a34b4c3eca7342fbc4cba090d02139902"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="common__mpi__catch__main_8cc.html#a34b4c3eca7342fbc4cba090d02139902">CATCH_CONFIG_RUNNER</a></td></tr>
-<tr class="separator:a34b4c3eca7342fbc4cba090d02139902"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:afd7b13def75c5d7feb77ac1ea2df5d0b"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; std::mt19937_64 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="common__mpi__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne</a> (new std::mt19937_64(0))</td></tr>
-<tr class="separator:afd7b13def75c5d7feb77ac1ea2df5d0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a217dbf8b442f20279ea00b898af96f52"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="common__mpi__catch__main_8cc.html#a217dbf8b442f20279ea00b898af96f52">main</a> (int argc, const char **argv)</td></tr>
-<tr class="separator:a217dbf8b442f20279ea00b898af96f52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a34b4c3eca7342fbc4cba090d02139902"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a34b4c3eca7342fbc4cba090d02139902">&#9670;&nbsp;</a></span>CATCH_CONFIG_RUNNER</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CATCH_CONFIG_RUNNER</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="common__mpi__catch__main_8cc_source.html#l00001">1</a> of file <a class="el" href="common__mpi__catch__main_8cc_source.html">common_mpi_catch_main.cc</a>.</p>
-
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="a217dbf8b442f20279ea00b898af96f52"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a217dbf8b442f20279ea00b898af96f52">&#9670;&nbsp;</a></span>main()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int main </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>argc</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char **&#160;</td>
-          <td class="paramname"><em>argv</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="common__mpi__catch__main_8cc_source.html#l00016">16</a> of file <a class="el" href="common__mpi__catch__main_8cc_source.html">common_mpi_catch_main.cc</a>.</p>
-
-<p class="reference">References <a class="el" href="types_8h_source.html#l00060">purify::constant::c</a>, <a class="el" href="logging_8disabled_8h_source.html#l00013">purify::logging::initialize()</a>, and <a class="el" href="common__mpi__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne()</a>.</p>
-<div class="fragment"><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;                                      {</div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  Catch::Session session;  <span class="comment">// There must be exactly once instance</span></div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> mpi_session = sopt::mpi::init(argc, argv);</div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="comment">// The following mess transforms the input arguments so that output files have different names</span></div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="comment">// on different processors</span></div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  std::vector&lt;std::string&gt; arguments(argv, argv + argc);</div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keyword">auto</span> output_opt = std::find_if(arguments.begin(), arguments.end(), [](std::string <span class="keyword">const</span> &amp;arg) {</div><div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordflow">if</span> (arg == <span class="stringliteral">&quot;-o&quot;</span> or arg == <span class="stringliteral">&quot;--out&quot;</span>) <span class="keywordflow">return</span> <span class="keyword">true</span>;</div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keyword">auto</span> <span class="keyword">const</span> N = std::string(<span class="stringliteral">&quot;--out=&quot;</span>).size();</div><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keywordflow">return</span> arg.size() &gt; N and arg.substr(0, N) == <span class="stringliteral">&quot;--out=&quot;</span>;</div><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  });</div><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keywordflow">if</span> (output_opt != arguments.end()) {</div><div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordflow">if</span> (*output_opt == <span class="stringliteral">&quot;-o&quot;</span> or *output_opt == <span class="stringliteral">&quot;--out&quot;</span>) output_opt += 1;</div><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordflow">if</span> (output_opt != arguments.end()) {</div><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      <span class="keywordtype">int</span> rank;</div><div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      MPI_Comm_rank(MPI_COMM_WORLD, &amp;rank);</div><div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      <span class="keywordflow">if</span> (rank &gt; 0)</div><div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        *output_opt =</div><div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;            std::regex_replace(*output_opt, std::regex(<span class="stringliteral">&quot;\\.xml&quot;</span>), std::to_string(rank) + <span class="stringliteral">&quot;.xml&quot;</span>);</div><div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    }</div><div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  }</div><div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div><div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="comment">// transforms the modified arguments to a C-style array of pointers.</span></div><div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  std::vector&lt;char const *&gt; cargs(arguments.size());</div><div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  std::transform(arguments.begin(), arguments.end(), cargs.begin(),</div><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;                 [](std::string <span class="keyword">const</span> &amp;<a class="code" href="namespacepurify_1_1constant.html#a289e794ad6812bcd3de2fdcc68dfb01b">c</a>) { <span class="keywordflow">return</span> <a class="code" href="namespacepurify_1_1constant.html#a289e794ad6812bcd3de2fdcc68dfb01b">c</a>.c_str(); });</div><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordtype">int</span> returnCode = session.applyCommandLine(cargs.size(), <span class="keyword">const_cast&lt;</span><span class="keywordtype">char</span> **<span class="keyword">&gt;</span>(cargs.data()));</div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordflow">if</span> (returnCode != 0)  <span class="comment">// Indicates a command line error</span></div><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordflow">return</span> returnCode;</div><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="common__mpi__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne</a>.reset(<span class="keyword">new</span> std::mt19937_64(session.configData().rngSeed));</div><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div><div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <a class="code" href="namespacepurify_1_1logging.html#a766221e3a05f736017082766ede24d4a">sopt::logging::initialize</a>();</div><div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <a class="code" href="namespacepurify_1_1logging.html#a766221e3a05f736017082766ede24d4a">purify::logging::initialize</a>();</div><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div><div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> result = session.run();</div><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keywordflow">return</span> result;</div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;}</div><div class="ttc" id="namespacepurify_1_1constant_html_a289e794ad6812bcd3de2fdcc68dfb01b"><div class="ttname"><a href="namespacepurify_1_1constant.html#a289e794ad6812bcd3de2fdcc68dfb01b">purify::constant::c</a></div><div class="ttdeci">const t_real c</div><div class="ttdoc">speed of light in vacuum </div><div class="ttdef"><b>Definition:</b> <a href="types_8h_source.html#l00060">types.h:60</a></div></div>
-<div class="ttc" id="namespacepurify_1_1logging_html_a766221e3a05f736017082766ede24d4a"><div class="ttname"><a href="namespacepurify_1_1logging.html#a766221e3a05f736017082766ede24d4a">purify::logging::initialize</a></div><div class="ttdeci">std::shared_ptr&lt; int &gt; initialize(std::string const &amp;)</div><div class="ttdoc">Initializes a logger. </div><div class="ttdef"><b>Definition:</b> <a href="logging_8disabled_8h_source.html#l00013">logging.disabled.h:13</a></div></div>
-<div class="ttc" id="common__mpi__catch__main_8cc_html_afd7b13def75c5d7feb77ac1ea2df5d0b"><div class="ttname"><a href="common__mpi__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne</a></div><div class="ttdeci">std::unique_ptr&lt; std::mt19937_64 &gt; mersenne(new std::mt19937_64(0))</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="afd7b13def75c5d7feb77ac1ea2df5d0b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afd7b13def75c5d7feb77ac1ea2df5d0b">&#9670;&nbsp;</a></span>mersenne()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::unique_ptr&lt;std::mt19937_64&gt; mersenne </td>
-          <td>(</td>
-          <td class="paramtype">new &#160;</td>
-          <td class="paramname"><em>std::mt19937_64</em>0</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="reference">Referenced by <a class="el" href="common__mpi__catch__main_8cc_source.html#l00016">main()</a>.</p>
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -1,10 +1,25 @@
 var searchData=
 [
-  ['data_2ein_2eh',['data.in.h',['../data_8in_8h.html',1,'']]],
-  ['degridding_2ecc',['degridding.cc',['../degridding_8cc.html',1,'']]],
-  ['directories_2ein_2eh',['directories.in.h',['../directories_8in_8h.html',1,'']]],
-  ['distribute_2ecc',['distribute.cc',['../purify_2distribute_8cc.html',1,'(Global Namespace)'],['../tests_2distribute_8cc.html',1,'(Global Namespace)']]],
-  ['distribute_2eh',['distribute.h',['../distribute_8h.html',1,'']]],
-  ['distribute_5fsparse_5fvector_2ecc',['distribute_sparse_vector.cc',['../distribute__sparse__vector_8cc.html',1,'']]],
-  ['distributesparsevector_2eh',['DistributeSparseVector.h',['../DistributeSparseVector_8h.html',1,'']]]
+  ['casa_2ecc',['casa.cc',['../casa_8cc.html',1,'']]],
+  ['casacore_2ecc',['casacore.cc',['../purify_2casacore_8cc.html',1,'(Global Namespace)'],['../tests_2casacore_8cc.html',1,'(Global Namespace)']]],
+  ['casacore_2eh',['casacore.h',['../casacore_8h.html',1,'']]],
+  ['cdata_2eh',['cdata.h',['http://astro-informatics.github.io/sopt/cdata_8h.html',1,'']]],
+  ['chained_5foperators_2ecc',['chained_operators.cc',['http://astro-informatics.github.io/sopt/chained__operators_8cc.html',1,'']]],
+  ['chained_5foperators_2eh',['chained_operators.h',['http://astro-informatics.github.io/sopt/chained__operators_8h.html',1,'']]],
+  ['cimg_2eh',['cimg.h',['../cimg_8h.html',1,'']]],
+  ['common_5fcatch_5fmain_2ecc',['common_catch_main.cc',['../common__catch__main_8cc.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/common__catch__main_8cc.html',1,'(Global Namespace)']]],
+  ['common_5fmpi_5fcatch_5fmain_2ecc',['common_mpi_catch_main.cc',['../common__mpi__catch__main_8cc.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/common__mpi__catch__main_8cc.html',1,'(Global Namespace)']]],
+  ['communicator_2ecc',['communicator.cc',['http://astro-informatics.github.io/sopt/sopt_2mpi_2communicator_8cc.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/tests_2communicator_8cc.html',1,'(Global Namespace)']]],
+  ['communicator_2eh',['communicator.h',['http://astro-informatics.github.io/sopt/communicator_8h.html',1,'']]],
+  ['compare_5fwprojection_2ecc',['compare_wprojection.cc',['../compare__wprojection_8cc.html',1,'']]],
+  ['config_2ein_2eh',['config.in.h',['../config_8in_8h.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/config_8in_8h.html',1,'(Global Namespace)']]],
+  ['conjugate_5fgradient_2ecc',['conjugate_gradient.cc',['http://astro-informatics.github.io/sopt/benchmarks_2conjugate__gradient_8cc.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/examples_2conjugate__gradient_8cc.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/tests_2conjugate__gradient_8cc.html',1,'(Global Namespace)']]],
+  ['conjugate_5fgradient_2eh',['conjugate_gradient.h',['http://astro-informatics.github.io/sopt/conjugate__gradient_8h.html',1,'']]],
+  ['contributors_2emd',['CONTRIBUTORS.md',['../CONTRIBUTORS_8md.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/CONTRIBUTORS_8md.html',1,'(Global Namespace)']]],
+  ['convergence_5ffactory_2eh',['convergence_factory.h',['../convergence__factory_8h.html',1,'']]],
+  ['convolution_2ecc',['convolution.cc',['../convolution_8cc.html',1,'']]],
+  ['convolution_2eh',['convolution.h',['../convolution_8h.html',1,'']]],
+  ['copy_5ftiff_2ecc',['copy_tiff.cc',['http://astro-informatics.github.io/sopt/copy__tiff_8cc.html',1,'']]],
+  ['credible_5fregion_2ecc',['credible_region.cc',['http://astro-informatics.github.io/sopt/credible__region_8cc.html',1,'']]],
+  ['credible_5fregion_2eh',['credible_region.h',['http://astro-informatics.github.io/sopt/credible__region_8h.html',1,'']]]
 ];

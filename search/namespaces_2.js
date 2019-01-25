@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['operators_5ftest',['operators_test',['../namespaceoperators__test.html',1,'']]]
+  ['eigen',['Eigen',['http://astro-informatics.github.io/sopt/namespaceEigen.html',1,'']]],
+  ['internal',['internal',['http://astro-informatics.github.io/sopt/namespaceEigen_1_1internal.html',1,'Eigen']]]
 ];
