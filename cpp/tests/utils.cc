@@ -652,3 +652,27 @@ TEST_CASE("generate_baseline") {
   CHECK(R5(1) == test_coverage.v(5));
   CHECK(R5(2) == test_coverage.w(5));
 }
+
+TEST_CASE("conjugate symmetry") {
+  t_uint const number_of_vis = 100;
+  t_uint const max_w = 100;
+  t_real const sigma_m = 1000;
+  const auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, max_w);
+  const auto reflected_data = utilities::conjugate_w(uv_data);
+  REQUIRE(uv_data.size() == reflected_data.size());
+  for (t_uint i = 0; i < uv_data.size(); i++) {
+    if (uv_data.w(i) < 0) {
+      REQUIRE(uv_data.u(i) == Approx(-reflected_data.u(i)).epsilon(1e-12));
+      REQUIRE(uv_data.v(i) == Approx(-reflected_data.v(i)).epsilon(1e-12));
+      REQUIRE(uv_data.w(i) == Approx(-reflected_data.w(i)).epsilon(1e-12));
+      REQUIRE(uv_data.vis(i).real() == Approx(std::conj(reflected_data.vis(i)).real()).epsilon(1e-12));
+      REQUIRE(uv_data.vis(i).imag() == Approx(std::conj(reflected_data.vis(i)).imag()).epsilon(1e-12));
+    } else {
+      REQUIRE(uv_data.u(i) == Approx(reflected_data.u(i)).epsilon(1e-12));
+      REQUIRE(uv_data.v(i) == Approx(reflected_data.v(i)).epsilon(1e-12));
+      REQUIRE(uv_data.w(i) == Approx(reflected_data.w(i)).epsilon(1e-12));
+      REQUIRE(uv_data.vis(i).real() == Approx(reflected_data.vis(i).real()).epsilon(1e-12));
+      REQUIRE(uv_data.vis(i).imag() == Approx(reflected_data.vis(i).imag()).epsilon(1e-12));
+    }
+  }
+}
