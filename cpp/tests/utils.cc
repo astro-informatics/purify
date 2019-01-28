@@ -665,8 +665,10 @@ TEST_CASE("conjugate symmetry") {
       REQUIRE(uv_data.u(i) == Approx(-reflected_data.u(i)).epsilon(1e-12));
       REQUIRE(uv_data.v(i) == Approx(-reflected_data.v(i)).epsilon(1e-12));
       REQUIRE(uv_data.w(i) == Approx(-reflected_data.w(i)).epsilon(1e-12));
-      REQUIRE(uv_data.vis(i).real() == Approx(std::conj(reflected_data.vis(i)).real()).epsilon(1e-12));
-      REQUIRE(uv_data.vis(i).imag() == Approx(std::conj(reflected_data.vis(i)).imag()).epsilon(1e-12));
+      REQUIRE(uv_data.vis(i).real() ==
+              Approx(std::conj(reflected_data.vis(i)).real()).epsilon(1e-12));
+      REQUIRE(uv_data.vis(i).imag() ==
+              Approx(std::conj(reflected_data.vis(i)).imag()).epsilon(1e-12));
     } else {
       REQUIRE(uv_data.u(i) == Approx(reflected_data.u(i)).epsilon(1e-12));
       REQUIRE(uv_data.v(i) == Approx(reflected_data.v(i)).epsilon(1e-12));
