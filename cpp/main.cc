@@ -100,6 +100,8 @@ int main(int argc, const char **argv) {
 #endif
       uv_data = read_measurements::read_measurements(params.measurements(), true, stokes::I,
                                                      params.measurements_units());
+    if(params.conjugate_w())
+      uv_data = utilities::conjugate_w(uv_data);
 #ifdef PURIFY_MPI
     if (params.mpi_wstacking()) {
       auto const world = sopt::mpi::Communicator::World();
@@ -136,6 +138,8 @@ int main(int argc, const char **argv) {
                                                        params.measurements_units());
       uv_data.weights = Vector<t_complex>::Ones(uv_data.weights.size());
     }
+    if(params.conjugate_w())
+      uv_data = utilities::conjugate_w(uv_data);
 #ifdef PURIFY_MPI
     if (params.mpi_wstacking()) {
       auto const world = sopt::mpi::Communicator::World();
