@@ -277,45 +277,19 @@ utilities::vis_params uv_scale(const utilities::vis_params &uv_vis, const t_int 
   return scaled_vis;
 }
 
-utilities::vis_params uv_symmetry(const utilities::vis_params &uv_vis) {
-  /*
-    Adds in reflection of the fourier plane using the condjugate symmetry for a real image.
-
-    uv_vis:: uv coordinates for the fourier plane
-  */
-  t_int total = uv_vis.u.size();
-  Vector<t_real> utemp(2 * total);
-  Vector<t_real> vtemp(2 * total);
-  Vector<t_real> wtemp(2 * total);
-  Vector<t_complex> vistemp(2 * total);
-  Vector<t_complex> weightstemp(2 * total);
-
-  for (t_int i = 0; i < uv_vis.u.size(); ++i) {
-    utemp(i) = uv_vis.u(i);
-    vtemp(i) = uv_vis.v(i);
-    wtemp(i) = uv_vis.w(i);
-    vistemp(i) = uv_vis.vis(i);
-    weightstemp(i) = uv_vis.weights(i);
+utilities::vis_params conjugate_w(const utilities::vis_params &uv_vis) {
+  utilities::vis_params output = uv_vis;
+#pragma omp parallel for
+  for (t_uint i = 0; i < output.size(); i++) {
+    if (uv_vis.w(i) < 0) {
+      output.w(i) = -uv_vis.w(i);
+      output.v(i) = -uv_vis.v(i);
+      output.u(i) = -uv_vis.u(i);
+      output.vis(i) = std::conj(uv_vis.vis(i));
+    }
+    assert(output.w(i) >= 0);
   }
-  for (t_int i = total; i < 2 * total; ++i) {
-    utemp(i) = -uv_vis.u(i - total);
-    vtemp(i) = -uv_vis.v(i - total);
-    wtemp(i) = uv_vis.w(i - total);
-    vistemp(i) = std::conj(uv_vis.vis(i - total));
-    weightstemp(i) = uv_vis.weights(i - total);
-  }
-  utilities::vis_params conj_vis;
-  conj_vis.u = utemp;
-  conj_vis.v = vtemp;
-  conj_vis.w = wtemp;
-  conj_vis.vis = vistemp;
-  conj_vis.weights = weightstemp;
-  conj_vis.units = uv_vis.units;
-  conj_vis.ra = uv_vis.ra;
-  conj_vis.dec = uv_vis.dec;
-  conj_vis.average_frequency = uv_vis.average_frequency;
-
-  return conj_vis;
+  return output;
 }
 
 t_int sub2ind(const t_int &row, const t_int &col, const t_int &rows, const t_int &cols) {

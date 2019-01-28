@@ -86,8 +86,8 @@ utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t
 //! scales the visibilities to units of pixels
 utilities::vis_params uv_scale(const utilities::vis_params &uv_vis, const t_int &ftsizeu,
                                const t_int &ftsizev);
-//! Puts in conjugate visibilities
-utilities::vis_params uv_symmetry(const utilities::vis_params &uv_vis);
+//! reflects visibilities into the w >= 0 domain
+utilities::vis_params conjugate_w(const utilities::vis_params &uv_vis);
 //! Converts from subscript to index for matrix.
 t_int sub2ind(const t_int &row, const t_int &col, const t_int &rows, const t_int &cols);
 //! Converts from index to subscript for matrix.
