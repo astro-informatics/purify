@@ -185,6 +185,7 @@ void YamlParser::parseAndSetMeasureOperators(const YAML::Node& measureOperatorsN
   this->wprojection_ = get<bool>(measureOperatorsNode, {"wide-field", "wprojection"});
   this->mpi_wstacking_ = get<bool>(measureOperatorsNode, {"wide-field", "mpi_wstacking"});
   this->kmeans_iters_ = get<t_int>(measureOperatorsNode, {"wide-field", "kmeans_iterations"});
+  this->conjugate_w_ = get<bool>(measureOperatorsNode, {"wide-field", "conjugate_w"});
 }
 
 void YamlParser::parseAndSetSARA(const YAML::Node& SARANode) {
