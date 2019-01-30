@@ -543,9 +543,9 @@
     </member>
     <member kind="function">
       <type>utilities::vis_params</type>
-      <name>uv_symmetry</name>
+      <name>conjugate_w</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
-      <anchor>ace27c31f9aabd023d883002f75179f13</anchor>
+      <anchor>a8f267ff244270871a0d36b52ff9b3eb6</anchor>
       <arglist>(const utilities::vis_params &amp;uv_vis)</arglist>
     </member>
     <member kind="function">
@@ -837,9 +837,9 @@
     </member>
     <member kind="function">
       <type>utilities::vis_params</type>
-      <name>uv_symmetry</name>
+      <name>conjugate_w</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
-      <anchor>ace27c31f9aabd023d883002f75179f13</anchor>
+      <anchor>a8f267ff244270871a0d36b52ff9b3eb6</anchor>
       <arglist>(const utilities::vis_params &amp;uv_vis)</arglist>
     </member>
     <member kind="function">
@@ -5212,6 +5212,13 @@
       <anchor>a0d4ce22c6bcead9789fe0a7bca7a7044</anchor>
       <arglist>(&quot;generate_baseline&quot;)</arglist>
     </member>
+    <member kind="function">
+      <type></type>
+      <name>TEST_CASE</name>
+      <anchorfile>utils_8cc.html</anchorfile>
+      <anchor>a252b0fc313e8fb83b83e0c9e0720dd93</anchor>
+      <arglist>(&quot;conjugate symmetry&quot;)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>wavelet_factory.cc</name>
@@ -8762,9 +8769,9 @@
     </member>
     <member kind="function">
       <type>utilities::vis_params</type>
-      <name>uv_symmetry</name>
+      <name>conjugate_w</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
-      <anchor>ace27c31f9aabd023d883002f75179f13</anchor>
+      <anchor>a8f267ff244270871a0d36b52ff9b3eb6</anchor>
       <arglist>(const utilities::vis_params &amp;uv_vis)</arglist>
     </member>
     <member kind="function">
