@@ -19,7 +19,9 @@ t_real estimate_cell_size(const t_real max_u, const t_uint imsize, const t_real 
 
 t_real fov_cosine(t_real const cell, t_uint const imsize) {
   const t_real theta_FoV_L = imsize * cell;
-  return 2 * std::sin(constant::pi / 180. * theta_FoV_L / (60. * 60.) * 0.5);
+  const t_real extra_theta = (theta_FoV_L > 180. * 60. * 60.) ? theta_FoV_L - 180. * 60. * 60. : 0.;
+  return 2 * std::sin(constant::pi / 180. * (theta_FoV_L - extra_theta) / (60. * 60.) * 0.5) +
+         2 * std::sin(constant::pi / 180. * extra_theta / (60. * 60.) * 0.5);
 }
 
 Matrix<t_complex> generate_chirp(const t_real w_rate, const t_real cell_x, const t_real cell_y,
