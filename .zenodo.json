@@ -1,0 +1,55 @@
+{
+    "publication_date": "2019-02-01",
+    "title": "PURIFY",
+    "version": "3.0.0",
+	  "creators": [
+	      {
+	          "affiliation": "University College London",
+	          "name": "Luke Pratley",
+	          "orcid": "0000-0002-4716-9933"
+	      },
+	      {
+	          "affiliation": "Imperial College",
+	          "name": "Mayeul d'Avezac",
+	          "orcid": "0000-0002-2615-8397"
+	      },
+	      {
+	          "name": "Rafael Carrillo",
+	          "orcid": "0000-0001-7149-6304"
+	      },
+	      {
+	          "affiliation": "University College London",
+	          "name": "Ilektra Christidi"
+	      },
+	      {
+	          "affiliation": "University College London",
+	          "name": "Roland Guichard",
+	          "orcid": "0000-0003-3969-4102"
+	      },
+	      {
+	          "affiliation": "University College London",
+	          "name": "Jason D. McEwen",
+	          "orcid": "0000-0002-5852-8890"
+	      },
+	      {
+	          "affiliation": "University College London",
+	          "name": "David Pérez-Suárez",
+	          "orcid": "0000-0003-0784-6909"
+	      },
+	      {
+	          "affiliation": "Heriot Watt University",
+	          "name": "Yves Wiaux",
+	          "orcid": "0000-0002-1658-0121"
+	      }
+	  ],
+	  "keywords": [
+	      "radio astronomy",
+	      "image reconstruction",
+        "parallelization",
+        "big data"
+	  ],
+	  "license": "GPL-2.0",
+	  "upload_type": "software",
+    "description": "Next-generation radio interferometric imaging.",
+    "access_right": "open"
+}
