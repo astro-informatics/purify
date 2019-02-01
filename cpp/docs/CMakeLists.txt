@@ -8,6 +8,12 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
 )
 
+file(COPY
+  ${CMAKE_CURRENT_SOURCE_DIR}/DoxygenLayout.xml
+  DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+
 if (web)
   file(DOWNLOAD http://astro-informatics.github.io/sopt/sopt.tag ${CMAKE_CURRENT_BINARY_DIR}/sopt/sopt.tag)
 endif()
