@@ -16,6 +16,18 @@
 //! Whether FFTW has openmp
 #cmakedefine PURIFY_OPENMP_FFTW
 
+//! Whether PURIFY is running with mpi
+#cmakedefine PURIFY_MPI
+
+//! Whether PURIFY is running with arrayfire
+#cmakedefine PURIFY_ARRAYFIRE
+
+//! Whether PURIFY is running with CImg
+#cmakedefine PURIFY_CImg
+
+//! Whether PURIFY is running with casacore
+#cmakedefine PURIFY_CASACORE
+
 #include <string>
 #include <tuple>
 
@@ -41,6 +53,6 @@ inline constexpr bool color_logger() {
   return @PURIFY_COLOR_LOGGING@;
   // clang-format on
 }
-}
+} // namespace purify
 
 #endif

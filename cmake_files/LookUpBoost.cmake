@@ -42,11 +42,11 @@ ExternalProject_Add(
     Lookup-Boost
     PREFIX ${EXTERNAL_ROOT}
     # Downloads boost from url -- much faster than svn
-    URL http://downloads.sourceforge.net/project/boost/boost/1.57.0/boost_1_57_0.tar.bz2
+    URL https://dl.bintray.com/boostorg/release/1.65.0/source/boost_1_65_0.tar.bz2
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND ./bootstrap.sh
     BUILD_COMMAND ${configure_command}
-    INSTALL_COMMAND ./b2 ${toolset} link=static variant=release --with-math --with-filesystem
+    INSTALL_COMMAND ./b2 ${toolset} variant=release --with-math --with-filesystem
         --prefix=${EXTERNAL_ROOT} install
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON

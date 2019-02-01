@@ -1,3 +1,4 @@
+#include "purify/casacore.h"
 #include <boost/filesystem.hpp>
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
 #include <casacore/tables/TaQL/TableParse.h>
@@ -8,7 +9,6 @@
 #include <casacore/tables/Tables/ScalarColumn.h>
 #include <casacore/tables/Tables/SetupNewTab.h>
 #include <casacore/tables/Tables/TableColumn.h>
-#include "purify/casacore.h"
 #include "purify/directories.h"
 
 #include "purify/types.h"
@@ -49,22 +49,21 @@ TEST_CASE("Casacore") {
 }
 
 class TmpPath {
-public:
+ public:
   TmpPath()
-      : path_(boost::filesystem::unique_path(boost::filesystem::temp_directory_path()
-                                             / "%%%%-%%%%-%%%%-%%%%.ms")) {}
+      : path_(boost::filesystem::unique_path(boost::filesystem::temp_directory_path() /
+                                             "%%%%-%%%%-%%%%-%%%%.ms")) {}
   ~TmpPath() {
-    if(boost::filesystem::exists(path()))
-      boost::filesystem::remove_all(path());
+    if (boost::filesystem::exists(path())) boost::filesystem::remove_all(path());
   }
   boost::filesystem::path const &path() const { return path_; }
 
-private:
+ private:
   boost::filesystem::path path_;
 };
 
 class TmpMS : public TmpPath {
-public:
+ public:
   TmpMS() : TmpPath() {
     casa::TableDesc simpleDesc = casa::MS::requiredTableDesc();
     casa::SetupNewTable newTab(path().string(), simpleDesc, casa::Table::New);
@@ -77,140 +76,116 @@ public:
   casa::MeasurementSet const *operator->() const { return ms_.get(); }
   casa::MeasurementSet *operator->() { return ms_.get(); }
 
-protected:
+ protected:
   std::unique_ptr<casa::MeasurementSet> ms_;
 };
 
+const std::string test_file = atca_filename("0332-391.ms");
+
 TEST_CASE("Size/Number of channels") {
-  CHECK(purify::casa::MeasurementSet(purify::notinstalled::ngc3256_ms()).size() == 128);
+  CHECK(purify::casa::MeasurementSet(test_file).size() == 13);
 }
 
 TEST_CASE("Single channel") {
   namespace pc = purify::casa;
-  auto const ms = pc::MeasurementSet(purify::notinstalled::ngc3256_ms());
+  auto const ms = pc::MeasurementSet(test_file);
   SECTION("Check channel validity") {
-    CHECK(not pc::MeasurementSet::const_iterator::value_type(0, ms).is_valid());
-    CHECK(pc::MeasurementSet::const_iterator::value_type(17, ms).is_valid());
+    CHECK(pc::MeasurementSet::const_iterator::value_type(0, ms).is_valid());
+    CHECK(pc::MeasurementSet::const_iterator::value_type(4, ms).is_valid());
   }
+  // Raw data from the measurement set "0332-391.ms" was read out using CASA's casabrowser
+  // executable. Then it was copied into this test.
   SECTION("Raw UVW") {
-    auto const channel = pc::MeasurementSet::const_iterator::value_type(17, ms);
-    REQUIRE(channel.size() == 141059);
+    auto const channel = pc::MeasurementSet::const_iterator::value_type(11, ms);
+    REQUIRE(channel.size() == 20541);
     auto const u = channel.raw_u();
-    REQUIRE(u.size() == 141059);
-    CHECK(std::abs(u[0] + 48.184256396979784) < 1e-8);
-    CHECK(std::abs(u[20000] + 34.078338234565763) < 1e-8);
+    REQUIRE(u.size() == 20541);
+    CHECK(std::abs(u[0] - 3889.46519177759410013095475733280181884765625) < 1e-8);
+    CHECK(std::abs(u[3360] - 683.2842475491) < 1e-8);
     auto const v = channel.raw_v();
-    REQUIRE(v.size() == 141059);
-    CHECK(std::abs(v[0] + 2.8979287890493985) < 1e-8);
-    CHECK(std::abs(v[20000] - 45.856539171696184) < 1e-8);
+    REQUIRE(v.size() == 20541);
+    CHECK(std::abs(v[0] - 1346.20383349449502929928712546825408935546875) < 1e-8);
+    CHECK(std::abs(v[3360] + 785.8117311632) < 1e-8);
+    auto const w = channel.raw_w();
+    REQUIRE(w.size() == 20541);
+    CHECK(std::abs(w[0] - 1663.30025165469896819558925926685333251953125) < 1e-8);
+    CHECK(std::abs(w[3360] + 970.3123979733) < 1e-8);
   }
 
   SECTION("Raw frequencies") {
     auto const f0 = pc::MeasurementSet::const_iterator::value_type(0, ms).raw_frequencies();
-    CHECK(f0.size() == 4);
-    CHECK(std::abs(f0(0) - 113211987500.0) < 1e-1);
-    CHECK(std::abs(f0(1) - 111450812500.10001) < 1e-4);
+    CHECK(f0.size() == 1);
+    CHECK(std::abs(f0(0) - 1431999959.500274181365966796875) < 1e-1);
 
-    auto const f17 = pc::MeasurementSet::const_iterator::value_type(17, ms).raw_frequencies();
-    CHECK(f17.size() == 4);
-    CHECK(std::abs(f17(0) - 113477612500.0) < 1e-1);
-    CHECK(std::abs(f17(1) - 111716437500.10001) < 1e-4);
+    auto const f11 = pc::MeasurementSet::const_iterator::value_type(11, ms).raw_frequencies();
+    CHECK(f11.size() == 1);
+    CHECK(std::abs(f11(0) - 1343999961.9890842437744140625) < 1e-1);
   }
 
   SECTION("data desc id") {
-    REQUIRE(pc::MeasurementSet::const_iterator::value_type(0, ms).data_desc_id().size() == 0);
-    REQUIRE(pc::MeasurementSet::const_iterator::value_type(17, ms).data_desc_id().size() == 141059);
+    REQUIRE(pc::MeasurementSet::const_iterator::value_type(0, ms).data_desc_id().size() == 20490);
+    REQUIRE(pc::MeasurementSet::const_iterator::value_type(4, ms).data_desc_id().size() == 20606);
   }
 
   SECTION("I") {
     using namespace purify;
-    auto const I = pc::MeasurementSet::const_iterator::value_type(17, ms).I();
-    REQUIRE(I.size() == 141059);
-    CHECK(std::abs(I(0) - t_complex(-0.30947005748748779, -0.10632525384426117)) < 1e-12);
-    CHECK(std::abs(I(10) - t_complex(0.31782057881355286, 0.42863702774047852)) < 1e-12);
+    auto const I = pc::MeasurementSet::const_iterator::value_type(11, ms).I();
+    REQUIRE(I.size() == 20541);
+    CHECK(std::abs(I(0) - t_complex(0.1666463911533, -0.05232101678848)) < 1e-12);
+    CHECK(std::abs(I(10) - t_complex(0.1421023607254, -0.04858251661062)) < 1e-12);
 
-    REQUIRE(pc::MeasurementSet::const_iterator::value_type(0, ms).I().size() == 0);
+    REQUIRE(pc::MeasurementSet::const_iterator::value_type(0, ms).I().size() == 20490);
   }
 
   SECTION("wI") {
     using namespace purify;
-    auto const wI = pc::MeasurementSet::const_iterator::value_type(17, ms).wI();
-    REQUIRE(wI.size() == 141059);
+    auto const wI = pc::MeasurementSet::const_iterator::value_type(11, ms).wI();
+    REQUIRE(wI.size() == 20541);
     CAPTURE(wI.head(5).transpose());
     CHECK(wI.isApprox(0.5 * purify::Vector<t_real>::Ones(wI.size())));
   }
 
   SECTION("frequencies") {
     using namespace purify;
-    auto const f = pc::MeasurementSet::const_iterator::value_type(17, ms).frequencies();
-    REQUIRE(f.size() == 141059);
-    CHECK(std::abs(f(0) - 113477612500.0) < 1e-0);
-    CHECK(std::abs(f(1680) - 111716437500.10001) < 1e-0);
-    CHECK(std::abs(f(3360) - 101240562499.89999) < 1e-0);
-    CHECK(std::abs(f(5040) - 102785237500.0) < 1e-0);
+    auto const f = pc::MeasurementSet::const_iterator::value_type(11, ms).frequencies();
+    REQUIRE(f.size() == 20541);
+    CHECK(std::abs(f(0) - 1343999961.989) < 1e-0);
+    CHECK(std::abs(f(1680) - 1343999961.989) < 1e-0);
+    CHECK(std::abs(f(3360) - 1343999961.989) < 1e-0);
+    CHECK(std::abs(f(5040) - 1343999961.989) < 1e-0);
   }
 }
 
 TEST_CASE("Measurement channel") {
   using namespace purify;
-  REQUIRE(not purify::casa::MeasurementSet(purify::notinstalled::ngc3256_ms())[0].is_valid());
-  auto const channel = purify::casa::MeasurementSet(purify::notinstalled::ngc3256_ms())[17];
+  auto const channel = purify::casa::MeasurementSet(test_file)[0];
   REQUIRE(channel.is_valid());
   auto const I = channel.I();
-  REQUIRE(I.size() == 141059);
-  CHECK(std::abs(I(0) - t_complex(-0.30947005748748779, -0.10632525384426117)) < 1e-12);
-  CHECK(std::abs(I(10) - t_complex(0.31782057881355286, 0.42863702774047852)) < 1e-12);
+  REQUIRE(I.size() == 20490);
+  CHECK(std::abs(I(0) - t_complex(-0.01469034608454, -0.00434834882617)) < 1e-12);
+  CHECK(std::abs(I(10) - t_complex(-0.09461227059364, -0.01139064785093)) < 1e-12);
 }
 
 TEST_CASE("Channel iteration") {
-  std::vector<int> const valids{
-      17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  33,  34,
-      35,  36,  37,  38,  39,  40,  41,  42,  43,  44,  45,  46,  47,  48,  49,  50,  51,  52,
-      53,  54,  55,  56,  57,  58,  59,  60,  61,  62,  63,  64,  65,  66,  67,  68,  69,  70,
-      71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,  83,  84,  85,  86,  87,  88,
-      89,  90,  91,  92,  93,  94,  95,  96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 106,
-      107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124};
-  auto const ms = purify::casa::MeasurementSet(purify::notinstalled::ngc3256_ms());
+  std::vector<int> const valids{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+  auto const ms = purify::casa::MeasurementSet(test_file);
   auto i_channel = ms.begin();
   auto const i_end = ms.end();
-  for(; i_channel < i_end; i_channel += 10) {
-    CHECK(i_channel->channel() < 128);
-    bool const is_valid
-        = std::find(valids.begin(), valids.end(), i_channel->channel()) != valids.end();
+  for (; i_channel < i_end; i_channel += 5) {
+    CHECK(i_channel->channel() < 13);
+    bool const is_valid =
+        std::find(valids.begin(), valids.end(), i_channel->channel()) != valids.end();
     CHECK(is_valid == i_channel->is_valid());
   }
 }
 
-// TEST_CASE("Read Measurement") {
-//   purify::utilities::vis_params const vis_file =
-//   purify::utilities::read_visibility(vla_filename("at166B.3C129.c0I.vis"));
-//   purify::utilities::vis_params const ms_file =
-//   purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"),
-//   purify::casa::MeasurementSet::ChannelWrapper::polarization::I);
-//
-//   REQUIRE(vis_file.u.size() == ms_file.u.size());
-//
-//   CHECK(vis_file.u.isApprox(ms_file.u, 1e-6));
-//   CHECK(vis_file.v.isApprox(ms_file.v, 1e-6));
-//   CHECK(vis_file.vis.isApprox(ms_file.vis, 1e-6));
-//   purify::utilities::vis_params const ms_fileLL =
-//   purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"),
-//   purify::casa::MeasurementSet::ChannelWrapper::polarization::LL);
-//   purify::utilities::vis_params const ms_fileRR =
-//   purify::casa::read_measurementset(vla_filename("at166B.3C129.c0.ms"),
-//   purify::casa::MeasurementSet::ChannelWrapper::polarization::RR);
-//   purify::Vector<purify::t_complex> const weights = (1./(1./ms_fileLL.weights.array() +
-//   1./ms_fileRR.weights.array())).matrix();
-//   CHECK(vis_file.weights.real().isApprox(weights.real(), 1e-6));
-// }
-
 TEST_CASE("Direction") {
-  auto const ms = purify::casa::MeasurementSet(purify::notinstalled::ngc3256_ms());
+  auto const ms = purify::casa::MeasurementSet(test_file);
   auto const direction = ms.direction();
   auto const right_ascension = ms.right_ascension();
   auto const declination = ms.declination();
-  CHECK(std::abs(right_ascension - 2.7395560603928995) < 1e-8);
-  CHECK(std::abs(declination + 0.76628680808811045) < 1e-8);
-  CHECK(std::abs(direction[0] - 2.7395560603928995) < 1e-8);
-  CHECK(std::abs(direction[1] + 0.76628680808811045) < 1e-8);
+  CHECK(std::abs(right_ascension - 0.934273294000000031900299291010014712810516357421875) < 1e-8);
+  CHECK(std::abs(declination + 0.68069387400000003207622967238421551883220672607421875) < 1e-8);
+  CHECK(std::abs(direction[0] - 0.934273294000000031900299291010014712810516357421875) < 1e-8);
+  CHECK(std::abs(direction[1] + 0.68069387400000003207622967238421551883220672607421875) < 1e-8);
 }

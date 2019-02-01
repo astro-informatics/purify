@@ -1,0 +1,79 @@
+### Config file for Purify
+Version: 3.0.0
+GeneralConfiguration:
+  InputOutput:
+    input:
+      # If the following parameter is "measurements", only the measurements block should
+      # be provided, and the measurements will be read from file. If it's "simulation", only the
+      # simulation block should be provided, and random measurements of the given
+      # image will be generated with the requested noise.
+      source: measurements # one from measurements, simulation
+      measurements:
+        measurements_files:
+          - /path/to/measurment/set # path to the measurement set
+        measurements_polarization: I # one from I Q V XX LL
+        measurements_units: pixels # one from lambda, radians, pixels
+        measurements_sigma: 0.1 # the noise level in the data
+        warm_start: /path/to/warm/start/image
+    output_prefix: path/to/output/dir # results directory will be created inside this path, and called output_<timestamp>
+
+  ### Execution parameters
+  logging: debug # How much logging you want (debug, critical, ..)# FIXME: add the options, compile?
+  iterations: 100 # number of iterations (>= 0)
+  epsilonScaling: 1 # RMS noise (> 0)
+  ## modelImage:  # If none epsilonL2 * RealImage # FIXME - maybe to delete
+
+########## Measure Operators ##########
+MeasureOperators:
+  pixelSize:
+    cellsizex: 1
+    cellsizey: 1
+  imageSize: # for the moment: power of two
+    width: 1024
+    height: 1024
+  J: # Interpolation pixels (default 4x4). Input either a value or pair
+    Jx: 4
+    Jy: 4
+    Jw: 30
+  kernel: kb # kernel, choose between: kb, Gauss, box
+  oversampling: 2 # value > 1
+  powermethod:
+    iters: 100 # value > 0
+    tolerance: 1e-4 # value > 0
+    eigenvector: 
+      real:  ""
+      imag:  ""
+  wide-field:
+    wprojection: False # using radially symmetric w projection kernel
+    mpi_wstacking: False # applies average w-stack correction on each node (always True with wprojection)
+    conjugate_w: True #reflects measurements onto the positive w-domain (can reduce computation)
+    kmeans_iterations: 100 #number of iterations in w-stacking clustering algorithm
+  gpu: False
+  # TODO: Add others like weighting. (at the moment natural)
+
+########## SARA ##########
+SARA:
+  # wavelet bases, to choose from: Dirac, DB1, ..., DBn (where n=0 is dirac, and 1 <= n <= 35 is DB basis)
+  wavelet_dict: 0..8 # sequence of desired basis: 0,23,31 or 0,12..16,20
+  wavelet_levels: 4 # value for all
+  dualFBVarianceConvergence: 1e-3 # (>0) relative convergence tolerance of l1 proximal
+  realValueConstraint: True # Boolean
+  positiveValueConstraint: True #boolean
+
+AlgorithmOptions:
+  algorithm: padmm # will just read the options of that one.
+  ########## PADMM ##########
+  padmm:
+    epsilonConvergenceScaling: 1 # Default 1 (>0)
+    # Following is only accepted when MPI is used
+    mpiAlgorithm:  fully-distributed # one of none, serial-equivalent, fully-distributed
+    # Be careful changing the following unless you know what you are doing
+    relVarianceConvergence: 1e-3 # (>0)
+    stepsize:  # Stepsize, choose value between: default, variable, 100, x
+      update_tolerance: 1e-1 #when predicted stepsize is greater than this value, it will be updated
+      update_iters: 0 #how many iterations to allow updating of step size
+  fb: #solve the unconstrained problem
+    mpiAlgorithm: serial-equivalent # one of none, serial-equivalent
+    regularisation_parameter: 1
+    stepsize: 1
+    relVarianceConvergence: 1e-3 # (>0) relative convergence of the objective function

@@ -1,0 +1,279 @@
+language: cpp
+sudo: required
+dist: trusty
+
+env:
+  global:
+    - BUILD_CMD='make VERBOSE=1'
+    - TEST_CMD='ctest -T test --output-on-failure -V'
+    - OMP_NUM_THREADS=4
+    - MPI_CONFIG='CMAKE_CMD_EXTRA="-DMPIEXEC:FILEPATH=$(which mpirun) -DMPIEXEC_MAX_NUMPROCS=${MPI_PROCS}"'
+
+# The apt packages below are needed but can no longer be installed with
+# sudo apt-get.
+addons:
+  homebrew:
+    packages: &osx_sources
+      - gcc@7
+      - fftw
+    update: true
+
+cache:
+  directories:
+    - $HOME/spack
+
+matrix:
+  fast_finish: true
+
+  include:
+    - os: osx
+      osx_image: xcode10.1
+      env:
+        - TITLE="XCode 10.1 - GCC"
+        - MPI=OFF
+        - openMP=OFF
+
+    - os: osx
+      osx_image: xcode10.1
+      env:
+        - TITLE="XCode 10.1 - Clang"
+        - MPI=OFF
+        - openMP=OFF
+
+    - os: osx
+      osx_image: xcode10.1
+      env:
+        - TITLE="XCode 10.1 - GCC - MPI"
+        - MPI=ON
+        - openMP=OFF
+        - MPI_PROCS=2
+      addons:
+        homebrew:
+          packages:
+            - *osx_sources
+            - modules
+            - lmod
+
+    - os: linux
+      addons:
+        apt:
+          sources: &basic_sources
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - &native_deps [ g++-7, clang-5.0, libtiff5-dev, libgomp1, libfftw3-dev ]
+            # libtiff5-dev version 5 ?; libgomp1 version 4.8.4-2
+            # libfftw3-dev version 3.3.3
+            - &all_deps [ libboost-all-dev, libeigen3-dev, libyaml-cpp-dev ]
+            # libboost-all-dev version 1.54; libeigen3-dev version 3.2.0
+            # libcfitsio3-dev version 3.34; libyaml-cpp-dev version 0.5.1
+            #   \-> We need CFITSIO 3.41, this could help to install other dependencies...
+      env:
+        - TITLE="All dependencies - GCC"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - MPI=OFF
+        - openMP=OFF
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+            - *all_deps
+      env:
+        - TITLE="All dependencies - GCC - OMP"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - MPI=OFF
+        - openMP=ON
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+            - *all_deps
+            - lcov
+      env:
+        - TITLE="All dependencies - GCC - MPI"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - MPI=ON
+        - openMP=ON
+        - MPI_PROCS=2
+        - COVERAGE=ON
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+            - *all_deps
+      env:
+        - TITLE="All dependencies - GCC - MPI - mpich"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - MPI=ON
+        - openMP=ON
+        - MPI_PROCS=4
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+      env:
+        - TITLE="No dependencies - GCC - MPI"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - MPI=ON
+        - openMP=ON
+        - MPI_PROCS=2
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+            - *all_deps
+            - &all_casa [ flex, bison, libblas-dev, liblapack-dev, libcfitsio3-dev, wcslib-dev, gfortran, libncurses5-dev, libreadline6-dev, libhdf5-serial-dev, python-numpy, python3-numpy ]
+      env:
+        - TITLE="CASA: All dependencies - GCC"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - Tests=ON
+        - MPI=OFF
+        - openMP=ON
+        - CASA=ON
+        - EXAMPLES=ON
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+            - *all_deps
+      env:
+        - TITLE="All dependencies - GCC - MPI - examples"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - Tests=ON
+        - MPI=ON
+        - openMP=ON
+        - EXAMPLES=ON
+        - TEST_CMD=''
+
+    - os: linux
+      services:
+        - docker
+      env:
+        - TITLE="Documentation - GCC"
+        - DOCS=ON
+        - BUILD_CMD='make docweb VERBOSE=1'
+      script:
+        - chmod o+w . # To allow docker to create the build directory
+        - docker run --rm -v $(pwd):/mydata uclrits/sopt /bin/sh -c "mkdir build; cd build; cmake .. -Ddocs=${DOCS} -Dweb=ON; eval ${BUILD_CMD}"
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - *basic_sources
+          packages:
+            - *native_deps
+      env:
+        - TITLE="Lint"
+        - DEBUG=True
+        - LDFLAGS='-pthread'
+        - MPI=OFF
+        - openMP=OFF
+        - DOCS=OFF
+        - BUILD_CMD="find ../ -regex '.*\.\(cc\|h\)' -not -iname '*.in.h' | xargs -I{} -P 10 clang-format-7 -i -style=file {}; git diff"
+        - TEST_CMD="git diff --exit-code || (echo '## NOTE: your code is not linted properly - fix the above'; false)"
+
+  allow_failures:
+    # Because boost error on finding files
+    - os: osx
+      osx_image: xcode10.1
+      env:
+        - TITLE="XCode 10.1 - GCC - MPI"
+        - MPI=ON
+        - openMP=OFF
+        - MPI_PROCS=2
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+  keep-history: true
+  local-dir: build/cpp/docs/html
+  verbose: true # FIXME: just at first to see logs
+  on:
+    branch: development
+    condition: $TITLE = "Documentation - GCC"
+
+before_install:
+  - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
+  - if [ $TRAVIS_OS_NAME = linux ]; then ClangVer="-5.0"; fi
+  - if [[ ${TITLE} = *GCC* ]]; then CC=gcc-7; else CC=clang${ClangVer}; fi
+  - if [[ ${TITLE} = *GCC* ]]; then CXX=g++-7; else CXX=clang++${ClangVer}; fi
+  - if [ $TRAVIS_OS_NAME = osx ] && [[ $MPI = ON ]]; then bash .ci/install_spack.sh; source $(brew --prefix modules)/init/bash; source .ci/spack_env.sh ;fi
+  # As MPI is not installed already, this variable is not set properly; this
+  # way is set up for all the jobs in the same manner.
+  - echo "==================== ${TITLE} ====================="
+  - if [[ $MPI = ON ]]; then if [ $TRAVIS_OS_NAME = linux ]; then  if [[ ${TITLE} != *mpich* ]]; then bash .ci/build_openmpi.sh; MPI_EXTRA="--oversubscribe"; export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH; else bash .ci/build_mpich.sh; fi; fi; fi;
+  - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; echo $CMAKE_CMD_EXTRA;  fi
+  - if [[ ${TITLE} = *Documentation* ]]; then docker pull uclrits/sopt; fi
+
+
+install:
+
+before_script:
+  - |
+    if [[ ${TITLE} = *Lint* ]]; then
+        curl https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        echo "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-7 main" | sudo tee -a /etc/apt/sources.list
+        sudo apt-get update -y -qq
+        sudo apt-get install clang-format-7
+    fi
+
+script:
+  - pwd
+  - mkdir build
+  - cd build
+  - |
+    cmake .. -DCMAKE_BUILD_TYPE=Release \
+    -Dtests=${Tests-ON} \
+    -Ddompi=${MPI} \
+    -Dexamples=${EXAMPLES-OFF} \
+    -Dopenmp=${openMP} \
+    -Ddocs=${DOCS-OFF} \
+    -Ddocasa=${CASA-OFF} \
+    -Dbenchmarks=${Benchmarks-OFF} \
+    -Dcoverage=${COVERAGE-OFF} \
+    -DPURIFY_TEST_LOG_LEVEL=${test_level-critical} \
+    -DSopt_GIT_REPOSITORY=https://github.com/astro-informatics/sopt.git \
+    -DSopt_GIT_TAG=development \
+    -DGreatCMakeCookOff_DIR:PATH=/tmp/GreatCMakeCookOff/cmake \
+    -DCFitsIO_URL=https://github.com/UCL-RITS/BinaryBlobs-dependencies/raw/master/Astronomy/cfitsio3410.tar.gz \
+    ${CMAKE_CMD_EXTRA} -DMPIEXEC_PREFLAGS="${MPI_EXTRA-}"
+  - while sleep 540 ; do echo "=========== make is taking more than 9m - pinging travis =========="; done & # cfits may take long to download
+  - eval $BUILD_CMD
+  - eval $TEST_CMD
+  - if [[ ${TITLE} != *Documentation* ]] && [[ ${TITLE} != *Lint* ]]; then sudo make install; fi
+
+after_success:
+  - if [ "${TITLE}" = "All dependencies - GCC - MPI" ]; then cd ..; bash .ci/coverage.sh; fi

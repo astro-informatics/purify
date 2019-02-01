@@ -1,9 +1,8 @@
+#include <random>
 #include "catch.hpp"
+#include "purify/directories.h"
 #include "purify/utilities.h"
 
-#include "purify/FFTOperator.h"
-
-#include "purify/directories.h"
 using namespace purify;
 using namespace purify::notinstalled;
 
@@ -11,7 +10,7 @@ TEST_CASE("utilities [mod]", "[mod]") {
   Array<t_real> range;
   range.setLinSpaced(201, -100, 100);
   Array<t_real> output(range.size());
-  for(t_int i = 0; i < range.size(); ++i) {
+  for (t_int i = 0; i < range.size(); ++i) {
     output(i) = utilities::mod(range(i), 20);
   }
   Array<t_real> expected(201);
@@ -511,6 +510,39 @@ TEST_CASE("utilities [read_write_vis]", "[read_write_vis]") {
   CHECK(new_random_uv_data.vis.isApprox(random_uv_data.vis, 1e-8));
   CHECK(new_random_uv_data.weights.isApprox(random_uv_data.weights, 1e-8));
 }
+TEST_CASE("read_mutiple_vis") {
+  std::string vis_file = vla_filename("at166B.3C129.c0.vis");
+  SECTION("one file") {
+    const std::vector<std::string> names = {vis_file};
+    const auto uv_data = utilities::read_visibility(vis_file);
+    const auto uv_multi = utilities::read_visibility(names);
+    CAPTURE(names.size());
+    CAPTURE(uv_data.size());
+    CHECK(uv_data.size() * names.size() == uv_multi.size());
+    for (int i = 0; i < names.size(); i++) {
+      CHECK(uv_data.u.isApprox(uv_multi.u.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.v.isApprox(uv_multi.v.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.w.isApprox(uv_multi.w.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.vis.isApprox(uv_multi.vis.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.weights.isApprox(uv_multi.weights.segment(i * uv_data.size(), uv_data.size())));
+    }
+  }
+  SECTION("many files") {
+    const std::vector<std::string> names = {vis_file, vis_file, vis_file};
+    const auto uv_data = utilities::read_visibility(vis_file);
+    const auto uv_multi = utilities::read_visibility(names);
+    CAPTURE(names.size());
+    CAPTURE(uv_data.size());
+    CHECK(uv_data.size() * names.size() == uv_multi.size());
+    for (int i = 0; i < names.size(); i++) {
+      CHECK(uv_data.u.isApprox(uv_multi.u.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.v.isApprox(uv_multi.v.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.w.isApprox(uv_multi.w.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.vis.isApprox(uv_multi.vis.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.weights.isApprox(uv_multi.weights.segment(i * uv_data.size(), uv_data.size())));
+    }
+  }
+}
 TEST_CASE("utilities [file exists]", "[file exists]") {
   std::string vis_file = vla_filename("at166B.3C129.c0.vis");
   // File should exist
@@ -531,16 +563,16 @@ TEST_CASE("utilities [fit_fwhm]", "[fit_fwhm]") {
   t_real const sigma_x = fwhm_x / (2 * std::sqrt(2 * std::log(2)));
   t_real const sigma_y = fwhm_y / (2 * std::sqrt(2 * std::log(2)));
   // calculating Gaussian
-  t_real const a = std::pow(std::cos(theta), 2) / (2 * sigma_x * sigma_x)
-                   + std::pow(std::sin(theta), 2) / (2 * sigma_y * sigma_y);
-  t_real const b = -std::sin(2 * theta) / (4 * sigma_x * sigma_x)
-                   + std::sin(2 * theta) / (4 * sigma_y * sigma_y);
-  t_real const c = std::pow(std::sin(theta), 2) / (2 * sigma_x * sigma_x)
-                   + std::pow(std::cos(theta), 2) / (2 * sigma_y * sigma_y);
+  t_real const a = std::pow(std::cos(theta), 2) / (2 * sigma_x * sigma_x) +
+                   std::pow(std::sin(theta), 2) / (2 * sigma_y * sigma_y);
+  t_real const b = -std::sin(2 * theta) / (4 * sigma_x * sigma_x) +
+                   std::sin(2 * theta) / (4 * sigma_y * sigma_y);
+  t_real const c = std::pow(std::sin(theta), 2) / (2 * sigma_x * sigma_x) +
+                   std::pow(std::cos(theta), 2) / (2 * sigma_y * sigma_y);
   auto x0 = imsizex * 0.5;
   auto y0 = imsizey * 0.5;
-  for(t_int i = 0; i < imsizex; ++i) {
-    for(t_int j = 0; j < imsizey; ++j) {
+  for (t_int i = 0; i < imsizex; ++i) {
+    for (t_int j = 0; j < imsizey; ++j) {
       t_real x = i - x0;
       t_real y = j - y0;
       psf(j, i) = std::exp(-a * x * x + 2 * b * x * y - c * y * y);
@@ -569,7 +601,7 @@ TEST_CASE("utilities [sparse multiply]", "[sparse multiply]") {
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> dis_row(0, rows);
   std::uniform_real_distribution<> dis_col(0, cols);
-  for(t_int i = 0; i < nz_values; ++i) {
+  for (t_int i = 0; i < nz_values; ++i) {
     tripletList.emplace_back(std::floor(dis_row(rd)), std::floor(dis_col(rd)), M_values(i));
   }
   Sparse<t_complex> M(rows, cols);
@@ -578,20 +610,71 @@ TEST_CASE("utilities [sparse multiply]", "[sparse multiply]") {
   Vector<t_complex> const parallel_output = utilities::sparse_multiply_matrix(M, x);
   Vector<t_complex> const correct_output = M * x;
 
-  for(t_int i = 0; i < rows; ++i) {
+  for (t_int i = 0; i < rows; ++i) {
     CHECK(std::abs((correct_output(i) - parallel_output(i)) / correct_output(i)) < 1e-13);
   }
 }
 
-TEST_CASE("utilities [resample]", "[resample]") {
-  // up samples random matrix
-  Matrix<t_complex> const image = Matrix<t_complex>::Random(1024, 1024);
-  FFTOperator fftop = purify::FFTOperator().fftw_flag((FFTW_ESTIMATE | FFTW_PRESERVE_INPUT));
+TEST_CASE("generate_baseline") {
+  // testing if randomly generating a uvcoverage from baseline configuration works
+  const Matrix<t_real> B = utilities::generate_antennas(4);
+  CHECK(B.allFinite());
+  CHECK(B.rows() == 4);
+  CHECK(B.cols() == 3);
+  CAPTURE(B);
+  const utilities::vis_params test_coverage = utilities::antenna_to_coverage(B);
+  CHECK(test_coverage.u.allFinite());
+  CHECK(test_coverage.v.allFinite());
+  CHECK(test_coverage.w.allFinite());
+  CHECK(test_coverage.size() == 2 * 3);
+  const Vector<t_real> R0 = B.row(0) - B.row(1);
+  const Vector<t_real> R1 = B.row(0) - B.row(2);
+  const Vector<t_real> R2 = B.row(0) - B.row(3);
+  const Vector<t_real> R3 = B.row(1) - B.row(2);
+  const Vector<t_real> R4 = B.row(1) - B.row(3);
+  const Vector<t_real> R5 = B.row(2) - B.row(3);
+  CHECK(R0(0) == test_coverage.u(0));
+  CHECK(R0(1) == test_coverage.v(0));
+  CHECK(R0(2) == test_coverage.w(0));
+  CHECK(R1(0) == test_coverage.u(1));
+  CHECK(R1(1) == test_coverage.v(1));
+  CHECK(R1(2) == test_coverage.w(1));
+  CHECK(R2(0) == test_coverage.u(2));
+  CHECK(R2(1) == test_coverage.v(2));
+  CHECK(R2(2) == test_coverage.w(2));
+  CHECK(R3(0) == test_coverage.u(3));
+  CHECK(R3(1) == test_coverage.v(3));
+  CHECK(R3(2) == test_coverage.w(3));
+  CHECK(R4(0) == test_coverage.u(4));
+  CHECK(R4(1) == test_coverage.v(4));
+  CHECK(R4(2) == test_coverage.w(4));
+  CHECK(R5(0) == test_coverage.u(5));
+  CHECK(R5(1) == test_coverage.v(5));
+  CHECK(R5(2) == test_coverage.w(5));
+}
 
-  auto const ft_grid = fftop.forward(image);
-  auto const new_ft_grid = utilities::re_sample_ft_grid(ft_grid, 4.) * 4. * 4.;
-  Matrix<t_complex> const image_resample = fftop.inverse(new_ft_grid);
-  Matrix<t_complex> const image_resample_alt = utilities::re_sample_image(image, 4.);
-  CHECK(image_resample.isApprox(image_resample_alt, 1e-13));
-  CHECK(image_resample(0) == image_resample_alt(0));
+TEST_CASE("conjugate symmetry") {
+  t_uint const number_of_vis = 100;
+  t_uint const max_w = 100;
+  t_real const sigma_m = 1000;
+  const auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, max_w);
+  const auto reflected_data = utilities::conjugate_w(uv_data);
+  REQUIRE(uv_data.size() == reflected_data.size());
+  for (t_uint i = 0; i < uv_data.size(); i++) {
+    if (uv_data.w(i) < 0) {
+      REQUIRE(uv_data.u(i) == Approx(-reflected_data.u(i)).epsilon(1e-12));
+      REQUIRE(uv_data.v(i) == Approx(-reflected_data.v(i)).epsilon(1e-12));
+      REQUIRE(uv_data.w(i) == Approx(-reflected_data.w(i)).epsilon(1e-12));
+      REQUIRE(uv_data.vis(i).real() ==
+              Approx(std::conj(reflected_data.vis(i)).real()).epsilon(1e-12));
+      REQUIRE(uv_data.vis(i).imag() ==
+              Approx(std::conj(reflected_data.vis(i)).imag()).epsilon(1e-12));
+    } else {
+      REQUIRE(uv_data.u(i) == Approx(reflected_data.u(i)).epsilon(1e-12));
+      REQUIRE(uv_data.v(i) == Approx(reflected_data.v(i)).epsilon(1e-12));
+      REQUIRE(uv_data.w(i) == Approx(reflected_data.w(i)).epsilon(1e-12));
+      REQUIRE(uv_data.vis(i).real() == Approx(reflected_data.vis(i).real()).epsilon(1e-12));
+      REQUIRE(uv_data.vis(i).imag() == Approx(reflected_data.vis(i).imag()).epsilon(1e-12));
+    }
+  }
 }

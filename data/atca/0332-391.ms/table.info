@@ -1,0 +1,5 @@
+Type = Measurement Set
+SubType = MIRIAD/CARMA
+
+This is a MeasurementSet Table holding measurements from a Telescope
+Made with Importmiriad

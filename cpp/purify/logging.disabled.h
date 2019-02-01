@@ -17,8 +17,8 @@ inline std::shared_ptr<int> get() { return nullptr; }
 inline void set_level(std::string const &, std::string const &){};
 inline void set_level(std::string const &){};
 inline bool has_level(std::string const &, std::string const &) { return false; }
-}
-}
+}  // namespace logging
+}  // namespace purify
 
 //! \macro For internal use only
 #define PURIFY_LOG_(...)

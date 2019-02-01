@@ -5,17 +5,19 @@
 # - BUILD_TYPE: defaults to Release
 #
 if(Sopt_ARGUMENTS)
-    cmake_parse_arguments(Sopt "" "GIT_REPOSITORY;GIT_TAG;BUILD_TYPE" ""
-        ${Sopt_ARGUMENTS})
+  cmake_parse_arguments(Sopt "" "GIT_REPOSITORY;GIT_TAG;BUILD_TYPE;MPI" "" ${Sopt_ARGUMENTS})
 endif()
 if(NOT Sopt_GIT_REPOSITORY)
-    set(Sopt_GIT_REPOSITORY https://github.com/basp-group/sopt.git)
+    set(Sopt_GIT_REPOSITORY https://github.com/astro-informatics/sopt.git)
 endif()
 if(NOT Sopt_GIT_TAG)
-    set(Sopt_GIT_TAG master)
+    set(Sopt_GIT_TAG development)
 endif()
 if(NOT Sopt_BUILD_TYPE)
     set(Sopt_BUILD_TYPE Release)
+endif()
+if(NOT Sopt_MPI)
+  set(Sopt_MPI OFF)
 endif()
 
 # write subset of variables to cache for sopt to use
@@ -38,6 +40,7 @@ ExternalProject_Add(
       -C "${EXTERNAL_ROOT}/src/SoptVariables.cmake"
       -DBUILD_SHARED_LIBS=OFF
       -DCMAKE_BUILD_TYPE=${Sopt_BUILD_TYPE}
+      -Ddompi=${Sopt_MPI}
       -Dregressions=OFF
       -Dtests=OFF
       -Dpython=OFF
@@ -46,6 +49,7 @@ ExternalProject_Add(
       -Dlogging=${logging}
       -DNOEXPORT=TRUE
       -Dopenmp=${openmp}
+      -Ddocs=OFF
     INSTALL_DIR ${EXTERNAL_ROOT}
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
