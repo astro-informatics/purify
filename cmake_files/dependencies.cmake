@@ -73,7 +73,7 @@ endif()
 # Unless otherwise specified, if purify is not on master, then sopt will be
 # downloaded from development branch.
 if(NOT Sopt_GIT_TAG)
-  set(Sopt_GIT_TAG development CACHE STRING "Branch/tag when downloading sopt")
+  set(Sopt_GIT_TAG stable CACHE STRING "Branch/tag when downloading sopt")
 endif()
 if(NOT Sopt_GIT_REPOSITORY)
   set(Sopt_GIT_REPOSITORY https://www.github.com/astro-informatics/sopt.git
