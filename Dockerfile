@@ -1,4 +1,4 @@
-FROM uclrits/sopt:18.10
+FROM uclrits/sopt:stable
 
 USER root
 WORKDIR /build
@@ -7,14 +7,14 @@ ENV LD_LIBRARY_PATH /usr/local/lib
 RUN docker-apt-install casacore-dev
 
 # Build purify
-RUN git clone https://github.com/astro-informatics/purify.git
+RUN git clone --single-branch --branch stable https://github.com/astro-informatics/purify.git
 RUN mkdir -p /build/purify/build && cd /build/purify/build && \
     cmake .. -DCMAKE_BUILD_TYPE=Release \
     -Dtests=ON \
     -Dexamples=OFF \
     -Ddocasa=ON \
     -Dbenchmarks=OFF \
-    -DSopt_GIT_TAG=development \
+    -DSopt_GIT_TAG=stable \
     -DCFitsIO_URL=https://github.com/UCL-RITS/BinaryBlobs-dependencies/raw/master/Astronomy/cfitsio3410.tar.gz \
     -DMPIEXEC:FILEPATH=$(which mpirun) -DMPIEXEC_MAX_NUMPROCS=4 \
     -DMPIEXEC_PREFLAGS="--oversubscribe" && \
