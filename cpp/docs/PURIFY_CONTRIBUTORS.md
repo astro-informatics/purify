@@ -1,4 +1,4 @@
-Contributors {#contributors}
+Contributors {#purify_contributors}
 ----------------------------------
 
 **Purify** was initially created by Rafael Carrillo, Jason McEwen and Yves Wiaux but major contributions
