@@ -206,8 +206,8 @@ License
 Webpage
 -------
 
-[documentation](http://astro-informatics.github.io/purify)
-[repository](https://github.com/astro-informatics/purify)
+[Documentation](http://astro-informatics.github.io/purify)
+[Repository](https://github.com/astro-informatics/purify)
 
 Support
 -------
