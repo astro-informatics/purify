@@ -47,7 +47,7 @@ var searchData=
   ['conjugategradient',['ConjugateGradient',['http://astro-informatics.github.io/sopt/classsopt_1_1ConjugateGradient.html',1,'sopt::ConjugateGradient'],['classsopt_1_1ConjugateGradient.html#a8773556e24e11ea926e9f6b9af1c71b8',1,'sopt::ConjugateGradient::ConjugateGradient()']]],
   ['const_5fiterator',['const_iterator',['../classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html',1,'purify::casa::MeasurementSet::const_iterator'],['../classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html#a37fb894b0f681396a5e172093967316f',1,'purify::casa::MeasurementSet::const_iterator::const_iterator()']]],
   ['contributors',['Contributors',['http://astro-informatics.github.io/sopt/contributors.html',1,'']]],
-  ['contributors_2emd',['CONTRIBUTORS.md',['../CONTRIBUTORS_8md.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/CONTRIBUTORS_8md.html',1,'(Global Namespace)']]],
+  ['contributors_2emd',['CONTRIBUTORS.md',['http://astro-informatics.github.io/sopt/CONTRIBUTORS_8md.html',1,'']]],
   ['converged',['converged',['classsopt_1_1proximal_1_1L1_1_1Breaker.html#a25bff18090d2a4cf5cc400061e3bdd83',1,'sopt::proximal::L1::Breaker']]],
   ['convergence_5ffactory_2eh',['convergence_factory.h',['../convergence__factory_8h.html',1,'']]],
   ['convergencefunction',['ConvergenceFunction',['http://astro-informatics.github.io/sopt/namespacesopt.html#acc375c693a8c32c2a954d17a7773b7f8',1,'sopt']]],
@@ -69,5 +69,6 @@ var searchData=
   ['credible_5finterval_5fgrid',['credible_interval_grid',['http://astro-informatics.github.io/sopt/namespacesopt_1_1credible__region.html#a0bc1aa04714cdc67760cdc70f90d6e26',1,'sopt::credible_region::credible_interval_grid(const Eigen::MatrixBase&lt; T &gt; &amp;solution, const t_uint &amp;rows, const t_uint &amp;cols, const t_uint &amp;grid_pixel_size, const std::function&lt; t_real(typename T::PlainObject)&gt; &amp;objective_function, const t_real &amp;energy_upperbound)'],['http://astro-informatics.github.io/sopt/namespacesopt_1_1credible__region.html#a241ac6adc49c40d978928329209cf259',1,'sopt::credible_region::credible_interval_grid(const Eigen::MatrixBase&lt; T &gt; &amp;solution, const t_uint &amp;rows, const t_uint &amp;cols, const std::tuple&lt; t_uint, t_uint &gt; &amp;grid_pixel_size, const std::function&lt; t_real(typename T::PlainObject)&gt; &amp;objective_function, const t_real &amp;energy_upperbound)']]],
   ['credible_5fregion_2ecc',['credible_region.cc',['http://astro-informatics.github.io/sopt/credible__region_8cc.html',1,'']]],
   ['credible_5fregion_2eh',['credible_region.h',['http://astro-informatics.github.io/sopt/credible__region_8h.html',1,'']]],
-  ['current',['current',['classsopt_1_1proximal_1_1L1_1_1Breaker.html#af743089a976216692dd4009017b72365',1,'sopt::proximal::L1::Breaker']]]
+  ['current',['current',['classsopt_1_1proximal_1_1L1_1_1Breaker.html#af743089a976216692dd4009017b72365',1,'sopt::proximal::L1::Breaker']]],
+  ['contributors',['Contributors',['../purify_contributors.html',1,'']]]
 ];

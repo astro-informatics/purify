@@ -25,5 +25,6 @@ var searchData=
   ['proximal_2ecc',['proximal.cc',['http://astro-informatics.github.io/sopt/proximal_8cc.html',1,'']]],
   ['proximal_2eh',['proximal.h',['http://astro-informatics.github.io/sopt/proximal_8h.html',1,'']]],
   ['proximal_5fexpression_2eh',['proximal_expression.h',['http://astro-informatics.github.io/sopt/proximal__expression_8h.html',1,'']]],
+  ['purify_5fcontributors_2emd',['PURIFY_CONTRIBUTORS.md',['../PURIFY__CONTRIBUTORS_8md.html',1,'']]],
   ['purify_5ffitsio_2ecc',['purify_fitsio.cc',['../purify__fitsio_8cc.html',1,'']]]
 ];

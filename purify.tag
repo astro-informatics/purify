@@ -1064,9 +1064,9 @@
     </member>
   </compound>
   <compound kind="file">
-    <name>CONTRIBUTORS.md</name>
+    <name>PURIFY_CONTRIBUTORS.md</name>
     <path>/mydata/cpp/docs/</path>
-    <filename>http://astro-informatics.github.io/purify/CONTRIBUTORS_8md</filename>
+    <filename>http://astro-informatics.github.io/purify/PURIFY__CONTRIBUTORS_8md</filename>
   </compound>
   <compound kind="file">
     <name>README.md</name>
@@ -9147,6 +9147,11 @@
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1wproj__utilities_1_1expansions.html" anchor="a92334b90f8de8f723450b3aca72d9e74a7d8bc5f1a8d3787d06ef11c97d4655df">taylor</enumvalue>
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1wproj__utilities_1_1expansions.html" anchor="a92334b90f8de8f723450b3aca72d9e74a172e4ecb02a864e1e4aa51dcce9d8a47">chebyshev</enumvalue>
     </member>
+  </compound>
+  <compound kind="page">
+    <name>purify_contributors</name>
+    <title>Contributors</title>
+    <filename>http://astro-informatics.github.io/purify/purify_contributors</filename>
   </compound>
   <compound kind="page">
     <name>index</name>

@@ -87,6 +87,7 @@ var searchData=
   ['purify_5farrayfire',['PURIFY_ARRAYFIRE',['../config_8in_8h.html#adbece49a101d6ae8524318d96ee522bf',1,'config.in.h']]],
   ['purify_5fcasacore',['PURIFY_CASACORE',['../config_8in_8h.html#a949747b2ae793d86aecd0f88cc927f5b',1,'config.in.h']]],
   ['purify_5fcimg',['PURIFY_CImg',['../config_8in_8h.html#a373d97ef824ffb387155468104405ccd',1,'config.in.h']]],
+  ['purify_5fcontributors_2emd',['PURIFY_CONTRIBUTORS.md',['../PURIFY__CONTRIBUTORS_8md.html',1,'']]],
   ['purify_5fcritical',['PURIFY_CRITICAL',['../logging_8h.html#a8137be11add63e96326a1b6c18a1bf43',1,'logging.h']]],
   ['purify_5fdebug',['PURIFY_DEBUG',['../logging_8h.html#a8aac71815ec42074b1410fa5ea48a268',1,'logging.h']]],
   ['purify_5fdo_5flogging',['PURIFY_DO_LOGGING',['../config_8in_8h.html#acb4684f4c7657d334277f117d385a319',1,'config.in.h']]],
