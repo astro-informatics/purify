@@ -15,5 +15,6 @@ var searchData=
   ['session_2eh',['session.h',['http://astro-informatics.github.io/sopt/session_8h.html',1,'']]],
   ['show_5fimage_2ecc',['show_image.cc',['../show__image_8cc.html',1,'']]],
   ['soft_5fthreshhold_2ecc',['soft_threshhold.cc',['http://astro-informatics.github.io/sopt/soft__threshhold_8cc.html',1,'']]],
+  ['sopt_5fcontributors_2emd',['SOPT_CONTRIBUTORS.md',['http://astro-informatics.github.io/sopt/SOPT__CONTRIBUTORS_8md.html',1,'']]],
   ['sparse_2ecc',['sparse.cc',['../sparse_8cc.html',1,'']]]
 ];

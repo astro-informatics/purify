@@ -46,8 +46,6 @@ var searchData=
   ['conjugate_5fw',['conjugate_w',['../namespacepurify_1_1utilities.html#a8f267ff244270871a0d36b52ff9b3eb6',1,'purify::utilities']]],
   ['conjugategradient',['ConjugateGradient',['http://astro-informatics.github.io/sopt/classsopt_1_1ConjugateGradient.html',1,'sopt::ConjugateGradient'],['classsopt_1_1ConjugateGradient.html#a8773556e24e11ea926e9f6b9af1c71b8',1,'sopt::ConjugateGradient::ConjugateGradient()']]],
   ['const_5fiterator',['const_iterator',['../classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html',1,'purify::casa::MeasurementSet::const_iterator'],['../classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html#a37fb894b0f681396a5e172093967316f',1,'purify::casa::MeasurementSet::const_iterator::const_iterator()']]],
-  ['contributors',['Contributors',['http://astro-informatics.github.io/sopt/contributors.html',1,'']]],
-  ['contributors_2emd',['CONTRIBUTORS.md',['http://astro-informatics.github.io/sopt/CONTRIBUTORS_8md.html',1,'']]],
   ['converged',['converged',['classsopt_1_1proximal_1_1L1_1_1Breaker.html#a25bff18090d2a4cf5cc400061e3bdd83',1,'sopt::proximal::L1::Breaker']]],
   ['convergence_5ffactory_2eh',['convergence_factory.h',['../convergence__factory_8h.html',1,'']]],
   ['convergencefunction',['ConvergenceFunction',['http://astro-informatics.github.io/sopt/namespacesopt.html#acc375c693a8c32c2a954d17a7773b7f8',1,'sopt']]],
@@ -70,5 +68,6 @@ var searchData=
   ['credible_5fregion_2ecc',['credible_region.cc',['http://astro-informatics.github.io/sopt/credible__region_8cc.html',1,'']]],
   ['credible_5fregion_2eh',['credible_region.h',['http://astro-informatics.github.io/sopt/credible__region_8h.html',1,'']]],
   ['current',['current',['classsopt_1_1proximal_1_1L1_1_1Breaker.html#af743089a976216692dd4009017b72365',1,'sopt::proximal::L1::Breaker']]],
-  ['contributors',['Contributors',['../purify_contributors.html',1,'']]]
+  ['contributors',['Contributors',['../purify_contributors.html',1,'']]],
+  ['contributors',['Contributors',['http://astro-informatics.github.io/sopt/sopt_contributors.html',1,'']]]
 ];

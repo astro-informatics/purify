@@ -15,7 +15,6 @@ var searchData=
   ['config_2ein_2eh',['config.in.h',['../config_8in_8h.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/config_8in_8h.html',1,'(Global Namespace)']]],
   ['conjugate_5fgradient_2ecc',['conjugate_gradient.cc',['http://astro-informatics.github.io/sopt/benchmarks_2conjugate__gradient_8cc.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/examples_2conjugate__gradient_8cc.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/tests_2conjugate__gradient_8cc.html',1,'(Global Namespace)']]],
   ['conjugate_5fgradient_2eh',['conjugate_gradient.h',['http://astro-informatics.github.io/sopt/conjugate__gradient_8h.html',1,'']]],
-  ['contributors_2emd',['CONTRIBUTORS.md',['http://astro-informatics.github.io/sopt/CONTRIBUTORS_8md.html',1,'']]],
   ['convergence_5ffactory_2eh',['convergence_factory.h',['../convergence__factory_8h.html',1,'']]],
   ['convolution_2ecc',['convolution.cc',['../convolution_8cc.html',1,'']]],
   ['convolution_2eh',['convolution.h',['../convolution_8h.html',1,'']]],
