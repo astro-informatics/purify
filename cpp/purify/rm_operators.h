@@ -207,6 +207,7 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_1d(
     const t_real oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
     const t_uint Ju = 4) {
   auto uv_vis = uv_vis_input;
+  //need to find a way to set RM resolution, i.e. Faraday pixel size
   return init_degrid_operator_1d<T>(uv_vis.u, uv_vis.weights, imsizex, oversample_ratio, kernel,
                                     Ju);
 }
