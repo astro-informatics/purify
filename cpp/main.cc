@@ -119,7 +119,7 @@ int main(int argc, const char **argv) {
                                std::to_string(params.height()) + ").");
     t_int const number_of_pixels = image.size();
     t_int const number_of_vis = params.number_of_measurements();
-    t_real const sigma_m = constant::pi / 3;
+    t_real const sigma_m = constant::pi / 4;
     const t_real rms_w = params.w_rms();  // lambda
     if (params.measurements().at(0) == "") {
       uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, rms_w);
