@@ -99,7 +99,7 @@ Vector<t_int> equal_distribution(Vector<t_real> const &u, Vector<t_real> const &
 }
 std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters,
-    const std::function<t_real(t_real)> &cost) {
+    const std::function<t_real(t_real)> &cost, const t_real rel_diff) {
   std::vector<t_int> w_node(w.size(), 0);
   std::vector<t_real> w_centre(number_of_nodes, 0);
   std::vector<t_real> w_sum(number_of_nodes, 0);
@@ -132,7 +132,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
       w_sum[j] = 0;
       w_count[j] = 0;
     }
-    if ((diff / number_of_nodes) < 1e-3) {
+    if ((diff / number_of_nodes) < rel_diff) {
       PURIFY_DEBUG("Converged!");
       break;
     } else {
@@ -146,7 +146,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
 #ifdef PURIFY_MPI
 std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters,
-    sopt::mpi::Communicator const &comm, const std::function<t_real(t_real)> &cost) {
+    sopt::mpi::Communicator const &comm, const std::function<t_real(t_real)> &cost, const t_real rel_diff) {
   std::vector<t_int> w_node(w.size(), 0);
   std::vector<t_real> w_centre(number_of_nodes, 0);
   std::vector<t_real> w_sum(number_of_nodes, 0);
@@ -183,7 +183,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
       w_sum[j] = 0;
       w_count[j] = 0;
     }
-    if ((diff / number_of_nodes) < 1e-3) {
+    if ((diff / number_of_nodes) < rel_diff) {
       if (comm.is_root()) PURIFY_DEBUG("Converged!");
       break;
     } else {
