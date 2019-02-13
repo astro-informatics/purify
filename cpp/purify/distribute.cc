@@ -146,7 +146,8 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
 #ifdef PURIFY_MPI
 std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters,
-    sopt::mpi::Communicator const &comm, const std::function<t_real(t_real)> &cost, const t_real rel_diff) {
+    sopt::mpi::Communicator const &comm, const std::function<t_real(t_real)> &cost,
+    const t_real rel_diff) {
   std::vector<t_int> w_node(w.size(), 0);
   std::vector<t_real> w_centre(number_of_nodes, 0);
   std::vector<t_real> w_sum(number_of_nodes, 0);
