@@ -192,7 +192,7 @@ int main(int argc, const char **argv) {
       "{}\"x{}\".",
       params.cellsizey(), params.cellsizex(), ideal_cell_y, ideal_cell_x);
   t_real const flux_scale =
-      (uv_data.units == utilities::vis_units::lambda)
+      (params.source() == purify::utilities::vis_source::measurements)
           ? widefield::pixel_to_lambda(params.cellsizex(), params.width(), params.oversampling()) *
                 widefield::pixel_to_lambda(params.cellsizey(), params.height(),
                                            params.oversampling())
