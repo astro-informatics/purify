@@ -57,16 +57,14 @@ std::function<bool(Vector<T> const &, Vector<T> const &)> l1_convergence_factory
   case (ConvergenceType::mpi_local): {
     return [algo_weak, comm, conv](Vector<T> const &x, Vector<T> const &) {
       auto const algo = algo_weak.lock();
-      return comm.all_reduce<uint8_t>(
-          (*conv)(sopt::l1_norm(algo->Psi().adjoint() * x, algo->l1_proximal_weights())), MPI_LAND);
+      return comm.all_reduce<uint8_t>((*conv)(sopt::l1_norm(algo->Psi().adjoint() * x)), MPI_LAND);
     };
     break;
   }
   case (ConvergenceType::mpi_global): {
     return [algo_weak, comm, conv](Vector<T> const &x, Vector<T> const &) {
       auto const algo = algo_weak.lock();
-      return (*conv)(
-          sopt::mpi::l1_norm(algo->Psi().adjoint() * x, algo->l1_proximal_weights(), comm));
+      return (*conv)(sopt::mpi::l1_norm(algo->Psi().adjoint() * x, comm));
     };
     break;
   }
