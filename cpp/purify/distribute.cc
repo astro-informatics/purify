@@ -162,7 +162,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
   for (int n = 0; n < iters; n++) {
     if (comm.is_root()) PURIFY_DEBUG("clustering iteration {}", n);
     for (int i = 0; i < w.size(); i++) {
-      t_real min = 1e10;
+      t_real min = 2 * (wmax - wmin);
       for (int node = 0; node < number_of_nodes; node++) {
         const t_real cost_val = cost(w(i) - w_centre.at(node));
         if (cost_val < min) {
