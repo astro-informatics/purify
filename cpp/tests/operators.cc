@@ -6,6 +6,7 @@
 #include "purify/kernels.h"
 #include "purify/logging.h"
 #include "purify/test_data.h"
+#include "purify/wproj_operators.h"
 #include <sopt/power_method.h>
 
 using namespace purify;
@@ -140,5 +141,99 @@ TEST_CASE("Operators") {
     const Vector<t_complex> indirect_input = Vector<t_complex>::Random(M);
     const Vector<t_complex> indirect_output = measure_op->adjoint() * indirect_input;
     CHECK(indirect_output.size() == imsizex * imsizey);
+  }
+}
+TEST_CASE("Degridding from multiple Images") {
+  const t_int imsizex = 32;
+  const t_int imsizey = 32;
+  const t_int M = 5;
+  const t_real oversample_ratio = 2;
+  const t_int ftsizeu = std::floor(imsizex * oversample_ratio);
+  const t_int ftsizev = std::floor(imsizey * oversample_ratio);
+  auto const kernelu = [](t_real) -> t_real { return 1.; };
+  auto const kernelv = [](t_real) -> t_real { return 1.; };
+  const t_int Ju = 1;
+  const t_int Jv = 1;
+  for (t_int images : {1, 2, 3, 5, 10}) {
+    Vector<t_real> u = Vector<t_real>::Zero(M * images);
+    Vector<t_real> v = Vector<t_real>::Zero(M * images);
+    Vector<t_complex> weights = Vector<t_complex>::Zero(M * images);
+    Vector<t_complex> vis = Vector<t_complex>::Zero(M * images);
+    Vector<t_complex> image = Vector<t_complex>::Zero(ftsizeu * ftsizev * images);
+    std::vector<t_int> image_index(M * images, 0);
+    // double up vector
+    u.segment(0, M) = Vector<t_real>::Random(M);
+    v.segment(0, M) = Vector<t_real>::Random(M);
+    weights.segment(0, M) = Vector<t_complex>::Random(M);
+    vis.segment(0, M) = Vector<t_complex>::Random(M);
+    image.segment(0, ftsizeu * ftsizev) = Vector<t_complex>::Random(ftsizeu * ftsizev);
+    for (t_int i = 1; i < images; i++) {
+      image.segment(ftsizeu * ftsizev * i, ftsizeu * ftsizev) =
+          image.segment(0, ftsizeu * ftsizev) * i;
+      u.segment(M * i, M) = u.segment(0, M);
+      v.segment(M * i, M) = v.segment(0, M);
+      weights.segment(M * i, M) = weights.segment(0, M);
+      vis.segment(M * i, M) = vis.segment(0, M) * i;
+      for (t_int c = 0; c < M; c++) image_index[M * i + c] = i;
+    }
+    const auto G_tuple = operators::init_gridding_matrix_2d<Vector<t_complex>>(
+        images, image_index, u, v, weights, imsizey, imsizex, oversample_ratio, kernelu, kernelv,
+        Ju, Jv);
+    sopt::LinearTransform<Vector<t_complex>> const G = {
+        std::get<0>(G_tuple), {0, 1, M}, std::get<1>(G_tuple), {0, 1, ftsizeu * ftsizev * images}};
+    const Vector<t_complex> forward = G * image;
+    for (t_int i = 1; i < images; i++)
+      REQUIRE((i * forward.segment(0, M)).isApprox(forward.segment(M * i, M), 1e-7));
+    const Vector<t_complex> backward = G.adjoint() * vis;
+    for (t_int i = 1; i < images; i++)
+      REQUIRE((i * backward.segment(0, ftsizeu * ftsizev))
+                  .isApprox(backward.segment(ftsizeu * ftsizev * i, ftsizeu * ftsizev), 1e-7));
+  }
+}
+TEST_CASE("Degridding from multiple Images wproj") {
+  const t_int imsizex = 32;
+  const t_int imsizey = 32;
+  const t_int M = 5;
+  const t_real oversample_ratio = 2;
+  const t_int ftsizeu = std::floor(imsizex * oversample_ratio);
+  const t_int ftsizev = std::floor(imsizey * oversample_ratio);
+  auto const kernelu = [](t_real) -> t_real { return 1.; };
+  auto const kernelv = [](t_real) -> t_real { return 1.; };
+  const t_int Ju = 1;
+  const t_int Jv = 1;
+  for (t_int images : {1, 2, 3, 5, 10}) {
+    Vector<t_real> u = Vector<t_real>::Zero(M * images);
+    Vector<t_real> v = Vector<t_real>::Zero(M * images);
+    Vector<t_complex> weights = Vector<t_complex>::Zero(M * images);
+    Vector<t_complex> vis = Vector<t_complex>::Zero(M * images);
+    Vector<t_complex> image = Vector<t_complex>::Zero(ftsizeu * ftsizev * images);
+    std::vector<t_int> image_index(M * images, 0);
+    // double up vector
+    u.segment(0, M) = Vector<t_real>::Random(M);
+    v.segment(0, M) = Vector<t_real>::Random(M);
+    weights.segment(0, M) = Vector<t_complex>::Random(M);
+    vis.segment(0, M) = Vector<t_complex>::Random(M);
+    image.segment(0, ftsizeu * ftsizev) = Vector<t_complex>::Random(ftsizeu * ftsizev);
+    for (t_int i = 1; i < images; i++) {
+      image.segment(ftsizeu * ftsizev * i, ftsizeu * ftsizev) =
+          image.segment(0, ftsizeu * ftsizev) * i;
+      u.segment(M * i, M) = u.segment(0, M);
+      v.segment(M * i, M) = v.segment(0, M);
+      weights.segment(M * i, M) = weights.segment(0, M);
+      vis.segment(M * i, M) = vis.segment(0, M) * i;
+      for (t_int c = 0; c < M; c++) image_index[M * i + c] = i;
+    }
+    const auto G_tuple = operators::init_gridding_matrix_2d<Vector<t_complex>>(
+        images, image_index, std::vector<t_real>(images, 0), u, v, u * 0, weights, imsizey, imsizex,
+        oversample_ratio, kernelu, kernelv, Ju, 10, 1, 1, 1e-6, 1e-6, dde_type::wkernel_radial);
+    sopt::LinearTransform<Vector<t_complex>> const G = {
+        std::get<0>(G_tuple), {0, 1, M}, std::get<1>(G_tuple), {0, 1, ftsizeu * ftsizev * images}};
+    const Vector<t_complex> forward = G * image;
+    for (t_int i = 1; i < images; i++)
+      REQUIRE((i * forward.segment(0, M)).isApprox(forward.segment(M * i, M), 1e-7));
+    const Vector<t_complex> backward = G.adjoint() * vis;
+    for (t_int i = 1; i < images; i++)
+      REQUIRE((i * backward.segment(0, ftsizeu * ftsizev))
+                  .isApprox(backward.segment(ftsizeu * ftsizev * i, ftsizeu * ftsizev), 1e-7));
   }
 }
