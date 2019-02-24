@@ -72,6 +72,10 @@ Sparse<t_complex> init_gridding_matrix_2d(const t_uint number_of_images,
                                           const std::function<t_real(t_real)> kernelu,
                                           const std::function<t_real(t_real)> kernelv,
                                           const t_uint Ju, const t_uint Jv) {
+  if (std::any_of(image_index.begin(), image_index.end(), [&number_of_images](int index) {
+        return index < 0 or index > (number_of_images - 1);
+      }))
+    throw std::runtime_error("Image index is out of bounds");
   const t_uint ftsizev_ = std::floor(imsizey_ * oversample_ratio);
   const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
   const t_uint rows = u.size();
@@ -96,6 +100,7 @@ Sparse<t_complex> init_gridding_matrix_2d(const t_uint number_of_images,
         const t_real k_v = std::floor(v(m) - jv_max * 0.5);
         const t_uint q = utilities::mod(k_u + ju, ftsizeu_);
         const t_uint p = utilities::mod(k_v + jv, ftsizev_);
+        assert(image_index.at(m) < number_of_images);
         const t_uint index =
             utilities::sub2ind(p, q, ftsizev_, ftsizeu_) + image_index.at(m) * ftsizev_ * ftsizeu_;
         interpolation_matrix.insert(m, index) =
