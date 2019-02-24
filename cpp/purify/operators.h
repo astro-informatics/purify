@@ -32,7 +32,6 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
                                           const std::function<t_real(t_real)> kernelu,
                                           const std::function<t_real(t_real)> kernelv,
                                           const t_uint Ju = 4, const t_uint Jv = 4);
-
 //! Construct gridding matrix with wprojection
 Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v,
                                           const Vector<t_real> &w, const Vector<t_complex> &weights,
@@ -43,6 +42,25 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
                                           const t_uint Ju, const t_uint Jw, const t_real cellx,
                                           const t_real celly, const t_real abs_error,
                                           const t_real rel_error, const dde_type dde);
+
+//! Construct all to all gridding matrix
+Sparse<t_complex> init_gridding_matrix_2d(const t_uint number_of_images,
+                                          const std::vector<t_int> &image_index,
+                                          const Vector<t_real> &u, const Vector<t_real> &v,
+                                          const Vector<t_complex> &weights, const t_uint &imsizey_,
+                                          const t_uint &imsizex_, const t_real &oversample_ratio,
+                                          const std::function<t_real(t_real)> kernelu,
+                                          const std::function<t_real(t_real)> kernelv,
+                                          const t_uint Ju = 4, const t_uint Jv = 4);
+//! Construct all to all gridding matrix with wprojection
+Sparse<t_complex> init_gridding_matrix_2d(
+    const t_uint number_of_images, const std::vector<t_int> &image_index,
+    const std::vector<t_real> &w_stacks, const Vector<t_real> &u, const Vector<t_real> &v,
+    const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint imsizey_,
+    const t_uint imsizex_, const t_real oversample_ratio,
+    const std::function<t_real(t_real)> &ftkerneluv, const std::function<t_real(t_real)> &kerneluv,
+    const t_uint Ju, const t_uint Jw, const t_real cellx, const t_real celly,
+    const t_real abs_error, const t_real rel_error, const dde_type dde);
 
 //! Given the Fourier transform of a gridding kernel, creates the scaling image for gridding
 //! correction.
