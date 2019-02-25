@@ -592,9 +592,9 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d_all_to_all(
     uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
                                  std::floor(oversample_ratio * imsizey));
 
-  return init_degrid_operator_2d_mpi<T>(comm, image_index, w_stacks, uv_vis.u, uv_vis.v, uv_vis.w,
-                                        uv_vis.weights, imsizey, imsizex, oversample_ratio, kernel,
-                                        Ju, Jv, w_stacking, cell_x, cell_y);
+  return init_degrid_operator_2d_all_to_all<T>(
+      comm, image_index, w_stacks, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex,
+      oversample_ratio, kernel, Ju, Jv, w_stacking, cell_x, cell_y);
 }
 #endif
 
