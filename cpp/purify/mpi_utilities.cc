@@ -6,7 +6,14 @@
 
 namespace purify {
 namespace utilities {
+
 void regroup(vis_params &uv_params, std::vector<t_int> const &groups_, const t_int max_groups) {
+  std::vector<t_int> image_index(uv_params.size(), 0);
+  regroup(uv_params, image_index, groups_, max_groups);
+}
+
+void regroup(vis_params &uv_params, std::vector<t_int> &image_index,
+             std::vector<t_int> const &groups_, const t_int max_groups) {
   std::vector<t_int> groups = groups_;
   // Figure out size of each group
   std::map<t_int, t_int> sizes;
@@ -62,6 +69,7 @@ void regroup(vis_params &uv_params, std::vector<t_int> const &groups_, const t_i
     std::swap(uv_params.w(i), uv_params.w(swapper));
     std::swap(uv_params.vis(i), uv_params.vis(swapper));
     std::swap(uv_params.weights(i), uv_params.weights(swapper));
+    std::swap(image_index[i], image_index[swapper]);
 
     ++swapper;
   }
@@ -84,11 +92,13 @@ vis_params regroup_and_scatter(vis_params const &params, std::vector<t_int> cons
   regroup(copy, groups, comm.size());
   return scatter_visibilities(copy, sizes, comm);
 }
-vis_params regroup_and_all_to_all(vis_params const &params, std::vector<t_int> const &groups,
-                                  sopt::mpi::Communicator const &comm) {
-  if (comm.size() == 1) return params;
+std::tuple<vis_params, std::vector<t_int>> regroup_and_all_to_all(
+    vis_params const &params, const std::vector<t_int> &image_index,
+    std::vector<t_int> const &groups, sopt::mpi::Communicator const &comm) {
+  if (comm.size() == 1) return std::make_tuple(params, image_index);
   vis_params copy = params;
-  regroup(copy, groups, comm.size());
+  auto index_copy = image_index;
+  regroup(copy, index_copy, groups, comm.size());
 
   std::vector<t_int> sizes(comm.size());
   std::fill(sizes.begin(), sizes.end(), 0);
@@ -98,7 +108,14 @@ vis_params regroup_and_all_to_all(vis_params const &params, std::vector<t_int> c
     ++sizes[group];
   }
 
-  return all_to_all_visibilities(copy, sizes, comm);
+  return std::make_tuple(all_to_all_visibilities(copy, sizes, comm),
+                         comm.all_to_allv(index_copy, sizes));
+}
+
+vis_params regroup_and_all_to_all(vis_params const &params, std::vector<t_int> const &groups,
+                                  sopt::mpi::Communicator const &comm) {
+  return std::get<0>(
+      regroup_and_all_to_all(params, std::vector<t_int>(params.size(), 0), groups, comm));
 }
 
 vis_params all_to_all_visibilities(vis_params const &params, std::vector<t_int> const &sizes,
