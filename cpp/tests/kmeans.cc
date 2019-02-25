@@ -81,11 +81,17 @@ TEST_CASE("distribute w") {
   auto const comm = sopt::mpi::Communicator::World();
 
   const auto params = utilities::random_sample_density(M, 0, constant::pi / 3, 100);
-  const auto kmeans = distribute::kmeans_algo(params.w, comm.size(), 0, comm);
+  const auto kmeans = distribute::kmeans_algo(params.w, comm.size(), 100, comm);
   const std::vector<t_int> image_index = std::get<0>(kmeans);
   const std::vector<t_real> w_stacks = std::get<1>(kmeans);
   const std::vector<t_int> groups =
       distribute::w_support(params.w, image_index, w_stacks, du, min_support, max_support, comm);
-  auto sorted = utilities::regroup_and_all_to_all(params, groups, comm);
-  CHECK(sorted.size() < 1.1 * M);
+  auto sorted = utilities::regroup_and_all_to_all(params, image_index, groups, comm);
+  const auto data = utilities::w_stacking_with_all_to_all(
+      params, du, min_support, max_support, comm, 100, [](t_real x) { return x * x; });
+  CHECK(std::get<0>(sorted).u.isApprox(std::get<0>(data).u));
+  CHECK(std::get<0>(sorted).v.isApprox(std::get<0>(data).v));
+  CHECK(std::get<0>(sorted).w.isApprox(std::get<0>(data).w));
+  CHECK(std::get<1>(sorted) == std::get<1>(data));
+  CHECK(w_stacks == std::get<2>(data));
 }
