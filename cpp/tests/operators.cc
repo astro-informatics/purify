@@ -138,7 +138,7 @@ TEST_CASE("Operators") {
     const Vector<t_complex> direct_input = Vector<t_complex>::Random(imsizex * imsizey);
     const Vector<t_complex> direct_output = *measure_op * direct_input;
     CHECK(direct_output.size() == M_measures);
-    const Vector<t_complex> indirect_input = Vector<t_complex>::Random(M);
+    const Vector<t_complex> indirect_input = Vector<t_complex>::Random(M_measures).eval();
     const Vector<t_complex> indirect_output = measure_op->adjoint() * indirect_input;
     CHECK(indirect_output.size() == imsizex * imsizey);
   }
