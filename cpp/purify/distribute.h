@@ -39,6 +39,11 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters,
     sopt::mpi::Communicator const &comm,
     const std::function<t_real(t_real)> &cost = [](t_real x) { return x * x; });
+//! Indicies to evenly distribute kernel coefficients values across nodes
+std::vector<t_int> w_support(Vector<t_real> const &w, const std::vector<t_int> &image_index,
+                             const std::vector<t_real> &w_stacks, const t_real du,
+                             const t_int min_support, const t_int max_support,
+                             sopt::mpi::Communicator const &comm);
 #endif
 //! Distribute visibilities into nodes in order of w terms (useful for w-stacking)
 Vector<t_int> w_distribution(Vector<t_real> const &u, const Vector<t_real> &v,

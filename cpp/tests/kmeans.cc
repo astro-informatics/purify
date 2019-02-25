@@ -73,3 +73,19 @@ TEST_CASE("k-means") {
   TEST_MACRO(weights)
 #undef TEST_MACRO
 }
+TEST_CASE("distribute w") {
+  const t_uint M = 10;
+  const t_int min_support = 4;
+  const t_int max_support = 100;
+  const t_real du = 100;
+  auto const comm = sopt::mpi::Communicator::World();
+
+  const auto params = utilities::random_sample_density(M, 0, constant::pi / 3, 100);
+  const auto kmeans = distribute::kmeans_algo(params.w, comm.size(), 0, comm);
+  const std::vector<t_int> image_index = std::get<0>(kmeans);
+  const std::vector<t_real> w_stacks = std::get<1>(kmeans);
+  const std::vector<t_int> groups =
+      distribute::w_support(params.w, image_index, w_stacks, du, min_support, max_support, comm);
+  auto sorted = utilities::regroup_and_all_to_all(params, groups, comm);
+  CHECK(sorted.size() < 1.1 * M);
+}
