@@ -194,9 +194,23 @@ utilities::vis_params set_cell_size(const sopt::mpi::Communicator &comm,
 utilities::vis_params w_stacking(utilities::vis_params const &params,
                                  sopt::mpi::Communicator const &comm, const t_int iters,
                                  const std::function<t_real(t_real)> &cost) {
-  const std::vector<t_int> w_stacks =
+  const std::vector<t_int> image_index =
       std::get<0>(distribute::kmeans_algo(params.w, comm.size(), iters, comm, cost));
-  return utilities::regroup_and_all_to_all(params, w_stacks, comm);
+  return utilities::regroup_and_all_to_all(params, image_index, comm);
+}
+std::tuple<utilities::vis_params, std::vector<t_int>, std::vector<t_real>>
+w_stacking_with_all_to_all(utilities::vis_params const &params, const t_real du,
+                           const t_int min_support, const t_int max_support,
+                           sopt::mpi::Communicator const &comm, const t_int iters,
+                           const std::function<t_real(t_real)> &cost) {
+  const auto kmeans = distribute::kmeans_algo(params.w, comm.size(), iters, comm, cost);
+  const std::vector<t_int> image_index = std::get<0>(kmeans);
+  const std::vector<t_real> w_stacks = std::get<1>(kmeans);
+  const std::vector<t_int> groups =
+      distribute::w_support(params.w, image_index, w_stacks, du, min_support, max_support, comm);
+  const auto data = utilities::regroup_and_all_to_all(params, image_index, groups, comm);
+  return std::tuple<utilities::vis_params, std::vector<t_int>, std::vector<t_real>>(
+      std::get<0>(data), std::get<1>(data), w_stacks);
 }
 }  // namespace utilities
 }  // namespace purify

@@ -54,10 +54,11 @@ utilities::vis_params w_stacking(utilities::vis_params const &params,
                                  const std::function<t_real(t_real)> &cost);
 //! \brief distribute data, sort into w-stacks using MPI, then distribute the stacks for all to all
 //! operator
-std::tuple<utilities::vis_params, std::vector<t_int>> w_stacking_with_all_to_all(
-    utilities::vis_params const &params, const t_real du, const t_int min_support,
-    const t_int max_support, sopt::mpi::Communicator const &comm, const t_int iters,
-    const std::function<t_real(t_real)> &cost);
+std::tuple<utilities::vis_params, std::vector<t_int>, std::vector<t_real>>
+w_stacking_with_all_to_all(utilities::vis_params const &params, const t_real du,
+                           const t_int min_support, const t_int max_support,
+                           sopt::mpi::Communicator const &comm, const t_int iters,
+                           const std::function<t_real(t_real)> &cost);
 #endif
 //! \brief Calculate step size using MPI (does not include factor of 1e-3)
 //! \param[in] vis: Vector of measurement data
