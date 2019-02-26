@@ -58,6 +58,10 @@ int main(int argc, const char **argv) {
     mop_algo = (not params.gpu())
                    ? factory::distributed_measurement_operator::mpi_distribute_image
                    : factory::distributed_measurement_operator::gpu_mpi_distribute_image;
+    if(params.mpi_all_to_all())
+    mop_algo = (not params.gpu())
+                   ? factory::distributed_measurement_operator::mpi_distribute_all_to_all
+                   : factory::distributed_measurement_operator::gpu_mpi_distribute_all_to_all;
     wop_algo = factory::distributed_wavelet_operator::mpi_sara;
     using_mpi = true;
   }
