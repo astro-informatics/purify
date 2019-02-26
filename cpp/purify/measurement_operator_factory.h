@@ -26,7 +26,8 @@ enum class distributed_measurement_operator {
   mpi_distribute_all_to_all,
   gpu_serial,
   gpu_mpi_distribute_image,
-  gpu_mpi_distribute_grid
+  gpu_mpi_distribute_grid,
+  gpu_mpi_distribute_all_to_all
 };
 
 namespace {
