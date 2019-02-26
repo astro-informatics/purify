@@ -3,7 +3,7 @@ PURIFY
 
 [![Build Status](https://travis-ci.com/astro-informatics/purify.svg?branch=development)](https://travis-ci.com/astro-informatics/purify)
 [![codecov](https://codecov.io/gh/astro-informatics/purify/branch/development/graph/badge.svg)](https://codecov.io/gh/astro-informatics/purify)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2555253.svg)](https://doi.org/10.5281/zenodo.2555253)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2555252.svg)](https://doi.org/10.5281/zenodo.2555252)
 
 Description
 -------------
