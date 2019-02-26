@@ -40,6 +40,26 @@ void check_complex_for_gpu() {
 
 //! distributed measurement operator factory
 template <class T, class... ARGS>
+std::shared_ptr<sopt::LinearTransform<T>> all_to_all_measurement_operator_factory(
+    const distributed_measurement_operator distribute, const std::vector<t_int> &image_stacks,
+    const std::vector<t_real> &w_stacks, ARGS &&... args) {
+  switch (distribute) {
+#ifdef PURIFY_MPI
+  case (distributed_measurement_operator::mpi_distribute_all_to_all): {
+    PURIFY_LOW_LOG("Using MPI all to all measurement operator.");
+    auto const world = sopt::mpi::Communicator::World();
+    return measurementoperator::init_degrid_operator_2d_all_to_all<T>(world, image_stacks, w_stacks,
+                                                                      std::forward<ARGS>(args)...);
+  }
+#endif
+  default:
+    throw std::runtime_error(
+        "Distributed method not found for Measurement Operator. Are you sure you compiled with "
+        "MPI?");
+  }
+}
+//! distributed measurement operator factory
+template <class T, class... ARGS>
 std::shared_ptr<sopt::LinearTransform<T>> measurement_operator_factory(
     const distributed_measurement_operator distribute, ARGS &&... args) {
   switch (distribute) {
@@ -90,26 +110,6 @@ std::shared_ptr<sopt::LinearTransform<T>> measurement_operator_factory(
     return gpu::measurementoperator::init_degrid_operator_2d_mpi(world,
                                                                  std::forward<ARGS>(args)...);
 #endif
-  }
-#endif
-  default:
-    throw std::runtime_error(
-        "Distributed method not found for Measurement Operator. Are you sure you compiled with "
-        "MPI?");
-  }
-}
-//! distributed measurement operator factory
-template <class T, class... ARGS>
-std::shared_ptr<sopt::LinearTransform<T>> measurement_operator_factory(
-    const distributed_measurement_operator distribute, const std::vector<t_int> &image_stacks,
-    const std::vector<t_real> &w_stacks, ARGS &&... args) {
-  switch (distribute) {
-#ifdef PURIFY_MPI
-  case (distributed_measurement_operator::mpi_distribute_all_to_all): {
-    PURIFY_LOW_LOG("Using MPI all to all measurement operator.");
-    auto const world = sopt::mpi::Communicator::World();
-    return measurementoperator::init_degrid_operator_2d_all_to_all<T>(world, image_stacks, w_stacks,
-                                                                      std::forward<ARGS>(args)...);
   }
 #endif
   default:

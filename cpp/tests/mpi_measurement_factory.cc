@@ -90,7 +90,7 @@ TEST_CASE("Serial vs Distributed Operator") {
         100, 1e-4, world.broadcast(Vector<t_complex>::Ones(height * width).eval())));
     // all to all operator
     const auto op_wproj_all = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-        factory::measurement_operator_factory<Vector<t_complex>>(
+        factory::all_to_all_measurement_operator_factory<Vector<t_complex>>(
             factory::distributed_measurement_operator::mpi_distribute_all_to_all, image_index,
             w_stacks, uv_mpi, height, width, cell_size, cell_size, over_sample, kernel, J, J, true),
         100, 1e-4, world.broadcast(Vector<t_complex>::Ones(height * width).eval())));
@@ -132,7 +132,7 @@ TEST_CASE("Serial vs Distributed Operator") {
         100, 1e-4, world.broadcast(Vector<t_complex>::Ones(height * width).eval())));
     // all to all operator
     const auto op_wproj_all = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-        factory::measurement_operator_factory<Vector<t_complex>>(
+        factory::all_to_all_measurement_operator_factory<Vector<t_complex>>(
             factory::distributed_measurement_operator::mpi_distribute_all_to_all, image_index,
             w_stacks, uv_mpi, height, width, cell_size, cell_size, over_sample, kernel, J, 100,
             true, 1e-8, 1e-8, dde_type::wkernel_radial),
