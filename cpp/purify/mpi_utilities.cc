@@ -205,7 +205,7 @@ w_stacking_with_all_to_all(utilities::vis_params const &params, const t_real du,
                            sopt::mpi::Communicator const &comm, const t_int iters,
                            const std::function<t_real(t_real)> &cost) {
   const auto kmeans = distribute::kmeans_algo(params.w, comm.size(), iters, comm, cost);
-  const std::vector<t_real> w_stacks = std::get<1>(kmeans);
+  const std::vector<t_real> &w_stacks = std::get<1>(kmeans);
   const std::vector<t_int> groups = distribute::w_support(params.w, std::get<0>(kmeans), w_stacks,
                                                           du, min_support, max_support, comm);
   utilities::vis_params outdata;
