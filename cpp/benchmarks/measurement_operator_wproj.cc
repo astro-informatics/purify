@@ -39,7 +39,7 @@ class DegridOperatorCtorFixturePar : public ::benchmark::Fixture {
     const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
     m_uv_data = utilities::w_stacking(uv_data, m_world, 100, cost);
     std::tie(m_uv_data_all_to_all, m_image_index, m_w_stacks) =
-        utilities::w_stacking_with_all_to_all(uv_data, du, 4, 100, m_world, 100, cost);
+        utilities::w_stacking_with_all_to_all(uv_data, du, 4, 100, m_world, 100, 1.01, cost);
   }
 
   void TearDown(const ::benchmark::State &state) {}
@@ -101,7 +101,6 @@ BENCHMARK_DEFINE_F(DegridOperatorCtorFixturePar, MPI)(benchmark::State &state) {
   state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizex * m_imsizey) *
                           sizeof(t_complex));
 }
-
 
 // -------------- Register benchmarks -------------------------//
 

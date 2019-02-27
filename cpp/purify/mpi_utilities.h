@@ -58,7 +58,7 @@ std::tuple<utilities::vis_params, std::vector<t_int>, std::vector<t_real>>
 w_stacking_with_all_to_all(utilities::vis_params const &params, const t_real du,
                            const t_int min_support, const t_int max_support,
                            sopt::mpi::Communicator const &comm, const t_int iters,
-                           const std::function<t_real(t_real)> &cost);
+                           const t_real fill_relaxation, const std::function<t_real(t_real)> &cost);
 #endif
 //! \brief Calculate step size using MPI (does not include factor of 1e-3)
 //! \param[in] vis: Vector of measurement data
