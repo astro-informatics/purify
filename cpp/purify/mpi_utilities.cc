@@ -97,7 +97,7 @@ std::tuple<vis_params, std::vector<t_int>> regroup_and_all_to_all(
     std::vector<t_int> const &groups, sopt::mpi::Communicator const &comm) {
   if (comm.size() == 1) return std::make_tuple(params, image_index);
   vis_params copy = params;
-  auto index_copy = image_index;
+  std::vector<t_int> index_copy = image_index;
   regroup(copy, index_copy, groups, comm.size());
 
   std::vector<t_int> sizes(comm.size());
@@ -204,13 +204,15 @@ w_stacking_with_all_to_all(utilities::vis_params const &params, const t_real du,
                            sopt::mpi::Communicator const &comm, const t_int iters,
                            const std::function<t_real(t_real)> &cost) {
   const auto kmeans = distribute::kmeans_algo(params.w, comm.size(), iters, comm, cost);
-  const std::vector<t_int> image_index = std::get<0>(kmeans);
+  std::vector<t_int> image_index = std::get<0>(kmeans);
+  utilities::vis_params outdata;
   const std::vector<t_real> w_stacks = std::get<1>(kmeans);
   const std::vector<t_int> groups =
       distribute::w_support(params.w, image_index, w_stacks, du, min_support, max_support, comm);
-  const auto data = utilities::regroup_and_all_to_all(params, image_index, groups, comm);
+  std::tie(outdata, image_index) =
+      utilities::regroup_and_all_to_all(params, image_index, groups, comm);
   return std::tuple<utilities::vis_params, std::vector<t_int>, std::vector<t_real>>(
-      std::get<0>(data), std::get<1>(data), w_stacks);
+      outdata, image_index, w_stacks);
 }
 }  // namespace utilities
 }  // namespace purify
