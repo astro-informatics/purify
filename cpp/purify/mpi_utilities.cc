@@ -97,7 +97,8 @@ std::tuple<vis_params, std::vector<t_int>> regroup_and_all_to_all(
     std::vector<t_int> const &groups, sopt::mpi::Communicator const &comm) {
   if (comm.size() == 1) return std::make_tuple(params, image_index);
   vis_params copy = params;
-  std::vector<t_int> index_copy = image_index;
+  std::vector<t_int> index_copy(image_index.size());
+  std::copy(image_index.begin(), image_index.end(), index_copy.begin());
   regroup(copy, index_copy, groups, comm.size());
 
   std::vector<t_int> sizes(comm.size());
