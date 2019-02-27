@@ -210,7 +210,7 @@ w_stacking_with_all_to_all(utilities::vis_params const &params, const t_real du,
   utilities::vis_params outdata;
   std::vector<t_int> image_index;
   std::tie(outdata, image_index) =
-      utilities::regroup_and_all_to_all(params, image_index, groups, comm);
+      utilities::regroup_and_all_to_all(params, std::get<0>(kmeans), groups, comm);
   return std::tuple<utilities::vis_params, std::vector<t_int>, std::vector<t_real>>(
       outdata, image_index, w_stacks);
 }
