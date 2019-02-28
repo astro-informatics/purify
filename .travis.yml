@@ -247,8 +247,12 @@ before_install:
 
 
 install:
-  - git clone --depth 1 git://github.com/UCL-RITS/ci-helpers.git
-  - source ci-helpers/travis/setup.sh ${CI_HELPERS}
+  # Add CI-helpers and install the dependencies we need from them.
+  - |
+    if [ ! -z ${CI_HELPERS} ]; then
+        git clone --depth 1 git://github.com/UCL-RITS/ci-helpers.git
+        source ci-helpers/travis/setup.sh ${CI_HELPERS}
+    fi
   # As MPI is not installed already, this variable is not set properly; this
   # way is set up for all the jobs in the same manner.
   - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; echo $CMAKE_CMD_EXTRA;  fi
