@@ -20,7 +20,7 @@ addons:
 
 cache:
   directories:
-    - $HOME/spack
+    - $HOME/ci-helpers/spack
     - $HOME/ci-helpers/openmpi
     - $HOME/ci-helpers/mpich
 
@@ -49,6 +49,7 @@ matrix:
         - MPI=ON
         - openMP=OFF
         - MPI_PROCS=2
+        - CI_HELPERS='spack'
       addons:
         homebrew:
           packages:
@@ -223,6 +224,7 @@ matrix:
         - MPI=ON
         - openMP=OFF
         - MPI_PROCS=2
+        - CI_HELPERS='spack'
 
 deploy:
   provider: pages
@@ -240,7 +242,6 @@ before_install:
   - if [ $TRAVIS_OS_NAME = linux ]; then ClangVer="-5.0"; fi
   - if [[ ${TITLE} = *GCC* ]]; then CC=gcc-7; else CC=clang${ClangVer}; fi
   - if [[ ${TITLE} = *GCC* ]]; then CXX=g++-7; else CXX=clang++${ClangVer}; fi
-  - if [ $TRAVIS_OS_NAME = osx ] && [[ $MPI = ON ]]; then bash .ci/install_spack.sh; source $(brew --prefix modules)/init/bash; source .ci/spack_env.sh ;fi
   - echo "==================== ${TITLE} ====================="
   - if [[ ${TITLE} = *Documentation* ]]; then docker pull uclrits/sopt; fi
 
