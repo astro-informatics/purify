@@ -179,6 +179,7 @@ matrix:
         - LDFLAGS='-pthread'
         - Tests=ON
         - MPI=ON
+        - MPI_PROCS=2
         - openMP=ON
         - EXAMPLES=ON
         - TEST_CMD=''
