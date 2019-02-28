@@ -21,6 +21,8 @@ addons:
 cache:
   directories:
     - $HOME/spack
+    - $HOME/ci-helpers/openmpi
+    - $HOME/ci-helpers/mpich
 
 matrix:
   fast_finish: true
