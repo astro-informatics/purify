@@ -245,7 +245,7 @@ before_install:
 
 
 install:
-  - git clone --depth 1 git://github.com/UCL-RSDG/ci-helpers.git
+  - git clone --depth 1 git://github.com/UCL-RITS/ci-helpers.git
   - source ci-helpers/travis/setup.sh ${CI_HELPERS}
   - |
     if [[ $MPI = ON ]] && [ $TRAVIS_OS_NAME == linux ]; then
