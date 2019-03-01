@@ -107,7 +107,7 @@ $(function() {
 <div class="fragment"><div class="line">cd /path/to/code/build</div><div class="line">ctest .</div></div><!-- fragment --><h2>Usage </h2>
 <p>The main purify executable lives either in the build directory or in the in the <code>bin</code> subdirectory of the installation directory. <code>purify</code> has one required argument, it a string for the file path of the config file containing the settings.</p>
 <p><code>purify path/to/config.yaml</code>.</p>
-<p>A <a href="https://github.com/astro-informatics/purify/blob/master/data/config/config.yaml">template with a description of the settings</a> is included in the <code>data/config</code> directory.<code> When</code>purify` runs a directory will be created, and the output images will be saved and time-stamped. Additionally, a config file with the settings used will be saved and time-stamped, helping for reproducibility and book-keeping.</p>
+<p>A <a href="https://github.com/astro-informatics/purify/blob/development/data/config/config.yaml">template with a description of the settings</a> is included in the <code>data/config</code> directory.<code> When</code>purify` runs a directory will be created, and the output images will be saved and time-stamped. Additionally, a config file with the settings used will be saved and time-stamped, helping for reproducibility and book-keeping.</p>
 <h2>Docker </h2>
 <p>If you want to use Docker instead, you can build an image using the Dockerfile available in the repository or pulling it from <a href="https://hub.docker.com/r/uclrits/purify">DockerHub</a>.</p>
 <div class="fragment"><div class="line">docker build -t purify .</div></div><!-- fragment --><p>or</p>
