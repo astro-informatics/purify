@@ -106,7 +106,7 @@ of the installation directory. `purify` has one required argument, it a string f
 
 `purify path/to/config.yaml`.
 
-A [template with a description of the settings](https://github.com/astro-informatics/purify/blob/master/data/config/config.yaml) 
+A [template with a description of the settings](https://github.com/astro-informatics/purify/blob/development/data/config/config.yaml)
 is included in the `data/config` directory.`
 When `purify` runs a directory will be created, and the output images will be
 saved and time-stamped. Additionally, a config file with the settings used will
