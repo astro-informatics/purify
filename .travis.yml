@@ -20,7 +20,9 @@ addons:
 
 cache:
   directories:
-    - $HOME/spack
+    - $HOME/ci-helpers/spack
+    - $HOME/ci-helpers/openmpi
+    - $HOME/ci-helpers/mpich
 
 matrix:
   fast_finish: true
@@ -47,6 +49,7 @@ matrix:
         - MPI=ON
         - openMP=OFF
         - MPI_PROCS=2
+        - CI_HELPERS='spack'
       addons:
         homebrew:
           packages:
@@ -107,6 +110,8 @@ matrix:
         - openMP=ON
         - MPI_PROCS=2
         - COVERAGE=ON
+        - CI_HELPERS='openmpi'
+        - MPI_EXTRA="--oversubscribe"
 
     - os: linux
       addons:
@@ -123,6 +128,7 @@ matrix:
         - MPI=ON
         - openMP=ON
         - MPI_PROCS=4
+        - CI_HELPERS='mpich'
 
     - os: linux
       addons:
@@ -138,6 +144,8 @@ matrix:
         - MPI=ON
         - openMP=ON
         - MPI_PROCS=2
+        - CI_HELPERS='openmpi'
+        - MPI_EXTRA="--oversubscribe"
 
     - os: linux
       addons:
@@ -172,9 +180,12 @@ matrix:
         - LDFLAGS='-pthread'
         - Tests=ON
         - MPI=ON
+        - MPI_PROCS=2
         - openMP=ON
         - EXAMPLES=ON
         - TEST_CMD=''
+        - CI_HELPERS='openmpi'
+        - MPI_EXTRA="--oversubscribe"
 
     - os: linux
       services:
@@ -213,6 +224,7 @@ matrix:
         - MPI=ON
         - openMP=OFF
         - MPI_PROCS=2
+        - CI_HELPERS='spack'
 
 deploy:
   provider: pages
@@ -230,16 +242,20 @@ before_install:
   - if [ $TRAVIS_OS_NAME = linux ]; then ClangVer="-5.0"; fi
   - if [[ ${TITLE} = *GCC* ]]; then CC=gcc-7; else CC=clang${ClangVer}; fi
   - if [[ ${TITLE} = *GCC* ]]; then CXX=g++-7; else CXX=clang++${ClangVer}; fi
-  - if [ $TRAVIS_OS_NAME = osx ] && [[ $MPI = ON ]]; then bash .ci/install_spack.sh; source $(brew --prefix modules)/init/bash; source .ci/spack_env.sh ;fi
-  # As MPI is not installed already, this variable is not set properly; this
-  # way is set up for all the jobs in the same manner.
   - echo "==================== ${TITLE} ====================="
-  - if [[ $MPI = ON ]]; then if [ $TRAVIS_OS_NAME = linux ]; then  if [[ ${TITLE} != *mpich* ]]; then bash .ci/build_openmpi.sh; MPI_EXTRA="--oversubscribe"; export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH; else bash .ci/build_mpich.sh; fi; fi; fi;
-  - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; echo $CMAKE_CMD_EXTRA;  fi
   - if [[ ${TITLE} = *Documentation* ]]; then docker pull uclrits/sopt; fi
 
 
 install:
+  # Add CI-helpers and install the dependencies we need from them.
+  - |
+    if [ ! -z ${CI_HELPERS} ]; then
+        git clone --depth 1 git://github.com/UCL-RITS/ci-helpers.git
+        source ci-helpers/travis/setup.sh ${CI_HELPERS}
+    fi
+  # As MPI is not installed already, this variable is not set properly; this
+  # way is set up for all the jobs in the same manner.
+  - if [[ $MPI = ON ]]; then eval $MPI_CONFIG; echo $CMAKE_CMD_EXTRA;  fi
 
 before_script:
   - |
