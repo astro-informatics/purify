@@ -177,12 +177,12 @@ int main(int argc, const char **argv) {
               ? factory::measurement_operator_factory<Vector<t_complex>>(
                     mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
                     params.cellsizex(), params.oversampling(),
-                    kernels::kernel_from_string.at(params.kernel()), 2 * params.Jy(),
-                    2 * params.Jx(), params.mpi_wstacking())
+                    kernels::kernel_from_string.at(params.kernel()), params.sim_J(), params.sim_J(),
+                    params.mpi_wstacking())
               : factory::measurement_operator_factory<Vector<t_complex>>(
                     mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
                     params.cellsizex(), params.oversampling(),
-                    kernels::kernel_from_string.at(params.kernel()), 2 * params.Jx(), params.Jw(),
+                    kernels::kernel_from_string.at(params.kernel()), params.sim_J(), params.Jw(),
                     params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
     else
       sky_measurements =
@@ -190,12 +190,12 @@ int main(int argc, const char **argv) {
               ? factory::all_to_all_measurement_operator_factory<Vector<t_complex>>(
                     mop_algo, image_index, w_stacks, uv_data, params.height(), params.width(),
                     params.cellsizey(), params.cellsizex(), params.oversampling(),
-                    kernels::kernel_from_string.at(params.kernel()), 2 * params.Jy(),
-                    2 * params.Jx(), params.mpi_wstacking())
+                    kernels::kernel_from_string.at(params.kernel()), params.sim_J(), params.sim_J(),
+                    params.mpi_wstacking())
               : factory::all_to_all_measurement_operator_factory<Vector<t_complex>>(
                     mop_algo, image_index, w_stacks, uv_data, params.height(), params.width(),
                     params.cellsizey(), params.cellsizex(), params.oversampling(),
-                    kernels::kernel_from_string.at(params.kernel()), 2 * params.Jx(), params.Jw(),
+                    kernels::kernel_from_string.at(params.kernel()), params.sim_J(), params.Jw(),
                     params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
 #ifdef PURIFY_MPI
     auto const comm = sopt::mpi::Communicator::World();

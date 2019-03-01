@@ -101,6 +101,7 @@ class YamlParser {
   YAML_MACRO(t_uint, Jx, 0)
   YAML_MACRO(t_uint, Jy, 0)
   YAML_MACRO(t_uint, Jw, 0)
+  YAML_MACRO(t_uint, sim_J, 0)
   YAML_MACRO(t_real, oversampling, 0)
   YAML_MACRO(t_real, powMethod_tolerance, 0)
   YAML_MACRO(std::string, eigenvector_real, "")

@@ -13,6 +13,7 @@ GeneralConfiguration:
         signal_to_noise: 10 # signal-to-noise ratio to be added to the sky model
         number_of_measurements: 10000 # number of measurements per a node
         w_rms: 30. # RMS w value in random uvw coverage
+        sim_J: 8
         coverage_files:  #path to converage units. This is only used if it is not an empty string
           - path/to/coverage/measurement/file
         coverage_units: lambda # one from lambda, radians, pixels
