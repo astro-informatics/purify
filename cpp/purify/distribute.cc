@@ -198,14 +198,14 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
 
 std::vector<t_int> w_support(Vector<t_real> const &w, const std::vector<t_int> &image_index,
                              const std::vector<t_real> &w_stacks, const t_real du,
-                             const t_int min_support, const t_int max_support, const t_real fill_relaxation,
-                             sopt::mpi::Communicator const &comm) {
+                             const t_int min_support, const t_int max_support,
+                             const t_real fill_relaxation, sopt::mpi::Communicator const &comm) {
   t_real coeff_total = 0;
   for (t_int i = 0; i < w.size(); i++)
     coeff_total += widefield::w_support(std::abs(w(i) - w_stacks.at(image_index.at(i))), du,
                                         min_support, max_support);
   const t_real coeff_average =
-      comm.all_sum_all<t_real>(coeff_total) / static_cast<t_real>(comm.size()) * fill_relaxation;
+      comm.all_sum_all<t_real>(coeff_total) / static_cast<t_real>(comm.size());
   if (comm.is_root())
     PURIFY_DEBUG("Each node should have on average {} coefficients.", coeff_average);
   t_real coeff_sum = 0;
@@ -220,7 +220,7 @@ std::vector<t_int> w_support(Vector<t_real> const &w, const std::vector<t_int> &
         const t_int cost = widefield::w_support(std::abs(w(i) - w_stacks.at(image_index.at(i))), du,
                                                 min_support, max_support);
         total += cost;
-        if (cost + coeff_sum > coeff_average) {
+        if ((cost + coeff_sum) > coeff_average * (1. + fill_relaxation)) {
           PURIFY_DEBUG("{} node should have {} coefficients.", group, coeff_sum);
           coeff_sum = 0;
           group++;

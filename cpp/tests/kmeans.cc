@@ -86,10 +86,10 @@ TEST_CASE("distribute w") {
   const std::vector<t_int> image_index = std::get<0>(kmeans);
   const std::vector<t_real> w_stacks = std::get<1>(kmeans);
   const std::vector<t_int> groups = distribute::w_support(params.w, image_index, w_stacks, du,
-                                                          min_support, max_support, 1.01, comm);
+                                                          min_support, max_support, 0.01, comm);
   auto sorted = utilities::regroup_and_all_to_all(params, image_index, groups, comm);
   const auto data = utilities::w_stacking_with_all_to_all(
-      params, du, min_support, max_support, comm, 100, 1.01, [](t_real x) { return x * x; });
+      params, du, min_support, max_support, comm, 100, 0.01, [](t_real x) { return x * x; });
   CHECK(std::get<0>(sorted).u.isApprox(std::get<0>(data).u));
   CHECK(std::get<0>(sorted).v.isApprox(std::get<0>(data).v));
   CHECK(std::get<0>(sorted).w.isApprox(std::get<0>(data).w));
