@@ -385,17 +385,19 @@ TEST_CASE("Serial vs Distributed GPU Operator Radial WProjection") {
   const t_real celly = 1;
   const t_real abs_error = 1e-6;
   const t_real rel_error = 1e-8;
+  const Vector<t_complex> power_init =
+      world.broadcast(Vector<t_complex>::Random(height * width).eval());
   const auto op_serial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_serial, height, width, cellx, celly, over_sample, kernel, J, 4, true, abs_error,
           rel_error, dde_type::wkernel_radial),
-      10000, 1e-5, Vector<t_complex>::Random(height * width)));
+      10000, 1e-5, power_init);
 
   const auto op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       gpu::measurementoperator::init_degrid_operator_2d(world, uv_mpi, height, width, cellx, celly,
                                                         over_sample, kernel, J, 4, true, abs_error,
                                                         rel_error, dde_type::wkernel_radial),
-      10000, 1e-5, world.broadcast(Vector<t_complex>::Random(height * width).eval())));
+      10000, 1e-5, power_init);
 
   if (uv_serial.u.size() == uv_mpi.u.size()) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
@@ -455,19 +457,21 @@ TEST_CASE("Serial vs Distributed Operator Radial WProjection") {
   auto const height = 128;
   const t_real cellx = 1;
   const t_real celly = 1;
-  const t_real abs_error = 1e-6;
+  const t_real abs_error = 1e-8;
   const t_real rel_error = 1e-8;
+  const Vector<t_complex> power_init =
+      world.broadcast(Vector<t_complex>::Random(height * width).eval());
   const auto op_serial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_serial, height, width, cellx, celly, over_sample, kernel, J, 4, true, abs_error,
           rel_error, dde_type::wkernel_radial),
-      10000, 1e-5, Vector<t_complex>::Random(height * width)));
+      10000, 1e-5, power_init));
 
   const auto op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           world, uv_mpi, height, width, cellx, celly, over_sample, kernel, J, 4, true, abs_error,
           rel_error, dde_type::wkernel_radial),
-      10000, 1e-5, world.broadcast(Vector<t_complex>::Random(height * width).eval())));
+      10000, 1e-5, power_init));
 
   if (uv_serial.u.size() == uv_mpi.u.size()) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
