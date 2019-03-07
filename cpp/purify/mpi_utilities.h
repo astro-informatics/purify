@@ -17,10 +17,16 @@ namespace utilities {
 //! smallest key, etc.
 void regroup(utilities::vis_params &params, std::vector<t_int> const &groups,
              const t_int max_groups);
+void regroup(vis_params &uv_params, std::vector<t_int> &image_index,
+             std::vector<t_int> const &groups_, const t_int max_groups);
 //! \brief regroup and distributes data
 vis_params regroup_and_scatter(vis_params const &params, std::vector<t_int> const &groups,
                                sopt::mpi::Communicator const &comm);
 //! \brief regroup and distributes data to and from all nodes
+std::tuple<vis_params, std::vector<t_int>> regroup_and_all_to_all(
+    vis_params const &params, const std::vector<t_int> &image_index,
+    std::vector<t_int> const &groups, sopt::mpi::Communicator const &comm);
+//! \brief without image index
 vis_params regroup_and_all_to_all(vis_params const &params, std::vector<t_int> const &groups,
                                   sopt::mpi::Communicator const &comm);
 //! \brief distribute data according to input order
@@ -46,6 +52,13 @@ utilities::vis_params set_cell_size(const sopt::mpi::Communicator &comm,
 utilities::vis_params w_stacking(utilities::vis_params const &params,
                                  sopt::mpi::Communicator const &comm, const t_int iters,
                                  const std::function<t_real(t_real)> &cost);
+//! \brief distribute data, sort into w-stacks using MPI, then distribute the stacks for all to all
+//! operator
+std::tuple<utilities::vis_params, std::vector<t_int>, std::vector<t_real>>
+w_stacking_with_all_to_all(utilities::vis_params const &params, const t_real du,
+                           const t_int min_support, const t_int max_support,
+                           sopt::mpi::Communicator const &comm, const t_int iters,
+                           const t_real fill_relaxation, const std::function<t_real(t_real)> &cost);
 #endif
 //! \brief Calculate step size using MPI (does not include factor of 1e-3)
 //! \param[in] vis: Vector of measurement data

@@ -42,6 +42,8 @@ int main(int argc, const char **argv) {
                          : factory::distributed_measurement_operator::gpu_serial;
   factory::distributed_wavelet_operator wop_algo = factory::distributed_wavelet_operator::serial;
   bool using_mpi = false;
+  std::vector<t_int> image_index = std::vector<t_int>();
+  std::vector<t_real> w_stacks = std::vector<t_real>();
 
 #ifdef PURIFY_MPI
   auto const session = sopt::mpi::init(argc, argv);
@@ -56,6 +58,10 @@ int main(int argc, const char **argv) {
     mop_algo = (not params.gpu())
                    ? factory::distributed_measurement_operator::mpi_distribute_image
                    : factory::distributed_measurement_operator::gpu_mpi_distribute_image;
+    if (params.mpi_all_to_all())
+      mop_algo = (not params.gpu())
+                     ? factory::distributed_measurement_operator::mpi_distribute_all_to_all
+                     : factory::distributed_measurement_operator::gpu_mpi_distribute_all_to_all;
     wop_algo = factory::distributed_wavelet_operator::mpi_sara;
     using_mpi = true;
   }
@@ -102,7 +108,16 @@ int main(int argc, const char **argv) {
                                                      params.measurements_units());
     if (params.conjugate_w()) uv_data = utilities::conjugate_w(uv_data);
 #ifdef PURIFY_MPI
-    if (params.mpi_wstacking()) {
+    if (params.mpi_wstacking() and
+        (mop_algo == factory::distributed_measurement_operator::mpi_distribute_all_to_all or
+         mop_algo == factory::distributed_measurement_operator::gpu_mpi_distribute_all_to_all)) {
+      auto const world = sopt::mpi::Communicator::World();
+      const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
+      const t_real du =
+          widefield::pixel_to_lambda(params.cellsizex(), params.width(), params.oversampling());
+      std::tie(uv_data, image_index, w_stacks) = utilities::w_stacking_with_all_to_all(
+          uv_data, du, params.Jx(), params.Jw(), world, params.kmeans_iters(), .01, cost);
+    } else if (params.mpi_wstacking()) {
       auto const world = sopt::mpi::Communicator::World();
       const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
       uv_data = utilities::w_stacking(uv_data, world, params.kmeans_iters(), cost);
@@ -139,24 +154,50 @@ int main(int argc, const char **argv) {
     }
     if (params.conjugate_w()) uv_data = utilities::conjugate_w(uv_data);
 #ifdef PURIFY_MPI
-    if (params.mpi_wstacking()) {
+    if (params.mpi_wstacking() and
+        (mop_algo == factory::distributed_measurement_operator::mpi_distribute_all_to_all or
+         mop_algo == factory::distributed_measurement_operator::gpu_mpi_distribute_all_to_all)) {
+      auto const world = sopt::mpi::Communicator::World();
+      const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
+      const t_real du =
+          widefield::pixel_to_lambda(params.cellsizex(), params.width(), params.oversampling());
+      std::tie(uv_data, image_index, w_stacks) = utilities::w_stacking_with_all_to_all(
+          uv_data, du, params.Jx(), params.Jw(), world, params.kmeans_iters(),
+          .01 / static_cast<t_real>(world.size()), cost);
+    } else if (params.mpi_wstacking()) {
       auto const world = sopt::mpi::Communicator::World();
       const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
       uv_data = utilities::w_stacking(uv_data, world, params.kmeans_iters(), cost);
     }
 #endif
-    std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> sky_measurements =
-        (not params.wprojection())
-            ? factory::measurement_operator_factory<Vector<t_complex>>(
-                  mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
-                  params.cellsizex(), params.oversampling(),
-                  kernels::kernel_from_string.at(params.kernel()), 2 * params.Jy(), 2 * params.Jx(),
-                  params.mpi_wstacking())
-            : factory::measurement_operator_factory<Vector<t_complex>>(
-                  mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
-                  params.cellsizex(), params.oversampling(),
-                  kernels::kernel_from_string.at(params.kernel()), 2 * params.Jx(), params.Jw(),
-                  params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
+    std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> sky_measurements;
+    if (mop_algo != factory::distributed_measurement_operator::mpi_distribute_all_to_all and
+        mop_algo != factory::distributed_measurement_operator::gpu_mpi_distribute_all_to_all)
+      sky_measurements =
+          (not params.wprojection())
+              ? factory::measurement_operator_factory<Vector<t_complex>>(
+                    mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
+                    params.cellsizex(), params.oversampling(),
+                    kernels::kernel_from_string.at(params.kernel()), params.sim_J(), params.sim_J(),
+                    params.mpi_wstacking())
+              : factory::measurement_operator_factory<Vector<t_complex>>(
+                    mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
+                    params.cellsizex(), params.oversampling(),
+                    kernels::kernel_from_string.at(params.kernel()), params.sim_J(), params.Jw(),
+                    params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
+    else
+      sky_measurements =
+          (not params.wprojection())
+              ? factory::all_to_all_measurement_operator_factory<Vector<t_complex>>(
+                    mop_algo, image_index, w_stacks, uv_data, params.height(), params.width(),
+                    params.cellsizey(), params.cellsizex(), params.oversampling(),
+                    kernels::kernel_from_string.at(params.kernel()), params.sim_J(), params.sim_J(),
+                    params.mpi_wstacking())
+              : factory::all_to_all_measurement_operator_factory<Vector<t_complex>>(
+                    mop_algo, image_index, w_stacks, uv_data, params.height(), params.width(),
+                    params.cellsizey(), params.cellsizex(), params.oversampling(),
+                    kernels::kernel_from_string.at(params.kernel()), params.sim_J(), params.Jw(),
+                    params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
 #ifdef PURIFY_MPI
     auto const comm = sopt::mpi::Communicator::World();
     sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
@@ -200,18 +241,34 @@ int main(int argc, const char **argv) {
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale;
 
   // create measurement operator
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measurements_transform =
-      (not params.wprojection())
-          ? factory::measurement_operator_factory<Vector<t_complex>>(
-                mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
-                params.cellsizex(), params.oversampling(),
-                kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jx(),
-                params.mpi_wstacking())
-          : factory::measurement_operator_factory<Vector<t_complex>>(
-                mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
-                params.cellsizex(), params.oversampling(),
-                kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jw(),
-                params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measurements_transform;
+  if (mop_algo != factory::distributed_measurement_operator::mpi_distribute_all_to_all and
+      mop_algo != factory::distributed_measurement_operator::gpu_mpi_distribute_all_to_all)
+    measurements_transform =
+        (not params.wprojection())
+            ? factory::measurement_operator_factory<Vector<t_complex>>(
+                  mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
+                  params.cellsizex(), params.oversampling(),
+                  kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jx(),
+                  params.mpi_wstacking())
+            : factory::measurement_operator_factory<Vector<t_complex>>(
+                  mop_algo, uv_data, params.height(), params.width(), params.cellsizey(),
+                  params.cellsizex(), params.oversampling(),
+                  kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jw(),
+                  params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
+  else
+    measurements_transform =
+        (not params.wprojection())
+            ? factory::all_to_all_measurement_operator_factory<Vector<t_complex>>(
+                  mop_algo, image_index, w_stacks, uv_data, params.height(), params.width(),
+                  params.cellsizey(), params.cellsizex(), params.oversampling(),
+                  kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jx(),
+                  params.mpi_wstacking())
+            : factory::all_to_all_measurement_operator_factory<Vector<t_complex>>(
+                  mop_algo, image_index, w_stacks, uv_data, params.height(), params.width(),
+                  params.cellsizey(), params.cellsizex(), params.oversampling(),
+                  kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jw(),
+                  params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
 #ifdef PURIFY_MPI
   auto const comm = sopt::mpi::Communicator::World();
   auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(

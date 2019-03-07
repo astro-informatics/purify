@@ -53,9 +53,9 @@ class AllToAllSparseVector {
       : AllToAllSparseVector(std::vector<t_int>(local_indices.begin(), local_indices.end()),
                              ft_grid_size, start, _comm) {}
   template <class T0>
-  AllToAllSparseVector(Eigen::SparseMatrixBase<T0> const &sparse, const t_int start,
-                       const sopt::mpi::Communicator &_comm)
-      : AllToAllSparseVector(non_empty_outers(sparse), sparse.cols(), start, _comm) {}
+  AllToAllSparseVector(Eigen::SparseMatrixBase<T0> const &sparse, const t_int ft_grid_size,
+                       const t_int start, const sopt::mpi::Communicator &_comm)
+      : AllToAllSparseVector(non_empty_outers(sparse), ft_grid_size, start, _comm) {}
 
   template <class T0, class T1>
   void recv_grid(Eigen::MatrixBase<T0> const &input, Eigen::MatrixBase<T1> const &output) const {
