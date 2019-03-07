@@ -72,7 +72,7 @@ AlgorithmOptions:
   ########## PADMM ##########
   padmm: #solve the constrained problem
     # Following is only accepted when MPI is used
-    mpiAlgorithm:  fully-distributed # one of none, serial-equivalent, fully-distributed
+    mpiAlgorithm: serial-equivalent  # one of none, serial-equivalent, fully-distributed
     # Be careful changing the following unless you know what you are doing
     relVarianceConvergence: 1e-3 # (>0) relative converegence tolerance of objective function
     epsilonConvergenceScaling: 1 # (>0) l2 convergence tolerance for residuals
@@ -88,7 +88,7 @@ AlgorithmOptions:
     dualFBVarianceConvergence: 1e-3 # (>0) relative convergence tolerance of l1 proximal
   primaldual: #solve the constrained problem
     # Following is only accepted when MPI is used
-    mpiAlgorithm:  fully-distributed # one of none, serial-equivalent, fully-distributed
+    mpiAlgorithm: serial-equivalent # one of none, serial-equivalent, fully-distributed
     # Be careful changing the following unless you know what you are doing
     relVarianceConvergence: 1e-3 # (>0) relative converegence tolerance of objective function
     epsilonConvergenceScaling: 1 # (>0) l2 convergence tolerance for residuals
