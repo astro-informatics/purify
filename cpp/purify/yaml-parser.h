@@ -114,6 +114,7 @@ class YamlParser {
   YAML_MACRO(bool, mpi_all_to_all, true)
   YAML_MACRO(bool, conjugate_w, true)
   YAML_MACRO(bool, gpu, false)
+  YAML_MACRO(t_int, precondition_iters, 0)
   YAML_MACRO(t_int, kmeans_iters, 10)
   YAML_MACRO(t_real, measurements_sigma, 1)
   YAML_MACRO(t_real, signal_to_noise, 30)

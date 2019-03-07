@@ -243,6 +243,8 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
     this->update_iters_ = get<t_int>(algorithmOptionsNode, {"primaldual", "stepsize", "update_iters"});
     this->update_tolerance_ =
         get<t_real>(algorithmOptionsNode, {"primaldual", "stepsize", "update_tolerance"});
+    this->precondition_iters_ =
+        get<t_int>(algorithmOptionsNode, {"primaldual", "precondition_iters"});
   } else {
     throw std::runtime_error(
         "Only padmm algorithm configured for now. Please fill the appropriate block in the "

@@ -84,6 +84,7 @@ AlgorithmOptions:
     mpiAlgorithm: serial-equivalent # one of none, serial-equivalent, fully-distributed
     # Be careful changing the following unless you know what you are doing
     relVarianceConvergence: 1e-3 # (>0) relative converegence tolerance of objective function
+    precondition_iters: 0 #use sampling density (based on field of view) to accelerate primal dual
     epsilonConvergenceScaling: 1 # (>0) l2 convergence tolerance for residuals
     stepsize:  # Stepsize, choose value between: default, variable, 100, x
       update_tolerance: 1e-1 #when predicted stepsize is greater than this value, it will be updated

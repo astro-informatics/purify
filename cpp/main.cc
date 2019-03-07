@@ -319,6 +319,22 @@ int main(int argc, const char **argv) {
         sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(), sara_size,
         params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
         params.relVarianceConvergence());
+  // Add primal dual preconditioning
+  if (params.algorithm() == "primaldual" and params.precondition_iters() > 0) {
+    PURIFY_HIGH_LOG(
+        "Using visibility sampling density to precondtion primal dual with {} subiterations",
+        params.precondition_iters());
+    primaldual->precondition_iters(params.precondition_iters());
+    if (using_mpi) {
+      const auto world = sopt::mpi::Communicator::World();
+      primaldual->precondition_weights(widefield::sample_density_weights(
+          uv_data.u, uv_data.v, params.cellsizex(), params.cellsizey(), params.width(),
+          params.height(), params.oversampling(), world));
+    } else
+      primaldual->precondition_weights(widefield::sample_density_weights(
+          uv_data.u, uv_data.v, params.cellsizex(), params.cellsizey(), params.width(),
+          params.height(), params.oversampling()));
+  }
 
   // Save some things before applying the algorithm
   // the config yaml file - this also generates the output directory and the timestamp
