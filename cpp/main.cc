@@ -294,6 +294,7 @@ int main(int argc, const char **argv) {
   // Create algorithm
   std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm;
   std::shared_ptr<sopt::algorithm::ImagingForwardBackward<t_complex>> fb;
+  std::shared_ptr<sopt::algorithm::ImagingPrimalDual<t_complex>> primaldual;
   if (params.algorithm() == "padmm")
     padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
         params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
@@ -312,6 +313,12 @@ int main(int argc, const char **argv) {
         (params.wavelet_basis().size() < 2) and (not params.realValueConstraint()) and
             (not params.positiveValueConstraint()),
         params.relVarianceConvergence(), params.dualFBVarianceConvergence(), 50);
+  if (params.algorithm() == "primaldual")
+    primaldual = factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
+        params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
+        sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(), sara_size,
+        params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
+        params.relVarianceConvergence());
 
   // Save some things before applying the algorithm
   // the config yaml file - this also generates the output directory and the timestamp
@@ -342,7 +349,15 @@ int main(int argc, const char **argv) {
     factory::add_updater<t_complex, sopt::algorithm::ImagingProximalADMM<t_complex>>(
         algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
         update_header_res, params.height(), params.width(), sara_size, using_mpi);
-  } else {
+  }
+  if (params.algorithm() == "primaldual") {
+    const std::weak_ptr<sopt::algorithm::ImagingPrimalDual<t_complex>> algo_weak(primaldual);
+    // Adding step size update to algorithm
+    factory::add_updater<t_complex, sopt::algorithm::ImagingPrimalDual<t_complex>>(
+        algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
+        update_header_res, params.height(), params.width(), sara_size, using_mpi);
+  }
+  if (params.algorithm() == "fb") {
     const std::weak_ptr<sopt::algorithm::ImagingForwardBackward<t_complex>> algo_weak(fb);
     // Adding step size update to algorithm
     factory::add_updater<t_complex, sopt::algorithm::ImagingForwardBackward<t_complex>>(
@@ -441,6 +456,19 @@ int main(int argc, const char **argv) {
 
     // Save the rest of the output
     // the clean image
+    image = Image<t_complex>::Map(diagnostic.x.data(), params.height(), params.width()).real();
+    const Vector<t_complex> residuals = measurements_transform->adjoint() * diagnostic.residual;
+    residual_image =
+        Image<t_complex>::Map(residuals.data(), params.height(), params.width()).real();
+    purified_header.hasconverged = diagnostic.good;
+    purified_header.niters = diagnostic.niters;
+  }
+  if (params.algorithm() == "primaldual") {
+    // Apply algorithm
+    auto const diagnostic =
+        (*primaldual)(std::make_tuple(estimate_image.eval(), estimate_res.eval()));
+
+    // Save the rest of the output
     image = Image<t_complex>::Map(diagnostic.x.data(), params.height(), params.width()).real();
     const Vector<t_complex> residuals = measurements_transform->adjoint() * diagnostic.residual;
     residual_image =
