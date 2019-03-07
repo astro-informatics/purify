@@ -240,7 +240,7 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
         get<std::string>(algorithmOptionsNode, {"primaldual", "mpiAlgorithm"}));
     this->relVarianceConvergence_ =
         get<t_real>(algorithmOptionsNode, {"primaldual", "relVarianceConvergence"});
-    this->update_iters_ = get<t_int>(algorithmOptionsNode, {"padmm", "stepsize", "update_iters"});
+    this->update_iters_ = get<t_int>(algorithmOptionsNode, {"primaldual", "stepsize", "update_iters"});
     this->update_tolerance_ =
         get<t_real>(algorithmOptionsNode, {"primaldual", "stepsize", "update_tolerance"});
   } else {
