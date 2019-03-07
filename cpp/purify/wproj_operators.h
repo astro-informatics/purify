@@ -107,6 +107,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
   return std::make_tuple(direct, indirect);
 }
 
+#ifdef PURIFY_MPI
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
 base_mpi_all_to_all_degrid_operator_2d(
@@ -169,6 +170,7 @@ base_mpi_all_to_all_degrid_operator_2d(
   PURIFY_LOW_LOG("Finished consturction of Φ.");
   return std::make_tuple(direct, indirect);
 }
+#endif
 
 }  // namespace operators
 
