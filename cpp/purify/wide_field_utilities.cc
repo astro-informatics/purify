@@ -31,8 +31,9 @@ Matrix<t_complex> generate_chirp(const t_real w_rate, const t_real cell_x, const
 }
 
 Matrix<t_complex> estimate_sample_density(const Vector<t_real> &u, const Vector<t_real> &v,
-                                       const t_real cellx, const t_real celly, const t_uint imsizex,
-                                       const t_uint imsizey, const t_real oversample_ratio) {
+                                          const t_real cellx, const t_real celly,
+                                          const t_uint imsizex, const t_uint imsizey,
+                                          const t_real oversample_ratio) {
   const t_int ftsizeu = std::floor(oversample_ratio * imsizex);
   const t_int ftsizev = std::floor(oversample_ratio * imsizex);
   Matrix<t_complex> sample_density = Matrix<t_complex>::Zero(ftsizev, ftsizeu);
@@ -62,6 +63,8 @@ Vector<t_complex> sample_density_weights(const Vector<t_real> &u, const Vector<t
     const t_int p = utilities::mod(floor(v(i) * dv), ftsizev);
     weights(i) = 1. / sample_density(p, q);
   }
+  const t_real max_weight = weights.array().cwiseAbs().maxCoeff();
+  weights /= max_weight;
   return weights;
 }
 #ifdef PURIFY_MPI
@@ -82,6 +85,8 @@ Vector<t_complex> sample_density_weights(const Vector<t_real> &u, const Vector<t
     const t_int p = utilities::mod(floor(v(i) * dv), ftsizev);
     weights(i) = 1. / sample_density(p, q);
   }
+  const t_real max_weight = comm.all_reduce<t_real>(weights.array().cwiseAbs().maxCoeff(), MPI_MAX);
+  weights /= max_weight;
   return weights;
 }
 #endif
