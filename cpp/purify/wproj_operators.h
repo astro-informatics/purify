@@ -139,9 +139,9 @@ base_mpi_all_to_all_degrid_operator_2d(
     PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
     std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d_all_to_all<T>(
         comm, local_grid_size, comm.rank() * local_grid_size, number_of_images, image_index,
-        (w_stacking) ? w_stacks : std::vector<t_real>(comm.size(), 0.), u, v, w, weights,
-        imsizey, imsizex, oversample_ratio, std::get<0>(kerneluvs), std::get<1>(kerneluvs), Ju, Jw,
-        cellx, celly, absolute_error, relative_error, dde);
+        (w_stacking) ? w_stacks : std::vector<t_real>(comm.size(), 0.), u, v, w, weights, imsizey,
+        imsizex, oversample_ratio, std::get<0>(kerneluvs), std::get<1>(kerneluvs), Ju, Jw, cellx,
+        celly, absolute_error, relative_error, dde);
     break;
   }
   case (dde_type::wkernel_2d): {
@@ -157,9 +157,9 @@ base_mpi_all_to_all_degrid_operator_2d(
     auto const kerneluvs = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
     std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d_all_to_all<T>(
         comm, local_grid_size, comm.rank() * local_grid_size, number_of_images, image_index,
-        (w_stacking) ? w_stacks : std::vector<t_real>(comm.size(), 0.), u, v, w, weights,
-        imsizey, imsizex, oversample_ratio, std::get<0>(kerneluvs), std::get<1>(kerneluvs), Ju, Jw,
-        cellx, celly, absolute_error, relative_error, dde);
+        (w_stacking) ? w_stacks : std::vector<t_real>(comm.size(), 0.), u, v, w, weights, imsizey,
+        imsizex, oversample_ratio, std::get<0>(kerneluvs), std::get<1>(kerneluvs), Ju, Jw, cellx,
+        celly, absolute_error, relative_error, dde);
     break;
   }
   default:

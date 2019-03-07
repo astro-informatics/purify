@@ -116,8 +116,7 @@ int main(int argc, const char **argv) {
       const t_real du =
           widefield::pixel_to_lambda(params.cellsizex(), params.width(), params.oversampling());
       std::tie(uv_data, image_index, w_stacks) = utilities::w_stacking_with_all_to_all(
-          uv_data, du, params.Jx(), params.Jw(), world, params.kmeans_iters(),
-          .01 , cost);
+          uv_data, du, params.Jx(), params.Jw(), world, params.kmeans_iters(), .01, cost);
     } else if (params.mpi_wstacking()) {
       auto const world = sopt::mpi::Communicator::World();
       const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
