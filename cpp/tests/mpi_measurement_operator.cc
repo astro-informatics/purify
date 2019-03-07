@@ -238,10 +238,12 @@ TEST_CASE("Serial vs All to All Fourier Grid Operator weighted") {
   auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
+  const Vector<t_complex> power_init =
+      world.broadcast(Vector<t_complex>::Random(height * width).eval());
   const auto op_serial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample),
-      100, 1e-4, Vector<t_complex>::Random(height * width)));
+      100, 1e-4, power_init));
   // First create an instance of an engine.
   std::random_device rnd_device;
   // Specify the engine and distribution.
@@ -257,7 +259,7 @@ TEST_CASE("Serial vs All to All Fourier Grid Operator weighted") {
       purify::measurementoperator::init_degrid_operator_2d_all_to_all<Vector<t_complex>>(
           world, image_index, w_stacks, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width,
           over_sample),
-      100, 1e-4, world.broadcast(Vector<t_complex>::Random(height * width).eval())));
+      100, 1e-4, power_init));
 
   if (world.size() == 1) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
@@ -321,19 +323,21 @@ TEST_CASE("Standard vs All to All stacking") {
   const auto kmeans = distribute::kmeans_algo(uv_mpi.w, world.size(), 100, world);
   const std::vector<t_int> image_index = std::get<0>(kmeans);
   const std::vector<t_real> w_stacks = std::get<1>(kmeans);
+  const Vector<t_complex> power_init =
+      world.broadcast(Vector<t_complex>::Random(height * width).eval());
 
   const auto uv_stacks = utilities::regroup_and_all_to_all(uv_mpi, image_index, world);
   // standard operator
   const auto op_stack = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           world, uv_stacks, height, width, cell_size, cell_size, over_sample, kernel, J, J, true),
-      100, 1e-4, world.broadcast(Vector<t_complex>::Random(height * width).eval())));
+      100, 1e-4, power_init));
   // all to all operator
   const auto op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d_all_to_all<Vector<t_complex>>(
           world, image_index, w_stacks, uv_mpi, height, width, cell_size, cell_size, over_sample,
           kernel, J, J, true),
-      100, 1e-4, world.broadcast(Vector<t_complex>::Random(height * width).eval())));
+      100, 1e-4, power_init));
   if (world.size() == 1) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
     CHECK(uv_serial.v.isApprox(uv_mpi.v));
@@ -390,6 +394,8 @@ TEST_CASE("Standard vs All to All wproj") {
   const auto kmeans = distribute::kmeans_algo(uv_mpi.w, world.size(), 100, world);
   const std::vector<t_int> image_index = std::get<0>(kmeans);
   const std::vector<t_real> w_stacks = std::get<1>(kmeans);
+  const Vector<t_complex> power_init =
+      world.broadcast(Vector<t_complex>::Random(height * width).eval());
 
   const auto uv_stacks = utilities::regroup_and_all_to_all(uv_mpi, image_index, world);
   // standard operator
@@ -397,13 +403,13 @@ TEST_CASE("Standard vs All to All wproj") {
       purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           world, uv_stacks, height, width, cell_size, cell_size, over_sample, kernel, J, 100, true,
           1e-8, 1e-8, dde_type::wkernel_radial),
-      100, 1e-4, world.broadcast(Vector<t_complex>::Ones(height * width).eval())));
+      100, 1e-4, power_init));
   // all to all operator
   const auto op_wproj_all = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d_all_to_all<Vector<t_complex>>(
           world, image_index, w_stacks, uv_mpi, height, width, cell_size, cell_size, over_sample,
           kernel, J, 100, true, 1e-8, 1e-8, dde_type::wkernel_radial),
-      100, 1e-4, world.broadcast(Vector<t_complex>::Ones(height * width).eval())));
+      100, 1e-4, power_init));
   if (world.size() == 1) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
     CHECK(uv_serial.v.isApprox(uv_mpi.v));
@@ -456,14 +462,16 @@ TEST_CASE("Serial vs Distributed GPU Fourier Grid Operator weighted") {
   auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
+  const Vector<t_complex> power_init =
+      world.broadcast(Vector<t_complex>::Random(height * width).eval());
   const auto op_serial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample),
-      100, 1e-4, Vector<t_complex>::Random(height * width)));
+      100, 1e-4, power_init));
   const auto op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::gpu::measurementoperator::init_degrid_operator_2d_mpi(
           world, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample),
-      100, 1e-4, world.broadcast(Vector<t_complex>::Random(height * width).eval())));
+      100, 1e-4, power_init));
 
   if (world.size() == 1) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
