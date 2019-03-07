@@ -1,4 +1,5 @@
 #include "purify/wide_field_utilities.h"
+#include "purify/utilities.h"
 
 namespace purify {
 namespace widefield {
@@ -28,5 +29,61 @@ Matrix<t_complex> generate_chirp(const t_real w_rate, const t_real cell_x, const
                                  const t_uint x_size, const t_uint y_size) {
   return generate_chirp([](t_real, t_real) { return 1.; }, w_rate, cell_x, cell_y, x_size, y_size);
 }
+
+Matrix<t_complex> estimate_sample_density(const Vector<t_real> &u, const Vector<t_real> &v,
+                                       const t_real cellx, const t_real celly, const t_uint imsizex,
+                                       const t_uint imsizey, const t_real oversample_ratio) {
+  const t_int ftsizeu = std::floor(oversample_ratio * imsizex);
+  const t_int ftsizev = std::floor(oversample_ratio * imsizex);
+  Matrix<t_complex> sample_density = Matrix<t_complex>::Zero(ftsizev, ftsizeu);
+  const t_real du = pixel_to_lambda(cellx, imsizex, oversample_ratio);
+  const t_real dv = pixel_to_lambda(celly, imsizey, oversample_ratio);
+  for (t_int i = 0; i < u.size(); ++i) {
+    const t_int q = utilities::mod(floor(u(i) * du), ftsizeu);
+    const t_int p = utilities::mod(floor(v(i) * dv), ftsizev);
+    sample_density(p, q) += 1.;
+  }
+  return sample_density;
+}
+
+Vector<t_complex> sample_density_weights(const Vector<t_real> &u, const Vector<t_real> &v,
+                                         const t_real cellx, const t_real celly,
+                                         const t_uint imsizex, const t_uint imsizey,
+                                         const t_real oversample_ratio) {
+  Vector<t_complex> weights = Vector<t_complex>::Zero(u.size());
+  const t_int ftsizeu = std::floor(oversample_ratio * imsizex);
+  const t_int ftsizev = std::floor(oversample_ratio * imsizex);
+  const Matrix<t_complex> sample_density =
+      estimate_sample_density(u, v, cellx, celly, imsizex, imsizey, oversample_ratio);
+  const t_real du = pixel_to_lambda(cellx, imsizex, oversample_ratio);
+  const t_real dv = pixel_to_lambda(celly, imsizey, oversample_ratio);
+  for (t_int i = 0; i < u.size(); ++i) {
+    const t_int q = utilities::mod(floor(u(i) * du), ftsizeu);
+    const t_int p = utilities::mod(floor(v(i) * dv), ftsizev);
+    weights(i) = 1. / sample_density(p, q);
+  }
+  return weights;
+}
+#ifdef PURIFY_MPI
+Vector<t_complex> sample_density_weights(const Vector<t_real> &u, const Vector<t_real> &v,
+                                         const t_real cellx, const t_real celly,
+                                         const t_uint imsizex, const t_uint imsizey,
+                                         const t_real oversample_ratio,
+                                         const sopt::mpi::Communicator &comm) {
+  Vector<t_complex> weights = Vector<t_complex>::Zero(u.size());
+  const t_int ftsizeu = std::floor(oversample_ratio * imsizex);
+  const t_int ftsizev = std::floor(oversample_ratio * imsizex);
+  const Matrix<t_complex> sample_density = comm.all_sum_all(
+      estimate_sample_density(u, v, cellx, celly, imsizex, imsizey, oversample_ratio));
+  const t_real du = pixel_to_lambda(cellx, imsizex, oversample_ratio);
+  const t_real dv = pixel_to_lambda(celly, imsizey, oversample_ratio);
+  for (t_int i = 0; i < u.size(); ++i) {
+    const t_int q = utilities::mod(floor(u(i) * du), ftsizeu);
+    const t_int p = utilities::mod(floor(v(i) * dv), ftsizev);
+    weights(i) = 1. / sample_density(p, q);
+  }
+  return weights;
+}
+#endif
 }  // namespace widefield
 }  // namespace purify

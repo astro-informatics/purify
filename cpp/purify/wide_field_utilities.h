@@ -4,6 +4,9 @@
 #include "purify/config.h"
 #include "purify/types.h"
 #include "purify/logging.h"
+#ifdef PURIFY_MPI
+#include <sopt/mpi/communicator.h>
+#endif
 namespace purify {
 namespace widefield {
 //! estaimte support size of w given u resolution du
@@ -12,6 +15,23 @@ t_int w_support(const t_real w, const t_real du, const t_int min, const t_int ma
 t_real pixel_to_lambda(const t_real cell, const t_uint imsize, const t_real oversample_ratio);
 //! return cell size from the bandwidth
 t_real estimate_cell_size(const t_real max_u, const t_uint imsize, const t_real oversample_ratio);
+//! estimate sample desity grid for a given field of view
+Matrix<t_complex> estimate_sample_density(const Vector<t_real> &u, const Vector<t_real> &v,
+                                       const t_real cellx, const t_real celly, const t_uint imsizex,
+                                       const t_uint imsizey, const t_real oversample_ratio);
+//! create sample density weights for a given field of view, uniform weighting
+Vector<t_complex> sample_density_weights(const Vector<t_real> &u, const Vector<t_real> &v,
+                                         const t_real cellx, const t_real celly,
+                                         const t_uint imsizex, const t_uint imsizey,
+                                         const t_real oversample_ratio);
+#ifdef PURIFY_MPI
+//! create sample density weights with MPI for a given field of view, uniform weighting with MPI
+Vector<t_complex> sample_density_weights(const Vector<t_real> &u, const Vector<t_real> &v,
+                                         const t_real cellx, const t_real celly,
+                                         const t_uint imsizex, const t_uint imsizey,
+                                         const t_real oversample_ratio,
+                                         const sopt::mpi::Communicator &comm);
+#endif
 //! Work out max L and M directional cosines from image parameters
 t_real fov_cosine(t_real const cell, t_uint const imsize);
 //! Generate image of DDE for aw-stacking
