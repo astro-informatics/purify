@@ -80,7 +80,7 @@ TEST_CASE("estimate_sample_density") {
   const Vector<t_real> v = Vector<t_real>::Random(M) * 1000;
 
   const Vector<t_complex> weights =
-      widefield::sample_density_weights(u, v, cellx, celly, imsizex, imsizey, oversample_ratio);
+      widefield::sample_density_weights(u, v, cellx, celly, imsizex, imsizey, oversample_ratio, 1);
   REQUIRE(weights.size() == M);
   CHECK(weights.isApprox(Vector<t_complex>::Ones(weights.size())));
 }

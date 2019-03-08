@@ -19,7 +19,7 @@ TEST_CASE("estimate_sample_density MPI") {
   const Vector<t_real> v = Vector<t_real>::Random(M) * 1000;
   const sopt::mpi::Communicator comm = sopt::mpi::Communicator::World();
   const Vector<t_complex> weights = widefield::sample_density_weights(
-      u, v, cellx, celly, imsizex, imsizey, oversample_ratio, comm);
+      u, v, cellx, celly, imsizex, imsizey, oversample_ratio, 1, comm);
   REQUIRE(weights.size() == M);
   CHECK(weights.isApprox(Vector<t_complex>::Ones(weights.size())));
 }
