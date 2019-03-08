@@ -62,7 +62,7 @@ TEST_CASE("Calcuate DDE Image") {
   SECTION("w is zero") {
     const t_real w_rate = 0;
     const Image<t_complex> chirp_image =
-        widefield::generate_dde([](t_real, t_real) { return 1.; }, 1, 1, imsizex, imsizey);
+        widefield::generate_dde([](t_real, t_real) { return 1.; }, 1, 1, imsizex, imsizey, 0);
     REQUIRE(chirp_image.cols() == imsizex);
     REQUIRE(chirp_image.rows() == imsizey);
     REQUIRE(chirp_image.isApprox(Image<t_complex>::Constant(imsizey, imsizex, 1)));
