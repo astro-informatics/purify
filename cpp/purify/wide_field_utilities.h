@@ -18,18 +18,18 @@ t_real estimate_cell_size(const t_real max_u, const t_uint imsize, const t_real 
 //! estimate sample desity grid for a given field of view
 Matrix<t_complex> estimate_sample_density(const Vector<t_real> &u, const Vector<t_real> &v,
                                        const t_real cellx, const t_real celly, const t_uint imsizex,
-                                       const t_uint imsizey, const t_real oversample_ratio);
+                                       const t_uint imsizey, const t_real oversample_ratio, const t_real scale);
 //! create sample density weights for a given field of view, uniform weighting
 Vector<t_complex> sample_density_weights(const Vector<t_real> &u, const Vector<t_real> &v,
                                          const t_real cellx, const t_real celly,
                                          const t_uint imsizex, const t_uint imsizey,
-                                         const t_real oversample_ratio);
+                                         const t_real oversample_ratio, const t_real scale);
 #ifdef PURIFY_MPI
 //! create sample density weights with MPI for a given field of view, uniform weighting with MPI
 Vector<t_complex> sample_density_weights(const Vector<t_real> &u, const Vector<t_real> &v,
                                          const t_real cellx, const t_real celly,
                                          const t_uint imsizex, const t_uint imsizey,
-                                         const t_real oversample_ratio,
+                                         const t_real oversample_ratio, const t_real scale,
                                          const sopt::mpi::Communicator &comm);
 #endif
 //! Work out max L and M directional cosines from image parameters

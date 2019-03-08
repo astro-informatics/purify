@@ -329,11 +329,11 @@ int main(int argc, const char **argv) {
       const auto world = sopt::mpi::Communicator::World();
       primaldual->precondition_weights(widefield::sample_density_weights(
           uv_data.u, uv_data.v, params.cellsizex(), params.cellsizey(), params.width(),
-          params.height(), params.oversampling(), world));
+          params.height(), params.oversampling(), 0.5, world));
     } else
       primaldual->precondition_weights(widefield::sample_density_weights(
           uv_data.u, uv_data.v, params.cellsizex(), params.cellsizey(), params.width(),
-          params.height(), params.oversampling()));
+          params.height(), params.oversampling(), 0.5));
   }
 
   // Save some things before applying the algorithm
