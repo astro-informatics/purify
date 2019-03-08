@@ -1,6 +1,6 @@
 # Looks up [Sopt](http://basp-group.github.io/sopt/)
 #
-# - GIT_REPOSITORY: defaults to https://github.com/basp-group/sopt.git
+# - GIT_REPOSITORY: defaults to https://github.com/astro-informatics/sopt.git
 # - GIT_TAG: defaults to master
 # - BUILD_TYPE: defaults to Release
 #

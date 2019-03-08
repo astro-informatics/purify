@@ -3,6 +3,7 @@ PURIFY
 
 [![Build Status](https://travis-ci.com/astro-informatics/purify.svg?branch=development)](https://travis-ci.com/astro-informatics/purify)
 [![codecov](https://codecov.io/gh/astro-informatics/purify/branch/development/graph/badge.svg)](https://codecov.io/gh/astro-informatics/purify)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2555252.svg)](https://doi.org/10.5281/zenodo.2555252)
 
 Description
 -------------
@@ -105,7 +106,7 @@ of the installation directory. `purify` has one required argument, it a string f
 
 `purify path/to/config.yaml`.
 
-A [template with a description of the settings](https://github.com/astro-informatics/purify/blob/master/data/config/config.yaml) 
+A [template with a description of the settings](https://github.com/astro-informatics/purify/blob/development/data/config/config.yaml)
 is included in the `data/config` directory.`
 When `purify` runs a directory will be created, and the output images will be
 saved and time-stamped. Additionally, a config file with the settings used will
