@@ -63,13 +63,13 @@ class AllToAllSparseVector {
     Vector<typename T0::Scalar> buffer;
     mapping(input, buffer);
     assert(buffer.size() == std::accumulate(send_sizes.begin(), send_sizes.end(), 0));
-    output.const_cast_derived() = comm.all_to_allv<typename T0::Scalar>(buffer, send_sizes);
+    output.const_cast_derived() = comm.all_to_allv<typename T0::Scalar>(buffer, send_sizes, recv_sizes);
   }
 
   template <class T0, class T1>
   void send_grid(Eigen::MatrixBase<T0> const &input, Eigen::MatrixBase<T1> const &output) const {
     assert(input.cols() == 1);
-    auto const buffer = comm.all_to_allv<typename T0::Scalar>(input, recv_sizes);
+    auto const buffer = comm.all_to_allv<typename T0::Scalar>(input, recv_sizes, send_sizes);
     mapping.adjoint(buffer, output.derived());
   }
 
