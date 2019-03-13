@@ -101,6 +101,8 @@ typename std::enable_if<std::is_scalar<T>::value, void>::type write_key(fitsfile
     datatype = TFLOAT;
   else if (std::is_same<T, int>::value)
     datatype = TINT;
+  else if (std::is_same<T, t_int>::value)
+    datatype = TINT;
   else if (std::is_same<T, bool>::value)
     datatype = TLOGICAL;
   else
@@ -123,6 +125,8 @@ typename std::enable_if<std::is_scalar<T>::value, T>::type read_key(fitsfile *fp
   else if (std::is_same<T, float>::value)
     datatype = TFLOAT;
   else if (std::is_same<T, int>::value)
+    datatype = TINT;
+  else if (std::is_same<T, t_int>::value)
     datatype = TINT;
   else if (std::is_same<T, bool>::value)
     datatype = TLOGICAL;
