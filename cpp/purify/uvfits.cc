@@ -47,18 +47,18 @@ utilities::vis_params read_uvfits(const std::string &vis_name2, const utilities:
 utilities::vis_params read_uvfits(const std::string &filename, const bool flag, const stokes pol) {
   utilities::vis_params uv_data;
   fitsfile *fptr;
-  t_int status = 0;
-  t_int hdupos;
-  t_int baselines;
-  t_int naxes;
-  t_int pcount;
+  int status = 0;
+  int hdupos;
+  int baselines;
+  int naxes;
+  int pcount;
   std::shared_ptr<char> comment =
       std::shared_ptr<char>(new char[FLEN_CARD], [](char *ptr) { delete[] ptr; });
   PURIFY_MEDIUM_LOG("Reading uvfits {}", filename);
   if (fits_open_file(&fptr, filename.c_str(), READONLY, &status))
     throw std::runtime_error("Could not open file " + filename);
 
-  t_int hdutype;
+  int hdutype;
   if (fits_movabs_hdu(fptr, 1, &hdutype, &status)) throw std::runtime_error("Error changing HDU.");
   if (hdutype != IMAGE_HDU)
     throw std::runtime_error("HDU 1 not expected type " + std::to_string(hdutype));
@@ -71,10 +71,10 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
   if (naxes == 0) throw std::runtime_error("No axes in header... ");
   if (pcount == 0) throw std::runtime_error("No uvw or time coordinates in header... ");
   t_uint total = 1;
-  std::vector<t_int> naxis(naxes, 0);
+  std::vector<int> naxis(naxes, 0);
   // filling up axis sizes
   for (int i = 1; i < naxes; i++) {
-    t_int n;
+    int n;
     std::string key = "NAXIS" + std::to_string(i + 1);
     fits_read_key(fptr, TINT, key.c_str(), &n, comment.get(), &status);
     naxis[i] = n;
@@ -106,8 +106,8 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
   if (frequencies.size() != channels)
     throw std::runtime_error("Number of frequencies doesn't match number of channels. " +
                              std::to_string(frequencies.size()) + "!=" + std::to_string(channels));
-  t_int pol_index1;
-  t_int pol_index2;
+  int pol_index1;
+  int pol_index2;
   Vector<t_complex> stokes_transform = Vector<t_complex>::Zero(2);
   switch (pol) {
   case stokes::I:
@@ -244,16 +244,16 @@ utilities::vis_params read_polarisation(const Vector<t_real> &data, const Matrix
   uv_data.units = utilities::vis_units::lambda;
   return uv_data;
 }
-Vector<t_real> read_uvfits_freq(fitsfile *fptr, t_int *status, const t_int &col) {
+Vector<t_real> read_uvfits_freq(fitsfile *fptr, int *status, const int &col) {
   Vector<t_real> output;
   read_uvfits_freq(fptr, status, output, col);
   return output;
 }
-void read_uvfits_freq(fitsfile *fptr, t_int *status, Vector<t_real> &output, const t_int &col) {
+void read_uvfits_freq(fitsfile *fptr, int *status, Vector<t_real> &output, const int &col) {
   t_real cfreq;
   t_real dfreq;
-  t_int crpix;
-  t_int nfreq;
+  int crpix;
+  int nfreq;
   std::shared_ptr<char> comment =
       std::shared_ptr<char>(new char[FLEN_CARD], [](char *ptr) { delete[] ptr; });
   std::string key = "CRVAL" + std::to_string(col);
@@ -266,29 +266,29 @@ void read_uvfits_freq(fitsfile *fptr, t_int *status, Vector<t_real> &output, con
   fits_read_key(fptr, TINT, key.c_str(), &nfreq, comment.get(), status);
   if (nfreq == 0) throw std::runtime_error("Wrong number of channels read from header.");
   output = Vector<t_real>::Zero(nfreq);
-  for (t_int i = 0; i < output.size(); i++) output(i) = (i - nfreq * 0.5) * dfreq + cfreq;
+  for (int i = 0; i < output.size(); i++) output(i) = (i - nfreq * 0.5) * dfreq + cfreq;
 }
-Vector<t_real> read_uvfits_data(fitsfile *fptr, t_int *status, const std::vector<t_int> &naxis,
-                                const t_int &baselines) {
+Vector<t_real> read_uvfits_data(fitsfile *fptr, int *status, const std::vector<int> &naxis,
+                                const int &baselines) {
   Vector<t_real> output;
   read_uvfits_data(fptr, status, naxis, baselines, output);
   return output;
 }
-void read_uvfits_data(fitsfile *fptr, t_int *status, const std::vector<t_int> &naxis,
-                      const t_int &baselines, Vector<t_real> &output) {
+void read_uvfits_data(fitsfile *fptr, int *status, const std::vector<int> &naxis,
+                      const int &baselines, Vector<t_real> &output) {
   long nelements = 1;
   for (int i = 2; i < naxis.size(); i++) {
     nelements *= static_cast<long>(naxis.at(i));
   }
   if (nelements == 0) throw std::runtime_error("Zero number of elements.");
   output = Vector<t_real>::Zero(naxis.at(1) * nelements * baselines);
-  t_int nulval = 0;
-  t_int anynul = 0;
+  int nulval = 0;
+  int anynul = 0;
   fits_read_col(fptr, TDOUBLE, 2, 1, 1, static_cast<long>(output.size()), &nulval, output.data(),
                 &anynul, status);
 }
-Matrix<t_real> read_uvfits_coords(fitsfile *fptr, t_int *status, const t_int &groups,
-                                  const t_int &pcount) {
+Matrix<t_real> read_uvfits_coords(fitsfile *fptr, int *status, const int &groups,
+                                  const int &pcount) {
   Matrix<t_real> output;
   read_uvfits_coords(fptr, status, pcount, groups, output);
   return output;
@@ -310,23 +310,23 @@ t_complex read_weight_from_data(const Vector<t_real> &data, const t_uint pol, co
                                 const t_uint baselines) {
   return t_complex(read_value_from_data(data, 2, pol, pols, chan, chans, baseline, baselines), 0);
 }
-void read_uvfits_coords(fitsfile *fptr, t_int *status, const t_int &pcount, const t_int &groups,
+void read_uvfits_coords(fitsfile *fptr, int *status, const int &pcount, const int &groups,
                         Matrix<t_real> &output) {
   output = Matrix<t_real>::Zero(pcount, groups);
-  t_int nulval = 0;
-  t_int anynul;
+  int nulval = 0;
+  int anynul;
   // reading in parameters per baseline
   for (int i = 0; i < groups; i++)
     fits_read_col(fptr, TDOUBLE, 1, 1 + i, 1, pcount, &nulval, output.col(i).data(), &anynul,
                   status);
 }
-void read_fits_keys(fitsfile *fptr, t_int *status) {
+void read_fits_keys(fitsfile *fptr, int *status) {
   std::shared_ptr<char> card =
       std::shared_ptr<char>(new char[FLEN_CARD], [](char *ptr) { delete[] ptr; });
-  t_int nkeys;
+  int nkeys;
   fits_get_hdrspace(fptr, &nkeys, NULL, status);
 
-  for (t_int ii = 1; ii <= nkeys; ii++) {
+  for (int ii = 1; ii <= nkeys; ii++) {
     fits_read_record(fptr, ii, card.get(), status); /* read keyword */
     std::printf("%s\n", card.get());
   }
