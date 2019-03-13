@@ -12,8 +12,43 @@ namespace purify {
 //! \param[in] local_indices: indices that will be received by this process
 //! \param[in] N: Size of the ftgrid on each node
 //! \param[in] comm: Communicator over which to distribute the vector
-std::vector<t_int> all_to_all_recv_sizes(const std::vector<t_int> &local_indices, const t_int nodes,
-                                         const t_int N);
+template <class STORAGE_INDEX_TYPE>
+std::vector<t_int> all_to_all_recv_sizes(const std::vector<STORAGE_INDEX_TYPE> &local_indices,
+                                         const t_int nodes, const t_int N) {
+  std::vector<t_int> recv_sizes;
+  t_int group = 0;
+  t_int count = 0;
+  if (static_cast<STORAGE_INDEX_TYPE>(N) * static_cast<STORAGE_INDEX_TYPE>(nodes) < 0)
+    throw std::runtime_error(
+        "Total number of pixels across FFT grids is less than 0. Please use index mapper with 64 "
+        "bit int "
+        "data types, i.e. long long int.");
+
+  for (const auto &index : local_indices) {
+    const t_int index_group = std::floor(static_cast<t_real>(index) / static_cast<t_real>(N));
+    if (index_group < group)
+      throw std::runtime_error("local indices are out of order for columns of gridding matrix");
+    if (group != index_group) {
+      recv_sizes.push_back(count);
+      group++;
+      while (group < index_group) {
+        recv_sizes.push_back(0);
+        group++;
+      }
+      count = 1;
+    } else
+      count++;
+  }
+  recv_sizes.push_back(count);
+  group++;
+  while (group < nodes) {
+    recv_sizes.push_back(0);
+    group++;
+  }
+  assert(group == nodes);
+  assert(local_indices.size() == std::accumulate(recv_sizes.begin(), recv_sizes.end(), 0));
+  return recv_sizes;
+}
 //! Finds sizes to be sent from each node for degridding
 //! \param[in] recv_sizes: sizes recieved from each node for degridding
 //! \param[in] comm: Communicator over which to distribute the vector
