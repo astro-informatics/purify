@@ -18,7 +18,8 @@ std::vector<t_int> all_to_all_recv_sizes(const std::vector<STORAGE_INDEX_TYPE> &
   std::vector<t_int> recv_sizes;
   t_int group = 0;
   t_int count = 0;
-  if (static_cast<STORAGE_INDEX_TYPE>(N) * static_cast<STORAGE_INDEX_TYPE>(nodes) < 0)
+  if (static_cast<unsigned long long int>(N) * static_cast<unsigned long long int>(nodes) >
+      std::numeric_limits<STORAGE_INDEX_TYPE>::max())
     throw std::runtime_error(
         "Total number of pixels across FFT grids is less than 0. Please use index mapper with 64 "
         "bit int "
@@ -98,8 +99,7 @@ class AllToAllSparseVector {
   AllToAllSparseVector(Eigen::SparseMatrixBase<T0> const &sparse,
                        const STORAGE_INDEX_TYPE ft_grid_size, const STORAGE_INDEX_TYPE start,
                        const sopt::mpi::Communicator &_comm)
-      : AllToAllSparseVector(non_empty_outers(sparse), ft_grid_size,
-                                                        start, _comm) {}
+      : AllToAllSparseVector(non_empty_outers(sparse), ft_grid_size, start, _comm) {}
 
   template <class T0, class T1>
   void recv_grid(Eigen::MatrixBase<T0> const &input, Eigen::MatrixBase<T1> const &output) const {
