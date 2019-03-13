@@ -7,15 +7,15 @@
 #include <vector>
 
 namespace purify {
-
+template <class STORAGE_INDEX_TYPE = t_int>
 class IndexMapping {
  public:
-  IndexMapping(const std::vector<t_int> &indices, const t_int N, const t_int start = 0)
+  IndexMapping(const std::vector<STORAGE_INDEX_TYPE> &indices, const STORAGE_INDEX_TYPE N, const STORAGE_INDEX_TYPE start = 0)
       : indices(indices), N(N), start(start){};
   template <class ITER>
-  IndexMapping(const ITER &first, const ITER &end, const t_int N, const t_int start = 0)
-      : IndexMapping(std::vector<t_int>(first, end), N, start) {}
-  IndexMapping(const std::set<t_int> &indices, const t_int N, const t_int start = 0)
+  IndexMapping(const ITER &first, const ITER &end, const STORAGE_INDEX_TYPE N, const STORAGE_INDEX_TYPE start = 0)
+      : IndexMapping(std::vector<STORAGE_INDEX_TYPE>(first, end), N, start) {}
+  IndexMapping(const std::set<STORAGE_INDEX_TYPE> &indices, const STORAGE_INDEX_TYPE N, const STORAGE_INDEX_TYPE start = 0)
       : IndexMapping(indices.begin(), indices.end(), N, start) {}
 
   //! Creates a vector of elements equal to re-indexed inpu
@@ -38,25 +38,25 @@ class IndexMapping {
     auto &derived = output.const_cast_derived();
     derived = T1::Zero(N, 1);
     typename T0::Index i(0);
-    for (auto const &index : indices) {
+    for (STORAGE_INDEX_TYPE const &index : indices) {
       assert(index >= start and index < (N + start));
       derived(index - start) += input(i++);
     }
   }
 
   t_int rows() const { return indices.size(); }
-  t_int cols() const { return N; }
+  STORAGE_INDEX_TYPE cols() const { return N; }
 
  private:
-  std::vector<t_int> indices;
-  t_int start;
-  t_int N;
+  std::vector<STORAGE_INDEX_TYPE> indices;
+  STORAGE_INDEX_TYPE start;
+  STORAGE_INDEX_TYPE N;
 };
 
 //! Indices of non empty outer indices
 template <class T0>
-std::set<t_int> non_empty_outers(Eigen::SparseMatrixBase<T0> const &matrix) {
-  std::set<t_int> result;
+std::set<typename T0::StorageIndex> non_empty_outers(Eigen::SparseMatrixBase<T0> const &matrix) {
+  std::set<typename T0::StorageIndex> result;
   for (typename T0::StorageIndex k = 0; k < matrix.derived().outerSize(); ++k)
     for (typename T0::InnerIterator it(matrix.derived(), k); it; ++it) result.insert(it.col());
   return result;
@@ -68,23 +68,25 @@ Sparse<typename T0::Scalar> compress_outer(T0 const &matrix) {
   static_assert(T0::IsRowMajor, "Not tested for col major");
   auto const indices = non_empty_outers(matrix);
 
-  std::vector<t_int> mapping(matrix.cols(), 0);
+  SparseVector<typename T0::StorageIndex, typename T0::StorageIndex> mapping(matrix.cols());
+  mapping.reserve(indices.size());
   t_int i(0);
-  for (auto const &index : indices) mapping[index] = i++;
+  for (auto const &index : indices) mapping.coeffRef(index) = i++;
 
-  std::vector<t_int> rows(matrix.rows() + 1, 0);
-  std::vector<t_int> cols(matrix.nonZeros(), 0);
+  std::vector<typename T0::StorageIndex> rows(matrix.rows() + 1, 0);
+  std::vector<typename T0::StorageIndex> cols(matrix.nonZeros(), 0);
   rows[matrix.rows()] = matrix.nonZeros();
   t_int index = 0;
   for (t_int k = 0; k < matrix.outerSize(); ++k) {
     rows[k] = index;
     for (typename Sparse<typename T0::Scalar>::InnerIterator it(matrix, k); it; ++it) {
-      cols[index] = mapping[it.col()];
+      cols[index] = mapping.coeff(it.col());
       index++;
     }
   }
-  return Eigen::MappedSparseMatrix<typename T0::Scalar, Eigen::RowMajor>(
-      matrix.rows(), indices.size(), matrix.nonZeros(), rows.data(), cols.data(),
+  return Eigen::MappedSparseMatrix<typename T0::Scalar, Eigen::RowMajor, t_int>(
+      matrix.rows(), indices.size(), matrix.nonZeros(), reinterpret_cast<typename Sparse<typename T0::Scalar>::StorageIndex *>(rows.data()),
+      reinterpret_cast<typename Sparse<typename T0::Scalar>::StorageIndex *>(cols.data()),
       const_cast<typename T0::Scalar *>(matrix.derived().valuePtr()));
 }
 }  // namespace purify

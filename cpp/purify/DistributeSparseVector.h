@@ -13,12 +13,12 @@ namespace purify {
 //! \details Only the root node will ever have the full vector. Other nodes only get those indices
 //! they ask for.
 class DistributeSparseVector {
-  DistributeSparseVector(const IndexMapping &_mapping, const std::vector<t_int> &_sizes,
+  DistributeSparseVector(const IndexMapping<t_int> &_mapping, const std::vector<t_int> &_sizes,
                          const t_int _local_size, const sopt::mpi::Communicator &_comm)
       : mapping(_mapping), sizes(_sizes), local_size(_local_size), comm(_comm) {}
   DistributeSparseVector(const std::vector<t_int> &local_indices, std::vector<t_int> const &_sizes,
                          t_int global_size, const sopt::mpi::Communicator &_comm)
-      : DistributeSparseVector(IndexMapping(_comm.gather(local_indices, _sizes), global_size),
+      : DistributeSparseVector(IndexMapping<t_int>(_comm.gather(local_indices, _sizes), global_size),
                                _sizes, static_cast<t_int>(local_indices.size()), _comm) {}
 
  public:
@@ -71,7 +71,7 @@ class DistributeSparseVector {
   }
 
  private:
-  IndexMapping mapping;
+  IndexMapping<t_int> mapping;
   std::vector<t_int> sizes;
   t_int local_size;
   sopt::mpi::Communicator comm;
