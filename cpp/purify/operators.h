@@ -163,8 +163,8 @@ Sparse<t_complex, STORAGE_INDEX_TYPE> init_gridding_matrix_2d(
 
   auto const ftkernel_radial = [&](const t_real l) -> t_real { return ftkerneluv(l) / norm; };
 
-  t_int coeffs_done = 0;
-  t_uint total = 0;
+  long long int coeffs_done = 0;
+  long long int total = 0;
 
 #pragma omp parallel for
   for (t_int m = 0; m < rows; ++m) {
@@ -574,8 +574,8 @@ base_mpi_all_to_all_degrid_operator_2d(
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   const t_int local_grid_size =
       std::floor(imsizex * oversample_ratio) * std::floor(imsizex * oversample_ratio);
-  std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d_all_to_all<T, long long int>(
-      comm, static_cast<long long int>(local_grid_size), static_cast<long long int>(comm.rank()) * static_cast<long long int>(local_grid_size), number_of_images, image_index, u, v,
+  std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d_all_to_all<T, std::int64_t>(
+      comm, static_cast<std::int64_t>(local_grid_size), static_cast<std::int64_t>(comm.rank()) * static_cast<std::int64_t>(local_grid_size), number_of_images, image_index, u, v,
       weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv);
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
