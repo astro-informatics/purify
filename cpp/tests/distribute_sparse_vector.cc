@@ -1,3 +1,4 @@
+#include <random>
 #include <set>
 #include <purify/AllToAllSparseVector.h>
 #include <purify/DistributeSparseVector.h>
@@ -45,7 +46,7 @@ TEST_CASE("All to one Sparse Vector") {
       Vector<t_int>::Random(std::max(world.size() * 2, world.size() + 2)));
   std::vector<t_int> const indices = {static_cast<t_int>(world.rank()),
                                       static_cast<t_int>(world.size() + 1)};
-  AllToAllSparseVector distributor(indices, grid.size(), grid.size() * world.rank(), world);
+  AllToAllSparseVector<t_int> distributor(indices, grid.size(), grid.size() * world.rank(), world);
 
   SECTION("Scatter") {
     Vector<t_int> output;
@@ -84,12 +85,12 @@ TEST_CASE("All to All Sparse Vector") {
     std::vector<t_int> const indices = {
         static_cast<t_int>(grid.size() * (world.rank() + 1) + world.size() + 1),
         static_cast<t_int>(world.rank())};
-    CHECK_THROWS(AllToAllSparseVector(indices, grid.size(), grid.size() * world.rank(), world));
+    CHECK_THROWS(AllToAllSparseVector<t_int>(indices, grid.size(), grid.size() * world.rank(), world));
   }
   std::vector<t_int> const indices = {
       static_cast<t_int>(world.rank()),
       static_cast<t_int>(grid.size() * world.rank() + world.size() + 1)};
-  AllToAllSparseVector distributor(indices, grid.size(), grid.size() * world.rank(), world);
+  AllToAllSparseVector<t_int> distributor(indices, grid.size(), grid.size() * world.rank(), world);
 
   SECTION("Scatter") {
     Vector<t_int> output;
@@ -119,6 +120,50 @@ TEST_CASE("All to All Sparse Vector") {
         else
           CHECK(output(i) == 1);
       }
+    }
+  }
+}
+
+TEST_CASE("recv_sizes") {
+  for (t_int nodes : {1, 2, 5, 10, 20, 50, 100, 1000}) {
+    for (t_int imsize : {128, 1024, 2048, 4096, 8192, 16384, 32768}) {
+      const t_uint N = imsize * imsize;
+      // First create an instance of an engine.
+      std::random_device rnd_device;
+      // Specify the engine and distribution.
+      std::mt19937 mersenne_engine(rnd_device());  // Generates random integers
+      std::uniform_int_distribution<t_int> dist(0, nodes * N);
+      auto gen = [&dist, &mersenne_engine]() { return dist(mersenne_engine); };
+      std::vector<t_int> local_indices(10);
+      std::generate(local_indices.begin(), local_indices.end(), gen);
+      std::sort(local_indices.begin(), local_indices.end(),
+                [](t_int a, t_int b) { return (a < b); });
+      CAPTURE(local_indices);
+      CAPTURE(nodes);
+      CAPTURE(std::sqrt(N));
+      if (N * nodes < 0)
+        CHECK_THROWS(all_to_all_recv_sizes(local_indices, nodes, N));
+      else
+        std::vector<t_int> recv = all_to_all_recv_sizes(local_indices, nodes, N);
+    }
+  }
+  for (t_int nodes : {1, 2, 5, 10, 20, 50, 100, 1000}) {
+    for (t_int imsize : {128, 1024, 2048, 4096, 8192, 16384, 32768}) {
+      const t_uint N = imsize * imsize;
+      // First create an instance of an engine.
+      std::random_device rnd_device;
+      // Specify the engine and distribution.
+      std::mt19937 mersenne_engine(rnd_device());  // Generates random integers
+      std::uniform_int_distribution<long long int> dist(0, nodes * N);
+      auto gen = [&dist, &mersenne_engine]() { return dist(mersenne_engine); };
+      std::vector<long long int> local_indices(10);
+      std::generate(local_indices.begin(), local_indices.end(), gen);
+      std::sort(local_indices.begin(), local_indices.end(),
+                [](long long int a, long long int b) { return (a < b); });
+      CAPTURE(local_indices);
+      CAPTURE(nodes);
+      CAPTURE(std::sqrt(N));
+        std::vector<long long int> recv = all_to_all_recv_sizes<long long int>(local_indices, nodes, N);
     }
   }
 }
