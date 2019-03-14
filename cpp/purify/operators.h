@@ -163,8 +163,8 @@ Sparse<t_complex, STORAGE_INDEX_TYPE> init_gridding_matrix_2d(
 
   auto const ftkernel_radial = [&](const t_real l) -> t_real { return ftkerneluv(l) / norm; };
 
-  long long int coeffs_done = 0;
-  long long int total = 0;
+  std::int64_t coeffs_done = 0;
+  std::int64_t total = 0;
 
 #pragma omp parallel for
   for (t_int m = 0; m < rows; ++m) {
@@ -272,12 +272,13 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_gridding_m
 //! Constructs degridding operator using MPI all to all
 template <class T, class STORAGE_INDEX_TYPE, class... ARGS>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_gridding_matrix_2d_all_to_all(
-    const sopt::mpi::Communicator &comm, const STORAGE_INDEX_TYPE local_grid_size, const STORAGE_INDEX_TYPE start_index,
-    const t_uint number_of_images, const std::vector<t_int> &image_index, ARGS &&... args) {
+    const sopt::mpi::Communicator &comm, const STORAGE_INDEX_TYPE local_grid_size,
+    const STORAGE_INDEX_TYPE start_index, const t_uint number_of_images,
+    const std::vector<t_int> &image_index, ARGS &&... args) {
   Sparse<t_complex, STORAGE_INDEX_TYPE> interpolation_matrix_original =
       details::init_gridding_matrix_2d(number_of_images, image_index, std::forward<ARGS>(args)...);
-  const AllToAllSparseVector<STORAGE_INDEX_TYPE> distributor(interpolation_matrix_original, local_grid_size,
-                                         start_index, comm);
+  const AllToAllSparseVector<STORAGE_INDEX_TYPE> distributor(interpolation_matrix_original,
+                                                             local_grid_size, start_index, comm);
   const std::shared_ptr<const Sparse<t_complex>> interpolation_matrix =
       std::make_shared<const Sparse<t_complex>>(
           purify::compress_outer(interpolation_matrix_original));
@@ -574,9 +575,12 @@ base_mpi_all_to_all_degrid_operator_2d(
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   const t_int local_grid_size =
       std::floor(imsizex * oversample_ratio) * std::floor(imsizex * oversample_ratio);
-  std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d_all_to_all<T, std::int64_t>(
-      comm, static_cast<std::int64_t>(local_grid_size), static_cast<std::int64_t>(comm.rank()) * static_cast<std::int64_t>(local_grid_size), number_of_images, image_index, u, v,
-      weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv);
+  std::tie(directG, indirectG) =
+      purify::operators::init_gridding_matrix_2d_all_to_all<T, std::int64_t>(
+          comm, static_cast<std::int64_t>(local_grid_size),
+          static_cast<std::int64_t>(comm.rank()) * static_cast<std::int64_t>(local_grid_size),
+          number_of_images, image_index, u, v, weights, imsizey, imsizex, oversample_ratio, kernelv,
+          kernelu, Ju, Jv);
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
   PURIFY_LOW_LOG("Finished consturction of Φ.");
