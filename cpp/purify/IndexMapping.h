@@ -10,12 +10,15 @@ namespace purify {
 template <class STORAGE_INDEX_TYPE = t_int>
 class IndexMapping {
  public:
-  IndexMapping(const std::vector<STORAGE_INDEX_TYPE> &indices, const STORAGE_INDEX_TYPE N, const STORAGE_INDEX_TYPE start = 0)
+  IndexMapping(const std::vector<STORAGE_INDEX_TYPE> &indices, const STORAGE_INDEX_TYPE N,
+               const STORAGE_INDEX_TYPE start = 0)
       : indices(indices), N(N), start(start){};
   template <class ITER>
-  IndexMapping(const ITER &first, const ITER &end, const STORAGE_INDEX_TYPE N, const STORAGE_INDEX_TYPE start = 0)
+  IndexMapping(const ITER &first, const ITER &end, const STORAGE_INDEX_TYPE N,
+               const STORAGE_INDEX_TYPE start = 0)
       : IndexMapping(std::vector<STORAGE_INDEX_TYPE>(first, end), N, start) {}
-  IndexMapping(const std::set<STORAGE_INDEX_TYPE> &indices, const STORAGE_INDEX_TYPE N, const STORAGE_INDEX_TYPE start = 0)
+  IndexMapping(const std::set<STORAGE_INDEX_TYPE> &indices, const STORAGE_INDEX_TYPE N,
+               const STORAGE_INDEX_TYPE start = 0)
       : IndexMapping(indices.begin(), indices.end(), N, start) {}
 
   //! Creates a vector of elements equal to re-indexed inpu
@@ -73,20 +76,19 @@ Sparse<typename T0::Scalar> compress_outer(T0 const &matrix) {
   t_int i(0);
   for (auto const &index : indices) mapping.coeffRef(index) = i++;
 
-  std::vector<typename T0::StorageIndex> rows(matrix.rows() + 1, 0);
-  std::vector<typename T0::StorageIndex> cols(matrix.nonZeros(), 0);
+  std::vector<typename Sparse<typename T0::Scalar>::StorageIndex> rows(matrix.rows() + 1, 0);
+  std::vector<typename Sparse<typename T0::Scalar>::StorageIndex> cols(matrix.nonZeros(), 0);
   rows[matrix.rows()] = matrix.nonZeros();
   t_int index = 0;
-  for (t_int k = 0; k < matrix.outerSize(); ++k) {
+  for (typename T0::StorageIndex k = 0; k < matrix.outerSize(); ++k) {
     rows[k] = index;
-    for (typename Sparse<typename T0::Scalar>::InnerIterator it(matrix, k); it; ++it) {
+    for (typename Sparse<typename T0::Scalar, typename T0::StorageIndex>::InnerIterator it(matrix, k); it; ++it) {
       cols[index] = mapping.coeff(it.col());
       index++;
     }
   }
-  return Eigen::MappedSparseMatrix<typename T0::Scalar, Eigen::RowMajor, t_int>(
-      matrix.rows(), indices.size(), matrix.nonZeros(), reinterpret_cast<typename Sparse<typename T0::Scalar>::StorageIndex *>(rows.data()),
-      reinterpret_cast<typename Sparse<typename T0::Scalar>::StorageIndex *>(cols.data()),
+  return Eigen::MappedSparseMatrix<typename T0::Scalar, Eigen::RowMajor, typename Sparse<typename T0::Scalar>::StorageIndex>(
+      matrix.rows(), indices.size(), matrix.nonZeros(), rows.data(), cols.data(),
       const_cast<typename T0::Scalar *>(matrix.derived().valuePtr()));
 }
 }  // namespace purify
