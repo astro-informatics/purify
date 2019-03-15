@@ -128,12 +128,13 @@ TEST_CASE("All to All Sparse Vector") {
 TEST_CASE("recv_sizes") {
   for (t_int nodes : {1, 2, 5, 10, 20, 50, 100, 1000}) {
     for (t_int imsize : {128, 1024, 2048, 4096, 8192, 16384, 32768}) {
-      const t_int N = imsize * imsize;
+      const std::int32_t N = imsize * imsize;
       CAPTURE(imsize);
+      CAPTURE(N);
       // First create an instance of an engine.
       std::random_device rnd_device;
       // Specify the engine and distribution.
-      std::mt19937 mersenne_engine(rnd_device());  // Generates random integers
+      std::mt19937_64 mersenne_engine(rnd_device());  // Generates random integers
       std::uniform_int_distribution<t_int> dist(0, nodes * N);
       auto gen = [&dist, &mersenne_engine]() { return dist(mersenne_engine); };
       std::vector<t_int> local_indices(10);
@@ -142,7 +143,7 @@ TEST_CASE("recv_sizes") {
                 [](t_int a, t_int b) { return (a < b); });
       CAPTURE(local_indices);
       CAPTURE(nodes);
-      if (static_cast<long long int>(N) * static_cast<long long int>(nodes) >
+      if (static_cast<std::int64_t>(N) * static_cast<std::int64_t>(nodes) >
           std::numeric_limits<t_int>::max())
         CHECK_THROWS(all_to_all_recv_sizes<t_int>(local_indices, nodes, N));
       else {
@@ -153,24 +154,26 @@ TEST_CASE("recv_sizes") {
       }
     }
   }
-  for (t_int nodes : {1, 2, 5, 10, 20, 50, 100, 1000}) {
-    for (t_int imsize : {128, 1024, 2048, 4096, 8192, 16384, 32768}) {
-      const long long int N = imsize * imsize;
+}
+TEST_CASE("recv_sizes 64 bit") {
+  for (std::int64_t nodes : {1, 2, 5, 10, 20, 50, 100, 1000}) {
+    for (std::int64_t imsize : {128, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072}) {
+      const std::int64_t N = imsize * imsize;
       CAPTURE(imsize);
       // First create an instance of an engine.
       std::random_device rnd_device;
       // Specify the engine and distribution.
-      std::mt19937 mersenne_engine(rnd_device());  // Generates random integers
-      std::uniform_int_distribution<long long int> dist(
-          0, static_cast<long long int>(nodes) * static_cast<long long int>(N));
-      auto gen = [&dist, &mersenne_engine]() { return dist(mersenne_engine); };
-      std::vector<long long int> local_indices(10);
+      std::mt19937_64 mersenne_engine(rnd_device());  // Generates random integers
+      std::uniform_int_distribution<std::int64_t> dist(
+          0, static_cast<std::int64_t>(nodes) * static_cast<std::int64_t>(N));
+      auto gen = [&dist, &mersenne_engine]() -> std::int64_t { return dist(mersenne_engine); };
+      std::vector<std::int64_t> local_indices(10);
       std::generate(local_indices.begin(), local_indices.end(), gen);
       std::sort(local_indices.begin(), local_indices.end(),
-                [](long long int a, long long int b) { return (a < b); });
+                [](std::int64_t a, std::int64_t b) { return (a < b); });
       CAPTURE(local_indices);
       CAPTURE(nodes);
-      std::vector<t_int> recv = all_to_all_recv_sizes<long long int>(local_indices, nodes, N);
+      std::vector<t_int> recv = all_to_all_recv_sizes<std::int64_t>(local_indices, nodes, N);
       for (const auto& a : recv) CHECK(a >= 0);
       CHECK(local_indices.size() == std::accumulate(recv.begin(), recv.end(), 0));
     }
