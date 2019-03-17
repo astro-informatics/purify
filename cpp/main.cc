@@ -233,13 +233,6 @@ int main(int argc, const char **argv) {
       "Using cell size {}\" x {}\", recommended from the uv coverage and field of view is "
       "{}\"x{}\".",
       params.cellsizey(), params.cellsizex(), ideal_cell_y, ideal_cell_x);
-  t_real const flux_scale =
-      (uv_data.units == utilities::vis_units::lambda)
-          ? widefield::pixel_to_lambda(params.cellsizex(), params.width(), params.oversampling()) *
-                widefield::pixel_to_lambda(params.cellsizey(), params.height(),
-                                           params.oversampling())
-          : 1.;
-  uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale;
 
   // create measurement operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measurements_transform;
@@ -270,6 +263,16 @@ int main(int argc, const char **argv) {
                   params.cellsizey(), params.cellsizex(), params.oversampling(),
                   kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jw(),
                   params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
+  // calculate conversion for jy/pixel
+  // uv_data.weights /= uv_data.weights.cwiseAbs().maxCoeff();
+  Vector<t_complex> point_source = Vector<t_complex>::Zero(params.width() * params.height());
+  point_source(params.width() / 2 + params.height() / 2 * params.width()) = 1.;
+  t_real const flux_scale =
+      (uv_data.units == utilities::vis_units::lambda)
+          ? ((*measurements_transform * point_source).norm() * constant::pi * constant::pi) /
+                uv_data.weights.norm() * std::sqrt(uv_data.size())
+          : 1.;
+  uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale;
 #ifdef PURIFY_MPI
   auto const comm = sopt::mpi::Communicator::World();
   auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
