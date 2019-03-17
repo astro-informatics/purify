@@ -326,7 +326,8 @@ int main(int argc, const char **argv) {
   // Add primal dual preconditioning
   if (params.algorithm() == "primaldual" and params.precondition_iters() > 0) {
     PURIFY_HIGH_LOG(
-        "Using visibility sampling density to precondtion primal dual with {} subiterations",
+        "Using visibility sampling density to precondtion primal dual with {} "
+        "subiterations",
         params.precondition_iters());
     primaldual->precondition_iters(params.precondition_iters());
     if (using_mpi) {
