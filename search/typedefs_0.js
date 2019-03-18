@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['algorithm',['Algorithm',['classsopt_1_1algorithm_1_1PositiveQuadrant.html#af9b47575b9a759068144c0a5b26d6b25',1,'sopt::algorithm::PositiveQuadrant::Algorithm()'],['classsopt_1_1algorithm_1_1Reweighted.html#acafa7db5b2a33aa860f0c16401f26973',1,'sopt::algorithm::Reweighted::Algorithm()']]],
-  ['array',['Array',['http://astro-informatics.github.io/sopt/namespacesopt.html#a9de8d7c976f608fe47220203047b5cb8',1,'sopt']]]
+  ['difference_5ftype',['difference_type',['../classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html#a9a5174b3d3ee12335f2a7d6293aeaf70',1,'purify::casa::MeasurementSet::const_iterator']]],
+  ['direction',['Direction',['../classpurify_1_1casa_1_1MeasurementSet.html#ab42446436227d207bfe3dc9990913188',1,'purify::casa::MeasurementSet']]]
 ];

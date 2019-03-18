@@ -1,4 +1,23 @@
 var searchData=
 [
-  ['kernels_5ftest',['kernels_test',['../namespacekernels__test.html',1,'']]]
+  ['casa',['casa',['../namespacepurify_1_1casa.html',1,'purify']]],
+  ['constant',['constant',['../namespacepurify_1_1constant.html',1,'purify']]],
+  ['convol',['convol',['../namespacepurify_1_1convol.html',1,'purify']]],
+  ['details',['details',['../namespacepurify_1_1casa_1_1details.html',1,'purify::casa::details'],['../namespacepurify_1_1details.html',1,'purify::details']]],
+  ['distribute',['distribute',['../namespacepurify_1_1distribute.html',1,'purify']]],
+  ['expansions',['expansions',['../namespacepurify_1_1wproj__utilities_1_1expansions.html',1,'purify::wproj_utilities']]],
+  ['factory',['factory',['../namespacepurify_1_1factory.html',1,'purify']]],
+  ['integration',['integration',['../namespacepurify_1_1integration.html',1,'purify']]],
+  ['kernels',['kernels',['../namespacepurify_1_1kernels.html',1,'purify']]],
+  ['logging',['logging',['../namespacepurify_1_1logging.html',1,'purify']]],
+  ['measurementoperator',['measurementoperator',['../namespacepurify_1_1measurementoperator.html',1,'purify']]],
+  ['notinstalled',['notinstalled',['../namespacepurify_1_1notinstalled.html',1,'purify']]],
+  ['operators',['operators',['../namespacepurify_1_1operators.html',1,'purify']]],
+  ['pfitsio',['pfitsio',['../namespacepurify_1_1pfitsio.html',1,'purify']]],
+  ['projection_5fkernels',['projection_kernels',['../namespacepurify_1_1projection__kernels.html',1,'purify']]],
+  ['purify',['purify',['../namespacepurify.html',1,'']]],
+  ['read_5fmeasurements',['read_measurements',['../namespacepurify_1_1read__measurements.html',1,'purify']]],
+  ['utilities',['utilities',['../namespacepurify_1_1utilities.html',1,'purify']]],
+  ['widefield',['widefield',['../namespacepurify_1_1widefield.html',1,'purify']]],
+  ['wproj_5futilities',['wproj_utilities',['../namespacepurify_1_1wproj__utilities.html',1,'purify']]]
 ];

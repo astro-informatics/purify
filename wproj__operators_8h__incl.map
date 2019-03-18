@@ -1,11 +1,8 @@
 <map id="/mydata/cpp/purify/wproj_operators.h" name="/mydata/cpp/purify/wproj_operators.h">
-<area shape="rect" id="node3" href="$types_8h.html" title="purify/types.h" alt="" coords="927,251,1039,278"/>
-<area shape="rect" id="node9" href="$operators_8h.html" title="purify/operators.h" alt="" coords="927,95,1066,121"/>
-<area shape="rect" id="node8" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="1205,333,1308,360"/>
-<area shape="rect" id="node13" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="348,169,472,196"/>
-<area shape="rect" id="node18" href="$logging_8h.html" title="purify/logging.h" alt="" coords="1507,251,1631,278"/>
-<area shape="rect" id="node22" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="1365,169,1490,196"/>
-<area shape="rect" id="node24" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/chained__operators_8h.html" title="sopt/chained_operators.h" alt="" coords="903,169,1090,196"/>
-<area shape="rect" id="node25" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/linear__transform_8h.html" title="sopt/linear_transform.h" alt="" coords="1165,169,1340,196"/>
-<area shape="rect" id="node19" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="1651,333,1833,360"/>
+<area shape="rect" id="node3" href="$types_8h.html" title="purify/types.h" alt="" coords="225,251,337,278"/>
+<area shape="rect" id="node9" href="$operators_8h.html" title="purify/operators.h" alt="" coords="963,95,1102,121"/>
+<area shape="rect" id="node13" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="369,169,493,196"/>
+<area shape="rect" id="node18" href="$logging_8h.html" title="purify/logging.h" alt="" coords="1425,169,1549,196"/>
+<area shape="rect" id="node22" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="1275,169,1401,196"/>
+<area shape="rect" id="node19" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="1600,251,1783,278"/>
 </map>

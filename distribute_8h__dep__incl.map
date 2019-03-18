@@ -12,7 +12,8 @@
 <area shape="rect" id="node17" href="$mpi__measurement__factory_8cc.html" title="/mydata/cpp/tests/mpi\l_measurement_factory.cc" alt="" coords="1740,95,1929,136"/>
 <area shape="rect" id="node18" href="$mpi__measurement__operator_8cc.html" title="/mydata/cpp/tests/mpi\l_measurement_operator.cc" alt="" coords="1954,95,2153,136"/>
 <area shape="rect" id="node19" href="$mpi__wavelet__factory_8cc.html" title="/mydata/cpp/tests/mpi\l_wavelet_factory.cc" alt="" coords="2177,95,2345,136"/>
-<area shape="rect" id="node20" href="$wavelet__factory_8cc.html" title="/mydata/cpp/tests/wavelet\l_factory.cc" alt="" coords="2369,95,2564,136"/>
+<area shape="rect" id="node20" href="$serial__vs__parallel__padmm_8cc.html" title="/mydata/cpp/tests/serial\l_vs_parallel_padmm.cc" alt="" coords="2369,95,2548,136"/>
+<area shape="rect" id="node21" href="$wavelet__factory_8cc.html" title="/mydata/cpp/tests/wavelet\l_factory.cc" alt="" coords="2572,95,2767,136"/>
 <area shape="rect" id="node7" href="$main_8cc.html" title="/mydata/cpp/main.cc" alt="" coords="1301,191,1459,218"/>
 <area shape="rect" id="node8" href="$purify_2read__measurements_8cc.html" title="/mydata/cpp/purify\l/read_measurements.cc" alt="" coords="525,184,704,225"/>
 <area shape="rect" id="node9" href="$yaml-parser_8cc.html" title="/mydata/cpp/purify\l/yaml&#45;parser.cc" alt="" coords="729,184,874,225"/>

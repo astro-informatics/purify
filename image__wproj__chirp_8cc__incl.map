@@ -1,15 +1,11 @@
 <map id="/mydata/cpp/example/image_wproj_chirp.cc" name="/mydata/cpp/example/image_wproj_chirp.cc">
-<area shape="rect" id="node3" href="$types_8h.html" title="purify/types.h" alt="" coords="1176,326,1288,353"/>
-<area shape="rect" id="node10" href="$logging_8h.html" title="purify/logging.h" alt="" coords="1599,326,1723,353"/>
-<area shape="rect" id="node14" href="$operators_8h.html" title="purify/operators.h" alt="" coords="823,169,961,196"/>
-<area shape="rect" id="node23" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="1973,244,2099,271"/>
-<area shape="rect" id="node28" href="$pfitsio_8h.html" title="purify/pfitsio.h" alt="" coords="1978,169,2094,196"/>
-<area shape="rect" id="node30" href="$wide__field__utilities_8h.html" title="purify/wide_field_utilities.h" alt="" coords="1310,244,1509,271"/>
-<area shape="rect" id="node31" href="$wproj__operators_8h.html" title="purify/wproj_operators.h" alt="" coords="588,95,769,121"/>
-<area shape="rect" id="node32" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/power__method_8h.html" title="sopt/power_method.h" alt="" coords="1533,244,1696,271"/>
-<area shape="rect" id="node8" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="1025,408,1127,435"/>
-<area shape="rect" id="node11" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="1966,408,2149,435"/>
-<area shape="rect" id="node18" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="303,244,427,271"/>
-<area shape="rect" id="node25" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/chained__operators_8h.html" title="sopt/chained_operators.h" alt="" coords="799,244,985,271"/>
-<area shape="rect" id="node26" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/linear__transform_8h.html" title="sopt/linear_transform.h" alt="" coords="1061,244,1235,271"/>
+<area shape="rect" id="node3" href="$types_8h.html" title="purify/types.h" alt="" coords="1747,326,1859,353"/>
+<area shape="rect" id="node10" href="$logging_8h.html" title="purify/logging.h" alt="" coords="382,244,506,271"/>
+<area shape="rect" id="node14" href="$operators_8h.html" title="purify/operators.h" alt="" coords="1027,169,1165,196"/>
+<area shape="rect" id="node23" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="531,244,656,271"/>
+<area shape="rect" id="node28" href="$pfitsio_8h.html" title="purify/pfitsio.h" alt="" coords="386,169,502,196"/>
+<area shape="rect" id="node30" href="$wide__field__utilities_8h.html" title="purify/wide_field_utilities.h" alt="" coords="658,169,857,196"/>
+<area shape="rect" id="node31" href="$wproj__operators_8h.html" title="purify/wproj_operators.h" alt="" coords="1097,95,1279,121"/>
+<area shape="rect" id="node11" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="73,326,255,353"/>
+<area shape="rect" id="node18" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="833,244,957,271"/>
 </map>

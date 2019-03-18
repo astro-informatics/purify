@@ -4594,11 +4594,55 @@
     <name>common_catch_main.cc</name>
     <path>/mydata/cpp/tests/</path>
     <filename>http://astro-informatics.github.io/purify/common__catch__main_8cc</filename>
+    <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
+    <member kind="define">
+      <type>#define</type>
+      <name>CATCH_CONFIG_RUNNER</name>
+      <anchorfile>common__catch__main_8cc.html</anchorfile>
+      <anchor>a34b4c3eca7342fbc4cba090d02139902</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>std::unique_ptr&lt; std::mt19937_64 &gt;</type>
+      <name>mersenne</name>
+      <anchorfile>common__catch__main_8cc.html</anchorfile>
+      <anchor>afd7b13def75c5d7feb77ac1ea2df5d0b</anchor>
+      <arglist>(new std::mt19937_64(0))</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>main</name>
+      <anchorfile>common__catch__main_8cc.html</anchorfile>
+      <anchor>a3c04138a5bfe5d72780bb7e82a18e627</anchor>
+      <arglist>(int argc, char **argv)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>common_mpi_catch_main.cc</name>
     <path>/mydata/cpp/tests/</path>
     <filename>http://astro-informatics.github.io/purify/common__mpi__catch__main_8cc</filename>
+    <includes id="logging_8h" name="logging.h" local="no" imported="no">purify/logging.h</includes>
+    <member kind="define">
+      <type>#define</type>
+      <name>CATCH_CONFIG_RUNNER</name>
+      <anchorfile>common__mpi__catch__main_8cc.html</anchorfile>
+      <anchor>a34b4c3eca7342fbc4cba090d02139902</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>std::unique_ptr&lt; std::mt19937_64 &gt;</type>
+      <name>mersenne</name>
+      <anchorfile>common__mpi__catch__main_8cc.html</anchorfile>
+      <anchor>afd7b13def75c5d7feb77ac1ea2df5d0b</anchor>
+      <arglist>(new std::mt19937_64(0))</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>main</name>
+      <anchorfile>common__mpi__catch__main_8cc.html</anchorfile>
+      <anchor>a217dbf8b442f20279ea00b898af96f52</anchor>
+      <arglist>(int argc, const char **argv)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>convolution.cc</name>
@@ -5122,6 +5166,34 @@
     <name>serial_vs_parallel_padmm.cc</name>
     <path>/mydata/cpp/tests/</path>
     <filename>http://astro-informatics.github.io/purify/serial__vs__parallel__padmm_8cc</filename>
+    <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
+    <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
+    <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
+    <includes id="mpi__utilities_8h" name="mpi_utilities.h" local="yes" imported="no">purify/mpi_utilities.h</includes>
+    <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
+    <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
+    <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
+    <member kind="function">
+      <type>utilities::vis_params</type>
+      <name>dirty_visibilities</name>
+      <anchorfile>serial__vs__parallel__padmm_8cc.html</anchorfile>
+      <anchor>afe5e952b59a169f29c862ee9709cc251</anchor>
+      <arglist>(t_uint number_of_vis=10, t_uint width=20, t_uint height=20, t_uint over_sample=2, t_real ISNR=30)</arglist>
+    </member>
+    <member kind="function">
+      <type>utilities::vis_params</type>
+      <name>dirty_visibilities</name>
+      <anchorfile>serial__vs__parallel__padmm_8cc.html</anchorfile>
+      <anchor>a584149d4457b29d7dfaf7c83af0e0460</anchor>
+      <arglist>(sopt::mpi::Communicator const &amp;comm, t_uint number_of_vis=10, t_uint width=20, t_uint height=20, t_uint over_sample=2, t_real ISNR=30)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>TEST_CASE</name>
+      <anchorfile>serial__vs__parallel__padmm_8cc.html</anchorfile>
+      <anchor>a330b35a606144274f6402c3c4e8065d5</anchor>
+      <arglist>(&quot;Serial vs. Parallel PADMM with random coverage.&quot;)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>sparse.cc</name>

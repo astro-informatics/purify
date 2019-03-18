@@ -1,20 +1,14 @@
 var searchData=
 [
-  ['kaiser_5fbessel',['kaiser_bessel',['../namespacepurify_1_1kernels.html#a5ebd5a33dc46d12eca370fb011c6d20a',1,'purify::kernels']]],
-  ['kaiser_5fbessel_5fgeneral',['kaiser_bessel_general',['../namespacepurify_1_1kernels.html#a95321ed82db7eb7e34a706bf0de8135a',1,'purify::kernels']]],
-  ['kb',['kb',['../namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668aba34ea40525a4379add785228e37fe86',1,'purify::kernels']]],
-  ['kbmin',['kbmin',['../namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668ac8f9b2014e544adacfc19dfeba3718e8',1,'purify::kernels']]],
-  ['kernel',['kernel',['../namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668',1,'purify::kernels']]],
-  ['kernel_5ffrom_5fstring',['kernel_from_string',['../namespacepurify_1_1kernels.html#a1e2f3c37e5c0c6e2f2a3282110891f31',1,'purify::kernels']]],
-  ['kernel_5fgauss_5fvalues',['kernel_gauss_values',['../namespacekernels__test.html#a0f906705aecd45568868ad81da26718c',1,'kernels_test']]],
-  ['kernel_5fkb_5fvalues',['kernel_kb_values',['../namespacekernels__test.html#abd51c1413c5c3da8244ec2aafa8c783f',1,'kernels_test']]],
-  ['kernel_5flinear_5finterp',['kernel_linear_interp',['../namespacepurify_1_1kernels.html#add23bd0781527fd3fb7adfbdcd540c90',1,'purify::kernels']]],
-  ['kernel_5fpswf_5fvalues',['kernel_pswf_values',['../namespacekernels__test.html#a7bb2fa229d396344b77fb114572058be',1,'kernels_test']]],
-  ['kernel_5fsamples',['kernel_samples',['../namespacepurify_1_1kernels.html#a47eee0820c6469891800858427889494',1,'purify::kernels']]],
-  ['kernel_5fx_5fvalues',['kernel_x_values',['../namespacekernels__test.html#abfe98f98ba03415a8e5d0dab22daf9b8',1,'kernels_test']]],
-  ['kernels_2ecc',['kernels.cc',['../purify_2kernels_8cc.html',1,'(Global Namespace)'],['../tests_2kernels_8cc.html',1,'(Global Namespace)']]],
-  ['kernels_2eh',['kernels.h',['../kernels_8h.html',1,'']]],
-  ['kernels_5ftest',['kernels_test',['../namespacekernels__test.html',1,'']]],
-  ['kmeans_2ecc',['kmeans.cc',['../kmeans_8cc.html',1,'']]],
-  ['kmeans_5falgo',['kmeans_algo',['../namespacepurify_1_1distribute.html#ae6155f9cc952e699bb3b40941a166171',1,'purify::distribute']]]
+  ['l1',['l1',['../namespacepurify_1_1integration.html#a5d8cd1673befa0bfd8cc7618ff5a9816a377fd569971eedeba8fbea28434a390a',1,'purify::integration']]],
+  ['l2',['l2',['../namespacepurify_1_1integration.html#a5d8cd1673befa0bfd8cc7618ff5a9816abec25675775e9e0a0d783a5018b463e3',1,'purify::integration']]],
+  ['lambda',['lambda',['../namespacepurify_1_1utilities.html#aa2af2ee7e4f1bb93a42235b9d973983da945f3fc449518a73b9f5f32868db466c',1,'purify::utilities']]],
+  ['linear_5fconvol_5f1d',['linear_convol_1d',['../namespacepurify_1_1convol.html#adf71b9fa393f32b36d0cbc545d831360',1,'purify::convol']]],
+  ['linear_5fconvol_5f2d',['linear_convol_2d',['../namespacepurify_1_1convol.html#a8243104c62ca603ba048c521ca99be92',1,'purify::convol::linear_convol_2d(const Vector&lt; T &gt; &amp;kernelfu, const Vector&lt; T &gt; &amp;kernelfv, const Matrix&lt; T &gt; &amp;kernelg)'],['../namespacepurify_1_1convol.html#a8d09d81178acd9e2b707396697b39c1a',1,'purify::convol::linear_convol_2d(const std::function&lt; T(t_int)&gt; &amp;kernelu, const std::function&lt; T(t_int)&gt; &amp;kernelv, const std::function&lt; T(t_int, t_int)&gt; &amp;kernelw, const t_uint &amp;Jfu, const t_uint &amp;Jfv, const t_uint &amp;Jgu, const t_uint &amp;Jgv)']]],
+  ['linf',['linf',['../namespacepurify_1_1integration.html#a5d8cd1673befa0bfd8cc7618ff5a9816a707f3c5e9c59c9e5f347d2cbec59c66b',1,'purify::integration']]],
+  ['ll',['LL',['../namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a67824ecf84f5816f07b74fa956bdbcd2',1,'purify']]],
+  ['logging_2edisabled_2eh',['logging.disabled.h',['../logging_8disabled_8h.html',1,'']]],
+  ['logging_2eenabled_2eh',['logging.enabled.h',['../logging_8enabled_8h.html',1,'']]],
+  ['logging_2eh',['logging.h',['../logging_8h.html',1,'']]],
+  ['lr',['LR',['../namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a90a7c45eaffbd575ca6fb361e6d170a4',1,'purify']]]
 ];

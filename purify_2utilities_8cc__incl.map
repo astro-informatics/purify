@@ -1,11 +1,8 @@
 <map id="/mydata/cpp/purify/utilities.cc" name="/mydata/cpp/purify/utilities.cc">
-<area shape="rect" id="node2" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="187,169,313,196"/>
-<area shape="rect" id="node15" href="$logging_8h.html" title="purify/logging.h" alt="" coords="433,251,557,278"/>
-<area shape="rect" id="node18" href="$operators_8h.html" title="purify/operators.h" alt="" coords="711,95,850,121"/>
-<area shape="rect" id="node4" href="$types_8h.html" title="purify/types.h" alt="" coords="729,251,841,278"/>
-<area shape="rect" id="node9" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="1021,333,1124,360"/>
-<area shape="rect" id="node16" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="155,333,337,360"/>
-<area shape="rect" id="node21" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="1196,169,1320,196"/>
-<area shape="rect" id="node26" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/chained__operators_8h.html" title="sopt/chained_operators.h" alt="" coords="843,169,1030,196"/>
-<area shape="rect" id="node27" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/linear__transform_8h.html" title="sopt/linear_transform.h" alt="" coords="439,169,613,196"/>
+<area shape="rect" id="node2" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="1088,169,1213,196"/>
+<area shape="rect" id="node15" href="$logging_8h.html" title="purify/logging.h" alt="" coords="33,169,157,196"/>
+<area shape="rect" id="node18" href="$operators_8h.html" title="purify/operators.h" alt="" coords="717,95,856,121"/>
+<area shape="rect" id="node4" href="$types_8h.html" title="purify/types.h" alt="" coords="1188,251,1300,278"/>
+<area shape="rect" id="node16" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="69,251,251,278"/>
+<area shape="rect" id="node21" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="785,169,909,196"/>
 </map>
