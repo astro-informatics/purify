@@ -28,7 +28,7 @@ message(STATUS "Building purify in ${CMAKE_BUILD_TYPE} mode")
 
 # Set version and build id of this package
 include(version)
-set(Sopt_GIT_TAG "v3.0.1" CACHE STRING "Branch/tag when downloading sopt")
+set(Sopt_GIT_TAG "development" CACHE STRING "Branch/tag when downloading sopt")
 
 # we are doing c++11
 include(AddCPP11Flags)
