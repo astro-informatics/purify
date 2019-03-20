@@ -58,7 +58,7 @@ find_package(TIFF REQUIRED)
 
 lookup_package(Boost REQUIRED COMPONENTS filesystem)
 
-lookup_package(Eigen3 REQUIRED DOWNLOAD_BY_DEFAULT ARGUMENTS URL "http://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz" MD5 "f2a417d083fe8ca4b8ed2bc613d20f07")
+lookup_package(Eigen3 REQUIRED)
 
 set(PURIFY_ARRAYFIRE FALSE)
 if(doaf)
