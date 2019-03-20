@@ -59,6 +59,9 @@ find_package(TIFF REQUIRED)
 lookup_package(Boost REQUIRED COMPONENTS filesystem)
 
 lookup_package(Eigen3 REQUIRED)
+if(NOT EIGEN3_FOUND)
+  set(EIGEN3_INCLUDE_DIR "")
+endif()
 
 set(PURIFY_ARRAYFIRE FALSE)
 if(doaf)
