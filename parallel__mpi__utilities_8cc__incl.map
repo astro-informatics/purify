@@ -1,5 +1,9 @@
 <map id="/mydata/cpp/tests/parallel_mpi_utilities.cc" name="/mydata/cpp/tests/parallel_mpi_utilities.cc">
-<area shape="rect" id="node3" href="$mpi__utilities_8h.html" title="purify/mpi_utilities.h" alt="" coords="191,95,348,121"/>
-<area shape="rect" id="node6" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="267,169,392,196"/>
-<area shape="rect" id="node7" href="$types_8h.html" title="purify/types.h" alt="" coords="225,244,337,271"/>
+<area shape="rect" id="node3" href="$mpi__utilities_8h.html" title="purify/mpi_utilities.h" alt="" coords="537,95,694,121"/>
+<area shape="rect" id="node6" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="826,244,951,271"/>
+<area shape="rect" id="node16" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/linear__transform_8h.html" title="sopt/linear_transform.h" alt="" coords="377,169,552,196"/>
+<area shape="rect" id="node7" href="$types_8h.html" title="purify/types.h" alt="" coords="403,319,515,345"/>
+<area shape="rect" id="node12" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="293,393,396,420"/>
+<area shape="rect" id="node17" href="$logging_8h.html" title="sopt/logging.h" alt="" coords="627,244,742,271"/>
+<area shape="rect" id="node18" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="729,319,912,345"/>
 </map>

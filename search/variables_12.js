@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['w',['w',['../structpurify_1_1utilities_1_1vis__params.html#a65de7bf9749e252c2f419fd29c8d2ca2',1,'purify::utilities::vis_params']]],
-  ['weights',['weights',['../structpurify_1_1utilities_1_1vis__params.html#a91df0d9033a35225f6ed93bc2e3ab253',1,'purify::utilities::vis_params']]]
+  ['u',['u',['../structpurify_1_1utilities_1_1vis__params.html#a561d75ad12718981faf6d846d7a6bd3c',1,'purify::utilities::vis_params::u()'],['../namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5',1,'operators_test::u()']]],
+  ['units',['units',['../structpurify_1_1utilities_1_1vis__params.html#aadff757058a3bc040f9ddfc78ad47b1c',1,'purify::utilities::vis_params']]]
 ];

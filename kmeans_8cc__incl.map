@@ -1,8 +1,11 @@
 <map id="/mydata/cpp/tests/kmeans.cc" name="/mydata/cpp/tests/kmeans.cc">
-<area shape="rect" id="node4" href="$types_8h.html" title="purify/types.h" alt="" coords="382,229,494,256"/>
-<area shape="rect" id="node10" href="$distribute_8h.html" title="purify/distribute.h" alt="" coords="707,80,846,107"/>
-<area shape="rect" id="node17" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="1014,155,1139,181"/>
-<area shape="rect" id="node20" href="$mpi__utilities_8h.html" title="purify/mpi_utilities.h" alt="" coords="1075,80,1233,107"/>
-<area shape="rect" id="node14" href="$logging_8h.html" title="purify/logging.h" alt="" coords="815,155,939,181"/>
-<area shape="rect" id="node15" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="756,229,939,256"/>
+<area shape="rect" id="node4" href="$types_8h.html" title="purify/types.h" alt="" coords="892,304,1004,331"/>
+<area shape="rect" id="node10" href="$distribute_8h.html" title="purify/distribute.h" alt="" coords="392,155,531,181"/>
+<area shape="rect" id="node17" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="692,229,817,256"/>
+<area shape="rect" id="node20" href="$mpi__utilities_8h.html" title="purify/mpi_utilities.h" alt="" coords="605,80,763,107"/>
+<area shape="rect" id="node23" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/communicator_8h.html" title="sopt/mpi/communicator.h" alt="" coords="994,80,1182,107"/>
+<area shape="rect" id="node9" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="1185,379,1287,405"/>
+<area shape="rect" id="node14" href="$logging_8h.html" title="purify/logging.h" alt="" coords="389,229,513,256"/>
+<area shape="rect" id="node15" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="369,304,551,331"/>
+<area shape="rect" id="node22" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/linear__transform_8h.html" title="sopt/linear_transform.h" alt="" coords="657,155,831,181"/>
 </map>

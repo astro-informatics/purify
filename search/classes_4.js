@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['header_5fparams',['header_params',['../structpurify_1_1pfitsio_1_1header__params.html',1,'purify::pfitsio']]]
+  ['euclidiannorm',['EuclidianNorm',['http://astro-informatics.github.io/sopt/classsopt_1_1proximal_1_1EuclidianNorm.html',1,'sopt::proximal']]],
+  ['exception',['Exception',['http://astro-informatics.github.io/sopt/classsopt_1_1Exception.html',1,'sopt']]]
 ];

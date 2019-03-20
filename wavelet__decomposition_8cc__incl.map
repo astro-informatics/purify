@@ -1,8 +1,11 @@
 <map id="/mydata/cpp/example/wavelet_decomposition.cc" name="/mydata/cpp/example/wavelet_decomposition.cc">
-<area shape="rect" id="node3" href="$types_8h.html" title="purify/types.h" alt="" coords="880,259,992,285"/>
-<area shape="rect" id="node10" href="$logging_8h.html" title="purify/logging.h" alt="" coords="358,184,482,211"/>
-<area shape="rect" id="node14" href="$pfitsio_8h.html" title="purify/pfitsio.h" alt="" coords="508,102,624,129"/>
-<area shape="rect" id="node16" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="187,184,312,211"/>
-<area shape="rect" id="node19" href="$wavelet__operator__factory_8h.html" title="purify/wavelet_operator\l_factory.h" alt="" coords="774,95,952,136"/>
-<area shape="rect" id="node11" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="289,259,472,285"/>
+<area shape="rect" id="node3" href="$types_8h.html" title="purify/types.h" alt="" coords="771,333,883,360"/>
+<area shape="rect" id="node10" href="$logging_8h.html" title="purify/logging.h" alt="" coords="127,259,251,285"/>
+<area shape="rect" id="node14" href="$pfitsio_8h.html" title="purify/pfitsio.h" alt="" coords="377,184,493,211"/>
+<area shape="rect" id="node16" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="504,259,629,285"/>
+<area shape="rect" id="node19" href="$wavelet__operator__factory_8h.html" title="purify/wavelet_operator\l_factory.h" alt="" coords="401,95,580,136"/>
+<area shape="rect" id="node8" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="670,408,773,435"/>
+<area shape="rect" id="node11" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="246,333,429,360"/>
+<area shape="rect" id="node21" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/wavelets_8h.html" title="sopt/wavelets.h" alt="" coords="729,184,855,211"/>
+<area shape="rect" id="node22" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/sara_8h.html" title="sopt/wavelets/sara.h" alt="" coords="144,184,301,211"/>
 </map>

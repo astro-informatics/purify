@@ -1,7 +1,9 @@
 <map id="/mydata/cpp/example/casa.cc" name="/mydata/cpp/example/casa.cc">
-<area shape="rect" id="node3" href="$casacore_8h.html" title="purify/casacore.h" alt="" coords="1214,95,1349,121"/>
-<area shape="rect" id="node24" href="$logging_8h.html" title="purify/logging.h" alt="" coords="67,95,191,121"/>
-<area shape="rect" id="node4" href="$types_8h.html" title="purify/types.h" alt="" coords="1748,259,1860,285"/>
-<area shape="rect" id="node20" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="1548,177,1673,203"/>
-<area shape="rect" id="node25" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="38,177,221,203"/>
+<area shape="rect" id="node3" href="$casacore_8h.html" title="purify/casacore.h" alt="" coords="1219,95,1354,121"/>
+<area shape="rect" id="node24" href="$logging_8h.html" title="purify/logging.h" alt="" coords="70,95,194,121"/>
+<area shape="rect" id="node4" href="$types_8h.html" title="purify/types.h" alt="" coords="1720,259,1832,285"/>
+<area shape="rect" id="node20" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="1486,177,1612,203"/>
+<area shape="rect" id="node22" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/utilities_8h.html" title="sopt/utilities.h" alt="" coords="1686,177,1801,203"/>
+<area shape="rect" id="node9" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="1610,333,1712,360"/>
+<area shape="rect" id="node25" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="40,177,223,203"/>
 </map>
