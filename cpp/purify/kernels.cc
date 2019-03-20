@@ -148,9 +148,9 @@ Vector<t_real> kernel_samples(const t_real total_samples,
      Pre-calculates samples of a kernel, that can be used with linear interpolation (see Rapid
      gridding reconstruction with a minimal oversampling ratio, Beatty et. al. 2005)
      */
-  Vector<t_real> samples(total_samples);
-  for (t_real i = 0; i < total_samples; ++i) {
-    samples(i) = kernelu(i / total_samples * J - J / 2);
+  Vector<t_real> samples(static_cast<Vector<t_real>::Index>(total_samples));
+  for (Vector<t_real>::Index i = 0; i < static_cast<t_int>(total_samples); ++i) {
+    samples(i) = kernelu(static_cast<t_real>(i) / total_samples * J - J / 2);
   }
   return samples;
 }
