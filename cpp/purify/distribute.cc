@@ -203,6 +203,7 @@ std::vector<t_int> w_support(Vector<t_real> const &w, const std::vector<t_int> &
   t_real coeff_total = 0;
   for (t_int i = 0; i < w.size(); i++)
     coeff_total += widefield::w_support(std::abs(w(i) - w_stacks.at(image_index.at(i))), du,
+                                        min_support, max_support) * widefield::w_support(std::abs(w(i) - w_stacks.at(image_index.at(i))), du,
                                         min_support, max_support);
   const t_real coeff_average =
       comm.all_sum_all<t_real>(coeff_total) / static_cast<t_real>(comm.size());
@@ -218,6 +219,7 @@ std::vector<t_int> w_support(Vector<t_real> const &w, const std::vector<t_int> &
     for (t_int i = 0; i < size; i++) {
       if (comm.rank() == rank) {
         const t_int cost = widefield::w_support(std::abs(w(i) - w_stacks.at(image_index.at(i))), du,
+                                                min_support, max_support) * widefield::w_support(std::abs(w(i) - w_stacks.at(image_index.at(i))), du,
                                                 min_support, max_support);
         total += cost;
         if (group < (comm.size() - 1))
