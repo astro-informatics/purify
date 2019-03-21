@@ -104,9 +104,8 @@ typename K::Scalar mean(const K x) {
 template <class K>
 t_real variance(const K x) {
   // calculate variance of vector x
-  auto q = (x.array() - x.array().mean()).matrix();
-  t_real var = std::real((q.adjoint() * q)(0) / static_cast<t_real>(q.size() - 1));
-  return var;
+  const Matrix<typename K::Scalar> q = (x.array() - x.array().mean()).matrix();
+  return std::real((q.adjoint() * q)(0) / static_cast<t_real>(q.size() - 1));
 }
 //! Calculates the standard deviation of a vector
 template <class K>
