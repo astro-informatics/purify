@@ -38,7 +38,7 @@ t_real fov_cosine(t_real const cell, t_uint const imsize);
 template <class DDE>
 Matrix<t_complex> generate_dde(const DDE &dde, const t_real cell_x, const t_real cell_y,
                                const t_uint x_size, const t_uint y_size, const t_real stop_gap) {
-  assert(stop_gap > 1);
+  assert(stop_gap <= 1);
   const t_real L = fov_cosine(cell_x, x_size);
   const t_real M = fov_cosine(cell_y, y_size);
 
