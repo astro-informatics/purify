@@ -88,28 +88,29 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
     return true;
   };
 #endif
-  auto const padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
-                         .itermax(500)
-                         .gamma((Psi.adjoint() * (measurements_transform->adjoint() * uv_data.vis))
-                                    .cwiseAbs()
-                                    .maxCoeff() *
-                                1e-3)
-                         .relative_variation(1e-3)
-                         .l2ball_proximal_epsilon(epsilon)
-                         .tight_frame(false)
-                         .l1_proximal_tolerance(1e-2)
-                         .l1_proximal_nu(1.)
-                         .l1_proximal_itermax(50)
-                         .l1_proximal_positivity_constraint(true)
-                         .l1_proximal_real_constraint(true)
-                         .residual_convergence(epsilon)
-                         .lagrange_update_scale(0.9)
+  auto const padmm =
+      sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
+          .itermax(500)
+          .gamma((Psi.adjoint() * (measurements_transform->adjoint() * uv_data.vis).eval())
+                     .cwiseAbs()
+                     .maxCoeff() *
+                 1e-3)
+          .relative_variation(1e-3)
+          .l2ball_proximal_epsilon(epsilon)
+          .tight_frame(false)
+          .l1_proximal_tolerance(1e-2)
+          .l1_proximal_nu(1.)
+          .l1_proximal_itermax(50)
+          .l1_proximal_positivity_constraint(true)
+          .l1_proximal_real_constraint(true)
+          .residual_convergence(epsilon)
+          .lagrange_update_scale(0.9)
 #ifdef PURIFY_CImg
-                         .is_converged(show_image)
+          .is_converged(show_image)
 #endif
-                         .nu(1e0)
-                         .Psi(Psi)
-                         .Phi(*measurements_transform);
+          .nu(1e0)
+          .Psi(Psi)
+          .Phi(*measurements_transform);
 
   auto const diagnostic = padmm();
   assert(diagnostic.x.size() == M31.size());

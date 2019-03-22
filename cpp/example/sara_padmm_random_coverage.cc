@@ -77,7 +77,9 @@ int main(int, char **) {
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
   auto const purify_gamma =
-      (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() *
+      (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis).eval())
+          .cwiseAbs()
+          .maxCoeff() *
       beta;
 
   // auto purify_gamma = 3 * utilities::median((Psi.adjoint() * (measurements_transform.adjoint() *
