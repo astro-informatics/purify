@@ -57,7 +57,7 @@ class IndexMapping {
 template <class T0>
 std::set<t_int> non_empty_outers(Eigen::SparseMatrixBase<T0> const &matrix) {
   std::set<t_int> result;
-  for (typename T0::StorageIndex k = 0; k < matrix.derived().outerSize(); ++k)
+  for (typename T0::Index k = 0; k < matrix.derived().outerSize(); ++k)
     for (typename T0::InnerIterator it(matrix.derived(), k); it; ++it) result.insert(it.col());
   return result;
 }

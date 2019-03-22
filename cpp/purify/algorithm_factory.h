@@ -75,9 +75,10 @@ padmm_factory(const algo_distribution dist,
   switch (dist) {
   case (algo_distribution::serial): {
     padmm
-        ->gamma(
-            (wavelets->adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() *
-            1e-3)
+        ->gamma((wavelets->adjoint() * (measurements->adjoint() * uv_data.vis).eval())
+                    .cwiseAbs()
+                    .maxCoeff() *
+                1e-3)
         .l2ball_proximal_epsilon(epsilon)
         .residual_tolerance(epsilon);
     return padmm;
