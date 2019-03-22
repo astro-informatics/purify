@@ -276,7 +276,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_gridding_m
     const STORAGE_INDEX_TYPE start_index, const t_uint number_of_images,
     const std::vector<t_int> &image_index, ARGS &&... args) {
   Sparse<t_complex, STORAGE_INDEX_TYPE> interpolation_matrix_original =
-      details::init_gridding_matrix_2d(number_of_images, image_index, std::forward<ARGS>(args)...);
+      details::init_gridding_matrix_2d<STORAGE_INDEX_TYPE>(number_of_images, image_index, std::forward<ARGS>(args)...);
   const AllToAllSparseVector<STORAGE_INDEX_TYPE> distributor(interpolation_matrix_original,
                                                              local_grid_size, start_index, comm);
   const std::shared_ptr<const Sparse<t_complex>> interpolation_matrix =

@@ -57,11 +57,12 @@ class IndexMapping {
 };
 
 //! Indices of non empty outer indices
-template <class T0>
-std::set<t_int> non_empty_outers(Eigen::SparseMatrixBase<T0> const &matrix) {
-  std::set<t_int> result;
+template <class T0, class STORAGE_INDEX_TYPE = t_int>
+std::set<STORAGE_INDEX_TYPE> non_empty_outers(Eigen::SparseMatrixBase<T0> const &matrix) {
+  std::set<STORAGE_INDEX_TYPE> result;
   for (typename T0::Index k = 0; k < matrix.derived().outerSize(); ++k)
-    for (typename T0::InnerIterator it(matrix.derived(), k); it; ++it) result.insert(it.col());
+    for (typename T0::InnerIterator it(matrix.derived(), k); it; ++it)
+      result.insert(static_cast<STORAGE_INDEX_TYPE>(it.col()));
   return result;
 }
 
@@ -71,26 +72,25 @@ Sparse<typename T0::Scalar> compress_outer(T0 const &matrix) {
   static_assert(T0::IsRowMajor, "Not tested for col major");
   auto const indices = non_empty_outers(matrix);
 
-  SparseVector<typename T0::StorageIndex, typename T0::StorageIndex> mapping(matrix.cols());
+  SparseVector<typename T0::Index, typename T0::Index> mapping(matrix.cols());
   mapping.reserve(indices.size());
   t_int i(0);
   for (auto const &index : indices) mapping.coeffRef(index) = i++;
 
-  std::vector<typename Sparse<typename T0::Scalar>::StorageIndex> rows(matrix.rows() + 1, 0);
-  std::vector<typename Sparse<typename T0::Scalar>::StorageIndex> cols(matrix.nonZeros(), 0);
+  std::vector<typename Sparse<typename T0::Scalar>::Index> rows(matrix.rows() + 1, 0);
+  std::vector<typename Sparse<typename T0::Scalar>::Index> cols(matrix.nonZeros(), 0);
   rows[matrix.rows()] = matrix.nonZeros();
   t_int index = 0;
-  for (typename T0::StorageIndex k = 0; k < matrix.outerSize(); ++k) {
+  for (typename T0::Index k = 0; k < matrix.outerSize(); ++k) {
     rows[k] = index;
-    for (typename Sparse<typename T0::Scalar, typename T0::StorageIndex>::InnerIterator it(matrix,
-                                                                                           k);
-         it; ++it) {
+    for (typename T0::InnerIterator it(matrix, k); it;
+         ++it) {
       cols[index] = mapping.coeff(it.col());
       index++;
     }
   }
   return Eigen::MappedSparseMatrix<typename T0::Scalar, Eigen::RowMajor,
-                                   typename Sparse<typename T0::Scalar>::StorageIndex>(
+                                   typename Sparse<typename T0::Scalar>::Index>(
       matrix.rows(), indices.size(), matrix.nonZeros(), rows.data(), cols.data(),
       const_cast<typename T0::Scalar *>(matrix.derived().valuePtr()));
 }

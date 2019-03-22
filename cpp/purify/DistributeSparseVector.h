@@ -38,7 +38,7 @@ class DistributeSparseVector {
   template <class T0>
   DistributeSparseVector(Eigen::SparseMatrixBase<T0> const &sparse,
                          const sopt::mpi::Communicator &_comm)
-      : DistributeSparseVector(non_empty_outers(sparse), sparse.cols(), _comm) {}
+      : DistributeSparseVector(non_empty_outers<T0, t_int>(sparse), sparse.cols(), _comm) {}
 
   template <class T0, class T1>
   void scatter(Eigen::MatrixBase<T0> const &input, Eigen::MatrixBase<T1> const &output) const {

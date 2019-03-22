@@ -101,7 +101,7 @@ class AllToAllSparseVector {
   AllToAllSparseVector(Eigen::SparseMatrixBase<T0> const &sparse,
                        const STORAGE_INDEX_TYPE ft_grid_size, const STORAGE_INDEX_TYPE start,
                        const sopt::mpi::Communicator &_comm)
-      : AllToAllSparseVector(non_empty_outers(sparse), ft_grid_size, start, _comm) {}
+      : AllToAllSparseVector(non_empty_outers<T0, STORAGE_INDEX_TYPE>(sparse), ft_grid_size, start, _comm) {}
 
   template <class T0, class T1>
   void recv_grid(Eigen::MatrixBase<T0> const &input, Eigen::MatrixBase<T1> const &output) const {
