@@ -16,5 +16,5 @@ var searchData=
   ['kernels_2eh',['kernels.h',['../kernels_8h.html',1,'']]],
   ['kernels_5ftest',['kernels_test',['../namespacekernels__test.html',1,'']]],
   ['kmeans_2ecc',['kmeans.cc',['../kmeans_8cc.html',1,'']]],
-  ['kmeans_5falgo',['kmeans_algo',['../namespacepurify_1_1distribute.html#ae6155f9cc952e699bb3b40941a166171',1,'purify::distribute']]]
+  ['kmeans_5falgo',['kmeans_algo',['../namespacepurify_1_1distribute.html#a63f1d94d4471ff67adec654d547dff4a',1,'purify::distribute']]]
 ];

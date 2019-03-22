@@ -2039,8 +2039,8 @@
       <type>std::tuple&lt; std::vector&lt; t_int &gt;, std::vector&lt; t_real &gt; &gt;</type>
       <name>kmeans_algo</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1distribute.html</anchorfile>
-      <anchor>ae6155f9cc952e699bb3b40941a166171</anchor>
-      <arglist>(const Vector&lt; t_real &gt; &amp;w, const t_int number_of_nodes, const t_int iters, const std::function&lt; t_real(t_real)&gt; &amp;cost=[](t_real x) { return x *x;})</arglist>
+      <anchor>a63f1d94d4471ff67adec654d547dff4a</anchor>
+      <arglist>(const Vector&lt; t_real &gt; &amp;w, const t_int number_of_nodes, const t_int iters, const std::function&lt; t_real(t_real)&gt; &amp;cost=[](t_real x) { return x *x;}, const t_real rel_diff=1e-3)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -2089,8 +2089,8 @@
       <type>std::tuple&lt; std::vector&lt; t_int &gt;, std::vector&lt; t_real &gt; &gt;</type>
       <name>kmeans_algo</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1distribute.html</anchorfile>
-      <anchor>ae6155f9cc952e699bb3b40941a166171</anchor>
-      <arglist>(const Vector&lt; t_real &gt; &amp;w, const t_int number_of_nodes, const t_int iters, const std::function&lt; t_real(t_real)&gt; &amp;cost=[](t_real x) { return x *x;})</arglist>
+      <anchor>a63f1d94d4471ff67adec654d547dff4a</anchor>
+      <arglist>(const Vector&lt; t_real &gt; &amp;w, const t_int number_of_nodes, const t_int iters, const std::function&lt; t_real(t_real)&gt; &amp;cost=[](t_real x) { return x *x;}, const t_real rel_diff=1e-3)</arglist>
     </member>
     <member kind="function">
       <type>Vector&lt; t_int &gt;</type>
@@ -7663,8 +7663,8 @@
       <type>std::tuple&lt; std::vector&lt; t_int &gt;, std::vector&lt; t_real &gt; &gt;</type>
       <name>kmeans_algo</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1distribute.html</anchorfile>
-      <anchor>ae6155f9cc952e699bb3b40941a166171</anchor>
-      <arglist>(const Vector&lt; t_real &gt; &amp;w, const t_int number_of_nodes, const t_int iters, const std::function&lt; t_real(t_real)&gt; &amp;cost=[](t_real x) { return x *x;})</arglist>
+      <anchor>a63f1d94d4471ff67adec654d547dff4a</anchor>
+      <arglist>(const Vector&lt; t_real &gt; &amp;w, const t_int number_of_nodes, const t_int iters, const std::function&lt; t_real(t_real)&gt; &amp;cost=[](t_real x) { return x *x;}, const t_real rel_diff=1e-3)</arglist>
     </member>
   </compound>
   <compound kind="namespace">
