@@ -49,7 +49,7 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
   point(std::floor(imsizey / 2), std::floor(imsizex / 2)) = 1.;
   const Vector<> psf =
       (measurements_transform->adjoint() *
-       (*measurements_transform * Vector<t_complex>::Map(point.data(), point.size())))
+       (*measurements_transform * Vector<t_complex>::Map(point.data(), point.size())).eval())
           .real();
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), imsizey, imsizex), dirty_image_fits);
