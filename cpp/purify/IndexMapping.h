@@ -58,9 +58,9 @@ class IndexMapping {
 
 //! Indices of non empty outer indices
 template <class T0>
-std::set<typename T0::StorageIndex> non_empty_outers(Eigen::SparseMatrixBase<T0> const &matrix) {
-  std::set<typename T0::StorageIndex> result;
-  for (typename T0::StorageIndex k = 0; k < matrix.derived().outerSize(); ++k)
+std::set<t_int> non_empty_outers(Eigen::SparseMatrixBase<T0> const &matrix) {
+  std::set<t_int> result;
+  for (typename T0::Index k = 0; k < matrix.derived().outerSize(); ++k)
     for (typename T0::InnerIterator it(matrix.derived(), k); it; ++it) result.insert(it.col());
   return result;
 }
@@ -82,12 +82,15 @@ Sparse<typename T0::Scalar> compress_outer(T0 const &matrix) {
   t_int index = 0;
   for (typename T0::StorageIndex k = 0; k < matrix.outerSize(); ++k) {
     rows[k] = index;
-    for (typename Sparse<typename T0::Scalar, typename T0::StorageIndex>::InnerIterator it(matrix, k); it; ++it) {
+    for (typename Sparse<typename T0::Scalar, typename T0::StorageIndex>::InnerIterator it(matrix,
+                                                                                           k);
+         it; ++it) {
       cols[index] = mapping.coeff(it.col());
       index++;
     }
   }
-  return Eigen::MappedSparseMatrix<typename T0::Scalar, Eigen::RowMajor, typename Sparse<typename T0::Scalar>::StorageIndex>(
+  return Eigen::MappedSparseMatrix<typename T0::Scalar, Eigen::RowMajor,
+                                   typename Sparse<typename T0::Scalar>::StorageIndex>(
       matrix.rows(), indices.size(), matrix.nonZeros(), rows.data(), cols.data(),
       const_cast<typename T0::Scalar *>(matrix.derived().valuePtr()));
 }

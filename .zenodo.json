@@ -1,12 +1,17 @@
 {
-    "publication_date": "2019-02-01",
+    "publication_date": "2019-02-25",
     "title": "PURIFY",
-    "version": "3.0.0",
+    "version": "3.0.1",
 	  "creators": [
 	      {
 	          "affiliation": "University College London",
 	          "name": "Luke Pratley",
 	          "orcid": "0000-0002-4716-9933"
+	      },
+	      {
+	          "affiliation": "University College London",
+	          "name": "Jason D. McEwen",
+	          "orcid": "0000-0002-5852-8890"
 	      },
 	      {
 	          "affiliation": "Imperial College",
@@ -19,17 +24,13 @@
 	      },
 	      {
 	          "affiliation": "University College London",
-	          "name": "Ilektra Christidi"
+	          "name": "Ilektra Christidi",
+            "orcid": "0000-0002-5045-7987"
 	      },
 	      {
 	          "affiliation": "University College London",
 	          "name": "Roland Guichard",
 	          "orcid": "0000-0003-3969-4102"
-	      },
-	      {
-	          "affiliation": "University College London",
-	          "name": "Jason D. McEwen",
-	          "orcid": "0000-0002-5852-8890"
 	      },
 	      {
 	          "affiliation": "University College London",

@@ -3,7 +3,7 @@ PURIFY
 
 [![Build Status](https://travis-ci.com/astro-informatics/purify.svg?branch=development)](https://travis-ci.com/astro-informatics/purify)
 [![codecov](https://codecov.io/gh/astro-informatics/purify/branch/development/graph/badge.svg)](https://codecov.io/gh/astro-informatics/purify)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2555253.svg)](https://doi.org/10.5281/zenodo.2555253)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2555252.svg)](https://doi.org/10.5281/zenodo.2555252)
 
 Description
 -------------
@@ -29,7 +29,7 @@ Dependencies installation
   portable C++ libraries. V1.65 downloaded automatically if absent but needs a
   cmake >= 3.9.2.
 - [fftw3](www.fftw.org): Fastest Fourier Transform in the West
-- [Eigen3](http://eigen.tuxfamily.org/index.php?title=Main_Page) v3.2.0 (Trusty) Modern `C++` linear algebra.
+- [Eigen3](http://eigen.tuxfamily.org/index.php?title=Main_Page) v3.3.7 (Trusty) Modern `C++` linear algebra.
   Downloaded automatically if absent.
 - [tiff](http://www.libtiff.org/) v4.0.3 (Trusty) Tag Image File Format library
 - [astro-informatics/sopt](https://github.com/astro-informatics/sopt) v* Sparse Optimization
@@ -106,7 +106,7 @@ of the installation directory. `purify` has one required argument, it a string f
 
 `purify path/to/config.yaml`.
 
-A [template with a description of the settings](https://github.com/astro-informatics/purify/blob/master/data/config/config.yaml) 
+A [template with a description of the settings](https://github.com/astro-informatics/purify/blob/development/data/config/config.yaml)
 is included in the `data/config` directory.`
 When `purify` runs a directory will be created, and the output images will be
 saved and time-stamped. Additionally, a config file with the settings used will
