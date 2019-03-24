@@ -118,7 +118,7 @@ t_real pswf(const t_real x, const t_real J) {
 */
   const t_real eta0 = 2 * x / J;
   const t_real alpha = 1;
-  return calc_for_pswf(eta0, J, alpha) * std::pow(1 - eta0 * eta0, alpha);
+  return calc_for_pswf(eta0, J, alpha) * std::pow(1 - eta0 * eta0, alpha) ;
 }
 
 t_real ft_pswf(const t_real x, const t_real J) {
@@ -138,7 +138,7 @@ t_real ft_pswf(const t_real x, const t_real J) {
   const t_real alpha = 1;
   const t_real eta0 = 2 * x;
 
-  return calc_for_pswf(eta0, J, alpha);
+  return calc_for_pswf(eta0, J, alpha) * std::sqrt(5.343);
 }
 
 Vector<t_real> kernel_samples(const t_real total_samples,
@@ -226,7 +226,7 @@ t_real ft_gaussian_general(const t_real x, const t_real J, const t_real sigma) {
      */
 
   t_real a = x * sigma;
-  return 1. / std::exp(-a * a * 2);
+  return std::exp(a * a * 2);
 }
 }  // namespace kernels
 
