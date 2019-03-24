@@ -1,5 +1,5 @@
 include(VersionAndGitRef)
-set_version(3.0.1)
+set_version(3.1.0)
 get_gitref()
 
 set(version ${Purify_VERSION})
