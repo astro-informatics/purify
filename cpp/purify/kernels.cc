@@ -29,10 +29,9 @@ t_real ft_kaiser_bessel_general(const t_real x, const t_real J, const t_real alp
 
   t_complex eta = std::sqrt(
       static_cast<t_complex>((constant::pi * x * J) * (constant::pi * x * J) - alpha * alpha));
-  const t_real normalisation =
-      38828.11016883;  // Factor that keeps it consistent with fessler formula
+  const t_real normalisation = J / boost::math::cyl_bessel_i(0, alpha);
 
-  return std::real(std::sin(eta) / eta) /
+  return std::real(std::sin(eta) / eta) *
          normalisation;  // simple way of doing the calculation, the
   // boost bessel funtions do not support
   // complex valued arguments
@@ -214,7 +213,7 @@ t_real gaussian_general(const t_real x, const t_real J, const t_real sigma) {
      */
 
   t_real a = x / sigma;
-  return std::exp(-a * a * 0.5);
+  return std::exp(-a * a * 0.5) / (sigma * std::sqrt(2 * constant::pi));
 }
 
 t_real ft_gaussian_general(const t_real x, const t_real J, const t_real sigma) {
@@ -226,8 +225,8 @@ t_real ft_gaussian_general(const t_real x, const t_real J, const t_real sigma) {
      sigma:: standard deviation of Gaussian kernel (in pixels)
      */
 
-  t_real a = x * sigma * constant::pi;
-  return std::sqrt(constant::pi / 2) / sigma * std::exp(-a * a * 2);
+  t_real a = x * sigma;
+  return 1. / std::exp(-a * a * 2);
 }
 }  // namespace kernels
 

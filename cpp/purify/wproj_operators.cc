@@ -63,15 +63,8 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
   const t_uint max_evaluations = 1e8;
   const t_real relative_error = rel_error;
   const t_real absolute_error = abs_error;
-  // normalising kernel
-  t_uint e = 0;
-  const t_real norm = std::pow(
-      std::abs(projection_kernels::exact_w_projection_integration_1d(
-          0, 0, 0, du, oversample_ratio, [&](const t_real l) -> t_real { return ftkerneluv(l); },
-          1e9, 0, 1e-12, integration::method::h, e)),
-      (dde == dde_type::wkernel_radial) ? 1 : 0.5);
 
-  auto const ftkernel_radial = [&](const t_real l) -> t_real { return ftkerneluv(l) / norm; };
+  auto const ftkernel_radial = [&](const t_real l) -> t_real { return ftkerneluv(l); };
 
   t_int coeffs_done = 0;
   t_uint total = 0;
