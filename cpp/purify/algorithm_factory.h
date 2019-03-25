@@ -82,8 +82,6 @@ padmm_factory(const algo_distribution dist,
                 1e-3)
         .l2ball_proximal_epsilon(epsilon)
         .residual_tolerance(epsilon);
-    PURIFY_LOW_LOG("Value of epsilon will provide {} RMS Jy/pixel in the residual map.",
-                   epsilon / std::sqrt(std::get<2>(measurements->adjoint().sizes())));
     return padmm;
   }
 #ifdef PURIFY_MPI
@@ -123,8 +121,6 @@ padmm_factory(const algo_distribution dist,
   padmm->objective_convergence(
       purify::factory::l1_convergence_factory<typename Algorithm::Scalar>(obj_conv, padmm_weak));
 #endif
-  PURIFY_LOW_LOG("Value of epsilon will provide {} RMS Jy/pixel in the residual map.",
-                 epsilon / std::sqrt(std::get<2>(measurements->adjoint().sizes())));
   return padmm;
 }
 
@@ -222,8 +218,6 @@ primaldual_factory(
             1e-3)
         .l2ball_proximal_epsilon(epsilon)
         .residual_tolerance(epsilon);
-    PURIFY_LOW_LOG("Value of epsilon will provide {} RMS Jy/pixel in the residual map.",
-                   epsilon / std::sqrt(std::get<2>(measurements->adjoint().sizes())));
     return primaldual;
   }
 #ifdef PURIFY_MPI
@@ -264,8 +258,6 @@ primaldual_factory(
       purify::factory::l1_convergence_factory<typename Algorithm::Scalar>(obj_conv,
                                                                           primaldual_weak));
 #endif
-  PURIFY_LOW_LOG("Value of epsilon will provide {} RMS Jy/pixel in the residual map.",
-                 epsilon / std::sqrt(std::get<2>(measurements->adjoint().sizes())));
   return primaldual;
 }
 
