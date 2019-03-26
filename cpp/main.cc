@@ -257,13 +257,6 @@ int main(int argc, const char **argv) {
       "Using cell size {}\" x {}\", recommended from the uv coverage and field of view is "
       "{}\"x{}\".",
       params.cellsizey(), params.cellsizex(), ideal_cell_y, ideal_cell_x);
-  t_real const flux_scale =
-      (params.source() == purify::utilities::vis_source::measurements)
-          ? widefield::pixel_to_lambda(params.cellsizex(), params.width(), params.oversampling()) *
-                widefield::pixel_to_lambda(params.cellsizey(), params.height(),
-                                           params.oversampling())
-          : 1.;
-  uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale;
 
   // create measurement operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measurements_transform;
@@ -294,20 +287,33 @@ int main(int argc, const char **argv) {
                   params.cellsizey(), params.cellsizex(), params.oversampling(),
                   kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jw(),
                   params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
+  t_real operator_norm = 1.;
 #ifdef PURIFY_MPI
-  auto const comm = sopt::mpi::Communicator::World();
-  auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
-      measurements_transform, params.powMethod_iter(), params.powMethod_tolerance(),
-      comm.broadcast(measurement_op_eigen_vector));
-  measurements_transform = std::get<2>(power_method_result);
-  measurement_op_eigen_vector = std::get<1>(power_method_result);
-#else
-  auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
-      measurements_transform, params.powMethod_iter(), params.powMethod_tolerance(),
-      measurement_op_eigen_vector);
-  measurements_transform = std::get<2>(power_method_result);
-  measurement_op_eigen_vector = std::get<1>(power_method_result);
+  if (using_mpi) {
+    auto const comm = sopt::mpi::Communicator::World();
+    auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
+        measurements_transform, params.powMethod_iter(), params.powMethod_tolerance(),
+        comm.broadcast(measurement_op_eigen_vector));
+    measurements_transform = std::get<2>(power_method_result);
+    measurement_op_eigen_vector = std::get<1>(power_method_result);
+    operator_norm = std::get<0>(power_method_result);
+  } else
 #endif
+  {
+    auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
+        measurements_transform, params.powMethod_iter(), params.powMethod_tolerance(),
+        measurement_op_eigen_vector);
+    measurements_transform = std::get<2>(power_method_result);
+    measurement_op_eigen_vector = std::get<1>(power_method_result);
+    operator_norm = std::get<0>(power_method_result);
+  }
+  PURIFY_LOW_LOG("Value of operator norm is {}", operator_norm);
+  t_real const flux_scale = (params.source() == purify::utilities::vis_source::measurements)
+                                ? std::sqrt(std::floor(params.width() * params.oversampling()) *
+                                            std::floor(params.width() * params.oversampling())) *
+                                      operator_norm
+                                : 1.;
+  uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale;
   // create wavelet operator
   std::vector<std::tuple<std::string, t_uint>> sara;
   for (size_t i = 0; i < params.wavelet_basis().size(); i++)
