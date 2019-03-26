@@ -79,7 +79,7 @@ TEST_CASE("flux units") {
   SECTION("kb") {
     const kernels::kernel kernel = kernels::kernel::kb;
     for (auto& J : {4, 5, 6, 7, 8}) {
-      for (auto& imsize : {128, 256, 512, 1024}) {
+      for (auto& imsize : {128, 256, 512}) {
         const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
             measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
                 u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
@@ -101,7 +101,7 @@ TEST_CASE("flux units") {
   SECTION("pswf") {
     const kernels::kernel kernel = kernels::kernel::pswf;
     for (auto& J : {4, 5, 6, 7, 8}) {
-      for (auto& imsize : {128, 256, 512, 1024}) {
+      for (auto& imsize : {128, 256, 512}) {
         if (J != 6)
           CHECK_THROWS(measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
               u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
@@ -129,7 +129,7 @@ TEST_CASE("flux units") {
   SECTION("gauss") {
     const kernels::kernel kernel = kernels::kernel::gauss;
     for (auto& J : {4, 5, 6, 7, 8}) {
-      for (auto& imsize : {128, 256, 512, 1024}) {
+      for (auto& imsize : {128, 256, 512}) {
         const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
             measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
                 u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
@@ -151,7 +151,7 @@ TEST_CASE("flux units") {
   SECTION("box") {
     const kernels::kernel kernel = kernels::kernel::box;
     for (auto& J : {4, 5, 6, 7, 8}) {
-      for (auto& imsize : {128, 256, 512, 1024}) {
+      for (auto& imsize : {128, 256, 512}) {
         const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
             measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
                 u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
@@ -173,7 +173,7 @@ TEST_CASE("flux units") {
   SECTION("wproj kb") {
     const kernels::kernel kernel = kernels::kernel::kb;
     for (auto& J : {4, 5, 6, 7, 8}) {
-      for (auto& imsize : {128, 256, 512, 1024}) {
+      for (auto& imsize : {128, 256, 512}) {
         const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
             measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
                 u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
@@ -195,7 +195,7 @@ TEST_CASE("flux units") {
   SECTION("wproj pswf") {
     const kernels::kernel kernel = kernels::kernel::pswf;
     for (auto& J : {4, 5, 6, 7, 8}) {
-      for (auto& imsize : {128, 256, 512, 1024}) {
+      for (auto& imsize : {128, 256, 512}) {
         if (J != 6)
           CHECK_THROWS(measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
               u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
@@ -224,7 +224,7 @@ TEST_CASE("flux units") {
   SECTION("wproj gauss") {
     const kernels::kernel kernel = kernels::kernel::gauss;
     for (auto& J : {4, 5, 6, 7, 8}) {
-      for (auto& imsize : {128, 256, 512, 1024}) {
+      for (auto& imsize : {128, 256, 512}) {
         const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
             measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
                 u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
@@ -246,7 +246,7 @@ TEST_CASE("flux units") {
   SECTION("wproj box") {
     const kernels::kernel kernel = kernels::kernel::box;
     for (auto& J : {4, 5, 6, 7, 8}) {
-      for (auto& imsize : {128, 256, 512, 1024}) {
+      for (auto& imsize : {128, 256, 512}) {
         const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
             measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
                 u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
@@ -262,6 +262,43 @@ TEST_CASE("flux units") {
         CAPTURE(J);
         CAPTURE(imsize)
         CHECK(y_test.isApprox(y, 1e-2));
+      }
+    }
+  }
+}
+TEST_CASE("normed operator") {
+  const t_real oversample_ratio = 2;
+  const t_int power_iters = 1000;
+  const t_real power_tol = 1e-4;
+  Vector<t_real> u = Vector<t_real>::Random(10);
+  Vector<t_real> v = Vector<t_real>::Random(10);
+  const t_uint M = u.size();
+  const Vector<t_complex> y = Vector<t_complex>::Ones(u.size());
+  SECTION("kb") {
+    const kernels::kernel kernel = kernels::kernel::kb;
+    for (auto& J : {4, 5, 6, 7, 8}) {
+      for (auto& imsize : {128, 256, 512}) {
+        const Vector<t_complex> init = Vector<t_complex>::Ones(imsize * imsize);
+        auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
+            measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+                u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
+                imsize, imsize, oversample_ratio, kernel, J, J),
+            power_iters, power_tol, init);
+        const t_real norm = std::get<0>(power_method_result);
+        const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
+            std::get<2>(power_method_result);
+
+        Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
+        input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
+        const Vector<t_complex> y_test =
+            (*measure_op * input).eval() *
+            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+        CAPTURE(y_test.cwiseAbs().mean());
+        CAPTURE(y);
+        CAPTURE(y_test);
+        CAPTURE(J);
+        CAPTURE(imsize)
+        CHECK((y_test * norm).isApprox(y, 1e-3));
       }
     }
   }
