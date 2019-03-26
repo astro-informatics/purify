@@ -102,10 +102,34 @@ int main(int argc, const char **argv) {
       uv_data = read_measurements::read_measurements(params.measurements(), world,
                                                      distribute::plan::radial, true, stokes::I,
                                                      params.measurements_units());
+      const t_real norm = std::sqrt(std::real(world.all_sum_all(
+                              (1. / (uv_data.weights.array() * uv_data.weights.array())).sum()))) /
+                          std::sqrt(world.all_sum_all(uv_data.size()));
+      // normalise weights
+      uv_data.weights = uv_data.weights * norm;
+      // using no weights for now
+      // uv_data.weights = Vector<t_complex>::Ones(uv_data.size());
+      PURIFY_LOW_LOG("Expected image domain residual RMS is {} jy/pixel",
+                     params.measurements_sigma() * params.epsilonScaling() *
+                         std::sqrt(2 * world.all_sum_all(uv_data.size())) /
+                         (params.oversampling() * params.width() * params.height()));
     } else
 #endif
+    {
       uv_data = read_measurements::read_measurements(params.measurements(), true, stokes::I,
                                                      params.measurements_units());
+      const t_real norm =
+          std::sqrt(std::real((1. / (uv_data.weights.array() * uv_data.weights.array())).sum())) /
+          std::sqrt(uv_data.size());
+      // normalising weights
+      uv_data.weights = uv_data.weights * norm;
+      // using no weights for now
+      // uv_data.weights = Vector<t_complex>::Ones(uv_data.size());
+      PURIFY_LOW_LOG("Expected image domain residual RMS is {} jy/pixel",
+                     params.measurements_sigma() * params.epsilonScaling() *
+                         std::sqrt(2 * uv_data.size()) /
+                         (params.oversampling() * params.width() * params.height()));
+    }
     if (params.conjugate_w()) uv_data = utilities::conjugate_w(uv_data);
 #ifdef PURIFY_MPI
     if (params.mpi_wstacking() and
