@@ -21,7 +21,8 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
                  const t_real update_tol, const t_uint update_iters,
                  const pfitsio::header_params &update_solution_header,
                  const pfitsio::header_params &update_residual_header, const t_uint imsizey,
-                 const t_uint imsizex, const t_uint sara_size, const bool using_mpi) {
+                 const t_uint imsizex, const t_uint sara_size, const bool using_mpi,
+                 const t_real beam_units = 1) {
   if (update_tol < 0)
     throw std::runtime_error("Step size update tolerance must be greater than zero.");
   if (step_size_scale < 0)
@@ -39,8 +40,8 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
     const auto comm = sopt::mpi::Communicator::World();
     const std::shared_ptr<t_int> iter = std::make_shared<t_int>(0);
     const auto updater = [update_tol, update_iters, imsizex, imsizey, algo_weak, iter,
-                          step_size_scale, update_header_sol, update_header_res, sara_size,
-                          comm](const Vector<T> &x, const Vector<T> &res) -> bool {
+                          step_size_scale, update_header_sol, update_header_res, sara_size, comm,
+                          beam_units](const Vector<T> &x, const Vector<T> &res) -> bool {
       auto algo = algo_weak.lock();
       if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ {}", algo->gamma());
       if (algo->gamma() > 0) {
@@ -54,8 +55,9 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
                         ? new_gamma
                         : algo->gamma());
       }
-      Vector<t_complex> const residual = algo->Phi().adjoint() * res;
-
+      Vector<t_complex> const residual = algo->Phi().adjoint() * (res / beam_units).eval();
+      PURIFY_MEDIUM_LOG("RMS of residual map in Jy/beam {}",
+                        residual.norm() / std::sqrt(residual.size()));
       if (comm.is_root()) {
         update_header_sol->niters = *iter;
         update_header_res->niters = *iter;
@@ -77,7 +79,7 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
   } else {
     const std::shared_ptr<t_int> iter = std::make_shared<t_int>(0);
     const auto updater = [update_tol, update_iters, imsizex, imsizey, algo_weak, iter,
-                          step_size_scale, update_header_sol, update_header_res
+                          step_size_scale, update_header_sol, update_header_res, beam_units
 #ifdef PURIFY_CImg
                           ,
                           canvas
@@ -95,7 +97,9 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
                         ? new_gamma
                         : algo->gamma());
       }
-      Vector<t_complex> const residual = algo->Phi().adjoint() * res;
+      Vector<t_complex> const residual = algo->Phi().adjoint() * (res / beam_units).eval();
+      PURIFY_MEDIUM_LOG("RMS of residual map in Jy/beam {}",
+                        residual.norm() / std::sqrt(residual.size()));
 #ifdef PURIFY_CImg
       const auto img1 = cimg::make_image(x.real().eval(), imsizey, imsizex)
                             .get_normalize(0, 1)
