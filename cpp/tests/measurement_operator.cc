@@ -95,6 +95,11 @@ TEST_CASE("flux units") {
         CAPTURE(J);
         CAPTURE(imsize)
         CHECK(y_test.isApprox(y, 1e-3));
+        const Vector<t_complex> psf =
+            (measure_op->adjoint() * y) *
+            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+              Approx(1.).margin(0.001));
       }
     }
   }
@@ -122,6 +127,11 @@ TEST_CASE("flux units") {
           CAPTURE(J);
           CAPTURE(imsize)
           CHECK(y_test.isApprox(y, 1e-3));
+          const Vector<t_complex> psf =
+              (measure_op->adjoint() * y) *
+              std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+          CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+                Approx(1.).margin(0.001));
         }
       }
     }
@@ -145,6 +155,11 @@ TEST_CASE("flux units") {
         CAPTURE(J);
         CAPTURE(imsize)
         CHECK(y_test.isApprox(y, 1e-2));
+        const Vector<t_complex> psf =
+            (measure_op->adjoint() * y) *
+            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+              Approx(1.).margin(0.01));
       }
     }
   }
@@ -167,6 +182,11 @@ TEST_CASE("flux units") {
         CAPTURE(J);
         CAPTURE(imsize)
         CHECK(y_test.isApprox(y, 1e-3));
+        const Vector<t_complex> psf =
+            (measure_op->adjoint() * y) *
+            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+              Approx(1.).margin(0.001));
       }
     }
   }
@@ -189,6 +209,11 @@ TEST_CASE("flux units") {
         CAPTURE(J);
         CAPTURE(imsize)
         CHECK(y_test.isApprox(y, 1e-3));
+        const Vector<t_complex> psf =
+            (measure_op->adjoint() * y) *
+            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+              Approx(1.).margin(0.001));
       }
     }
   }
@@ -217,6 +242,11 @@ TEST_CASE("flux units") {
           CAPTURE(J);
           CAPTURE(imsize)
           CHECK(y_test.isApprox(y, 1e-3));
+          const Vector<t_complex> psf =
+              (measure_op->adjoint() * y) *
+              std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+          CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+                Approx(1.).margin(0.001));
         }
       }
     }
@@ -240,6 +270,11 @@ TEST_CASE("flux units") {
         CAPTURE(J);
         CAPTURE(imsize)
         CHECK(y_test.isApprox(y, 1e-2));
+        const Vector<t_complex> psf =
+            (measure_op->adjoint() * y) *
+            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+              Approx(1.).margin(0.01));
       }
     }
   }
@@ -262,6 +297,11 @@ TEST_CASE("flux units") {
         CAPTURE(J);
         CAPTURE(imsize)
         CHECK(y_test.isApprox(y, 1e-2));
+        const Vector<t_complex> psf =
+            (measure_op->adjoint() * y) *
+            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+              Approx(1.).margin(0.001));
       }
     }
   }
@@ -299,6 +339,11 @@ TEST_CASE("normed operator") {
         CAPTURE(J);
         CAPTURE(imsize)
         CHECK((y_test * norm).isApprox(y, 1e-3));
+        const Vector<t_complex> psf =
+            (measure_op->adjoint() * y) *
+            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M * norm;
+        CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+              Approx(1.).margin(0.001));
       }
     }
   }
