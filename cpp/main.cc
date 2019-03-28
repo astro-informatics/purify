@@ -102,33 +102,25 @@ int main(int argc, const char **argv) {
       uv_data = read_measurements::read_measurements(params.measurements(), world,
                                                      distribute::plan::radial, true, stokes::I,
                                                      params.measurements_units());
-      const t_real norm = std::sqrt(std::real(world.all_sum_all(
-                              (1. / (uv_data.weights.array() * uv_data.weights.array())).sum()))) /
-                          std::sqrt(world.all_sum_all(uv_data.size()));
+      const t_real norm =
+          std::sqrt(world.all_sum_all(
+                        (uv_data.weights.real().array() * uv_data.weights.real().array()).sum()) /
+                    world.all_sum_all(uv_data.size()));
       // normalise weights
-      uv_data.weights = uv_data.weights * norm;
+      uv_data.weights = uv_data.weights / norm;
       // using no weights for now
       // uv_data.weights = Vector<t_complex>::Ones(uv_data.size());
-      PURIFY_LOW_LOG("Expected image domain residual RMS is {} jy/pixel",
-                     params.measurements_sigma() * params.epsilonScaling() *
-                         std::sqrt(2 * world.all_sum_all(uv_data.size())) /
-                         (params.oversampling() * params.width() * params.height()));
     } else
 #endif
     {
       uv_data = read_measurements::read_measurements(params.measurements(), true, stokes::I,
                                                      params.measurements_units());
-      const t_real norm =
-          std::sqrt(std::real((1. / (uv_data.weights.array() * uv_data.weights.array())).sum())) /
-          std::sqrt(uv_data.size());
+      const t_real norm = std::sqrt(
+          (uv_data.weights.real().array() * uv_data.weights.real().array()).sum() / uv_data.size());
       // normalising weights
-      uv_data.weights = uv_data.weights * norm;
+      uv_data.weights = uv_data.weights / norm;
       // using no weights for now
       // uv_data.weights = Vector<t_complex>::Ones(uv_data.size());
-      PURIFY_LOW_LOG("Expected image domain residual RMS is {} jy/pixel",
-                     params.measurements_sigma() * params.epsilonScaling() *
-                         std::sqrt(2 * uv_data.size()) /
-                         (params.oversampling() * params.width() * params.height()));
     }
     if (params.conjugate_w()) uv_data = utilities::conjugate_w(uv_data);
 #ifdef PURIFY_MPI
@@ -314,6 +306,108 @@ int main(int argc, const char **argv) {
                                       operator_norm
                                 : 1.;
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale;
+
+  // Save some things before applying the algorithm
+  // the config yaml file - this also generates the output directory and the timestamp
+  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
+#ifdef PURIFY_MPI
+    auto const world = sopt::mpi::Communicator::World();
+    if (world.is_root())
+#else
+    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
+#endif
+      params.writeOutput();
+  } else {
+    params.writeOutput();
+  }
+  const std::string out_dir = params.output_prefix() + "/output_" + params.timestamp();
+  // Creating header for saving output images during iterations
+  const pfitsio::header_params update_header_sol =
+      pfitsio::header_params(out_dir + "/sol_update.fits", "Jy/Pixel", 1, uv_data.ra, uv_data.dec,
+                             params.measurements_polarization(), params.cellsizex(),
+                             params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
+  const pfitsio::header_params update_header_res =
+      pfitsio::header_params(out_dir + "/res_update.fits", "Jy/Beam", 1, uv_data.ra, uv_data.dec,
+                             params.measurements_polarization(), params.cellsizex(),
+                             params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
+  const pfitsio::header_params def_header = pfitsio::header_params(
+      "", "Jy/Pixel", 1, uv_data.ra, uv_data.dec, params.measurements_polarization(),
+      params.cellsizex(), params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
+  // the eigenvector
+  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
+#ifdef PURIFY_MPI
+    auto const world = sopt::mpi::Communicator::World();
+    if (world.is_root())
+#else
+    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
+#endif
+    {
+      pfitsio::write2d(measurement_op_eigen_vector.real(), params.height(), params.width(),
+                       out_dir + "/eigenvector_real.fits", "pix", true);
+      pfitsio::write2d(measurement_op_eigen_vector.imag(), params.height(), params.width(),
+                       out_dir + "/eigenvector_imag.fits", "pix", true);
+    }
+  } else {
+    pfitsio::write2d(measurement_op_eigen_vector.real(), params.height(), params.width(),
+                     out_dir + "/eigenvector_real.fits", "pix", true);
+    pfitsio::write2d(measurement_op_eigen_vector.imag(), params.height(), params.width(),
+                     out_dir + "/eigenvector_imag.fits", "pix", true);
+  }
+  // the psf
+  pfitsio::header_params psf_header = def_header;
+  psf_header.fits_name = out_dir + "/psf.fits";
+  psf_header.pix_units = "Jy/Pixel";
+  const Vector<t_complex> psf = measurements_transform->adjoint() * (uv_data.weights / flux_scale);
+  const Image<t_real> psf_image =
+      Image<t_complex>::Map(psf.data(), params.height(), params.width()).real();
+  PURIFY_HIGH_LOG(
+      "Peak of PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)",
+      psf_image(static_cast<t_int>(params.width() * 0.5 + params.height() * 0.5 * params.width())));
+  t_real beam_units = 1.;
+  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
+#ifdef PURIFY_MPI
+    auto const world = sopt::mpi::Communicator::World();
+    beam_units = world.all_sum_all(uv_data.size()) / flux_scale / flux_scale;
+    PURIFY_LOW_LOG("Expected image domain residual RMS is {} jy/beam",
+                   params.measurements_sigma() * params.epsilonScaling() *
+                       std::sqrt(2 * params.oversampling() * params.oversampling() /
+                                 world.all_sum_all(uv_data.size())) *
+                       operator_norm);
+    if (world.is_root())
+#else
+    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
+#endif
+      pfitsio::write2d(psf_image, psf_header, true);
+  } else {
+    beam_units = uv_data.size() / flux_scale / flux_scale;
+    PURIFY_LOW_LOG(
+        "Expected image domain residual RMS is {} jy/beam",
+        params.measurements_sigma() * params.epsilonScaling() *
+            std::sqrt(2 * params.oversampling() * params.oversampling() / uv_data.size()) *
+            operator_norm);
+    pfitsio::write2d(psf_image, psf_header, true);
+  }
+  PURIFY_HIGH_LOG(
+      "Theoretical calculation for peak PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)",
+      beam_units);
+  // the dirty image
+  pfitsio::header_params dirty_header = def_header;
+  dirty_header.fits_name = out_dir + "/dirty.fits";
+  dirty_header.pix_units = "Jy/Beam";
+  const Vector<t_complex> dimage = measurements_transform->adjoint() * uv_data.vis;
+  const Image<t_real> dirty_image =
+      Image<t_complex>::Map(dimage.data(), params.height(), params.width()).real();
+  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
+#ifdef PURIFY_MPI
+    auto const world = sopt::mpi::Communicator::World();
+    if (world.is_root())
+#else
+    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
+#endif
+      pfitsio::write2d(dirty_image / beam_units, dirty_header, true);
+  } else {
+    pfitsio::write2d(dirty_image / beam_units, dirty_header, true);
+  }
   // create wavelet operator
   std::vector<std::tuple<std::string, t_uint>> sara;
   for (size_t i = 0; i < params.wavelet_basis().size(); i++)
@@ -368,111 +462,26 @@ int main(int argc, const char **argv) {
           params.height(), params.oversampling(), 0.5));
   }
 
-  // Save some things before applying the algorithm
-  // the config yaml file - this also generates the output directory and the timestamp
-  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
-#ifdef PURIFY_MPI
-    auto const world = sopt::mpi::Communicator::World();
-    if (world.is_root())
-#else
-    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
-#endif
-      params.writeOutput();
-  } else {
-    params.writeOutput();
-  }
-  const std::string out_dir = params.output_prefix() + "/output_" + params.timestamp();
-  // Creating header for saving output images during iterations
-  const pfitsio::header_params update_header_sol =
-      pfitsio::header_params(out_dir + "/sol_update.fits", "Jy/Pixel", 1, uv_data.ra, uv_data.dec,
-                             params.measurements_polarization(), params.cellsizex(),
-                             params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
-  const pfitsio::header_params update_header_res =
-      pfitsio::header_params(out_dir + "/res_update.fits", "Jy/Pixel", 1, uv_data.ra, uv_data.dec,
-                             params.measurements_polarization(), params.cellsizex(),
-                             params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
   if (params.algorithm() == "padmm") {
     const std::weak_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> algo_weak(padmm);
     // Adding step size update to algorithm
     factory::add_updater<t_complex, sopt::algorithm::ImagingProximalADMM<t_complex>>(
         algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
-        update_header_res, params.height(), params.width(), sara_size, using_mpi);
+        update_header_res, params.height(), params.width(), sara_size, using_mpi, beam_units);
   }
   if (params.algorithm() == "primaldual") {
     const std::weak_ptr<sopt::algorithm::ImagingPrimalDual<t_complex>> algo_weak(primaldual);
     // Adding step size update to algorithm
     factory::add_updater<t_complex, sopt::algorithm::ImagingPrimalDual<t_complex>>(
         algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
-        update_header_res, params.height(), params.width(), sara_size, using_mpi);
+        update_header_res, params.height(), params.width(), sara_size, using_mpi, beam_units);
   }
   if (params.algorithm() == "fb") {
     const std::weak_ptr<sopt::algorithm::ImagingForwardBackward<t_complex>> algo_weak(fb);
     // Adding step size update to algorithm
     factory::add_updater<t_complex, sopt::algorithm::ImagingForwardBackward<t_complex>>(
         algo_weak, 0, params.update_tolerance(), 0, update_header_sol, update_header_res,
-        params.height(), params.width(), sara_size, using_mpi);
-  }
-  const pfitsio::header_params def_header = pfitsio::header_params(
-      "", "Jy/Pixel", 1, uv_data.ra, uv_data.dec, params.measurements_polarization(),
-      params.cellsizex(), params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
-  // the eigenvector
-  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
-#ifdef PURIFY_MPI
-    auto const world = sopt::mpi::Communicator::World();
-    if (world.is_root())
-#else
-    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
-#endif
-    {
-      pfitsio::write2d(measurement_op_eigen_vector.real(), params.height(), params.width(),
-                       out_dir + "/eigenvector_real.fits", "pix", true);
-      pfitsio::write2d(measurement_op_eigen_vector.imag(), params.height(), params.width(),
-                       out_dir + "/eigenvector_imag.fits", "pix", true);
-    }
-  } else {
-    pfitsio::write2d(measurement_op_eigen_vector.real(), params.height(), params.width(),
-                     out_dir + "/eigenvector_real.fits", "pix", true);
-    pfitsio::write2d(measurement_op_eigen_vector.imag(), params.height(), params.width(),
-                     out_dir + "/eigenvector_imag.fits", "pix", true);
-  }
-  // the psf
-  pfitsio::header_params psf_header = def_header;
-  psf_header.fits_name = out_dir + "/psf.fits";
-  psf_header.pix_units = "Jy/Pixel";
-  const Vector<t_complex> psf =
-      measurements_transform->adjoint() * (uv_data.weights.array() / flux_scale);
-  const Image<t_real> psf_image =
-      Image<t_complex>::Map(psf.data(), params.height(), params.width()).real();
-  PURIFY_HIGH_LOG("Peak of PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)",
-                  psf_image.maxCoeff());
-  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
-#ifdef PURIFY_MPI
-    auto const world = sopt::mpi::Communicator::World();
-    if (world.is_root())
-#else
-    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
-#endif
-      pfitsio::write2d(psf_image, psf_header, true);
-  } else {
-    pfitsio::write2d(psf_image, psf_header, true);
-  }
-  // the dirty image
-  pfitsio::header_params dirty_header = def_header;
-  dirty_header.fits_name = out_dir + "/dirty.fits";
-  dirty_header.pix_units = "Jy/Beam";
-  const Vector<t_complex> dimage = measurements_transform->adjoint() * uv_data.vis;
-  const Image<t_real> dirty_image =
-      Image<t_complex>::Map(dimage.data(), params.height(), params.width()).real();
-  if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
-#ifdef PURIFY_MPI
-    auto const world = sopt::mpi::Communicator::World();
-    if (world.is_root())
-#else
-    throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
-#endif
-      pfitsio::write2d(dirty_image / psf_image.maxCoeff(), dirty_header, true);
-  } else {
-    pfitsio::write2d(dirty_image / psf_image.maxCoeff(), dirty_header, true);
+        params.height(), params.width(), sara_size, using_mpi, beam_units);
   }
 
   PURIFY_HIGH_LOG("Starting sopt!");
@@ -485,14 +494,15 @@ int main(int argc, const char **argv) {
           ? Vector<t_complex>::Map(pfitsio::read2d(params.warm_start()).data(),
                                    params.height() * params.width())
           : dimage;
-  const auto estimate_res = (*measurements_transform) * estimate_image - uv_data.vis;
+  const auto estimate_res = (*measurements_transform * estimate_image).eval() - uv_data.vis;
   if (params.algorithm() == "padmm") {
     // Apply algorithm
     auto const diagnostic = (*padmm)(std::make_tuple(estimate_image.eval(), estimate_res.eval()));
 
     // Save the rest of the output
     image = Image<t_complex>::Map(diagnostic.x.data(), params.height(), params.width()).real();
-    const Vector<t_complex> residuals = measurements_transform->adjoint() * diagnostic.residual;
+    const Vector<t_complex> residuals =
+        measurements_transform->adjoint() * (diagnostic.residual / beam_units);
     residual_image =
         Image<t_complex>::Map(residuals.data(), params.height(), params.width()).real();
     purified_header.hasconverged = diagnostic.good;
@@ -505,7 +515,8 @@ int main(int argc, const char **argv) {
     // Save the rest of the output
     // the clean image
     image = Image<t_complex>::Map(diagnostic.x.data(), params.height(), params.width()).real();
-    const Vector<t_complex> residuals = measurements_transform->adjoint() * diagnostic.residual;
+    const Vector<t_complex> residuals =
+        measurements_transform->adjoint() * (diagnostic.residual / beam_units);
     residual_image =
         Image<t_complex>::Map(residuals.data(), params.height(), params.width()).real();
     purified_header.hasconverged = diagnostic.good;
@@ -518,7 +529,8 @@ int main(int argc, const char **argv) {
 
     // Save the rest of the output
     image = Image<t_complex>::Map(diagnostic.x.data(), params.height(), params.width()).real();
-    const Vector<t_complex> residuals = measurements_transform->adjoint() * diagnostic.residual;
+    const Vector<t_complex> residuals =
+        measurements_transform->adjoint() * (diagnostic.residual / beam_units);
     residual_image =
         Image<t_complex>::Map(residuals.data(), params.height(), params.width()).real();
     purified_header.hasconverged = diagnostic.good;
@@ -538,6 +550,7 @@ int main(int argc, const char **argv) {
   // the residuals
   pfitsio::header_params residuals_header = purified_header;
   residuals_header.fits_name = out_dir + "/residuals.fits";
+  residuals_header.pix_units = "Jy/Beam";
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
     auto const world = sopt::mpi::Communicator::World();
