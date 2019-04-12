@@ -610,12 +610,8 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d(
     const t_real &cell_x, const t_real &cell_y, const t_real &oversample_ratio = 2,
     const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
     const bool w_stacking = false) {
-  auto uv_vis = uv_vis_input;
-  if (uv_vis.units == utilities::vis_units::lambda)
-    uv_vis = utilities::set_cell_size(uv_vis, cell_x, cell_y);
-  if (uv_vis.units == utilities::vis_units::radians)
-    uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
-                                 std::floor(oversample_ratio * imsizey));
+  const auto uv_vis = utilities::convert_to_pixels(uv_vis_input, cell_x, cell_y, imsizex, imsizey,
+                                                   oversample_ratio);
   return init_degrid_operator_2d<T>(uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex,
                                     oversample_ratio, kernel, Ju, Jv, w_stacking, cell_x, cell_y);
 }
@@ -648,12 +644,8 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d(
     const t_uint &imsizey, const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
     const t_real &oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
     const t_uint Ju = 4, const t_uint Jv = 4, const bool w_stacking = false) {
-  auto uv_vis = uv_vis_input;
-  if (uv_vis.units == utilities::vis_units::lambda)
-    uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
-  if (uv_vis.units == utilities::vis_units::radians)
-    uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
-                                 std::floor(oversample_ratio * imsizey));
+  const auto uv_vis = utilities::convert_to_pixels(uv_vis_input, cell_x, cell_y, imsizex, imsizey,
+                                                   oversample_ratio);
   return init_degrid_operator_2d<T>(comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey,
                                     imsizex, oversample_ratio, kernel, Ju, Jv, w_stacking, cell_x,
                                     cell_y);
@@ -688,13 +680,8 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d_mpi(
     const t_uint &imsizey, const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
     const t_real oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
     const t_uint Ju = 4, const t_uint Jv = 4, const bool w_stacking = false) {
-  auto uv_vis = uv_vis_input;
-  if (uv_vis.units == utilities::vis_units::lambda)
-    uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
-  if (uv_vis.units == utilities::vis_units::radians)
-    uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
-                                 std::floor(oversample_ratio * imsizey));
-
+  const auto uv_vis = utilities::convert_to_pixels(uv_vis_input, cell_x, cell_y, imsizex, imsizey,
+                                                   oversample_ratio);
   return init_degrid_operator_2d_mpi<T>(comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey,
                                         imsizex, oversample_ratio, kernel, Ju, Jv, w_stacking,
                                         cell_x, cell_y);
@@ -733,13 +720,8 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d_all_to_all(
     const t_uint imsizey, const t_uint imsizex, const t_real cell_x, const t_real cell_y,
     const t_real oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
     const t_uint Ju = 4, const t_uint Jv = 4, const bool w_stacking = false) {
-  auto uv_vis = uv_vis_input;
-  if (uv_vis.units == utilities::vis_units::lambda)
-    uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
-  if (uv_vis.units == utilities::vis_units::radians)
-    uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
-                                 std::floor(oversample_ratio * imsizey));
-
+  const auto uv_vis = utilities::convert_to_pixels(uv_vis_input, cell_x, cell_y, imsizex, imsizey,
+                                                   oversample_ratio);
   return init_degrid_operator_2d_all_to_all<T>(
       comm, image_index, w_stacks, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex,
       oversample_ratio, kernel, Ju, Jv, w_stacking, cell_x, cell_y);

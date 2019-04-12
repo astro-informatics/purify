@@ -25,6 +25,12 @@ t_real fov_cosine(t_real const cell, t_uint const imsize) {
          2 * std::sin(constant::pi / 180. * extra_theta / (60. * 60.) * 0.5);
 }
 
+t_real equivalent_miriad_cell_size(const t_real cell, const t_uint imsize,
+                                   const t_real oversample_ratio) {
+  const t_real du = pixel_to_lambda(cell, imsize, oversample_ratio);
+  return 60. * 60. * 180. / (static_cast<t_real>(imsize) * oversample_ratio * du * constant::pi);
+}
+
 Matrix<t_complex> generate_chirp(const t_real w_rate, const t_real cell_x, const t_real cell_y,
                                  const t_uint x_size, const t_uint y_size) {
   return generate_chirp([](t_real, t_real) { return 1.; }, w_rate, cell_x, cell_y, x_size, y_size);
@@ -71,8 +77,8 @@ Vector<t_complex> sample_density_weights(const Vector<t_real> &u, const Vector<t
 Vector<t_complex> sample_density_weights(const Vector<t_real> &u, const Vector<t_real> &v,
                                          const t_real cellx, const t_real celly,
                                          const t_uint imsizex, const t_uint imsizey,
-                                         const t_real oversample_ratio,
-                                         const t_real scale, const sopt::mpi::Communicator &comm) {
+                                         const t_real oversample_ratio, const t_real scale,
+                                         const sopt::mpi::Communicator &comm) {
   Vector<t_complex> weights = Vector<t_complex>::Zero(u.size());
   const t_int ftsizeu = std::floor(oversample_ratio * imsizex);
   const t_int ftsizev = std::floor(oversample_ratio * imsizex);

@@ -276,6 +276,25 @@ utilities::vis_params uv_scale(const utilities::vis_params &uv_vis, const t_int 
   scaled_vis.average_frequency = uv_vis.average_frequency;
   return scaled_vis;
 }
+utilities::vis_params convert_to_pixels(const utilities::vis_params &uv_vis, const t_real cell_x,
+                                        const t_real cell_y, const t_real imsizex,
+                                        const t_real imsizey, const t_real oversample_ratio) {
+  t_real du = 1;
+  t_real dv = 1;
+  if (uv_vis.units == utilities::vis_units::lambda) {
+    du = widefield::pixel_to_lambda(cell_x, imsizex, oversample_ratio);
+    dv = widefield::pixel_to_lambda(cell_y, imsizey, oversample_ratio);
+  }
+  if (uv_vis.units == utilities::vis_units::radians) {
+    du = constant::pi / std::floor(imsizex * oversample_ratio);
+    dv = constant::pi / std::floor(imsizey * oversample_ratio);
+  }
+  auto out = uv_vis;
+  out.u = uv_vis.u / du;
+  out.v = uv_vis.v / dv;
+  out.units = utilities::vis_units::pixels;
+  return out;
+}
 
 utilities::vis_params conjugate_w(const utilities::vis_params &uv_vis) {
   utilities::vis_params output = uv_vis;
@@ -442,7 +461,7 @@ bool file_exists(const std::string &name) {
   return (stat(name.c_str(), &buffer) == 0);
 }
 
-Vector<t_real> fit_fwhm(const Image<t_real> &psf, const t_int &size) {
+std::tuple<t_real, t_real, t_real> fit_fwhm(const Image<t_real> &psf, const t_int &size) {
   /*
           Find FWHM of point spread function, using least squares.
 
@@ -452,8 +471,8 @@ Vector<t_real> fit_fwhm(const Image<t_real> &psf, const t_int &size) {
           3 pixels across the beam.
   */
 
-  auto x0 = std::floor(psf.cols() * 0.5);
-  auto y0 = std::floor(psf.rows() * 0.5);
+  t_int x0 = std::floor(psf.cols() * 0.5);
+  t_int y0 = std::floor(psf.rows() * 0.5);
 
   // finding patch
   Image<t_real> patch =
@@ -463,7 +482,7 @@ Vector<t_real> fit_fwhm(const Image<t_real> &psf, const t_int &size) {
   // finding values for least squares
 
   std::vector<t_tripletList> entries;
-  auto total_entries = 0;
+  t_int total_entries = 0;
 
   for (t_int i = 0; i < patch.cols(); ++i) {
     for (t_int j = 0; j < patch.rows(); ++j) {
@@ -506,12 +525,12 @@ Vector<t_real> fit_fwhm(const Image<t_real> &psf, const t_int &size) {
   t_real const sigma_x = std::sqrt(1 / (2 * t));
   t_real const sigma_y = std::sqrt(1 / (2 * s));
 
-  Vector<t_real> fit_parameters = Vector<t_real>::Zero(3);
+  std::tuple<t_real, t_real, t_real> fit_parameters;
 
   // fit for the beam rms, used for FWHM
-  fit_parameters(0) = sigma_x;
-  fit_parameters(1) = sigma_y;
-  fit_parameters(2) = theta;  // because 2*theta is periodic with pi.
+  std::get<0>(fit_parameters) = sigma_x;
+  std::get<1>(fit_parameters) = sigma_y;
+  std::get<2>(fit_parameters) = theta;  // because 2*theta is periodic with pi.
   return fit_parameters;
 }
 
