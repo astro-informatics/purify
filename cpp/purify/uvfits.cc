@@ -47,13 +47,14 @@ utilities::vis_params read_uvfits(const std::string &vis_name2, const utilities:
 }
 
 utilities::vis_params read_uvfits(const std::string &filename, const bool flag, const stokes pol) {
-  utilities::vis_params uv_data;
   fitsfile *fptr;
   int status = 0;
   int hdupos;
   int baselines;
   int naxes;
   int pcount;
+  t_real ra = 0;
+  t_real dec = 0;
   std::shared_ptr<char> comment =
       std::shared_ptr<char>(new char[FLEN_CARD], [](char *ptr) { delete[] ptr; });
   PURIFY_MEDIUM_LOG("Reading uvfits {}", filename);
@@ -65,8 +66,8 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
   if (hdutype != IMAGE_HDU)
     throw std::runtime_error("HDU 1 not expected type " + std::to_string(hdutype));
 
-  fits_read_key(fptr, TDOUBLE, "CRVAL5", &uv_data.ra, comment.get(), &status);
-  fits_read_key(fptr, TDOUBLE, "CRVAL6", &uv_data.dec, comment.get(), &status);
+  fits_read_key(fptr, TDOUBLE, "CRVAL5", &ra, comment.get(), &status);
+  fits_read_key(fptr, TDOUBLE, "CRVAL6", &dec, comment.get(), &status);
   fits_read_key(fptr, TINT, "GCOUNT", &baselines, comment.get(), &status);
   fits_read_key(fptr, TINT, "NAXIS", &naxes, comment.get(), &status);
   fits_read_key(fptr, TINT, "PCOUNT", &pcount, comment.get(), &status);
@@ -87,6 +88,7 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
   const t_uint pols = naxis.at(2);
   const t_uint ifs = naxis.at(4);
   const t_uint pointings_num = naxis.at(5);
+  PURIFY_LOW_LOG("RA: {} deg, Dec.: {} deg", ra, dec);
   PURIFY_MEDIUM_LOG("Pointings: {}", pointings_num);
   PURIFY_MEDIUM_LOG("IFs: {}", ifs);
   PURIFY_MEDIUM_LOG("Baselines: {}", baselines);
@@ -152,7 +154,7 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
     fits_report_error(stderr, status);
     throw std::runtime_error("Error reading fits file...");
   }
-  return read_polarisation_with_flagging(
+  auto uv_data = read_polarisation_with_flagging(
       data, coords, frequencies, pol_index1, pol_index2, pols, baselines, channels,
       stokes_transform,
       [flag](const t_complex vis1, const t_complex weight1, const t_complex vis2,
@@ -165,6 +167,9 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
         else
           return true;
       });
+  uv_data.ra = ra;
+  uv_data.dec = dec;
+  return uv_data;
 }
 
 utilities::vis_params filter_and_combine(
