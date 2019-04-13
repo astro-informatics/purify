@@ -39,7 +39,7 @@ TEST_CASE("Serial vs Distributed Operator") {
   const auto op_serial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample),
-      100, 1e-4, Vector<t_complex>::Random(width * height)));
+      100, 1e-4, Vector<t_complex>::Ones(width * height)));
   CAPTURE(world.size());
 
   for (auto method : {factory::distributed_measurement_operator::mpi_distribute_image,
@@ -191,7 +191,7 @@ TEST_CASE("GPU Serial vs Distributed Operator") {
   const auto op_serial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample),
-      100, 1e-4, Vector<t_complex>::Random(width * height)));
+      100, 1e-4, Vector<t_complex>::Ones(width * height)));
   CAPTURE(world.size());
 
   for (auto method : {factory::distributed_measurement_operator::gpu_mpi_distribute_image,
