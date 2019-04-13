@@ -41,15 +41,17 @@ TEST_CASE("Serial vs Distributed Operator") {
   auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
+  const Vector<t_complex> power_init =
+      world.broadcast(Vector<t_complex>::Random(height * width).eval());
   const auto op_serial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample),
-      100, 1e-4, Vector<t_complex>::Random(height * width)));
+      100, 1e-4, power_init));
 
   const auto op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           world, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample),
-      100, 1e-4, world.broadcast(Vector<t_complex>::Random(height * width).eval())));
+      100, 1e-4, power_init));
 
   if (uv_serial.u.size() == uv_mpi.u.size()) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
@@ -105,15 +107,17 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator") {
   auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
+  const Vector<t_complex> power_init =
+      world.broadcast(Vector<t_complex>::Random(height * width).eval());
   const auto op_serial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample),
-      100, 1e-4, Vector<t_complex>::Random(height * width)));
+      100, 1e-4, power_init));
 
   const auto op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
           world, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample),
-      100, 1e-4, world.broadcast(Vector<t_complex>::Random(height * width).eval())));
+      100, 1e-4, power_init));
 
   if (uv_serial.u.size() == uv_mpi.u.size()) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
@@ -172,14 +176,16 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator weighted") {
   auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
+  const Vector<t_complex> power_init =
+      world.broadcast(Vector<t_complex>::Random(height * width).eval());
   const auto op_serial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample),
-      100, 1e-4, Vector<t_complex>::Random(height * width)));
+      100, 1e-4, power_init));
   const auto op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
           world, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample),
-      100, 1e-4, world.broadcast(Vector<t_complex>::Random(height * width).eval())));
+      100, 1e-4, power_init));
 
   if (world.size() == 1) {
     REQUIRE(uv_serial.u.isApprox(uv_mpi.u));
