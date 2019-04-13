@@ -25,7 +25,7 @@ utilities::vis_params read_uvfits(const std::string &vis_name2, const utilities:
 //! Remove visibilities with zero weighting
 utilities::vis_params filter_and_combine(
     const utilities::vis_params &input, const utilities::vis_params &input2,
-    const Vector<t_complex> stokes_transform,
+    const Vector<t_complex> & stokes_transform,
     const std::function<bool(t_real, t_real, t_real, t_complex, t_complex, t_real, t_real, t_real,
                              t_complex, t_complex)> &filter =
         [](const t_real, const t_real, const t_real, const t_complex vis1, const t_complex weight1,
@@ -36,6 +36,12 @@ utilities::vis_params filter_and_combine(
                  (!std::isnan(vis1.real()) and !std::isnan(vis1.imag())) and
                  (!std::isnan(vis2.real()) and !std::isnan(vis2.imag()));
         });
+//! read polarisation with flaggging
+utilities::vis_params read_polarisation_with_flagging(
+    const Vector<t_real> &data, const Matrix<t_real> &coords, const Vector<t_real> &frequencies,
+    const t_uint pol_index1, const t_uint pol_index2, const t_uint pols, const t_uint baselines,
+    const t_uint channels, const Vector<t_complex> stokes_transform,
+    const std::function<bool(t_complex, t_complex, t_complex, t_complex)> &filter);
 //! Read uvfits keys out
 void read_fits_keys(fitsfile *fptr, int *status);
 //! read frequencies for each channel

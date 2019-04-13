@@ -16,6 +16,7 @@ utilities::vis_params read_uvfits(const std::vector<std::string> &names, const b
   for (int i = 1; i < names.size(); i++) output = read_uvfits(names.at(i), output);
   return output;
 }
+
 utilities::vis_params read_uvfits(const std::string &vis_name2, const utilities::vis_params &uv1,
                                   const bool flag, const stokes pol) {
   utilities::vis_params uv;
@@ -44,6 +45,7 @@ utilities::vis_params read_uvfits(const std::string &vis_name2, const utilities:
   uv.weights.segment(uv1.size(), uv2.size()) = uv2.weights;
   return uv;
 }
+
 utilities::vis_params read_uvfits(const std::string &filename, const bool flag, const stokes pol) {
   utilities::vis_params uv_data;
   fitsfile *fptr;
@@ -145,24 +147,29 @@ utilities::vis_params read_uvfits(const std::string &filename, const bool flag, 
     stokes_transform(1) = 1. / 2;
     break;
   }
-  auto const uv_data1 =
-      read_polarisation(data, coords, frequencies, pol_index1, pols, baselines, channels);
-  auto const uv_data2 =
-      read_polarisation(data, coords, frequencies, pol_index2, pols, baselines, channels);
-  PURIFY_MEDIUM_LOG("All Data Read!");
   fits_close_file(fptr, &status);
   if (status) { /* print any error messages */
     fits_report_error(stderr, status);
     throw std::runtime_error("Error reading fits file...");
   }
-  return (flag) ? filter_and_combine(uv_data1, uv_data2, stokes_transform)
-                : filter_and_combine(uv_data1, uv_data2, stokes_transform,
-                                     [](t_real, t_real, t_real, t_complex, t_complex, t_real,
-                                        t_real, t_real, t_complex, t_complex) { return true; });
+  return read_polarisation_with_flagging(
+      data, coords, frequencies, pol_index1, pol_index2, pols, baselines, channels,
+      stokes_transform,
+      [flag](const t_complex vis1, const t_complex weight1, const t_complex vis2,
+             const t_complex weight2) {
+        if (flag)
+          return (weight1.real() > 0.) and (weight2.real() > 0.) and (std::abs(vis1) > 1e-20) and
+                 (std::abs(vis2) > 1e-20) and
+                 (!std::isnan(vis1.real()) and !std::isnan(vis1.imag())) and
+                 (!std::isnan(vis2.real()) and !std::isnan(vis2.imag()));
+        else
+          return true;
+      });
 }
+
 utilities::vis_params filter_and_combine(
     const utilities::vis_params &input, const utilities::vis_params &input2,
-    const Vector<t_complex> stokes_transform,
+    const Vector<t_complex> &stokes_transform,
     const std::function<bool(t_real, t_real, t_real, t_complex, t_complex, t_real, t_real, t_real,
                              t_complex, t_complex)> &filter) {
   t_uint size = 0;
@@ -209,6 +216,66 @@ utilities::vis_params filter_and_combine(
 
   return output;
 }
+
+utilities::vis_params read_polarisation_with_flagging(
+    const Vector<t_real> &data, const Matrix<t_real> &coords, const Vector<t_real> &frequencies,
+    const t_uint pol_index1, const t_uint pol_index2, const t_uint pols, const t_uint baselines,
+    const t_uint channels, const Vector<t_complex> stokes_transform,
+    const std::function<bool(t_complex, t_complex, t_complex, t_complex)> &filter) {
+  t_uint count = 0;
+  for (t_uint c = 0; c < channels; c++)
+    for (t_uint b = 0; b < baselines; b++) {
+      t_complex const weight1 =
+          read_weight_from_data(data, pol_index1, pols, c, channels, b, baselines);
+      t_complex const weight2 =
+          read_weight_from_data(data, pol_index2, pols, c, channels, b, baselines);
+      t_complex const vis1 = read_vis_from_data(data, pol_index1, pols, c, channels, b, baselines);
+      t_complex const vis2 = read_vis_from_data(data, pol_index2, pols, c, channels, b, baselines);
+      if (filter(vis1, weight1, vis2, weight2)) count++;
+    }
+  const t_uint stride = count;
+  utilities::vis_params uv_data;
+  uv_data.u = Vector<t_real>::Zero(stride);
+  uv_data.v = Vector<t_real>::Zero(stride);
+  uv_data.w = Vector<t_real>::Zero(stride);
+  uv_data.time = Vector<t_real>::Zero(stride);
+  uv_data.baseline = Vector<t_uint>::Zero(stride);
+  uv_data.vis = Vector<t_complex>::Zero(stride);
+  uv_data.weights = Vector<t_complex>::Zero(stride);
+  uv_data.average_frequency = frequencies.array().mean();
+  if (pol_index1 >= pols) throw std::runtime_error("Polarisation index out of bounds.");
+  if (pol_index2 >= pols) throw std::runtime_error("Polarisation index out of bounds.");
+  PURIFY_LOW_LOG("Applying flags: Keeping {} out of {} data points.", stride, channels * baselines);
+  // reading in data
+  count = 0;
+  for (t_uint c = 0; c < channels; c++)
+    for (t_uint b = 0; b < baselines; b++) {
+      t_complex const weight1 =
+          read_weight_from_data(data, pol_index1, pols, c, channels, b, baselines);
+      t_complex const weight2 =
+          read_weight_from_data(data, pol_index2, pols, c, channels, b, baselines);
+      t_complex const vis1 = read_vis_from_data(data, pol_index1, pols, c, channels, b, baselines);
+      t_complex const vis2 = read_vis_from_data(data, pol_index2, pols, c, channels, b, baselines);
+      // checking flags of both polarisations
+      if (filter(vis1, weight1, vis2, weight2)) {
+        uv_data.vis(count) = uv_data.vis(count) =
+            vis1 * stokes_transform(0) + vis2 * stokes_transform(1);
+        uv_data.weights(count) =
+            1. / std::sqrt(1. / weight1 * stokes_transform(0) + 1. / weight2 * stokes_transform(1));
+        uv_data.u(count) = coords(0, b) * frequencies(c);
+        uv_data.v(count) = -coords(1, b) * frequencies(c);
+        uv_data.w(count) = coords(2, b) * frequencies(c);
+        uv_data.baseline(count) = static_cast<t_uint>(coords(3, b));
+        uv_data.time(count) = coords(4, b);
+        count++;
+      }
+    }
+  assert(count == stride);
+  uv_data.frequencies = frequencies;
+  uv_data.units = utilities::vis_units::lambda;
+  PURIFY_MEDIUM_LOG("All Data Read!");
+  return uv_data;
+}
 utilities::vis_params read_polarisation(const Vector<t_real> &data, const Matrix<t_real> &coords,
                                         const Vector<t_real> &frequencies, const t_uint pol_index1,
                                         const t_uint pols, const t_uint baselines,
@@ -244,11 +311,13 @@ utilities::vis_params read_polarisation(const Vector<t_real> &data, const Matrix
   uv_data.units = utilities::vis_units::lambda;
   return uv_data;
 }
+
 Vector<t_real> read_uvfits_freq(fitsfile *fptr, int *status, const int &col) {
   Vector<t_real> output;
   read_uvfits_freq(fptr, status, output, col);
   return output;
 }
+
 void read_uvfits_freq(fitsfile *fptr, int *status, Vector<t_real> &output, const int &col) {
   t_real cfreq;
   t_real dfreq;
@@ -268,12 +337,14 @@ void read_uvfits_freq(fitsfile *fptr, int *status, Vector<t_real> &output, const
   output = Vector<t_real>::Zero(nfreq);
   for (int i = 0; i < output.size(); i++) output(i) = (i - nfreq * 0.5) * dfreq + cfreq;
 }
+
 Vector<t_real> read_uvfits_data(fitsfile *fptr, int *status, const std::vector<int> &naxis,
                                 const int &baselines) {
   Vector<t_real> output;
   read_uvfits_data(fptr, status, naxis, baselines, output);
   return output;
 }
+
 void read_uvfits_data(fitsfile *fptr, int *status, const std::vector<int> &naxis,
                       const int &baselines, Vector<t_real> &output) {
   long nelements = 1;
@@ -287,29 +358,34 @@ void read_uvfits_data(fitsfile *fptr, int *status, const std::vector<int> &naxis
   fits_read_col(fptr, TDOUBLE, 2, 1, 1, static_cast<long>(output.size()), &nulval, output.data(),
                 &anynul, status);
 }
+
 Matrix<t_real> read_uvfits_coords(fitsfile *fptr, int *status, const int &groups,
                                   const int &pcount) {
   Matrix<t_real> output;
   read_uvfits_coords(fptr, status, pcount, groups, output);
   return output;
 }
+
 t_real read_value_from_data(const Vector<t_real> &data, const t_uint col, const t_uint pol,
                             const t_uint pols, const t_uint chan, const t_uint chans,
                             const t_uint baseline, const t_uint baselines) {
   const t_uint index = col + 3 * (pol + pols * (chan + chans * baseline));
   return data(index);
 }
+
 t_complex read_vis_from_data(const Vector<t_real> &data, const t_uint pol, const t_uint pols,
                              const t_uint chan, const t_uint chans, const t_uint baseline,
                              const t_uint baselines) {
   return t_complex(read_value_from_data(data, 0, pol, pols, chan, chans, baseline, baselines),
                    read_value_from_data(data, 1, pol, pols, chan, chans, baseline, baselines));
 }
+
 t_complex read_weight_from_data(const Vector<t_real> &data, const t_uint pol, const t_uint pols,
                                 const t_uint chan, const t_uint chans, const t_uint baseline,
                                 const t_uint baselines) {
   return t_complex(read_value_from_data(data, 2, pol, pols, chan, chans, baseline, baselines), 0);
 }
+
 void read_uvfits_coords(fitsfile *fptr, int *status, const int &pcount, const int &groups,
                         Matrix<t_real> &output) {
   output = Matrix<t_real>::Zero(pcount, groups);
@@ -320,6 +396,7 @@ void read_uvfits_coords(fitsfile *fptr, int *status, const int &pcount, const in
     fits_read_col(fptr, TDOUBLE, 1, 1 + i, 1, pcount, &nulval, output.col(i).data(), &anynul,
                   status);
 }
+
 void read_fits_keys(fitsfile *fptr, int *status) {
   std::shared_ptr<char> card =
       std::shared_ptr<char>(new char[FLEN_CARD], [](char *ptr) { delete[] ptr; });
