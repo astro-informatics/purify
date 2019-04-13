@@ -249,7 +249,11 @@ int main(int argc, const char **argv) {
       "Using cell size {}\" x {}\", recommended from the uv coverage and field of view is "
       "{}\"x{}\".",
       params.cellsizey(), params.cellsizex(), ideal_cell_y, ideal_cell_x);
-
+  PURIFY_HIGH_LOG("The equivalent miriad cell size is: {}\" x {}\"",
+                  widefield::equivalent_miriad_cell_size(params.cellsizex(), params.width(),
+                                                         params.oversampling()),
+                  widefield::equivalent_miriad_cell_size(params.cellsizey(), params.height(),
+                                                         params.oversampling()));
   // create measurement operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measurements_transform;
   if (mop_algo != factory::distributed_measurement_operator::mpi_distribute_all_to_all and
@@ -369,7 +373,7 @@ int main(int argc, const char **argv) {
     auto const world = sopt::mpi::Communicator::World();
     beam_units = world.all_sum_all(uv_data.size()) / flux_scale / flux_scale;
     PURIFY_LOW_LOG("Expected image domain residual RMS is {} jy/beam",
-                   params.measurements_sigma() * params.epsilonScaling() *
+                   sigma * params.epsilonScaling() *
                        std::sqrt(2 * params.oversampling() * params.oversampling() /
                                  world.all_sum_all(uv_data.size())) *
                        operator_norm);
@@ -382,7 +386,7 @@ int main(int argc, const char **argv) {
     beam_units = uv_data.size() / flux_scale / flux_scale;
     PURIFY_LOW_LOG(
         "Expected image domain residual RMS is {} jy/beam",
-        params.measurements_sigma() * params.epsilonScaling() *
+        sigma * params.epsilonScaling() *
             std::sqrt(2 * params.oversampling() * params.oversampling() / uv_data.size()) *
             operator_norm);
     pfitsio::write2d(psf_image, psf_header, true);
@@ -390,6 +394,7 @@ int main(int argc, const char **argv) {
   PURIFY_HIGH_LOG(
       "Theoretical calculation for peak PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)",
       beam_units);
+  PURIFY_HIGH_LOG("Effective sigma is {} Jy", sigma * params.epsilonScaling());
   // the dirty image
   pfitsio::header_params dirty_header = def_header;
   dirty_header.fits_name = out_dir + "/dirty.fits";
