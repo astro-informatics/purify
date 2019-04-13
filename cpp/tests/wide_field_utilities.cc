@@ -35,6 +35,9 @@ TEST_CASE("uvw units") {
     CAPTURE(1. / scale);
     CAPTURE(uv_pixels.u.transpose());
     CHECK(uv_lambda.u.isApprox(uv_pixels.u * scale, 1e-6));
+    CHECK(
+        1. ==
+        Approx(widefield::equivalent_miriad_cell_size(1., imsizex, oversample_ratio)).margin(1e-4));
   }
   SECTION("arcsec") {
     const t_real cell = 3;
@@ -53,6 +56,28 @@ TEST_CASE("uvw units") {
     CAPTURE(1. / scale);
     CAPTURE(uv_pixels.u.transpose());
     CHECK(uv_lambda.u.isApprox(uv_pixels.u * scale, 1e-6));
+    CHECK(3. == Approx(widefield::equivalent_miriad_cell_size(cell, imsizex, oversample_ratio))
+                    .margin(1e-4));
+  }
+}
+
+TEST_CASE("test cell size conversion") {
+  const t_real oversample_ratio = 2;
+  const t_int imsize = 8192;
+  for (t_real FoV : {0.1, 0.2, 0.3, 0.4, 0.5, 1., 5., 10., 15., 20., 25., 30., 40., 50., 60., 70.,
+                     80., 90., 120.}) {
+    const t_real cell = FoV / imsize * 60 * 60;
+    const t_real miriad_cell =
+        widefield::equivalent_miriad_cell_size(cell, imsize, oversample_ratio);
+    CAPTURE(cell);
+    CAPTURE(miriad_cell);
+    CAPTURE(FoV);
+    CAPTURE(miriad_cell * imsize / 60. / 60.);
+    CAPTURE((1 - miriad_cell * imsize / 60. / 60. / FoV) * FoV);
+    if (FoV < 0.5)
+      CHECK(cell == Approx(miriad_cell).margin(1e-12));
+    else
+      CHECK(cell > miriad_cell);
   }
 }
 
