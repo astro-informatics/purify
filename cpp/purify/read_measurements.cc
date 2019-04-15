@@ -31,18 +31,18 @@ utilities::vis_params read_measurements(const std::vector<std::string> &names, c
       format format_check = format::uvfits;
       // checking if reading measurement set or .vis file
       std::size_t found = names.at(i).find_last_of(".");
-      std::string format = "." + names.at(i).substr(found + 1);
-      std::transform(format.begin(), format.end(), format.begin(), ::tolower);
-      if (format == ".ms") {
+      std::string format_string = "." + names.at(i).substr(found + 1);
+      std::transform(format_string.begin(), format_string.end(), format_string.begin(), ::tolower);
+      if (format_string == ".ms") {
         format_check = format::ms;
         if (not dir_exists(file_path.native()))
           throw std::runtime_error(names.at(i) +
                                    " is not a directory, as expected for a measurement set.");
-      } else if (format == ".vis") {
+      } else if (format_string == ".vis") {
         format_check = format::vis;
         if (not file_exists(file_path.native()))
           throw std::runtime_error(names.at(i) + " is not a regular file.");
-      } else if (format == ".uvfits") {
+      } else if (format_string == ".uvfits") {
         format_check = format::uvfits;
         if (not file_exists(file_path.native()))
           throw std::runtime_error(names.at(i) + " is not a regular file.");

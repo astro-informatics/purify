@@ -149,8 +149,8 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   auto const epsilon = world.broadcast(utilities::calculate_l2_radius(uv_data.vis.size(), sigma));
   auto const purify_gamma =
       world.is_root()
-          ? world.broadcast((Psi.adjoint() * (Phi.adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() *
-                            1e-3)
+          ? world.broadcast(
+                (Psi.adjoint() * (Phi.adjoint() * uv_data.vis).eval()).cwiseAbs().maxCoeff() * 1e-3)
           : world.broadcast<t_real>();
   PURIFY_HIGH_LOG("Starting sopt!");
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
