@@ -15,6 +15,7 @@
 
 #include <sopt/imaging_forward_backward.h>
 #include <sopt/imaging_padmm.h>
+#include <sopt/imaging_primal_dual.h>
 #include <sopt/joint_map.h>
 #include <sopt/relative_variation.h>
 #include <sopt/utilities.h>
@@ -75,9 +76,10 @@ padmm_factory(const algo_distribution dist,
   switch (dist) {
   case (algo_distribution::serial): {
     padmm
-        ->gamma(
-            (wavelets->adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() *
-            1e-3)
+        ->gamma((wavelets->adjoint() * (measurements->adjoint() * uv_data.vis).eval())
+                    .cwiseAbs()
+                    .maxCoeff() *
+                1e-3)
         .l2ball_proximal_epsilon(epsilon)
         .residual_tolerance(epsilon);
     return padmm;
@@ -178,6 +180,85 @@ fb_factory(const algo_distribution dist,
         "with MPI.");
   }
   return fb;
+}
+
+//! return shared pointer to primal dual object
+template <class Algorithm>
+typename std::enable_if<
+    std::is_same<Algorithm, sopt::algorithm::ImagingPrimalDual<t_complex>>::value,
+    std::shared_ptr<Algorithm>>::type
+primaldual_factory(
+    const algo_distribution dist,
+    std::shared_ptr<sopt::LinearTransform<Vector<typename Algorithm::Scalar>> const> const
+        &measurements,
+    std::shared_ptr<sopt::LinearTransform<Vector<typename Algorithm::Scalar>> const> const
+        &wavelets,
+    const utilities::vis_params &uv_data, const t_real sigma, const t_uint imsizey,
+    const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations = 500,
+    const bool real_constraint = true, const bool positive_constraint = true,
+    const t_real relative_variation = 1e-3) {
+  typedef typename Algorithm::Scalar t_scalar;
+  auto epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
+  auto primaldual = std::make_shared<Algorithm>(uv_data.vis);
+  primaldual->itermax(max_iterations)
+      .relative_variation(relative_variation)
+      .real_constraint(real_constraint)
+      .positivity_constraint(positive_constraint)
+      .Psi(*wavelets)
+      .Phi(*measurements);
+#ifdef PURIFY_MPI
+  ConvergenceType obj_conv = ConvergenceType::mpi_global;
+  ConvergenceType rel_conv = ConvergenceType::mpi_global;
+#endif
+  switch (dist) {
+  case (algo_distribution::serial): {
+    primaldual
+        ->gamma(
+            (wavelets->adjoint() * (measurements->adjoint() * uv_data.vis)).cwiseAbs().maxCoeff() *
+            1e-3)
+        .l2ball_proximal_epsilon(epsilon)
+        .residual_tolerance(epsilon);
+    return primaldual;
+  }
+#ifdef PURIFY_MPI
+  case (algo_distribution::mpi_serial): {
+    obj_conv = ConvergenceType::mpi_global;
+    rel_conv = ConvergenceType::mpi_global;
+    auto const comm = sopt::mpi::Communicator::World();
+    epsilon =
+        utilities::calculate_l2_radius(comm.all_sum_all(uv_data.vis.size()), comm.broadcast(sigma));
+    // communicator ensuring l2 norm in l2ball proximal is global
+    primaldual->l2ball_proximal_communicator(comm);
+    break;
+  }
+  case (algo_distribution::mpi_distributed): {
+    obj_conv = ConvergenceType::mpi_local;
+    rel_conv = ConvergenceType::mpi_local;
+    break;
+  }
+#endif
+  default:
+    throw std::runtime_error(
+        "Type of distributed primal dual algorithm not recognised. You might not have compiled "
+        "with MPI.");
+  }
+#ifdef PURIFY_MPI
+  auto const comm = sopt::mpi::Communicator::World();
+  std::weak_ptr<Algorithm> const primaldual_weak(primaldual);
+  // set epsilon
+  primaldual->residual_tolerance(epsilon).l2ball_proximal_epsilon(epsilon);
+  // set gamma
+  primaldual->gamma(comm.all_reduce(
+      utilities::step_size(uv_data.vis, measurements, wavelets, sara_size) * 1e-3, MPI_MAX));
+  // communicator ensuring l1 norm in l1 proximal is global
+  primaldual->residual_convergence(
+      purify::factory::l2_convergence_factory<typename Algorithm::Scalar>(rel_conv,
+                                                                          primaldual_weak));
+  primaldual->objective_convergence(
+      purify::factory::l1_convergence_factory<typename Algorithm::Scalar>(obj_conv,
+                                                                          primaldual_weak));
+#endif
+  return primaldual;
 }
 
 template <class Algorithm, class... ARGS>

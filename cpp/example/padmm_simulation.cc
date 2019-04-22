@@ -98,7 +98,8 @@ int main(int nargs, char const **args) {
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
   auto const purify_gamma =
-      (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis)).real().maxCoeff() * 1e-3;
+      (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis).eval()).real().maxCoeff() *
+      1e-3;
   t_int iters = 0;
   auto convergence_function = [&iters](const Vector<t_complex> &x) {
     iters = iters + 1;

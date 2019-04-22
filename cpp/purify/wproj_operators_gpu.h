@@ -112,12 +112,8 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2
     const kernels::kernel kernel, const t_uint Ju, const t_uint Jw, const bool w_stacking,
     const t_real absolute_error, const t_real relative_error, const dde_type dde,
     const t_uint idx = 0) {
-  auto uv_vis = uv_vis_input;
-  if (uv_vis.units == utilities::vis_units::lambda)
-    uv_vis = utilities::set_cell_size(uv_vis, cell_x, cell_y);
-  if (uv_vis.units == utilities::vis_units::radians)
-    uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
-                                 std::floor(oversample_ratio * imsizey));
+  const auto uv_vis = utilities::convert_to_pixels(uv_vis_input, cell_x, cell_y, imsizex, imsizey,
+                                                   oversample_ratio);
   return init_degrid_operator_2d(uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex,
                                  oversample_ratio, kernel, Ju, Jw, w_stacking, cell_x, cell_y,
                                  absolute_error, relative_error, dde, idx);
@@ -149,12 +145,8 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2
     const t_real oversample_ratio, const kernels::kernel kernel, const t_uint Ju, const t_uint Jw,
     const bool w_stacking, const t_real absolute_error, const t_real relative_error,
     const dde_type dde, const t_uint idx = 0) {
-  auto uv_vis = uv_vis_input;
-  if (uv_vis.units == utilities::vis_units::lambda)
-    uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
-  if (uv_vis.units == utilities::vis_units::radians)
-    uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
-                                 std::floor(oversample_ratio * imsizey));
+  const auto uv_vis = utilities::convert_to_pixels(uv_vis_input, cell_x, cell_y, imsizex, imsizey,
+                                                   oversample_ratio);
   return init_degrid_operator_2d(comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey,
                                  imsizex, oversample_ratio, kernel, Ju, Jw, w_stacking, cell_x,
                                  cell_y, absolute_error, relative_error, dde, idx);
@@ -179,12 +171,8 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2
     const t_real oversample_ratio, const kernels::kernel kernel, const t_uint Ju, const t_uint Jw,
     const bool w_stacking, const t_real absolute_error, const t_real relative_error,
     const dde_type dde, const t_uint idx = 0) {
-  auto uv_vis = uv_vis_input;
-  if (uv_vis.units == utilities::vis_units::lambda)
-    uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
-  if (uv_vis.units == utilities::vis_units::radians)
-    uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
-                                 std::floor(oversample_ratio * imsizey));
+  const auto uv_vis = utilities::convert_to_pixels(uv_vis_input, cell_x, cell_y, imsizex, imsizey,
+                                                   oversample_ratio);
   return init_degrid_operator_2d(comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey,
                                  imsizex, oversample_ratio, kernel, Ju, Jw, w_stacking, cell_x,
                                  cell_y, absolute_error, relative_error, dde, idx);

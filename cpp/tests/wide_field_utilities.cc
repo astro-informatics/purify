@@ -35,6 +35,9 @@ TEST_CASE("uvw units") {
     CAPTURE(1. / scale);
     CAPTURE(uv_pixels.u.transpose());
     CHECK(uv_lambda.u.isApprox(uv_pixels.u * scale, 1e-6));
+    CHECK(
+        1. ==
+        Approx(widefield::equivalent_miriad_cell_size(1., imsizex, oversample_ratio)).margin(1e-4));
   }
   SECTION("arcsec") {
     const t_real cell = 3;
@@ -53,6 +56,28 @@ TEST_CASE("uvw units") {
     CAPTURE(1. / scale);
     CAPTURE(uv_pixels.u.transpose());
     CHECK(uv_lambda.u.isApprox(uv_pixels.u * scale, 1e-6));
+    CHECK(3. == Approx(widefield::equivalent_miriad_cell_size(cell, imsizex, oversample_ratio))
+                    .margin(1e-4));
+  }
+}
+
+TEST_CASE("test cell size conversion") {
+  const t_real oversample_ratio = 2;
+  const t_int imsize = 8192;
+  for (t_real FoV : {0.1, 0.2, 0.3, 0.4, 0.5, 1., 5., 10., 15., 20., 25., 30., 40., 50., 60., 70.,
+                     80., 90., 120.}) {
+    const t_real cell = FoV / imsize * 60 * 60;
+    const t_real miriad_cell =
+        widefield::equivalent_miriad_cell_size(cell, imsize, oversample_ratio);
+    CAPTURE(cell);
+    CAPTURE(miriad_cell);
+    CAPTURE(FoV);
+    CAPTURE(miriad_cell * imsize / 60. / 60.);
+    CAPTURE((1 - miriad_cell * imsize / 60. / 60. / FoV) * FoV);
+    if (FoV < 0.5)
+      CHECK(cell == Approx(miriad_cell).margin(1e-12));
+    else
+      CHECK(cell > miriad_cell);
   }
 }
 
@@ -62,9 +87,25 @@ TEST_CASE("Calcuate DDE Image") {
   SECTION("w is zero") {
     const t_real w_rate = 0;
     const Image<t_complex> chirp_image =
-        widefield::generate_dde([](t_real, t_real) { return 1.; }, 1, 1, imsizex, imsizey);
+        widefield::generate_dde([](t_real, t_real) { return 1.; }, 1, 1, imsizex, imsizey, 0);
     REQUIRE(chirp_image.cols() == imsizex);
     REQUIRE(chirp_image.rows() == imsizey);
     REQUIRE(chirp_image.isApprox(Image<t_complex>::Constant(imsizey, imsizex, 1)));
   }
+}
+
+TEST_CASE("estimate_sample_density") {
+  const t_int imsizex = 1024;
+  const t_int imsizey = 1024;
+  const t_real cellx = 10;
+  const t_real celly = 10;
+  const t_real oversample_ratio = 2;
+  const t_int M = 6;
+  const Vector<t_real> u = Vector<t_real>::Random(M) * 1000;
+  const Vector<t_real> v = Vector<t_real>::Random(M) * 1000;
+
+  const Vector<t_complex> weights =
+      widefield::sample_density_weights(u, v, cellx, celly, imsizex, imsizey, oversample_ratio, 1);
+  REQUIRE(weights.size() == M);
+  CHECK(weights.isApprox(Vector<t_complex>::Ones(weights.size())));
 }

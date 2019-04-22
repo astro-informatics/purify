@@ -145,6 +145,7 @@ void YamlParser::parseAndSetGeneralConfiguration(const YAML::Node& generalConfig
         get<t_real>(generalConfigNode, {"InputOutput", "input", "simulation", "signal_to_noise"});
     this->number_of_measurements_ = get<t_int>(
         generalConfigNode, {"InputOutput", "input", "simulation", "number_of_measurements"});
+    this->sim_J_ = get<t_int>(generalConfigNode, {"InputOutput", "input", "simulation", "sim_J"});
     this->w_rms_ = get<t_real>(generalConfigNode, {"InputOutput", "input", "simulation", "w_rms"});
     this->measurements_ = get_vector<std::vector<std::string>>(
         generalConfigNode, {"InputOutput", "input", "simulation", "coverage_files"});
@@ -184,6 +185,8 @@ void YamlParser::parseAndSetMeasureOperators(const YAML::Node& measureOperatorsN
   this->gpu_ = get<bool>(measureOperatorsNode, {"gpu"});
   this->wprojection_ = get<bool>(measureOperatorsNode, {"wide-field", "wprojection"});
   this->mpi_wstacking_ = get<bool>(measureOperatorsNode, {"wide-field", "mpi_wstacking"});
+  this->mpi_all_to_all_ = get<bool>(measureOperatorsNode, {"wide-field", "mpi_all_to_all"});
+  this->all_to_all_fill_ = get<t_real>(measureOperatorsNode, {"wide-field", "all_to_all_fill"});
   this->kmeans_iters_ = get<t_int>(measureOperatorsNode, {"wide-field", "kmeans_iterations"});
   this->conjugate_w_ = get<bool>(measureOperatorsNode, {"wide-field", "conjugate_w"});
 }
@@ -192,7 +195,6 @@ void YamlParser::parseAndSetSARA(const YAML::Node& SARANode) {
   const std::string values_str = get<std::string>(SARANode, {"wavelet_dict"});
   this->wavelet_basis_ = this->getWavelets(values_str);
   this->wavelet_levels_ = get<t_int>(SARANode, {"wavelet_levels"});
-  this->dualFBVarianceConvergence_ = get<t_real>(SARANode, {"dualFBVarianceConvergence"});
   this->realValueConstraint_ = get<bool>(SARANode, {"realValueConstraint"});
   this->positiveValueConstraint_ = get<bool>(SARANode, {"positiveValueConstraint"});
 }
@@ -209,6 +211,8 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
     this->update_iters_ = get<t_int>(algorithmOptionsNode, {"padmm", "stepsize", "update_iters"});
     this->update_tolerance_ =
         get<t_real>(algorithmOptionsNode, {"padmm", "stepsize", "update_tolerance"});
+    this->dualFBVarianceConvergence_ =
+        get<t_real>(algorithmOptionsNode, {"padmm", "dualFBVarianceConvergence"});
   } else if (this->algorithm_ == "fb" or this->algorithm_ == "fb_joint_map") {
     this->mpiAlgorithm_ = factory::algo_distribution_string.at(
         get<std::string>(algorithmOptionsNode, {"fb", "mpiAlgorithm"}));
@@ -217,6 +221,8 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
     this->stepsize_ = get<t_real>(algorithmOptionsNode, {"fb", "stepsize"});
     this->regularisation_parameter_ =
         get<t_real>(algorithmOptionsNode, {"fb", "regularisation_parameter"});
+    this->dualFBVarianceConvergence_ =
+        get<t_real>(algorithmOptionsNode, {"fb", "dualFBVarianceConvergence"});
     if (this->algorithm_ == "fb_joint_map") {
       this->jmap_iters_ =
           get<t_uint>(algorithmOptionsNode, {"fb", "joint_map_estimation", "iters"});
@@ -228,6 +234,18 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
           get<t_real>(algorithmOptionsNode, {"fb", "joint_map_estimation", "alpha"});
       this->jmap_beta_ = get<t_real>(algorithmOptionsNode, {"fb", "joint_map_estimation", "beta"});
     }
+  } else if (this->algorithm_ == "primaldual") {
+    this->epsilonConvergenceScaling_ =
+        get<t_int>(algorithmOptionsNode, {"primaldual", "epsilonConvergenceScaling"});
+    this->mpiAlgorithm_ = factory::algo_distribution_string.at(
+        get<std::string>(algorithmOptionsNode, {"primaldual", "mpiAlgorithm"}));
+    this->relVarianceConvergence_ =
+        get<t_real>(algorithmOptionsNode, {"primaldual", "relVarianceConvergence"});
+    this->update_iters_ = get<t_int>(algorithmOptionsNode, {"primaldual", "stepsize", "update_iters"});
+    this->update_tolerance_ =
+        get<t_real>(algorithmOptionsNode, {"primaldual", "stepsize", "update_tolerance"});
+    this->precondition_iters_ =
+        get<t_int>(algorithmOptionsNode, {"primaldual", "precondition_iters"});
   } else {
     throw std::runtime_error(
         "Only padmm algorithm configured for now. Please fill the appropriate block in the "

@@ -14,158 +14,337 @@ using namespace purify::notinstalled;
 using namespace purify;
 
 TEST_CASE("regression_degrid") {
-  const std::string test_dir = "expected/measurement_operator/";
-  const std::vector<t_real> u = read_data<t_real>(notinstalled::data_filename(test_dir + "u"));
-  const std::vector<t_real> v = read_data<t_real>(notinstalled::data_filename(test_dir + "v"));
-  std::string const fitsfile = image_filename("M31.fits");
-  Image<t_complex> const M31 = pfitsio::read2d(fitsfile);
-  Vector<t_complex> const input = Vector<t_complex>::Map(M31.data(), M31.size());
+  const t_int imsizex = 256;
+  const t_int imsizey = 256;
+  Vector<t_real> u = Vector<t_real>::Random(10) * imsizex / 2;
+  Vector<t_real> v = Vector<t_real>::Random(10) * imsizey / 2;
+  Vector<t_complex> input = Vector<t_complex>::Zero(imsizex * imsizey);
+  input(static_cast<t_int>(imsizex * 0.5 + imsizey * 0.5 * imsizex)) = 1.;
   const t_uint M = u.size();
   const t_real oversample_ratio = 2;
-  const t_uint imsizex = M31.cols();
-  const t_uint imsizey = M31.rows();
-  const t_uint ftsizev = std::floor(imsizey * oversample_ratio);
-  const t_uint ftsizeu = std::floor(imsizex * oversample_ratio);
-  const t_uint Ju = 4;
-  const t_uint Jv = 4;
-  const t_uint power_iters = 1;
-  const t_real power_tol = 1e-9;
+  const t_int ftsizev = std::floor(imsizey * oversample_ratio);
+  const t_int ftsizeu = std::floor(imsizex * oversample_ratio);
+  const t_uint Ju = 8;
+  const t_uint Jv = 8;
+
+  const Vector<t_complex> y = Vector<t_complex>::Ones(u.size());
+  CAPTURE(u);
+  CAPTURE(v);
 
   SECTION("kb") {
     const kernels::kernel kernel = kernels::kernel::kb;
-    const std::vector<t_complex> y_exact =
-        read_data<t_complex>(notinstalled::data_filename(test_dir + "kb_exact_data"));
-    const auto measure_op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+    const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
         measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-            Vector<t_real>::Map(v.data(), v.size()), Vector<t_real>::Map(u.data(), u.size()),
-            Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M), imsizey, imsizex, oversample_ratio,
-            kernel, Ju, Jv),
-        power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
-    const Vector<t_complex> y_test = (*measure_op) * input;
-    const Vector<t_complex> y = Vector<t_complex>::Map(y_exact.data(), y_exact.size());
+            u, v, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M), imsizey, imsizex,
+            oversample_ratio, kernel, Ju, Jv);
+    const Vector<t_complex> y_test = *measure_op * input;
     CAPTURE(y_test.array() / y.array());
-    const t_real max_test = y_test.cwiseAbs().maxCoeff();
-    const t_real max_data = y.cwiseAbs().maxCoeff();
+    const t_real max_test = y_test.cwiseAbs().mean();
     CAPTURE(y_test / max_test);
-    CAPTURE(y / max_data);
-    CHECK((y_test / max_test).isApprox((y / max_data), 1e-6));
+    CAPTURE(y);
+    CHECK((y_test / max_test).isApprox((y), 1e-6));
   }
   SECTION("pswf") {
     const kernels::kernel kernel = kernels::kernel::pswf;
-    const std::vector<t_complex> y_exact =
-        read_data<t_complex>(notinstalled::data_filename(test_dir + "pswf_exact_data"));
-    const auto measure_op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-        measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-            Vector<t_real>::Map(v.data(), v.size()), Vector<t_real>::Map(u.data(), u.size()),
-            Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M), imsizey, imsizex, oversample_ratio,
-            kernel, 6, 6),
-        power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
-    const Vector<t_complex> y_test = (*measure_op) * input;
-    const Vector<t_complex> y = Vector<t_complex>::Map(y_exact.data(), y_exact.size());
+    const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+        u, v, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M), imsizey, imsizex,
+        oversample_ratio, kernel, 6, 6);
+    const Vector<t_complex> y_test = *measure_op * input;
     CAPTURE(y_test.array() / y.array());
-    const t_real max_test = y_test.cwiseAbs().maxCoeff();
-    const t_real max_data = y.cwiseAbs().maxCoeff();
+    const t_real max_test = y_test.cwiseAbs().mean();
     CAPTURE(y_test / max_test);
-    CAPTURE(y / max_data);
-    CHECK((y_test / max_test).isApprox((y / max_data), 1e-6));
+    CAPTURE(y);
+    CHECK((y_test / max_test).isApprox((y), 1e-3));
   }
   SECTION("gauss") {
     const kernels::kernel kernel = kernels::kernel::gauss;
-    std::vector<t_complex> y_exact =
-        read_data<t_complex>(notinstalled::data_filename(test_dir + "gauss_exact_data"));
-    const auto measure_op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-        measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-            Vector<t_real>::Map(v.data(), v.size()), Vector<t_real>::Map(u.data(), u.size()),
-            Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M), imsizey, imsizex, oversample_ratio,
-            kernel, 6, 6),
-        power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
-    const Vector<t_complex> y_test = (*measure_op) * input;
-    const Vector<t_complex> y = Vector<t_complex>::Map(y_exact.data(), y_exact.size());
+    const auto measure_op = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+        u, v, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M), imsizey, imsizex,
+        oversample_ratio, kernel, 10, 10);
+    const Vector<t_complex> y_test = *measure_op * input;
     CAPTURE(y_test.array() / y.array());
-    const t_real max_test = y_test.cwiseAbs().maxCoeff();
-    const t_real max_data = y.cwiseAbs().maxCoeff();
+    const t_real max_test = y_test.cwiseAbs().mean();
     CAPTURE(y_test / max_test);
-    CAPTURE(y / max_data);
-    CHECK((y_test / max_test).isApprox((y / max_data), 1e-6));
+    CAPTURE(y);
+    CHECK((y_test / max_test).isApprox((y), 1e-4));
   }
 }
 
-TEST_CASE("wprojection") {
-  std::string const fitsfile = image_filename("M31.fits");
-  Image<t_complex> const M31 = pfitsio::read2d(fitsfile);
-  Vector<t_complex> const input = Vector<t_complex>::Map(M31.data(), M31.size());
-  const Vector<t_complex> vis = Vector<t_complex>::Random(10);
-  const t_uint imsizex = M31.cols();
-  const t_uint imsizey = M31.rows();
-  const t_uint Jw = 30;
-  const t_real cell_x = 1;
-  const t_real cell_y = 1;
-  const t_uint power_iters = 1000;
-  const t_real power_tol = 1e-4;
-  const t_real abs_error = 1e-9;
-  const t_real rel_error = 1e-9;
-  const bool w_term = false;
-  const t_uint M = 10;
-  utilities::vis_params uv_data;
-  uv_data.u = Vector<t_real>::Random(M);
-  uv_data.v = Vector<t_real>::Random(M);
-  uv_data.w = Vector<t_real>::Zero(M);
-  uv_data.weights = Vector<t_complex>::Ones(M);
-  uv_data.vis = Vector<t_complex>::Ones(M);
-  SECTION("oversample 2") {
+TEST_CASE("flux units") {
+  const t_real oversample_ratio = 2;
+  Vector<t_real> u = Vector<t_real>::Random(10);
+  Vector<t_real> v = Vector<t_real>::Random(10);
+  const t_uint M = u.size();
+  const Vector<t_complex> y = Vector<t_complex>::Ones(u.size());
+  SECTION("kb") {
     const kernels::kernel kernel = kernels::kernel::kb;
-    const t_real oversample_ratio = 2;
-    const t_uint Ju = 4;
-    const t_uint Jv = 4;
-    auto mop = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-        measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-            uv_data, imsizey, imsizex, cell_x, cell_y, oversample_ratio, kernel, Ju, Jv, w_term),
-        power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
-    auto mop_wproj = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-        measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-            uv_data, imsizey, imsizex, cell_x, cell_y, oversample_ratio, kernel, Ju, Jw, w_term,
-            abs_error, rel_error, dde_type::wkernel_radial),
-        power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
-    REQUIRE((mop_wproj->adjoint() * vis).size() == imsizex * imsizey);
-    REQUIRE((mop->adjoint() * vis).size() == imsizex * imsizey);
-    REQUIRE((*mop * input).size() == M);
-    REQUIRE((*mop_wproj * input).size() == M);
-    const t_real op_norm = std::get<0>(sopt::algorithm::power_method<Vector<t_complex>>(
-        {[=](Vector<t_complex>& output, const Vector<t_complex>& inp) {
-           output = (*mop * inp).eval() - (*mop_wproj * inp).eval();
-         },
-         [=](Vector<t_complex>& output, const Vector<t_complex>& inp) {
-           output = (mop->adjoint() * inp).eval() - (mop_wproj->adjoint() * inp).eval();
-         }},
-        power_iters, power_tol, input));
-    REQUIRE(op_norm == Approx(0).margin(1e-3));
+    for (auto& J : {4, 5, 6, 7, 8}) {
+      for (auto& imsize : {128, 256, 512}) {
+        const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
+            measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+                u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
+                imsize, imsize, oversample_ratio, kernel, J, J);
+        Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
+        input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
+        const Vector<t_complex> y_test =
+            (*measure_op * input).eval() *
+            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+        CAPTURE(y_test.cwiseAbs().mean());
+        CAPTURE(y);
+        CAPTURE(y_test);
+        CAPTURE(J);
+        CAPTURE(imsize)
+        CHECK(y_test.isApprox(y, 1e-3));
+        const Vector<t_complex> psf =
+            (measure_op->adjoint() * y) *
+            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+              Approx(1.).margin(0.001));
+      }
+    }
   }
-  SECTION("oversample 1.375") {
-    const kernels::kernel kernel = kernels::kernel::kbmin;
-    const t_real oversample_ratio = 1.375;
-    const t_uint Ju = 5;
-    const t_uint Jv = 5;
-    auto mop = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-        measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-            uv_data, imsizey, imsizex, cell_x, cell_y, oversample_ratio, kernel, Ju, Jv, w_term),
-        power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
-    auto mop_wproj = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-        measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-            uv_data, imsizey, imsizex, cell_x, cell_y, oversample_ratio, kernel, Ju, Jw, w_term,
-            abs_error, rel_error, dde_type::wkernel_radial),
-        power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
-    REQUIRE((mop->adjoint() * vis).size() == imsizex * imsizey);
-    REQUIRE((mop_wproj->adjoint() * vis).size() == imsizex * imsizey);
-    REQUIRE((*mop * input).size() == M);
-    REQUIRE((*mop_wproj * input).size() == M);
-    const t_real op_norm = std::get<0>(sopt::algorithm::power_method<Vector<t_complex>>(
-        {[=](Vector<t_complex>& output, const Vector<t_complex>& inp) {
-           output = (*mop * inp).eval() - (*mop_wproj * inp).eval();
-         },
-         [=](Vector<t_complex>& output, const Vector<t_complex>& inp) {
-           output = (mop->adjoint() * inp).eval() - (mop_wproj->adjoint() * inp).eval();
-         }},
-        power_iters, power_tol, input));
-    REQUIRE(op_norm == Approx(0).margin(2e-3));
+  SECTION("pswf") {
+    const kernels::kernel kernel = kernels::kernel::pswf;
+    for (auto& J : {4, 5, 6, 7, 8}) {
+      for (auto& imsize : {128, 256, 512}) {
+        if (J != 6)
+          CHECK_THROWS(measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+              u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
+              imsize, imsize, oversample_ratio, kernel, J, J));
+        else {
+          const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
+              measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+                  u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M),
+                  Vector<t_complex>::Ones(M), imsize, imsize, oversample_ratio, kernel, J, J);
+          Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
+          input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
+          const Vector<t_complex> y_test =
+              (*measure_op * input).eval() *
+              std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+          CAPTURE(y_test.cwiseAbs().mean());
+          CAPTURE(y);
+          CAPTURE(y_test);
+          CAPTURE(J);
+          CAPTURE(imsize)
+          CHECK(y_test.isApprox(y, 1e-3));
+          const Vector<t_complex> psf =
+              (measure_op->adjoint() * y) *
+              std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+          CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+                Approx(1.).margin(0.001));
+        }
+      }
+    }
+  }
+  SECTION("gauss") {
+    const kernels::kernel kernel = kernels::kernel::gauss;
+    for (auto& J : {4, 5, 6, 7, 8}) {
+      for (auto& imsize : {128, 256, 512}) {
+        const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
+            measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+                u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
+                imsize, imsize, oversample_ratio, kernel, J, J);
+        Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
+        input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
+        const Vector<t_complex> y_test =
+            (*measure_op * input).eval() *
+            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+        CAPTURE(y_test.cwiseAbs().mean());
+        CAPTURE(y);
+        CAPTURE(y_test);
+        CAPTURE(J);
+        CAPTURE(imsize)
+        CHECK(y_test.isApprox(y, 1e-2));
+        const Vector<t_complex> psf =
+            (measure_op->adjoint() * y) *
+            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+              Approx(1.).margin(0.01));
+      }
+    }
+  }
+  SECTION("box") {
+    const kernels::kernel kernel = kernels::kernel::box;
+    for (auto& J : {4, 5, 6, 7, 8}) {
+      for (auto& imsize : {128, 256, 512}) {
+        const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
+            measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+                u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
+                imsize, imsize, oversample_ratio, kernel, J, J);
+        Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
+        input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
+        const Vector<t_complex> y_test =
+            (*measure_op * input).eval() *
+            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+        CAPTURE(y_test.cwiseAbs().mean());
+        CAPTURE(y);
+        CAPTURE(y_test);
+        CAPTURE(J);
+        CAPTURE(imsize)
+        CHECK(y_test.isApprox(y, 1e-3));
+        const Vector<t_complex> psf =
+            (measure_op->adjoint() * y) *
+            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+              Approx(1.).margin(0.001));
+      }
+    }
+  }
+  SECTION("wproj kb") {
+    const kernels::kernel kernel = kernels::kernel::kb;
+    for (auto& J : {4, 5, 6, 7, 8}) {
+      for (auto& imsize : {128, 256, 512}) {
+        const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
+            measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+                u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
+                imsize, imsize, oversample_ratio, kernel, J, J, false, 1e-6, 1e-6);
+        Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
+        input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
+        const Vector<t_complex> y_test =
+            (*measure_op * input).eval() *
+            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+        CAPTURE(y_test.cwiseAbs().mean());
+        CAPTURE(y);
+        CAPTURE(y_test);
+        CAPTURE(J);
+        CAPTURE(imsize)
+        CHECK(y_test.isApprox(y, 1e-3));
+        const Vector<t_complex> psf =
+            (measure_op->adjoint() * y) *
+            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+              Approx(1.).margin(0.001));
+      }
+    }
+  }
+  SECTION("wproj pswf") {
+    const kernels::kernel kernel = kernels::kernel::pswf;
+    for (auto& J : {4, 5, 6, 7, 8}) {
+      for (auto& imsize : {128, 256, 512}) {
+        if (J != 6)
+          CHECK_THROWS(measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+              u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
+              imsize, imsize, oversample_ratio, kernel, J, J, false, 1e-6, 1e-6));
+        else {
+          const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
+              measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+                  u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M),
+                  Vector<t_complex>::Ones(M), imsize, imsize, oversample_ratio, kernel, J, J, false,
+                  1e-6, 1e-6);
+          Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
+          input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
+          const Vector<t_complex> y_test =
+              (*measure_op * input).eval() *
+              std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+          CAPTURE(y_test.cwiseAbs().mean());
+          CAPTURE(y);
+          CAPTURE(y_test);
+          CAPTURE(J);
+          CAPTURE(imsize)
+          CHECK(y_test.isApprox(y, 1e-3));
+          const Vector<t_complex> psf =
+              (measure_op->adjoint() * y) *
+              std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+          CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+                Approx(1.).margin(0.001));
+        }
+      }
+    }
+  }
+  SECTION("wproj gauss") {
+    const kernels::kernel kernel = kernels::kernel::gauss;
+    for (auto& J : {4, 5, 6, 7, 8}) {
+      for (auto& imsize : {128, 256, 512}) {
+        const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
+            measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+                u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
+                imsize, imsize, oversample_ratio, kernel, J, J, false, 1e-6, 1e-6);
+        Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
+        input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
+        const Vector<t_complex> y_test =
+            (*measure_op * input).eval() *
+            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+        CAPTURE(y_test.cwiseAbs().mean());
+        CAPTURE(y);
+        CAPTURE(y_test);
+        CAPTURE(J);
+        CAPTURE(imsize)
+        CHECK(y_test.isApprox(y, 1e-2));
+        const Vector<t_complex> psf =
+            (measure_op->adjoint() * y) *
+            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+              Approx(1.).margin(0.01));
+      }
+    }
+  }
+  SECTION("wproj box") {
+    const kernels::kernel kernel = kernels::kernel::box;
+    for (auto& J : {4, 5, 6, 7, 8}) {
+      for (auto& imsize : {128, 256, 512}) {
+        const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
+            measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+                u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
+                imsize, imsize, oversample_ratio, kernel, J, J, false, 1e-6, 1e-6);
+        Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
+        input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
+        const Vector<t_complex> y_test =
+            (*measure_op * input).eval() *
+            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+        CAPTURE(y_test.cwiseAbs().mean());
+        CAPTURE(y);
+        CAPTURE(y_test);
+        CAPTURE(J);
+        CAPTURE(imsize)
+        CHECK(y_test.isApprox(y, 1e-2));
+        const Vector<t_complex> psf =
+            (measure_op->adjoint() * y) *
+            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+              Approx(1.).margin(0.001));
+      }
+    }
+  }
+}
+TEST_CASE("normed operator") {
+  const t_real oversample_ratio = 2;
+  const t_int power_iters = 1000;
+  const t_real power_tol = 1e-4;
+  Vector<t_real> u = Vector<t_real>::Random(10);
+  Vector<t_real> v = Vector<t_real>::Random(10);
+  const t_uint M = u.size();
+  const Vector<t_complex> y = Vector<t_complex>::Ones(u.size());
+  SECTION("kb") {
+    const kernels::kernel kernel = kernels::kernel::kb;
+    for (auto& J : {4, 5, 6, 7, 8}) {
+      for (auto& imsize : {128, 256, 512}) {
+        const Vector<t_complex> init = Vector<t_complex>::Ones(imsize * imsize);
+        auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
+            measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+                u * imsize / 2, v * imsize / 2, Vector<t_real>::Zero(M), Vector<t_complex>::Ones(M),
+                imsize, imsize, oversample_ratio, kernel, J, J),
+            power_iters, power_tol, init);
+        const t_real norm = std::get<0>(power_method_result);
+        const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
+            std::get<2>(power_method_result);
+
+        Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
+        input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
+        const Vector<t_complex> y_test =
+            (*measure_op * input).eval() *
+            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+        CAPTURE(y_test.cwiseAbs().mean());
+        CAPTURE(y);
+        CAPTURE(y_test);
+        CAPTURE(J);
+        CAPTURE(imsize)
+        CHECK((y_test * norm).isApprox(y, 1e-3));
+        const Vector<t_complex> psf =
+            (measure_op->adjoint() * y) *
+            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M * norm;
+        CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
+              Approx(1.).margin(0.001));
+      }
+    }
   }
 }

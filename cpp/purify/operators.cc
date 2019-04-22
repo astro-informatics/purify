@@ -63,5 +63,6 @@ Image<t_complex> init_correction2d(const t_real &oversample_ratio, const t_uint 
          widefield::generate_chirp(w_mean, cellx, celly, imsizex_, imsizey_).array() * imsizex_ *
          imsizey_;
 }
+
 }  // namespace details
 }  // namespace purify

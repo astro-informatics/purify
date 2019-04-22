@@ -25,7 +25,7 @@ utilities::vis_params read_uvfits(const std::string &vis_name2, const utilities:
 //! Remove visibilities with zero weighting
 utilities::vis_params filter_and_combine(
     const utilities::vis_params &input, const utilities::vis_params &input2,
-    const Vector<t_complex> stokes_transform,
+    const Vector<t_complex> & stokes_transform,
     const std::function<bool(t_real, t_real, t_real, t_complex, t_complex, t_real, t_real, t_real,
                              t_complex, t_complex)> &filter =
         [](const t_real, const t_real, const t_real, const t_complex vis1, const t_complex weight1,
@@ -36,15 +36,21 @@ utilities::vis_params filter_and_combine(
                  (!std::isnan(vis1.real()) and !std::isnan(vis1.imag())) and
                  (!std::isnan(vis2.real()) and !std::isnan(vis2.imag()));
         });
+//! read polarisation with flaggging
+utilities::vis_params read_polarisation_with_flagging(
+    const Vector<t_real> &data, const Matrix<t_real> &coords, const Vector<t_real> &frequencies,
+    const t_uint pol_index1, const t_uint pol_index2, const t_uint pols, const t_uint baselines,
+    const t_uint channels, const Vector<t_complex> stokes_transform,
+    const std::function<bool(t_complex, t_complex, t_complex, t_complex)> &filter);
 //! Read uvfits keys out
-void read_fits_keys(fitsfile *fptr, t_int *status);
+void read_fits_keys(fitsfile *fptr, int *status);
 //! read frequencies for each channel
-Vector<t_real> read_uvfits_freq(fitsfile *fptr, t_int *status, const t_int &col);
-void read_uvfits_freq(fitsfile *fptr, t_int *status, Vector<t_real> &output, const t_int &col);
+Vector<t_real> read_uvfits_freq(fitsfile *fptr, int *status, const int &col);
+void read_uvfits_freq(fitsfile *fptr, int *status, Vector<t_real> &output, const int &col);
 //! read coordinates from uvfits file
-Matrix<t_real> read_uvfits_coords(fitsfile *fptr, t_int *status, const t_int &groups,
-                                  const t_int &pcount);
-void read_uvfits_coords(fitsfile *fptr, t_int *status, const t_int &groups, const t_int &pcount,
+Matrix<t_real> read_uvfits_coords(fitsfile *fptr, int *status, const int &groups,
+                                  const int &pcount);
+void read_uvfits_coords(fitsfile *fptr, int *status, const int &groups, const int &pcount,
                         Matrix<t_real> &output);
 //! read polarisation data from uvfits data
 utilities::vis_params read_polarisation(const Vector<t_real> &data, const Matrix<t_real> &coords,
@@ -52,10 +58,10 @@ utilities::vis_params read_polarisation(const Vector<t_real> &data, const Matrix
                                         const t_uint pols, const t_uint baselines,
                                         const t_uint channels);
 //! read data from uvfits file
-Vector<t_real> read_uvfits_data(fitsfile *fptr, t_int *status, const std::vector<t_int> &naxis,
-                                const t_int &baselines);
-void read_uvfits_data(fitsfile *fptr, t_int *status, const std::vector<t_int> &naxis,
-                      const t_int &baselines, Vector<t_real> &output);
+Vector<t_real> read_uvfits_data(fitsfile *fptr, int *status, const std::vector<int> &naxis,
+                                const int &baselines);
+void read_uvfits_data(fitsfile *fptr, int *status, const std::vector<int> &naxis,
+                      const int &baselines, Vector<t_real> &output);
 //! read value from data
 t_real read_value_from_data(const Vector<t_real> &data, const t_uint col, const t_uint pol,
                             const t_uint pols, const t_uint chan, const t_uint chans,

@@ -1,4 +1,5 @@
 #include "purify/distribute.h"
+#include "purify/wide_field_utilities.h"
 
 namespace purify {
 namespace distribute {
@@ -99,7 +100,7 @@ Vector<t_int> equal_distribution(Vector<t_real> const &u, Vector<t_real> const &
 }
 std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters,
-    const std::function<t_real(t_real)> &cost) {
+    const std::function<t_real(t_real)> &cost, const t_real rel_diff) {
   std::vector<t_int> w_node(w.size(), 0);
   std::vector<t_real> w_centre(number_of_nodes, 0);
   std::vector<t_real> w_sum(number_of_nodes, 0);
@@ -132,7 +133,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
       w_sum[j] = 0;
       w_count[j] = 0;
     }
-    if ((diff / number_of_nodes) < 1e-3) {
+    if ((diff / number_of_nodes) < rel_diff) {
       PURIFY_DEBUG("Converged!");
       break;
     } else {
@@ -146,7 +147,8 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
 #ifdef PURIFY_MPI
 std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters,
-    sopt::mpi::Communicator const &comm, const std::function<t_real(t_real)> &cost) {
+    sopt::mpi::Communicator const &comm, const std::function<t_real(t_real)> &cost,
+    const t_real rel_diff) {
   std::vector<t_int> w_node(w.size(), 0);
   std::vector<t_real> w_centre(number_of_nodes, 0);
   std::vector<t_real> w_sum(number_of_nodes, 0);
@@ -161,7 +163,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
   for (int n = 0; n < iters; n++) {
     if (comm.is_root()) PURIFY_DEBUG("clustering iteration {}", n);
     for (int i = 0; i < w.size(); i++) {
-      t_real min = 1e10;
+      t_real min = 2 * (wmax - wmin);
       for (int node = 0; node < number_of_nodes; node++) {
         const t_real cost_val = cost(w(i) - w_centre.at(node));
         if (cost_val < min) {
@@ -183,7 +185,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
       w_sum[j] = 0;
       w_count[j] = 0;
     }
-    if ((diff / number_of_nodes) < 1e-3) {
+    if ((diff / number_of_nodes) < rel_diff) {
       if (comm.is_root()) PURIFY_DEBUG("Converged!");
       break;
     } else {
@@ -193,6 +195,57 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
   }
 
   return std::make_tuple(w_node, w_centre);
+}
+
+std::vector<t_int> w_support(Vector<t_real> const &w, const std::vector<t_int> &image_index,
+                             const std::vector<t_real> &w_stacks, const t_real du,
+                             const t_int min_support, const t_int max_support,
+                             const t_real fill_relaxation, sopt::mpi::Communicator const &comm) {
+  t_real coeff_total = 0;
+  for (t_int i = 0; i < w.size(); i++)
+    coeff_total += widefield::w_support(std::abs(w(i) - w_stacks.at(image_index.at(i))), du,
+                                        min_support, max_support) * widefield::w_support(std::abs(w(i) - w_stacks.at(image_index.at(i))), du,
+                                        min_support, max_support);
+  const t_real coeff_average =
+      comm.all_sum_all<t_real>(coeff_total) / static_cast<t_real>(comm.size());
+  if (comm.is_root())
+    PURIFY_DEBUG("Each node should have on average {} coefficients.", coeff_average);
+  t_real coeff_sum = 0;
+  t_int group = 0;
+  std::vector<t_int> groups(w.size(), comm.rank());
+  std::vector<t_int> coeffs(comm.size(), comm.rank());
+  t_int total = 0;
+  for (t_int rank = 0; rank < comm.size(); rank++) {
+    const auto size = comm.broadcast(w.size(), rank);
+    for (t_int i = 0; i < size; i++) {
+      if (comm.rank() == rank) {
+        const t_int cost = widefield::w_support(std::abs(w(i) - w_stacks.at(image_index.at(i))), du,
+                                                min_support, max_support) * widefield::w_support(std::abs(w(i) - w_stacks.at(image_index.at(i))), du,
+                                                min_support, max_support);
+        total += cost;
+        if (group < (comm.size() - 1))
+          if ((cost + coeff_sum) > coeff_average * (1. + fill_relaxation)) {
+            PURIFY_DEBUG("{} node should have {} coefficients.", group, coeff_sum);
+            coeff_sum = 0;
+            group++;
+          }
+        coeff_sum += cost;
+        groups[i] = group;
+      }
+    }
+    if (group > comm.size() - 1)
+      throw std::runtime_error(
+          "Error distributing visibilites to even computational load for wide field imaging. Group "
+          "number out of bounds.");
+    coeff_sum = comm.broadcast(coeff_sum, rank);
+    group = comm.broadcast(group, rank);
+
+    if (total != coeff_total and comm.rank() == rank)
+      throw std::runtime_error(
+          "Total number of coefficients calculated is not the same, loop might be broken.");
+  }
+  if (comm.is_root()) PURIFY_DEBUG("{} node should have {} coefficients.", group, coeff_sum);
+  return groups;
 }
 #endif
 

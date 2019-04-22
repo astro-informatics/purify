@@ -39,6 +39,7 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser_s.measurements_sigma() == 1);
     REQUIRE(yaml_parser_s.skymodel() == "/path/to/sky/image");
     REQUIRE(yaml_parser_s.signal_to_noise() == 10);
+    REQUIRE(yaml_parser_s.sim_J() == 8);
   }
   SECTION("Check the rest of the GeneralConfiguration variables") {
     REQUIRE(yaml_parser.filepath() == file_path);
@@ -63,6 +64,7 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser.Jw() == 30);
     REQUIRE(yaml_parser.wprojection() == false);
     REQUIRE(yaml_parser.mpi_wstacking() == false);
+    REQUIRE(yaml_parser.mpi_all_to_all() == false);
     REQUIRE(yaml_parser.kmeans_iters() == 100);
     REQUIRE(yaml_parser.gpu() == false);
   }
@@ -77,7 +79,7 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser.epsilonConvergenceScaling() == 1);
     REQUIRE(yaml_parser.realValueConstraint() == true);
     REQUIRE(yaml_parser.positiveValueConstraint() == true);
-    REQUIRE(yaml_parser.mpiAlgorithm() == factory::algo_distribution::mpi_distributed);
+    REQUIRE(yaml_parser.mpiAlgorithm() == factory::algo_distribution::mpi_serial);
     REQUIRE(yaml_parser.relVarianceConvergence() == 1e-3);
     REQUIRE(yaml_parser.dualFBVarianceConvergence() == 1e-3);
   }
@@ -111,6 +113,7 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser_check.cellsizex() == yaml_parser_m.cellsizex());
     REQUIRE(yaml_parser_check.cellsizey() == yaml_parser_m.cellsizey());
     REQUIRE(yaml_parser_check.width() == yaml_parser_m.width());
+    REQUIRE(yaml_parser_check.mpi_all_to_all() == yaml_parser_m.mpi_all_to_all());
     REQUIRE(yaml_parser_check.height() == yaml_parser_m.height());
     REQUIRE(yaml_parser_check.Jx() == yaml_parser_m.Jx());
     REQUIRE(yaml_parser_check.Jy() == yaml_parser_m.Jy());

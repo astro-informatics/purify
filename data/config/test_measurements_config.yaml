@@ -46,6 +46,8 @@ MeasureOperators:
   wide-field:
     wprojection: False # using radially symmetric w projection kernel
     mpi_wstacking: False # applies average w-stack correction on each node (always True with wprojection)
+    mpi_all_to_all: False # performs all to all operation of the grid to even out computation 
+    all_to_all_fill: 0.01 # fill each node to this faction above the average computational load
     conjugate_w: True #reflects measurements onto the positive w-domain (can reduce computation)
     kmeans_iterations: 100 #number of iterations in w-stacking clustering algorithm
   gpu: False
@@ -56,7 +58,6 @@ SARA:
   # wavelet bases, to choose from: Dirac, DB1, ..., DBn (where n=0 is dirac, and 1 <= n <= 35 is DB basis)
   wavelet_dict: 0..8 # sequence of desired basis: 0,23,31 or 0,12..16,20
   wavelet_levels: 4 # value for all
-  dualFBVarianceConvergence: 1e-3 # (>0) relative convergence tolerance of l1 proximal
   realValueConstraint: True # Boolean
   positiveValueConstraint: True #boolean
 
@@ -66,9 +67,10 @@ AlgorithmOptions:
   padmm:
     epsilonConvergenceScaling: 1 # Default 1 (>0)
     # Following is only accepted when MPI is used
-    mpiAlgorithm:  fully-distributed # one of none, serial-equivalent, fully-distributed
+    mpiAlgorithm:  serial-equivalent # one of none, serial-equivalent, fully-distributed
     # Be careful changing the following unless you know what you are doing
     relVarianceConvergence: 1e-3 # (>0)
+    dualFBVarianceConvergence: 1e-3 # (>0) relative convergence tolerance of l1 proximal
     stepsize:  # Stepsize, choose value between: default, variable, 100, x
       update_tolerance: 1e-1 #when predicted stepsize is greater than this value, it will be updated
       update_iters: 0 #how many iterations to allow updating of step size
@@ -76,4 +78,15 @@ AlgorithmOptions:
     mpiAlgorithm: serial-equivalent # one of none, serial-equivalent
     regularisation_parameter: 1
     stepsize: 1
+    dualFBVarianceConvergence: 1e-3 # (>0) relative convergence tolerance of l1 proximal
     relVarianceConvergence: 1e-3 # (>0) relative convergence of the objective function
+  primaldual: #solve the constrained problem
+    # Following is only accepted when MPI is used
+    mpiAlgorithm: serial-equivalent # one of none, serial-equivalent, fully-distributed
+    # Be careful changing the following unless you know what you are doing
+    relVarianceConvergence: 1e-3 # (>0) relative converegence tolerance of objective function
+    precondition_iters: 0 #use sampling density (based on field of view) to accelerate primal dual
+    epsilonConvergenceScaling: 1 # (>0) l2 convergence tolerance for residuals
+    stepsize:  # Stepsize, choose value between: default, variable, 100, x
+      update_tolerance: 1e-1 #when predicted stepsize is greater than this value, it will be updated
+      update_iters: 0 #how many iterations to allow updating of step size

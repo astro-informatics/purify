@@ -29,10 +29,9 @@ t_real ft_kaiser_bessel_general(const t_real x, const t_real J, const t_real alp
 
   t_complex eta = std::sqrt(
       static_cast<t_complex>((constant::pi * x * J) * (constant::pi * x * J) - alpha * alpha));
-  const t_real normalisation =
-      38828.11016883;  // Factor that keeps it consistent with fessler formula
+  const t_real normalisation = J / boost::math::cyl_bessel_i(0, alpha);
 
-  return std::real(std::sin(eta) / eta) /
+  return std::real(std::sin(eta) / eta) *
          normalisation;  // simple way of doing the calculation, the
   // boost bessel funtions do not support
   // complex valued arguments
@@ -119,7 +118,7 @@ t_real pswf(const t_real x, const t_real J) {
 */
   const t_real eta0 = 2 * x / J;
   const t_real alpha = 1;
-  return calc_for_pswf(eta0, J, alpha) * std::pow(1 - eta0 * eta0, alpha);
+  return calc_for_pswf(eta0, J, alpha) * std::pow(1 - eta0 * eta0, alpha) ;
 }
 
 t_real ft_pswf(const t_real x, const t_real J) {
@@ -139,7 +138,7 @@ t_real ft_pswf(const t_real x, const t_real J) {
   const t_real alpha = 1;
   const t_real eta0 = 2 * x;
 
-  return calc_for_pswf(eta0, J, alpha);
+  return calc_for_pswf(eta0, J, alpha) * std::sqrt(5.343);
 }
 
 Vector<t_real> kernel_samples(const t_real total_samples,
@@ -148,9 +147,9 @@ Vector<t_real> kernel_samples(const t_real total_samples,
      Pre-calculates samples of a kernel, that can be used with linear interpolation (see Rapid
      gridding reconstruction with a minimal oversampling ratio, Beatty et. al. 2005)
      */
-  Vector<t_real> samples(total_samples);
-  for (t_real i = 0; i < total_samples; ++i) {
-    samples(i) = kernelu(i / total_samples * J - J / 2);
+  Vector<t_real> samples(static_cast<Vector<t_real>::Index>(total_samples));
+  for (Vector<t_real>::Index i = 0; i < static_cast<t_int>(total_samples); ++i) {
+    samples(i) = kernelu(static_cast<t_real>(i) / total_samples * J - J / 2);
   }
   return samples;
 }
@@ -214,7 +213,7 @@ t_real gaussian_general(const t_real x, const t_real J, const t_real sigma) {
      */
 
   t_real a = x / sigma;
-  return std::exp(-a * a * 0.5);
+  return std::exp(-a * a * 0.5) / (sigma * std::sqrt(2 * constant::pi));
 }
 
 t_real ft_gaussian_general(const t_real x, const t_real J, const t_real sigma) {
@@ -226,8 +225,8 @@ t_real ft_gaussian_general(const t_real x, const t_real J, const t_real sigma) {
      sigma:: standard deviation of Gaussian kernel (in pixels)
      */
 
-  t_real a = x * sigma * constant::pi;
-  return std::sqrt(constant::pi / 2) / sigma * std::exp(-a * a * 2);
+  t_real a = x * sigma;
+  return std::exp(a * a * 2);
 }
 }  // namespace kernels
 

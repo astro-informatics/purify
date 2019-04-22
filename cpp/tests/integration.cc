@@ -99,7 +99,7 @@ TEST_CASE("complex") {
         return (x(0) >= 0) ? std::exp(I * n * x(0)) * 1. / 2. : -std::exp(I * n * x(0)) * 1. / 2.;
       };
       const t_complex cresult = integration::integrate(
-          xmin, xmax, cfunc1, integration::norm_type::l2, 1e-5, 1e-5, max_evaluations, int_method);
+          xmin, xmax, cfunc1, integration::norm_type::l2, 1e-6, 1e-6, max_evaluations, int_method);
       CAPTURE(cresult);
       CHECK(std::abs(cresult - t_complex(0., 2.)) / 2. < 1e-4);
     }
@@ -121,10 +121,12 @@ TEST_CASE("complex") {
 #pragma omp parallel for
       for (int i = 0; i < funcs.size(); i++) {
         const t_complex cresult =
-            integration::integrate(xmin, xmax, funcs.at(i), integration::norm_type::l2, 1e-5, 1e-5,
+            integration::integrate(xmin, xmax, funcs.at(i), integration::norm_type::l2, 1e-6, 1e-6,
                                    max_evaluations, int_method);
         CAPTURE(cresult);
-        CHECK(std::abs(cresult - t_complex(0., 2. * (i + 1))) / (2. * (i + 1)) < 1e-4);
+        CHECK(std::abs(cresult - t_complex(0., 2. * static_cast<t_real>(i + 1))) /
+                  (2. * static_cast<t_real>(i + 1)) <
+              1e-4);
       }
     }
   }
