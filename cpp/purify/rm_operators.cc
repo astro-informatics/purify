@@ -22,8 +22,7 @@ Sparse<t_complex> init_gridding_matrix_1d(const Vector<t_real> &u, const Vector<
   for (t_int m = 0; m < rows; ++m) {
     for (t_int ju = 1; ju < ju_max + 1; ++ju) {
       const t_real k_u = std::floor(u(m) - ju_max * 0.5);
-      const t_uint q = utilities::mod(k_u + ju, ftsizeu_);
-      const t_uint index = utilities::sub2ind(0, q, 1, ftsizeu_);
+      const t_uint index = utilities::mod(k_u + ju, ftsizeu_);
       interpolation_matrix.insert(m, index) = std::exp(-2 * constant::pi * I * (k_u + ju) * 0.5) *
                                               kernelu(u(m) - (k_u + ju)) * weights(m);
     }

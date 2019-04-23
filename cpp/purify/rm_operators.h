@@ -48,7 +48,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_gridding_m
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_zero_padding_1d(
     const Image<typename T::Scalar> &S, const t_real oversample_ratio) {
-  const t_uint imsizex_ = S.cols();
+  const t_uint imsizex_ = S.size();
   const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
   const t_uint x_start = std::floor(ftsizeu_ * 0.5 - imsizex_ * 0.5);
   auto direct = [=](T &output, const T &x) {
@@ -162,12 +162,11 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
 
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_operator_1d(
-    const Vector<t_real> &u, const Vector<t_complex> &weights, const t_uint imsizey,
-    const t_uint imsizex, const t_real oversample_ratio = 2,
-    const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
-    const fftw_plan ft_plan = fftw_plan::measure) {
+    const Vector<t_real> &u, const Vector<t_complex> &weights, const t_uint imsizex,
+    const t_real oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
+    const t_uint Ju = 4, const fftw_plan ft_plan = fftw_plan::measure) {
   std::function<t_real(t_real)> kernelu, ftkernelu;
-  std::tie(kernelu, ftkernelu) = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
+  std::tie(ftkernelu, kernelu) = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
   sopt::OperatorFunction<T> directFZ, indirectFZ;
   std::tie(directFZ, indirectFZ) =
       base_padding_and_FFT_1d<T>(ftkernelu, imsizex, oversample_ratio, ft_plan);
@@ -197,7 +196,7 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_1d(
   std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_1d<T>(
-      u, weights, imsizex, oversample_ratio, kernel, Ju);
+      u, weights, imsizex, oversample_ratio, kernel, Ju, ft_plan);
   return std::make_shared<sopt::LinearTransform<T>>(directDegrid, M, indirectDegrid, N);
 }
 
@@ -207,7 +206,7 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_1d(
     const t_real oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
     const t_uint Ju = 4) {
   auto uv_vis = uv_vis_input;
-  //need to find a way to set RM resolution, i.e. Faraday pixel size
+  // need to find a way to set RM resolution, i.e. Faraday pixel size
   return init_degrid_operator_1d<T>(uv_vis.u, uv_vis.weights, imsizex, oversample_ratio, kernel,
                                     Ju);
 }
