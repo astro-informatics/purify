@@ -8,19 +8,27 @@
 
 namespace purify {
 
-namespace details {
+namespace rm_details {
 
 //! Construct gridding matrix
 Sparse<t_complex> init_gridding_matrix_1d(const Vector<t_real> &u, const Vector<t_complex> &weights,
                                           const t_uint imsizex_, const t_real oversample_ratio,
                                           const std::function<t_real(t_real)> kernelu,
                                           const t_uint Ju);
+//! Construct gridding matrix with fde
+Sparse<t_complex> init_gridding_matrix_1d(const Vector<t_real> &u, const Vector<t_real> &widths,
+                                          const Vector<t_complex> &weights, const t_uint imsizex_,
+                                          const t_real cell, const t_real oversample_ratio,
+                                          const std::function<t_real(t_real)> ftkernelu,
+                                          const t_uint Ju, const t_uint J_max,
+                                          const t_real rel_error, const t_real abs_error);
 
 //! Given the Fourier transform of a gridding kernel, creates the scaling image for gridding
 //! correction.
 Image<t_complex> init_correction1d(const t_real oversample_ratio, const t_uint imsizex_,
                                    const std::function<t_real(t_real)> ftkernelu);
-
+//! gives size of lambda^2 pixel given faraday cell size (in rad/m^2) and image size
+t_real pixel_to_lambda2(const t_real cell, const t_uint imsize, const t_real oversample_ratio);
 }  // namespace details
 
 namespace operators {
@@ -31,7 +39,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_gridding_m
     ARGS &&... args) {
   const std::shared_ptr<const Sparse<t_complex>> interpolation_matrix =
       std::make_shared<const Sparse<t_complex>>(
-          details::init_gridding_matrix_1d(std::forward<ARGS>(args)...));
+          rm_details::init_gridding_matrix_1d(std::forward<ARGS>(args)...));
   const std::shared_ptr<const Sparse<t_complex>> adjoint =
       std::make_shared<const Sparse<t_complex>>(interpolation_matrix->adjoint());
 
@@ -135,7 +143,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
   sopt::OperatorFunction<T> directFFT, indirectFFT;
 
   const Image<t_complex> S =
-      purify::details::init_correction1d(oversample_ratio, imsizex, ftkernelu);
+      purify::rm_details::init_correction1d(oversample_ratio, imsizex, ftkernelu);
   PURIFY_LOW_LOG("Building Measurement Operator: WGFZDB");
   PURIFY_LOW_LOG(
       "Constructing Zero Padding "
@@ -162,9 +170,11 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
 
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_operator_1d(
-    const Vector<t_real> &u, const Vector<t_complex> &weights, const t_uint imsizex,
-    const t_real oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
-    const t_uint Ju = 4, const fftw_plan ft_plan = fftw_plan::measure) {
+    const Vector<t_real> &u, const Vector<t_real> &widths, const Vector<t_complex> &weights,
+    const t_uint imsizex, const t_real cell, const t_real oversample_ratio = 2,
+    const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
+    const t_uint J_max = 30, const t_real abs_error = 1e-6, const t_real rel_error = 1e-6,
+    const fftw_plan ft_plan = fftw_plan::measure) {
   std::function<t_real(t_real)> kernelu, ftkernelu;
   std::tie(ftkernelu, kernelu) = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
   sopt::OperatorFunction<T> directFZ, indirectFZ;
@@ -174,7 +184,8 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
   PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
   PURIFY_MEDIUM_LOG("Number of channels: {}", u.size());
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_1d<T>(
-      u, weights, imsizex, oversample_ratio, kernelu, Ju);
+      u, widths, weights, imsizex, cell, oversample_ratio, kernelu, Ju, J_max, abs_error,
+      rel_error);
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
   PURIFY_LOW_LOG("Finished consturction of RM Φ.");
@@ -188,27 +199,19 @@ namespace measurementoperator {
 //! Returns linear transform that is the standard degridding operator
 template <class T>
 std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_1d(
-    const Vector<t_real> &u, const Vector<t_complex> &weights, const t_uint imsizex,
-    const t_real oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
-    const t_uint Ju = 4) {
+    const Vector<t_real> &u, const Vector<t_real> &widths, const Vector<t_complex> &weights,
+    const t_uint imsizex, const t_real cell, const t_real oversample_ratio = 2,
+    const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
+    const t_uint J_max = 30, const t_real abs_error = 1e-6, const t_real rel_error = 1e-6) {
+  const t_real du = rm_details::pixel_to_lambda2(cell, imsizex, oversample_ratio);
   const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
   std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizex)};
   std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
   sopt::OperatorFunction<T> directDegrid, indirectDegrid;
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_1d<T>(
-      u, weights, imsizex, oversample_ratio, kernel, Ju, ft_plan);
+      -u / du, widths, weights, imsizex, cell, oversample_ratio, kernel, Ju, J_max, abs_error,
+      rel_error, ft_plan);
   return std::make_shared<sopt::LinearTransform<T>>(directDegrid, M, indirectDegrid, N);
-}
-
-template <class T>
-std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_1d(
-    const utilities::vis_params &uv_vis_input, const t_uint imsizex,
-    const t_real oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
-    const t_uint Ju = 4) {
-  auto uv_vis = uv_vis_input;
-  // need to find a way to set RM resolution, i.e. Faraday pixel size
-  return init_degrid_operator_1d<T>(uv_vis.u, uv_vis.weights, imsizex, oversample_ratio, kernel,
-                                    Ju);
 }
 
 }  // namespace measurementoperator
