@@ -13,8 +13,7 @@ t_complex fourier_rm_kernel(const t_real x, const t_real dlambda2, const t_real 
 t_complex exact_rm_projection_integration(const t_real u, const t_real dlambda2, const t_real du,
                                           const t_real oversample_ratio,
                                           const std::function<t_complex(t_real)> &ftkernelu,
-                                          const t_uint max_evaluations,
-                                          const t_real absolute_error,
+                                          const t_uint max_evaluations, const t_real absolute_error,
                                           const t_real relative_error,
                                           const integration::method method, t_uint &evaluations) {
   auto const func = [&](const Vector<t_real> &x) -> t_complex {
@@ -25,8 +24,7 @@ t_complex exact_rm_projection_integration(const t_real u, const t_real dlambda2,
   xmax(0) = oversample_ratio / 2.;
   const Vector<t_real> xmin = -xmax;
   return integration::integrate(xmin, xmax, func, integration::norm_type::paired, absolute_error,
-                                relative_error, max_evaluations, method) /
-         (xmax(0) - xmin(0));
+                                relative_error, max_evaluations, method);
 }
 }  // namespace projection_kernels
 }  // namespace purify
