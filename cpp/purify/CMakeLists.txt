@@ -29,12 +29,13 @@ set(HEADERS
   wkernel_integration.h
   wproj_operators.h
   rm_operators.h
+  rm_kernel_integration.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(SOURCES utilities.cc pfitsio.cc
   kernels.cc wproj_utilities.cc operators.cc uvfits.cc yaml-parser.cc
   read_measurements.cc distribute.cc integration.cc wide_field_utilities.cc wkernel_integration.cc 
-  wproj_operators.cc rm_operators.cc)
+  wproj_operators.cc rm_operators.cc rm_kernel_integration.cc)
 
 if(TARGET casacore::ms)
   list(APPEND SOURCES casacore.cc)
