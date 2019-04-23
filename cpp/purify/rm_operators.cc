@@ -66,8 +66,6 @@ Sparse<t_complex> init_gridding_matrix_1d(const Vector<t_real> &u, const Vector<
 
   const t_complex I(0, 1);
   const t_uint max_evaluations = 1e9;
-  // If I collapse this for loop there is a crash when using MPI... Sparse<>::insert() doesn't work
-  // right
 #pragma omp parallel for
   for (t_int m = 0; m < rows; ++m) {
     const t_int ju_max = std::min<t_int>(std::floor(Ju + widths(m) / du), J_max);

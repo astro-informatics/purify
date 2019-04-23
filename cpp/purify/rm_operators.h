@@ -29,7 +29,7 @@ Image<t_complex> init_correction1d(const t_real oversample_ratio, const t_uint i
                                    const std::function<t_real(t_real)> ftkernelu);
 //! gives size of lambda^2 pixel given faraday cell size (in rad/m^2) and image size
 t_real pixel_to_lambda2(const t_real cell, const t_uint imsize, const t_real oversample_ratio);
-}  // namespace details
+}  // namespace rm_details
 
 namespace operators {
 
@@ -171,10 +171,9 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_operator_1d(
     const Vector<t_real> &u, const Vector<t_real> &widths, const Vector<t_complex> &weights,
-    const t_uint imsizex, const t_real cell, const t_real oversample_ratio = 2,
-    const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
-    const t_uint J_max = 30, const t_real abs_error = 1e-6, const t_real rel_error = 1e-6,
-    const fftw_plan ft_plan = fftw_plan::measure) {
+    const t_uint imsizex, const t_real cell, const t_real oversample_ratio,
+    const kernels::kernel kernel, const t_uint Ju, const t_uint J_max, const t_real abs_error,
+    const t_real rel_error, const fftw_plan ft_plan) {
   std::function<t_real(t_real)> kernelu, ftkernelu;
   std::tie(ftkernelu, kernelu) = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
   sopt::OperatorFunction<T> directFZ, indirectFZ;
@@ -184,7 +183,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
   PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
   PURIFY_MEDIUM_LOG("Number of channels: {}", u.size());
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_1d<T>(
-      u, widths, weights, imsizex, cell, oversample_ratio, kernelu, Ju, J_max, abs_error,
+      u, widths, weights, imsizex, cell, oversample_ratio, ftkernelu, Ju, J_max, abs_error,
       rel_error);
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
