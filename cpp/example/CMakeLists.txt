@@ -9,6 +9,7 @@ add_example(compare_wprojection LIBRARIES libpurify NOTEST)
 add_example(generate_vis_data LIBRARIES libpurify NOTEST)
 
 add_example(plot_wkernel LIBRARIES libpurify NOTEST)
+add_example(plot_rmkernel LIBRARIES libpurify NOTEST)
 add_example(wavelet_decomposition LIBRARIES libpurify NOTEST)
 add_example(histogram_equalisation LIBRARIES libpurify NOTEST)
 
