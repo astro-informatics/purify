@@ -68,6 +68,7 @@ TEST_CASE("1d FFT") {
 
 TEST_CASE("regression_degrid") {
   const t_int imsizex = 256;
+  const t_real cell = constant::pi / imsizex;
   Vector<t_real> u = Vector<t_real>::Random(10) * imsizex / 2;
   Vector<t_complex> input = Vector<t_complex>::Zero(imsizex);
   input(static_cast<t_int>(imsizex * 0.5)) = 1.;
@@ -83,7 +84,7 @@ TEST_CASE("regression_degrid") {
     const kernels::kernel kernel = kernels::kernel::kb;
     const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
         measurementoperator::init_degrid_operator_1d<Vector<t_complex>>(
-            u, Vector<t_complex>::Ones(M), imsizex, oversample_ratio, kernel, Ju);
+            u, Vector<t_complex>::Ones(M), imsizex, cell, oversample_ratio, kernel, Ju);
     const Vector<t_complex> y_test = *measure_op * input;
     CAPTURE(y_test.array() / y.array());
     const t_real max_test = y_test.cwiseAbs().mean();
@@ -94,7 +95,7 @@ TEST_CASE("regression_degrid") {
   SECTION("pswf") {
     const kernels::kernel kernel = kernels::kernel::pswf;
     const auto measure_op = measurementoperator::init_degrid_operator_1d<Vector<t_complex>>(
-        u, Vector<t_complex>::Ones(M), imsizex, oversample_ratio, kernel, 6);
+        u, Vector<t_complex>::Ones(M), imsizex, cell, oversample_ratio, kernel, 6);
     const Vector<t_complex> y_test = *measure_op * input;
     CAPTURE(y_test.array() / y.array());
     const t_real max_test = y_test.cwiseAbs().mean();
@@ -105,7 +106,7 @@ TEST_CASE("regression_degrid") {
   SECTION("gauss") {
     const kernels::kernel kernel = kernels::kernel::gauss;
     const auto measure_op = measurementoperator::init_degrid_operator_1d<Vector<t_complex>>(
-        u, Vector<t_complex>::Ones(M), imsizex, oversample_ratio, kernel, Ju);
+        u, Vector<t_complex>::Ones(M), imsizex, cell, oversample_ratio, kernel, Ju);
     const Vector<t_complex> y_test = *measure_op * input;
     CAPTURE(y_test.array() / y.array());
     const t_real max_test = y_test.cwiseAbs().mean();
@@ -124,8 +125,9 @@ TEST_CASE("flux units") {
     const kernels::kernel kernel = kernels::kernel::kb;
     for (auto& J : {4, 5, 6, 7, 8}) {
       for (auto& imsize : {128, 256, 512}) {
+        const t_real cell = constant::pi / imsize;
         const auto measure_op = measurementoperator::init_degrid_operator_1d<Vector<t_complex>>(
-            u, Vector<t_complex>::Ones(M), imsize, oversample_ratio, kernel, J);
+            u, Vector<t_complex>::Ones(M), imsize, cell, oversample_ratio, kernel, J);
         Vector<t_complex> input = Vector<t_complex>::Zero(imsize);
         input(static_cast<t_int>(imsize * 0.5)) = 1.;
         const Vector<t_complex> y_test =
@@ -147,12 +149,14 @@ TEST_CASE("flux units") {
     const kernels::kernel kernel = kernels::kernel::pswf;
     for (auto& J : {4, 5, 6, 7, 8}) {
       for (auto& imsize : {128, 256, 512}) {
+        const t_real cell = constant::pi / imsize;
         if (J != 6)
           CHECK_THROWS(measurementoperator::init_degrid_operator_1d<Vector<t_complex>>(
-              u * imsize / 2, Vector<t_complex>::Ones(M), imsize, oversample_ratio, kernel, J));
+              u * imsize / 2, Vector<t_complex>::Ones(M), imsize, cell, oversample_ratio, kernel,
+              J));
         else {
           const auto measure_op = measurementoperator::init_degrid_operator_1d<Vector<t_complex>>(
-              u, Vector<t_complex>::Ones(M), imsize, oversample_ratio, kernel, J);
+              u, Vector<t_complex>::Ones(M), imsize, cell, oversample_ratio, kernel, J);
           Vector<t_complex> input = Vector<t_complex>::Zero(imsize);
           input(static_cast<t_int>(imsize * 0.5)) = 1.;
           const Vector<t_complex> y_test =
@@ -175,8 +179,9 @@ TEST_CASE("flux units") {
     const kernels::kernel kernel = kernels::kernel::gauss;
     for (auto& J : {4, 5, 6, 7, 8}) {
       for (auto& imsize : {128, 256, 512}) {
+        const t_real cell = constant::pi / imsize;
         const auto measure_op = measurementoperator::init_degrid_operator_1d<Vector<t_complex>>(
-            u, Vector<t_complex>::Ones(M), imsize, oversample_ratio, kernel, J);
+            u, Vector<t_complex>::Ones(M), imsize, cell, oversample_ratio, kernel, J);
         Vector<t_complex> input = Vector<t_complex>::Zero(imsize);
         input(static_cast<t_int>(imsize * 0.5)) = 1.;
         const Vector<t_complex> y_test =
@@ -189,8 +194,7 @@ TEST_CASE("flux units") {
         CAPTURE(imsize)
         CHECK(y_test.isApprox(y, 1e-2));
         const Vector<t_complex> psf =
-            (measure_op->adjoint() * y) *
-            std::sqrt(input.size() * oversample_ratio ) / M;
+            (measure_op->adjoint() * y) * std::sqrt(input.size() * oversample_ratio) / M;
         CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5))) == Approx(1.).margin(0.01));
       }
     }
@@ -199,8 +203,9 @@ TEST_CASE("flux units") {
     const kernels::kernel kernel = kernels::kernel::box;
     for (auto& J : {4, 5, 6, 7, 8}) {
       for (auto& imsize : {128, 256, 512}) {
+        const t_real cell = constant::pi / imsize;
         const auto measure_op = measurementoperator::init_degrid_operator_1d<Vector<t_complex>>(
-            u, Vector<t_complex>::Ones(M), imsize, oversample_ratio, kernel, J);
+            u, Vector<t_complex>::Ones(M), imsize, cell, oversample_ratio, kernel, J);
         Vector<t_complex> input = Vector<t_complex>::Zero(imsize);
         input(static_cast<t_int>(imsize * 0.5)) = 1.;
         const Vector<t_complex> y_test =
@@ -231,10 +236,12 @@ TEST_CASE("normed operator") {
     const kernels::kernel kernel = kernels::kernel::kb;
     for (auto& J : {4, 5, 6, 7, 8}) {
       for (auto& imsize : {128, 256, 512}) {
+        const t_real cell = constant::pi / imsize;
         const Vector<t_complex> init = Vector<t_complex>::Ones(imsize);
         auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
             measurementoperator::init_degrid_operator_1d<Vector<t_complex>>(
-                u * imsize / 2, Vector<t_complex>::Ones(M), imsize, oversample_ratio, kernel, J),
+                u * imsize / 2, Vector<t_complex>::Ones(M), imsize, cell, oversample_ratio, kernel,
+                J),
             power_iters, power_tol, init);
         const t_real norm = std::get<0>(power_method_result);
         const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
