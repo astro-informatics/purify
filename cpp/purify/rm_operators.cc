@@ -52,6 +52,7 @@ Sparse<t_complex> init_gridding_matrix_1d(const Vector<t_real> &u, const Vector<
     total_coeffs(i) = Ju_max;
   }
   const t_real num_of_coeffs = total_coeffs.array().cast<t_real>().sum();
+  PURIFY_HIGH_LOG("Max channel width in wavelengths squared: {}", widths.maxCoeff());
   PURIFY_HIGH_LOG("Using {} rows (coefficients per a row {}), and memory of {} MegaBytes",
                   total_coeffs.size(), total_coeffs.array().cast<t_real>().mean(),
                   16. * num_of_coeffs / std::pow(10., 6));
