@@ -29,9 +29,9 @@ void run_admm(const Vector<t_complex> &y,
 
   auto const padmm =
       sopt::algorithm::ImagingProximalADMM<t_complex>(y)
-          .itermax(10000)
+          .itermax(100000)
           .gamma((Psi.adjoint() * (measure_op->adjoint() * y).eval()).cwiseAbs().maxCoeff() * 1e-3)
-          .relative_variation(1e-6)
+          .relative_variation(1e-7)
           .l2ball_proximal_epsilon(epsilon)
           .tight_frame(false)
           .l1_proximal_tolerance(1e-3)
@@ -72,17 +72,17 @@ int main(int nargs, char const **args) {
   auto const power_iters = 100;
   auto const power_tol = 1e-4;
   auto const Ju = 4;
-  auto const imsizex = 8192;
+  auto const imsizex = 8192 * 2;
 
   auto const kernel = "kb";
   const t_real dnu = (end_c - start_c) / channels;  // Hz
   const t_int Jl_max = 100;
   const Vector<t_real> freq = Vector<t_real>::LinSpaced(channels, start_c, end_c);
-  const Vector<t_real> lambda2 = ((constant::c / (freq.array() - dnu)).square() +
-                                  (constant::c / (freq.array() + dnu)).square()) /
+  const Vector<t_real> lambda2 = ((constant::c / (freq.array() - dnu / 2.)).square() +
+                                  (constant::c / (freq.array() + dnu / 2.)).square()) /
                                  2;
-  const Vector<t_real> widths = ((constant::c / (freq.array() - dnu)).square() -
-                                 (constant::c / (freq.array() + dnu)).square());
+  const Vector<t_real> widths = ((constant::c / (freq.array() - dnu / 2.)).square() -
+                                 (constant::c / (freq.array() + dnu / 2.)).square());
 
   const t_real cell = constant::pi / (2 * lambda2.maxCoeff());  // rad/m^2
   const auto measure_op_stuff = sopt::algorithm::normalise_operator<Vector<t_complex>>(
@@ -106,8 +106,10 @@ int main(int nargs, char const **args) {
 
   Vector<t_complex> input = Vector<t_complex>::Zero(imsizex);
   for (t_int i = 0; i < 15; i++)
-    input((i + 1) * 512 - 1) =
+    input((i + 1) * 1024 - 1) =
         std::exp(-2. * t_complex(0., 1.) * constant::pi * static_cast<t_real>(i) / 8.);
+  pfitsio::write2d(input.real(), "rm_input_real.fits");
+  pfitsio::write2d(input.imag(), "rm_input_imag.fits");
 
   Vector<t_complex> y = (*measure_op * input);
   t_real const sigma = utilities::SNR_to_standard_deviation(y, snr);
