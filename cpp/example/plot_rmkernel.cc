@@ -52,7 +52,7 @@ int main(int nargs, char const **args) {
   };
   t_uint total = 0;
   t_uint rtotal = 0;
-  t_int const Ju = 40;
+  t_int const Ju = 20;
   t_real const upsample = 5;
   t_int const Ju_max = std::floor(Ju * upsample);
   const t_int Jl_max = 100;
