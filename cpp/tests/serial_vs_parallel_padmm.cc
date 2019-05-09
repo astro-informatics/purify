@@ -77,7 +77,7 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   auto Phi = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           split_comm, uv_data.u, uv_data.v, uv_data.w, uv_data.weights, width, height, over_sample),
-      500, 1e-9, Vector<t_complex>::Ones(width * height)));
+      500, 1e-9, Vector<t_complex>::Ones(width * height).eval()));
 
   SECTION("Measurement operator parallelization") {
     SECTION("Gridding") {

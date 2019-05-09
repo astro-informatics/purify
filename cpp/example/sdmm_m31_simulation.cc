@@ -53,14 +53,14 @@ int main(int nargs, char const **args) {
       *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(), 2,
           kernels::kernel_from_string.at("kb"), 8, 8),
-      100, 1e-4, Vector<t_complex>::Random(sky_model.size())));
+      100, 1e-4, Vector<t_complex>::Random(sky_model.size()).eval()));
   uv_data.vis = simulate_measurements * sky_model;
 
   auto measurements_transform = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data.u, uv_data.v, uv_data.w, uv_data.weights, sky_model.cols(), sky_model.rows(),
           over_sample, kernels::kernel_from_string.at(kernel), J, J),
-      100, 1e-4, Vector<t_complex>::Random(sky_model.size())));
+      100, 1e-4, Vector<t_complex>::Random(sky_model.size()).eval()));
 
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),

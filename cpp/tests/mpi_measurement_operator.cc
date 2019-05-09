@@ -44,7 +44,7 @@ TEST_CASE("Serial vs Distributed Operator") {
   const auto op_serial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample),
-      100, 1e-4, Vector<t_complex>::Random(height * width)));
+      100, 1e-4, Vector<t_complex>::Random(height * width).eval()));
 
   const auto op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
@@ -108,7 +108,7 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator") {
   const auto op_serial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample),
-      100, 1e-4, Vector<t_complex>::Random(height * width)));
+      100, 1e-4, Vector<t_complex>::Random(height * width).eval()));
 
   const auto op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
@@ -175,7 +175,7 @@ TEST_CASE("Serial vs Distributed Fourier Grid Operator weighted") {
   const auto op_serial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_serial.u, uv_serial.v, uv_serial.w, uv_serial.weights, height, width, over_sample),
-      100, 1e-4, Vector<t_complex>::Random(height * width)));
+      100, 1e-4, Vector<t_complex>::Random(height * width).eval()));
   const auto op = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       purify::measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
           world, uv_mpi.u, uv_mpi.v, uv_mpi.w, uv_mpi.weights, height, width, over_sample),

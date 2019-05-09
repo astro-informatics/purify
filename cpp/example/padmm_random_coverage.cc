@@ -43,7 +43,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
               uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample,
               kernels::kernel_from_string.at(kernel), J, 30, true, 1e-6, 1e-6,
               dde_type::wkernel_radial),
-          1000, 1e-4, Vector<t_complex>::Random(imsizex * imsizey)));
+          1000, 1e-4, Vector<t_complex>::Random(imsizex * imsizey).eval()));
 #else
   af::setDevice(0);
   auto const measurements_transform =
@@ -51,7 +51,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
           gpu::measurementoperator::init_degrid_operator_2d(
               uv_data, imsizey, imsizex, std::get<1>(w_term), std::get<1>(w_term), over_sample,
               kernels::kernel_from_string.at(kernel), J, J, std::get<0>(w_term)),
-          1000, 1e-4, Vector<t_complex>::Random(imsizex * imsizey)));
+          1000, 1e-4, Vector<t_complex>::Random(imsizex * imsizey).eval()));
 #endif
   sopt::wavelets::SARA const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
@@ -166,13 +166,13 @@ int main(int, char **) {
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2,
           kernels::kernel_from_string.at("kb"), 8, 30, true, 1e-6, 1e-6, dde_type::wkernel_radial),
-      1000, 0.0001, Vector<t_complex>::Random(M31.size())));
+      1000, 0.0001, Vector<t_complex>::Random(M31.size()).eval()));
 #else
   auto const sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       gpu::measurementoperator::init_degrid_operator_2d(
           uv_data, M31.rows(), M31.cols(), cellsize, cellsize, 2,
           kernels::kernel_from_string.at("kb"), 8, 8, w_term),
-      1000, 0.0001, Vector<t_complex>::Random(M31.size())));
+      1000, 0.0001, Vector<t_complex>::Random(M31.size()).eval()));
 
 #endif
   uv_data.vis = (*sky_measurements) * Image<t_complex>::Map(M31.data(), M31.size(), 1);

@@ -32,7 +32,7 @@ int main(int nargs, char const **args) {
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
           kernels::kernel_from_string.at(kernel), Ju, Jv),
-      power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
+      power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey).eval()));
   for (t_uint i = 0; i < 100; i++) {
     PURIFY_LOW_LOG("Iteration: {}", i);
     Vector<t_complex> const measurements = *measure_op * image;

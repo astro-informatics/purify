@@ -45,7 +45,7 @@ std::tuple<utilities::vis_params, t_real> dirty_visibilities(
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data, ground_truth_image.rows(), ground_truth_image.cols(), std::get<1>(w_term),
           std::get<1>(w_term), 2, kernels::kernel::kb, 8, 8, std::get<0>(w_term)),
-      100, 1e-4, Vector<t_complex>::Random(ground_truth_image.size())));
+      100, 1e-4, Vector<t_complex>::Random(ground_truth_image.size()).eval()));
   // Generates measurements from image
   uv_data.vis = (*sky_measurements) *
                 Image<t_complex>::Map(ground_truth_image.data(), ground_truth_image.size(), 1);

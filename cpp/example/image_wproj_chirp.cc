@@ -72,7 +72,7 @@ int main(int nargs, char const **args) {
           uv_vis, imsizey, imsizex, cell, cell, oversample_ratio,
           kernels::kernel_from_string.at(kernel), Ju, Jw, false, 1e-6, 1e-6,
           (radial) ? dde_type::wkernel_radial : dde_type::wkernel_2d),
-      power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
+      power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey).eval()));
   Vector<t_complex> const measurements =
       (measure_opw->adjoint() * Vector<t_complex>::Constant(1, 1)).conjugate();
   t_uint max_pos = 0;

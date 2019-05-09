@@ -44,7 +44,7 @@ int main(int nargs, char const **args) {
       measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           uv_data.u, uv_data.v, uv_data.w, uv_data.weights, M31.cols(), M31.rows(), over_sample,
           kernels::kernel_from_string.at(kernel), J, J),
-      100, 1e-4, Vector<t_complex>::Random(M31.size())));
+      100, 1e-4, Vector<t_complex>::Random(M31.size()).eval()));
   uv_data.vis = *measurements_transform * Vector<t_complex>::Map(M31.data(), M31.size());
   utilities::write_visibility(uv_data, vis_file);
 }

@@ -61,7 +61,7 @@ int main(int nargs, char const **args) {
           std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count() / total;
       // normalise operator
       mop_radial = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-          mop_radial, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
+          mop_radial, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey).eval()));
 
       start = std::chrono::high_resolution_clock::now();
       auto mop_2d = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
@@ -72,7 +72,7 @@ int main(int nargs, char const **args) {
           std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count() / total;
       // normalise operator
       mop_2d = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-          mop_2d, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
+          mop_2d, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey).eval()));
 
       start = std::chrono::high_resolution_clock::now();
       auto mop = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
@@ -83,7 +83,7 @@ int main(int nargs, char const **args) {
           std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count() / total;
       // normalise operator
       mop = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-          mop, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey)));
+          mop, power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey).eval()));
       diff_wr_w2d[i - 1] +=
           std::get<0>(sopt::algorithm::power_method<Vector<t_complex>>(
               {[=](Vector<t_complex> &out, const Vector<t_complex> &x) {
@@ -94,7 +94,7 @@ int main(int nargs, char const **args) {
                  out = (mop_radial->adjoint() * x) - (mop_2d->adjoint() * x);
                },
                mop_radial->adjoint().sizes()},
-              power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey))) /
+              power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey).eval())) /
           total;
       diff_mop_w2d[i - 1] +=
           std::get<0>(sopt::algorithm::power_method<Vector<t_complex>>(
@@ -106,7 +106,7 @@ int main(int nargs, char const **args) {
                  out = (mop_2d->adjoint() * x) - (mop->adjoint() * x);
                },
                mop_2d->adjoint().sizes()},
-              power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey))) /
+              power_iters, power_tol, Vector<t_complex>::Random(imsizex * imsizey).eval())) /
           total;
       trial++;
     }
