@@ -302,6 +302,38 @@
     </member>
   </compound>
   <compound kind="file">
+    <name>measurement_operator_wproj.cc</name>
+    <path>/mydata/cpp/benchmarks/</path>
+    <filename>http://astro-informatics.github.io/purify/measurement__operator__wproj_8cc</filename>
+    <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
+    <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
+    <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
+    <includes id="wide__field__utilities_8h" name="wide_field_utilities.h" local="yes" imported="no">purify/wide_field_utilities.h</includes>
+    <includes id="wproj__operators_8h" name="wproj_operators.h" local="yes" imported="no">purify/wproj_operators.h</includes>
+    <class kind="class">DegridOperatorCtorFixturePar</class>
+    <member kind="function">
+      <type></type>
+      <name>BENCHMARK_DEFINE_F</name>
+      <anchorfile>measurement__operator__wproj_8cc.html</anchorfile>
+      <anchor>ad1480f3bda78fed9d8bf382322b89848</anchor>
+      <arglist>(DegridOperatorCtorFixturePar, Distr)(benchmark</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>BENCHMARK_DEFINE_F</name>
+      <anchorfile>measurement__operator__wproj_8cc.html</anchorfile>
+      <anchor>a775a50347851cf9bfc5349ef699b04d1</anchor>
+      <arglist>(DegridOperatorCtorFixturePar, MPI)(benchmark</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>Args</name>
+      <anchorfile>measurement__operator__wproj_8cc.html</anchorfile>
+      <anchor>abf814573c0eebf9c0b4492469bbb0828</anchor>
+      <arglist>({64, 1000, 4}) -&gt; UseManualTime() -&gt;Repetitions(10) -&gt;Unit(benchmark::kMillisecond)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
     <name>padmm.cc</name>
     <path>/mydata/cpp/benchmarks/</path>
     <filename>http://astro-informatics.github.io/purify/padmm_8cc</filename>
@@ -444,8 +476,8 @@
       <type>utilities::vis_params</type>
       <name>random_measurements</name>
       <anchorfile>namespaceb__utilities.html</anchorfile>
-      <anchor>a7bf0bd5fea46254ea5c4e81af5c42d1c</anchor>
-      <arglist>(t_int size)</arglist>
+      <anchor>a224195343f875ecd21158fe98df7daf8</anchor>
+      <arglist>(t_int size, const t_real max_w, const t_int id)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -720,8 +752,8 @@
       <type>utilities::vis_params</type>
       <name>random_measurements</name>
       <anchorfile>namespaceb__utilities.html</anchorfile>
-      <anchor>a7bf0bd5fea46254ea5c4e81af5c42d1c</anchor>
-      <arglist>(t_int size)</arglist>
+      <anchor>a224195343f875ecd21158fe98df7daf8</anchor>
+      <arglist>(t_int size, const t_real max_w, const t_int id)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -1998,6 +2030,7 @@
     <path>/mydata/cpp/purify/</path>
     <filename>http://astro-informatics.github.io/purify/purify_2distribute_8cc</filename>
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
+    <includes id="wide__field__utilities_8h" name="wide_field_utilities.h" local="yes" imported="no">purify/wide_field_utilities.h</includes>
     <namespace>purify</namespace>
     <namespace>purify::distribute</namespace>
     <member kind="function">
@@ -2884,9 +2917,18 @@
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248a74136b24217cb75599440e6e1d807cf7">serial</enumvalue>
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248a3c25e5e5347476170daf56c780247dab">mpi_distribute_image</enumvalue>
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248ade789d500028594f8485e34f4fd201da">mpi_distribute_grid</enumvalue>
+      <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248affd4db530301a1cf705ff432f5c077df">mpi_distribute_all_to_all</enumvalue>
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248aeb435348cd1dd3b23bc83af306c8af4e">gpu_serial</enumvalue>
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248a3c5924386fd8ce3e082a2e4e2f73a3a2">gpu_mpi_distribute_image</enumvalue>
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248a91443239f9c1344dd49541bb99dfb3e0">gpu_mpi_distribute_grid</enumvalue>
+      <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248ad48fcb96c71f66bce3c404dcee372760">gpu_mpi_distribute_all_to_all</enumvalue>
+    </member>
+    <member kind="function">
+      <type>std::shared_ptr&lt; sopt::LinearTransform&lt; T &gt; &gt;</type>
+      <name>all_to_all_measurement_operator_factory</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html</anchorfile>
+      <anchor>a982d866a07f58b531103adeaf0a5c524</anchor>
+      <arglist>(const distributed_measurement_operator distribute, const std::vector&lt; t_int &gt; &amp;image_stacks, const std::vector&lt; t_real &gt; &amp;w_stacks, ARGS &amp;&amp;... args)</arglist>
     </member>
     <member kind="function">
       <type>std::shared_ptr&lt; sopt::LinearTransform&lt; T &gt; &gt;</type>
@@ -2912,11 +2954,25 @@
       <arglist>(vis_params &amp;uv_params, std::vector&lt; t_int &gt; const &amp;groups_, const t_int max_groups)</arglist>
     </member>
     <member kind="function">
+      <type>void</type>
+      <name>regroup</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
+      <anchor>a42c92f789242071d7235f91722adf1a2</anchor>
+      <arglist>(vis_params &amp;uv_params, std::vector&lt; t_int &gt; &amp;image_index, std::vector&lt; t_int &gt; const &amp;groups_, const t_int max_groups)</arglist>
+    </member>
+    <member kind="function">
       <type>vis_params</type>
       <name>regroup_and_scatter</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
       <anchor>acd42c5df2679743eb61058c3be5eaf01</anchor>
       <arglist>(vis_params const &amp;params, std::vector&lt; t_int &gt; const &amp;groups, sopt::mpi::Communicator const &amp;comm)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::tuple&lt; vis_params, std::vector&lt; t_int &gt; &gt;</type>
+      <name>regroup_and_all_to_all</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
+      <anchor>a0f47c1143385cefc9d38ee29767ebd98</anchor>
+      <arglist>(vis_params const &amp;params, const std::vector&lt; t_int &gt; &amp;image_index, std::vector&lt; t_int &gt; const &amp;groups, sopt::mpi::Communicator const &amp;comm)</arglist>
     </member>
     <member kind="function">
       <type>vis_params</type>
@@ -2966,6 +3022,13 @@
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
       <anchor>af19b6e8e20f56ac162dbbb8ad8136c51</anchor>
       <arglist>(utilities::vis_params const &amp;params, sopt::mpi::Communicator const &amp;comm, const t_int iters, const std::function&lt; t_real(t_real)&gt; &amp;cost)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::tuple&lt; utilities::vis_params, std::vector&lt; t_int &gt;, std::vector&lt; t_real &gt; &gt;</type>
+      <name>w_stacking_with_all_to_all</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
+      <anchor>a23a6781460a9f37faf1d8e9047e5be4e</anchor>
+      <arglist>(utilities::vis_params const &amp;params, const t_real du, const t_int min_support, const t_int max_support, sopt::mpi::Communicator const &amp;comm, const t_int iters, const t_real fill_relaxation, const std::function&lt; t_real(t_real)&gt; &amp;cost)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -3018,6 +3081,13 @@
       <anchor>a288d7453cd72dededadfb96cfcad60b4</anchor>
       <arglist>(const t_real &amp;oversample_ratio, const t_uint &amp;imsizey_, const t_uint &amp;imsizex_, const std::function&lt; t_real(t_real)&gt; ftkernelu, const std::function&lt; t_real(t_real)&gt; ftkernelv, const t_real &amp;w_mean, const t_real &amp;cellx, const t_real &amp;celly)</arglist>
     </member>
+    <member kind="function">
+      <type>Sparse&lt; t_complex &gt;</type>
+      <name>init_gridding_matrix_2d</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1details.html</anchorfile>
+      <anchor>ae4662f661f80d6a8d3bd2399b8f1d033</anchor>
+      <arglist>(const t_uint number_of_images, const std::vector&lt; t_int &gt; &amp;image_index, const Vector&lt; t_real &gt; &amp;u, const Vector&lt; t_real &gt; &amp;v, const Vector&lt; t_complex &gt; &amp;weights, const t_uint &amp;imsizey_, const t_uint &amp;imsizex_, const t_real &amp;oversample_ratio, const std::function&lt; t_real(t_real)&gt; kernelu, const std::function&lt; t_real(t_real)&gt; kernelv, const t_uint Ju=4, const t_uint Jv=4)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>operators.cc</name>
@@ -3027,6 +3097,7 @@
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="kernels_8h" name="kernels.h" local="yes" imported="no">purify/kernels.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
+    <includes id="wproj__operators_8h" name="wproj_operators.h" local="yes" imported="no">purify/wproj_operators.h</includes>
     <namespace>operators_test</namespace>
     <member kind="function">
       <type></type>
@@ -3034,6 +3105,20 @@
       <anchorfile>tests_2operators_8cc.html</anchorfile>
       <anchor>a3b57e179b9eee3862f82554801486322</anchor>
       <arglist>(&quot;Operators&quot;)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>TEST_CASE</name>
+      <anchorfile>tests_2operators_8cc.html</anchorfile>
+      <anchor>aebb05d785ed775c648cfb48487749ab7</anchor>
+      <arglist>(&quot;Degridding from multiple Images&quot;)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>TEST_CASE</name>
+      <anchorfile>tests_2operators_8cc.html</anchorfile>
+      <anchor>ab98363c37d88a29f0c6fac13f6ba71ea</anchor>
+      <arglist>(&quot;Degridding from multiple Images wproj&quot;)</arglist>
     </member>
     <member kind="variable">
       <type>const std::string</type>
@@ -3126,6 +3211,20 @@
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1details.html</anchorfile>
       <anchor>aadad7ec0a0d88c5ddd10f28a27d1b4a5</anchor>
       <arglist>(const Vector&lt; t_real &gt; &amp;u, const Vector&lt; t_real &gt; &amp;v, const Vector&lt; t_real &gt; &amp;w, const Vector&lt; t_complex &gt; &amp;weights, const t_uint imsizey_, const t_uint imsizex_, const t_real oversample_ratio, const std::function&lt; t_real(t_real)&gt; &amp;ftkerneluv, const std::function&lt; t_real(t_real)&gt; &amp;kerneluv, const t_uint Ju, const t_uint Jw, const t_real cellx, const t_real celly, const t_real abs_error, const t_real rel_error, const dde_type dde)</arglist>
+    </member>
+    <member kind="function">
+      <type>Sparse&lt; t_complex &gt;</type>
+      <name>init_gridding_matrix_2d</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1details.html</anchorfile>
+      <anchor>ae4662f661f80d6a8d3bd2399b8f1d033</anchor>
+      <arglist>(const t_uint number_of_images, const std::vector&lt; t_int &gt; &amp;image_index, const Vector&lt; t_real &gt; &amp;u, const Vector&lt; t_real &gt; &amp;v, const Vector&lt; t_complex &gt; &amp;weights, const t_uint &amp;imsizey_, const t_uint &amp;imsizex_, const t_real &amp;oversample_ratio, const std::function&lt; t_real(t_real)&gt; kernelu, const std::function&lt; t_real(t_real)&gt; kernelv, const t_uint Ju=4, const t_uint Jv=4)</arglist>
+    </member>
+    <member kind="function">
+      <type>Sparse&lt; t_complex &gt;</type>
+      <name>init_gridding_matrix_2d</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1details.html</anchorfile>
+      <anchor>aa342179670e55799abfce7fd1111ddaf</anchor>
+      <arglist>(const t_uint number_of_images, const std::vector&lt; t_int &gt; &amp;image_index, const std::vector&lt; t_real &gt; &amp;w_stacks, const Vector&lt; t_real &gt; &amp;u, const Vector&lt; t_real &gt; &amp;v, const Vector&lt; t_real &gt; &amp;w, const Vector&lt; t_complex &gt; &amp;weights, const t_uint imsizey_, const t_uint imsizex_, const t_real oversample_ratio, const std::function&lt; t_real(t_real)&gt; &amp;ftkerneluv, const std::function&lt; t_real(t_real)&gt; &amp;kerneluv, const t_uint Ju, const t_uint Jw, const t_real cellx, const t_real celly, const t_real abs_error, const t_real rel_error, const dde_type dde)</arglist>
     </member>
     <member kind="function">
       <type>Image&lt; t_complex &gt;</type>
@@ -4001,7 +4100,7 @@
     <name>wide_field_utilities.cc</name>
     <path>/mydata/cpp/purify/</path>
     <filename>http://astro-informatics.github.io/purify/purify_2wide__field__utilities_8cc</filename>
-    <includes id="wide__field__utilities_8h" name="wide_field_utilities.h" local="yes" imported="no">wide_field_utilities.h</includes>
+    <includes id="wide__field__utilities_8h" name="wide_field_utilities.h" local="yes" imported="no">purify/wide_field_utilities.h</includes>
     <namespace>purify</namespace>
     <namespace>purify::widefield</namespace>
     <member kind="function">
@@ -4220,6 +4319,13 @@
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1details.html</anchorfile>
       <anchor>a8baba6d82e8930a1b2571c541a660669</anchor>
       <arglist>(const t_real oversample_ratio, const t_uint imsizey_, const t_uint imsizex_, const std::function&lt; t_real(t_real)&gt; &amp;ftkerneluv, const t_real w_mean, const t_real cellx, const t_real celly)</arglist>
+    </member>
+    <member kind="function">
+      <type>Sparse&lt; t_complex &gt;</type>
+      <name>init_gridding_matrix_2d</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1details.html</anchorfile>
+      <anchor>aa342179670e55799abfce7fd1111ddaf</anchor>
+      <arglist>(const t_uint number_of_images, const std::vector&lt; t_int &gt; &amp;image_index, const std::vector&lt; t_real &gt; &amp;w_stacks, const Vector&lt; t_real &gt; &amp;u, const Vector&lt; t_real &gt; &amp;v, const Vector&lt; t_real &gt; &amp;w, const Vector&lt; t_complex &gt; &amp;weights, const t_uint imsizey_, const t_uint imsizex_, const t_real oversample_ratio, const std::function&lt; t_real(t_real)&gt; &amp;ftkerneluv, const std::function&lt; t_real(t_real)&gt; &amp;kerneluv, const t_uint Ju, const t_uint Jw, const t_real cellx, const t_real celly, const t_real abs_error, const t_real rel_error, const dde_type dde)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -4849,6 +4955,13 @@
       <anchor>a1ca7a856fcbb65b7b8e35aa90ef2b01b</anchor>
       <arglist>(&quot;k-means&quot;)</arglist>
     </member>
+    <member kind="function">
+      <type></type>
+      <name>TEST_CASE</name>
+      <anchorfile>kmeans_8cc.html</anchorfile>
+      <anchor>a53bd6ee2ef83fccfd23783c89e076f2e</anchor>
+      <arglist>(&quot;distribute w&quot;)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>measurement_factory.cc</name>
@@ -4969,6 +5082,27 @@
       <anchorfile>mpi__measurement__operator_8cc.html</anchorfile>
       <anchor>a4bbcc6111afbeac899814b202f828b81</anchor>
       <arglist>(&quot;Serial vs Distributed Fourier Grid Operator weighted&quot;)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>TEST_CASE</name>
+      <anchorfile>mpi__measurement__operator_8cc.html</anchorfile>
+      <anchor>a505638e0a45aa4b46764a659f661a0df</anchor>
+      <arglist>(&quot;Serial vs All to All Fourier Grid Operator weighted&quot;)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>TEST_CASE</name>
+      <anchorfile>mpi__measurement__operator_8cc.html</anchorfile>
+      <anchor>aa0aef85eac8b48803e29a13a946af746</anchor>
+      <arglist>(&quot;Standard vs All to All stacking&quot;)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>TEST_CASE</name>
+      <anchorfile>mpi__measurement__operator_8cc.html</anchorfile>
+      <anchor>a90e3710b1250e43936031ac08609cfcc</anchor>
+      <arglist>(&quot;Standard vs All to All wproj&quot;)</arglist>
     </member>
     <member kind="function">
       <type></type>
@@ -5708,6 +5842,20 @@
       <anchor>af6efd1bd4e930ee8fe1e980b60d03644</anchor>
       <arglist>(const ::benchmark::State &amp;state)</arglist>
     </member>
+    <member kind="function">
+      <type>void</type>
+      <name>SetUp</name>
+      <anchorfile>classDegridOperatorCtorFixturePar.html</anchorfile>
+      <anchor>a459dd3ab089e71fd83f9ed503f76a3c9</anchor>
+      <arglist>(const ::benchmark::State &amp;state)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>TearDown</name>
+      <anchorfile>classDegridOperatorCtorFixturePar.html</anchorfile>
+      <anchor>af6efd1bd4e930ee8fe1e980b60d03644</anchor>
+      <arglist>(const ::benchmark::State &amp;state)</arglist>
+    </member>
     <member kind="variable">
       <type>t_uint</type>
       <name>m_counter</name>
@@ -5755,6 +5903,27 @@
       <name>m_w_term</name>
       <anchorfile>classDegridOperatorCtorFixturePar.html</anchorfile>
       <anchor>a32ed96a79ff87a33ae546d8231ce76ff</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>utilities::vis_params</type>
+      <name>m_uv_data_all_to_all</name>
+      <anchorfile>classDegridOperatorCtorFixturePar.html</anchorfile>
+      <anchor>a6c826c98333762fefbb7eb3bca901fb2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; t_real &gt;</type>
+      <name>m_w_stacks</name>
+      <anchorfile>classDegridOperatorCtorFixturePar.html</anchorfile>
+      <anchor>a77c6c6f3bc326525ec8687b6c690ad15</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; t_int &gt;</type>
+      <name>m_image_index</name>
+      <anchorfile>classDegridOperatorCtorFixturePar.html</anchorfile>
+      <anchor>afa0904a6a4ad064d41abff5ace0ec19b</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -7068,8 +7237,8 @@
       <type>utilities::vis_params</type>
       <name>random_measurements</name>
       <anchorfile>namespaceb__utilities.html</anchorfile>
-      <anchor>a7bf0bd5fea46254ea5c4e81af5c42d1c</anchor>
-      <arglist>(t_int size)</arglist>
+      <anchor>a224195343f875ecd21158fe98df7daf8</anchor>
+      <arglist>(t_int size, const t_real max_w, const t_int id)</arglist>
     </member>
   </compound>
   <compound kind="namespace">
@@ -7592,8 +7761,22 @@
       <type>Sparse&lt; t_complex &gt;</type>
       <name>init_gridding_matrix_2d</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1details.html</anchorfile>
+      <anchor>ae4662f661f80d6a8d3bd2399b8f1d033</anchor>
+      <arglist>(const t_uint number_of_images, const std::vector&lt; t_int &gt; &amp;image_index, const Vector&lt; t_real &gt; &amp;u, const Vector&lt; t_real &gt; &amp;v, const Vector&lt; t_complex &gt; &amp;weights, const t_uint &amp;imsizey_, const t_uint &amp;imsizex_, const t_real &amp;oversample_ratio, const std::function&lt; t_real(t_real)&gt; kernelu, const std::function&lt; t_real(t_real)&gt; kernelv, const t_uint Ju=4, const t_uint Jv=4)</arglist>
+    </member>
+    <member kind="function">
+      <type>Sparse&lt; t_complex &gt;</type>
+      <name>init_gridding_matrix_2d</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1details.html</anchorfile>
       <anchor>aadad7ec0a0d88c5ddd10f28a27d1b4a5</anchor>
       <arglist>(const Vector&lt; t_real &gt; &amp;u, const Vector&lt; t_real &gt; &amp;v, const Vector&lt; t_real &gt; &amp;w, const Vector&lt; t_complex &gt; &amp;weights, const t_uint imsizey_, const t_uint imsizex_, const t_real oversample_ratio, const std::function&lt; t_real(t_real)&gt; &amp;ftkerneluv, const std::function&lt; t_real(t_real)&gt; &amp;kerneluv, const t_uint Ju, const t_uint Jw, const t_real cellx, const t_real celly, const t_real abs_error, const t_real rel_error, const dde_type dde)</arglist>
+    </member>
+    <member kind="function">
+      <type>Sparse&lt; t_complex &gt;</type>
+      <name>init_gridding_matrix_2d</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1details.html</anchorfile>
+      <anchor>aa342179670e55799abfce7fd1111ddaf</anchor>
+      <arglist>(const t_uint number_of_images, const std::vector&lt; t_int &gt; &amp;image_index, const std::vector&lt; t_real &gt; &amp;w_stacks, const Vector&lt; t_real &gt; &amp;u, const Vector&lt; t_real &gt; &amp;v, const Vector&lt; t_real &gt; &amp;w, const Vector&lt; t_complex &gt; &amp;weights, const t_uint imsizey_, const t_uint imsizex_, const t_real oversample_ratio, const std::function&lt; t_real(t_real)&gt; &amp;ftkerneluv, const std::function&lt; t_real(t_real)&gt; &amp;kerneluv, const t_uint Ju, const t_uint Jw, const t_real cellx, const t_real celly, const t_real abs_error, const t_real rel_error, const dde_type dde)</arglist>
     </member>
     <member kind="function">
       <type>Sparse&lt; t_complex &gt;</type>
@@ -7709,9 +7892,11 @@
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248a74136b24217cb75599440e6e1d807cf7">serial</enumvalue>
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248a3c25e5e5347476170daf56c780247dab">mpi_distribute_image</enumvalue>
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248ade789d500028594f8485e34f4fd201da">mpi_distribute_grid</enumvalue>
+      <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248affd4db530301a1cf705ff432f5c077df">mpi_distribute_all_to_all</enumvalue>
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248aeb435348cd1dd3b23bc83af306c8af4e">gpu_serial</enumvalue>
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248a3c5924386fd8ce3e082a2e4e2f73a3a2">gpu_mpi_distribute_image</enumvalue>
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248a91443239f9c1344dd49541bb99dfb3e0">gpu_mpi_distribute_grid</enumvalue>
+      <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a6b8de5116c3d7d0d679cd6dd47a80248ad48fcb96c71f66bce3c404dcee372760">gpu_mpi_distribute_all_to_all</enumvalue>
     </member>
     <member kind="enumeration">
       <type></type>
@@ -7742,6 +7927,13 @@
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html</anchorfile>
       <anchor>aa6f2e06bcd3586e4583b44f1feb07abd</anchor>
       <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::shared_ptr&lt; sopt::LinearTransform&lt; T &gt; &gt;</type>
+      <name>all_to_all_measurement_operator_factory</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html</anchorfile>
+      <anchor>a982d866a07f58b531103adeaf0a5c524</anchor>
+      <arglist>(const distributed_measurement_operator distribute, const std::vector&lt; t_int &gt; &amp;image_stacks, const std::vector&lt; t_real &gt; &amp;w_stacks, ARGS &amp;&amp;... args)</arglist>
     </member>
     <member kind="function">
       <type>std::shared_ptr&lt; sopt::LinearTransform&lt; T &gt; &gt;</type>
@@ -8621,11 +8813,25 @@
       <arglist>(vis_params &amp;uv_params, std::vector&lt; t_int &gt; const &amp;groups_, const t_int max_groups)</arglist>
     </member>
     <member kind="function">
+      <type>void</type>
+      <name>regroup</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
+      <anchor>a42c92f789242071d7235f91722adf1a2</anchor>
+      <arglist>(vis_params &amp;uv_params, std::vector&lt; t_int &gt; &amp;image_index, std::vector&lt; t_int &gt; const &amp;groups_, const t_int max_groups)</arglist>
+    </member>
+    <member kind="function">
       <type>vis_params</type>
       <name>regroup_and_scatter</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
       <anchor>acd42c5df2679743eb61058c3be5eaf01</anchor>
       <arglist>(vis_params const &amp;params, std::vector&lt; t_int &gt; const &amp;groups, sopt::mpi::Communicator const &amp;comm)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::tuple&lt; vis_params, std::vector&lt; t_int &gt; &gt;</type>
+      <name>regroup_and_all_to_all</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
+      <anchor>a0f47c1143385cefc9d38ee29767ebd98</anchor>
+      <arglist>(vis_params const &amp;params, const std::vector&lt; t_int &gt; &amp;image_index, std::vector&lt; t_int &gt; const &amp;groups, sopt::mpi::Communicator const &amp;comm)</arglist>
     </member>
     <member kind="function">
       <type>vis_params</type>
@@ -8675,6 +8881,13 @@
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
       <anchor>af19b6e8e20f56ac162dbbb8ad8136c51</anchor>
       <arglist>(utilities::vis_params const &amp;params, sopt::mpi::Communicator const &amp;comm, const t_int iters, const std::function&lt; t_real(t_real)&gt; &amp;cost)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::tuple&lt; utilities::vis_params, std::vector&lt; t_int &gt;, std::vector&lt; t_real &gt; &gt;</type>
+      <name>w_stacking_with_all_to_all</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
+      <anchor>a23a6781460a9f37faf1d8e9047e5be4e</anchor>
+      <arglist>(utilities::vis_params const &amp;params, const t_real du, const t_int min_support, const t_int max_support, sopt::mpi::Communicator const &amp;comm, const t_int iters, const t_real fill_relaxation, const std::function&lt; t_real(t_real)&gt; &amp;cost)</arglist>
     </member>
     <member kind="function">
       <type>t_real</type>

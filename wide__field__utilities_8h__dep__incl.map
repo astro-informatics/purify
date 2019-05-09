@@ -1,11 +1,13 @@
 <map id="/mydata/cpp/purify/wide_field_utilities.h" name="/mydata/cpp/purify/wide_field_utilities.h">
-<area shape="rect" id="node2" href="$compare__wprojection_8cc.html" title="/mydata/cpp/example\l/compare_wprojection.cc" alt="" coords="5,95,189,136"/>
-<area shape="rect" id="node3" href="$image__wproj__chirp_8cc.html" title="/mydata/cpp/example\l/image_wproj_chirp.cc" alt="" coords="214,95,381,136"/>
-<area shape="rect" id="node4" href="$plot__wkernel_8cc.html" title="/mydata/cpp/example\l/plot_wkernel.cc" alt="" coords="405,95,569,136"/>
-<area shape="rect" id="node5" href="$main_8cc.html" title="/mydata/cpp/main.cc" alt="" coords="593,102,751,129"/>
-<area shape="rect" id="node6" href="$purify_2operators_8cc.html" title="/mydata/cpp/purify\l/operators.cc" alt="" coords="775,95,921,136"/>
-<area shape="rect" id="node7" href="$purify_2wide__field__utilities_8cc.html" title="/mydata/cpp/purify\l/wide_field_utilities.cc" alt="" coords="945,95,1111,136"/>
-<area shape="rect" id="node8" href="$wproj__operators_8cc.html" title="/mydata/cpp/purify\l/wproj_operators.cc" alt="" coords="1136,95,1285,136"/>
-<area shape="rect" id="node9" href="$tests_2wide__field__utilities_8cc.html" title="/mydata/cpp/tests/wide\l_field_utilities.cc" alt="" coords="1310,95,1485,136"/>
-<area shape="rect" id="node10" href="$wkernel_8cc.html" title="/mydata/cpp/tests/wkernel.cc" alt="" coords="1509,102,1723,129"/>
+<area shape="rect" id="node2" href="$measurement__operator__wproj_8cc.html" title="/mydata/cpp/benchmarks\l/measurement_operator\l_wproj.cc" alt="" coords="5,95,192,151"/>
+<area shape="rect" id="node3" href="$compare__wprojection_8cc.html" title="/mydata/cpp/example\l/compare_wprojection.cc" alt="" coords="216,102,400,143"/>
+<area shape="rect" id="node4" href="$image__wproj__chirp_8cc.html" title="/mydata/cpp/example\l/image_wproj_chirp.cc" alt="" coords="425,102,591,143"/>
+<area shape="rect" id="node5" href="$plot__wkernel_8cc.html" title="/mydata/cpp/example\l/plot_wkernel.cc" alt="" coords="615,102,779,143"/>
+<area shape="rect" id="node6" href="$main_8cc.html" title="/mydata/cpp/main.cc" alt="" coords="803,109,962,136"/>
+<area shape="rect" id="node7" href="$purify_2distribute_8cc.html" title="/mydata/cpp/purify\l/distribute.cc" alt="" coords="986,102,1131,143"/>
+<area shape="rect" id="node8" href="$purify_2operators_8cc.html" title="/mydata/cpp/purify\l/operators.cc" alt="" coords="1155,102,1301,143"/>
+<area shape="rect" id="node9" href="$purify_2wide__field__utilities_8cc.html" title="/mydata/cpp/purify\l/wide_field_utilities.cc" alt="" coords="1325,102,1491,143"/>
+<area shape="rect" id="node10" href="$wproj__operators_8cc.html" title="/mydata/cpp/purify\l/wproj_operators.cc" alt="" coords="1516,102,1665,143"/>
+<area shape="rect" id="node11" href="$tests_2wide__field__utilities_8cc.html" title="/mydata/cpp/tests/wide\l_field_utilities.cc" alt="" coords="1690,102,1865,143"/>
+<area shape="rect" id="node12" href="$wkernel_8cc.html" title="/mydata/cpp/tests/wkernel.cc" alt="" coords="1889,109,2103,136"/>
 </map>
