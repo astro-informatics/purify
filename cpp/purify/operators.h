@@ -15,6 +15,7 @@
 #include <fftw3.h>
 
 #ifdef PURIFY_MPI
+#include "purify/AllToAllSparseVector.h"
 #include "purify/DistributeSparseVector.h"
 #include "purify/IndexMapping.h"
 #include "purify/mpi_utilities.h"
@@ -32,7 +33,6 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
                                           const std::function<t_real(t_real)> kernelu,
                                           const std::function<t_real(t_real)> kernelv,
                                           const t_uint Ju = 4, const t_uint Jv = 4);
-
 //! Construct gridding matrix with wprojection
 Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<t_real> &v,
                                           const Vector<t_real> &w, const Vector<t_complex> &weights,
@@ -43,6 +43,25 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
                                           const t_uint Ju, const t_uint Jw, const t_real cellx,
                                           const t_real celly, const t_real abs_error,
                                           const t_real rel_error, const dde_type dde);
+
+//! Construct all to all gridding matrix
+Sparse<t_complex> init_gridding_matrix_2d(const t_uint number_of_images,
+                                          const std::vector<t_int> &image_index,
+                                          const Vector<t_real> &u, const Vector<t_real> &v,
+                                          const Vector<t_complex> &weights, const t_uint &imsizey_,
+                                          const t_uint &imsizex_, const t_real &oversample_ratio,
+                                          const std::function<t_real(t_real)> kernelu,
+                                          const std::function<t_real(t_real)> kernelv,
+                                          const t_uint Ju = 4, const t_uint Jv = 4);
+//! Construct all to all gridding matrix with wprojection
+Sparse<t_complex> init_gridding_matrix_2d(
+    const t_uint number_of_images, const std::vector<t_int> &image_index,
+    const std::vector<t_real> &w_stacks, const Vector<t_real> &u, const Vector<t_real> &v,
+    const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint imsizey_,
+    const t_uint imsizex_, const t_real oversample_ratio,
+    const std::function<t_real(t_real)> &ftkerneluv, const std::function<t_real(t_real)> &kerneluv,
+    const t_uint Ju, const t_uint Jw, const t_real cellx, const t_real celly,
+    const t_real abs_error, const t_real rel_error, const dde_type dde);
 
 //! Given the Fourier transform of a gridding kernel, creates the scaling image for gridding
 //! correction.
@@ -97,6 +116,32 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_gridding_m
         } else {
           distributor.gather(utilities::sparse_multiply_matrix(*adjoint, input), output);
         }
+      });
+}
+
+//! Constructs degridding operator using MPI all to all
+template <class T, class... ARGS>
+std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_gridding_matrix_2d_all_to_all(
+    const sopt::mpi::Communicator &comm, const t_int local_grid_size, const t_int start_index,
+    const t_uint number_of_images, const std::vector<t_int> &image_index, ARGS &&... args) {
+  Sparse<t_complex> interpolation_matrix_original =
+      details::init_gridding_matrix_2d(number_of_images, image_index, std::forward<ARGS>(args)...);
+  const AllToAllSparseVector distributor(interpolation_matrix_original, local_grid_size,
+                                         start_index, comm);
+  const std::shared_ptr<const Sparse<t_complex>> interpolation_matrix =
+      std::make_shared<const Sparse<t_complex>>(
+          purify::compress_outer(interpolation_matrix_original));
+  const std::shared_ptr<const Sparse<t_complex>> adjoint =
+      std::make_shared<const Sparse<t_complex>>(interpolation_matrix->adjoint());
+
+  return std::make_tuple(
+      [=](T &output, const T &input) {
+        assert(input.size() > 0);
+        distributor.recv_grid(input, output);
+        output = utilities::sparse_multiply_matrix(*interpolation_matrix, output);
+      },
+      [=](T &output, const T &input) {
+        distributor.send_grid(utilities::sparse_multiply_matrix(*adjoint, input), output);
       });
 }
 
@@ -350,6 +395,43 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_mpi_degrid
   else
     return std::make_tuple(directG, indirectG);
 }
+template <class T>
+std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>>
+base_mpi_all_to_all_degrid_operator_2d(
+    const sopt::mpi::Communicator &comm, const std::vector<t_int> &image_index,
+    const std::vector<t_real> &w_stacks, const Vector<t_real> &u, const Vector<t_real> &v,
+    const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint &imsizey,
+    const t_uint &imsizex, const t_real oversample_ratio = 2,
+    const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
+    const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
+    const bool w_stacking = false, const t_real cellx = 1, const t_real celly = 1) {
+  const t_uint number_of_images = comm.size();
+  if (std::any_of(image_index.begin(), image_index.end(), [&number_of_images](int index) {
+        return index < 0 or index > (number_of_images - 1);
+      }))
+    throw std::runtime_error("Image index is out of bounds");
+  std::function<t_real(t_real)> kernelu, kernelv, ftkernelu, ftkernelv;
+  std::tie(kernelu, kernelv, ftkernelu, ftkernelv) =
+      purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
+  sopt::OperatorFunction<T> directFZ, indirectFZ;
+  t_real const w_mean = w_stacking ? w_stacks.at(comm.rank()) : 0.;
+  std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(
+      ftkernelu, ftkernelv, imsizey, imsizex, oversample_ratio, ft_plan, w_mean, cellx, celly);
+  sopt::OperatorFunction<T> directG, indirectG;
+  PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
+                    imsizey * celly / (60. * 60.));
+  PURIFY_LOW_LOG("Constructing Weighting and MPI Gridding Operators: WG");
+  PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
+  const t_int local_grid_size =
+      std::floor(imsizex * oversample_ratio) * std::floor(imsizex * oversample_ratio);
+  std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d_all_to_all<T>(
+      comm, local_grid_size, comm.rank() * local_grid_size, number_of_images, image_index, u, v,
+      weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv);
+  auto direct = sopt::chained_operators<T>(directG, directFZ);
+  auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
+  PURIFY_LOW_LOG("Finished consturction of Φ.");
+  return std::make_tuple(direct, indirect);
+}
 #endif
 
 }  // namespace operators
@@ -468,6 +550,51 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d_mpi(
   return init_degrid_operator_2d_mpi<T>(comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey,
                                         imsizex, oversample_ratio, kernel, Ju, Jv, w_stacking,
                                         cell_x, cell_y);
+}
+
+//! Returns linear transform that is the weighted degridding operator with a distributed Fourier
+//! grid
+template <class T>
+std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d_all_to_all(
+    const sopt::mpi::Communicator &comm, const std::vector<t_int> &image_index,
+    const std::vector<t_real> &w_stacks, const Vector<t_real> &u, const Vector<t_real> &v,
+    const Vector<t_real> &w, const Vector<t_complex> &weights, const t_uint imsizey,
+    const t_uint imsizex, const t_real oversample_ratio = 2,
+    const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
+    const bool w_stacking = false, const t_real cellx = 1, const t_real celly = 1) {
+  const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
+  std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizey * imsizex)};
+  std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
+  auto Broadcast = purify::operators::init_broadcaster<T>(comm);
+  sopt::OperatorFunction<T> directDegrid, indirectDegrid;
+  std::tie(directDegrid, indirectDegrid) =
+      purify::operators::base_mpi_all_to_all_degrid_operator_2d<T>(
+          comm, image_index, w_stacks, u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel,
+          Ju, Jv, ft_plan, w_stacking, cellx, celly);
+
+  const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
+  auto direct = directDegrid;
+  auto indirect = sopt::chained_operators<T>(allsumall, indirectDegrid);
+  return std::make_shared<sopt::LinearTransform<T>>(direct, M, indirect, N);
+}
+
+template <class T>
+std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_2d_all_to_all(
+    const sopt::mpi::Communicator &comm, const std::vector<t_int> &image_index,
+    const std::vector<t_real> &w_stacks, const utilities::vis_params &uv_vis_input,
+    const t_uint imsizey, const t_uint imsizex, const t_real cell_x, const t_real cell_y,
+    const t_real oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
+    const t_uint Ju = 4, const t_uint Jv = 4, const bool w_stacking = false) {
+  auto uv_vis = uv_vis_input;
+  if (uv_vis.units == utilities::vis_units::lambda)
+    uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
+  if (uv_vis.units == utilities::vis_units::radians)
+    uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
+                                 std::floor(oversample_ratio * imsizey));
+
+  return init_degrid_operator_2d_all_to_all<T>(
+      comm, image_index, w_stacks, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex,
+      oversample_ratio, kernel, Ju, Jv, w_stacking, cell_x, cell_y);
 }
 #endif
 

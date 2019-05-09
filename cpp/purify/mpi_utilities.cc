@@ -6,7 +6,14 @@
 
 namespace purify {
 namespace utilities {
+
 void regroup(vis_params &uv_params, std::vector<t_int> const &groups_, const t_int max_groups) {
+  std::vector<t_int> image_index(uv_params.size(), 0);
+  regroup(uv_params, image_index, groups_, max_groups);
+}
+
+void regroup(vis_params &uv_params, std::vector<t_int> &image_index,
+             std::vector<t_int> const &groups_, const t_int max_groups) {
   std::vector<t_int> groups = groups_;
   // Figure out size of each group
   std::map<t_int, t_int> sizes;
@@ -62,6 +69,7 @@ void regroup(vis_params &uv_params, std::vector<t_int> const &groups_, const t_i
     std::swap(uv_params.w(i), uv_params.w(swapper));
     std::swap(uv_params.vis(i), uv_params.vis(swapper));
     std::swap(uv_params.weights(i), uv_params.weights(swapper));
+    std::swap(image_index[i], image_index[swapper]);
 
     ++swapper;
   }
@@ -84,11 +92,14 @@ vis_params regroup_and_scatter(vis_params const &params, std::vector<t_int> cons
   regroup(copy, groups, comm.size());
   return scatter_visibilities(copy, sizes, comm);
 }
-vis_params regroup_and_all_to_all(vis_params const &params, std::vector<t_int> const &groups,
-                                  sopt::mpi::Communicator const &comm) {
-  if (comm.size() == 1) return params;
+std::tuple<vis_params, std::vector<t_int>> regroup_and_all_to_all(
+    vis_params const &params, const std::vector<t_int> &image_index,
+    std::vector<t_int> const &groups, sopt::mpi::Communicator const &comm) {
+  if (comm.size() == 1) return std::make_tuple(params, image_index);
   vis_params copy = params;
-  regroup(copy, groups, comm.size());
+  std::vector<t_int> index_copy(image_index.size());
+  std::copy(image_index.begin(), image_index.end(), index_copy.begin());
+  regroup(copy, index_copy, groups, comm.size());
 
   std::vector<t_int> sizes(comm.size());
   std::fill(sizes.begin(), sizes.end(), 0);
@@ -98,7 +109,14 @@ vis_params regroup_and_all_to_all(vis_params const &params, std::vector<t_int> c
     ++sizes[group];
   }
 
-  return all_to_all_visibilities(copy, sizes, comm);
+  return std::make_tuple(all_to_all_visibilities(copy, sizes, comm),
+                         comm.all_to_allv(index_copy, sizes));
+}
+
+vis_params regroup_and_all_to_all(vis_params const &params, std::vector<t_int> const &groups,
+                                  sopt::mpi::Communicator const &comm) {
+  return std::get<0>(
+      regroup_and_all_to_all(params, std::vector<t_int>(params.size(), 0), groups, comm));
 }
 
 vis_params all_to_all_visibilities(vis_params const &params, std::vector<t_int> const &sizes,
@@ -177,9 +195,26 @@ utilities::vis_params set_cell_size(const sopt::mpi::Communicator &comm,
 utilities::vis_params w_stacking(utilities::vis_params const &params,
                                  sopt::mpi::Communicator const &comm, const t_int iters,
                                  const std::function<t_real(t_real)> &cost) {
-  const std::vector<t_int> w_stacks =
+  const std::vector<t_int> image_index =
       std::get<0>(distribute::kmeans_algo(params.w, comm.size(), iters, comm, cost));
-  return utilities::regroup_and_all_to_all(params, w_stacks, comm);
+  return utilities::regroup_and_all_to_all(params, image_index, comm);
+}
+std::tuple<utilities::vis_params, std::vector<t_int>, std::vector<t_real>>
+w_stacking_with_all_to_all(utilities::vis_params const &params, const t_real du,
+                           const t_int min_support, const t_int max_support,
+                           sopt::mpi::Communicator const &comm, const t_int iters,
+                           const t_real fill_relaxation,
+                           const std::function<t_real(t_real)> &cost) {
+  const auto kmeans = distribute::kmeans_algo(params.w, comm.size(), iters, comm, cost);
+  const std::vector<t_real> &w_stacks = std::get<1>(kmeans);
+  const std::vector<t_int> groups = distribute::w_support(
+      params.w, std::get<0>(kmeans), w_stacks, du, min_support, max_support, fill_relaxation, comm);
+  utilities::vis_params outdata;
+  std::vector<t_int> image_index;
+  std::tie(outdata, image_index) =
+      utilities::regroup_and_all_to_all(params, std::get<0>(kmeans), groups, comm);
+  return std::tuple<utilities::vis_params, std::vector<t_int>, std::vector<t_real>>(
+      outdata, image_index, w_stacks);
 }
 }  // namespace utilities
 }  // namespace purify

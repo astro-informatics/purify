@@ -145,6 +145,7 @@ void YamlParser::parseAndSetGeneralConfiguration(const YAML::Node& generalConfig
         get<t_real>(generalConfigNode, {"InputOutput", "input", "simulation", "signal_to_noise"});
     this->number_of_measurements_ = get<t_int>(
         generalConfigNode, {"InputOutput", "input", "simulation", "number_of_measurements"});
+    this->sim_J_ = get<t_int>(generalConfigNode, {"InputOutput", "input", "simulation", "sim_J"});
     this->w_rms_ = get<t_real>(generalConfigNode, {"InputOutput", "input", "simulation", "w_rms"});
     this->measurements_ = get_vector<std::vector<std::string>>(
         generalConfigNode, {"InputOutput", "input", "simulation", "coverage_files"});
@@ -184,6 +185,7 @@ void YamlParser::parseAndSetMeasureOperators(const YAML::Node& measureOperatorsN
   this->gpu_ = get<bool>(measureOperatorsNode, {"gpu"});
   this->wprojection_ = get<bool>(measureOperatorsNode, {"wide-field", "wprojection"});
   this->mpi_wstacking_ = get<bool>(measureOperatorsNode, {"wide-field", "mpi_wstacking"});
+  this->mpi_all_to_all_ = get<bool>(measureOperatorsNode, {"wide-field", "mpi_all_to_all"});
   this->kmeans_iters_ = get<t_int>(measureOperatorsNode, {"wide-field", "kmeans_iterations"});
   this->conjugate_w_ = get<bool>(measureOperatorsNode, {"wide-field", "conjugate_w"});
 }

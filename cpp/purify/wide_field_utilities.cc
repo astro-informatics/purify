@@ -1,4 +1,4 @@
-#include "wide_field_utilities.h"
+#include "purify/wide_field_utilities.h"
 
 namespace purify {
 namespace widefield {

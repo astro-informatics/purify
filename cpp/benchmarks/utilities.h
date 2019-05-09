@@ -28,7 +28,7 @@ std::tuple<utilities::vis_params, t_real> dirty_measurements(
     Image<t_complex> const& ground_truth_image, t_uint number_of_vis, t_real snr,
     const t_real& cellsize);
 
-utilities::vis_params random_measurements(t_int size);
+utilities::vis_params random_measurements(t_int size, const t_real max_w = 100, const t_int id = 0);
 #ifdef PURIFY_MPI
 double duration(std::chrono::high_resolution_clock::time_point start,
                 std::chrono::high_resolution_clock::time_point end,
