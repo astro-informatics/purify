@@ -1,6 +1,7 @@
 var searchData=
 [
   ['imagingforwardbackward',['ImagingForwardBackward',['http://astro-informatics.github.io/sopt/classsopt_1_1algorithm_1_1ImagingForwardBackward.html',1,'sopt::algorithm']]],
+  ['imagingprimaldual',['ImagingPrimalDual',['http://astro-informatics.github.io/sopt/classsopt_1_1algorithm_1_1ImagingPrimalDual.html',1,'sopt::algorithm']]],
   ['imagingproximaladmm',['ImagingProximalADMM',['http://astro-informatics.github.io/sopt/classsopt_1_1algorithm_1_1ImagingProximalADMM.html',1,'sopt::algorithm']]],
   ['indexmapping',['IndexMapping',['../classpurify_1_1IndexMapping.html',1,'purify']]],
   ['introspectsdmm',['IntrospectSDMM',['http://astro-informatics.github.io/sopt/classIntrospectSDMM.html',1,'']]],

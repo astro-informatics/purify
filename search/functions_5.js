@@ -1,7 +1,7 @@
 var searchData=
 [
   ['f_5fgradient',['f_gradient',['classsopt_1_1algorithm_1_1ForwardBackward.html#ad5ff963c11f8f31a2fb3802daf99d16b',1,'sopt::algorithm::ForwardBackward']]],
-  ['f_5fproximal',['f_proximal',['classsopt_1_1algorithm_1_1ProximalADMM.html#a96a4fb1c1b4e9aaf8c716d2c3d416538',1,'sopt::algorithm::ProximalADMM']]],
+  ['f_5fproximal',['f_proximal',['classsopt_1_1algorithm_1_1PrimalDual.html#aa68279f9bc2127ea66e52012022d86d9',1,'sopt::algorithm::PrimalDual::f_proximal()'],['classsopt_1_1algorithm_1_1ProximalADMM.html#a96a4fb1c1b4e9aaf8c716d2c3d416538',1,'sopt::algorithm::ProximalADMM::f_proximal()']]],
   ['factory',['factory',['http://astro-informatics.github.io/sopt/namespacesopt_1_1wavelets.html#a65aedf4b737bb07c94642b42fe99bfab',1,'sopt::wavelets']]],
   ['fb_5ffactory',['fb_factory',['../namespacepurify_1_1factory.html#aa6f2e06bcd3586e4583b44f1feb07abd',1,'purify::factory']]],
   ['field_5fids',['field_ids',['../classpurify_1_1casa_1_1MeasurementSet_1_1ChannelWrapper.html#a1fa7d891f0d3ae941e541405078a055e',1,'purify::casa::MeasurementSet::ChannelWrapper']]],

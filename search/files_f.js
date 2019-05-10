@@ -7,7 +7,7 @@ var searchData=
   ['registered_5ftypes_2ecc',['registered_types.cc',['http://astro-informatics.github.io/sopt/registered__types_8cc.html',1,'']]],
   ['registered_5ftypes_2eh',['registered_types.h',['http://astro-informatics.github.io/sopt/registered__types_8h.html',1,'']]],
   ['relative_5fvariation_2eh',['relative_variation.h',['http://astro-informatics.github.io/sopt/relative__variation_8h.html',1,'']]],
-  ['reweighted_2ecc',['reweighted.cc',['http://astro-informatics.github.io/sopt/examples_2primal__dual_2reweighted_8cc.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/examples_2proximal__admm_2reweighted_8cc.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/examples_2sdmm_2reweighted_8cc.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/tests_2reweighted_8cc.html',1,'(Global Namespace)']]],
+  ['reweighted_2ecc',['reweighted.cc',['http://astro-informatics.github.io/sopt/examples_2proximal__admm_2reweighted_8cc.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/examples_2sdmm_2reweighted_8cc.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/tests_2reweighted_8cc.html',1,'(Global Namespace)']]],
   ['reweighted_2eh',['reweighted.h',['http://astro-informatics.github.io/sopt/reweighted_8h.html',1,'']]],
   ['reweighted_5fsdmm_2ecc',['reweighted_sdmm.cc',['http://astro-informatics.github.io/sopt/reweighted__sdmm_8cc.html',1,'']]]
 ];

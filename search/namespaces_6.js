@@ -6,6 +6,7 @@ var searchData=
   ['forwardbackward',['ForwardBackward',['http://astro-informatics.github.io/sopt/structsopt_1_1algorithm_1_1ForwardBackward_1_1Diagnostic.html',1,'sopt::algorithm']]],
   ['hasvaluetype',['HasValueType',['http://astro-informatics.github.io/sopt/structsopt_1_1details_1_1HasValueType_1_1Derived.html',1,'sopt::details']]],
   ['imagingforwardbackward',['ImagingForwardBackward',['http://astro-informatics.github.io/sopt/structsopt_1_1algorithm_1_1ImagingForwardBackward_1_1Diagnostic.html',1,'sopt::algorithm']]],
+  ['imagingprimaldual',['ImagingPrimalDual',['http://astro-informatics.github.io/sopt/structsopt_1_1algorithm_1_1ImagingPrimalDual_1_1Diagnostic.html',1,'sopt::algorithm']]],
   ['imagingproximaladmm',['ImagingProximalADMM',['http://astro-informatics.github.io/sopt/structsopt_1_1algorithm_1_1ImagingProximalADMM_1_1Diagnostic.html',1,'sopt::algorithm']]],
   ['jointmap',['JointMAP',['http://astro-informatics.github.io/sopt/structsopt_1_1algorithm_1_1JointMAP_1_1DiagnosticAndResultReg.html',1,'sopt::algorithm']]],
   ['l1',['L1',['http://astro-informatics.github.io/sopt/classsopt_1_1proximal_1_1L1_1_1Breaker.html',1,'sopt::proximal']]],

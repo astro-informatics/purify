@@ -1,7 +1,7 @@
 var searchData=
 [
   ['f_5fgradient',['f_gradient',['classsopt_1_1algorithm_1_1ForwardBackward.html#ad5ff963c11f8f31a2fb3802daf99d16b',1,'sopt::algorithm::ForwardBackward']]],
-  ['f_5fproximal',['f_proximal',['classsopt_1_1algorithm_1_1ProximalADMM.html#a96a4fb1c1b4e9aaf8c716d2c3d416538',1,'sopt::algorithm::ProximalADMM']]],
+  ['f_5fproximal',['f_proximal',['classsopt_1_1algorithm_1_1PrimalDual.html#aa68279f9bc2127ea66e52012022d86d9',1,'sopt::algorithm::PrimalDual::f_proximal()'],['classsopt_1_1algorithm_1_1ProximalADMM.html#a96a4fb1c1b4e9aaf8c716d2c3d416538',1,'sopt::algorithm::ProximalADMM::f_proximal()']]],
   ['factory',['factory',['classsopt_1_1wavelets_1_1Wavelet.html#a127561e37a23c4cfde3ec8935ebded8f',1,'sopt::wavelets::Wavelet::factory()'],['http://astro-informatics.github.io/sopt/namespacesopt_1_1wavelets.html#a65aedf4b737bb07c94642b42fe99bfab',1,'sopt::wavelets::factory()']]],
   ['fallback',['Fallback',['http://astro-informatics.github.io/sopt/structsopt_1_1details_1_1HasValueType_1_1Fallback.html',1,'sopt::details::HasValueType']]],
   ['fb_5ffactory',['fb_factory',['../namespacepurify_1_1factory.html#aa6f2e06bcd3586e4583b44f1feb07abd',1,'purify::factory']]],

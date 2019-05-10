@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['g_5fproximal',['g_proximal',['classsopt_1_1algorithm_1_1ForwardBackward.html#aded1ee9c25417d1f0f5333e7c6b833b0',1,'sopt::algorithm::ForwardBackward::g_proximal()'],['classsopt_1_1algorithm_1_1ProximalADMM.html#a463d5fe15218df71370f16b70e22472a',1,'sopt::algorithm::ProximalADMM::g_proximal()']]],
+  ['g_5fproximal',['g_proximal',['classsopt_1_1algorithm_1_1ForwardBackward.html#aded1ee9c25417d1f0f5333e7c6b833b0',1,'sopt::algorithm::ForwardBackward::g_proximal()'],['classsopt_1_1algorithm_1_1PrimalDual.html#ac422e051ec531e547a854cbab7cb004a',1,'sopt::algorithm::PrimalDual::g_proximal()'],['classsopt_1_1algorithm_1_1ProximalADMM.html#a463d5fe15218df71370f16b70e22472a',1,'sopt::algorithm::ProximalADMM::g_proximal()']]],
   ['gaussian',['gaussian',['../namespacepurify_1_1kernels.html#aca4681b624d0137ad6a594cf93393015',1,'purify::kernels']]],
   ['gaussian_5fgeneral',['gaussian_general',['../namespacepurify_1_1kernels.html#a9144b80de7e992f02fa42d2f2e4557b7',1,'purify::kernels']]],
   ['gcd',['gcd',['http://astro-informatics.github.io/sopt/namespacesopt_1_1details.html#a19d03d9b49ed12e7f7b91cb8b19e1db2',1,'sopt::details']]],
