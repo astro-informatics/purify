@@ -118,7 +118,7 @@ t_real pswf(const t_real x, const t_real J) {
 */
   const t_real eta0 = 2 * x / J;
   const t_real alpha = 1;
-  return calc_for_pswf(eta0, J, alpha) * std::pow(1 - eta0 * eta0, alpha) ;
+  return calc_for_pswf(eta0, J, alpha) * std::pow(1 - eta0 * eta0, alpha);
 }
 
 t_real ft_pswf(const t_real x, const t_real J) {

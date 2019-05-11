@@ -84,10 +84,9 @@ utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t
                                     const t_real &max_v, const t_real &cell_size_u,
                                     const t_real &cell_size_v);
 //! Converts u and v coordaintes to units of pixels
-utilities::vis_params convert_to_pixels(const utilities::vis_params &uv_vis,
-                                                   const t_real cell_x, const t_real cell_y,
-                                                   const t_real imsizex, const t_real imsizey,
-                                                   const t_real oversample_ratio);
+utilities::vis_params convert_to_pixels(const utilities::vis_params &uv_vis, const t_real cell_x,
+                                        const t_real cell_y, const t_real imsizex,
+                                        const t_real imsizey, const t_real oversample_ratio);
 //! scales the visibilities to units of pixels
 utilities::vis_params uv_scale(const utilities::vis_params &uv_vis, const t_int &ftsizeu,
                                const t_int &ftsizev);

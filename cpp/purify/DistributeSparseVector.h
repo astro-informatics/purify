@@ -18,8 +18,9 @@ class DistributeSparseVector {
       : mapping(_mapping), sizes(_sizes), local_size(_local_size), comm(_comm) {}
   DistributeSparseVector(const std::vector<t_int> &local_indices, std::vector<t_int> const &_sizes,
                          t_int global_size, const sopt::mpi::Communicator &_comm)
-      : DistributeSparseVector(IndexMapping<t_int>(_comm.gather(local_indices, _sizes), global_size),
-                               _sizes, static_cast<t_int>(local_indices.size()), _comm) {}
+      : DistributeSparseVector(
+            IndexMapping<t_int>(_comm.gather(local_indices, _sizes), global_size), _sizes,
+            static_cast<t_int>(local_indices.size()), _comm) {}
 
  public:
   //! Constructs a functor to distribute and gather a vector

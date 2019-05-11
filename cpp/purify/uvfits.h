@@ -25,7 +25,7 @@ utilities::vis_params read_uvfits(const std::string &vis_name2, const utilities:
 //! Remove visibilities with zero weighting
 utilities::vis_params filter_and_combine(
     const utilities::vis_params &input, const utilities::vis_params &input2,
-    const Vector<t_complex> & stokes_transform,
+    const Vector<t_complex> &stokes_transform,
     const std::function<bool(t_real, t_real, t_real, t_complex, t_complex, t_real, t_real, t_real,
                              t_complex, t_complex)> &filter =
         [](const t_real, const t_real, const t_real, const t_complex vis1, const t_complex weight1,

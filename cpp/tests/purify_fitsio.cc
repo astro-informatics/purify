@@ -99,7 +99,7 @@ TEST_CASE("header") {
   const t_real channels_total = 2;
   const t_real channel_width = 11;  // in MHz
   const t_real polarisation = stokes_int.at(stokes::I);
-  const int niters = 10;         // number of iterations
+  const int niters = 10;           // number of iterations
   const bool hasconverged = true;  // stating if model has converged
   const t_real relative_variation = 1e-3;
   const t_real residual_convergence = 1e-4;

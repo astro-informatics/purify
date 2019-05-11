@@ -83,8 +83,7 @@ Sparse<typename T0::Scalar> compress_outer(T0 const &matrix) {
   t_int index = 0;
   for (typename T0::Index k = 0; k < matrix.outerSize(); ++k) {
     rows[k] = index;
-    for (typename T0::InnerIterator it(matrix, k); it;
-         ++it) {
+    for (typename T0::InnerIterator it(matrix, k); it; ++it) {
       cols[index] = mapping.coeff(it.col());
       index++;
     }
