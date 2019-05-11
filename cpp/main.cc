@@ -456,12 +456,14 @@ int main(int argc, const char **argv) {
         "subiterations",
         params.precondition_iters());
     primaldual->precondition_iters(params.precondition_iters());
+#ifdef PURIFY_MPI
     if (using_mpi) {
       const auto world = sopt::mpi::Communicator::World();
       primaldual->precondition_weights(widefield::sample_density_weights(
           uv_data.u, uv_data.v, params.cellsizex(), params.cellsizey(), params.width(),
           params.height(), params.oversampling(), 0.5, world));
     } else
+#endif
       primaldual->precondition_weights(widefield::sample_density_weights(
           uv_data.u, uv_data.v, params.cellsizex(), params.cellsizey(), params.width(),
           params.height(), params.oversampling(), 0.5));
