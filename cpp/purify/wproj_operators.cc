@@ -135,7 +135,6 @@ Image<t_complex> init_correction_radial_2d(const t_real oversample_ratio, const 
          imsizey_;
 }
 
-
 }  // namespace details
 
 }  // namespace purify
