@@ -1,3 +1,4 @@
+#include <random>
 #include <set>
 #include <purify/AllToAllSparseVector.h>
 #include <purify/DistributeSparseVector.h>
@@ -45,7 +46,7 @@ TEST_CASE("All to one Sparse Vector") {
       Vector<t_int>::Random(std::max(world.size() * 2, world.size() + 2)));
   std::vector<t_int> const indices = {static_cast<t_int>(world.rank()),
                                       static_cast<t_int>(world.size() + 1)};
-  AllToAllSparseVector distributor(indices, grid.size(), grid.size() * world.rank(), world);
+  AllToAllSparseVector<t_int> distributor(indices, grid.size(), grid.size() * world.rank(), world);
 
   SECTION("Scatter") {
     Vector<t_int> output;
@@ -84,12 +85,13 @@ TEST_CASE("All to All Sparse Vector") {
     std::vector<t_int> const indices = {
         static_cast<t_int>(grid.size() * (world.rank() + 1) + world.size() + 1),
         static_cast<t_int>(world.rank())};
-    CHECK_THROWS(AllToAllSparseVector(indices, grid.size(), grid.size() * world.rank(), world));
+    CHECK_THROWS(
+        AllToAllSparseVector<t_int>(indices, grid.size(), grid.size() * world.rank(), world));
   }
   std::vector<t_int> const indices = {
       static_cast<t_int>(world.rank()),
       static_cast<t_int>(grid.size() * world.rank() + world.size() + 1)};
-  AllToAllSparseVector distributor(indices, grid.size(), grid.size() * world.rank(), world);
+  AllToAllSparseVector<t_int> distributor(indices, grid.size(), grid.size() * world.rank(), world);
 
   SECTION("Scatter") {
     Vector<t_int> output;
@@ -119,6 +121,61 @@ TEST_CASE("All to All Sparse Vector") {
         else
           CHECK(output(i) == 1);
       }
+    }
+  }
+}
+
+TEST_CASE("recv_sizes") {
+  for (t_int nodes : {1, 2, 5, 10, 20, 50, 100, 1000}) {
+    for (t_int imsize : {128, 1024, 2048, 4096, 8192, 16384, 32768}) {
+      const std::int32_t N = imsize * imsize;
+      CAPTURE(imsize);
+      CAPTURE(N);
+      // First create an instance of an engine.
+      std::random_device rnd_device;
+      // Specify the engine and distribution.
+      std::mt19937_64 mersenne_engine(rnd_device());  // Generates random integers
+      std::uniform_int_distribution<t_int> dist(0, nodes * N);
+      auto gen = [&dist, &mersenne_engine]() { return dist(mersenne_engine); };
+      std::vector<t_int> local_indices(10);
+      std::generate(local_indices.begin(), local_indices.end(), gen);
+      std::sort(local_indices.begin(), local_indices.end(),
+                [](t_int a, t_int b) { return (a < b); });
+      CAPTURE(local_indices);
+      CAPTURE(nodes);
+      if (static_cast<std::int64_t>(N) * static_cast<std::int64_t>(nodes) >
+          std::numeric_limits<t_int>::max())
+        CHECK_THROWS(all_to_all_recv_sizes<t_int>(local_indices, nodes, N));
+      else {
+        std::vector<t_int> recv = all_to_all_recv_sizes(local_indices, nodes, N);
+        for (const auto& a : recv) CHECK(a >= 0);
+
+        CHECK(local_indices.size() == std::accumulate(recv.begin(), recv.end(), 0));
+      }
+    }
+  }
+}
+TEST_CASE("recv_sizes 64 bit") {
+  for (std::int64_t nodes : {1, 2, 5, 10, 20, 50, 100, 1000}) {
+    for (std::int64_t imsize : {128, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072}) {
+      const std::int64_t N = imsize * imsize;
+      CAPTURE(imsize);
+      // First create an instance of an engine.
+      std::random_device rnd_device;
+      // Specify the engine and distribution.
+      std::mt19937_64 mersenne_engine(rnd_device());  // Generates random integers
+      std::uniform_int_distribution<std::int64_t> dist(
+          0, static_cast<std::int64_t>(nodes) * static_cast<std::int64_t>(N));
+      auto gen = [&dist, &mersenne_engine]() -> std::int64_t { return dist(mersenne_engine); };
+      std::vector<std::int64_t> local_indices(10);
+      std::generate(local_indices.begin(), local_indices.end(), gen);
+      std::sort(local_indices.begin(), local_indices.end(),
+                [](std::int64_t a, std::int64_t b) { return (a < b); });
+      CAPTURE(local_indices);
+      CAPTURE(nodes);
+      std::vector<t_int> recv = all_to_all_recv_sizes<std::int64_t>(local_indices, nodes, N);
+      for (const auto& a : recv) CHECK(a >= 0);
+      CHECK(local_indices.size() == std::accumulate(recv.begin(), recv.end(), 0));
     }
   }
 }

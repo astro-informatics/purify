@@ -83,6 +83,10 @@ utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis,
 utilities::vis_params set_cell_size(const utilities::vis_params &uv_vis, const t_real &max_u,
                                     const t_real &max_v, const t_real &cell_size_u,
                                     const t_real &cell_size_v);
+//! Converts u and v coordaintes to units of pixels
+utilities::vis_params convert_to_pixels(const utilities::vis_params &uv_vis, const t_real cell_x,
+                                        const t_real cell_y, const t_real imsizex,
+                                        const t_real imsizey, const t_real oversample_ratio);
 //! scales the visibilities to units of pixels
 utilities::vis_params uv_scale(const utilities::vis_params &uv_vis, const t_int &ftsizeu,
                                const t_int &ftsizev);
@@ -128,7 +132,7 @@ Vector<t_complex> add_noise(const Vector<t_complex> &y, const t_complex &mean,
 //! Test to see if file exists
 bool file_exists(const std::string &name);
 //! Method to fit Gaussian to PSF
-Vector<t_real> fit_fwhm(const Image<t_real> &psf, const t_int &size = 3);
+std::tuple<t_real, t_real, t_real> fit_fwhm(const Image<t_real> &psf, const t_int &size = 3);
 //! Return median of real vector
 t_real median(const Vector<t_real> &input);
 //! Calculate the dynamic range between the model and residuals

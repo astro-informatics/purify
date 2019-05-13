@@ -579,9 +579,9 @@ TEST_CASE("utilities [fit_fwhm]", "[fit_fwhm]") {
     }
   }
   auto const fit = utilities::fit_fwhm(psf, 3);
-  auto new_fwhm_x = fit(0) * 2 * std::sqrt(2 * std::log(2));
-  auto new_fwhm_y = fit(1) * 2 * std::sqrt(2 * std::log(2));
-  auto new_theta = fit(2);
+  auto new_fwhm_x = std::get<0>(fit) * 2 * std::sqrt(2 * std::log(2));
+  auto new_fwhm_y = std::get<1>(fit) * 2 * std::sqrt(2 * std::log(2));
+  auto new_theta = std::get<2>(fit);
   CHECK(std::abs(new_fwhm_x - fwhm_x) < 1e-13);
   CHECK(std::abs(new_fwhm_y - fwhm_y) < 1e-13);
   CHECK(std::abs(new_theta - theta) < 1e-13);

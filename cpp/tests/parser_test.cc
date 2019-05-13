@@ -79,7 +79,7 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser.epsilonConvergenceScaling() == 1);
     REQUIRE(yaml_parser.realValueConstraint() == true);
     REQUIRE(yaml_parser.positiveValueConstraint() == true);
-    REQUIRE(yaml_parser.mpiAlgorithm() == factory::algo_distribution::mpi_distributed);
+    REQUIRE(yaml_parser.mpiAlgorithm() == factory::algo_distribution::mpi_serial);
     REQUIRE(yaml_parser.relVarianceConvergence() == 1e-3);
     REQUIRE(yaml_parser.dualFBVarianceConvergence() == 1e-3);
   }

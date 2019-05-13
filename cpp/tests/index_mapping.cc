@@ -14,7 +14,7 @@ TEST_CASE("Index mapping operator") {
     Vector<t_int> input(10);
     std::iota(input.data(), input.data() + input.size(), 0);
 
-    auto mapper = IndexMapping(indices, input.size());
+    auto mapper = IndexMapping<t_int>(indices, input.size());
     Vector<t_int> output;
 
     mapper(input, output);
@@ -40,7 +40,7 @@ TEST_CASE("Index mapping operator") {
     Vector<t_int> input(10);
     std::iota(input.data(), input.data() + input.size(), 0);
 
-    auto mapper = IndexMapping(indices, input.size());
+    auto mapper = IndexMapping<t_int>(indices, input.size());
     Vector<t_int> output;
 
     mapper(input, output);
@@ -101,7 +101,7 @@ TEST_CASE("Vector-shrinked matrix multiplication") {
   Vector<t_int> const input = Vector<uint8_t>::Random(N).cast<t_int>();
 
   Sparse<t_int> const compressed = compress_outer(sparse);
-  auto const mapper = IndexMapping(non_empty_outers(sparse), input.size());
+  auto const mapper = IndexMapping<t_int>(non_empty_outers(sparse), input.size());
   Vector<t_int> comp_input;
   mapper(input, comp_input);
 

@@ -204,6 +204,8 @@ std::vector<t_int> w_support(Vector<t_real> const &w, const std::vector<t_int> &
   t_real coeff_total = 0;
   for (t_int i = 0; i < w.size(); i++)
     coeff_total += widefield::w_support(std::abs(w(i) - w_stacks.at(image_index.at(i))), du,
+                                        min_support, max_support) *
+                   widefield::w_support(std::abs(w(i) - w_stacks.at(image_index.at(i))), du,
                                         min_support, max_support);
   const t_real coeff_average =
       comm.all_sum_all<t_real>(coeff_total) / static_cast<t_real>(comm.size());
@@ -219,13 +221,16 @@ std::vector<t_int> w_support(Vector<t_real> const &w, const std::vector<t_int> &
     for (t_int i = 0; i < size; i++) {
       if (comm.rank() == rank) {
         const t_int cost = widefield::w_support(std::abs(w(i) - w_stacks.at(image_index.at(i))), du,
+                                                min_support, max_support) *
+                           widefield::w_support(std::abs(w(i) - w_stacks.at(image_index.at(i))), du,
                                                 min_support, max_support);
         total += cost;
-        if ((cost + coeff_sum) > coeff_average * (1. + fill_relaxation)) {
-          PURIFY_DEBUG("{} node should have {} coefficients.", group, coeff_sum);
-          coeff_sum = 0;
-          group++;
-        }
+        if (group < (comm.size() - 1))
+          if ((cost + coeff_sum) > coeff_average * (1. + fill_relaxation)) {
+            PURIFY_DEBUG("{} node should have {} coefficients.", group, coeff_sum);
+            coeff_sum = 0;
+            group++;
+          }
         coeff_sum += cost;
         groups[i] = group;
       }

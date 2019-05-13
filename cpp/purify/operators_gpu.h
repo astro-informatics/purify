@@ -292,12 +292,8 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2
     const t_real &cell_x, const t_real &cell_y, const t_real &oversample_ratio = 2,
     const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
     const bool w_term = false, const t_uint &idx = 0) {
-  auto uv_vis = uv_vis_input;
-  if (uv_vis.units == utilities::vis_units::lambda)
-    uv_vis = utilities::set_cell_size(uv_vis, cell_x, cell_y);
-  if (uv_vis.units == utilities::vis_units::radians)
-    uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
-                                 std::floor(oversample_ratio * imsizey));
+  const auto uv_vis = utilities::convert_to_pixels(uv_vis_input, cell_x, cell_y, imsizex, imsizey,
+                                                   oversample_ratio);
   return gpu::measurementoperator::init_degrid_operator_2d(
       uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio, kernel, Ju,
       Jv, w_term, cell_x, cell_y, idx);
@@ -330,12 +326,8 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2
     const t_uint &imsizey, const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
     const t_real &oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
     const t_uint Ju = 4, const t_uint Jv = 4, const bool w_term = false, const t_uint &idx = 0) {
-  auto uv_vis = uv_vis_input;
-  if (uv_vis.units == utilities::vis_units::lambda)
-    uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
-  if (uv_vis.units == utilities::vis_units::radians)
-    uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
-                                 std::floor(oversample_ratio * imsizey));
+  const auto uv_vis = utilities::convert_to_pixels(uv_vis_input, cell_x, cell_y, imsizex, imsizey,
+                                                   oversample_ratio);
   return gpu::measurementoperator::init_degrid_operator_2d_mpi(
       comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
       kernel, Ju, Jv, w_term, cell_x, cell_y, idx);
@@ -367,12 +359,8 @@ std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> init_degrid_operator_2
     const t_uint &imsizey, const t_uint &imsizex, const t_real &cell_x, const t_real &cell_y,
     const t_real &oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
     const t_uint Ju = 4, const t_uint Jv = 4, const bool w_term = false, const t_uint &idx = 0) {
-  auto uv_vis = uv_vis_input;
-  if (uv_vis.units == utilities::vis_units::lambda)
-    uv_vis = utilities::set_cell_size(comm, uv_vis, cell_x, cell_y);
-  if (uv_vis.units == utilities::vis_units::radians)
-    uv_vis = utilities::uv_scale(uv_vis, std::floor(oversample_ratio * imsizex),
-                                 std::floor(oversample_ratio * imsizey));
+  const auto uv_vis = utilities::convert_to_pixels(uv_vis_input, cell_x, cell_y, imsizex, imsizey,
+                                                   oversample_ratio);
   return gpu::measurementoperator::init_degrid_operator_2d(
       comm, uv_vis.u, uv_vis.v, uv_vis.w, uv_vis.weights, imsizey, imsizex, oversample_ratio,
       kernel, Ju, Jv, w_term, idx);

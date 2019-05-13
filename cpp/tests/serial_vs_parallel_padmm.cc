@@ -64,6 +64,8 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   auto const J = 4;
   auto const ISNR = 30;
 
+  const Vector<t_complex> power_init =
+      world.broadcast(Vector<t_complex>::Random(height * width).eval());
   auto const uv_serial = dirty_visibilities(world, nvis, width, height, over_sample, ISNR);
   // distribute only on processors doing it parallel
   auto const uv_data = distribute_params(uv_serial, split_comm);
@@ -77,7 +79,7 @@ TEST_CASE("Serial vs. Parallel PADMM with random coverage.") {
   auto Phi = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
       *measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           split_comm, uv_data.u, uv_data.v, uv_data.w, uv_data.weights, width, height, over_sample),
-      500, 1e-9, Vector<t_complex>::Ones(width * height)));
+      500, 1e-9, power_init));
 
   SECTION("Measurement operator parallelization") {
     SECTION("Gridding") {

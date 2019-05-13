@@ -102,10 +102,26 @@ int main(int argc, const char **argv) {
       uv_data = read_measurements::read_measurements(params.measurements(), world,
                                                      distribute::plan::radial, true, stokes::I,
                                                      params.measurements_units());
+      const t_real norm =
+          std::sqrt(world.all_sum_all(
+                        (uv_data.weights.real().array() * uv_data.weights.real().array()).sum()) /
+                    world.all_sum_all(uv_data.size()));
+      // normalise weights
+      uv_data.weights = uv_data.weights / norm;
+      // using no weights for now
+      // uv_data.weights = Vector<t_complex>::Ones(uv_data.size());
     } else
 #endif
+    {
       uv_data = read_measurements::read_measurements(params.measurements(), true, stokes::I,
                                                      params.measurements_units());
+      const t_real norm = std::sqrt(
+          (uv_data.weights.real().array() * uv_data.weights.real().array()).sum() / uv_data.size());
+      // normalising weights
+      uv_data.weights = uv_data.weights / norm;
+      // using no weights for now
+      // uv_data.weights = Vector<t_complex>::Ones(uv_data.size());
+    }
     if (params.conjugate_w()) uv_data = utilities::conjugate_w(uv_data);
 #ifdef PURIFY_MPI
     if (params.mpi_wstacking() and
@@ -116,7 +132,7 @@ int main(int argc, const char **argv) {
       const t_real du =
           widefield::pixel_to_lambda(params.cellsizex(), params.width(), params.oversampling());
       std::tie(uv_data, image_index, w_stacks) = utilities::w_stacking_with_all_to_all(
-          uv_data, du, params.Jx(), params.Jw(), world, params.kmeans_iters(), .01, cost);
+          uv_data, du, params.Jx(), params.Jw(), world, params.kmeans_iters(), 0, cost);
     } else if (params.mpi_wstacking()) {
       auto const world = sopt::mpi::Communicator::World();
       const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
@@ -162,8 +178,7 @@ int main(int argc, const char **argv) {
       const t_real du =
           widefield::pixel_to_lambda(params.cellsizex(), params.width(), params.oversampling());
       std::tie(uv_data, image_index, w_stacks) = utilities::w_stacking_with_all_to_all(
-          uv_data, du, params.Jx(), params.Jw(), world, params.kmeans_iters(),
-          .01 / static_cast<t_real>(world.size()), cost);
+          uv_data, du, params.Jx(), params.Jw(), world, params.kmeans_iters(), 0, cost);
     } else if (params.mpi_wstacking()) {
       auto const world = sopt::mpi::Communicator::World();
       const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
@@ -232,14 +247,11 @@ int main(int argc, const char **argv) {
       "Using cell size {}\" x {}\", recommended from the uv coverage and field of view is "
       "{}\"x{}\".",
       params.cellsizey(), params.cellsizex(), ideal_cell_y, ideal_cell_x);
-  t_real const flux_scale =
-      (params.source() == purify::utilities::vis_source::measurements)
-          ? widefield::pixel_to_lambda(params.cellsizex(), params.width(), params.oversampling()) *
-                widefield::pixel_to_lambda(params.cellsizey(), params.height(),
-                                           params.oversampling())
-          : 1.;
-  uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale;
-
+  PURIFY_HIGH_LOG("The equivalent miriad cell size is: {}\" x {}\"",
+                  widefield::equivalent_miriad_cell_size(params.cellsizex(), params.width(),
+                                                         params.oversampling()),
+                  widefield::equivalent_miriad_cell_size(params.cellsizey(), params.height(),
+                                                         params.oversampling()));
   // create measurement operator
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measurements_transform;
   if (mop_algo != factory::distributed_measurement_operator::mpi_distribute_all_to_all and
@@ -269,49 +281,33 @@ int main(int argc, const char **argv) {
                   params.cellsizey(), params.cellsizex(), params.oversampling(),
                   kernels::kernel_from_string.at(params.kernel()), params.Jy(), params.Jw(),
                   params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
+  t_real operator_norm = 1.;
 #ifdef PURIFY_MPI
-  auto const comm = sopt::mpi::Communicator::World();
-  auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
-      measurements_transform, params.powMethod_iter(), params.powMethod_tolerance(),
-      comm.broadcast(measurement_op_eigen_vector));
-  measurements_transform = std::get<2>(power_method_result);
-  measurement_op_eigen_vector = std::get<1>(power_method_result);
-#else
-  auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
-      measurements_transform, params.powMethod_iter(), params.powMethod_tolerance(),
-      measurement_op_eigen_vector);
-  measurements_transform = std::get<2>(power_method_result);
-  measurement_op_eigen_vector = std::get<1>(power_method_result);
+  if (using_mpi) {
+    auto const comm = sopt::mpi::Communicator::World();
+    auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
+        measurements_transform, params.powMethod_iter(), params.powMethod_tolerance(),
+        comm.broadcast(measurement_op_eigen_vector));
+    measurements_transform = std::get<2>(power_method_result);
+    measurement_op_eigen_vector = std::get<1>(power_method_result);
+    operator_norm = std::get<0>(power_method_result);
+  } else
 #endif
-  // create wavelet operator
-  std::vector<std::tuple<std::string, t_uint>> sara;
-  for (size_t i = 0; i < params.wavelet_basis().size(); i++)
-    sara.push_back(std::make_tuple(params.wavelet_basis().at(i), params.wavelet_levels()));
-  t_uint sara_size = 0;
-  auto const wavelets_transform = factory::wavelet_operator_factory<Vector<t_complex>>(
-      wop_algo, sara, params.height(), params.width(), sara_size);
-
-  // Create algorithm
-  std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm;
-  std::shared_ptr<sopt::algorithm::ImagingForwardBackward<t_complex>> fb;
-  if (params.algorithm() == "padmm")
-    padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
-        params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
-        sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(), sara_size,
-        params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
-        (params.wavelet_basis().size() < 2) and (not params.realValueConstraint()) and
-            (not params.positiveValueConstraint()),
-        params.relVarianceConvergence(), params.dualFBVarianceConvergence(), 50);
-  if (params.algorithm() == "fb")
-    fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
-        params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
-        sigma * params.epsilonScaling() / flux_scale,
-        params.stepsize() * std::pow(sigma * params.epsilonScaling() / flux_scale, 2),
-        params.regularisation_parameter(), params.height(), params.width(), sara_size,
-        params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
-        (params.wavelet_basis().size() < 2) and (not params.realValueConstraint()) and
-            (not params.positiveValueConstraint()),
-        params.relVarianceConvergence(), params.dualFBVarianceConvergence(), 50);
+  {
+    auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
+        measurements_transform, params.powMethod_iter(), params.powMethod_tolerance(),
+        measurement_op_eigen_vector);
+    measurements_transform = std::get<2>(power_method_result);
+    measurement_op_eigen_vector = std::get<1>(power_method_result);
+    operator_norm = std::get<0>(power_method_result);
+  }
+  PURIFY_LOW_LOG("Value of operator norm is {}", operator_norm);
+  t_real const flux_scale = (params.source() == purify::utilities::vis_source::measurements)
+                                ? std::sqrt(std::floor(params.width() * params.oversampling()) *
+                                            std::floor(params.width() * params.oversampling())) *
+                                      operator_norm
+                                : 1.;
+  uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale;
 
   // Save some things before applying the algorithm
   // the config yaml file - this also generates the output directory and the timestamp
@@ -333,22 +329,9 @@ int main(int argc, const char **argv) {
                              params.measurements_polarization(), params.cellsizex(),
                              params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
   const pfitsio::header_params update_header_res =
-      pfitsio::header_params(out_dir + "/res_update.fits", "Jy/Pixel", 1, uv_data.ra, uv_data.dec,
+      pfitsio::header_params(out_dir + "/res_update.fits", "Jy/Beam", 1, uv_data.ra, uv_data.dec,
                              params.measurements_polarization(), params.cellsizex(),
                              params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
-  if (params.algorithm() == "padmm") {
-    const std::weak_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> algo_weak(padmm);
-    // Adding step size update to algorithm
-    factory::add_updater<t_complex, sopt::algorithm::ImagingProximalADMM<t_complex>>(
-        algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
-        update_header_res, params.height(), params.width(), sara_size, using_mpi);
-  } else {
-    const std::weak_ptr<sopt::algorithm::ImagingForwardBackward<t_complex>> algo_weak(fb);
-    // Adding step size update to algorithm
-    factory::add_updater<t_complex, sopt::algorithm::ImagingForwardBackward<t_complex>>(
-        algo_weak, 0, params.update_tolerance(), 0, update_header_sol, update_header_res,
-        params.height(), params.width(), sara_size, using_mpi);
-  }
   const pfitsio::header_params def_header = pfitsio::header_params(
       "", "Jy/Pixel", 1, uv_data.ra, uv_data.dec, params.measurements_polarization(),
       params.cellsizex(), params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
@@ -376,23 +359,40 @@ int main(int argc, const char **argv) {
   pfitsio::header_params psf_header = def_header;
   psf_header.fits_name = out_dir + "/psf.fits";
   psf_header.pix_units = "Jy/Pixel";
-  const Vector<t_complex> psf =
-      measurements_transform->adjoint() * (uv_data.weights.array() / flux_scale);
+  const Vector<t_complex> psf = measurements_transform->adjoint() * (uv_data.weights / flux_scale);
   const Image<t_real> psf_image =
       Image<t_complex>::Map(psf.data(), params.height(), params.width()).real();
-  PURIFY_HIGH_LOG("Peak of PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)",
-                  psf_image.maxCoeff());
+  PURIFY_HIGH_LOG(
+      "Peak of PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)",
+      psf_image(static_cast<t_int>(params.width() * 0.5 + params.height() * 0.5 * params.width())));
+  t_real beam_units = 1.;
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
     auto const world = sopt::mpi::Communicator::World();
+    beam_units = world.all_sum_all(uv_data.size()) / flux_scale / flux_scale;
+    PURIFY_LOW_LOG("Expected image domain residual RMS is {} jy/beam",
+                   sigma * params.epsilonScaling() *
+                       std::sqrt(2 * params.oversampling() * params.oversampling() /
+                                 world.all_sum_all(uv_data.size())) *
+                       operator_norm);
     if (world.is_root())
 #else
     throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
       pfitsio::write2d(psf_image, psf_header, true);
   } else {
+    beam_units = uv_data.size() / flux_scale / flux_scale;
+    PURIFY_LOW_LOG(
+        "Expected image domain residual RMS is {} jy/beam",
+        sigma * params.epsilonScaling() *
+            std::sqrt(2 * params.oversampling() * params.oversampling() / uv_data.size()) *
+            operator_norm);
     pfitsio::write2d(psf_image, psf_header, true);
   }
+  PURIFY_HIGH_LOG(
+      "Theoretical calculation for peak PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)",
+      beam_units);
+  PURIFY_HIGH_LOG("Effective sigma is {} Jy", sigma * params.epsilonScaling());
   // the dirty image
   pfitsio::header_params dirty_header = def_header;
   dirty_header.fits_name = out_dir + "/dirty.fits";
@@ -407,9 +407,86 @@ int main(int argc, const char **argv) {
 #else
     throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
 #endif
-      pfitsio::write2d(dirty_image / psf_image.maxCoeff(), dirty_header, true);
+      pfitsio::write2d(dirty_image / beam_units, dirty_header, true);
   } else {
-    pfitsio::write2d(dirty_image / psf_image.maxCoeff(), dirty_header, true);
+    pfitsio::write2d(dirty_image / beam_units, dirty_header, true);
+  }
+  // create wavelet operator
+  std::vector<std::tuple<std::string, t_uint>> sara;
+  for (size_t i = 0; i < params.wavelet_basis().size(); i++)
+    sara.push_back(std::make_tuple(params.wavelet_basis().at(i), params.wavelet_levels()));
+  t_uint sara_size = 0;
+  auto const wavelets_transform = factory::wavelet_operator_factory<Vector<t_complex>>(
+      wop_algo, sara, params.height(), params.width(), sara_size);
+
+  // Create algorithm
+  std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm;
+  std::shared_ptr<sopt::algorithm::ImagingForwardBackward<t_complex>> fb;
+  std::shared_ptr<sopt::algorithm::ImagingPrimalDual<t_complex>> primaldual;
+  if (params.algorithm() == "padmm")
+    padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
+        params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
+        sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(), sara_size,
+        params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
+        (params.wavelet_basis().size() < 2) and (not params.realValueConstraint()) and
+            (not params.positiveValueConstraint()),
+        params.relVarianceConvergence(), params.dualFBVarianceConvergence(), 50);
+  if (params.algorithm() == "fb")
+    fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
+        params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
+        sigma * params.epsilonScaling() / flux_scale,
+        params.stepsize() * std::pow(sigma * params.epsilonScaling() / flux_scale, 2),
+        params.regularisation_parameter(), params.height(), params.width(), sara_size,
+        params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
+        (params.wavelet_basis().size() < 2) and (not params.realValueConstraint()) and
+            (not params.positiveValueConstraint()),
+        params.relVarianceConvergence(), params.dualFBVarianceConvergence(), 50);
+  if (params.algorithm() == "primaldual")
+    primaldual = factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
+        params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
+        sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(), sara_size,
+        params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
+        params.relVarianceConvergence());
+  // Add primal dual preconditioning
+  if (params.algorithm() == "primaldual" and params.precondition_iters() > 0) {
+    PURIFY_HIGH_LOG(
+        "Using visibility sampling density to precondtion primal dual with {} "
+        "subiterations",
+        params.precondition_iters());
+    primaldual->precondition_iters(params.precondition_iters());
+#ifdef PURIFY_MPI
+    if (using_mpi) {
+      const auto world = sopt::mpi::Communicator::World();
+      primaldual->precondition_weights(widefield::sample_density_weights(
+          uv_data.u, uv_data.v, params.cellsizex(), params.cellsizey(), params.width(),
+          params.height(), params.oversampling(), 0.5, world));
+    } else
+#endif
+      primaldual->precondition_weights(widefield::sample_density_weights(
+          uv_data.u, uv_data.v, params.cellsizex(), params.cellsizey(), params.width(),
+          params.height(), params.oversampling(), 0.5));
+  }
+
+  if (params.algorithm() == "padmm") {
+    const std::weak_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> algo_weak(padmm);
+    // Adding step size update to algorithm
+    factory::add_updater<t_complex, sopt::algorithm::ImagingProximalADMM<t_complex>>(
+        algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
+        update_header_res, params.height(), params.width(), sara_size, using_mpi, beam_units);
+  }
+  if (params.algorithm() == "primaldual") {
+    const std::weak_ptr<sopt::algorithm::ImagingPrimalDual<t_complex>> algo_weak(primaldual);
+    // Adding step size update to algorithm
+    factory::add_updater<t_complex, sopt::algorithm::ImagingPrimalDual<t_complex>>(
+        algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
+        update_header_res, params.height(), params.width(), sara_size, using_mpi, beam_units);
+  }
+  if (params.algorithm() == "fb") {
+    const std::weak_ptr<sopt::algorithm::ImagingForwardBackward<t_complex>> algo_weak(fb);
+    // Adding step size update to algorithm
+    factory::add_updater<t_complex, sopt::algorithm::ImagingForwardBackward<t_complex>>(
+        algo_weak, 0, params.update_tolerance(), 0, update_header_sol, update_header_res,
+        params.height(), params.width(), sara_size, using_mpi, beam_units);
   }
 
   PURIFY_HIGH_LOG("Starting sopt!");
@@ -422,14 +499,15 @@ int main(int argc, const char **argv) {
           ? Vector<t_complex>::Map(pfitsio::read2d(params.warm_start()).data(),
                                    params.height() * params.width())
           : dimage;
-  const auto estimate_res = (*measurements_transform) * estimate_image - uv_data.vis;
+  const auto estimate_res = (*measurements_transform * estimate_image).eval() - uv_data.vis;
   if (params.algorithm() == "padmm") {
     // Apply algorithm
     auto const diagnostic = (*padmm)(std::make_tuple(estimate_image.eval(), estimate_res.eval()));
 
     // Save the rest of the output
     image = Image<t_complex>::Map(diagnostic.x.data(), params.height(), params.width()).real();
-    const Vector<t_complex> residuals = measurements_transform->adjoint() * diagnostic.residual;
+    const Vector<t_complex> residuals =
+        measurements_transform->adjoint() * (diagnostic.residual / beam_units);
     residual_image =
         Image<t_complex>::Map(residuals.data(), params.height(), params.width()).real();
     purified_header.hasconverged = diagnostic.good;
@@ -442,7 +520,22 @@ int main(int argc, const char **argv) {
     // Save the rest of the output
     // the clean image
     image = Image<t_complex>::Map(diagnostic.x.data(), params.height(), params.width()).real();
-    const Vector<t_complex> residuals = measurements_transform->adjoint() * diagnostic.residual;
+    const Vector<t_complex> residuals =
+        measurements_transform->adjoint() * (diagnostic.residual / beam_units);
+    residual_image =
+        Image<t_complex>::Map(residuals.data(), params.height(), params.width()).real();
+    purified_header.hasconverged = diagnostic.good;
+    purified_header.niters = diagnostic.niters;
+  }
+  if (params.algorithm() == "primaldual") {
+    // Apply algorithm
+    auto const diagnostic =
+        (*primaldual)(std::make_tuple(estimate_image.eval(), estimate_res.eval()));
+
+    // Save the rest of the output
+    image = Image<t_complex>::Map(diagnostic.x.data(), params.height(), params.width()).real();
+    const Vector<t_complex> residuals =
+        measurements_transform->adjoint() * (diagnostic.residual / beam_units);
     residual_image =
         Image<t_complex>::Map(residuals.data(), params.height(), params.width()).real();
     purified_header.hasconverged = diagnostic.good;
@@ -462,6 +555,7 @@ int main(int argc, const char **argv) {
   // the residuals
   pfitsio::header_params residuals_header = purified_header;
   residuals_header.fits_name = out_dir + "/residuals.fits";
+  residuals_header.pix_units = "Jy/Beam";
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
     auto const world = sopt::mpi::Communicator::World();

@@ -46,7 +46,6 @@ std::vector<t_int> w_support(Vector<t_real> const &w, const std::vector<t_int> &
                              const std::vector<t_real> &w_stacks, const t_real du,
                              const t_int min_support, const t_int max_support,
                              const t_real fill_relaxation, sopt::mpi::Communicator const &comm);
-
 #endif
 //! Distribute visibilities into nodes in order of w terms (useful for w-stacking)
 Vector<t_int> w_distribution(Vector<t_real> const &u, const Vector<t_real> &v,

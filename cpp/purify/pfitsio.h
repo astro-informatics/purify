@@ -101,6 +101,8 @@ typename std::enable_if<std::is_scalar<T>::value, void>::type write_key(fitsfile
     datatype = TFLOAT;
   else if (std::is_same<T, int>::value)
     datatype = TINT;
+  else if (std::is_same<T, t_int>::value)
+    datatype = TINT;
   else if (std::is_same<T, bool>::value)
     datatype = TLOGICAL;
   else
@@ -123,6 +125,8 @@ typename std::enable_if<std::is_scalar<T>::value, T>::type read_key(fitsfile *fp
   else if (std::is_same<T, float>::value)
     datatype = TFLOAT;
   else if (std::is_same<T, int>::value)
+    datatype = TINT;
+  else if (std::is_same<T, t_int>::value)
     datatype = TINT;
   else if (std::is_same<T, bool>::value)
     datatype = TLOGICAL;
@@ -213,7 +217,7 @@ typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::
     remove(header.fits_name.c_str());
   }
   fitsfile *fptr;
-  t_int status = 0;
+  int status = 0;
   std::vector<long> naxes = {static_cast<long>(rows), static_cast<long>(cols),
                              static_cast<long>(chans), 1};
   std::vector<long> fpixel = {1, 1, 1, 1};
@@ -299,7 +303,7 @@ typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::
   PURIFY_LOW_LOG("Dimensions {}x{}x{}x{}", rows, cols, channels, pols);
   if (pols > 1) throw std::runtime_error("Too many polarisations when reading " + fits_name);
   t_real nulval = 0;
-  t_int anynul = 0;
+  int anynul = 0;
   output.derived() = Vector<typename T::Scalar>::Zero(rows * cols * channels * pols);
   if (fits_read_pix(fptr, TDOUBLE, fpixel.data(), static_cast<long>(output.size()), &nulval,
                     output.derived().data(), &anynul, &status))

@@ -64,52 +64,5 @@ Image<t_complex> init_correction2d(const t_real &oversample_ratio, const t_uint 
          imsizey_;
 }
 
-Sparse<t_complex> init_gridding_matrix_2d(const t_uint number_of_images,
-                                          const std::vector<t_int> &image_index,
-                                          const Vector<t_real> &u, const Vector<t_real> &v,
-                                          const Vector<t_complex> &weights, const t_uint &imsizey_,
-                                          const t_uint &imsizex_, const t_real &oversample_ratio,
-                                          const std::function<t_real(t_real)> kernelu,
-                                          const std::function<t_real(t_real)> kernelv,
-                                          const t_uint Ju, const t_uint Jv) {
-  if (std::any_of(image_index.begin(), image_index.end(), [&number_of_images](int index) {
-        return index < 0 or index > (number_of_images - 1);
-      }))
-    throw std::runtime_error("Image index is out of bounds");
-  const t_uint ftsizev_ = std::floor(imsizey_ * oversample_ratio);
-  const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
-  const t_uint rows = u.size();
-  const t_uint cols = ftsizeu_ * ftsizev_ * number_of_images;
-  if (u.size() != v.size())
-    throw std::runtime_error(
-        "Size of u and v vectors are not the same for creating gridding matrix.");
-
-  Sparse<t_complex> interpolation_matrix(rows, cols);
-  interpolation_matrix.reserve(Vector<t_int>::Constant(rows, Ju * Jv));
-
-  const t_complex I(0, 1);
-  const t_int ju_max = std::min(Ju, ftsizeu_);
-  const t_int jv_max = std::min(Jv, ftsizev_);
-  // If I collapse this for loop there is a crash when using MPI... Sparse<>::insert() doesn't work
-  // right
-#pragma omp parallel for
-  for (t_int m = 0; m < rows; ++m) {
-    for (t_int ju = 1; ju < ju_max + 1; ++ju) {
-      for (t_int jv = 1; jv < jv_max + 1; ++jv) {
-        const t_real k_u = std::floor(u(m) - ju_max * 0.5);
-        const t_real k_v = std::floor(v(m) - jv_max * 0.5);
-        const t_uint q = utilities::mod(k_u + ju, ftsizeu_);
-        const t_uint p = utilities::mod(k_v + jv, ftsizev_);
-        assert(image_index.at(m) < number_of_images);
-        const t_uint index =
-            utilities::sub2ind(p, q, ftsizev_, ftsizeu_) + image_index.at(m) * ftsizev_ * ftsizeu_;
-        interpolation_matrix.insert(m, index) =
-            std::exp(-2 * constant::pi * I * ((k_u + ju) * 0.5 + (k_v + jv) * 0.5)) *
-            kernelu(u(m) - (k_u + ju)) * kernelv(v(m) - (k_v + jv)) * weights(m);
-      }
-    }
-  }
-  return interpolation_matrix;
-}
 }  // namespace details
 }  // namespace purify
