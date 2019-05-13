@@ -1,6 +1,7 @@
 var searchData=
 [
   ['same_5fmeasurement_5fset',['same_measurement_set',['../classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html#ab84f8fb9ec0c0cf9c4be1770e471b82f',1,'purify::casa::MeasurementSet::const_iterator']]],
+  ['sample_5fdensity_5fweights',['sample_density_weights',['../namespacepurify_1_1widefield.html#a9157870c8e9c31321a1a2cb531da6378',1,'purify::widefield']]],
   ['sampling',['Sampling',['classsopt_1_1Sampling.html#a09becc036c4d93d2d3c17bb09c76581f',1,'sopt::Sampling::Sampling(t_uint size, std::vector&lt; t_uint &gt; const &amp;indices)'],['classsopt_1_1Sampling.html#a6b80118bdb469695742e26d0cf039f04',1,'sopt::Sampling::Sampling(t_uint size, t_uint samples, RNG &amp;&amp;rng)'],['classsopt_1_1Sampling.html#a21d30fe3734b9f4e1d7bd98eb84575ee',1,'sopt::Sampling::Sampling(t_uint size, t_uint samples)']]],
   ['sara',['SARA',['classsopt_1_1wavelets_1_1SARA.html#a8f0b43c6ee6e71f0332c46cd0c79d307',1,'sopt::wavelets::SARA::SARA(std::initializer_list&lt; std::tuple&lt; std::string, t_uint &gt;&gt; const &amp;init)'],['classsopt_1_1wavelets_1_1SARA.html#a01f0ffc0dcf99f439f8176ebde88113e',1,'sopt::wavelets::SARA::SARA(ITERATOR first, ITERATOR last)'],['classsopt_1_1wavelets_1_1SARA.html#a9947fa29eb60d9eee0aee2b489788237',1,'sopt::wavelets::SARA::SARA(const_iterator first, const_iterator last)']]],
   ['scalar_5fcolumn',['scalar_column',['../classpurify_1_1casa_1_1MeasurementSet.html#a21f1ba4d6c81fd431785925f428c93b2',1,'purify::casa::MeasurementSet']]],

@@ -70,6 +70,7 @@ var searchData=
   ['primal_5fdual_2ecc',['primal_dual.cc',['http://astro-informatics.github.io/sopt/primal__dual_8cc.html',1,'']]],
   ['primal_5fdual_2eh',['primal_dual.h',['http://astro-informatics.github.io/sopt/primal__dual_8h.html',1,'']]],
   ['primaldual',['PrimalDual',['http://astro-informatics.github.io/sopt/classsopt_1_1algorithm_1_1PrimalDual.html',1,'sopt::algorithm::PrimalDual&lt; SCALAR &gt;'],['classsopt_1_1algorithm_1_1PrimalDual.html#ab62e2b3245b7be909624b8076b412e04',1,'sopt::algorithm::PrimalDual::PrimalDual()']]],
+  ['primaldual_5ffactory',['primaldual_factory',['../namespacepurify_1_1factory.html#a964df24d5921328c6d5eb9e8af749cc7',1,'purify::factory']]],
   ['projection_5fkernels',['projection_kernels',['../namespacepurify_1_1projection__kernels.html',1,'purify']]],
   ['projectpositivequadrant',['ProjectPositiveQuadrant',['http://astro-informatics.github.io/sopt/classsopt_1_1details_1_1ProjectPositiveQuadrant.html',1,'sopt::details']]],
   ['projectpositivequadrant_3c_20std_3a_3acomplex_3c_20scalar_20_3e_20_3e',['ProjectPositiveQuadrant&lt; std::complex&lt; SCALAR &gt; &gt;',['http://astro-informatics.github.io/sopt/classsopt_1_1details_1_1ProjectPositiveQuadrant_3_01std_1_1complex_3_01SCALAR_01_4_01_4.html',1,'sopt::details']]],

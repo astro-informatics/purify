@@ -18,5 +18,6 @@ var searchData=
   ['mpi_5futilities_2ecc',['mpi_utilities.cc',['../purify_2mpi__utilities_8cc.html',1,'(Global Namespace)'],['../tests_2mpi__utilities_8cc.html',1,'(Global Namespace)']]],
   ['mpi_5futilities_2eh',['mpi_utilities.h',['../mpi__utilities_8h.html',1,'']]],
   ['mpi_5fwavelet_5ffactory_2ecc',['mpi_wavelet_factory.cc',['../mpi__wavelet__factory_8cc.html',1,'']]],
-  ['mpi_5fwavelets_2ecc',['mpi_wavelets.cc',['http://astro-informatics.github.io/sopt/mpi__wavelets_8cc.html',1,'']]]
+  ['mpi_5fwavelets_2ecc',['mpi_wavelets.cc',['http://astro-informatics.github.io/sopt/mpi__wavelets_8cc.html',1,'']]],
+  ['mpi_5fwide_5ffield_5futilities_2ecc',['mpi_wide_field_utilities.cc',['../mpi__wide__field__utilities_8cc.html',1,'']]]
 ];

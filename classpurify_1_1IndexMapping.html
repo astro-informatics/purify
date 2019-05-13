@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PURIFY: purify::IndexMapping Class Reference</title>
+<title>PURIFY: purify::IndexMapping&lt; STORAGE_INDEX_TYPE &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -75,7 +75,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classpurify_1_1IndexMapping-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">purify::IndexMapping Class Reference</div>  </div>
+<div class="title">purify::IndexMapping&lt; STORAGE_INDEX_TYPE &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -83,55 +83,60 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a3cf84d8eb0d9b3b9c7b7ed08cca787b6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpurify_1_1IndexMapping.html#a3cf84d8eb0d9b3b9c7b7ed08cca787b6">IndexMapping</a> (const std::vector&lt; <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a> &gt; &amp;indices, const <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a> N, const <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a> start=0)</td></tr>
-<tr class="separator:a3cf84d8eb0d9b3b9c7b7ed08cca787b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08f286e69b232701b9be656282141668"><td class="memTemplParams" colspan="2">template&lt;class ITER &gt; </td></tr>
-<tr class="memitem:a08f286e69b232701b9be656282141668"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classpurify_1_1IndexMapping.html#a08f286e69b232701b9be656282141668">IndexMapping</a> (const ITER &amp;first, const ITER &amp;end, const <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a> N, const <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a> start=0)</td></tr>
-<tr class="separator:a08f286e69b232701b9be656282141668"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba763e2e761a4b1c1e092f0cd863476b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpurify_1_1IndexMapping.html#aba763e2e761a4b1c1e092f0cd863476b">IndexMapping</a> (const std::set&lt; <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a> &gt; &amp;indices, const <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a> N, const <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a> start=0)</td></tr>
-<tr class="separator:aba763e2e761a4b1c1e092f0cd863476b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad46f33d32242d0e81bd165c2b5ad52bf"><td class="memTemplParams" colspan="2">template&lt;class T0 , class T1 &gt; </td></tr>
-<tr class="memitem:ad46f33d32242d0e81bd165c2b5ad52bf"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classpurify_1_1IndexMapping.html#ad46f33d32242d0e81bd165c2b5ad52bf">operator()</a> (Eigen::MatrixBase&lt; T0 &gt; const &amp;input, Eigen::MatrixBase&lt; T1 &gt; const &amp;output) const</td></tr>
-<tr class="memdesc:ad46f33d32242d0e81bd165c2b5ad52bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a vector of elements equal to re-indexed inpu.  <a href="#ad46f33d32242d0e81bd165c2b5ad52bf">More...</a><br /></td></tr>
-<tr class="separator:ad46f33d32242d0e81bd165c2b5ad52bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7673f7ca2bfa8c75486e5b31463ee968"><td class="memTemplParams" colspan="2">template&lt;class T0 , class T1 &gt; </td></tr>
-<tr class="memitem:a7673f7ca2bfa8c75486e5b31463ee968"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classpurify_1_1IndexMapping.html#a7673f7ca2bfa8c75486e5b31463ee968">adjoint</a> (Eigen::MatrixBase&lt; T0 &gt; const &amp;input, Eigen::MatrixBase&lt; T1 &gt; const &amp;output) const</td></tr>
-<tr class="memdesc:a7673f7ca2bfa8c75486e5b31463ee968"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector of size <code>N</code> where non-zero elements are chosen from input at given indices.  <a href="#a7673f7ca2bfa8c75486e5b31463ee968">More...</a><br /></td></tr>
-<tr class="separator:a7673f7ca2bfa8c75486e5b31463ee968"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62d55335cb5e55fefd70de5ac4f77f4e"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpurify_1_1IndexMapping.html#a62d55335cb5e55fefd70de5ac4f77f4e">rows</a> () const</td></tr>
-<tr class="separator:a62d55335cb5e55fefd70de5ac4f77f4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1496703ce37d11748bd6b6d115b7cdd8"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpurify_1_1IndexMapping.html#a1496703ce37d11748bd6b6d115b7cdd8">cols</a> () const</td></tr>
-<tr class="separator:a1496703ce37d11748bd6b6d115b7cdd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4749aef0f46f0eb5765ce94a27087793"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpurify_1_1IndexMapping.html#a4749aef0f46f0eb5765ce94a27087793">IndexMapping</a> (const std::vector&lt; STORAGE_INDEX_TYPE &gt; &amp;indices, const STORAGE_INDEX_TYPE N, const STORAGE_INDEX_TYPE start=0)</td></tr>
+<tr class="separator:a4749aef0f46f0eb5765ce94a27087793"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4297dda628887edea2ba963d6d671ab5"><td class="memTemplParams" colspan="2">template&lt;class ITER &gt; </td></tr>
+<tr class="memitem:a4297dda628887edea2ba963d6d671ab5"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classpurify_1_1IndexMapping.html#a4297dda628887edea2ba963d6d671ab5">IndexMapping</a> (const ITER &amp;first, const ITER &amp;end, const STORAGE_INDEX_TYPE N, const STORAGE_INDEX_TYPE start=0)</td></tr>
+<tr class="separator:a4297dda628887edea2ba963d6d671ab5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbc51dafe5615165bd255978f5e6fba4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpurify_1_1IndexMapping.html#adbc51dafe5615165bd255978f5e6fba4">IndexMapping</a> (const std::set&lt; STORAGE_INDEX_TYPE &gt; &amp;indices, const STORAGE_INDEX_TYPE N, const STORAGE_INDEX_TYPE start=0)</td></tr>
+<tr class="separator:adbc51dafe5615165bd255978f5e6fba4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affcafd3f2e954b475cd0b5fb7578a51a"><td class="memTemplParams" colspan="2">template&lt;class T0 , class T1 &gt; </td></tr>
+<tr class="memitem:affcafd3f2e954b475cd0b5fb7578a51a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classpurify_1_1IndexMapping.html#affcafd3f2e954b475cd0b5fb7578a51a">operator()</a> (Eigen::MatrixBase&lt; T0 &gt; const &amp;input, Eigen::MatrixBase&lt; T1 &gt; const &amp;output) const</td></tr>
+<tr class="memdesc:affcafd3f2e954b475cd0b5fb7578a51a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a vector of elements equal to re-indexed inpu.  <a href="#affcafd3f2e954b475cd0b5fb7578a51a">More...</a><br /></td></tr>
+<tr class="separator:affcafd3f2e954b475cd0b5fb7578a51a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf54dc885f32ab804e6be1861a578cbd"><td class="memTemplParams" colspan="2">template&lt;class T0 , class T1 &gt; </td></tr>
+<tr class="memitem:adf54dc885f32ab804e6be1861a578cbd"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classpurify_1_1IndexMapping.html#adf54dc885f32ab804e6be1861a578cbd">adjoint</a> (Eigen::MatrixBase&lt; T0 &gt; const &amp;input, Eigen::MatrixBase&lt; T1 &gt; const &amp;output) const</td></tr>
+<tr class="memdesc:adf54dc885f32ab804e6be1861a578cbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector of size <code>N</code> where non-zero elements are chosen from input at given indices.  <a href="#adf54dc885f32ab804e6be1861a578cbd">More...</a><br /></td></tr>
+<tr class="separator:adf54dc885f32ab804e6be1861a578cbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2c6a41ecc0eed58d3e9c983c50042b7"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpurify_1_1IndexMapping.html#af2c6a41ecc0eed58d3e9c983c50042b7">rows</a> () const</td></tr>
+<tr class="separator:af2c6a41ecc0eed58d3e9c983c50042b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af356b62a81d13933eea58d3a9689bc84"><td class="memItemLeft" align="right" valign="top">STORAGE_INDEX_TYPE&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpurify_1_1IndexMapping.html#af356b62a81d13933eea58d3a9689bc84">cols</a> () const</td></tr>
+<tr class="separator:af356b62a81d13933eea58d3a9689bc84"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock">
+<div class="textblock"><h3>template&lt;class STORAGE_INDEX_TYPE = t_int&gt;<br />
+class purify::IndexMapping&lt; STORAGE_INDEX_TYPE &gt;</h3>
+
+
 <p class="definition">Definition at line <a class="el" href="IndexMapping_8h_source.html#l00011">11</a> of file <a class="el" href="IndexMapping_8h_source.html">IndexMapping.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a3cf84d8eb0d9b3b9c7b7ed08cca787b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3cf84d8eb0d9b3b9c7b7ed08cca787b6">&#9670;&nbsp;</a></span>IndexMapping() <span class="overload">[1/3]</span></h2>
+<a id="a4749aef0f46f0eb5765ce94a27087793"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4749aef0f46f0eb5765ce94a27087793">&#9670;&nbsp;</a></span>IndexMapping() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class STORAGE_INDEX_TYPE = t_int&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">purify::IndexMapping::IndexMapping </td>
+          <td class="memname"><a class="el" href="classpurify_1_1IndexMapping.html">purify::IndexMapping</a>&lt; STORAGE_INDEX_TYPE &gt;::<a class="el" href="classpurify_1_1IndexMapping.html">IndexMapping</a> </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const std::vector&lt; STORAGE_INDEX_TYPE &gt; &amp;&#160;</td>
           <td class="paramname"><em>indices</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a>&#160;</td>
+          <td class="paramtype">const STORAGE_INDEX_TYPE&#160;</td>
           <td class="paramname"><em>N</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a>&#160;</td>
+          <td class="paramtype">const STORAGE_INDEX_TYPE&#160;</td>
           <td class="paramname"><em>start</em> = <code>0</code>&#160;</td>
         </tr>
         <tr>
@@ -148,14 +153,16 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="IndexMapping_8h_source.html#l00013">13</a> of file <a class="el" href="IndexMapping_8h_source.html">IndexMapping.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;      : indices(indices), N(N), start(start){};</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;      : indices(indices), N(N), start(start){};</div></div><!-- fragment -->
 </div>
 </div>
-<a id="a08f286e69b232701b9be656282141668"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a08f286e69b232701b9be656282141668">&#9670;&nbsp;</a></span>IndexMapping() <span class="overload">[2/3]</span></h2>
+<a id="a4297dda628887edea2ba963d6d671ab5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4297dda628887edea2ba963d6d671ab5">&#9670;&nbsp;</a></span>IndexMapping() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class STORAGE_INDEX_TYPE = t_int&gt; </div>
 <div class="memtemplate">
 template&lt;class ITER &gt; </div>
 <table class="mlabels">
@@ -163,7 +170,7 @@ template&lt;class ITER &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">purify::IndexMapping::IndexMapping </td>
+          <td class="memname"><a class="el" href="classpurify_1_1IndexMapping.html">purify::IndexMapping</a>&lt; STORAGE_INDEX_TYPE &gt;::<a class="el" href="classpurify_1_1IndexMapping.html">IndexMapping</a> </td>
           <td>(</td>
           <td class="paramtype">const ITER &amp;&#160;</td>
           <td class="paramname"><em>first</em>, </td>
@@ -177,13 +184,13 @@ template&lt;class ITER &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a>&#160;</td>
+          <td class="paramtype">const STORAGE_INDEX_TYPE&#160;</td>
           <td class="paramname"><em>N</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a>&#160;</td>
+          <td class="paramtype">const STORAGE_INDEX_TYPE&#160;</td>
           <td class="paramname"><em>start</em> = <code>0</code>&#160;</td>
         </tr>
         <tr>
@@ -199,36 +206,38 @@ template&lt;class ITER &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="IndexMapping_8h_source.html#l00016">16</a> of file <a class="el" href="IndexMapping_8h_source.html">IndexMapping.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;      : <a class="code" href="classpurify_1_1IndexMapping.html#a3cf84d8eb0d9b3b9c7b7ed08cca787b6">IndexMapping</a>(std::vector&lt;t_int&gt;(first, end), N, start) {}</div><div class="ttc" id="classpurify_1_1IndexMapping_html_a3cf84d8eb0d9b3b9c7b7ed08cca787b6"><div class="ttname"><a href="classpurify_1_1IndexMapping.html#a3cf84d8eb0d9b3b9c7b7ed08cca787b6">purify::IndexMapping::IndexMapping</a></div><div class="ttdeci">IndexMapping(const std::vector&lt; t_int &gt; &amp;indices, const t_int N, const t_int start=0)</div><div class="ttdef"><b>Definition:</b> <a href="IndexMapping_8h_source.html#l00013">IndexMapping.h:13</a></div></div>
+<p class="definition">Definition at line <a class="el" href="IndexMapping_8h_source.html#l00017">17</a> of file <a class="el" href="IndexMapping_8h_source.html">IndexMapping.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;      : <a class="code" href="classpurify_1_1IndexMapping.html#a4749aef0f46f0eb5765ce94a27087793">IndexMapping</a>(std::vector&lt;STORAGE_INDEX_TYPE&gt;(first, end), N, start) {}</div><div class="ttc" id="classpurify_1_1IndexMapping_html_a4749aef0f46f0eb5765ce94a27087793"><div class="ttname"><a href="classpurify_1_1IndexMapping.html#a4749aef0f46f0eb5765ce94a27087793">purify::IndexMapping::IndexMapping</a></div><div class="ttdeci">IndexMapping(const std::vector&lt; STORAGE_INDEX_TYPE &gt; &amp;indices, const STORAGE_INDEX_TYPE N, const STORAGE_INDEX_TYPE start=0)</div><div class="ttdef"><b>Definition:</b> <a href="IndexMapping_8h_source.html#l00013">IndexMapping.h:13</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="aba763e2e761a4b1c1e092f0cd863476b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aba763e2e761a4b1c1e092f0cd863476b">&#9670;&nbsp;</a></span>IndexMapping() <span class="overload">[3/3]</span></h2>
+<a id="adbc51dafe5615165bd255978f5e6fba4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbc51dafe5615165bd255978f5e6fba4">&#9670;&nbsp;</a></span>IndexMapping() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class STORAGE_INDEX_TYPE = t_int&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">purify::IndexMapping::IndexMapping </td>
+          <td class="memname"><a class="el" href="classpurify_1_1IndexMapping.html">purify::IndexMapping</a>&lt; STORAGE_INDEX_TYPE &gt;::<a class="el" href="classpurify_1_1IndexMapping.html">IndexMapping</a> </td>
           <td>(</td>
-          <td class="paramtype">const std::set&lt; <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const std::set&lt; STORAGE_INDEX_TYPE &gt; &amp;&#160;</td>
           <td class="paramname"><em>indices</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a>&#160;</td>
+          <td class="paramtype">const STORAGE_INDEX_TYPE&#160;</td>
           <td class="paramname"><em>N</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a>&#160;</td>
+          <td class="paramtype">const STORAGE_INDEX_TYPE&#160;</td>
           <td class="paramname"><em>start</em> = <code>0</code>&#160;</td>
         </tr>
         <tr>
@@ -244,17 +253,19 @@ template&lt;class ITER &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="IndexMapping_8h_source.html#l00018">18</a> of file <a class="el" href="IndexMapping_8h_source.html">IndexMapping.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;      : <a class="code" href="classpurify_1_1IndexMapping.html#a3cf84d8eb0d9b3b9c7b7ed08cca787b6">IndexMapping</a>(indices.begin(), indices.end(), N, start) {}</div><div class="ttc" id="classpurify_1_1IndexMapping_html_a3cf84d8eb0d9b3b9c7b7ed08cca787b6"><div class="ttname"><a href="classpurify_1_1IndexMapping.html#a3cf84d8eb0d9b3b9c7b7ed08cca787b6">purify::IndexMapping::IndexMapping</a></div><div class="ttdeci">IndexMapping(const std::vector&lt; t_int &gt; &amp;indices, const t_int N, const t_int start=0)</div><div class="ttdef"><b>Definition:</b> <a href="IndexMapping_8h_source.html#l00013">IndexMapping.h:13</a></div></div>
+<p class="definition">Definition at line <a class="el" href="IndexMapping_8h_source.html#l00020">20</a> of file <a class="el" href="IndexMapping_8h_source.html">IndexMapping.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      : <a class="code" href="classpurify_1_1IndexMapping.html#a4749aef0f46f0eb5765ce94a27087793">IndexMapping</a>(indices.begin(), indices.end(), N, start) {}</div><div class="ttc" id="classpurify_1_1IndexMapping_html_a4749aef0f46f0eb5765ce94a27087793"><div class="ttname"><a href="classpurify_1_1IndexMapping.html#a4749aef0f46f0eb5765ce94a27087793">purify::IndexMapping::IndexMapping</a></div><div class="ttdeci">IndexMapping(const std::vector&lt; STORAGE_INDEX_TYPE &gt; &amp;indices, const STORAGE_INDEX_TYPE N, const STORAGE_INDEX_TYPE start=0)</div><div class="ttdef"><b>Definition:</b> <a href="IndexMapping_8h_source.html#l00013">IndexMapping.h:13</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a7673f7ca2bfa8c75486e5b31463ee968"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7673f7ca2bfa8c75486e5b31463ee968">&#9670;&nbsp;</a></span>adjoint()</h2>
+<a id="adf54dc885f32ab804e6be1861a578cbd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf54dc885f32ab804e6be1861a578cbd">&#9670;&nbsp;</a></span>adjoint()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class STORAGE_INDEX_TYPE = t_int&gt; </div>
 <div class="memtemplate">
 template&lt;class T0 , class T1 &gt; </div>
 <table class="mlabels">
@@ -262,7 +273,7 @@ template&lt;class T0 , class T1 &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void purify::IndexMapping::adjoint </td>
+          <td class="memname">void <a class="el" href="classpurify_1_1IndexMapping.html">purify::IndexMapping</a>&lt; STORAGE_INDEX_TYPE &gt;::adjoint </td>
           <td>(</td>
           <td class="paramtype">Eigen::MatrixBase&lt; T0 &gt; const &amp;&#160;</td>
           <td class="paramname"><em>input</em>, </td>
@@ -288,21 +299,23 @@ template&lt;class T0 , class T1 &gt; </div>
 
 <p>Vector of size <code>N</code> where non-zero elements are chosen from input at given indices. </p>
 
-<p class="definition">Definition at line <a class="el" href="IndexMapping_8h_source.html#l00036">36</a> of file <a class="el" href="IndexMapping_8h_source.html">IndexMapping.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;                                                                                          {</div><div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    assert(static_cast&lt;size_t&gt;(input.size()) == indices.size());</div><div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keyword">auto</span> &amp;derived = output.const_cast_derived();</div><div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    derived = T1::Zero(N, 1);</div><div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keyword">typename</span> T0::Index i(0);</div><div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> <span class="keyword">const</span> &amp;index : indices) {</div><div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      assert(index &gt;= start and index &lt; (N + start));</div><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      derived(index - start) += input(i++);</div><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    }</div><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  }</div></div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="IndexMapping_8h_source.html#l00039">39</a> of file <a class="el" href="IndexMapping_8h_source.html">IndexMapping.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;                                                                                          {</div><div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    assert(static_cast&lt;size_t&gt;(input.size()) == indices.size());</div><div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">auto</span> &amp;derived = output.const_cast_derived();</div><div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    derived = T1::Zero(N, 1);</div><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keyword">typename</span> T0::Index i(0);</div><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordflow">for</span> (STORAGE_INDEX_TYPE <span class="keyword">const</span> &amp;index : indices) {</div><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      assert(index &gt;= start and index &lt; (N + start));</div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      derived(index - start) += input(i++);</div><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    }</div><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  }</div></div><!-- fragment -->
 </div>
 </div>
-<a id="a1496703ce37d11748bd6b6d115b7cdd8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1496703ce37d11748bd6b6d115b7cdd8">&#9670;&nbsp;</a></span>cols()</h2>
+<a id="af356b62a81d13933eea58d3a9689bc84"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af356b62a81d13933eea58d3a9689bc84">&#9670;&nbsp;</a></span>cols()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class STORAGE_INDEX_TYPE = t_int&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a> purify::IndexMapping::cols </td>
+          <td class="memname">STORAGE_INDEX_TYPE <a class="el" href="classpurify_1_1IndexMapping.html">purify::IndexMapping</a>&lt; STORAGE_INDEX_TYPE &gt;::cols </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -315,17 +328,19 @@ template&lt;class T0 , class T1 &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="IndexMapping_8h_source.html#l00048">48</a> of file <a class="el" href="IndexMapping_8h_source.html">IndexMapping.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="IndexMapping_8h_source.html#l00051">51</a> of file <a class="el" href="IndexMapping_8h_source.html">IndexMapping.h</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="IndexMapping_8h_source.html#l00067">purify::compress_outer()</a>.</p>
-<div class="fragment"><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;{ <span class="keywordflow">return</span> N; }</div></div><!-- fragment -->
+<p class="reference">Referenced by <a class="el" href="IndexMapping_8h_source.html#l00071">purify::compress_outer()</a>.</p>
+<div class="fragment"><div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;{ <span class="keywordflow">return</span> N; }</div></div><!-- fragment -->
 </div>
 </div>
-<a id="ad46f33d32242d0e81bd165c2b5ad52bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad46f33d32242d0e81bd165c2b5ad52bf">&#9670;&nbsp;</a></span>operator()()</h2>
+<a id="affcafd3f2e954b475cd0b5fb7578a51a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affcafd3f2e954b475cd0b5fb7578a51a">&#9670;&nbsp;</a></span>operator()()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class STORAGE_INDEX_TYPE = t_int&gt; </div>
 <div class="memtemplate">
 template&lt;class T0 , class T1 &gt; </div>
 <table class="mlabels">
@@ -333,7 +348,7 @@ template&lt;class T0 , class T1 &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void purify::IndexMapping::operator() </td>
+          <td class="memname">void <a class="el" href="classpurify_1_1IndexMapping.html">purify::IndexMapping</a>&lt; STORAGE_INDEX_TYPE &gt;::operator() </td>
           <td>(</td>
           <td class="paramtype">Eigen::MatrixBase&lt; T0 &gt; const &amp;&#160;</td>
           <td class="paramname"><em>input</em>, </td>
@@ -359,21 +374,23 @@ template&lt;class T0 , class T1 &gt; </div>
 
 <p>Creates a vector of elements equal to re-indexed inpu. </p>
 
-<p class="definition">Definition at line <a class="el" href="IndexMapping_8h_source.html#l00023">23</a> of file <a class="el" href="IndexMapping_8h_source.html">IndexMapping.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;                                                                                             {</div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keyword">auto</span> &amp;derived = output.const_cast_derived();</div><div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    derived.resize(indices.size());</div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keyword">typename</span> T0::Index i(0);</div><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> <span class="keyword">const</span> &amp;index : indices) {</div><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      assert(index &gt;= start and index &lt; (N + start));</div><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      assert(derived.size() &gt; i);</div><div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      derived(i++) = input(index - start);</div><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    }</div><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  }</div></div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="IndexMapping_8h_source.html#l00026">26</a> of file <a class="el" href="IndexMapping_8h_source.html">IndexMapping.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;                                                                                             {</div><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keyword">auto</span> &amp;derived = output.const_cast_derived();</div><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    derived.resize(indices.size());</div><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">typename</span> T0::Index i(0);</div><div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> <span class="keyword">const</span> &amp;index : indices) {</div><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      assert(index &gt;= start and index &lt; (N + start));</div><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      assert(derived.size() &gt; i);</div><div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      derived(i++) = input(index - start);</div><div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    }</div><div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  }</div></div><!-- fragment -->
 </div>
 </div>
-<a id="a62d55335cb5e55fefd70de5ac4f77f4e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a62d55335cb5e55fefd70de5ac4f77f4e">&#9670;&nbsp;</a></span>rows()</h2>
+<a id="af2c6a41ecc0eed58d3e9c983c50042b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2c6a41ecc0eed58d3e9c983c50042b7">&#9670;&nbsp;</a></span>rows()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class STORAGE_INDEX_TYPE = t_int&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a> purify::IndexMapping::rows </td>
+          <td class="memname"><a class="elRef" href="forward__backward_8cc.html#a56f025f9d09304f4dd06933fbcc2f07c">t_int</a> <a class="el" href="classpurify_1_1IndexMapping.html">purify::IndexMapping</a>&lt; STORAGE_INDEX_TYPE &gt;::rows </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -386,10 +403,10 @@ template&lt;class T0 , class T1 &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="IndexMapping_8h_source.html#l00047">47</a> of file <a class="el" href="IndexMapping_8h_source.html">IndexMapping.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="IndexMapping_8h_source.html#l00050">50</a> of file <a class="el" href="IndexMapping_8h_source.html">IndexMapping.h</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="IndexMapping_8h_source.html#l00067">purify::compress_outer()</a>.</p>
-<div class="fragment"><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;{ <span class="keywordflow">return</span> indices.size(); }</div></div><!-- fragment -->
+<p class="reference">Referenced by <a class="el" href="IndexMapping_8h_source.html#l00071">purify::compress_outer()</a>.</p>
+<div class="fragment"><div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;{ <span class="keywordflow">return</span> indices.size(); }</div></div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>

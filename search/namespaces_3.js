@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['kernels_5ftest',['kernels_test',['../namespacekernels__test.html',1,'']]]
+  ['operators_5ftest',['operators_test',['../namespaceoperators__test.html',1,'']]]
 ];

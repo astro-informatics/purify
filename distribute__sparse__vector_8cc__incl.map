@@ -1,5 +1,5 @@
 <map id="/mydata/cpp/tests/distribute_sparse_vector.cc" name="/mydata/cpp/tests/distribute_sparse_vector.cc">
-<area shape="rect" id="node3" href="$AllToAllSparseVector_8h.html" title="purify/AllToAllSparseVector.h" alt="" coords="72,95,280,121"/>
-<area shape="rect" id="node5" href="$DistributeSparseVector_8h.html" title="purify/DistributeSparseVector.h" alt="" coords="304,95,528,121"/>
-<area shape="rect" id="node7" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/communicator_8h.html" title="sopt/mpi/communicator.h" alt="" coords="662,95,850,121"/>
+<area shape="rect" id="node4" href="$AllToAllSparseVector_8h.html" title="purify/AllToAllSparseVector.h" alt="" coords="168,95,376,121"/>
+<area shape="rect" id="node6" href="$DistributeSparseVector_8h.html" title="purify/DistributeSparseVector.h" alt="" coords="400,95,624,121"/>
+<area shape="rect" id="node8" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/communicator_8h.html" title="sopt/mpi/communicator.h" alt="" coords="758,95,946,121"/>
 </map>
