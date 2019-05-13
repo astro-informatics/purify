@@ -56,7 +56,6 @@ MeasureOperators:
     wprojection: False # using radially symmetric w projection kernel
     mpi_wstacking: False # applies average w-stack correction on each node (always True with wprojection)
     mpi_all_to_all: False # performs all to all operation of the grid to even out computation 
-    all_to_all_fill: 0.01 # fill each node to this faction above the average computational load
     conjugate_w: True #reflects measurements onto the positive w-domain (can reduce computation)
     kmeans_iterations: 100 #number of iterations in w-stacking clustering algorithm
 

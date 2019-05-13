@@ -186,7 +186,6 @@ void YamlParser::parseAndSetMeasureOperators(const YAML::Node& measureOperatorsN
   this->wprojection_ = get<bool>(measureOperatorsNode, {"wide-field", "wprojection"});
   this->mpi_wstacking_ = get<bool>(measureOperatorsNode, {"wide-field", "mpi_wstacking"});
   this->mpi_all_to_all_ = get<bool>(measureOperatorsNode, {"wide-field", "mpi_all_to_all"});
-  this->all_to_all_fill_ = get<t_real>(measureOperatorsNode, {"wide-field", "all_to_all_fill"});
   this->kmeans_iters_ = get<t_int>(measureOperatorsNode, {"wide-field", "kmeans_iterations"});
   this->conjugate_w_ = get<bool>(measureOperatorsNode, {"wide-field", "conjugate_w"});
 }
