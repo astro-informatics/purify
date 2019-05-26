@@ -31,7 +31,7 @@ int main(int nargs, char const **args) {
   t_real const sigma_m = constant::pi / 3;
   const t_real rms_w = 100.;  // lambda
   auto uv_data = utilities::random_sample_density(number_of_vis / world.size(), 0, sigma_m, rms_w);
-  //uv_data = utilities::conjugate_w(uv_data);
+  // uv_data = utilities::conjugate_w(uv_data);
   const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
   uv_data = utilities::w_stacking(uv_data, world, 100, cost);
   uv_data.units = utilities::vis_units::radians;
@@ -39,22 +39,24 @@ int main(int nargs, char const **args) {
   t_real con_time = 0;
   t_real app_time = 0;
   for (t_int i = 0; i < iters; i++) {
-    std::clock_t c_start = std::clock();
+    auto begin = std::chrono::high_resolution_clock::now();
     const auto measure_op = factory::measurement_operator_factory<Vector<t_complex>>(
         factory::distributed_measurement_operator::mpi_distribute_image, uv_data, imsizey, imsizex,
-        cell, cell, oversample_ratio, kernels::kernel_from_string.at(kernel), Ju, Jw, true, 1e-6, 1e-6,
-        dde_type::wkernel_radial);
-    std::clock_t c_end = std::clock();
-    con_time += (c_end - c_start) / CLOCKS_PER_SEC;  // total time for application to run in seconds
-    c_start = std::clock();
+        cell, cell, oversample_ratio, kernels::kernel_from_string.at(kernel), Ju, Jw, true, 1e-6,
+        1e-6, dde_type::wkernel_radial);
+    auto end = std::chrono::high_resolution_clock::now();
+    con_time += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() *
+                1e-9;  // total time for application to run in seconds
+    begin = std::chrono::high_resolution_clock::now();
     Vector<t_complex> const measurements = measure_op->adjoint() * (*measure_op * image).eval();
-    c_end = std::clock();
-    app_time += (c_end - c_start) / CLOCKS_PER_SEC;  // total time for application to run in seconds
+    end = std::chrono::high_resolution_clock::now();
+    app_time += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() *
+                1e-9;  // total time for application to run in seconds
   }
   con_time /= static_cast<t_real>(iters);
   app_time /= static_cast<t_real>(iters);
   if (world.is_root()) {
-    std::string const results = output_filename("times.txt");
+    std::string const results = output_filename(std::to_string(number_of_vis) + "times.txt");
     std::ofstream out(results);
     out.precision(13);
     out << con_time << " " << app_time << std::endl;
