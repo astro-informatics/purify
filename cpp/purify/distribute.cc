@@ -114,7 +114,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
   for (int n = 0; n < iters; n++) {
     PURIFY_DEBUG("clustering iteration {}", n);
     for (int i = 0; i < w.size(); i++) {
-      t_real min = 1e10;
+      t_real min = 2 * (wmax - wmin);
       for (int node = 0; node < number_of_nodes; node++) {
         const t_real cost_val = cost(w(i) - w_centre.at(node));
         if (cost_val < min) {
@@ -126,7 +126,8 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
       w_count[w_node[i]]++;
     }
     for (int j = 0; j < number_of_nodes; j++) {
-      diff += std::abs(w_sum.at(j) / w_count.at(j) - w_centre.at(j)) / std::abs(w_centre.at(j));
+      diff += std::abs(((w_count.at(j) > 0) ? w_sum.at(j) / w_count.at(j) : 0) - w_centre.at(j)) /
+              std::abs(w_centre.at(j));
       w_centre[j] = (w_count.at(j) > 0) ? w_sum.at(j) / w_count.at(j) : 0;
       PURIFY_DEBUG("Node {} has {} visibilities, using w-stack w = {}.", j, w_count.at(j),
                    w_centre.at(j));
@@ -177,7 +178,9 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     for (int j = 0; j < number_of_nodes; j++) {
       const t_real global_w_sum = comm.all_sum_all<t_real>(w_sum.at(j));
       const t_real global_w_count = comm.all_sum_all<t_real>(w_count.at(j));
-      diff += std::abs(global_w_sum / global_w_count - w_centre.at(j)) / std::abs(w_centre.at(j));
+      diff +=
+          std::abs(((global_w_count > 0) ? global_w_sum / global_w_count : 0) - w_centre.at(j)) /
+          std::abs(w_centre.at(j));
       w_centre[j] = (global_w_count > 0) ? global_w_sum / global_w_count : 0;
       if (comm.is_root())
         PURIFY_DEBUG("Node {} has {} visibilities, using w-stack w = {}.", j, global_w_count,
