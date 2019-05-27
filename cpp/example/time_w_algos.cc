@@ -26,14 +26,13 @@ int main(int nargs, char const **args) {
   const t_real cell = 40;
   auto const kernel = "kb";
 
-
   t_uint const number_of_pixels = imsizex * imsizey;
   // Generating random uv(w) coverage
   t_real const sigma_m = constant::pi / 3;
   const t_real rms_w = 100.;  // lambda
-  auto uv_data = utilities::random_sample_density(std::floor(number_of_vis / world.size()), 0, sigma_m, rms_w);
-  if(static_cast<bool>(conj))
-   uv_data = utilities::conjugate_w(uv_data);
+  auto uv_data =
+      utilities::random_sample_density(std::floor(number_of_vis / world.size()), 0, sigma_m, rms_w);
+  if (static_cast<bool>(conj)) uv_data = utilities::conjugate_w(uv_data);
   const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
   uv_data = utilities::w_stacking(uv_data, world, 100, cost);
   uv_data.units = utilities::vis_units::radians;
@@ -58,7 +57,9 @@ int main(int nargs, char const **args) {
   con_time /= static_cast<t_real>(iters);
   app_time /= static_cast<t_real>(iters);
   if (world.is_root()) {
-    std::string const results = output_filename(std::to_string(number_of_vis) + "times.txt");
+    std::string const results =
+        output_filename(std::to_string(number_of_vis) + "times_" + std::to_string(world.size()) +
+                        ((static_cast<bool>(conj)) ? "_conj" : "") + ".txt");
     std::ofstream out(results);
     out.precision(13);
     out << con_time << " " << app_time << std::endl;
