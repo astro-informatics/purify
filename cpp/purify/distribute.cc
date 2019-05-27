@@ -129,14 +129,14 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     }
     for (int j = 0; j < number_of_nodes; j++) {
       diff += std::abs(((w_count.at(j) > 0) ? w_sum.at(j) / w_count.at(j) : 0) - w_centre.at(j)) /
-              std::abs(w_centre.at(j));
+              std::abs(w_centre.at(j) * number_of_nodes);
       w_centre[j] = (w_count.at(j) > 0) ? w_sum.at(j) / w_count.at(j) : 0;
       PURIFY_DEBUG("Node {} has {} visibilities, using w-stack w = {}.", j, w_count.at(j),
                    w_centre.at(j));
       w_sum[j] = 0;
       w_count[j] = 0;
     }
-    if ((diff / number_of_nodes) < rel_diff) {
+    if (diff < rel_diff) {
       PURIFY_DEBUG("Converged!");
       break;
     } else {
@@ -184,7 +184,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
       const t_real global_w_count = comm.all_sum_all<t_real>(w_count.at(j));
       diff +=
           std::abs(((global_w_count > 0) ? global_w_sum / global_w_count : 0) - w_centre.at(j)) /
-          std::abs(w_centre.at(j));
+          std::abs(w_centre.at(j) * number_of_nodes);
       w_centre[j] = (global_w_count > 0) ? global_w_sum / global_w_count : 0;
       if (comm.is_root())
         PURIFY_DEBUG("Node {} has {} visibilities, using w-stack w = {}.", j, global_w_count,
@@ -192,12 +192,12 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
       w_sum[j] = 0;
       w_count[j] = 0;
     }
-    if ((diff / number_of_nodes) < rel_diff) {
+    if (diff < rel_diff) {
       if (comm.is_root()) PURIFY_DEBUG("Converged!");
       break;
     } else {
       if (comm.is_root()) PURIFY_DEBUG("relative_diff = {}", diff);
-      diff = 1;
+      diff = 0;
     }
   }
 
