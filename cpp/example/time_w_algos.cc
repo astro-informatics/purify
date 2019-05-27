@@ -10,9 +10,12 @@ using namespace purify;
 using namespace purify::notinstalled;
 
 int main(int nargs, char const **args) {
+  auto const session = sopt::mpi::init(nargs, args);
+  auto const world = sopt::mpi::Communicator::World();
   purify::logging::initialize();
-  purify::logging::set_level("warn");
+  purify::logging::set_level("debug");
   t_int const number_of_vis = (nargs > 1) ? std::stod(static_cast<std::string>(args[1])) : 1000.;
+  t_int const conj = (nargs > 2) ? std::stod(static_cast<std::string>(args[2])) : 0;
   // Gridding example
   auto const oversample_ratio = 2;
   auto const Ju = 4;
@@ -20,18 +23,17 @@ int main(int nargs, char const **args) {
   auto const Jw = 100;
   auto const imsizex = 256;
   auto const imsizey = 256;
-  const t_real cell = 1;
+  const t_real cell = 40;
   auto const kernel = "kb";
 
-  auto const session = sopt::mpi::init(nargs, args);
-  auto const world = sopt::mpi::Communicator::World();
 
   t_uint const number_of_pixels = imsizex * imsizey;
   // Generating random uv(w) coverage
   t_real const sigma_m = constant::pi / 3;
   const t_real rms_w = 100.;  // lambda
-  auto uv_data = utilities::random_sample_density(number_of_vis / world.size(), 0, sigma_m, rms_w);
-  // uv_data = utilities::conjugate_w(uv_data);
+  auto uv_data = utilities::random_sample_density(std::floor(number_of_vis / world.size()), 0, sigma_m, rms_w);
+  if(static_cast<bool>(conj))
+   uv_data = utilities::conjugate_w(uv_data);
   const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
   uv_data = utilities::w_stacking(uv_data, world, 100, cost);
   uv_data.units = utilities::vis_units::radians;
