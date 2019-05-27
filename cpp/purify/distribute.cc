@@ -124,8 +124,8 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
           w_node[i] = node;
         }
       }
-      w_sum[w_node[i]] += w(i);
-      w_count[w_node[i]]++;
+      w_sum[w_node.at(i)] += w(i);
+      w_count[w_node.at(i)]++;
     }
     for (int j = 0; j < number_of_nodes; j++) {
       diff += std::abs(((w_count.at(j) > 0) ? w_sum.at(j) / w_count.at(j) : 0) - w_centre.at(j)) /
@@ -176,8 +176,8 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
           w_node[i] = node;
         }
       }
-      w_sum[w_node[i]] += w(i);
-      w_count[w_node[i]]++;
+      w_sum[w_node.at(i)] += w(i);
+      w_count[w_node.at(i)]++;
     }
     for (int j = 0; j < number_of_nodes; j++) {
       const t_real global_w_sum = comm.all_sum_all<t_real>(w_sum.at(j));
@@ -197,7 +197,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
       break;
     } else {
       if (comm.is_root()) PURIFY_DEBUG("relative_diff = {}", diff);
-      diff = 0;
+      diff = 1;
     }
   }
 
