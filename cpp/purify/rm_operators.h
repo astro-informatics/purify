@@ -205,9 +205,15 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_1d(
   PURIFY_LOW_LOG("Cell size in Faraday Depth is {} rad/m^2", cell);
   const t_real min_sensitivity = 1.895 / widths.maxCoeff();
   const t_real max_sensitivity = 1.895 / widths.minCoeff();
+
+  const t_real min_null = constant::pi / widths.maxCoeff();
+  const t_real max_null = constant::pi / widths.minCoeff();
+
   const t_real imaging_sensitivity = imsizex * cell / 2;
   PURIFY_LOW_LOG("The max range of sensitivity is +/- {} rad/m^2", max_sensitivity);
   PURIFY_LOW_LOG("The min range of sensitivity is +/- {} rad/m^2", min_sensitivity);
+  PURIFY_LOW_LOG("The last sensitivity null is +/- {} rad/m^2", max_null);
+  PURIFY_LOW_LOG("The first sensitivity null is +/- {} rad/m^2", min_null);
   PURIFY_LOW_LOG("The imaging range is +/- {} rad/m^2", imsizex * cell / 2);
   const t_real du = rm_details::pixel_to_lambda2(cell, imsizex, oversample_ratio);
   const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
