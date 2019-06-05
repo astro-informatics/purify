@@ -63,11 +63,24 @@ int main(int nargs, char const **args) {
   purify::logging::set_level("debug");
   sopt::logging::initialize();
   sopt::logging::set_level("debug");
-
+/* POSSUM
   const t_int channels = 1100;
   const t_real start_c = 700e6;
   const t_real end_c = 1800e6;
   const t_real snr = 30;
+  const t_real dnu = 1e6;  // Hz
+  auto const oversample_ratio = 2;
+  auto const power_iters = 100;
+  auto const power_tol = 1e-4;
+  auto const Ju = 4;
+  auto const imsizex = 8192 * 2;
+*/
+
+  const t_int channels = 768;
+  const t_real start_c = 200.32e6;
+  const t_real end_c = 231.04e6;
+  const t_real snr = 30;
+  const t_real dnu = 40e3;  // Hz
   auto const oversample_ratio = 2;
   auto const power_iters = 100;
   auto const power_tol = 1e-4;
@@ -75,7 +88,6 @@ int main(int nargs, char const **args) {
   auto const imsizex = 8192 * 2;
 
   auto const kernel = "kb";
-  const t_real dnu = (end_c - start_c) / channels;  // Hz
   const t_int Jl_max = 100;
   const Vector<t_real> freq = Vector<t_real>::LinSpaced(channels, start_c, end_c);
   const Vector<t_real> lambda2 = ((constant::c / (freq.array() - dnu / 2.)).square() +
