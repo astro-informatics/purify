@@ -16,10 +16,10 @@ int main(int nargs, char const **args) {
   purify::logging::set_level("debug");
   t_int const number_of_vis = (nargs > 1) ? std::stod(static_cast<std::string>(args[1])) : 1000.;
   t_int const conj = (nargs > 2) ? std::stod(static_cast<std::string>(args[2])) : 0;
+  const t_int iters = (nargs > 3) ? std::stod(static_cast<std::string>(args[3])) : 1;
   // Gridding example
   auto const oversample_ratio = 2;
   auto const Ju = 4;
-  const t_int iters = 1;
   auto const Jw = 100;
   auto const imsizex = 256;
   auto const imsizey = 256;
@@ -62,7 +62,8 @@ int main(int nargs, char const **args) {
                         ((static_cast<bool>(conj)) ? "_conj" : "") + ".txt");
     std::ofstream out(results);
     out.precision(13);
-    out << con_time << " " << app_time << std::endl;
+    out << con_time << " " << app_time << std::endl;  // in seconds
+    PURIFY_DEBUG("Mean Construction Time: {}, Mean Application Time: {}", con_time, app_time);
     out.close();
   }
 }
