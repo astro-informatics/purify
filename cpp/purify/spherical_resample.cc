@@ -1,6 +1,6 @@
 #include "purify/spherical_resample.h"
-#include "purify/utilities.h"
 #include <iostream>
+#include "purify/utilities.h"
 namespace purify {
 namespace spherical_resample {
 
@@ -27,18 +27,15 @@ t_real calculate_n(const t_real theta_0, const t_real phi_0, const t_real theta,
 std::vector<t_int> generate_indicies(const Vector<t_real> &l, const Vector<t_real> &m,
                                      const Vector<t_real> &n, const t_int imsizey,
                                      const t_int imsizex, const t_real dl, const t_real dm) {
-  if(l.size() != m.size())
-    throw std::runtime_error("number of l and m samples do not match.");
-  if(l.size() != n.size())
-    throw std::runtime_error("number of l and n samples do not match.");
-  if(l.size() < 1)
-    throw std::runtime_error("number of l is less than 1.");
+  if (l.size() != m.size()) throw std::runtime_error("number of l and m samples do not match.");
+  if (l.size() != n.size()) throw std::runtime_error("number of l and n samples do not match.");
+  if (l.size() < 1) throw std::runtime_error("number of l is less than 1.");
   const t_real L = imsizex * dl;
   const t_real M = imsizey * dm;
   std::vector<t_int> indicies(0);
-  for (t_int i = 0; i < l.size(); i++){
-    if ((std::abs(l(i)) < L * 0.5) and (std::abs(m(i)) < M * 0.5) and (n(i) > 0.)){
-      indicies.emplace_back(i);
+  for (t_int i = 0; i < l.size(); i++) {
+    if ((std::abs(l(i)) < L * 0.5) and (std::abs(m(i)) < M * 0.5) and (n(i) > 0.)) {
+      indicies.push_back(i);
     }
   }
   return indicies;
@@ -58,7 +55,6 @@ Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<
   Sparse<t_complex> interpolation_matrix(rows, cols);
   interpolation_matrix.reserve(Vector<t_int>::Constant(rows, Jl * Jm));
 
-  const t_complex I(0, 1);
   const t_int jl_max = std::min(Jl, imsizex);
   const t_int jm_max = std::min(Jm, imsizey);
   // If I collapse this for loop there is a crash when using MPI... Sparse<>::insert() doesn't work
