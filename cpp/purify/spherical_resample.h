@@ -45,6 +45,9 @@ std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_resample_o
     n(k) = calculate_n(theta_0, phi_0, theta(k), phi(k));
   }
   const std::vector<t_int> indicies = generate_indicies(l, m, n, imsizey, imsizex, dl, dm);
+  if (indicies.size() < 1)
+    throw std::runtime_error(
+        "indicies is zero when constructing spherical resampling; check number_of_samples.");
   Vector<t_real> l_compressed = Vector<t_real>::Zero(indicies.size());
   Vector<t_real> m_compressed = Vector<t_real>::Zero(indicies.size());
   for (t_int k = 0; k < indicies.size(); k++) {
@@ -56,11 +59,13 @@ std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_resample_o
   const Sparse<t_complex> interrpolation_matrix_adjoint = interrpolation_matrix.adjoint();
   return std::make_tuple(
       [=](K &output, const K &input) {
+        assert(input.size() == number_of_samples);
         K buff = K::Zero(indicies.size());
         for (t_int k = 0; k < indicies.size(); k++) buff(k) = input(indicies.at(k));
         output = interrpolation_matrix_adjoint * buff;
       },
       [=](K &output, const K &input) {
+        assert(input.size() == imsizex * imsizey);
         const K buff = interrpolation_matrix * input;
         output = K::Zero(number_of_samples);
         for (t_int k = 0; k < indicies.size(); k++) output(indicies.at(k)) = buff(k);
