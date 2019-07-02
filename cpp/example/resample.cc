@@ -47,10 +47,10 @@ int main(int nargs, char const **args) {
                                                     std::function<t_real(t_int)>>(
           number_of_samples, theta_0, phi_0, theta, phi, imsizey, imsizex, dl, dm, kernell, kernelm,
           Jl, Jm);
-  sopt::LinearTransform<Vector<t_complex>> const resampler = {std::get<0>(resample_operator),
-                                                              {1, 0, number_of_samples},
-                                                              std::get<1>(resample_operator),
-                                                              {1, 0, imsizex * imsizey}};
+  sopt::LinearTransform<Vector<t_complex>> const resampler =
+      sopt::LinearTransform<Vector<t_complex>>(
+          std::get<0>(resample_operator), {0, 1, number_of_samples}, std::get<1>(resample_operator),
+          {0, 1, imsizex * imsizey});
   const Vector<t_complex> output = resampler.adjoint() * image;
 
   pfitsio::write2d(Image<t_complex>::Map(output.data(), num_phi, num_theta).real(),
