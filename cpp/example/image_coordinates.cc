@@ -23,11 +23,11 @@ int main(int nargs, char const **args) {
   Image<t_real> l = Image<t_real>::Zero(height, width);
   Image<t_real> m = Image<t_real>::Zero(height, width);
   Image<t_real> n = Image<t_real>::Zero(height, width);
-  for (t_int i = 0; i < width; i++) {
-    for (t_int j = 0; j < height; j++) {
-      l(j, i) = spherical_resample::calculate_l(theta_0, phi_0, dtheta * i, dphi * j);
-      m(j, i) = spherical_resample::calculate_m(theta_0, phi_0, dtheta * i, dphi * j);
-      n(j, i) = spherical_resample::calculate_n(theta_0, phi_0, dtheta * i, dphi * j);
+  for (t_int i = 0; i < height; i++) {
+    for (t_int j = 0; j < width; j++) {
+      l(i, j) = spherical_resample::calculate_l(theta_0, phi_0, dtheta * j, dphi * i);
+      m(i, j) = spherical_resample::calculate_m(theta_0, phi_0, dtheta * j, dphi * i);
+      n(i, j) = spherical_resample::calculate_n(theta_0, phi_0, dtheta * j, dphi * i);
     }
   }
   pfitsio::write2d(l.transpose(), "l_coordinates.fits");
