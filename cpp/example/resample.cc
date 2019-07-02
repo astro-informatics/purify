@@ -36,7 +36,7 @@ int main(int nargs, char const **args) {
   std::tie(kernell, kernelm, ftkernell, ftkernelm) =
       purify::create_kernels(kernels::kernel_from_string.at("kb"), Jl, Jm, imsizey, imsizex, 1);
   const auto theta = [num_theta](const t_int k) -> t_real {
-    return (k % num_theta) / num_theta * 2 * constant::pi;
+    return t_real(k % num_theta) / num_theta * 2 * constant::pi;
   };
   const auto phi = [num_theta, num_phi](const t_int k) -> t_real {
     return std::floor(k / num_theta) / num_phi * constant::pi;
