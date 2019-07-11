@@ -86,10 +86,14 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
         interpolation_matrix.insert(m, index) =
             std::exp(-2 * constant::pi * I * ((kwu + ju) * 0.5 + (kwv + jv) * 0.5)) * weights(m) *
             ((dde == dde_type::wkernel_radial)
-                 ? projection_kernels::exact_w_projection_integration_1d(
-                       (u(m) - (kwu + ju)), (v(m) - (kwv + jv)), w_val, du, oversample_ratio,
-                       ftkernel_radial, max_evaluations, absolute_error, relative_error,
-                       (du > 1.) ? integration::method::p : integration::method::h, evaluations)
+                 ? ((2 * constant::pi * w_val * (1 - std::sqrt(1 - std::pow(1. / du, 2))) > 0.01)
+                        ? projection_kernels::exact_w_projection_integration_1d(
+                              (u(m) - (kwu + ju)), (v(m) - (kwv + jv)), w_val, du, oversample_ratio,
+                              ftkernel_radial, max_evaluations, absolute_error, relative_error,
+                              (du > 1.) ? integration::method::p : integration::method::h,
+                              evaluations)
+                        : kerneluv(std::sqrt(std::pow(u(m) - (kwu + ju), 2) +
+                                             std::pow(v(m) - (kwv + jv), 2))))
                  : projection_kernels::exact_w_projection_integration(
                        (u(m) - (kwu + ju)), (v(m) - (kwv + jv)), w_val, du, dv, oversample_ratio,
                        ftkernel_radial, ftkernel_radial, max_evaluations, absolute_error,
