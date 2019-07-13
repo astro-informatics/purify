@@ -32,7 +32,7 @@ int main(int nargs, char const **args) {
     for (t_int w_iter = 1; w_iter < 4; w_iter++) {
       for (t_int cell_iters = 8; cell_iters < 11; cell_iters++) {
         t_int const number_of_vis = std::pow(10, nvis_iters);
-        const t_real rms_w = 10. * w_iter;  // lambda
+        const t_real rms_w = 50. * w_iter;  // lambda
         t_int const imsizex = std::pow(2, cell_iters);
         t_int const imsizey = imsizex;
         const t_real cell = FoV / static_cast<t_real>(imsizex);
