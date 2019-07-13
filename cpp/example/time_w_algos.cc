@@ -23,9 +23,8 @@ int main(int nargs, char const **args) {
   const t_real FoV = 25 * 60 * 60;
   std::string const results = output_filename("times_" + std::to_string(world.size()) +
                                               ((static_cast<bool>(conj)) ? "_conj" : "") + ".txt");
-  std::ofstream out;
+  std::ofstream out(world.is_root() ? results : output_filename("empty.txt"));
   if (world.is_root()) {
-    out = std::ofstream(results);
     out.precision(13);
   }
   for (t_int nvis_iters = 5; nvis_iters < 8; nvis_iters++) {
