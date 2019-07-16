@@ -27,9 +27,9 @@ int main(int nargs, char const **args) {
   if (world.is_root()) {
     out.precision(13);
   }
-  for (t_int nvis_iters = 5; nvis_iters < 8; nvis_iters++) {
-    for (t_int w_iter = 1; w_iter < 4; w_iter++) {
-      for (t_int cell_iters = 8; cell_iters < 11; cell_iters++) {
+  for (t_int nvis_iters = 6; nvis_iters < 9; nvis_iters++) {
+    for (t_int w_iter = 2; w_iter < 4; w_iter++) {
+      for (t_int cell_iters = 10; cell_iters < 15; cell_iters++) {
         t_int const number_of_vis = std::pow(10, nvis_iters);
         const t_real rms_w = 50. * w_iter;  // lambda
         t_int const imsizex = std::pow(2, cell_iters);
