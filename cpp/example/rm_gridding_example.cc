@@ -63,18 +63,18 @@ int main(int nargs, char const **args) {
   purify::logging::set_level("debug");
   sopt::logging::initialize();
   sopt::logging::set_level("debug");
-/* POSSUM
-  const t_int channels = 1100;
-  const t_real start_c = 700e6;
-  const t_real end_c = 1800e6;
-  const t_real snr = 30;
-  const t_real dnu = 1e6;  // Hz
-  auto const oversample_ratio = 2;
-  auto const power_iters = 100;
-  auto const power_tol = 1e-4;
-  auto const Ju = 4;
-  auto const imsizex = 8192 * 2;
-*/
+  /* POSSUM
+    const t_int channels = 1100;
+    const t_real start_c = 700e6;
+    const t_real end_c = 1800e6;
+    const t_real snr = 30;
+    const t_real dnu = 1e6;  // Hz
+    auto const oversample_ratio = 2;
+    auto const power_iters = 100;
+    auto const power_tol = 1e-4;
+    auto const Ju = 4;
+    auto const imsizex = 8192 * 2;
+  */
 
   const t_int channels = 768;
   const t_real start_c = 200.32e6;
