@@ -105,11 +105,14 @@ Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<
       for (t_int jm = 1; jm < jm_max + 1; ++jm) {
         const t_real k_l = std::floor(l(k) - jl_max * 0.5);
         const t_real k_m = std::floor(m(k) - jm_max * 0.5);
-        const t_int q = k_l + jl + std::floor(imsizex * 0.5);
-        const t_int p = k_m + jm + std::floor(imsizey * 0.5);
-        const t_int index = utilities::sub2ind(p, q, imsizey, imsizex);
+        const t_int q = k_l + jl;
+        const t_int p = k_m + jm;
+        const t_int index =
+            utilities::sub2ind(p + imsizey * 0.5, q + imsizex * 0.5, imsizey, imsizex);
         assert(k >= 0);
         assert(k < rows);
+        assert(l(k) > 0);
+        assert(m(k) > 0);
         if ((cols > index) and (index >= 0))
           interpolation_matrix.insert(k, index) =
               kernell(l(k) - (k_l + jl)) * kernelm(m(k) - (k_m + jm));
