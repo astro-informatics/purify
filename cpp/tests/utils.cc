@@ -620,6 +620,30 @@ TEST_CASE("generate_baseline") {
   CHECK(R5(2) == test_coverage.w(5));
 }
 
+TEST_CASE("sub2ind ind2sub") {
+  SECTION("Square Matrix") {
+    const t_int cols = 256;
+    const t_int rows = 256;
+    for (t_int k = 0; k < cols * rows; k++)
+      CHECK(k == utilities::sub2ind(utilities::ind2row(k, rows, cols),
+                                    utilities::ind2col(k, rows, cols), rows, cols));
+  }
+  SECTION("More Rows Matrix") {
+    const t_int cols = 256;
+    const t_int rows = 300;
+    for (t_int k = 0; k < cols * rows; k++)
+      CHECK(k == utilities::sub2ind(utilities::ind2row(k, rows, cols),
+                                    utilities::ind2col(k, rows, cols), rows, cols));
+  }
+  SECTION("More Cols Matrix") {
+    const t_int cols = 300;
+    const t_int rows = 256;
+    for (t_int k = 0; k < cols * rows; k++)
+      CHECK(k == utilities::sub2ind(utilities::ind2row(k, rows, cols),
+                                    utilities::ind2col(k, rows, cols), rows, cols));
+  }
+}
+
 TEST_CASE("conjugate symmetry") {
   t_uint const number_of_vis = 100;
   t_uint const max_w = 100;
