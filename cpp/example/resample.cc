@@ -16,30 +16,37 @@ using namespace purify;
 int main(int nargs, char const **args) {
   purify::logging::initialize();
   purify::logging::set_level("debug");
+#define ARGS_MACRO(NAME, ARGN, VALUE, TYPE)                                                  \
+  auto const NAME = static_cast<TYPE>(                                                       \
+      (nargs > ARGN) ? std::stod(static_cast<std::string>(args[ARGN])) / 180. * constant::pi \
+                     : VALUE);
+
+  ARGS_MACRO(theta_0, 1, 0., t_real)
+  ARGS_MACRO(phi_0, 2, constant::pi / 2., t_real)
+#undef ARGS_MACRO
+  
 
   std::string const fitsfile = image_filename("M31.fits");
   Image<t_complex> const M31 = pfitsio::read2d(fitsfile);
   Vector<t_complex> const image = Vector<t_complex>::Map(M31.data(), M31.size());
-  const t_int number_of_samples = 1024 * 1024;
-  const t_real theta_0 = constant::pi / 180. * 180.;  // radians
-  const t_real phi_0 = constant::pi / 180. * 90.;    // radians
+  const t_int num_theta = 1024;
+  const t_int num_phi = 512;
+  const t_int number_of_samples = num_theta * num_phi;
   const t_int imsizey = M31.rows();
   const t_int imsizex = M31.cols();
-  const t_real dl = 1. / imsizex;
-  const t_real dm = 1. / imsizey;
+  const t_real dl = 1.5 / imsizex;
+  const t_real dm = 1.5 / imsizey;
   const t_int Jl = 4;
   const t_int Jm = 4;
-  const t_int num_theta = std::sqrt(number_of_samples);
-  const t_int num_phi = std::sqrt(number_of_samples);
 
   std::function<t_real(t_real)> kernell, kernelm, ftkernell, ftkernelm;
   std::tie(kernell, kernelm, ftkernell, ftkernelm) =
       purify::create_kernels(kernels::kernel_from_string.at("kb"), Jl, Jm, imsizey, imsizex, 1);
-  const auto theta = [num_theta](const t_int k) -> t_real {
-    return t_real(k % num_theta) / num_theta * 2 * constant::pi;
+  const auto phi = [num_phi](const t_int k) -> t_real {
+    return utilities::ind2row(k, num_phi, num_theta) * constant::pi / num_phi;
   };
-  const auto phi = [num_theta, num_phi](const t_int k) -> t_real {
-    return std::floor(k / num_theta) / num_phi * constant::pi;
+  const auto theta = [num_theta, num_phi](const t_int k) -> t_real {
+    return utilities::ind2col(k, num_phi, num_theta) * 2 * constant::pi / num_theta;
   };
 
   const auto resample_operator =
@@ -53,6 +60,26 @@ int main(int nargs, char const **args) {
           {0, 1, imsizex * imsizey});
   const Vector<t_complex> output = resampler.adjoint() * image;
 
-  pfitsio::write2d(Image<t_complex>::Map(output.data(), num_phi, num_theta).real(),
+  Vector<t_real> l = Vector<t_real>::Zero(number_of_samples);
+  Vector<t_real> m = Vector<t_real>::Zero(number_of_samples);
+  Vector<t_real> n = Vector<t_real>::Zero(number_of_samples);
+  Vector<t_real> th = Vector<t_real>::Zero(number_of_samples);
+  Vector<t_real> ph = Vector<t_real>::Zero(number_of_samples);
+  for (t_int index = 0; index < number_of_samples; index++) {
+    l(index) = spherical_resample::calculate_l(theta(index), phi(index), 0., phi_0, theta_0);
+    m(index) = spherical_resample::calculate_m(theta(index), phi(index), 0., phi_0, theta_0);
+    n(index) = spherical_resample::calculate_n(theta(index), phi(index), 0., phi_0, theta_0);
+    th(index) = theta(index);
+    ph(index) = phi(index);
+  }
+  Vector<t_real> mask = spherical_resample::generate_mask(l, m, n, imsizex, imsizey, dl, dm);
+
+  pfitsio::write2d(Image<t_complex>::Map(output.data(), num_theta, num_phi).real(),
                    "image_on_sphere.fits");
+  pfitsio::write2d(Image<t_real>::Map(l.data(), num_theta, num_phi), "l_coordinates.fits");
+  pfitsio::write2d(Image<t_real>::Map(m.data(), num_theta, num_phi), "m_coordinates.fits");
+  pfitsio::write2d(Image<t_real>::Map(n.data(), num_theta, num_phi), "n_coordinates.fits");
+  pfitsio::write2d(Image<t_real>::Map(th.data(), num_theta, num_phi), "theta_coordinates.fits");
+  pfitsio::write2d(Image<t_real>::Map(ph.data(), num_theta, num_phi), "phi_coordinates.fits");
+  pfitsio::write2d(Image<t_real>::Map(mask.data(), num_theta, num_phi), "mask_coordinates.fits");
 }
