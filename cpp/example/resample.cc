@@ -24,7 +24,13 @@ int main(int nargs, char const **args) {
   ARGS_MACRO(theta_0, 1, 0., t_real)
   ARGS_MACRO(phi_0, 2, constant::pi / 2., t_real)
 #undef ARGS_MACRO
-  
+#define ARGS_MACRO(NAME, ARGN, VALUE, TYPE) \
+  auto const NAME =                         \
+      static_cast<TYPE>((nargs > ARGN) ? std::stod(static_cast<std::string>(args[ARGN])) : VALUE);
+
+  ARGS_MACRO(L, 3, 1., t_real)
+  ARGS_MACRO(M, 4, 1., t_real)
+#undef ARGS_MACRO
 
   std::string const fitsfile = image_filename("M31.fits");
   Image<t_complex> const M31 = pfitsio::read2d(fitsfile);
@@ -34,8 +40,8 @@ int main(int nargs, char const **args) {
   const t_int number_of_samples = num_theta * num_phi;
   const t_int imsizey = M31.rows();
   const t_int imsizex = M31.cols();
-  const t_real dl = 1.5 / imsizex;
-  const t_real dm = 1.5 / imsizey;
+  const t_real dl = L / imsizex;
+  const t_real dm = M / imsizey;
   const t_int Jl = 4;
   const t_int Jm = 4;
 
