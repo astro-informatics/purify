@@ -66,7 +66,19 @@ std::vector<t_int> generate_indicies(const Vector<t_real> &l, const Vector<t_rea
       indicies.push_back(i);
     }
   }
+  PURIFY_LOW_LOG("Mask has {} elements.", indicies.size());
   return indicies;
+}
+
+Vector<t_real> generate_mask(const Vector<t_real> &l, const Vector<t_real> &m,
+                             const Vector<t_real> &n, const t_int imsizey, const t_int imsizex,
+                             const t_real dl, const t_real dm) {
+  auto indicies = generate_indicies(l, m, n, imsizey, imsizex, dl, dm);
+  if (indicies.size() == 0)
+    throw std::runtime_error("Field of view does not overlap with sphere, so mask is empty.");
+  Vector<t_real> mask = Vector<t_real>::Zero(l.size());
+  for (auto const &k : indicies) mask(k) = 1.;
+  return mask;
 }
 
 Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<t_real> &m,

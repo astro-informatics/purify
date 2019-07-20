@@ -35,6 +35,10 @@ t_real calculate_n(const t_real theta, const t_real phi, const t_real alpha, con
 std::vector<t_int> generate_indicies(const Vector<t_real> &l, const Vector<t_real> &m,
                                      const Vector<t_real> &n, const t_int imsizey,
                                      const t_int imsizex, const t_real dl, const t_real dm);
+//! generate a mask for imaged field of view that is going to be resampled
+Vector<t_real> generate_mask(const Vector<t_real> &l, const Vector<t_real> &m,
+                             const Vector<t_real> &n, const t_int imsizey, const t_int imsizex,
+                             const t_real dl, const t_real dm);
 //! sparse matrix that degrids/grids between spherical sampling pattern and regular grid
 Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<t_real> &m,
                                           const t_int imsizey, const t_int imsizex,
