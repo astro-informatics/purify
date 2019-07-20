@@ -4,24 +4,52 @@
 namespace purify {
 namespace spherical_resample {
 
-t_real calculate_l(const t_real theta_0, const t_real phi_0, const t_real theta, const t_real phi) {
-  // cos(theta - theta_0)
-  const t_real a = std::cos(theta_0) * std::cos(theta) + std::sin(theta_0) * std::sin(theta);
-  // sin(phi - phi_0)
-  const t_real b = std::cos(phi_0) * std::sin(phi) - std::sin(phi_0) * std::cos(phi);
-  return a * b;
+t_real calculate_l(const t_real theta, const t_real phi) { return std::cos(theta) * std::sin(phi); }
+
+t_real calculate_m(const t_real theta, const t_real phi) { return std::sin(theta) * std::sin(phi); }
+
+t_real calculate_n(const t_real phi) { return std::cos(phi); }
+
+t_real calculate_rotated_l(const t_real l, const t_real m, const t_real n, const t_real alpha,
+                           const t_real beta, const t_real gamma) {
+  return l * (std::cos(alpha) * std::cos(beta) * std::cos(gamma) -
+              std::sin(alpha) * std::sin(gamma)) +
+         m * (-std::sin(alpha) * std::cos(beta) * std::cos(gamma) -
+              std::cos(alpha) * std::sin(gamma)) +
+         n * std::cos(alpha) * std::sin(beta);
 }
 
-t_real calculate_m(const t_real theta_0, const t_real phi_0, const t_real theta, const t_real phi) {
-  // sin(theta - theta_0)
-  const t_real a = std::cos(theta_0) * std::sin(theta) - std::sin(theta_0) * std::cos(theta);
-  // sin(phi - phi_0)
-  const t_real b = std::cos(phi_0) * std::sin(phi) - std::sin(phi_0) * std::cos(phi);
-  return a * b;
+t_real calculate_rotated_m(const t_real l, const t_real m, const t_real n, const t_real alpha,
+                           const t_real beta, const t_real gamma) {
+  return l * (std::sin(alpha) * std::cos(beta) * std::cos(gamma) +
+              std::cos(alpha) * std::sin(gamma)) +
+         m * (-std::sin(alpha) * std::cos(beta) * std::sin(gamma) +
+              std::cos(alpha) * std::cos(gamma)) +
+         n * std::sin(alpha) * std::sin(beta);
 }
-t_real calculate_n(const t_real theta_0, const t_real phi_0, const t_real theta, const t_real phi) {
-  // cos(phi - phi_0)
-  return std::cos(phi_0) * std::cos(phi) + std::sin(phi_0) * std::sin(phi);
+
+t_real calculate_rotated_n(const t_real l, const t_real m, const t_real n, const t_real alpha,
+                           const t_real beta, const t_real gamma) {
+  return l * (-std::sin(beta) * std::cos(gamma)) + m * (std::sin(beta) * std::sin(gamma)) +
+         n * std::cos(beta);
+}
+
+t_real calculate_l(const t_real theta, const t_real phi, const t_real alpha, const t_real beta,
+                   const t_real gamma) {
+  return calculate_rotated_l(calculate_l(theta, phi), calculate_m(theta, phi), calculate_n(phi),
+                             alpha, beta, gamma);
+}
+
+t_real calculate_m(const t_real theta, const t_real phi, const t_real alpha, const t_real beta,
+                   const t_real gamma) {
+  return calculate_rotated_m(calculate_l(theta, phi), calculate_m(theta, phi), calculate_n(phi),
+                             alpha, beta, gamma);
+}
+
+t_real calculate_n(const t_real theta, const t_real phi, const t_real alpha, const t_real beta,
+                   const t_real gamma) {
+  return calculate_rotated_n(calculate_l(theta, phi), calculate_m(theta, phi), calculate_n(phi),
+                             alpha, beta, gamma);
 }
 
 std::vector<t_int> generate_indicies(const Vector<t_real> &l, const Vector<t_real> &m,

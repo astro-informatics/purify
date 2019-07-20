@@ -7,11 +7,30 @@
 namespace purify {
 namespace spherical_resample {
 //! calculate l directional cosine for a given pointing given angles
-t_real calculate_l(const t_real theta_0, const t_real phi_0, const t_real theta, const t_real phi);
+t_real calculate_l(const t_real theta, const t_real phi);
 //! calculate m directional cosine for a given pointing given angles
-t_real calculate_m(const t_real theta_0, const t_real phi_0, const t_real theta, const t_real phi);
+t_real calculate_m(const t_real theta, const t_real phi);
 //! calculate n directional cosine for a given pointing given angles
-t_real calculate_n(const t_real theta_0, const t_real phi_0, const t_real theta, const t_real phi);
+t_real calculate_n(const t_real phi);
+//! calculate the rotated l from euler angles in zyz and starting coordinates (l, m, n)
+t_real calculate_rotated_l(const t_real l, const t_real m, const t_real n, const t_real alpha,
+                           const t_real beta, const t_real gamma);
+//! calculate the rotated m from euler angles in zyz and starting coordinates (l, m, n)
+t_real calculate_rotated_m(const t_real l, const t_real m, const t_real n, const t_real alpha,
+                           const t_real beta, const t_real gamma);
+//! calculate the rotated n from euler angles in zyz and starting coordinates (l, m, n)
+t_real calculate_rotated_n(const t_real l, const t_real m, const t_real n, const t_real alpha,
+                           const t_real beta, const t_real gamma);
+//! calculate the l in a rotated frame from euler angles in zyz
+t_real calculate_l(const t_real theta, const t_real phi, const t_real alpha, const t_real beta,
+                   const t_real gamma);
+//! calculate the m in a rotated frame from euler angles in zyz
+t_real calculate_m(const t_real theta, const t_real phi, const t_real alpha, const t_real beta,
+                   const t_real gamma);
+//! calculate the n in a rotated frame from euler angles in zyz
+t_real calculate_n(const t_real theta, const t_real phi, const t_real alpha, const t_real beta,
+                   const t_real gamma);
+
 //! generate indicies that overlap with imaging field of view for resampling
 std::vector<t_int> generate_indicies(const Vector<t_real> &l, const Vector<t_real> &m,
                                      const Vector<t_real> &n, const t_int imsizey,
@@ -40,9 +59,9 @@ std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_resample_o
   Vector<t_real> m = Vector<t_real>::Zero(number_of_samples);
   Vector<t_real> n = Vector<t_real>::Zero(number_of_samples);
   for (t_int k = 0; k < number_of_samples; k++) {
-    l(k) = calculate_l(theta_0, phi_0, theta(k), phi(k));
-    m(k) = calculate_m(theta_0, phi_0, theta(k), phi(k));
-    n(k) = calculate_n(theta_0, phi_0, theta(k), phi(k));
+    l(k) = calculate_l(theta(k), phi(k), 0., phi_0, theta_0);
+    m(k) = calculate_m(theta(k), phi(k), 0., phi_0, theta_0);
+    n(k) = calculate_n(theta(k), phi(k), 0., phi_0, theta_0);
   }
   const std::vector<t_int> indicies = generate_indicies(l, m, n, imsizey, imsizex, dl, dm);
   if (indicies.size() < 1)
