@@ -311,7 +311,7 @@ utilities::vis_params conjugate_w(const utilities::vis_params &uv_vis) {
   return output;
 }
 
-t_int sub2ind(const t_int &row, const t_int &col, const t_int &rows, const t_int &cols) {
+t_int sub2ind(const t_int row, const t_int col, const t_int rows, const t_int cols) {
   /*
     Converts (row, column) of a matrix to a single index. This does the same as the matlab funciton
     sub2ind, converts subscript to index.
@@ -325,7 +325,7 @@ t_int sub2ind(const t_int &row, const t_int &col, const t_int &rows, const t_int
   return row * cols + col;
 }
 
-std::tuple<t_int, t_int> ind2sub(const t_int &sub, const t_int &cols, const t_int &rows) {
+std::tuple<t_int, t_int> ind2sub(const t_int sub, const t_int rows, const t_int cols) {
   /*
     Converts index of a matrix to (row, column). This does the same as the matlab funciton sub2ind,
     converts subscript to index.
@@ -337,10 +337,16 @@ std::tuple<t_int, t_int> ind2sub(const t_int &sub, const t_int &cols, const t_in
     col:: output column of matrix
 
    */
-  return std::make_tuple<t_int, t_int>(std::floor((sub - (sub % cols)) / cols), sub % cols);
+  return std::make_tuple<t_int, t_int>(ind2row(sub, rows, cols), ind2col(sub, rows, cols));
 }
 
-t_real mod(const t_real &x, const t_real &y) {
+t_int ind2col(const t_int sub, const t_int rows, const t_int cols) { return sub % cols; }
+
+t_int ind2row(const t_int sub, const t_int rows, const t_int cols) {
+  return std::floor((sub - (sub % cols)) / cols);
+}
+
+t_real mod(const t_real x, const t_real y) {
   /*
     returns x % y, and warps circularly around y for negative values.
   */

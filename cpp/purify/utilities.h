@@ -93,11 +93,15 @@ utilities::vis_params uv_scale(const utilities::vis_params &uv_vis, const t_int 
 //! reflects visibilities into the w >= 0 domain
 utilities::vis_params conjugate_w(const utilities::vis_params &uv_vis);
 //! Converts from subscript to index for matrix.
-t_int sub2ind(const t_int &row, const t_int &col, const t_int &rows, const t_int &cols);
+t_int sub2ind(const t_int row, const t_int col, const t_int rows, const t_int cols);
 //! Converts from index to subscript for matrix.
-std::tuple<t_int, t_int> ind2sub(const t_int &sub, const t_int &cols, const t_int &rows);
+std::tuple<t_int, t_int> ind2sub(const t_int sub, const t_int rows, const t_int cols);
+//! Converts from index to column for matrix.
+t_int ind2col(const t_int sub, const t_int rows, const t_int cols);
+//! Converts from index to row for matrix.
+t_int ind2row(const t_int sub, const t_int rows, const t_int cols);
 //! Mod function modified to wrap circularly for negative numbers
-t_real mod(const t_real &x, const t_real &y);
+t_real mod(const t_real x, const t_real y);
 //! Calculate mean of vector
 template <class K>
 typename K::Scalar mean(const K x) {
