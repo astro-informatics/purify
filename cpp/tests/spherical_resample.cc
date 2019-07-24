@@ -99,3 +99,69 @@ TEST_CASE("select resamples") {
     CHECK(n(indicies.at(k)) > 0);
   }
 }
+
+TEST_CASE("Test FT Scaling and Padding") {
+  const t_int Jl = 4;
+  const t_int Jm = 4;
+  const t_int imsizex = 256;
+  const t_int imsizey = 256;
+  const t_real oversample_ratio = 2.;
+
+  const auto kernelstuff = purify::create_kernels(kernels::kernel_from_string.at("kb"), Jl, Jm,
+                                                  imsizey, imsizex, oversample_ratio);
+
+  const std::function<t_real(t_real)>& kernell = std::get<0>(kernelstuff);
+  const std::function<t_real(t_real)>& kernelm = std::get<1>(kernelstuff);
+  const std::function<t_real(t_real)>& ftkernell = std::get<2>(kernelstuff);
+  const std::function<t_real(t_real)>& ftkernelm = std::get<3>(kernelstuff);
+
+  const Image<t_complex> S_u = purify::details::init_correction2d(
+      oversample_ratio, imsizey, imsizex, ftkernell, ftkernelm, 0., 1., 1.);
+
+  auto FT_Z_op =
+      spherical_resample::init_FT_zero_padding_2d<Vector<t_complex>>(S_u, oversample_ratio);
+  SECTION("Forward") {
+    const Vector<t_complex> input = Vector<t_complex>::Ones(std::floor(imsizex * oversample_ratio) *
+                                                            std::floor(imsizex * oversample_ratio));
+    Vector<t_complex> output;
+    std::get<0>(FT_Z_op)(output, input);
+    CHECK(output.size() == imsizex * imsizey);
+    const Image<t_complex>& output_grid = Image<t_complex>::Map(output.data(), imsizey, imsizex);
+    CHECK(output_grid.topLeftCorner(imsizey * 0.5, imsizex * 0.5)
+              .real()
+              .isApprox(S_u.bottomRightCorner(imsizey * 0.5, imsizex * 0.5).real(), 1e-6));
+    CHECK(output_grid.topRightCorner(imsizey * 0.5, imsizex * 0.5)
+              .real()
+              .isApprox(S_u.bottomLeftCorner(imsizey * 0.5, imsizex * 0.5).real(), 1e-6));
+    CHECK(output_grid.bottomRightCorner(imsizey * 0.5, imsizex * 0.5)
+              .real()
+              .isApprox(S_u.topLeftCorner(imsizey * 0.5, imsizex * 0.5).real(), 1e-6));
+    CHECK(output_grid.bottomLeftCorner(imsizey * 0.5, imsizex * 0.5)
+              .real()
+              .isApprox(S_u.topRightCorner(imsizey * 0.5, imsizex * 0.5).real(), 1e-6));
+  }
+  SECTION("Backward") {
+    const Vector<t_complex> input =
+        Vector<t_complex>::Ones(std::floor(imsizex) * std::floor(imsizex));
+    Vector<t_complex> output;
+    std::get<1>(FT_Z_op)(output, input);
+    CHECK(output.size() ==
+          std::floor(imsizex * oversample_ratio) * std::floor(imsizex * oversample_ratio));
+    const Image<t_complex>& output_grid =
+        Image<t_complex>::Map(output.data(), std::floor(imsizey * oversample_ratio),
+                              std::floor(imsizex * oversample_ratio));
+    CHECK(output_grid.topLeftCorner(imsizey * 0.5, imsizex * 0.5)
+              .real()
+              .isApprox(S_u.bottomRightCorner(imsizey * 0.5, imsizex * 0.5).real(), 1e-6));
+    CHECK(output_grid.topRightCorner(imsizey * 0.5, imsizex * 0.5)
+              .real()
+              .isApprox(S_u.bottomLeftCorner(imsizey * 0.5, imsizex * 0.5).real(), 1e-6));
+    CHECK(output_grid.bottomRightCorner(imsizey * 0.5, imsizex * 0.5)
+              .real()
+              .isApprox(S_u.topLeftCorner(imsizey * 0.5, imsizex * 0.5).real(), 1e-6));
+    CHECK(output_grid.bottomLeftCorner(imsizey * 0.5, imsizex * 0.5)
+              .real()
+              .isApprox(S_u.topRightCorner(imsizey * 0.5, imsizex * 0.5).real(), 1e-6));
+  }
+}
+
