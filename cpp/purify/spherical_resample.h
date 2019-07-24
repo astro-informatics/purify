@@ -47,20 +47,12 @@ Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<
                                           const std::function<t_real(t_real)> kernell,
                                           const std::function<t_real(t_real)> kernelm,
                                           const t_int Jl, const t_int Jm);
-//! return operator that will resample between the sphere and the plane
-template <class K, class T>
-std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_resample_operator_2d(
-    const t_int number_of_samples, const t_real theta_0, const t_real phi_0, const T &theta,
-    const T &phi, const t_int imsizey, const t_int imsizex, const t_real dl, const t_real dm,
-    const std::function<t_real(t_real)> kernell, const std::function<t_real(t_real)> kernelm,
-    const t_int Jl, const t_int Jm) {
-  if ((Jl <= 0) or (Jm <= 0))
-    throw std::runtime_error("Support size of resampling kernel is not positive");
-  if ((imsizex <= 0) or (imsizey <= 0))
-    throw std::runtime_error("Tangent image size is not greater than zero.");
-  if (number_of_samples <= 0)
-    throw std::runtime_error("Number of samples on the sphere is not greater than zero.");
 
+//! generate the l and m coordinates in pixels and their indicies for resampling
+template <class T>
+std::tuple<Vector<t_real>, Vector<t_real>, std::vector<t_int>> calculate_compressed_lm(
+    const t_int number_of_samples, const t_real theta_0, const t_real phi_0, const T &theta,
+    const T &phi, const t_int imsizey, const t_int imsizex, const t_real dl, const t_real dm) {
   Vector<t_real> l = Vector<t_real>::Zero(number_of_samples);
   Vector<t_real> m = Vector<t_real>::Zero(number_of_samples);
   Vector<t_real> n = Vector<t_real>::Zero(number_of_samples);
@@ -79,22 +71,86 @@ std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_resample_o
     l_compressed(k) = l(indicies.at(k)) / dl;
     m_compressed(k) = m(indicies.at(k)) / dm;
   }
+  return std::make_tuple(l_compressed, m_compressed, indicies);
+}
+//! cutout region of sphere used for resampling
+template <class K>
+std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_pop_indicies_operator(
+    const std::vector<t_int> &indicies, const t_int number_of_samples) {
+  return std::make_tuple(
+      [=](K &output, const K &input) {
+        assert(input.size() == number_of_samples);
+        output = K::Zero(indicies.size());
+        for (t_int k = 0; k < indicies.size(); k++) output(k) = input(indicies.at(k));
+      },
+      [=](K &output, const K &input) {
+        assert(input.size() == indicies.size());
+        output = K::Zero(number_of_samples);
+        for (t_int k = 0; k < indicies.size(); k++) output(indicies.at(k)) = input(k);
+      });
+}
+
+//! returns an operator that will resample from a subset of coordinates
+template <class K>
+std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_resample_operator_2d(
+    const t_int number_of_samples, const Vector<t_real> &l_compressed,
+    const Vector<t_real> &m_compressed, const std::vector<t_int> &indicies, const t_int imsizey,
+    const t_int imsizex, const t_real dl, const t_real dm,
+    const std::function<t_real(t_real)> &kernell, const std::function<t_real(t_real)> &kernelm,
+    const t_int Jl, const t_int Jm) {
+  if ((Jl <= 0) or (Jm <= 0))
+    throw std::runtime_error("Support size of resampling kernel is not positive");
+  if ((imsizex <= 0) or (imsizey <= 0))
+    throw std::runtime_error("Tangent image size is not greater than zero.");
+  if (number_of_samples <= 0)
+    throw std::runtime_error("Number of samples on the sphere is not greater than zero.");
+  if (indicies.size() != l_compressed.size())
+    throw std::runtime_error("Indicies is not the same size as l_compressed.");
+  if (indicies.size() != l_compressed.size())
+    throw std::runtime_error("Indicies is not the same size as m_compressed.");
+
   const Sparse<t_complex> interrpolation_matrix = init_resample_matrix_2d(
       l_compressed, m_compressed, imsizey, imsizex, kernell, kernelm, Jl, Jm);
   const Sparse<t_complex> interrpolation_matrix_adjoint = interrpolation_matrix.adjoint();
   return std::make_tuple(
-      [=](K &output, const K &input) {
-        assert(input.size() == number_of_samples);
-        K buff = K::Zero(indicies.size());
-        for (t_int k = 0; k < indicies.size(); k++) buff(k) = input(indicies.at(k));
-        output = interrpolation_matrix_adjoint * buff;
-      },
+      [=](K &output, const K &input) { output = interrpolation_matrix_adjoint * input; },
       [=](K &output, const K &input) {
         assert(input.size() == imsizex * imsizey);
-        const K buff = interrpolation_matrix * input;
-        output = K::Zero(number_of_samples);
-        for (t_int k = 0; k < indicies.size(); k++) output(indicies.at(k)) = buff(k);
+        output = interrpolation_matrix * input;
       });
+}
+
+//! return operator that will resample between the sphere and the plane with masking
+template <class K, class T>
+std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_mask_and_resample_operator_2d(
+    const t_int number_of_samples, const t_real theta_0, const t_real phi_0, const T &theta,
+    const T &phi, const t_int imsizey, const t_int imsizex, const t_real dl, const t_real dm,
+    const std::function<t_real(t_real)> &kernell, const std::function<t_real(t_real)> &kernelm,
+    const t_int Jl, const t_int Jm) {
+  if ((Jl <= 0) or (Jm <= 0))
+    throw std::runtime_error("Support size of resampling kernel is not positive");
+  if ((imsizex <= 0) or (imsizey <= 0))
+    throw std::runtime_error("Tangent image size is not greater than zero.");
+  if (number_of_samples <= 0)
+    throw std::runtime_error("Number of samples on the sphere is not greater than zero.");
+  // Find indicies for cutting to resample
+  const auto lm_with_mask = calculate_compressed_lm<T>(number_of_samples, theta_0, phi_0, theta,
+                                                       phi, imsizey, imsizex, dl, dm);
+  const Vector<t_real> &l_compressed = std::get<0>(lm_with_mask);
+  const Vector<t_real> &m_compressed = std::get<1>(lm_with_mask);
+  const std::vector<t_int> &indicies = std::get<2>(lm_with_mask);
+  // Create operator to cutout region of sphere for resampling
+  const auto cutting_operator = init_pop_indicies_operator<K>(indicies, number_of_samples);
+  // Operator to perform resampling
+  const auto gridding_operator =
+      init_resample_operator_2d<K>(number_of_samples, l_compressed, m_compressed, indicies, imsizey,
+                                   imsizex, dl, dm, kernell, kernelm, Jl, Jm);
+  // Combining them together
+  auto direct =
+      sopt::chained_operators<K>(std::get<0>(gridding_operator), std::get<0>(cutting_operator));
+  auto indirect =
+      sopt::chained_operators<K>(std::get<1>(cutting_operator), std::get<1>(gridding_operator));
+  return std::make_tuple(direct, indirect);
 }
 
 //! gridding correction and zero padding in the FT domain (with FFT shift operations accounted for)
