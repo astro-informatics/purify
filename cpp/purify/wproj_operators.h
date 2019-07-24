@@ -14,8 +14,7 @@ namespace details {
 Image<t_complex> init_correction_radial_2d(const t_real oversample_ratio, const t_uint imsizey_,
                                            const t_uint imsizex_,
                                            const std::function<t_real(t_real)> &ftkerneluv,
-                                           const t_real w_mean, const t_real cellx,
-                                           const t_real celly);
+                                           const t_real w_mean, const t_real dl, const t_real dm);
 
 }  // namespace details
 
@@ -28,8 +27,12 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
     const t_real celly) {
   sopt::OperatorFunction<T> directZ, indirectZ;
   sopt::OperatorFunction<T> directFFT, indirectFFT;
+  const t_real L = widefield::fov_cosine(cellx, imsizex);
+  const t_real M = widefield::fov_cosine(celly, imsizey);
+  const t_real dl = L / imsizex;
+  const t_real dm = M / imsizey;
   const Image<t_complex> S = purify::details::init_correction_radial_2d(
-      oversample_ratio, imsizey, imsizex, ftkerneluv, w_mean, cellx, celly);
+      oversample_ratio, imsizey, imsizex, ftkerneluv, w_mean, dl, dm);
   PURIFY_LOW_LOG("Building Measurement Operator: WGFZDB");
   PURIFY_LOW_LOG(
       "Constructing Zero Padding "

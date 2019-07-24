@@ -44,11 +44,11 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
   return interpolation_matrix;
 }
 
-Image<t_complex> init_correction2d(const t_real &oversample_ratio, const t_uint &imsizey_,
-                                   const t_uint &imsizex_,
-                                   const std::function<t_real(t_real)> ftkernelu,
-                                   const std::function<t_real(t_real)> ftkernelv,
-                                   const t_real &w_mean, const t_real &cellx, const t_real &celly) {
+Image<t_complex> init_correction2d(const t_real oversample_ratio, const t_uint imsizey_,
+                                   const t_uint imsizex_,
+                                   const std::function<t_real(t_real)> &ftkernelu,
+                                   const std::function<t_real(t_real)> &ftkernelv,
+                                   const t_real w_mean, const t_real dl, const t_real dm) {
   const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
   const t_uint ftsizev_ = std::floor(imsizey_ * oversample_ratio);
   const t_uint x_start = std::floor(ftsizeu_ * 0.5 - imsizex_ * 0.5);
@@ -59,9 +59,8 @@ Image<t_complex> init_correction2d(const t_real &oversample_ratio, const t_uint 
   return ((1e0 / range.segment(y_start, imsizey_).unaryExpr(ftkernelv)).matrix() *
           (1e0 / range.segment(x_start, imsizex_).unaryExpr(ftkernelu)).matrix().transpose())
              .array() *
-         t_complex(1., 0.) *
-         widefield::generate_chirp(w_mean, cellx, celly, imsizex_, imsizey_).array() * imsizex_ *
-         imsizey_;
+         t_complex(1., 0.) * widefield::generate_chirp(w_mean, dl, dm, imsizex_, imsizey_).array() *
+         imsizex_ * imsizey_;
 }
 
 }  // namespace details

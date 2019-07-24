@@ -116,8 +116,7 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
 Image<t_complex> init_correction_radial_2d(const t_real oversample_ratio, const t_uint imsizey_,
                                            const t_uint imsizex_,
                                            const std::function<t_real(t_real)> &ftkerneluv,
-                                           const t_real w_mean, const t_real cellx,
-                                           const t_real celly) {
+                                           const t_real w_mean, const t_real dl, const t_real dm) {
   const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
   const t_uint ftsizev_ = std::floor(imsizey_ * oversample_ratio);
   const t_uint x_start = std::floor(ftsizeu_ * 0.5 - imsizex_ * 0.5);
@@ -131,7 +130,7 @@ Image<t_complex> init_correction_radial_2d(const t_real oversample_ratio, const 
                                     std::pow((j + 0.5 + x_start) / ftsizeu_ - 0.5, 2)));
 
   return gridding_correction.array() *
-         widefield::generate_chirp(w_mean, cellx, celly, imsizex_, imsizey_).array() * imsizex_ *
+         widefield::generate_chirp(w_mean, dl, dm, imsizex_, imsizey_).array() * imsizex_ *
          imsizey_;
 }
 

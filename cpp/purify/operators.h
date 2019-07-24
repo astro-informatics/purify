@@ -208,11 +208,11 @@ Sparse<t_complex, STORAGE_INDEX_TYPE> init_gridding_matrix_2d(
 
 //! Given the Fourier transform of a gridding kernel, creates the scaling image for gridding
 //! correction.
-Image<t_complex> init_correction2d(const t_real &oversample_ratio, const t_uint &imsizey_,
-                                   const t_uint &imsizex_,
-                                   const std::function<t_real(t_real)> ftkernelu,
-                                   const std::function<t_real(t_real)> ftkernelv,
-                                   const t_real &w_mean, const t_real &cellx, const t_real &celly);
+Image<t_complex> init_correction2d(const t_real oversample_ratio, const t_uint imsizey_,
+                                   const t_uint imsizex_,
+                                   const std::function<t_real(t_real)> &ftkernelu,
+                                   const std::function<t_real(t_real)> &ftkernelv,
+                                   const t_real w_mean, const t_real dl, const t_real dm);
 
 //! Construct gridding matrix with mixing
 template <class T, class... ARGS>
@@ -491,8 +491,12 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
       purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
   sopt::OperatorFunction<T> directFZ, indirectFZ;
   t_real const w_mean = w_stacking ? w.array().mean() : 0.;
+  const t_real L = widefield::fov_cosine(cellx, imsizex);
+  const t_real M = widefield::fov_cosine(celly, imsizey);
+  const t_real dl = L / imsizex;
+  const t_real dm = M / imsizey;
   std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(
-      ftkernelu, ftkernelv, imsizey, imsizex, oversample_ratio, ft_plan, w_mean, cellx, celly);
+      ftkernelu, ftkernelv, imsizey, imsizex, oversample_ratio, ft_plan, w_mean, dl, dm);
   sopt::OperatorFunction<T> directG, indirectG;
   PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
                     imsizey * celly / (60. * 60.));
@@ -520,8 +524,12 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_mpi_degrid
   std::tie(kernelu, kernelv, ftkernelu, ftkernelv) =
       purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
   sopt::OperatorFunction<T> directFZ, indirectFZ;
+  const t_real L = widefield::fov_cosine(cellx, imsizex);
+  const t_real M = widefield::fov_cosine(celly, imsizey);
+  const t_real dl = L / imsizex;
+  const t_real dm = M / imsizey;
   std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(
-      ftkernelu, ftkernelv, imsizey, imsizex, oversample_ratio, ft_plan, 0., cellx, celly);
+      ftkernelu, ftkernelv, imsizey, imsizex, oversample_ratio, ft_plan, 0., dl, dm);
   sopt::OperatorFunction<T> directG, indirectG;
   if (w_stacking == true)
     throw std::runtime_error(
@@ -560,8 +568,12 @@ base_mpi_all_to_all_degrid_operator_2d(
       purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
   sopt::OperatorFunction<T> directFZ, indirectFZ;
   t_real const w_mean = w_stacking ? w_stacks.at(comm.rank()) : 0.;
+  const t_real L = widefield::fov_cosine(cellx, imsizex);
+  const t_real M = widefield::fov_cosine(celly, imsizey);
+  const t_real dl = L / imsizex;
+  const t_real dm = M / imsizey;
   std::tie(directFZ, indirectFZ) = base_padding_and_FFT_2d<T>(
-      ftkernelu, ftkernelv, imsizey, imsizex, oversample_ratio, ft_plan, w_mean, cellx, celly);
+      ftkernelu, ftkernelv, imsizey, imsizex, oversample_ratio, ft_plan, w_mean, dl, dm);
   sopt::OperatorFunction<T> directG, indirectG;
   PURIFY_MEDIUM_LOG("FoV (width, height): {} deg x {} deg", imsizex * cellx / (60. * 60.),
                     imsizey * celly / (60. * 60.));

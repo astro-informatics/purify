@@ -84,10 +84,12 @@ TEST_CASE("test cell size conversion") {
 TEST_CASE("Calcuate DDE Image") {
   const t_int imsizex = 128;
   const t_int imsizey = 128;
+  const t_real dl = 0.001;
+  const t_real dm = 0.001;
   SECTION("w is zero") {
     const t_real w_rate = 0;
     const Image<t_complex> chirp_image =
-        widefield::generate_dde([](t_real, t_real) { return 1.; }, 1, 1, imsizex, imsizey, 0);
+        widefield::generate_dde([](t_real, t_real) { return 1.; }, dl, dm, imsizex, imsizey, 0);
     REQUIRE(chirp_image.cols() == imsizex);
     REQUIRE(chirp_image.rows() == imsizey);
     REQUIRE(chirp_image.isApprox(Image<t_complex>::Constant(imsizey, imsizex, 1)));
