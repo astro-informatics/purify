@@ -111,8 +111,6 @@ Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<
             utilities::sub2ind(p + imsizey * 0.5, q + imsizex * 0.5, imsizey, imsizex);
         assert(k >= 0);
         assert(k < rows);
-        assert(l(k) > 0);
-        assert(m(k) > 0);
         if ((cols > index) and (index >= 0))
           interpolation_matrix.insert(k, index) =
               kernell(l(k) - (k_l + jl)) * kernelm(m(k) - (k_m + jm));
