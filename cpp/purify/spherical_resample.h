@@ -5,6 +5,7 @@
 #include "purify/types.h"
 #include "purify/logging.h"
 #include "purify/operators.h"
+#include "purify/wproj_operators.h"
 
 namespace purify {
 namespace spherical_resample {
@@ -233,6 +234,71 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
       },
       [oversample_ratio_image_domain, &ftkernelv](t_real x) {
         return ftkernelv(x / oversample_ratio_image_domain);
+      },
+      w_mean, dl / oversample_ratio_image_domain, dm / oversample_ratio_image_domain);
+
+  std::tie(directZ_image_domain, indirectZ_image_domain) =
+      purify::operators::init_zero_padding_2d<T>(S_l, oversample_ratio);
+
+  const Image<t_complex> S_u = purify::details::init_correction2d(
+      oversample_ratio_image_domain, ftsizev_cropped, ftsizeu_cropped,
+      [oversample_ratio, &ftkernell](t_real x) { return ftkernell(x / oversample_ratio); },
+      [oversample_ratio, &ftkernelm](t_real x) { return ftkernelm(x / oversample_ratio); }, 0., 0.,
+      0.);
+
+  std::tie(directZ_ft_domain, indirectZ_ft_domain) =
+      spherical_resample::init_FT_zero_padding_2d<T>(S_u, oversample_ratio_image_domain);
+
+  PURIFY_LOW_LOG("Constructing FFT operator: F");
+  switch (ft_plan) {
+  case operators::fftw_plan::measure:
+    PURIFY_MEDIUM_LOG("Measuring Plans...");
+    break;
+  case operators::fftw_plan::estimate:
+    PURIFY_MEDIUM_LOG("Estimating Plans...");
+    break;
+  }
+  std::tie(directFFT, indirectFFT) = purify::operators::init_FFT_2d<T>(
+      imsizey_upsampled, imsizex_upsampled, oversample_ratio, ft_plan);
+
+  auto direct = sopt::chained_operators<T>(directZ_ft_domain, directFFT, directZ_image_domain);
+  auto indirect =
+      sopt::chained_operators<T>(indirectZ_image_domain, indirectFFT, indirectZ_ft_domain);
+  return std::make_tuple(direct, indirect);
+}
+
+template <class T>
+std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_and_FFT_2d(
+    const std::function<t_real(t_real)> &ftkerneluv, const std::function<t_real(t_real)> &ftkernell,
+    const std::function<t_real(t_real)> &ftkernelm, const t_uint imsizey, const t_uint imsizex,
+    const t_real oversample_ratio = 2, const t_real oversample_ratio_image_domain = 2,
+    const operators::fftw_plan &ft_plan = operators::fftw_plan::measure, const t_real w_mean = 0,
+    const t_real dl = 0, const t_real dm = 0) {
+  sopt::OperatorFunction<T> directZ_image_domain, indirectZ_image_domain;
+  sopt::OperatorFunction<T> directZ_ft_domain, indirectZ_ft_domain;
+  sopt::OperatorFunction<T> directFFT, indirectFFT;
+  const t_int imsizex_upsampled = std::floor(imsizex * oversample_ratio_image_domain);
+  const t_int imsizey_upsampled = std::floor(imsizey * oversample_ratio_image_domain);
+  const t_int ftsizeu_cropped = std::floor(imsizex * oversample_ratio);
+  const t_int ftsizev_cropped = std::floor(imsizey * oversample_ratio);
+  const t_int ftsizeu =
+      std::floor(imsizex * oversample_ratio_image_domain * oversample_ratio_image_domain);
+  const t_int ftsizev =
+      std::floor(imsizey * oversample_ratio_image_domain * oversample_ratio_image_domain);
+  PURIFY_LOW_LOG("Building Measurement Operator with Sampling on the Sphere");
+  PURIFY_LOW_LOG(
+      "Constructing Zero Padding "
+      "and Correction Operator: "
+      "ZDB");
+  PURIFY_MEDIUM_LOG("Image size (width, height): {} x {}", imsizex, imsizey);
+  PURIFY_MEDIUM_LOG("Oversampling Factor of FT grid: {}", oversample_ratio);
+  PURIFY_MEDIUM_LOG("Oversampling Factor of Image grid: {}", oversample_ratio_image_domain);
+  // Need to check relation between cell size and upsampling ratio... it will not work for large
+  // fields of view! Needs to be done directly to L and M
+  const Image<t_complex> S_l = purify::details::init_correction_radial_2d(
+      oversample_ratio, imsizey_upsampled, imsizex_upsampled,
+      [oversample_ratio_image_domain, &ftkerneluv](t_real x) {
+        return ftkerneluv(x / oversample_ratio_image_domain);
       },
       w_mean, dl / oversample_ratio_image_domain, dm / oversample_ratio_image_domain);
 

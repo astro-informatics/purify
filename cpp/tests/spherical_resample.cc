@@ -237,4 +237,18 @@ TEST_CASE("Test FFT Correction") {
           std::floor(imsizey * oversample_ratio) * std::floor(imsizex * oversample_ratio));
     CHECK(output.isApprox(ft_grid_cropped, 1e-6));
   }
+  SECTION("FFT with radial correction") {
+    const auto ZFZ_op = spherical_resample::base_padding_and_FFT_2d<Vector<t_complex>>(
+        [](t_real x) { return 1.; }, [](t_real x) { return 1.; }, ftkernell, ftkernelm, imsizey,
+        imsizex, oversample_ratio, oversample_ratio_image_domain, ft_plan, 0., 0., 0.);
+    const auto ZFZ_radial_op = spherical_resample::base_padding_and_FFT_2d<Vector<t_complex>>(
+        [](t_real x) { return 1.; }, ftkernell, ftkernelm, imsizey, imsizex, oversample_ratio,
+        oversample_ratio_image_domain, ft_plan, 0., 0., 0.);
+    Vector<t_complex> output;
+    std::get<0>(ZFZ_op)(output, image_on_plane);
+    Vector<t_complex> output_radial;
+    std::get<0>(ZFZ_op)(output_radial, image_on_plane);
+    CHECK(output.size() == output_radial.size());
+    CHECK(output.isApprox(output_radial, 1e-6));
+  }
 }
