@@ -204,7 +204,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
     const t_uint imsizey, const t_uint imsizex, const t_real oversample_ratio = 2,
     const t_real oversample_ratio_image_domain = 2,
     const operators::fftw_plan &ft_plan = operators::fftw_plan::measure, const t_real w_mean = 0,
-    const t_real cellx = 1, const t_real celly = 1) {
+    const t_real dl = 0, const t_real dm = 0) {
   sopt::OperatorFunction<T> directZ_image_domain, indirectZ_image_domain;
   sopt::OperatorFunction<T> directZ_ft_domain, indirectZ_ft_domain;
   sopt::OperatorFunction<T> directFFT, indirectFFT;
@@ -234,7 +234,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
       [oversample_ratio_image_domain, &ftkernelv](t_real x) {
         return ftkernelv(x / oversample_ratio_image_domain);
       },
-      w_mean, cellx / oversample_ratio_image_domain, celly / oversample_ratio_image_domain);
+      w_mean, dl / oversample_ratio_image_domain, dm / oversample_ratio_image_domain);
 
   std::tie(directZ_image_domain, indirectZ_image_domain) =
       purify::operators::init_zero_padding_2d<T>(S_l, oversample_ratio);

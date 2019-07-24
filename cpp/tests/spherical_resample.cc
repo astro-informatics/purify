@@ -195,7 +195,7 @@ TEST_CASE("Test FFT Correction") {
     const Image<t_complex> S_l = purify::details::init_correction2d(
         oversample_ratio, std::floor(imsizey * oversample_ratio_image_domain),
         std::floor(imsizex * oversample_ratio_image_domain), [](t_real x) { return 1.; },
-        [](t_real x) { return 1.; }, 0., 1., 1.);
+        [](t_real x) { return 1.; }, 0., 0., 0.);
 
     const auto Z_image_domain_op =
         purify::operators::init_zero_padding_2d<Vector<t_complex>>(S_l, oversample_ratio);
@@ -230,7 +230,7 @@ TEST_CASE("Test FFT Correction") {
           std::floor(imsizey * oversample_ratio) * std::floor(imsizex * oversample_ratio));
     const auto ZFZ_op = spherical_resample::base_padding_and_FFT_2d<Vector<t_complex>>(
         [](t_real x) { return 1.; }, [](t_real x) { return 1.; }, ftkernell, ftkernelm, imsizey,
-        imsizex, oversample_ratio, oversample_ratio_image_domain, ft_plan, 0., 1., 1.);
+        imsizex, oversample_ratio, oversample_ratio_image_domain, ft_plan, 0., 0., 0.);
     Vector<t_complex> output;
     std::get<0>(ZFZ_op)(output, image_on_plane);
     CHECK(output.size() ==
