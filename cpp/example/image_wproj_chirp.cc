@@ -54,8 +54,12 @@ int main(int nargs, char const **args) {
   uv_vis.v *= 0.;
   uv_vis.w = Vector<t_real>::Constant(1, wval);
   uv_vis.units = utilities::vis_units::radians;
+  const t_real L = widefield::fov_cosine(cell, imsizex);
+  const t_real M = widefield::fov_cosine(cell, imsize);
+  const t_real dl = L / imsize;
+  const t_real dm = M / imsize;
   Image<t_complex> chirp = details::init_correction2d(
-      2, imsizey, imsizex, [](t_real) { return 1.; }, [](t_real) { return 1.; }, wval, cell, cell);
+      2, imsizey, imsizex, [](t_real) { return 1.; }, [](t_real) { return 1.; }, wval, dl, dm);
 
   auto header =
       pfitsio::header_params("", " ", 1, 0, 0, stokes::I, cell, cell, 0, 1, 0, 0, 0, 0, 0);
