@@ -56,8 +56,8 @@ int main(int nargs, char const **args) {
   };
 
   const auto resample_operator =
-      spherical_resample::init_resample_operator_2d<Vector<t_complex>,
-                                                    std::function<t_real(t_int)>>(
+      spherical_resample::init_mask_and_resample_operator_2d<Vector<t_complex>,
+                                                             std::function<t_real(t_int)>>(
           number_of_samples, theta_0, phi_0, theta, phi, imsizey, imsizex, dl, dm, kernell, kernelm,
           Jl, Jm);
   sopt::LinearTransform<Vector<t_complex>> const resampler =
