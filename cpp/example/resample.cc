@@ -13,7 +13,7 @@ using namespace purify::notinstalled;
 
 using namespace purify;
 
-int main(int nargs, char const **args) {
+int main(int nargs, char const** args) {
   purify::logging::initialize();
   purify::logging::set_level("debug");
 #define ARGS_MACRO(NAME, ARGN, VALUE, TYPE)                                                  \
@@ -45,9 +45,13 @@ int main(int nargs, char const **args) {
   const t_int Jl = 4;
   const t_int Jm = 4;
 
-  std::function<t_real(t_real)> kernell, kernelm, ftkernell, ftkernelm;
-  std::tie(kernell, kernelm, ftkernell, ftkernelm) =
+  const auto kernelstuff =
       purify::create_kernels(kernels::kernel_from_string.at("kb"), Jl, Jm, imsizey, imsizex, 1);
+  const std::function<t_real(t_real)>& kernell = std::get<0>(kernelstuff);
+  const std::function<t_real(t_real)>& kernelm = std::get<1>(kernelstuff);
+  const std::function<t_real(t_real)>& ftkernell = std::get<2>(kernelstuff);
+  const std::function<t_real(t_real)>& ftkernelm = std::get<3>(kernelstuff);
+
   const auto phi = [num_phi](const t_int k) -> t_real {
     return utilities::ind2row(k, num_phi, num_theta) * constant::pi / num_phi;
   };
