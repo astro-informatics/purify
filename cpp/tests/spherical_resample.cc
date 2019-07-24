@@ -165,3 +165,76 @@ TEST_CASE("Test FT Scaling and Padding") {
   }
 }
 
+TEST_CASE("Test FFT Correction") {
+  const t_int Jl = 4;
+  const t_int Jm = 4;
+  const t_real oversample_ratio = 2.;
+  const t_real oversample_ratio_image_domain = 2.;
+  const t_int imsizex = 256;
+  const t_int imsizey = 256;
+  const auto ft_plan = operators::fftw_plan::measure;
+
+  const Vector<t_real> l = Vector<t_real>::Zero(1);
+  const Vector<t_real> m = Vector<t_real>::Zero(1);
+  const auto kernelstuff = purify::create_kernels(kernels::kernel_from_string.at("kb"), Jl, Jm,
+                                                  imsizey, imsizex, oversample_ratio_image_domain);
+
+  const std::function<t_real(t_real)>& kernell = std::get<0>(kernelstuff);
+  const std::function<t_real(t_real)>& kernelm = std::get<1>(kernelstuff);
+  const std::function<t_real(t_real)>& ftkernell = std::get<2>(kernelstuff);
+  const std::function<t_real(t_real)>& ftkernelm = std::get<3>(kernelstuff);
+
+  const Sparse<t_complex> interrpolation_matrix = spherical_resample::init_resample_matrix_2d(
+      l, m, std::floor(imsizey * oversample_ratio_image_domain),
+      std::floor(imsizex * oversample_ratio_image_domain), kernell, kernelm, Jl, Jm);
+
+  const Vector<t_complex> point_source = Vector<t_complex>::Ones(1);
+  const Vector<t_complex> image_on_plane = interrpolation_matrix.adjoint() * point_source;
+
+  SECTION("FFT operation") {
+    const Image<t_complex> S_l = purify::details::init_correction2d(
+        oversample_ratio, std::floor(imsizey * oversample_ratio_image_domain),
+        std::floor(imsizex * oversample_ratio_image_domain), [](t_real x) { return 1.; },
+        [](t_real x) { return 1.; }, 0., 1., 1.);
+
+    const auto Z_image_domain_op =
+        purify::operators::init_zero_padding_2d<Vector<t_complex>>(S_l, oversample_ratio);
+    Vector<t_complex> padded_image;
+
+    std::get<0>(Z_image_domain_op)(padded_image, image_on_plane);
+    CHECK(padded_image.size() ==
+          std::floor(imsizey * oversample_ratio * oversample_ratio_image_domain) *
+              std::floor(imsizex * oversample_ratio * oversample_ratio_image_domain));
+
+    const auto FFT_op = purify::operators::init_FFT_2d<Vector<t_complex>>(
+        std::floor(imsizey * oversample_ratio_image_domain),
+        std::floor(imsizex * oversample_ratio_image_domain), oversample_ratio, ft_plan);
+    Vector<t_complex> ft_grid;
+    std::get<0>(FFT_op)(ft_grid, padded_image);
+    CHECK(ft_grid.size() ==
+          std::floor(imsizey * oversample_ratio * oversample_ratio_image_domain) *
+              std::floor(imsizex * oversample_ratio * oversample_ratio_image_domain));
+    const Image<t_complex> S_u = purify::details::init_correction2d(
+        oversample_ratio_image_domain, std::floor(imsizey * oversample_ratio),
+        std::floor(imsizex * oversample_ratio),
+        [oversample_ratio, &ftkernell](t_real x) { return ftkernell(x / oversample_ratio); },
+        [oversample_ratio, &ftkernelm](t_real x) { return ftkernelm(x / oversample_ratio); }, 0.,
+        0., 0.);
+
+    auto const Z_ft_domain_op = spherical_resample::init_FT_zero_padding_2d<Vector<t_complex>>(
+        S_u, oversample_ratio_image_domain);
+
+    Vector<t_complex> ft_grid_cropped;
+    std::get<0>(Z_ft_domain_op)(ft_grid_cropped, ft_grid);
+    CHECK(ft_grid_cropped.size() ==
+          std::floor(imsizey * oversample_ratio) * std::floor(imsizex * oversample_ratio));
+    const auto ZFZ_op = spherical_resample::base_padding_and_FFT_2d<Vector<t_complex>>(
+        [](t_real x) { return 1.; }, [](t_real x) { return 1.; }, ftkernell, ftkernelm, imsizey,
+        imsizex, oversample_ratio, oversample_ratio_image_domain, ft_plan, 0., 1., 1.);
+    Vector<t_complex> output;
+    std::get<0>(ZFZ_op)(output, image_on_plane);
+    CHECK(output.size() ==
+          std::floor(imsizey * oversample_ratio) * std::floor(imsizex * oversample_ratio));
+    CHECK(output.isApprox(ft_grid_cropped, 1e-6));
+  }
+}
