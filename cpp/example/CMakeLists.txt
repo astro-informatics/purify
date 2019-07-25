@@ -14,6 +14,7 @@ add_example(histogram_equalisation LIBRARIES libpurify NOTEST)
 
 add_example(show_image LIBRARIES libpurify NOTEST)
 add_example(resample LIBRARIES libpurify NOTEST)
+add_example(spherical_imaging LIBRARIES libpurify NOTEST)
 add_example(sdmm_m31_simulation LIBRARIES libpurify NOTEST)
 
 add_example(padmm_simulation LIBRARIES libpurify NOTEST)
