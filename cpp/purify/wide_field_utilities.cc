@@ -12,6 +12,10 @@ t_real pixel_to_lambda(const t_real cell, const t_uint imsize, const t_real over
   return 1. / (oversample_ratio * fov_cosine(cell, imsize));
 }
 
+t_real dl2du(const t_real dl, const t_uint imsize, const t_real oversample_ratio) {
+  return 1. / (oversample_ratio * dl * imsize);
+}
+
 t_real estimate_cell_size(const t_real max_u, const t_uint imsize, const t_real oversample_ratio) {
   return (2. / static_cast<t_real>(imsize)) *
          std::asin(static_cast<t_real>(imsize) / (4 * oversample_ratio * max_u)) * 60. * 60. *

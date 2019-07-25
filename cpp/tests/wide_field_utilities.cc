@@ -80,6 +80,21 @@ TEST_CASE("test cell size conversion") {
       CHECK(cell > miriad_cell);
   }
 }
+TEST("calculate du given a dl and image size") {
+  const t_real oversample_ratio = 2;
+  const t_int imsize = 128;
+  const t_real dl = 0.01;
+  // show that upsampling image does not change resolution of fourier grid
+  for (t_real oversample_ratio_image_domain : {1, 2, 3, 5})
+    CHECK(widefield::dl2du(dl, imsize, oversample_ratio) ==
+          Approx(widefield::dl2du(dl / oversample_ratio_image_domain,
+                                  std::floor(imsize * oversample_ratio_image_domain),
+                                  oversample_ratio),
+                 1e-12));
+  CHECK(1. == Approx(widefield::dl2du(widefield::dl2du(dl, imsize, oversample_ratio), imsize,
+                                      oversample_ratio)),
+        1e-6);
+}
 
 TEST_CASE("Calcuate DDE Image") {
   const t_int imsizex = 128;

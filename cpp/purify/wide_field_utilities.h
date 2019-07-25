@@ -13,6 +13,9 @@ namespace widefield {
 t_int w_support(const t_real w, const t_real du, const t_int min, const t_int max);
 //! return factors to convert between arcsecond pixel size image space and lambda for uv space
 t_real pixel_to_lambda(const t_real cell, const t_uint imsize, const t_real oversample_ratio);
+//! converts been a given pixel size dl in the image domain to a pixel size du in the fourier
+//! fourier
+t_real dl2du(const t_real dl, const t_uint imsize, const t_real oversample_ratio);
 //! return cell size from the bandwidth
 t_real estimate_cell_size(const t_real max_u, const t_uint imsize, const t_real oversample_ratio);
 //! for a given purify cell size in arcsec provide the equivalent miriad cell size in arcsec
