@@ -238,8 +238,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
   PURIFY_MEDIUM_LOG("Image size (width, height): {} x {}", imsizex, imsizey);
   PURIFY_MEDIUM_LOG("Oversampling Factor of FT grid: {}", oversample_ratio);
   PURIFY_MEDIUM_LOG("Oversampling Factor of Image grid: {}", oversample_ratio_image_domain);
-  // Need to check relation between cell size and upsampling ratio... it will not work for large
-  // fields of view! Needs to be done directly to L and M
+
   const Image<t_complex> S_l = purify::details::init_correction2d(
       oversample_ratio, imsizey_upsampled, imsizex_upsampled,
       [oversample_ratio_image_domain, &ftkernelu](t_real x) {
@@ -307,8 +306,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
   PURIFY_MEDIUM_LOG("Image size (width, height): {} x {}", imsizex, imsizey);
   PURIFY_MEDIUM_LOG("Oversampling Factor of FT grid: {}", oversample_ratio);
   PURIFY_MEDIUM_LOG("Oversampling Factor of Image grid: {}", oversample_ratio_image_domain);
-  // Need to check relation between cell size and upsampling ratio... it will not work for large
-  // fields of view! Needs to be done directly to L and M
+
   const Image<t_complex> S_l = purify::details::init_correction_radial_2d(
       oversample_ratio, imsizey_upsampled, imsizex_upsampled,
       [oversample_ratio_image_domain, &ftkerneluv](t_real x) {
@@ -345,10 +343,13 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
       sopt::chained_operators<T>(indirectZ_image_domain, indirectFFT, indirectZ_ft_domain);
   return std::make_tuple(direct, indirect);
 }
-//! operator that degrids from the sphere to the uv domain (no w-projection, only w-stacking)
-template <class T>
-std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_sphere2plane_degrid_operator(
-    const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
+
+//! operator that degrids from the upsampled plane to the uv domain (no w-projection, only
+//! w-stacking)
+template <class T, class K>
+std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degrid_operator(
+    const t_int number_of_samples, const t_real theta_0, const t_real phi_0, const K &theta,
+    const K &phi, const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
     const Vector<t_complex> &weights, const t_uint imsizey, const t_uint imsizex,
     const t_real oversample_ratio = 2, const t_real oversample_ratio_image_domain = 2,
     const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
@@ -368,6 +369,12 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_sphere2pla
   const std::function<t_real(t_real)> &ftkernell = std::get<2>(lmkernels);
   const std::function<t_real(t_real)> &ftkernelm = std::get<3>(lmkernels);
 
+  PURIFY_LOW_LOG("Constructing Spherical Resampling Operator: P");
+  sopt::OperatorFunction<T> directP, indirectP;
+  std::tie(directP, indirectP) = init_mask_and_resample_operator_2d<T, K>(
+      number_of_samples, theta_0, phi_0, theta, phi, imsizey, imsizex,
+      oversample_ratio_image_domain, dl, dm, kernell, kernelm, Jl, Jm);
+
   sopt::OperatorFunction<T> directZFZ, indirectZFZ;
   t_real const w_mean = w_stacking ? w.array().mean() : 0.;
   std::tie(directZFZ, indirectZFZ) = base_padding_and_FFT_2d<T>(
@@ -383,8 +390,8 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_sphere2pla
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
       u, v, weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv);
 
-  const auto direct = sopt::chained_operators<T>(directG, directZFZ);
-  const auto indirect = sopt::chained_operators<T>(indirectZFZ, indirectG);
+  const auto direct = sopt::chained_operators<T>(directG, directZFZ, directP);
+  const auto indirect = sopt::chained_operators<T>(indirectP, indirectZFZ, indirectG);
   PURIFY_LOW_LOG("Finished consturction of Φ.");
   return std::make_tuple(direct, indirect);
 }
