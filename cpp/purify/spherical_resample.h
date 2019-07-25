@@ -345,6 +345,49 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
       sopt::chained_operators<T>(indirectZ_image_domain, indirectFFT, indirectZ_ft_domain);
   return std::make_tuple(direct, indirect);
 }
+//! operator that degrids from the sphere to the uv domain (no w-projection, only w-stacking)
+template <class T>
+std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_sphere2plane_degrid_operator(
+    const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
+    const Vector<t_complex> &weights, const t_uint imsizey, const t_uint imsizex,
+    const t_real oversample_ratio = 2, const t_real oversample_ratio_image_domain = 2,
+    const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
+    const t_uint Jl = 4, const t_uint Jm = 4,
+    const operators::fftw_plan &ft_plan = operators::fftw_plan::measure,
+    const bool w_stacking = false, const t_real dl = 1, const t_real dm = 1) {
+  auto const uvkernels = purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
+  const std::function<t_real(t_real)> &kernelu = std::get<0>(uvkernels);
+  const std::function<t_real(t_real)> &kernelv = std::get<1>(uvkernels);
+  const std::function<t_real(t_real)> &ftkernelu = std::get<2>(uvkernels);
+  const std::function<t_real(t_real)> &ftkernelv = std::get<3>(uvkernels);
+
+  auto const lmkernels =
+      purify::create_kernels(kernel, Jl, Jm, imsizey, imsizex, oversample_ratio_image_domain);
+  const std::function<t_real(t_real)> &kernell = std::get<0>(lmkernels);
+  const std::function<t_real(t_real)> &kernelm = std::get<1>(lmkernels);
+  const std::function<t_real(t_real)> &ftkernell = std::get<2>(lmkernels);
+  const std::function<t_real(t_real)> &ftkernelm = std::get<3>(lmkernels);
+
+  sopt::OperatorFunction<T> directZFZ, indirectZFZ;
+  t_real const w_mean = w_stacking ? w.array().mean() : 0.;
+  std::tie(directZFZ, indirectZFZ) = base_padding_and_FFT_2d<T>(
+      ftkernelu, ftkernelv, ftkernell, ftkernelm, imsizey, imsizex, oversample_ratio,
+      oversample_ratio_image_domain, ft_plan, w_mean, dl, dm);
+
+  PURIFY_MEDIUM_LOG("FoV (width, height): {} x {} (L x M)", imsizex * dl, imsizey * dm);
+  PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
+  PURIFY_MEDIUM_LOG("Mean, w: {}, +/- {}", w_mean, (w.maxCoeff() - w.minCoeff()) * 0.5);
+  PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
+
+  sopt::OperatorFunction<T> directG, indirectG;
+  std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
+      u, v, weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv);
+
+  const auto direct = sopt::chained_operators<T>(directG, directZFZ);
+  const auto indirect = sopt::chained_operators<T>(indirectZFZ, indirectG);
+  PURIFY_LOW_LOG("Finished consturction of Φ.");
+  return std::make_tuple(direct, indirect);
+}
 
 }  // namespace spherical_resample
 }  // namespace purify
