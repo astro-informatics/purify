@@ -53,13 +53,14 @@ t_real calculate_n(const t_real theta, const t_real phi, const t_real alpha, con
 }
 
 std::vector<t_int> generate_indicies(const Vector<t_real> &l, const Vector<t_real> &m,
-                                     const Vector<t_real> &n, const t_int imsizey,
-                                     const t_int imsizex, const t_real dl, const t_real dm) {
+                                     const Vector<t_real> &n, const t_int imsizey_upsampled,
+                                     const t_int imsizex_upsampled, const t_real dl_upsampled,
+                                     const t_real dm_upsampled) {
   if (l.size() != m.size()) throw std::runtime_error("number of l and m samples do not match.");
   if (l.size() != n.size()) throw std::runtime_error("number of l and n samples do not match.");
   if (l.size() < 1) throw std::runtime_error("number of l is less than 1.");
-  const t_real L = imsizex * dl;
-  const t_real M = imsizey * dm;
+  const t_real L = imsizex_upsampled * dl_upsampled;
+  const t_real M = imsizey_upsampled * dm_upsampled;
   std::vector<t_int> indicies(0);
   for (t_int i = 0; i < l.size(); i++) {
     if ((std::abs(l(i)) < L * 0.5) and (std::abs(m(i)) < M * 0.5) and (n(i) > 0.)) {
@@ -71,9 +72,11 @@ std::vector<t_int> generate_indicies(const Vector<t_real> &l, const Vector<t_rea
 }
 
 Vector<t_real> generate_mask(const Vector<t_real> &l, const Vector<t_real> &m,
-                             const Vector<t_real> &n, const t_int imsizey, const t_int imsizex,
-                             const t_real dl, const t_real dm) {
-  auto indicies = generate_indicies(l, m, n, imsizey, imsizex, dl, dm);
+                             const Vector<t_real> &n, const t_int imsizey_upsampled,
+                             const t_int imsizex_upsampled, const t_real dl_upsampled,
+                             const t_real dm_upsampled) {
+  auto indicies =
+      generate_indicies(l, m, n, imsizey_upsampled, imsizex_upsampled, dl_upsampled, dm_upsampled);
   if (indicies.size() == 0)
     throw std::runtime_error("Field of view does not overlap with sphere, so mask is empty.");
   Vector<t_real> mask = Vector<t_real>::Zero(l.size());
@@ -82,12 +85,13 @@ Vector<t_real> generate_mask(const Vector<t_real> &l, const Vector<t_real> &m,
 }
 
 Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<t_real> &m,
-                                          const t_int imsizey, const t_int imsizex,
+                                          const t_int imsizey_upsampled,
+                                          const t_int imsizex_upsampled,
                                           const std::function<t_real(t_real)> kernell,
                                           const std::function<t_real(t_real)> kernelm,
                                           const t_int Jl, const t_int Jm) {
   const t_int rows = l.size();
-  const t_int cols = imsizex * imsizey;
+  const t_int cols = imsizex_upsampled * imsizey_upsampled;
   if (l.size() != m.size())
     throw std::runtime_error(
         "Size of l and m vectors are not the same for creating resampling matrix.");
@@ -95,8 +99,8 @@ Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<
   Sparse<t_complex> interpolation_matrix(rows, cols);
   interpolation_matrix.reserve(Vector<t_int>::Constant(rows, Jl * Jm));
 
-  const t_int jl_max = std::min(Jl, imsizex);
-  const t_int jm_max = std::min(Jm, imsizey);
+  const t_int jl_max = std::min(Jl, imsizex_upsampled);
+  const t_int jm_max = std::min(Jm, imsizey_upsampled);
   // If I collapse this for loop there is a crash when using MPI... Sparse<>::insert() doesn't work
   // right
 #pragma omp parallel for
@@ -108,7 +112,8 @@ Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<
         const t_int q = k_l + jl;
         const t_int p = k_m + jm;
         const t_int index =
-            utilities::sub2ind(p + imsizey * 0.5, q + imsizex * 0.5, imsizey, imsizex);
+            utilities::sub2ind(p + imsizey_upsampled * 0.5, q + imsizex_upsampled * 0.5,
+                               imsizey_upsampled, imsizex_upsampled);
         assert(k >= 0);
         assert(k < rows);
         if ((cols > index) and (index >= 0))

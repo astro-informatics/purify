@@ -36,15 +36,18 @@ t_real calculate_n(const t_real theta, const t_real phi, const t_real alpha, con
 
 //! generate indicies that overlap with imaging field of view for resampling
 std::vector<t_int> generate_indicies(const Vector<t_real> &l, const Vector<t_real> &m,
-                                     const Vector<t_real> &n, const t_int imsizey,
-                                     const t_int imsizex, const t_real dl, const t_real dm);
+                                     const Vector<t_real> &n, const t_int imsizey_upsampled,
+                                     const t_int imsizex_upsampled, const t_real dl_upsampled,
+                                     const t_real dm_upsampled);
 //! generate a mask for imaged field of view that is going to be resampled
 Vector<t_real> generate_mask(const Vector<t_real> &l, const Vector<t_real> &m,
-                             const Vector<t_real> &n, const t_int imsizey, const t_int imsizex,
-                             const t_real dl, const t_real dm);
+                             const Vector<t_real> &n, const t_int imsizey_upsampled,
+                             const t_int imsizex_upsampled, const t_real dl_upsampled,
+                             const t_real dm_upsampled);
 //! sparse matrix that degrids/grids between spherical sampling pattern and regular grid
 Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<t_real> &m,
-                                          const t_int imsizey, const t_int imsizex,
+                                          const t_int imsizey_upsampled,
+                                          const t_int imsizex_upsampled,
                                           const std::function<t_real(t_real)> kernell,
                                           const std::function<t_real(t_real)> kernelm,
                                           const t_int Jl, const t_int Jm);
@@ -53,7 +56,8 @@ Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<
 template <class T>
 std::tuple<Vector<t_real>, Vector<t_real>, std::vector<t_int>> calculate_compressed_lm(
     const t_int number_of_samples, const t_real theta_0, const t_real phi_0, const T &theta,
-    const T &phi, const t_int imsizey, const t_int imsizex, const t_real dl, const t_real dm) {
+    const T &phi, const t_int imsizey_upsampled, const t_int imsizex_upsampled,
+    const t_real dl_upsampled, const t_real dm_upsampled) {
   Vector<t_real> l = Vector<t_real>::Zero(number_of_samples);
   Vector<t_real> m = Vector<t_real>::Zero(number_of_samples);
   Vector<t_real> n = Vector<t_real>::Zero(number_of_samples);
@@ -62,16 +66,22 @@ std::tuple<Vector<t_real>, Vector<t_real>, std::vector<t_int>> calculate_compres
     m(k) = calculate_m(theta(k), phi(k), 0., phi_0, theta_0);
     n(k) = calculate_n(theta(k), phi(k), 0., phi_0, theta_0);
   }
-  const std::vector<t_int> indicies = generate_indicies(l, m, n, imsizey, imsizex, dl, dm);
+  const std::vector<t_int> indicies =
+      generate_indicies(l, m, n, imsizey_upsampled, imsizex_upsampled, dl_upsampled, dm_upsampled);
   if (indicies.size() < 1)
     throw std::runtime_error(
         "indicies is zero when constructing spherical resampling; check number_of_samples.");
   Vector<t_real> l_compressed = Vector<t_real>::Zero(indicies.size());
   Vector<t_real> m_compressed = Vector<t_real>::Zero(indicies.size());
   for (t_int k = 0; k < indicies.size(); k++) {
-    l_compressed(k) = l(indicies.at(k)) / dl;
-    m_compressed(k) = m(indicies.at(k)) / dm;
+    l_compressed(k) = l(indicies.at(k)) / dl_upsampled;
+    m_compressed(k) = m(indicies.at(k)) / dm_upsampled;
   }
+  if (indicies.size() != l_compressed.size())
+    throw std::runtime_error("Indicies is not the same size as l_compressed.");
+  if (indicies.size() != m_compressed.size())
+    throw std::runtime_error("Indicies is not the same size as m_compressed.");
+
   return std::make_tuple(l_compressed, m_compressed, indicies);
 }
 //! cutout region of sphere used for resampling
@@ -95,28 +105,23 @@ std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_pop_indici
 template <class K>
 std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_resample_operator_2d(
     const t_int number_of_samples, const Vector<t_real> &l_compressed,
-    const Vector<t_real> &m_compressed, const std::vector<t_int> &indicies, const t_int imsizey,
-    const t_int imsizex, const t_real dl, const t_real dm,
-    const std::function<t_real(t_real)> &kernell, const std::function<t_real(t_real)> &kernelm,
-    const t_int Jl, const t_int Jm) {
+    const Vector<t_real> &m_compressed, const t_int imsizey_upsampled,
+    const t_int imsizex_upsampled, const std::function<t_real(t_real)> &kernell,
+    const std::function<t_real(t_real)> &kernelm, const t_int Jl, const t_int Jm) {
   if ((Jl <= 0) or (Jm <= 0))
     throw std::runtime_error("Support size of resampling kernel is not positive");
-  if ((imsizex <= 0) or (imsizey <= 0))
+  if ((imsizex_upsampled <= 0) or (imsizey_upsampled <= 0))
     throw std::runtime_error("Tangent image size is not greater than zero.");
   if (number_of_samples <= 0)
     throw std::runtime_error("Number of samples on the sphere is not greater than zero.");
-  if (indicies.size() != l_compressed.size())
-    throw std::runtime_error("Indicies is not the same size as l_compressed.");
-  if (indicies.size() != l_compressed.size())
-    throw std::runtime_error("Indicies is not the same size as m_compressed.");
 
   const Sparse<t_complex> interrpolation_matrix = init_resample_matrix_2d(
-      l_compressed, m_compressed, imsizey, imsizex, kernell, kernelm, Jl, Jm);
+      l_compressed, m_compressed, imsizey_upsampled, imsizex_upsampled, kernell, kernelm, Jl, Jm);
   const Sparse<t_complex> interrpolation_matrix_adjoint = interrpolation_matrix.adjoint();
   return std::make_tuple(
       [=](K &output, const K &input) { output = interrpolation_matrix_adjoint * input; },
       [=](K &output, const K &input) {
-        assert(input.size() == imsizex * imsizey);
+        assert(input.size() == imsizex_upsampled * imsizey_upsampled);
         output = interrpolation_matrix * input;
       });
 }
@@ -125,7 +130,8 @@ std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_resample_o
 template <class K, class T>
 std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_mask_and_resample_operator_2d(
     const t_int number_of_samples, const t_real theta_0, const t_real phi_0, const T &theta,
-    const T &phi, const t_int imsizey, const t_int imsizex, const t_real dl, const t_real dm,
+    const T &phi, const t_int imsizey, const t_int imsizex,
+    const t_real oversample_ratio_image_domain, const t_real dl, const t_real dm,
     const std::function<t_real(t_real)> &kernell, const std::function<t_real(t_real)> &kernelm,
     const t_int Jl, const t_int Jm) {
   if ((Jl <= 0) or (Jm <= 0))
@@ -135,17 +141,24 @@ std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_mask_and_r
   if (number_of_samples <= 0)
     throw std::runtime_error("Number of samples on the sphere is not greater than zero.");
   // Find indicies for cutting to resample
-  const auto lm_with_mask = calculate_compressed_lm<T>(number_of_samples, theta_0, phi_0, theta,
-                                                       phi, imsizey, imsizex, dl, dm);
+  const t_int imsizex_upsampled = std::floor(imsizex * oversample_ratio_image_domain);
+  const t_int imsizey_upsampled = std::floor(imsizey * oversample_ratio_image_domain);
+  const t_real dl_upsampled = dl / oversample_ratio_image_domain;
+  const t_real dm_upsampled = dm / oversample_ratio_image_domain;
+
+  const auto lm_with_mask =
+      calculate_compressed_lm<T>(number_of_samples, theta_0, phi_0, theta, phi, imsizey_upsampled,
+                                 imsizex_upsampled, dl_upsampled, dm_upsampled);
   const Vector<t_real> &l_compressed = std::get<0>(lm_with_mask);
   const Vector<t_real> &m_compressed = std::get<1>(lm_with_mask);
   const std::vector<t_int> &indicies = std::get<2>(lm_with_mask);
+
   // Create operator to cutout region of sphere for resampling
   const auto cutting_operator = init_pop_indicies_operator<K>(indicies, number_of_samples);
   // Operator to perform resampling
   const auto gridding_operator =
-      init_resample_operator_2d<K>(number_of_samples, l_compressed, m_compressed, indicies, imsizey,
-                                   imsizex, dl, dm, kernell, kernelm, Jl, Jm);
+      init_resample_operator_2d<K>(number_of_samples, l_compressed, m_compressed, imsizey_upsampled,
+                                   imsizex_upsampled, kernell, kernelm, Jl, Jm);
   // Combining them together
   auto direct =
       sopt::chained_operators<K>(std::get<0>(gridding_operator), std::get<0>(cutting_operator));
@@ -267,6 +280,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
   return std::make_tuple(direct, indirect);
 }
 
+//! generates operator to scale, zero padd, FFT, crop, scale (wtih radial correction)
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_and_FFT_2d(
     const std::function<t_real(t_real)> &ftkerneluv, const std::function<t_real(t_real)> &ftkernell,

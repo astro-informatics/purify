@@ -44,6 +44,7 @@ int main(int nargs, char const** args) {
   const t_real dm = M / imsizey;
   const t_int Jl = 4;
   const t_int Jm = 4;
+  const t_real oversample_ratio_image_domain = 1;
 
   const auto kernelstuff =
       purify::create_kernels(kernels::kernel_from_string.at("kb"), Jl, Jm, imsizey, imsizex, 1);
@@ -58,12 +59,11 @@ int main(int nargs, char const** args) {
   const auto theta = [num_theta, num_phi](const t_int k) -> t_real {
     return utilities::ind2col(k, num_phi, num_theta) * 2 * constant::pi / num_theta;
   };
-
   const auto resample_operator =
       spherical_resample::init_mask_and_resample_operator_2d<Vector<t_complex>,
                                                              std::function<t_real(t_int)>>(
-          number_of_samples, theta_0, phi_0, theta, phi, imsizey, imsizex, dl, dm, kernell, kernelm,
-          Jl, Jm);
+          number_of_samples, theta_0, phi_0, theta, phi, imsizey, imsizex,
+          oversample_ratio_image_domain, dl, dm, kernell, kernelm, Jl, Jm);
   sopt::LinearTransform<Vector<t_complex>> const resampler =
       sopt::LinearTransform<Vector<t_complex>>(
           std::get<0>(resample_operator), {0, 1, number_of_samples}, std::get<1>(resample_operator),
