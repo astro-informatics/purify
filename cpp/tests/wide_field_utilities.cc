@@ -91,7 +91,7 @@ TEST_CASE("calculate du given a dl and image size") {
                                   std::floor(imsize * oversample_ratio_image_domain),
                                   oversample_ratio))
               .epsilon(1e-12));
-  CHECK(dl == Approx(widefield::dl2du(widefield::dl2du(dl, imsize, oversample_ratio), imsize,
+  CHECK(dl == Approx(widefield::du2dl(widefield::dl2du(dl, imsize, oversample_ratio), imsize,
                                       oversample_ratio))
                   .epsilon(1e-12));
 }
