@@ -51,6 +51,13 @@ Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<
                                           const std::function<t_real(t_real)> kernell,
                                           const std::function<t_real(t_real)> kernelm,
                                           const t_int Jl, const t_int Jm);
+Sparse<t_complex> init_resample_matrix_2d(
+    const Vector<t_real> &l, const Vector<t_real> &m, const t_int imsizey_upsampled,
+    const t_int imsizex_upsampled, const std::function<t_real(t_real)> kernell,
+    const std::function<t_real(t_real)> kernelm, const t_int Jl, const t_int Jm,
+    const std::function<t_complex(t_real, t_real)> &dde = [](const t_real l,
+                                                             const t_real m) { return 1.; },
+    const t_real dl_upsampled = 0., const t_real dm_upsampled = 0.);
 
 //! generate the l and m coordinates in pixels and their indicies for resampling
 template <class T>

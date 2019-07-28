@@ -89,7 +89,9 @@ Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<
                                           const t_int imsizex_upsampled,
                                           const std::function<t_real(t_real)> kernell,
                                           const std::function<t_real(t_real)> kernelm,
-                                          const t_int Jl, const t_int Jm) {
+                                          const t_int Jl, const t_int Jm,
+                                          const std::function<t_complex(t_real, t_real)> &dde,
+                                          const t_real dl_upsampled, const t_real dm_upsampled) {
   const t_int rows = l.size();
   const t_int cols = imsizex_upsampled * imsizey_upsampled;
   if (l.size() != m.size())
@@ -118,7 +120,8 @@ Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<
         assert(k < rows);
         if ((cols > index) and (index >= 0))
           interpolation_matrix.insert(k, index) =
-              kernell(l(k) - (k_l + jl)) * kernelm(m(k) - (k_m + jm));
+              kernell(l(k) - (k_l + jl)) * kernelm(m(k) - (k_m + jm)) *
+              std::conj(dde(l(k) * dl_upsampled, m(k) * dm_upsampled));
       }
     }
   }
