@@ -400,8 +400,15 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
       oversample_ratio_image_domain, dl, dm, kernell, kernelm, Jl, Jm, dde);
 
   PURIFY_MEDIUM_LOG("FoV (width, height): {} x {} (L x M)", imsizex * dl, imsizey * dm);
+  PURIFY_MEDIUM_LOG("FoV (width, height): {} x {} (deg x deg)",
+                    std::asin(imsizex * dl / 2.) * 2. * 180. / constant::pi,
+                    std::asin(imsizey * dm / 2.) * 2. * 180. / constant::pi);
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
-  PURIFY_MEDIUM_LOG("Mean, w: {}, +/- {}", w_mean, (w.maxCoeff() - w.minCoeff()) * 0.5);
+  if (uvw_stacking) {
+    PURIFY_MEDIUM_LOG("Mean, u: {}, +/- {}", u_mean, (u.maxCoeff() - u.minCoeff()) * 0.5);
+    PURIFY_MEDIUM_LOG("Mean, v: {}, +/- {}", v_mean, (v.maxCoeff() - v.minCoeff()) * 0.5);
+    PURIFY_MEDIUM_LOG("Mean, w: {}, +/- {}", w_mean, (w.maxCoeff() - w.minCoeff()) * 0.5);
+  }
   PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
   const t_real du = widefield::dl2du(dl, imsizex, oversample_ratio);
   const t_real dv = widefield::dl2du(dm, imsizey, oversample_ratio);
