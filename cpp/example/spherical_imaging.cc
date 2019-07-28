@@ -33,6 +33,7 @@ int main(int nargs, char const** args) {
   ARGS_MACRO(u_val, 5, 0., t_real)
   ARGS_MACRO(v_val, 6, 0., t_real)
   ARGS_MACRO(w_val, 7, 0., t_real)
+  ARGS_MACRO(uvw_stacking, 8, 0., bool)
 #undef ARGS_MACRO
 
   const t_int num_theta = 1024;
@@ -50,14 +51,13 @@ int main(int nargs, char const** args) {
   const t_real oversample_ratio = 2;
   const kernels::kernel kernel = kernels::kernel::kb;
   const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
-  const bool w_stacking = true;
 
   const t_int num_vis = 1;
 
   const Vector<t_real> u = Vector<t_real>::Constant(num_vis, u_val);
   const Vector<t_real> v = Vector<t_real>::Constant(num_vis, v_val);
   const Vector<t_real> w = Vector<t_real>::Constant(num_vis, w_val);
-  const Vector<t_complex> weights = Vector<t_complex>::Constant(num_vis, 1);
+  const Vector<t_complex> weights = Vector<t_complex>::Constant(num_vis, 1.);
 
   const auto phi = [num_phi](const t_int k) -> t_real {
     return utilities::ind2row(k, num_phi, num_theta) * constant::pi / num_phi;
@@ -70,12 +70,50 @@ int main(int nargs, char const** args) {
                                                      std::function<t_real(t_int)>>(
           number_of_samples, theta_0, phi_0, theta, phi, u, v, w, weights, imsizey, imsizex,
           oversample_ratio, oversample_ratio_image_domain, kernel, Ju, Jv, Jl, Jm, ft_plan,
-          w_stacking, dl, dm);
+          uvw_stacking, dl, dm);
 
   sopt::LinearTransform<Vector<t_complex>> const m_op = sopt::LinearTransform<Vector<t_complex>>(
       std::get<0>(measure_op), {0, 1, number_of_samples}, std::get<1>(measure_op), {0, 1, num_vis});
-  const Vector<t_complex> output = m_op.adjoint() * Vector<t_complex>::Ones(1);
+  const Vector<t_complex> output =
+      m_op.adjoint() * (Vector<t_complex>::Ones(1) * std::sqrt(imsizex * imsizey) *
+                        oversample_ratio * oversample_ratio_image_domain);
+
+  Vector<t_real> l = Vector<t_real>::Zero(number_of_samples);
+  Vector<t_real> m = Vector<t_real>::Zero(number_of_samples);
+  Vector<t_real> n = Vector<t_real>::Zero(number_of_samples);
+  Vector<t_real> th = Vector<t_real>::Zero(number_of_samples);
+  Vector<t_real> ph = Vector<t_real>::Zero(number_of_samples);
+  Vector<t_complex> fourier_mode = Vector<t_complex>::Zero(number_of_samples);
+  for (t_int index = 0; index < number_of_samples; index++) {
+    l(index) = spherical_resample::calculate_l(theta(index), phi(index), 0., phi_0, theta_0);
+    m(index) = spherical_resample::calculate_m(theta(index), phi(index), 0., phi_0, theta_0);
+    n(index) = spherical_resample::calculate_n(theta(index), phi(index), 0., phi_0, theta_0);
+    th(index) = theta(index);
+    ph(index) = phi(index);
+  }
+  const Vector<t_real> mask = spherical_resample::generate_mask(l, m, n, imsizex, imsizey, dl, dm);
+  for (t_int index = 0; index < number_of_samples; index++) {
+    fourier_mode(index) =
+        (mask(index) > 0)
+            ? std::conj(std::exp(-2 * constant::pi * t_complex(0., 1.) *
+                                 (l(index) * u(0) + m(index) * v(0) +
+                                  (std::sqrt(1 - l(index) * l(index) - m(index) * m(index)) - 1) *
+                                      w(0))) /
+                        std::sqrt(1 - l(index) * l(index) - m(index) * m(index)))
+            : 0.;
+  }
+
+  pfitsio::write2d(Image<t_real>::Map(l.data(), num_theta, num_phi), "l_coordinates.fits");
+  pfitsio::write2d(Image<t_real>::Map(m.data(), num_theta, num_phi), "m_coordinates.fits");
+  pfitsio::write2d(Image<t_real>::Map(n.data(), num_theta, num_phi), "n_coordinates.fits");
+  pfitsio::write2d(Image<t_real>::Map(mask.data(), num_theta, num_phi), "mask_coordinates.fits");
+
+  const Vector<t_real> diff = 2 * (fourier_mode - output).array().abs() /
+                              (fourier_mode.array().abs() + output.array().abs());
+  pfitsio::write2d(Image<t_real>::Map(diff.data(), num_theta, num_phi), "fourier_mode_diff.fits");
 
   pfitsio::write2d(Image<t_complex>::Map(output.data(), num_theta, num_phi).real(),
-                   "image_on_sphere.fits");
+                   "fourier_mode_real_calculated.fits");
+  pfitsio::write2d(Image<t_complex>::Map(output.data(), num_theta, num_phi).imag(),
+                   "fourier_mode_imag_calculated.fits");
 }
