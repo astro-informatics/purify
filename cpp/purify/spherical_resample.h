@@ -114,7 +114,9 @@ std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_resample_o
     const t_int number_of_samples, const Vector<t_real> &l_compressed,
     const Vector<t_real> &m_compressed, const t_int imsizey_upsampled,
     const t_int imsizex_upsampled, const std::function<t_real(t_real)> &kernell,
-    const std::function<t_real(t_real)> &kernelm, const t_int Jl, const t_int Jm) {
+    const std::function<t_real(t_real)> &kernelm, const t_int Jl, const t_int Jm,
+    const std::function<t_complex(t_real, t_real)> &dde, const t_real dl_upsampled,
+    const t_real dm_upsampled) {
   if ((Jl <= 0) or (Jm <= 0))
     throw std::runtime_error("Support size of resampling kernel is not positive");
   if ((imsizex_upsampled <= 0) or (imsizey_upsampled <= 0))
@@ -122,8 +124,9 @@ std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_resample_o
   if (number_of_samples <= 0)
     throw std::runtime_error("Number of samples on the sphere is not greater than zero.");
 
-  const Sparse<t_complex> interrpolation_matrix = init_resample_matrix_2d(
-      l_compressed, m_compressed, imsizey_upsampled, imsizex_upsampled, kernell, kernelm, Jl, Jm);
+  const Sparse<t_complex> interrpolation_matrix =
+      init_resample_matrix_2d(l_compressed, m_compressed, imsizey_upsampled, imsizex_upsampled,
+                              kernell, kernelm, Jl, Jm, dde, dl_upsampled, dm_upsampled);
   const Sparse<t_complex> interrpolation_matrix_adjoint = interrpolation_matrix.adjoint();
   return std::make_tuple(
       [=](K &output, const K &input) { output = interrpolation_matrix_adjoint * input; },
@@ -140,7 +143,7 @@ std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_mask_and_r
     const T &phi, const t_int imsizey, const t_int imsizex,
     const t_real oversample_ratio_image_domain, const t_real dl, const t_real dm,
     const std::function<t_real(t_real)> &kernell, const std::function<t_real(t_real)> &kernelm,
-    const t_int Jl, const t_int Jm) {
+    const t_int Jl, const t_int Jm, const std::function<t_complex(t_real, t_real)> &dde) {
   if ((Jl <= 0) or (Jm <= 0))
     throw std::runtime_error("Support size of resampling kernel is not positive");
   if ((imsizex <= 0) or (imsizey <= 0))
@@ -163,9 +166,9 @@ std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_mask_and_r
   // Create operator to cutout region of sphere for resampling
   const auto cutting_operator = init_pop_indicies_operator<K>(indicies, number_of_samples);
   // Operator to perform resampling
-  const auto gridding_operator =
-      init_resample_operator_2d<K>(number_of_samples, l_compressed, m_compressed, imsizey_upsampled,
-                                   imsizex_upsampled, kernell, kernelm, Jl, Jm);
+  const auto gridding_operator = init_resample_operator_2d<K>(
+      number_of_samples, l_compressed, m_compressed, imsizey_upsampled, imsizex_upsampled, kernell,
+      kernelm, Jl, Jm, dde, dl_upsampled, dm_upsampled);
   // Combining them together
   auto direct =
       sopt::chained_operators<K>(std::get<0>(gridding_operator), std::get<0>(cutting_operator));
@@ -224,8 +227,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
     const std::function<t_real(t_real)> &ftkernell, const std::function<t_real(t_real)> &ftkernelm,
     const t_uint imsizey, const t_uint imsizex, const t_real oversample_ratio = 2,
     const t_real oversample_ratio_image_domain = 2,
-    const operators::fftw_plan &ft_plan = operators::fftw_plan::measure, const t_real w_mean = 0,
-    const t_real dl = 0, const t_real dm = 0) {
+    const operators::fftw_plan &ft_plan = operators::fftw_plan::measure) {
   sopt::OperatorFunction<T> directZ_image_domain, indirectZ_image_domain;
   sopt::OperatorFunction<T> directZ_ft_domain, indirectZ_ft_domain;
   sopt::OperatorFunction<T> directFFT, indirectFFT;
@@ -241,20 +243,20 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
   PURIFY_LOW_LOG(
       "Constructing Zero Padding "
       "and Correction Operator: "
-      "ZDB");
+      "Z");
   PURIFY_MEDIUM_LOG("Image size (width, height): {} x {}", imsizex, imsizey);
   PURIFY_MEDIUM_LOG("Oversampling Factor of FT grid: {}", oversample_ratio);
   PURIFY_MEDIUM_LOG("Oversampling Factor of Image grid: {}", oversample_ratio_image_domain);
 
-  const Image<t_complex> S_l = purify::details::init_correction2d(
-      oversample_ratio, imsizey_upsampled, imsizex_upsampled,
-      [oversample_ratio_image_domain, &ftkernelu](t_real x) {
-        return ftkernelu(x / oversample_ratio_image_domain);
-      },
-      [oversample_ratio_image_domain, &ftkernelv](t_real x) {
-        return ftkernelv(x / oversample_ratio_image_domain);
-      },
-      w_mean, dl / oversample_ratio_image_domain, dm / oversample_ratio_image_domain);
+  const Image<t_complex> S_l =
+      purify::details::init_correction2d(oversample_ratio, imsizey_upsampled, imsizex_upsampled,
+                                         [oversample_ratio_image_domain, &ftkernelu](t_real x) {
+                                           return ftkernelu(x / oversample_ratio_image_domain);
+                                         },
+                                         [oversample_ratio_image_domain, &ftkernelv](t_real x) {
+                                           return ftkernelv(x / oversample_ratio_image_domain);
+                                         },
+                                         0., 0., 0.);
 
   std::tie(directZ_image_domain, indirectZ_image_domain) =
       purify::operators::init_zero_padding_2d<T>(S_l, oversample_ratio);
@@ -292,8 +294,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
     const std::function<t_real(t_real)> &ftkerneluv, const std::function<t_real(t_real)> &ftkernell,
     const std::function<t_real(t_real)> &ftkernelm, const t_uint imsizey, const t_uint imsizex,
     const t_real oversample_ratio = 2, const t_real oversample_ratio_image_domain = 2,
-    const operators::fftw_plan &ft_plan = operators::fftw_plan::measure, const t_real w_mean = 0,
-    const t_real dl = 0, const t_real dm = 0) {
+    const operators::fftw_plan &ft_plan = operators::fftw_plan::measure) {
   sopt::OperatorFunction<T> directZ_image_domain, indirectZ_image_domain;
   sopt::OperatorFunction<T> directZ_ft_domain, indirectZ_ft_domain;
   sopt::OperatorFunction<T> directFFT, indirectFFT;
@@ -309,7 +310,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
   PURIFY_LOW_LOG(
       "Constructing Zero Padding "
       "and Correction Operator: "
-      "ZDB");
+      "Z");
   PURIFY_MEDIUM_LOG("Image size (width, height): {} x {}", imsizex, imsizey);
   PURIFY_MEDIUM_LOG("Oversampling Factor of FT grid: {}", oversample_ratio);
   PURIFY_MEDIUM_LOG("Oversampling Factor of Image grid: {}", oversample_ratio_image_domain);
@@ -319,7 +320,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
       [oversample_ratio_image_domain, &ftkerneluv](t_real x) {
         return ftkerneluv(x / oversample_ratio_image_domain);
       },
-      w_mean, dl / oversample_ratio_image_domain, dm / oversample_ratio_image_domain);
+      0., 0., 0.);
 
   std::tie(directZ_image_domain, indirectZ_image_domain) =
       purify::operators::init_zero_padding_2d<T>(S_l, oversample_ratio);
@@ -362,7 +363,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
     const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
     const t_uint Jl = 4, const t_uint Jm = 4,
     const operators::fftw_plan &ft_plan = operators::fftw_plan::measure,
-    const bool w_stacking = false, const t_real dl = 1, const t_real dm = 1) {
+    const bool uvw_stacking = false, const t_real dl = 1, const t_real dm = 1) {
   auto const uvkernels = purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
   const std::function<t_real(t_real)> &kernelu = std::get<0>(uvkernels);
   const std::function<t_real(t_real)> &kernelv = std::get<1>(uvkernels);
@@ -376,26 +377,38 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
   const std::function<t_real(t_real)> &ftkernell = std::get<2>(lmkernels);
   const std::function<t_real(t_real)> &ftkernelm = std::get<3>(lmkernels);
 
+  sopt::OperatorFunction<T> directZFZ, indirectZFZ;
+  std::tie(directZFZ, indirectZFZ) =
+      base_padding_and_FFT_2d<T>(ftkernelu, ftkernelv, ftkernell, ftkernelm, imsizey, imsizex,
+                                 oversample_ratio, oversample_ratio_image_domain, ft_plan);
+
+  t_real const w_mean = uvw_stacking ? w.array().mean() : 0.;
+  t_real const v_mean = uvw_stacking ? v.array().mean() : 0.;
+  t_real const u_mean = uvw_stacking ? u.array().mean() : 0.;
+  const t_complex I(0., 1.);
+  std::function<t_complex(t_real, t_real)> dde = [I, u_mean, v_mean, w_mean](const t_real l,
+                                                                             const t_real m) {
+    return std::exp(-2 * constant::pi * I *
+                    (u_mean * l + v_mean * m + w_mean * (std::sqrt(1. - l * l - m * m) - 1.))) /
+           std::sqrt(1. - l * l - m * m) * (((l * l + m * m) < 1.) ? 1. : 0.);
+  };
+
   PURIFY_LOW_LOG("Constructing Spherical Resampling Operator: P");
   sopt::OperatorFunction<T> directP, indirectP;
   std::tie(directP, indirectP) = init_mask_and_resample_operator_2d<T, K>(
       number_of_samples, theta_0, phi_0, theta, phi, imsizey, imsizex,
-      oversample_ratio_image_domain, dl, dm, kernell, kernelm, Jl, Jm);
-
-  sopt::OperatorFunction<T> directZFZ, indirectZFZ;
-  t_real const w_mean = w_stacking ? w.array().mean() : 0.;
-  std::tie(directZFZ, indirectZFZ) = base_padding_and_FFT_2d<T>(
-      ftkernelu, ftkernelv, ftkernell, ftkernelm, imsizey, imsizex, oversample_ratio,
-      oversample_ratio_image_domain, ft_plan, w_mean, dl, dm);
+      oversample_ratio_image_domain, dl, dm, kernell, kernelm, Jl, Jm, dde);
 
   PURIFY_MEDIUM_LOG("FoV (width, height): {} x {} (L x M)", imsizex * dl, imsizey * dm);
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   PURIFY_MEDIUM_LOG("Mean, w: {}, +/- {}", w_mean, (w.maxCoeff() - w.minCoeff()) * 0.5);
   PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
-
+  const t_real du = widefield::dl2du(dl, imsizex, oversample_ratio);
+  const t_real dv = widefield::dl2du(dm, imsizey, oversample_ratio);
   sopt::OperatorFunction<T> directG, indirectG;
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
-      u, v, weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv);
+      (u.array() - u_mean) / du, (v.array() - v_mean) / dv, weights, imsizey, imsizex,
+      oversample_ratio, kernelv, kernelu, Ju, Jv);
 
   const auto direct = sopt::chained_operators<T>(directG, directZFZ, directP);
   const auto indirect = sopt::chained_operators<T>(indirectP, indirectZFZ, indirectG);
