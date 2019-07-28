@@ -36,11 +36,11 @@ int main(int nargs, char const** args) {
   ARGS_MACRO(uvw_stacking, 8, 0., bool)
 #undef ARGS_MACRO
 
-  const t_int num_theta = 1024;
-  const t_int num_phi = 512;
+  const t_int num_theta = 2048;
+  const t_int num_phi = 1024;
   const t_int number_of_samples = num_theta * num_phi;
-  const t_int imsizey = 256;
-  const t_int imsizex = 256;
+  const t_int imsizey = 512;
+  const t_int imsizex = 512;
   const t_real dl = L / imsizex;
   const t_real dm = M / imsizey;
   const t_int Jl = 4;
@@ -58,6 +58,8 @@ int main(int nargs, char const** args) {
   const Vector<t_real> v = Vector<t_real>::Constant(num_vis, v_val);
   const Vector<t_real> w = Vector<t_real>::Constant(num_vis, w_val);
   const Vector<t_complex> weights = Vector<t_complex>::Constant(num_vis, 1.);
+
+  PURIFY_LOW_LOG("Resolution : {} x {} (deg x deg)", 360. / num_theta, 180. / num_phi);
 
   const auto phi = [num_phi](const t_int k) -> t_real {
     return utilities::ind2row(k, num_phi, num_theta) * constant::pi / num_phi;
