@@ -1,5 +1,5 @@
 ### Config file for Purify
-Version: 3.0.0
+Version: 3.1.0
 GeneralConfiguration:
   InputOutput:
     input:
@@ -63,7 +63,7 @@ SARA:
   positiveValueConstraint: True #boolean
 
 AlgorithmOptions:
-  algorithm: padmm # will just read the options of that one.
+  algorithm: primaldual # will just read the options of that one.
   ########## PADMM ##########
   padmm:
     epsilonConvergenceScaling: 1 # Default 1 (>0)
