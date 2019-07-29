@@ -63,7 +63,7 @@ std::vector<t_int> generate_indicies(const Vector<t_real> &l, const Vector<t_rea
   const t_real M = imsizey_upsampled * dm_upsampled;
   std::vector<t_int> indicies(0);
   for (t_int i = 0; i < l.size(); i++) {
-    if ((std::abs(l(i)) < L * 0.5) and (std::abs(m(i)) < M * 0.5) and (n(i) > 0.)) {
+    if (((l(i) * l(i) / (L * L * 0.25) + (m(i) * m(i) / (M * M * 0.25))) < 1.) and (n(i) > 0.)) {
       indicies.push_back(i);
     }
   }
