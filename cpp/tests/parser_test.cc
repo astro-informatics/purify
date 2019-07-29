@@ -73,7 +73,7 @@ TEST_CASE("Yaml parser and setting variables test") {
                                                   "DB5",   "DB6", "DB7", "DB8"};
     REQUIRE(yaml_parser.wavelet_basis() == expected_wavelets);
     REQUIRE(yaml_parser.wavelet_levels() == 4);
-    REQUIRE(yaml_parser.algorithm() == "padmm");
+    REQUIRE(yaml_parser.algorithm() == "primaldual");
   }
   SECTION("Check the AlgorithmOptions node variables") {
     REQUIRE(yaml_parser.epsilonConvergenceScaling() == 1);
@@ -81,7 +81,6 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser.positiveValueConstraint() == true);
     REQUIRE(yaml_parser.mpiAlgorithm() == factory::algo_distribution::mpi_serial);
     REQUIRE(yaml_parser.relVarianceConvergence() == 1e-3);
-    REQUIRE(yaml_parser.dualFBVarianceConvergence() == 1e-3);
   }
   SECTION("Check the writeOutput method") {
     yaml_parser_m.writeOutput();  // This test config file has a relative path for output, for
