@@ -127,4 +127,7 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser.relVarianceConvergence() == yaml_parser_m.relVarianceConvergence());
     std::remove(file_path_save.c_str());
   }
+  SECTION("test version") {
+    CHECK(purify::version() == yaml_parser.version());
+  }
 }
