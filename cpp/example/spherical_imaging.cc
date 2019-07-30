@@ -36,13 +36,9 @@ int main(int nargs, char const** args) {
   ARGS_MACRO(uvw_stacking, 8, 0., bool)
 #undef ARGS_MACRO
 
-  const t_int num_theta = 2048;
-  const t_int num_phi = 1024;
+  const t_int num_theta = 1024;
+  const t_int num_phi = 512;
   const t_int number_of_samples = num_theta * num_phi;
-  const t_int imsizey = 512;
-  const t_int imsizex = 512;
-  const t_real dl = L / imsizex;
-  const t_real dm = M / imsizey;
   const t_int Jl = 4;
   const t_int Jm = 4;
   const t_int Ju = 4;
@@ -70,15 +66,12 @@ int main(int nargs, char const** args) {
   const auto measure_op =
       spherical_resample::base_plane_degrid_operator<Vector<t_complex>,
                                                      std::function<t_real(t_int)>>(
-          number_of_samples, theta_0, phi_0, theta, phi, u, v, w, weights, imsizey, imsizex,
-          oversample_ratio, oversample_ratio_image_domain, kernel, Ju, Jv, Jl, Jm, ft_plan,
-          uvw_stacking, dl, dm);
+          number_of_samples, theta_0, phi_0, theta, phi, u, v, w, weights, oversample_ratio,
+          oversample_ratio_image_domain, kernel, Ju, Jv, Jl, Jm, ft_plan, uvw_stacking, L, M);
 
   sopt::LinearTransform<Vector<t_complex>> const m_op = sopt::LinearTransform<Vector<t_complex>>(
       std::get<0>(measure_op), {0, 1, number_of_samples}, std::get<1>(measure_op), {0, 1, num_vis});
-  const Vector<t_complex> output =
-      m_op.adjoint() * (Vector<t_complex>::Ones(1) * std::sqrt(imsizex * imsizey) *
-                        oversample_ratio * oversample_ratio_image_domain);
+  const Vector<t_complex> output = m_op.adjoint() * (Vector<t_complex>::Ones(1));
 
   Vector<t_real> l = Vector<t_real>::Zero(number_of_samples);
   Vector<t_real> m = Vector<t_real>::Zero(number_of_samples);
@@ -93,7 +86,7 @@ int main(int nargs, char const** args) {
     th(index) = theta(index);
     ph(index) = phi(index);
   }
-  const Vector<t_real> mask = spherical_resample::generate_mask(l, m, n, imsizex, imsizey, dl, dm);
+  const Vector<t_real> mask = spherical_resample::generate_mask(l, m, n, L, M);
   for (t_int index = 0; index < number_of_samples; index++) {
     fourier_mode(index) =
         (mask(index) > 0)
