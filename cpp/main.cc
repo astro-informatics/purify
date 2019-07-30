@@ -302,11 +302,8 @@ int main(int argc, const char **argv) {
     operator_norm = std::get<0>(power_method_result);
   }
   PURIFY_LOW_LOG("Value of operator norm is {}", operator_norm);
-  t_real const flux_scale = (params.source() == purify::utilities::vis_source::measurements)
-                                ? std::sqrt(std::floor(params.width() * params.oversampling()) *
-                                            std::floor(params.width() * params.oversampling())) *
-                                      operator_norm
-                                : 1.;
+  t_real const flux_scale =
+      (params.source() == purify::utilities::vis_source::measurements) ? operator_norm : 1.;
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale;
 
   // Save some things before applying the algorithm
