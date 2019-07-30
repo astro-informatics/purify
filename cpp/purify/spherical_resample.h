@@ -36,14 +36,10 @@ t_real calculate_n(const t_real theta, const t_real phi, const t_real alpha, con
 
 //! generate indicies that overlap with imaging field of view for resampling
 std::vector<t_int> generate_indicies(const Vector<t_real> &l, const Vector<t_real> &m,
-                                     const Vector<t_real> &n, const t_int imsizey_upsampled,
-                                     const t_int imsizex_upsampled, const t_real dl_upsampled,
-                                     const t_real dm_upsampled);
+                                     const Vector<t_real> &n, const t_real L, const t_real M);
 //! generate a mask for imaged field of view that is going to be resampled
 Vector<t_real> generate_mask(const Vector<t_real> &l, const Vector<t_real> &m,
-                             const Vector<t_real> &n, const t_int imsizey_upsampled,
-                             const t_int imsizex_upsampled, const t_real dl_upsampled,
-                             const t_real dm_upsampled);
+                             const Vector<t_real> &n, const t_real L, const t_real M);
 //! sparse matrix that degrids/grids between spherical sampling pattern and regular grid
 Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<t_real> &m,
                                           const t_int imsizey_upsampled,
@@ -73,8 +69,8 @@ std::tuple<Vector<t_real>, Vector<t_real>, std::vector<t_int>> calculate_compres
     m(k) = calculate_m(theta(k), phi(k), 0., phi_0, theta_0);
     n(k) = calculate_n(theta(k), phi(k), 0., phi_0, theta_0);
   }
-  const std::vector<t_int> indicies =
-      generate_indicies(l, m, n, imsizey_upsampled, imsizex_upsampled, dl_upsampled, dm_upsampled);
+  const std::vector<t_int> indicies = generate_indicies(l, m, n, imsizex_upsampled * dl_upsampled,
+                                                        imsizey_upsampled * dm_upsampled);
   if (indicies.size() < 1)
     throw std::runtime_error(
         "indicies is zero when constructing spherical resampling; check number_of_samples.");
@@ -358,12 +354,33 @@ template <class T, class K>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degrid_operator(
     const t_int number_of_samples, const t_real theta_0, const t_real phi_0, const K &theta,
     const K &phi, const Vector<t_real> &u, const Vector<t_real> &v, const Vector<t_real> &w,
-    const Vector<t_complex> &weights, const t_uint imsizey, const t_uint imsizex,
-    const t_real oversample_ratio = 2, const t_real oversample_ratio_image_domain = 2,
+    const Vector<t_complex> &weights, const t_real oversample_ratio = 2,
+    const t_real oversample_ratio_image_domain = 2,
     const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
     const t_uint Jl = 4, const t_uint Jm = 4,
     const operators::fftw_plan &ft_plan = operators::fftw_plan::measure,
-    const bool uvw_stacking = false, const t_real dl = 1, const t_real dm = 1) {
+    const bool uvw_stacking = false, const t_real L = 1, const t_real M = 1) {
+  t_real const w_mean = uvw_stacking ? w.array().mean() : 0.;
+  t_real const v_mean = uvw_stacking ? v.array().mean() : 0.;
+  t_real const u_mean = uvw_stacking ? u.array().mean() : 0.;
+
+  const t_real dl = std::min({0.25 / ((u.array() - u_mean).cwiseAbs().maxCoeff()), L / 32});
+  const t_real dm = std::min({0.25 / ((v.array() - v_mean).cwiseAbs().maxCoeff()), M / 32});
+  const t_int imsizex = std::floor(L / dl);
+  const t_int imsizey = std::floor(M / dm);
+  PURIFY_MEDIUM_LOG("dl x dm : {} x {} ", dl, dm);
+  PURIFY_MEDIUM_LOG("FoV (width, height): {} x {} (L x M)", imsizex * dl, imsizey * dm);
+  PURIFY_MEDIUM_LOG("FoV (width, height): {} x {} (deg x deg)",
+                    std::asin(imsizex * dl / 2.) * 2. * 180. / constant::pi,
+                    std::asin(imsizey * dm / 2.) * 2. * 180. / constant::pi);
+  PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
+  PURIFY_MEDIUM_LOG("Maximum u value is {} lambda, sphere needs to be sampled at dl = {}.",
+                    u.cwiseAbs().maxCoeff(), 0.5 / u.cwiseAbs().maxCoeff());
+  PURIFY_MEDIUM_LOG("Maximum v value is {} lambda, sphere needs to be sampled at dm = {}.",
+                    v.cwiseAbs().maxCoeff(), 0.5 / v.cwiseAbs().maxCoeff());
+  PURIFY_MEDIUM_LOG("Maximum w value is {} lambda, sphere needs to be sampled at dn = {}.",
+                    w.cwiseAbs().maxCoeff(), 0.5 / w.cwiseAbs().maxCoeff());
+
   auto const uvkernels = purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
   const std::function<t_real(t_real)> &kernelu = std::get<0>(uvkernels);
   const std::function<t_real(t_real)> &kernelv = std::get<1>(uvkernels);
@@ -382,9 +399,6 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
       base_padding_and_FFT_2d<T>(ftkernelu, ftkernelv, ftkernell, ftkernelm, imsizey, imsizex,
                                  oversample_ratio, oversample_ratio_image_domain, ft_plan);
 
-  t_real const w_mean = uvw_stacking ? w.array().mean() : 0.;
-  t_real const v_mean = uvw_stacking ? v.array().mean() : 0.;
-  t_real const u_mean = uvw_stacking ? u.array().mean() : 0.;
   const t_complex I(0., 1.);
   std::function<t_complex(t_real, t_real)> dde = [I, u_mean, v_mean, w_mean](const t_real l,
                                                                              const t_real m) {
@@ -399,11 +413,6 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
       number_of_samples, theta_0, phi_0, theta, phi, imsizey, imsizex,
       oversample_ratio_image_domain, dl, dm, kernell, kernelm, Jl, Jm, dde);
 
-  PURIFY_MEDIUM_LOG("FoV (width, height): {} x {} (L x M)", imsizex * dl, imsizey * dm);
-  PURIFY_MEDIUM_LOG("FoV (width, height): {} x {} (deg x deg)",
-                    std::asin(imsizex * dl / 2.) * 2. * 180. / constant::pi,
-                    std::asin(imsizey * dm / 2.) * 2. * 180. / constant::pi);
-  PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   if (uvw_stacking) {
     PURIFY_MEDIUM_LOG("Mean, u: {}, +/- {}", u_mean, (u.maxCoeff() - u.minCoeff()) * 0.5);
     PURIFY_MEDIUM_LOG("Mean, v: {}, +/- {}", v_mean, (v.maxCoeff() - v.minCoeff()) * 0.5);

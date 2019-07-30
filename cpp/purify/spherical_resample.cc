@@ -53,14 +53,10 @@ t_real calculate_n(const t_real theta, const t_real phi, const t_real alpha, con
 }
 
 std::vector<t_int> generate_indicies(const Vector<t_real> &l, const Vector<t_real> &m,
-                                     const Vector<t_real> &n, const t_int imsizey_upsampled,
-                                     const t_int imsizex_upsampled, const t_real dl_upsampled,
-                                     const t_real dm_upsampled) {
+                                     const Vector<t_real> &n, const t_real L, const t_real M) {
   if (l.size() != m.size()) throw std::runtime_error("number of l and m samples do not match.");
   if (l.size() != n.size()) throw std::runtime_error("number of l and n samples do not match.");
   if (l.size() < 1) throw std::runtime_error("number of l is less than 1.");
-  const t_real L = imsizex_upsampled * dl_upsampled;
-  const t_real M = imsizey_upsampled * dm_upsampled;
   std::vector<t_int> indicies(0);
   for (t_int i = 0; i < l.size(); i++) {
     if (((l(i) * l(i) / (L * L * 0.25) + (m(i) * m(i) / (M * M * 0.25))) < 1.) and (n(i) > 0.)) {
@@ -72,11 +68,8 @@ std::vector<t_int> generate_indicies(const Vector<t_real> &l, const Vector<t_rea
 }
 
 Vector<t_real> generate_mask(const Vector<t_real> &l, const Vector<t_real> &m,
-                             const Vector<t_real> &n, const t_int imsizey_upsampled,
-                             const t_int imsizex_upsampled, const t_real dl_upsampled,
-                             const t_real dm_upsampled) {
-  auto indicies =
-      generate_indicies(l, m, n, imsizey_upsampled, imsizex_upsampled, dl_upsampled, dm_upsampled);
+                             const Vector<t_real> &n, const t_real L, const t_real M) {
+  auto indicies = generate_indicies(l, m, n, L, M);
   if (indicies.size() == 0)
     throw std::runtime_error("Field of view does not overlap with sphere, so mask is empty.");
   Vector<t_real> mask = Vector<t_real>::Zero(l.size());
