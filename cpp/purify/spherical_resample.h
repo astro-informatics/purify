@@ -400,11 +400,13 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
                                  oversample_ratio, oversample_ratio_image_domain, ft_plan);
 
   const t_complex I(0., 1.);
-  std::function<t_complex(t_real, t_real)> dde = [I, u_mean, v_mean, w_mean](const t_real l,
-                                                                             const t_real m) {
+  std::function<t_complex(t_real, t_real)> dde = [I, u_mean, v_mean, w_mean, imsizex, imsizey,
+                                                  oversample_ratio, oversample_ratio_image_domain](
+                                                     const t_real l, const t_real m) {
     return std::exp(-2 * constant::pi * I *
                     (u_mean * l + v_mean * m + w_mean * (std::sqrt(1. - l * l - m * m) - 1.))) /
-           std::sqrt(1. - l * l - m * m) * (((l * l + m * m) < 1.) ? 1. : 0.);
+           std::sqrt(1. - l * l - m * m) * (((l * l + m * m) < 1.) ? 1. : 0.) *
+           std::sqrt(imsizex * imsizey) * oversample_ratio * oversample_ratio_image_domain;
   };
 
   PURIFY_LOW_LOG("Constructing Spherical Resampling Operator: P");
