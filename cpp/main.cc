@@ -367,11 +367,10 @@ int main(int argc, const char **argv) {
 #ifdef PURIFY_MPI
     auto const world = sopt::mpi::Communicator::World();
     beam_units = world.all_sum_all(uv_data.size()) / flux_scale / flux_scale;
-    PURIFY_LOW_LOG("Expected image domain residual RMS is {} jy/beam",
-                   sigma * params.epsilonScaling() *
-                       std::sqrt(2 * params.oversampling() * params.oversampling() /
-                                 world.all_sum_all(uv_data.size())) *
-                       operator_norm);
+    PURIFY_LOW_LOG(
+        "Expected image domain residual RMS is {} jy/beam",
+        sigma * params.epsilonScaling() * operator_norm /
+            (std::sqrt(params.width() * params.height()) * world.all_sum_all(uv_data.size())));
     if (world.is_root())
 #else
     throw std::runtime_error("Compile with MPI if you want to use MPI algorithm");
@@ -379,11 +378,9 @@ int main(int argc, const char **argv) {
       pfitsio::write2d(psf_image, psf_header, true);
   } else {
     beam_units = uv_data.size() / flux_scale / flux_scale;
-    PURIFY_LOW_LOG(
-        "Expected image domain residual RMS is {} jy/beam",
-        sigma * params.epsilonScaling() *
-            std::sqrt(2 * params.oversampling() * params.oversampling() / uv_data.size()) *
-            operator_norm);
+    PURIFY_LOW_LOG("Expected image domain residual RMS is {} jy/beam",
+                   sigma * params.epsilonScaling() * operator_norm /
+                       (std::sqrt(params.width() * params.height()) * uv_data.size()));
     pfitsio::write2d(psf_image, psf_header, true);
   }
   PURIFY_HIGH_LOG(
