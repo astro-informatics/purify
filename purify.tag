@@ -1512,6 +1512,22 @@
     </member>
   </compound>
   <compound kind="file">
+    <name>time_w_algos.cc</name>
+    <path>/mydata/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/time__w__algos_8cc</filename>
+    <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
+    <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
+    <includes id="measurement__operator__factory_8h" name="measurement_operator_factory.h" local="yes" imported="no">purify/measurement_operator_factory.h</includes>
+    <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
+    <member kind="function">
+      <type>int</type>
+      <name>main</name>
+      <anchorfile>time__w__algos_8cc.html</anchorfile>
+      <anchor>aea57d6e3bfb4b5e83027443146631164</anchor>
+      <arglist>(int nargs, char const **args)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
     <name>wavelet_decomposition.cc</name>
     <path>/mydata/cpp/example/</path>
     <filename>http://astro-informatics.github.io/purify/wavelet__decomposition_8cc</filename>
@@ -2955,15 +2971,15 @@
       <type>utilities::vis_params</type>
       <name>w_stacking</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
-      <anchor>af19b6e8e20f56ac162dbbb8ad8136c51</anchor>
-      <arglist>(utilities::vis_params const &amp;params, sopt::mpi::Communicator const &amp;comm, const t_int iters, const std::function&lt; t_real(t_real)&gt; &amp;cost)</arglist>
+      <anchor>a37001a359a524976a06439a804a51cb4</anchor>
+      <arglist>(utilities::vis_params const &amp;params, sopt::mpi::Communicator const &amp;comm, const t_int iters, const std::function&lt; t_real(t_real)&gt; &amp;cost, const t_real k_means_rel_diff)</arglist>
     </member>
     <member kind="function">
       <type>std::tuple&lt; utilities::vis_params, std::vector&lt; t_int &gt;, std::vector&lt; t_real &gt; &gt;</type>
       <name>w_stacking_with_all_to_all</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
-      <anchor>a23a6781460a9f37faf1d8e9047e5be4e</anchor>
-      <arglist>(utilities::vis_params const &amp;params, const t_real du, const t_int min_support, const t_int max_support, sopt::mpi::Communicator const &amp;comm, const t_int iters, const t_real fill_relaxation, const std::function&lt; t_real(t_real)&gt; &amp;cost)</arglist>
+      <anchor>ab6364c945c8df98349ca192860d1c769</anchor>
+      <arglist>(utilities::vis_params const &amp;params, const t_real du, const t_int min_support, const t_int max_support, sopt::mpi::Communicator const &amp;comm, const t_int iters, const t_real fill_relaxation, const std::function&lt; t_real(t_real)&gt; &amp;cost, const t_real k_means_rel_diff)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -8857,15 +8873,15 @@
       <type>utilities::vis_params</type>
       <name>w_stacking</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
-      <anchor>af19b6e8e20f56ac162dbbb8ad8136c51</anchor>
-      <arglist>(utilities::vis_params const &amp;params, sopt::mpi::Communicator const &amp;comm, const t_int iters, const std::function&lt; t_real(t_real)&gt; &amp;cost)</arglist>
+      <anchor>a37001a359a524976a06439a804a51cb4</anchor>
+      <arglist>(utilities::vis_params const &amp;params, sopt::mpi::Communicator const &amp;comm, const t_int iters, const std::function&lt; t_real(t_real)&gt; &amp;cost, const t_real k_means_rel_diff)</arglist>
     </member>
     <member kind="function">
       <type>std::tuple&lt; utilities::vis_params, std::vector&lt; t_int &gt;, std::vector&lt; t_real &gt; &gt;</type>
       <name>w_stacking_with_all_to_all</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1utilities.html</anchorfile>
-      <anchor>a23a6781460a9f37faf1d8e9047e5be4e</anchor>
-      <arglist>(utilities::vis_params const &amp;params, const t_real du, const t_int min_support, const t_int max_support, sopt::mpi::Communicator const &amp;comm, const t_int iters, const t_real fill_relaxation, const std::function&lt; t_real(t_real)&gt; &amp;cost)</arglist>
+      <anchor>ab6364c945c8df98349ca192860d1c769</anchor>
+      <arglist>(utilities::vis_params const &amp;params, const t_real du, const t_int min_support, const t_int max_support, sopt::mpi::Communicator const &amp;comm, const t_int iters, const t_real fill_relaxation, const std::function&lt; t_real(t_real)&gt; &amp;cost, const t_real k_means_rel_diff)</arglist>
     </member>
     <member kind="function">
       <type>t_real</type>
