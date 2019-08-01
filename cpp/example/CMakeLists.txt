@@ -53,6 +53,7 @@ if(PURIFY_MPI)
     LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
   target_compile_definitions(example_local_epsilon_distributed_grids_real_data_mpi
     PRIVATE PURIFY_PADMM_ALGORITHM=1)
+  add_example(time_w_algos LIBRARIES libpurify NOTEST)
 endif()
 if(PURIFY_MPI AND PURIFY_ARRAYFIRE)
   add_example(global_epsilon_replicated_grids_gpu padmm_mpi_random_coverage.cc NOTEST
