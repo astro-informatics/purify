@@ -373,7 +373,8 @@ TEST_CASE("Standard vs All to All wproj") {
   auto const world = sopt::mpi::Communicator::World();
 
   auto const N = 1000;
-  auto uv_serial = utilities::random_sample_density(N, 0, constant::pi / 3, 100);
+  const t_real w_rms = 100;
+  auto uv_serial = utilities::random_sample_density(N, 0, constant::pi / 3, w_rms);
   uv_serial.u = world.broadcast(uv_serial.u);
   uv_serial.v = world.broadcast(uv_serial.v);
   uv_serial.w = world.broadcast(uv_serial.w);
@@ -395,7 +396,7 @@ TEST_CASE("Standard vs All to All wproj") {
   auto const kernel = kernels::kernel::kb;
   auto const width = 128;
   auto const height = 128;
-  auto const cell_size = 1;
+  auto const cell_size = 60;
   // First create an instance of an engine.
   const auto kmeans = distribute::kmeans_algo(uv_mpi.w, world.size(), 100, world);
   const std::vector<t_int> image_index = std::get<0>(kmeans);
