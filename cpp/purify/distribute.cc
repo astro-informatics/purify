@@ -222,7 +222,7 @@ std::vector<t_int> w_support(Vector<t_real> const &w, const std::vector<t_int> &
   t_int group = 0;
   std::vector<t_int> groups(w.size(), comm.rank());
   std::vector<t_int> coeffs(comm.size(), comm.rank());
-  t_int total = 0;
+  long long int total = 0;
   for (t_int rank = 0; rank < comm.size(); rank++) {
     const auto size = comm.broadcast(w.size(), rank);
     for (t_int i = 0; i < size; i++) {
@@ -251,7 +251,8 @@ std::vector<t_int> w_support(Vector<t_real> const &w, const std::vector<t_int> &
 
     if (total != coeff_total and comm.rank() == rank)
       throw std::runtime_error(
-          "Total number of coefficients calculated is not the same, loop might be broken.");
+          "Total number of coefficients calculated is not the same, loop might be broken. " +
+          std::to_string(total) + " != " + std::to_string(coeff_total));
   }
   if (comm.is_root()) PURIFY_DEBUG("{} node should have {} coefficients.", group, coeff_sum);
   return groups;
