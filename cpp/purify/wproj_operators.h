@@ -14,7 +14,8 @@ namespace details {
 Image<t_complex> init_correction_radial_2d(const t_real oversample_ratio, const t_uint imsizey_,
                                            const t_uint imsizex_,
                                            const std::function<t_real(t_real)> &ftkerneluv,
-                                           const t_real w_mean, const t_real dl, const t_real dm);
+                                           const t_real w_mean, const t_real dl, const t_real dm,
+                                           const t_real oversample_ratio_image_domain = 1);
 
 }  // namespace details
 
