@@ -13,13 +13,11 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
                                           const t_real oversample_ratio,
                                           const std::function<t_real(t_real)> &ftkerneluv,
                                           const std::function<t_real(t_real)> &kerneluv,
-                                          const t_uint Ju, const t_uint Jw, const t_real cellx,
-                                          const t_real celly, const t_real abs_error,
+                                          const t_uint Ju, const t_uint Jw, const t_real du,
+                                          const t_real dv, const t_real abs_error,
                                           const t_real rel_error, const dde_type dde) {
   const t_uint ftsizev_ = std::floor(imsizey_ * oversample_ratio);
   const t_uint ftsizeu_ = std::floor(imsizex_ * oversample_ratio);
-  const t_real du = widefield::pixel_to_lambda(cellx, imsizex_, oversample_ratio);
-  const t_real dv = widefield::pixel_to_lambda(celly, imsizey_, oversample_ratio);
   PURIFY_HIGH_LOG("du x du: {}, {}", du, dv);
   if (std::abs(du - dv) > 1e-6)
     throw std::runtime_error(

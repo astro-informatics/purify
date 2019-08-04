@@ -67,6 +67,8 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
   sopt::OperatorFunction<T> directFZ, indirectFZ;
   sopt::OperatorFunction<T> directG, indirectG;
   t_real const w_mean = w_stacking ? w.array().mean() : 0;
+  const t_real du = widefield::pixel_to_lambda(cellx, imsizex, oversample_ratio);
+  const t_real dv = widefield::pixel_to_lambda(celly, imsizey, oversample_ratio);
   switch (dde) {
   case (dde_type::wkernel_radial): {
     auto const kerneluvs = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
@@ -79,7 +81,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
     PURIFY_MEDIUM_LOG("Mean, w: {}, +/- {}", w.array().mean(), (w.maxCoeff() - w.minCoeff()) * 0.5);
     std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
         u, v, w.array() - w_mean, weights, imsizey, imsizex, oversample_ratio,
-        std::get<0>(kerneluvs), std::get<1>(kerneluvs), Ju, Jw, cellx, celly, absolute_error,
+        std::get<0>(kerneluvs), std::get<1>(kerneluvs), Ju, Jw, du, dv, absolute_error,
         relative_error, dde);
     break;
   }
@@ -97,7 +99,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
     auto const kerneluvs = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
     std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
         u, v, w.array() - w_mean, weights, imsizey, imsizex, oversample_ratio,
-        std::get<0>(kerneluvs), std::get<1>(kerneluvs), Ju, Jw, cellx, celly, absolute_error,
+        std::get<0>(kerneluvs), std::get<1>(kerneluvs), Ju, Jw, du, dv, absolute_error,
         relative_error, dde);
     break;
   }
@@ -140,6 +142,8 @@ base_mpi_all_to_all_degrid_operator_2d(
                       imsizey * celly / (60. * 60.));
     PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
     PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
+    const t_real du = widefield::pixel_to_lambda(cellx, imsizex, oversample_ratio);
+    const t_real dv = widefield::pixel_to_lambda(celly, imsizey, oversample_ratio);
     std::tie(directG, indirectG) =
         purify::operators::init_gridding_matrix_2d_all_to_all<T, std::int64_t>(
             comm, static_cast<std::int64_t>(local_grid_size),
@@ -147,7 +151,7 @@ base_mpi_all_to_all_degrid_operator_2d(
             number_of_images, image_index,
             (w_stacking) ? w_stacks : std::vector<t_real>(comm.size(), 0.), u, v, w, weights,
             imsizey, imsizex, oversample_ratio, std::get<0>(kerneluvs), std::get<1>(kerneluvs), Ju,
-            Jw, cellx, celly, absolute_error, relative_error, dde);
+            Jw, du, dv, absolute_error, relative_error, dde);
     break;
   }
   case (dde_type::wkernel_2d): {
@@ -161,6 +165,8 @@ base_mpi_all_to_all_degrid_operator_2d(
     PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
     PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
     auto const kerneluvs = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
+    const t_real du = widefield::pixel_to_lambda(cellx, imsizex, oversample_ratio);
+    const t_real dv = widefield::pixel_to_lambda(celly, imsizey, oversample_ratio);
     std::tie(directG, indirectG) =
         purify::operators::init_gridding_matrix_2d_all_to_all<T, std::int64_t>(
             comm, static_cast<std::int64_t>(local_grid_size),
@@ -168,7 +174,7 @@ base_mpi_all_to_all_degrid_operator_2d(
             number_of_images, image_index,
             (w_stacking) ? w_stacks : std::vector<t_real>(comm.size(), 0.), u, v, w, weights,
             imsizey, imsizex, oversample_ratio, std::get<0>(kerneluvs), std::get<1>(kerneluvs), Ju,
-            Jw, cellx, celly, absolute_error, relative_error, dde);
+            Jw, du, dv, absolute_error, relative_error, dde);
     break;
   }
   default:
