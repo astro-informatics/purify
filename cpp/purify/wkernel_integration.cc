@@ -17,9 +17,10 @@ t_complex fourier_wproj_kernel(const t_real x, const t_real y, const t_real w, c
 }
 t_complex hankel_wproj_kernel(const t_real r, const t_real w, const t_real u, const t_real v,
                               const t_real du) {
-  return ((r / du < 1.) ? std::exp(t_complex(
-                              0., -2 * constant::pi * w * (std::sqrt(1 - (r * r) / (du * du)) - 1)))
-                        : 0.) *
+  return ((r / du < 1. and r < 0.5)
+              ? std::exp(
+                    t_complex(0., -2 * constant::pi * w * (std::sqrt(1 - (r * r) / (du * du)) - 1)))
+              : 1.) *
          boost::math::cyl_bessel_j(0, 2 * constant::pi * r * std::sqrt(u * u + v * v)) * r;
 }
 t_complex exact_w_projection_integration_1d(const t_real u, const t_real v, const t_real w,

@@ -87,7 +87,7 @@ Sparse<t_complex> init_gridding_matrix_2d(const Vector<t_real> &u, const Vector<
                  ? projection_kernels::exact_w_projection_integration_1d(
                        (u(m) - (kwu + ju)), (v(m) - (kwv + jv)), w_val, du, oversample_ratio,
                        ftkernel_radial, max_evaluations, absolute_error, relative_error,
-                       (du > 1.) ? integration::method::p : integration::method::h, evaluations)
+                       integration::method::h, evaluations)
                  : projection_kernels::exact_w_projection_integration(
                        (u(m) - (kwu + ju)), (v(m) - (kwv + jv)), w_val, du, dv, oversample_ratio,
                        ftkernel_radial, ftkernel_radial, max_evaluations, absolute_error,
