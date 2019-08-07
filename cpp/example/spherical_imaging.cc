@@ -64,11 +64,16 @@ int main(int nargs, char const** args) {
   const auto theta = [num_theta, num_phi](const t_int k) -> t_real {
     return utilities::ind2col(k, num_phi, num_theta) * 2 * constant::pi / num_theta;
   };
+  t_real const offset = constant::pi * 0. / 180.;
   const auto measure_op =
-      spherical_resample::base_plane_degrid_operator<Vector<t_complex>,
-                                                     std::function<t_real(t_int)>>(
-          number_of_samples, theta_0, phi_0, theta, phi, u, v, w, weights, oversample_ratio,
-          oversample_ratio_image_domain, kernel, Ju, Jv, Jl, Jm, ft_plan, uvw_stacking, L, M);
+      spherical_resample::base_plane_degrid_wproj_operator<Vector<t_complex>,
+                                                           std::function<t_real(t_int)>>(
+          number_of_samples, theta_0, phi_0 - offset, theta, phi,
+          spherical_resample::calculate_rotated_l(u, v, w, 0., offset, 0.),
+          spherical_resample::calculate_rotated_m(u, v, w, 0., offset, 0.),
+          spherical_resample::calculate_rotated_n(u, v, w, 0., offset, 0.), weights,
+          oversample_ratio, oversample_ratio_image_domain, kernel, Ju, Jw, Jl, Jm, ft_plan,
+          uvw_stacking, L, 1e-8, 1e-8);
 
   sopt::LinearTransform<Vector<t_complex>> const m_op = sopt::LinearTransform<Vector<t_complex>>(
       std::get<0>(measure_op), {0, 1, number_of_samples}, std::get<1>(measure_op), {0, 1, num_vis});
