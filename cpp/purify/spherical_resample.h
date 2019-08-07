@@ -330,8 +330,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
   PURIFY_MEDIUM_LOG("Oversampling Factor of Image grid: {}", oversample_ratio_image_domain);
 
   const Image<t_complex> S_l = purify::details::init_correction_radial_2d(
-      oversample_ratio, imsizey_upsampled, imsizex_upsampled, ftkerneluv, 0., 0., 0.,
-      oversample_ratio_image_domain);
+      oversample_ratio, imsizey_upsampled, imsizex_upsampled, ftkerneluv, 0., 0., 0.);
 
   std::tie(directZ_image_domain, indirectZ_image_domain) =
       purify::operators::init_zero_padding_2d<T>(S_l, oversample_ratio);
