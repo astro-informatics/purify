@@ -408,11 +408,6 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
   const std::function<t_real(t_real)> &ftkernell = std::get<2>(lmkernels);
   const std::function<t_real(t_real)> &ftkernelm = std::get<3>(lmkernels);
 
-  sopt::OperatorFunction<T> directZFZ, indirectZFZ;
-  std::tie(directZFZ, indirectZFZ) =
-      base_padding_and_FFT_2d<T>(ftkernelu, ftkernelv, ftkernell, ftkernelm, imsizey, imsizex,
-                                 oversample_ratio, oversample_ratio_image_domain, ft_plan);
-
   const t_complex I(0., 1.);
   std::function<t_complex(t_real, t_real)> dde = [I, u_mean, v_mean, w_mean, imsizex, imsizey,
                                                   oversample_ratio, oversample_ratio_image_domain](
@@ -428,6 +423,10 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
   std::tie(directP, indirectP) = init_mask_and_resample_operator_2d<T, K>(
       number_of_samples, theta_0, phi_0, theta, phi, imsizey, imsizex,
       oversample_ratio_image_domain, dl, dm, kernell, kernelm, Jl, Jm, dde);
+  sopt::OperatorFunction<T> directZFZ, indirectZFZ;
+  std::tie(directZFZ, indirectZFZ) =
+      base_padding_and_FFT_2d<T>(ftkernelu, ftkernelv, ftkernell, ftkernelm, imsizey, imsizex,
+                                 oversample_ratio, oversample_ratio_image_domain, ft_plan);
 
   if (uvw_stacking) {
     PURIFY_MEDIUM_LOG("Mean, u: {}, +/- {}", u_mean, (u.maxCoeff() - u.minCoeff()) * 0.5);
@@ -494,11 +493,6 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
   const std::function<t_real(t_real)> &ftkernell = std::get<2>(lmkernels);
   const std::function<t_real(t_real)> &ftkernelm = std::get<3>(lmkernels);
 
-  sopt::OperatorFunction<T> directZFZ, indirectZFZ;
-  std::tie(directZFZ, indirectZFZ) =
-      base_padding_and_FFT_2d<T>(ftkerneluv, ftkernell, ftkernelm, imsizey, imsizex,
-                                 oversample_ratio, oversample_ratio_image_domain, ft_plan);
-
   const t_complex I(0., 1.);
   std::function<t_complex(t_real, t_real)> dde = [I, u_mean, v_mean, w_mean, imsizex, imsizey,
                                                   oversample_ratio, oversample_ratio_image_domain](
@@ -515,6 +509,10 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
       number_of_samples, theta_0, phi_0, theta, phi, imsizey, imsizex,
       oversample_ratio_image_domain, dl, dm, kernell, kernelm, Jl, Jm, dde);
 
+  sopt::OperatorFunction<T> directZFZ, indirectZFZ;
+  std::tie(directZFZ, indirectZFZ) =
+      base_padding_and_FFT_2d<T>(ftkerneluv, ftkernell, ftkernelm, imsizey, imsizex,
+                                 oversample_ratio, oversample_ratio_image_domain, ft_plan);
   if (uvw_stacking) {
     PURIFY_MEDIUM_LOG("Mean, u: {}, +/- {}", u_mean, (u.maxCoeff() - u.minCoeff()) * 0.5);
     PURIFY_MEDIUM_LOG("Mean, v: {}, +/- {}", v_mean, (v.maxCoeff() - v.minCoeff()) * 0.5);
