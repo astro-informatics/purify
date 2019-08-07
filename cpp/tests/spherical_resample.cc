@@ -88,7 +88,7 @@ TEST_CASE("select resamples") {
   const Vector<t_real> m = Vector<t_real>::Random(N);
   const Vector<t_real> n = Vector<t_real>::Random(N);
   const std::vector<t_int> indicies =
-      spherical_resample::generate_indicies(l, m, n, imsizey, imsizex, dl, dm);
+      spherical_resample::generate_indicies(l, m, n, imsizey * dm, imsizex * dl);
   CAPTURE(l.head(20).transpose());
   CAPTURE(m.head(20).transpose());
   CAPTURE(n.head(20).transpose());
@@ -186,7 +186,8 @@ TEST_CASE("Test FFT Correction") {
 
   const Sparse<t_complex> interrpolation_matrix = spherical_resample::init_resample_matrix_2d(
       l, m, std::floor(imsizey * oversample_ratio_image_domain),
-      std::floor(imsizex * oversample_ratio_image_domain), kernell, kernelm, Jl, Jm);
+      std::floor(imsizex * oversample_ratio_image_domain), kernell, kernelm, Jl, Jm,
+      [](t_real, t_real) { return 1.; });
 
   const Vector<t_complex> point_source = Vector<t_complex>::Ones(1);
   const Vector<t_complex> image_on_plane = interrpolation_matrix.adjoint() * point_source;
@@ -230,7 +231,7 @@ TEST_CASE("Test FFT Correction") {
           std::floor(imsizey * oversample_ratio) * std::floor(imsizex * oversample_ratio));
     const auto ZFZ_op = spherical_resample::base_padding_and_FFT_2d<Vector<t_complex>>(
         [](t_real x) { return 1.; }, [](t_real x) { return 1.; }, ftkernell, ftkernelm, imsizey,
-        imsizex, oversample_ratio, oversample_ratio_image_domain, ft_plan, 0., 0., 0.);
+        imsizex, oversample_ratio, oversample_ratio_image_domain, ft_plan);
     Vector<t_complex> output;
     std::get<0>(ZFZ_op)(output, image_on_plane);
     CHECK(output.size() ==
@@ -240,10 +241,10 @@ TEST_CASE("Test FFT Correction") {
   SECTION("FFT with radial correction") {
     const auto ZFZ_op = spherical_resample::base_padding_and_FFT_2d<Vector<t_complex>>(
         [](t_real x) { return 1.; }, [](t_real x) { return 1.; }, ftkernell, ftkernelm, imsizey,
-        imsizex, oversample_ratio, oversample_ratio_image_domain, ft_plan, 0., 0., 0.);
+        imsizex, oversample_ratio, oversample_ratio_image_domain, ft_plan);
     const auto ZFZ_radial_op = spherical_resample::base_padding_and_FFT_2d<Vector<t_complex>>(
         [](t_real x) { return 1.; }, ftkernell, ftkernelm, imsizey, imsizex, oversample_ratio,
-        oversample_ratio_image_domain, ft_plan, 0., 0., 0.);
+        oversample_ratio_image_domain, ft_plan);
     Vector<t_complex> output;
     std::get<0>(ZFZ_op)(output, image_on_plane);
     Vector<t_complex> output_radial;
