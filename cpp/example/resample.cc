@@ -63,7 +63,8 @@ int main(int nargs, char const** args) {
       spherical_resample::init_mask_and_resample_operator_2d<Vector<t_complex>,
                                                              std::function<t_real(t_int)>>(
           number_of_samples, theta_0, phi_0, theta, phi, imsizey, imsizex,
-          oversample_ratio_image_domain, dl, dm, kernell, kernelm, Jl, Jm);
+          oversample_ratio_image_domain, dl, dm, kernell, kernelm, Jl, Jm,
+          [](t_real, t_real) { return 1.; });
   sopt::LinearTransform<Vector<t_complex>> const resampler =
       sopt::LinearTransform<Vector<t_complex>>(
           std::get<0>(resample_operator), {0, 1, number_of_samples}, std::get<1>(resample_operator),
@@ -82,7 +83,7 @@ int main(int nargs, char const** args) {
     th(index) = theta(index);
     ph(index) = phi(index);
   }
-  Vector<t_real> mask = spherical_resample::generate_mask(l, m, n, imsizex, imsizey, dl, dm);
+  Vector<t_real> mask = spherical_resample::generate_mask(l, m, n, imsizex * dl, imsizey * dm);
 
   pfitsio::write2d(Image<t_complex>::Map(output.data(), num_theta, num_phi).real(),
                    "image_on_sphere.fits");
