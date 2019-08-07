@@ -253,3 +253,140 @@ TEST_CASE("Test FFT Correction") {
     CHECK(output.isApprox(output_radial, 1e-6));
   }
 }
+
+TEST_CASE("planar grid degrid") {
+  const t_int Jl = 4;
+  const t_int Jm = 4;
+  const t_int Ju = 4;
+  const t_int Jv = 4;
+  const t_real oversample_ratio = 2.;
+  const t_real oversample_ratio_image_domain = 1.;
+  const t_int imsizex = 256;
+  const t_int imsizey = 256;
+  const auto ft_plan = operators::fftw_plan::measure;
+  auto const kernel = kernels::kernel_from_string.at("kb");
+  const Vector<t_real> u = Vector<t_real>::Zero(1);
+  const Vector<t_real> v = Vector<t_real>::Zero(1);
+  const Vector<t_real> w = Vector<t_real>::Zero(1).array();
+  const Vector<t_complex> weights = Vector<t_complex>::Ones(1);
+  SECTION("no projection") {
+    auto const uvkernels =
+        purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
+    const std::function<t_real(t_real)>& kernelu = std::get<0>(uvkernels);
+    const std::function<t_real(t_real)>& kernelv = std::get<1>(uvkernels);
+    const std::function<t_real(t_real)>& ftkernelu = std::get<2>(uvkernels);
+    const std::function<t_real(t_real)>& ftkernelv = std::get<3>(uvkernels);
+
+    auto const lmkernels =
+        purify::create_kernels(kernel, Jl, Jm, imsizey, imsizex, oversample_ratio_image_domain);
+    const std::function<t_real(t_real)>& kernell = std::get<0>(lmkernels);
+    const std::function<t_real(t_real)>& kernelm = std::get<1>(lmkernels);
+    const std::function<t_real(t_real)>& ftkernell = std::get<2>(lmkernels);
+    const std::function<t_real(t_real)>& ftkernelm = std::get<3>(lmkernels);
+
+    sopt::OperatorFunction<Vector<t_complex>> directZFZ, indirectZFZ;
+    std::tie(directZFZ, indirectZFZ) =
+        spherical_resample::base_padding_and_FFT_2d<Vector<t_complex>>(
+            ftkernelu, ftkernelv, [](t_real) { return 1.; }, [](t_real) { return 1.; }, imsizey,
+            imsizex, oversample_ratio, oversample_ratio_image_domain, ft_plan);
+
+    sopt::OperatorFunction<Vector<t_complex>> directG, indirectG;
+    std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<Vector<t_complex>>(
+        u, v, weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv);
+
+    const auto direct = sopt::chained_operators<Vector<t_complex>>(directG, directZFZ);
+    const auto indirect = sopt::chained_operators<Vector<t_complex>>(indirectZFZ, indirectG);
+    auto const measure_op = operators::base_degrid_operator_2d<Vector<t_complex>>(
+        u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jv, ft_plan, false, 1, 1);
+    const auto& forward_expected_op = std::get<0>(measure_op);
+    const auto& adjoint_expected_op = std::get<1>(measure_op);
+    SECTION("Forward") {
+      const Vector<t_complex> input = Vector<t_complex>::Ones(
+          imsizex * imsizey * oversample_ratio_image_domain * oversample_ratio_image_domain);
+      Vector<t_complex> output;
+      direct(output, input);
+      Vector<t_complex> output_expected;
+      forward_expected_op(output_expected, input);
+      CHECK(output.size() == 1);
+      CHECK(std::imag(output(0)) == Approx(0.).margin(1e-3));
+      CAPTURE(output_expected.head(1));
+      CAPTURE(output.head(1));
+      CHECK(output.isApprox(output_expected, 1e-6));
+    }
+    SECTION("adjoint") {
+      const Vector<t_complex> input = Vector<t_complex>::Ones(1);
+      Vector<t_complex> output;
+      indirect(output, input);
+      CAPTURE(output.head(5));
+      CAPTURE(input);
+      Vector<t_complex> output_expected;
+      adjoint_expected_op(output_expected, input);
+      CAPTURE(output_expected.head(5));
+      CHECK(output.isApprox(output_expected, 1e-6));
+    }
+  }
+  SECTION("projection") {
+    auto const uvkernels = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
+    const std::function<t_real(t_real)>& ftkerneluv = std::get<0>(uvkernels);
+    const std::function<t_real(t_real)>& kerneluv = std::get<1>(uvkernels);
+
+    auto const lmkernels =
+        purify::create_kernels(kernel, Jl, Jm, imsizey, imsizex, oversample_ratio_image_domain);
+    const std::function<t_real(t_real)>& kernell = std::get<0>(lmkernels);
+    const std::function<t_real(t_real)>& kernelm = std::get<1>(lmkernels);
+    const std::function<t_real(t_real)>& ftkernell = std::get<2>(lmkernels);
+    const std::function<t_real(t_real)>& ftkernelm = std::get<3>(lmkernels);
+
+    sopt::OperatorFunction<Vector<t_complex>> directZFZ, indirectZFZ;
+    std::tie(directZFZ, indirectZFZ) =
+        spherical_resample::base_padding_and_FFT_2d<Vector<t_complex>>(
+            ftkerneluv, [](t_real) { return 1.; }, [](t_real) { return 1.; }, imsizey, imsizex,
+            oversample_ratio, oversample_ratio_image_domain, ft_plan);
+
+    const t_real du = widefield::pixel_to_lambda(1., imsizex, oversample_ratio);
+    const t_real dv = widefield::pixel_to_lambda(1., imsizey, oversample_ratio);
+    const t_real absolute_error = 1e-8;
+    const t_real relative_error = 1e-8;
+    const t_int Jw = 100;
+    sopt::OperatorFunction<Vector<t_complex>> directG, indirectG;
+    std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<Vector<t_complex>>(
+        u, v, w, weights, imsizey, imsizex, oversample_ratio, ftkerneluv, kerneluv, Ju, Jw, du, dv,
+        absolute_error, relative_error, dde_type::wkernel_radial);
+
+    const auto direct = sopt::chained_operators<Vector<t_complex>>(directG, directZFZ);
+    const auto indirect = sopt::chained_operators<Vector<t_complex>>(indirectZFZ, indirectG);
+    auto const measure_op = operators::base_degrid_operator_2d<Vector<t_complex>>(
+        u, v, w, weights, imsizey, imsizex, oversample_ratio, kernel, Ju, Jw, ft_plan, false, 1, 1,
+        absolute_error, relative_error, dde_type::wkernel_radial);
+    const auto& forward_expected_op = std::get<0>(measure_op);
+    const auto& adjoint_expected_op = std::get<1>(measure_op);
+    SECTION("Forward") {
+      const Vector<t_complex> input = Vector<t_complex>::Ones(
+          imsizex * imsizey * oversample_ratio_image_domain * oversample_ratio_image_domain);
+      Vector<t_complex> output;
+      direct(output, input);
+      Vector<t_complex> output_expected;
+      forward_expected_op(output_expected, input);
+      CHECK(output.size() == 1);
+      CHECK(std::imag(output(0)) == Approx(0.).margin(1e-3));
+      CAPTURE(output_expected.head(1));
+      CAPTURE(output.head(1));
+      CAPTURE(1. / output.head(1).array());
+      CAPTURE(1. / output_expected.head(1).array());
+      CHECK(output.isApprox(output_expected, 1e-6));
+    }
+    SECTION("adjoint") {
+      const Vector<t_complex> input = Vector<t_complex>::Ones(1);
+      Vector<t_complex> output;
+      indirect(output, input);
+      CAPTURE(output.head(5));
+      CAPTURE(input);
+      Vector<t_complex> output_expected;
+      adjoint_expected_op(output_expected, input);
+      CAPTURE(output_expected.head(5));
+      CAPTURE(1. / output.head(5).array());
+      CAPTURE(1. / output_expected.head(5).array());
+      CHECK(output.isApprox(output_expected, 1e-6));
+    }
+  }
+}
