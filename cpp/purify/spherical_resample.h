@@ -483,8 +483,8 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
                     w.cwiseAbs().maxCoeff(), std::min(0.5 / w.cwiseAbs().maxCoeff(), 1.));
 
   auto const uvkernels = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
-  const std::function<t_real(t_real)> &kerneluv = std::get<0>(uvkernels);
-  const std::function<t_real(t_real)> &ftkerneluv = std::get<1>(uvkernels);
+  const std::function<t_real(t_real)> &kerneluv = std::get<1>(uvkernels);
+  const std::function<t_real(t_real)> &ftkerneluv = std::get<0>(uvkernels);
 
   auto const lmkernels =
       purify::create_kernels(kernel, Jl, Jm, imsizey, imsizex, oversample_ratio_image_domain);
