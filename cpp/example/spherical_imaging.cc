@@ -68,7 +68,7 @@ int main(int nargs, char const** args) {
   const auto measure_op =
       spherical_resample::base_plane_degrid_wproj_operator<Vector<t_complex>,
                                                            std::function<t_real(t_int)>>(
-          number_of_samples, theta_0, phi_0 - offset, theta, phi,
+          number_of_samples, theta_0, phi_0 + offset, theta, phi,
           spherical_resample::calculate_rotated_l(u, v, w, 0., offset, 0.),
           spherical_resample::calculate_rotated_m(u, v, w, 0., offset, 0.),
           spherical_resample::calculate_rotated_n(u, v, w, 0., offset, 0.), weights,
