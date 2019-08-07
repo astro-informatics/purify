@@ -43,6 +43,7 @@ int main(int nargs, char const** args) {
   const t_int Jm = 4;
   const t_int Ju = 4;
   const t_int Jv = 4;
+  const t_int Jw = 100;
   const t_real oversample_ratio_image_domain = 2;
   const t_real oversample_ratio = 2;
   const kernels::kernel kernel = kernels::kernel::kb;
@@ -90,11 +91,10 @@ int main(int nargs, char const** args) {
   for (t_int index = 0; index < number_of_samples; index++) {
     fourier_mode(index) =
         (mask(index) > 0)
-            ? std::conj(std::exp(-2 * constant::pi * t_complex(0., 1.) *
-                                 (l(index) * u(0) + m(index) * v(0) +
-                                  (std::sqrt(1 - l(index) * l(index) - m(index) * m(index)) - 1) *
-                                      w(0))) /
-                        std::sqrt(1 - l(index) * l(index) - m(index) * m(index)))
+            ? std::conj(
+                  std::exp(-2 * constant::pi * t_complex(0., 1.) *
+                           (l(index) * u(0) + m(index) * v(0) +
+                            (std::sqrt(1 - l(index) * l(index) - m(index) * m(index)) - 1) * w(0))))
             : 0.;
   }
 
@@ -111,4 +111,8 @@ int main(int nargs, char const** args) {
                    "fourier_mode_real_calculated.fits");
   pfitsio::write2d(Image<t_complex>::Map(output.data(), num_theta, num_phi).imag(),
                    "fourier_mode_imag_calculated.fits");
+  pfitsio::write2d(Image<t_complex>::Map(fourier_mode.data(), num_theta, num_phi).real(),
+                   "fourier_mode_real_expected.fits");
+  pfitsio::write2d(Image<t_complex>::Map(fourier_mode.data(), num_theta, num_phi).imag(),
+                   "fourier_mode_imag_expected.fits");
 }
