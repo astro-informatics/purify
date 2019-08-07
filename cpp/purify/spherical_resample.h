@@ -389,11 +389,11 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
                     std::asin(imsizey * dm / 2.) * 2. * 180. / constant::pi);
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   PURIFY_MEDIUM_LOG("Maximum u value is {} lambda, sphere needs to be sampled at dl = {}.",
-                    u.cwiseAbs().maxCoeff(), 0.5 / u.cwiseAbs().maxCoeff());
+                    u.cwiseAbs().maxCoeff(), std::min(0.5 / u.cwiseAbs().maxCoeff(), 1.));
   PURIFY_MEDIUM_LOG("Maximum v value is {} lambda, sphere needs to be sampled at dm = {}.",
-                    v.cwiseAbs().maxCoeff(), 0.5 / v.cwiseAbs().maxCoeff());
+                    v.cwiseAbs().maxCoeff(), std::min(0.5 / v.cwiseAbs().maxCoeff(), 1.));
   PURIFY_MEDIUM_LOG("Maximum w value is {} lambda, sphere needs to be sampled at dn = {}.",
-                    w.cwiseAbs().maxCoeff(), 0.5 / w.cwiseAbs().maxCoeff());
+                    w.cwiseAbs().maxCoeff(), std::min(0.5 / w.cwiseAbs().maxCoeff(), 1.));
 
   auto const uvkernels = purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
   const std::function<t_real(t_real)> &kernelu = std::get<0>(uvkernels);
@@ -477,11 +477,11 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
                     std::asin(imsizey * dm / 2.) * 2. * 180. / constant::pi);
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   PURIFY_MEDIUM_LOG("Maximum u value is {} lambda, sphere needs to be sampled at dl = {}.",
-                    u.cwiseAbs().maxCoeff(), 0.5 / u.cwiseAbs().maxCoeff());
+                    u.cwiseAbs().maxCoeff(), std::min(0.5 / u.cwiseAbs().maxCoeff(), 1.));
   PURIFY_MEDIUM_LOG("Maximum v value is {} lambda, sphere needs to be sampled at dm = {}.",
-                    v.cwiseAbs().maxCoeff(), 0.5 / v.cwiseAbs().maxCoeff());
+                    v.cwiseAbs().maxCoeff(), std::min(0.5 / v.cwiseAbs().maxCoeff(), 1.));
   PURIFY_MEDIUM_LOG("Maximum w value is {} lambda, sphere needs to be sampled at dn = {}.",
-                    w.cwiseAbs().maxCoeff(), 0.5 / w.cwiseAbs().maxCoeff());
+                    w.cwiseAbs().maxCoeff(), std::min(0.5 / w.cwiseAbs().maxCoeff(), 1.));
 
   auto const uvkernels = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
   const std::function<t_real(t_real)> &kerneluv = std::get<0>(uvkernels);
