@@ -36,11 +36,10 @@ t_complex exact_w_projection_integration_1d(const t_real u, const t_real v, cons
     return ftkerneluv(x(0)) * hankel_wproj_kernel(x(0), w, u, v, du);
   };
   const Vector<t_real> xmin = Vector<t_real>::Zero(1);
-  const Vector<t_real> xmax = Vector<t_real>::Constant(1, oversample_ratio / 2.);
+  const Vector<t_real> xmax = Vector<t_real>::Constant(1, oversample_ratio * 0.5);
   return 2. * constant::pi *
          integration::integrate(xmin, xmax, func, integration::norm_type::paired, absolute_error,
-                                relative_error, max_evaluations, method) /
-         std::pow(xmax(0), 2);
+                                relative_error, max_evaluations, method);
 }
 
 t_complex exact_w_projection_integration(const t_real u, const t_real v, const t_real w,
@@ -60,8 +59,7 @@ t_complex exact_w_projection_integration(const t_real u, const t_real v, const t
   xmax(1) = oversample_ratio / 2.;
   const Vector<t_real> xmin = -xmax;
   return integration::integrate(xmin, xmax, func, integration::norm_type::paired, absolute_error,
-                                relative_error, max_evaluations, method) /
-         (xmax(0) - xmin(0)) / (xmax(1) - xmin(1));
+                                relative_error, max_evaluations, method);
 }
 }  // namespace projection_kernels
 }  // namespace purify
