@@ -10,46 +10,22 @@ t_real calculate_m(const t_real theta, const t_real phi) { return std::sin(theta
 
 t_real calculate_n(const t_real phi) { return std::cos(phi); }
 
-t_real calculate_rotated_l(const t_real l, const t_real m, const t_real n, const t_real alpha,
-                           const t_real beta, const t_real gamma) {
-  return l * (std::cos(alpha) * std::cos(beta) * std::cos(gamma) -
-              std::sin(alpha) * std::sin(gamma)) +
-         m * (-std::sin(alpha) * std::cos(beta) * std::cos(gamma) -
-              std::cos(alpha) * std::sin(gamma)) +
-         n * std::cos(alpha) * std::sin(beta);
-}
-
-t_real calculate_rotated_m(const t_real l, const t_real m, const t_real n, const t_real alpha,
-                           const t_real beta, const t_real gamma) {
-  return l * (std::sin(alpha) * std::cos(beta) * std::cos(gamma) +
-              std::cos(alpha) * std::sin(gamma)) +
-         m * (-std::sin(alpha) * std::cos(beta) * std::sin(gamma) +
-              std::cos(alpha) * std::cos(gamma)) +
-         n * std::sin(alpha) * std::sin(beta);
-}
-
-t_real calculate_rotated_n(const t_real l, const t_real m, const t_real n, const t_real alpha,
-                           const t_real beta, const t_real gamma) {
-  return l * (-std::sin(beta) * std::cos(gamma)) + m * (std::sin(beta) * std::sin(gamma)) +
-         n * std::cos(beta);
-}
-
 t_real calculate_l(const t_real theta, const t_real phi, const t_real alpha, const t_real beta,
                    const t_real gamma) {
-  return calculate_rotated_l(calculate_l(theta, phi), calculate_m(theta, phi), calculate_n(phi),
-                             alpha, beta, gamma);
+  return calculate_rotated_l<t_real>(calculate_l(theta, phi), calculate_m(theta, phi),
+                                     calculate_n(phi), alpha, beta, gamma);
 }
 
 t_real calculate_m(const t_real theta, const t_real phi, const t_real alpha, const t_real beta,
                    const t_real gamma) {
-  return calculate_rotated_m(calculate_l(theta, phi), calculate_m(theta, phi), calculate_n(phi),
-                             alpha, beta, gamma);
+  return calculate_rotated_m<t_real>(calculate_l(theta, phi), calculate_m(theta, phi),
+                                     calculate_n(phi), alpha, beta, gamma);
 }
 
 t_real calculate_n(const t_real theta, const t_real phi, const t_real alpha, const t_real beta,
                    const t_real gamma) {
-  return calculate_rotated_n(calculate_l(theta, phi), calculate_m(theta, phi), calculate_n(phi),
-                             alpha, beta, gamma);
+  return calculate_rotated_n<t_real>(calculate_l(theta, phi), calculate_m(theta, phi),
+                                     calculate_n(phi), alpha, beta, gamma);
 }
 
 std::vector<t_int> generate_indicies(const Vector<t_real> &l, const Vector<t_real> &m,

@@ -16,14 +16,32 @@ t_real calculate_m(const t_real theta, const t_real phi);
 //! calculate n directional cosine for a given pointing given angles
 t_real calculate_n(const t_real phi);
 //! calculate the rotated l from euler angles in zyz and starting coordinates (l, m, n)
-t_real calculate_rotated_l(const t_real l, const t_real m, const t_real n, const t_real alpha,
-                           const t_real beta, const t_real gamma);
+template <class T>
+T calculate_rotated_l(const T &l, const T &m, const T &n, const t_real alpha, const t_real beta,
+                      const t_real gamma) {
+  return l * (std::cos(alpha) * std::cos(beta) * std::cos(gamma) -
+              std::sin(alpha) * std::sin(gamma)) +
+         m * (-std::sin(alpha) * std::cos(beta) * std::cos(gamma) -
+              std::cos(alpha) * std::sin(gamma)) +
+         n * std::cos(alpha) * std::sin(beta);
+}
 //! calculate the rotated m from euler angles in zyz and starting coordinates (l, m, n)
-t_real calculate_rotated_m(const t_real l, const t_real m, const t_real n, const t_real alpha,
-                           const t_real beta, const t_real gamma);
+template <class T>
+T calculate_rotated_m(const T &l, const T &m, const T &n, const t_real alpha, const t_real beta,
+                      const t_real gamma) {
+  return l * (std::sin(alpha) * std::cos(beta) * std::cos(gamma) +
+              std::cos(alpha) * std::sin(gamma)) +
+         m * (-std::sin(alpha) * std::cos(beta) * std::sin(gamma) +
+              std::cos(alpha) * std::cos(gamma)) +
+         n * std::sin(alpha) * std::sin(beta);
+}
 //! calculate the rotated n from euler angles in zyz and starting coordinates (l, m, n)
-t_real calculate_rotated_n(const t_real l, const t_real m, const t_real n, const t_real alpha,
-                           const t_real beta, const t_real gamma);
+template <class T>
+T calculate_rotated_n(const T &l, const T &m, const T &n, const t_real alpha, const t_real beta,
+                      const t_real gamma) {
+  return l * (-std::sin(beta) * std::cos(gamma)) + m * (std::sin(beta) * std::sin(gamma)) +
+         n * std::cos(beta);
+}
 //! calculate the l in a rotated frame from euler angles in zyz
 t_real calculate_l(const t_real theta, const t_real phi, const t_real alpha, const t_real beta,
                    const t_real gamma);
