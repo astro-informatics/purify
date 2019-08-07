@@ -82,9 +82,9 @@ Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<
         const t_real k_m = std::floor(m(k) - jm_max * 0.5);
         const t_int q = k_l + jl;
         const t_int p = k_m + jm;
-        const t_int index =
-            utilities::sub2ind(p + imsizey_upsampled * 0.5, q + imsizex_upsampled * 0.5,
-                               imsizey_upsampled, imsizex_upsampled);
+        const t_int index = utilities::sub2ind(std::floor(p + imsizey_upsampled * 0.5),
+                                               std::floor(q + imsizex_upsampled * 0.5),
+                                               imsizey_upsampled, imsizex_upsampled);
         assert(k >= 0);
         assert(k < rows);
         if ((cols > index) and (index >= 0))
