@@ -465,11 +465,14 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
 
   const t_int imsizex = std::pow(
       2, std::ceil(std::log2(std::floor(
-             L / std::min({0.25 / ((u.array() - u_mean).cwiseAbs().maxCoeff()), L / 512})))));
+             L / std::min({0.25 / ((u.array() - u_mean).cwiseAbs().maxCoeff()), L / Jw})))));
   const t_int imsizey = imsizex;
   const t_real dl = L / imsizex;
   const t_real dm = dl;
+  const t_real du = widefield::dl2du(dl, imsizex, oversample_ratio);
+  const t_real dv = widefield::dl2du(dm, imsizey, oversample_ratio);
   PURIFY_MEDIUM_LOG("dl x dm : {} x {} ", dl, dm);
+  PURIFY_MEDIUM_LOG("du x dv : {} x {} ", du, dv);
   PURIFY_MEDIUM_LOG("FoV (width, height): {} x {} (L x M)", imsizex * dl, imsizey * dm);
   PURIFY_MEDIUM_LOG("FoV (width, height): {} x {} (deg x deg)",
                     std::asin(imsizex * dl / 2.) * 2. * 180. / constant::pi,
@@ -519,8 +522,6 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
     PURIFY_MEDIUM_LOG("Mean, w: {}, +/- {}", w_mean, (w.maxCoeff() - w.minCoeff()) * 0.5);
   }
   PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
-  const t_real du = widefield::dl2du(dl, imsizex, oversample_ratio);
-  const t_real dv = widefield::dl2du(dm, imsizey, oversample_ratio);
   sopt::OperatorFunction<T> directG, indirectG;
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
       (u.array() - u_mean) / du, (v.array() - v_mean) / dv, w.array() - w_mean, weights, imsizey,
