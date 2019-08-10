@@ -88,7 +88,7 @@ Matrix<t_real> read_ant_positions(const std::string &pos_name);
 //! Read in a text file of antenna positions into a matrix [x, y ,z] and generate coverage for
 //! frequencies
 template <class T>
-utilities::vis_params read_ant_positions(const std::string &pos_name, const T &frequencies) {
+utilities::vis_params read_ant_positions_to_coverage(const std::string &pos_name, const T &frequencies) {
   return antenna_to_coverage(read_ant_positions(pos_name), frequencies);
 }
 //! Reading reals from visibility file (including nan's and inf's)
