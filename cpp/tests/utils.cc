@@ -287,6 +287,24 @@ TEST_CASE("generate coverage from antenna positions") {
   CHECK(B.rows() == 128);
   CHECK(B.cols() == 3);
   CHECK(B.allFinite());
+  SECTION("generate coverage") {
+    SECTION("one frequency") {
+      const t_real f = constant::c;
+      auto const coverage_from_file = utilities::read_ant_positions_to_coverage(pos_filename, f);
+      auto const coverage_from_B = utilities::antenna_to_coverage(B, f);
+      CHECK(coverage_from_file.u.isApprox(coverage_from_B.u));
+      CHECK(coverage_from_file.v.isApprox(coverage_from_B.v));
+      CHECK(coverage_from_file.w.isApprox(coverage_from_B.w));
+    }
+    SECTION("multi frequency") {
+      const std::vector<t_real> f = {constant::c, constant::c * 4, constant::c * 2};
+      auto const coverage_from_file = utilities::read_ant_positions_to_coverage(pos_filename, f);
+      auto const coverage_from_B = utilities::antenna_to_coverage(B, f);
+      CHECK(coverage_from_file.u.isApprox(coverage_from_B.u));
+      CHECK(coverage_from_file.v.isApprox(coverage_from_B.v));
+      CHECK(coverage_from_file.w.isApprox(coverage_from_B.w));
+    }
+  }
 }
 
 TEST_CASE("conjugate symmetry") {
