@@ -44,6 +44,10 @@ inline std::string vla_filename(std::string const &filename) {
 inline std::string atca_filename(std::string const &filename) {
   return data_filename("atca/" + filename);
 }
+//! Specific mwa data
+inline std::string mwa_filename(std::string const &filename) {
+  return data_filename("mwa/" + filename);
+}
 //! Some gridding regression data
 inline std::string gridding_filename(std::string const &filename) {
   return data_filename("expected/gridding/" + filename);
