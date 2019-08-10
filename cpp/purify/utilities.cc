@@ -8,10 +8,10 @@
 
 namespace purify {
 namespace utilities {
-Matrix<t_real> generate_antennas(const t_uint N) {
+Matrix<t_real> generate_antennas(const t_uint N, const t_real scale) {
   Matrix<t_real> B = Matrix<t_real>::Zero(N, 3);
   const t_real mean = 0;
-  const t_real standard_deviation = constant::pi;
+  const t_real standard_deviation = scale;
   auto sample = [&mean, &standard_deviation]() {
     std::random_device rd;
     std::mt19937_64 rng(rd());
@@ -29,37 +29,68 @@ Matrix<t_real> generate_antennas(const t_uint N) {
     B(i, 1) = sample();
     B(i, 2) = sample();
   }
-  return B;
+  return B * scale;
 }
 
-utilities::vis_params antenna_to_coverage(const t_uint N) {
-  return antenna_to_coverage(generate_antennas(N));
-}
-
-utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B) {
+utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B,
+                                          const std::vector<t_real> &frequencies) {
   if (B.cols() != 3) throw std::runtime_error("Antennae coordinates are not 3D vectors.");
   const t_uint M = B.rows() * (B.rows() - 1) * 0.5;
-  Vector<t_real> u = Vector<t_real>::Zero(M);
-  Vector<t_real> v = Vector<t_real>::Zero(M);
-  Vector<t_real> w = Vector<t_real>::Zero(M);
-  Vector<t_complex> weights = Vector<t_complex>::Ones(M);
-  Vector<t_complex> vis = Vector<t_complex>::Ones(M);
+  const t_uint chans = frequencies.size();
+  Vector<t_real> u = Vector<t_real>::Zero(M * chans);
+  Vector<t_real> v = Vector<t_real>::Zero(M * chans);
+  Vector<t_real> w = Vector<t_real>::Zero(M * chans);
+  Vector<t_complex> weights = Vector<t_complex>::Ones(M * chans);
+  Vector<t_complex> vis = Vector<t_complex>::Ones(M * chans);
   t_uint m = 0;
   for (t_uint i = 0; i < B.rows(); i++) {
     for (t_uint j = i + 1; j < B.rows(); j++) {
-      const Vector<t_real> r = B.row(i) - B.row(j);
-      u(m) = r(0);
-      v(m) = r(1);
-      w(m) = r(2);
+      const Vector<t_real> r = (B.row(i) - B.row(j));
+      for (t_int k = 0; k < frequencies.size(); k++) {
+        u(m + k * M) = r(0) * frequencies.at(k) / constant::c;
+        v(m + k * M) = r(1) * frequencies.at(k) / constant::c;
+        w(m + k * M) = r(2) * frequencies.at(k) / constant::c;
+      }
       m++;
     }
   }
   if (M != m)
     throw std::runtime_error(
         "Number of created baselines does not match expected baseline number N * (N - 1) / 2.");
-  utilities::vis_params coverage(u, v, w, vis, weights, utilities::vis_units::radians);
+  utilities::vis_params coverage(u, v, w, vis, weights, utilities::vis_units::lambda);
   return coverage;
 };
+utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B, const t_real frequency) {
+  return antenna_to_coverage(B, std::vector<t_real>(1, frequency));
+}
+
+Matrix<t_real> read_ant_positions(const std::string &pos_name) {
+  /*
+    Reads an csv file with x, y, z (meters) and returns the vectors as a matrix (x, y, z) cols.
+
+    vis_name:: name of input text file containing [x, y, z] (separated by ' ').
+  */
+  std::ifstream pos_file(pos_name);
+  pos_file.precision(13);
+  t_int row = 0;
+  std::string line;
+  // counts size of pos file
+  while (std::getline(pos_file, line)) ++row;
+  if (row < 1) throw std::runtime_error("No positions in the file: " + pos_name);
+  Matrix<t_real> B = Matrix<t_real>::Zero(row, 3);
+
+  pos_file.clear();
+  pos_file.seekg(0);
+  // reads in vis file
+  for (row = 0; row < B.rows(); ++row) {
+    B(row, 0) = streamtoreal(pos_file);
+    B(row, 1) = streamtoreal(pos_file);
+    B(row, 2) = streamtoreal(pos_file);
+  }
+
+  return B;
+}
+
 utilities::vis_params random_sample_density(const t_int vis_num, const t_real mean,
                                             const t_real standard_deviation, const t_real rms_w) {
   /*

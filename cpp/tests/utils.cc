@@ -214,40 +214,79 @@ TEST_CASE("utilities [sparse multiply]", "[sparse multiply]") {
 
 TEST_CASE("generate_baseline") {
   // testing if randomly generating a uvcoverage from baseline configuration works
-  const Matrix<t_real> B = utilities::generate_antennas(4);
+  const Matrix<t_real> B = utilities::generate_antennas(4, 1);
   CHECK(B.allFinite());
   CHECK(B.rows() == 4);
   CHECK(B.cols() == 3);
   CAPTURE(B);
-  const utilities::vis_params test_coverage = utilities::antenna_to_coverage(B);
-  CHECK(test_coverage.u.allFinite());
-  CHECK(test_coverage.v.allFinite());
-  CHECK(test_coverage.w.allFinite());
-  CHECK(test_coverage.size() == 2 * 3);
-  const Vector<t_real> R0 = B.row(0) - B.row(1);
-  const Vector<t_real> R1 = B.row(0) - B.row(2);
-  const Vector<t_real> R2 = B.row(0) - B.row(3);
-  const Vector<t_real> R3 = B.row(1) - B.row(2);
-  const Vector<t_real> R4 = B.row(1) - B.row(3);
-  const Vector<t_real> R5 = B.row(2) - B.row(3);
-  CHECK(R0(0) == test_coverage.u(0));
-  CHECK(R0(1) == test_coverage.v(0));
-  CHECK(R0(2) == test_coverage.w(0));
-  CHECK(R1(0) == test_coverage.u(1));
-  CHECK(R1(1) == test_coverage.v(1));
-  CHECK(R1(2) == test_coverage.w(1));
-  CHECK(R2(0) == test_coverage.u(2));
-  CHECK(R2(1) == test_coverage.v(2));
-  CHECK(R2(2) == test_coverage.w(2));
-  CHECK(R3(0) == test_coverage.u(3));
-  CHECK(R3(1) == test_coverage.v(3));
-  CHECK(R3(2) == test_coverage.w(3));
-  CHECK(R4(0) == test_coverage.u(4));
-  CHECK(R4(1) == test_coverage.v(4));
-  CHECK(R4(2) == test_coverage.w(4));
-  CHECK(R5(0) == test_coverage.u(5));
-  CHECK(R5(1) == test_coverage.v(5));
-  CHECK(R5(2) == test_coverage.w(5));
+  SECTION("one wavelength") {
+    const t_real frequency = constant::c;
+    const utilities::vis_params test_coverage = utilities::antenna_to_coverage(B, frequency);
+    CHECK(test_coverage.units == utilities::vis_units::lambda);
+    const utilities::vis_params test_coverage_xyz =
+        utilities::antenna_to_coverage(B.col(0), B.col(1), B.col(2), frequency);
+    CHECK(test_coverage_xyz.u.isApprox(test_coverage.u));
+    CHECK(test_coverage_xyz.v.isApprox(test_coverage.v));
+    CHECK(test_coverage_xyz.w.isApprox(test_coverage.w));
+    CHECK(test_coverage.u.allFinite());
+    CHECK(test_coverage.v.allFinite());
+    CHECK(test_coverage.w.allFinite());
+    CHECK(test_coverage.size() == 2 * 3);
+    const Vector<t_real> R0 = B.row(0) - B.row(1);
+    const Vector<t_real> R1 = B.row(0) - B.row(2);
+    const Vector<t_real> R2 = B.row(0) - B.row(3);
+    const Vector<t_real> R3 = B.row(1) - B.row(2);
+    const Vector<t_real> R4 = B.row(1) - B.row(3);
+    const Vector<t_real> R5 = B.row(2) - B.row(3);
+    CHECK(R0(0) == Approx(test_coverage.u(0)));
+    CHECK(R0(1) == Approx(test_coverage.v(0)));
+    CHECK(R0(2) == Approx(test_coverage.w(0)));
+    CHECK(R1(0) == Approx(test_coverage.u(1)));
+    CHECK(R1(1) == Approx(test_coverage.v(1)));
+    CHECK(R1(2) == Approx(test_coverage.w(1)));
+    CHECK(R2(0) == Approx(test_coverage.u(2)));
+    CHECK(R2(1) == Approx(test_coverage.v(2)));
+    CHECK(R2(2) == Approx(test_coverage.w(2)));
+    CHECK(R3(0) == Approx(test_coverage.u(3)));
+    CHECK(R3(1) == Approx(test_coverage.v(3)));
+    CHECK(R3(2) == Approx(test_coverage.w(3)));
+    CHECK(R4(0) == Approx(test_coverage.u(4)));
+    CHECK(R4(1) == Approx(test_coverage.v(4)));
+    CHECK(R4(2) == Approx(test_coverage.w(4)));
+    CHECK(R5(0) == Approx(test_coverage.u(5)));
+    CHECK(R5(1) == Approx(test_coverage.v(5)));
+    CHECK(R5(2) == Approx(test_coverage.w(5)));
+  }
+  SECTION("more wavelengths") {
+    const auto frequency = std::vector<t_real>{constant::c, 2 * constant::c, 5 * constant::c};
+    const t_int chan_size = B.rows() * (B.rows() - 1.) / 2.;
+    const utilities::vis_params test_coverage = utilities::antenna_to_coverage(B, frequency);
+    CHECK(test_coverage.u.allFinite());
+    CHECK(test_coverage.v.allFinite());
+    CHECK(test_coverage.w.allFinite());
+    CHECK(test_coverage.size() == chan_size * frequency.size());
+    t_int f_index = 0;
+    for (auto& f : frequency) {
+      CAPTURE(f);
+      CAPTURE(f_index);
+      CAPTURE(frequency.size());
+      const utilities::vis_params test_coverage_f = utilities::antenna_to_coverage(B, f);
+      CHECK(test_coverage_f.u.isApprox(test_coverage.u.segment(f_index * chan_size, chan_size)));
+      CHECK(test_coverage_f.v.isApprox(test_coverage.v.segment(f_index * chan_size, chan_size)));
+      CHECK(test_coverage_f.w.isApprox(test_coverage.w.segment(f_index * chan_size, chan_size)));
+      f_index++;
+    }
+    CHECK(f_index == frequency.size());
+  }
+}
+
+TEST_CASE("generate coverage from antenna positions") {
+  const std::string pos_filename = mwa_filename("Phase1_config.txt");
+
+  auto const B = utilities::read_ant_positions(pos_filename);
+  CHECK(B.rows() == 128);
+  CHECK(B.cols() == 3);
+  CHECK(B.allFinite());
 }
 
 TEST_CASE("conjugate symmetry") {
