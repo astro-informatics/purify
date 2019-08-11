@@ -122,7 +122,7 @@ utilities::vis_params uv_scale(const utilities::vis_params &uv_vis, const t_int 
 utilities::vis_params conjugate_w(const utilities::vis_params &uv_vis);
 //! calculate the rotated u from euler angles in zyz and starting coordinates (u, v, w)
 template <class T>
-T calculate_rotated_w(const T &u, const T &v, const T &w, const t_real alpha, const t_real beta,
+T calculate_rotated_u(const T &u, const T &v, const T &w, const t_real alpha, const t_real beta,
                       const t_real gamma) {
   return u * (std::cos(alpha) * std::cos(beta) * std::cos(gamma) -
               std::sin(alpha) * std::sin(gamma)) +
