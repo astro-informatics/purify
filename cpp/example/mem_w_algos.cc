@@ -32,15 +32,22 @@ int main(int nargs, char const **args) {
   t_int const imsizey = imsizex;
   const t_real cell = FoV / static_cast<t_real>(imsizex);
   auto const kernel = "kb";
+  const t_int channels = 80;
 
+  const std::string pos_filename = mwa_filename("Phase1_config.txt");
   t_uint const number_of_pixels = imsizex * imsizey;
   // Generating random uv(w) coverage
   t_real const sigma_m = constant::pi / 3;
   Vector<t_real> mem_stack = Vector<t_real>::Zero(world.size());
   Vector<t_real> mem_node = Vector<t_real>::Zero(world.size());
   for (t_int i = 0; i < iters; i++) {
-    auto uv_data = utilities::random_sample_density(std::floor(number_of_vis / world.size()), 0,
-                                                    sigma_m, rms_w);
+    std::vector<t_real> frequencies;
+    for (t_int k = 0; k < channels; k++)
+      frequencies.push_back(80e6 + (world.rank() * channels + k - channels * 0.5) * 4e4);
+    auto uv_data = utilities::read_ant_positions_to_coverage(pos_filename, frequencies);
+    //   auto uv_data = utilities::random_sample_density(std::floor(number_of_vis / world.size()),
+    //   0,
+    //                                                   sigma_m, rms_w);
     uv_data = utilities::conjugate_w(uv_data);
     const auto cost = [](t_real x) -> t_real { return std::abs(x * x); };
     const t_real du = widefield::pixel_to_lambda(cell, imsizex, oversample_ratio);
