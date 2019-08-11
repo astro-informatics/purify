@@ -308,6 +308,36 @@ TEST_CASE("generate coverage from antenna positions") {
   }
 }
 
+TEST_CASE("rotations") {
+  SECTION("u = 0, v = 0, w = 1") {
+    const t_real theta_0 = 0.;
+    const t_real phi_0 = 0.;
+    CHECK(0. ==
+          Approx(utilities::calculate_rotated_u(0., 0., 1., theta_0, phi_0, 0.)).margin(1e-6));
+    CHECK(0. ==
+          Approx(utilities::calculate_rotated_v(0., 0., 1., theta_0, phi_0, 0.)).margin(1e-6));
+    CHECK(1. == Approx(utilities::calculate_rotated_w(0., 0., 1., theta_0, phi_0, 0.)));
+  }
+  SECTION("u = 1, v = 0, w = 0") {
+    const t_real theta_0 = 0;
+    const t_real phi_0 = constant::pi / 2.;
+    CHECK(1. == Approx(utilities::calculate_rotated_u(0., 0., 1., theta_0, phi_0, 0.)));
+    CHECK(0. ==
+          Approx(utilities::calculate_rotated_v(0., 0., 1., theta_0, phi_0, 0.)).margin(1e-6));
+    CHECK(0. ==
+          Approx(utilities::calculate_rotated_w(0., 0., 1., theta_0, phi_0, 0.)).margin(1e-6));
+  }
+  SECTION("u = 0, v = 1, w = 0") {
+    const t_real theta_0 = constant::pi / 2.;
+    const t_real phi_0 = constant::pi / 2.;
+    CHECK(0. ==
+          Approx(utilities::calculate_rotated_u(0., 0., 1., theta_0, phi_0, 0.)).margin(1e-6));
+    CHECK(1. == Approx(utilities::calculate_rotated_v(0., 0., 1., theta_0, phi_0, 0.)));
+    CHECK(0. ==
+          Approx(utilities::calculate_rotated_w(0., 0., 1., theta_0, phi_0, 0.)).margin(1e-6));
+  }
+}
+
 TEST_CASE("conjugate symmetry") {
   t_uint const number_of_vis = 100;
   t_uint const max_w = 100;
