@@ -58,6 +58,8 @@ namespace constant {
 const t_real pi = 3.14159265358979323846;
 //! speed of light in vacuum
 const t_real c = 299792458.0;
+//! angular velocity of the earth
+const omega_e = 7.292115090 / (1.0e5);
 }  // namespace constant
 }  // namespace purify
 #endif
