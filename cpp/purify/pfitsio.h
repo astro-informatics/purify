@@ -6,7 +6,7 @@
 
 #include <fitsio.h>
 #include <string>
-#include "purify/utilities.h"
+#include "purify/uvw_utilities.h"
 
 namespace purify {
 

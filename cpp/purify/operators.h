@@ -8,6 +8,7 @@
 #include <type_traits>
 #include "purify/kernels.h"
 #include "purify/logging.h"
+#include "purify/uvw_utilities.h"
 #include "purify/utilities.h"
 #include "purify/wide_field_utilities.h"
 #include "purify/wkernel_integration.h"

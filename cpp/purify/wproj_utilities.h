@@ -17,7 +17,7 @@
 #include <sys/stat.h>
 #include "purify/logging.h"
 #include "purify/operators.h"
-#include "purify/utilities.h"
+#include "purify/uvw_utilities.h"
 
 namespace purify {
 namespace utilities {
