@@ -2,6 +2,7 @@
 #include "catch.hpp"
 #include "purify/directories.h"
 #include "purify/utilities.h"
+#include "purify/uvw_utilities.h"
 
 using namespace purify;
 using namespace purify::notinstalled;
