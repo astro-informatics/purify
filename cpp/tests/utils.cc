@@ -222,10 +222,14 @@ TEST_CASE("generate_baseline") {
   CAPTURE(B);
   SECTION("one wavelength") {
     const t_real frequency = constant::c;
-    const utilities::vis_params test_coverage = utilities::antenna_to_coverage(B, frequency);
+    const t_real times = 0.;
+    const t_real phi_dec = 0.;
+    const t_real theta_ra = 0.;
+    const utilities::vis_params test_coverage =
+        utilities::antenna_to_coverage(B, frequency, times, theta_ra, phi_dec);
     CHECK(test_coverage.units == utilities::vis_units::lambda);
-    const utilities::vis_params test_coverage_xyz =
-        utilities::antenna_to_coverage(B.col(0), B.col(1), B.col(2), frequency);
+    const utilities::vis_params test_coverage_xyz = utilities::antenna_to_coverage(
+        B.col(0), B.col(1), B.col(2), frequency, times, theta_ra, phi_dec);
     CHECK(test_coverage_xyz.u.isApprox(test_coverage.u));
     CHECK(test_coverage_xyz.v.isApprox(test_coverage.v));
     CHECK(test_coverage_xyz.w.isApprox(test_coverage.w));
@@ -260,24 +264,36 @@ TEST_CASE("generate_baseline") {
   }
   SECTION("more wavelengths") {
     const auto frequency = std::vector<t_real>{constant::c, 2 * constant::c, 5 * constant::c};
-    const t_int chan_size = B.rows() * (B.rows() - 1.) / 2.;
-    const utilities::vis_params test_coverage = utilities::antenna_to_coverage(B, frequency);
+    const auto times = std::vector<t_real>{0, 2, 100};
+    const t_real phi_dec = 0.;
+    const t_real theta_ra = 0.;
+    const t_int M = B.rows() * (B.rows() - 1) / 2;
+    const utilities::vis_params test_coverage =
+        utilities::antenna_to_coverage(B, frequency, times, theta_ra, phi_dec);
     CHECK(test_coverage.u.allFinite());
     CHECK(test_coverage.v.allFinite());
     CHECK(test_coverage.w.allFinite());
-    CHECK(test_coverage.size() == chan_size * frequency.size());
+    CHECK(test_coverage.size() == M * frequency.size() * times.size());
     t_int f_index = 0;
-    for (auto& f : frequency) {
-      CAPTURE(f);
-      CAPTURE(f_index);
-      CAPTURE(frequency.size());
-      const utilities::vis_params test_coverage_f = utilities::antenna_to_coverage(B, f);
-      CHECK(test_coverage_f.u.isApprox(test_coverage.u.segment(f_index * chan_size, chan_size)));
-      CHECK(test_coverage_f.v.isApprox(test_coverage.v.segment(f_index * chan_size, chan_size)));
-      CHECK(test_coverage_f.w.isApprox(test_coverage.w.segment(f_index * chan_size, chan_size)));
-      f_index++;
+    t_int t_index = 0;
+    for (t_int k = 0; k < frequency.size(); k++) {
+      for (t_int j = 0; j < times.size(); j++) {
+        const t_real f = frequency.at(k);
+        const t_real t = times.at(j);
+        CAPTURE(f);
+        CAPTURE(t);
+        CAPTURE(f_index);
+        CAPTURE(frequency.size());
+        const utilities::vis_params test_coverage_f =
+            utilities::antenna_to_coverage(B, f, t, theta_ra, phi_dec);
+        const t_int index = (k + j * frequency.size()) * M;
+        CAPTURE(test_coverage.u.segment(index, M).head(5));
+        CAPTURE(test_coverage_f.u.head(5));
+        CHECK(test_coverage_f.u.isApprox(test_coverage.u.segment(index, M)));
+        CHECK(test_coverage_f.v.isApprox(test_coverage.v.segment(index, M)));
+        CHECK(test_coverage_f.w.isApprox(test_coverage.w.segment(index, M)));
+      }
     }
-    CHECK(f_index == frequency.size());
   }
 }
 
@@ -291,16 +307,20 @@ TEST_CASE("generate coverage from antenna positions") {
   SECTION("generate coverage") {
     SECTION("one frequency") {
       const t_real f = constant::c;
-      auto const coverage_from_file = utilities::read_ant_positions_to_coverage(pos_filename, f);
-      auto const coverage_from_B = utilities::antenna_to_coverage(B, f);
+      const t_real t = 0.;
+      auto const coverage_from_file =
+          utilities::read_ant_positions_to_coverage(pos_filename, f, t, 0., 0.);
+      auto const coverage_from_B = utilities::antenna_to_coverage(B, f, t, 0., 0.);
       CHECK(coverage_from_file.u.isApprox(coverage_from_B.u));
       CHECK(coverage_from_file.v.isApprox(coverage_from_B.v));
       CHECK(coverage_from_file.w.isApprox(coverage_from_B.w));
     }
     SECTION("multi frequency") {
       const std::vector<t_real> f = {constant::c, constant::c * 4, constant::c * 2};
-      auto const coverage_from_file = utilities::read_ant_positions_to_coverage(pos_filename, f);
-      auto const coverage_from_B = utilities::antenna_to_coverage(B, f);
+      const std::vector<t_real> t = {0., 4, 24};
+      auto const coverage_from_file =
+          utilities::read_ant_positions_to_coverage(pos_filename, f, t, 0., 0.);
+      auto const coverage_from_B = utilities::antenna_to_coverage(B, f, t, 0., 0.);
       CHECK(coverage_from_file.u.isApprox(coverage_from_B.u));
       CHECK(coverage_from_file.v.isApprox(coverage_from_B.v));
       CHECK(coverage_from_file.w.isApprox(coverage_from_B.w));
