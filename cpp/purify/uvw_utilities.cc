@@ -33,23 +33,35 @@ Matrix<t_real> generate_antennas(const t_uint N, const t_real scale) {
 }
 
 utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B,
-                                          const std::vector<t_real> &frequencies) {
+                                          const std::vector<t_real> &frequencies,
+                                          const std::vector<t_real> &times, const t_real theta_ra,
+                                          const t_real phi_dec) {
   if (B.cols() != 3) throw std::runtime_error("Antennae coordinates are not 3D vectors.");
-  const t_uint M = B.rows() * (B.rows() - 1) * 0.5;
+  const t_uint M = B.rows() * (B.rows() - 1) / 2;
   const t_uint chans = frequencies.size();
-  Vector<t_real> u = Vector<t_real>::Zero(M * chans);
-  Vector<t_real> v = Vector<t_real>::Zero(M * chans);
-  Vector<t_real> w = Vector<t_real>::Zero(M * chans);
-  Vector<t_complex> weights = Vector<t_complex>::Ones(M * chans);
-  Vector<t_complex> vis = Vector<t_complex>::Ones(M * chans);
+  const t_uint time_samples = times.size();
+  Vector<t_real> u = Vector<t_real>::Zero(M * chans * time_samples);
+  Vector<t_real> v = Vector<t_real>::Zero(M * chans * time_samples);
+  Vector<t_real> w = Vector<t_real>::Zero(M * chans * time_samples);
+  Vector<t_complex> weights = Vector<t_complex>::Ones(M * chans * time_samples);
+  Vector<t_complex> vis = Vector<t_complex>::Ones(M * chans * time_samples);
   t_uint m = 0;
   for (t_uint i = 0; i < B.rows(); i++) {
     for (t_uint j = i + 1; j < B.rows(); j++) {
       const Vector<t_real> r = (B.row(i) - B.row(j));
-      for (t_int k = 0; k < frequencies.size(); k++) {
-        u(m + k * M) = r(0) * frequencies.at(k) / constant::c;
-        v(m + k * M) = r(1) * frequencies.at(k) / constant::c;
-        w(m + k * M) = r(2) * frequencies.at(k) / constant::c;
+      for (t_int k = 0; k < chans; k++) {
+        for (t_int t = 0; t < time_samples; t++) {
+          const t_int index = m + M * (k + chans * t);
+          u(index) = utilities::calculate_rotated_u(r(0), r(1), r(2), 0., phi_dec,
+                                                    theta_ra + constant::omega_e * times.at(t)) *
+                     frequencies.at(k) / constant::c;
+          v(index) = utilities::calculate_rotated_v(r(0), r(1), r(2), 0., phi_dec,
+                                                    theta_ra + constant::omega_e * times.at(t)) *
+                     frequencies.at(k) / constant::c;
+          w(index) = utilities::calculate_rotated_w(r(0), r(1), r(2), 0., phi_dec,
+                                                    theta_ra + constant::omega_e * times.at(t)) *
+                     frequencies.at(k) / constant::c;
+        }
       }
       m++;
     }
@@ -60,8 +72,24 @@ utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B,
   utilities::vis_params coverage(u, v, w, vis, weights, utilities::vis_units::lambda);
   return coverage;
 };
-utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B, const t_real frequency) {
-  return antenna_to_coverage(B, std::vector<t_real>(1, frequency));
+
+utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B, const t_real frequency,
+                                          const std::vector<t_real> &times, const t_real theta_ra,
+                                          const t_real phi_dec) {
+  return antenna_to_coverage(B, std::vector<t_real>(1, frequency), times, theta_ra, phi_dec);
+}
+
+utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B, const t_real frequency,
+                                          const t_real times, const t_real theta_ra,
+                                          const t_real phi_dec) {
+  return antenna_to_coverage(B, std::vector<t_real>(1, frequency), std::vector<t_real>(1, times),
+                             theta_ra, phi_dec);
+}
+
+utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B,
+                                          const std::vector<t_real> &frequency, const t_real times,
+                                          const t_real theta_ra, const t_real phi_dec) {
+  return antenna_to_coverage(B, frequency, std::vector<t_real>(1, times), theta_ra, phi_dec);
 }
 
 Matrix<t_real> read_ant_positions(const std::string &pos_name) {

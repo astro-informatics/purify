@@ -62,35 +62,51 @@ utilities::vis_params random_sample_density(const t_int vis_num, const t_real me
 Matrix<t_real> generate_antennas(const t_uint N, const t_real scale);
 template <class T>
 utilities::vis_params antenna_to_coverage(const t_uint N, const t_real scale, const T &frequency) {
-  return antenna_to_coverage(generate_antennas(N, scale), frequency);
+  return antenna_to_coverage(generate_antennas(N, scale), frequency, 0., 0., 0.);
 }
 //! Using guassianly distributed (sigma = pi) antenna positions generate a coverage
 utilities::vis_params antenna_to_coverage(const t_uint N);
-//! Provided antenna positions generate a coverage for a fixed frequency
-utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B, const t_real frequency);
-//! Provided antenna positions generate a coverage for a fixed frequencies
+//! Provided antenna positions generate a coverage for a fixed frequency for mulitple times
+utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B, const t_real frequency,
+                                          const std::vector<t_real> &times, const t_real theta_ra,
+                                          const t_real phi_dec);
+//! Provided antenna positions generate a coverage for a fixed frequency a fixed time
+utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B, const t_real frequency,
+                                          const t_real times, const t_real theta_ra,
+                                          const t_real phi_dec);
+//! Provided antenna positions generate a coverage for multiple frequency a fixed time
 utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B,
-                                          const std::vector<t_real> &frequencies);
+                                          const std::vector<t_real> &frequencies,
+                                          const t_real times, const t_real theta_ra,
+                                          const t_real phi_dec);
+//! Provided antenna positions generate a coverage for multiple frequencies for multiple times
+utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B,
+                                          const std::vector<t_real> &frequencies,
+                                          const std::vector<t_real> &times, const t_real theta_ra,
+                                          const t_real phi_dec);
 //! Provided antenna positions generate a coverage
-template <class T>
+template <class T, class K>
 utilities::vis_params antenna_to_coverage(const Vector<t_real> &x, const Vector<t_real> &y,
-                                          const Vector<t_real> &z, const T &frequencies) {
+                                          const Vector<t_real> &z, const T &frequencies,
+                                          const K &times, const t_real theta_ra,
+                                          const t_real phi_dec) {
   if (x.size() != y.size()) throw std::runtime_error("x and y positions are not the same amount.");
   if (x.size() != z.size()) throw std::runtime_error("x and z positions are not the same amount.");
   Matrix<t_real> B(x.size(), 3);
   B.col(0) = x;
   B.col(1) = y;
   B.col(2) = z;
-  return antenna_to_coverage(B, frequencies);
+  return antenna_to_coverage(B, frequencies, times, theta_ra, phi_dec);
 }
 //! Read in a text file of antenna positions into a matrix [x, y ,z]
 Matrix<t_real> read_ant_positions(const std::string &pos_name);
 //! Read in a text file of antenna positions into a matrix [x, y ,z] and generate coverage for
 //! frequencies
-template <class T>
+template <class T, class K>
 utilities::vis_params read_ant_positions_to_coverage(const std::string &pos_name,
-                                                     const T &frequencies) {
-  return antenna_to_coverage(read_ant_positions(pos_name), frequencies);
+                                                     const T &frequencies, const K &times,
+                                                     const t_real theta_ra, const t_real phi_dec) {
+  return antenna_to_coverage(read_ant_positions(pos_name), frequencies, times, theta_ra, phi_dec);
 }
 //! Reading reals from visibility file (including nan's and inf's)
 t_real streamtoreal(std::ifstream &stream);
