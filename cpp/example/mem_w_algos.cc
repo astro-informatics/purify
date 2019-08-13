@@ -44,7 +44,13 @@ int main(int nargs, char const **args) {
     std::vector<t_real> frequencies;
     for (t_int k = 0; k < channels; k++)
       frequencies.push_back(80e6 + (world.rank() * channels + k - channels * 0.5) * 4e4);
-    auto uv_data = utilities::read_ant_positions_to_coverage(pos_filename, frequencies);
+
+    const std::vector<t_real> times = {0.,  8.,  16., 24., 32., 40.,  48., 56.,
+                                       64., 72., 80., 88., 96., 104., 112.};
+    const t_real theta_ra = 0. * 180. / constant::pi;
+    const t_real phi_dec = 0. * 180. / constant::pi;
+    auto uv_data =
+        utilities::read_ant_positions_to_coverage(pos_filename, frequencies, times, 0., 0.);
     //   auto uv_data = utilities::random_sample_density(std::floor(number_of_vis / world.size()),
     //   0,
     //                                                   sigma_m, rms_w);
