@@ -79,11 +79,59 @@ utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B,
                                           const std::vector<t_real> &frequencies,
                                           const t_real times, const t_real theta_ra,
                                           const t_real phi_dec);
-//! Provided antenna positions generate a coverage for multiple frequencies for multiple times
+//! Provided antenna positions generate a coverage for multiple frequencies for multiple times for
+//! earth rotation synthesis
 utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B,
                                           const std::vector<t_real> &frequencies,
-                                          const std::vector<t_real> &times, const t_real theta_ra,
+                                          const std::vector<t_real> times, const t_real theta_ra,
                                           const t_real phi_dec);
+//! Provided antenna positions generate a coverage for multiple frequencies for multiple times at
+//! different pointings
+template <class F>
+utilities::vis_params antenna_to_coverage_general(const Matrix<t_real> &B,
+                                                  const std::vector<t_real> &frequencies,
+                                                  const std::vector<t_real> &times,
+                                                  const F &position_angle_RA_function,
+                                                  const F &position_angle_DEC_function) {
+  if (B.cols() != 3) throw std::runtime_error("Antennae coordinates are not 3D vectors.");
+  const t_uint M = B.rows() * (B.rows() - 1) / 2;
+  const t_uint chans = frequencies.size();
+  const t_uint time_samples = times.size();
+  Vector<t_real> u = Vector<t_real>::Zero(M * chans * time_samples);
+  Vector<t_real> v = Vector<t_real>::Zero(M * chans * time_samples);
+  Vector<t_real> w = Vector<t_real>::Zero(M * chans * time_samples);
+  Vector<t_complex> weights = Vector<t_complex>::Ones(M * chans * time_samples);
+  Vector<t_complex> vis = Vector<t_complex>::Ones(M * chans * time_samples);
+  t_uint m = 0;
+  for (t_uint i = 0; i < B.rows(); i++) {
+    for (t_uint j = i + 1; j < B.rows(); j++) {
+      const Vector<t_real> r = (B.row(i) - B.row(j));
+      for (t_int k = 0; k < chans; k++) {
+        for (t_int t = 0; t < time_samples; t++) {
+          const t_int index = m + M * (k + chans * t);
+          u(index) = utilities::calculate_rotated_u(r(0), r(1), r(2),
+                                                    position_angle_RA_function(times.at(t)),
+                                                    position_angle_DEC_function(times.at(t)), 0.) *
+                     frequencies.at(k) / constant::c;
+          v(index) = utilities::calculate_rotated_v(r(0), r(1), r(2),
+                                                    position_angle_RA_function(times.at(t)),
+                                                    position_angle_DEC_function(times.at(t)), 0.) *
+                     frequencies.at(k) / constant::c;
+          w(index) = utilities::calculate_rotated_w(r(0), r(1), r(2),
+                                                    position_angle_RA_function(times.at(t)),
+                                                    position_angle_DEC_function(times.at(t)), 0.) *
+                     frequencies.at(k) / constant::c;
+        }
+      }
+      m++;
+    }
+  }
+  if (M != m)
+    throw std::runtime_error(
+        "Number of created baselines does not match expected baseline number N * (N - 1) / 2.");
+  utilities::vis_params coverage(u, v, w, vis, weights, utilities::vis_units::lambda);
+  return coverage;
+};
 //! Provided antenna positions generate a coverage
 template <class T, class K>
 utilities::vis_params antenna_to_coverage(const Vector<t_real> &x, const Vector<t_real> &y,
