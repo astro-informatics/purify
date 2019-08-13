@@ -54,6 +54,34 @@ struct vis_params {
   t_uint size() const { return this->vis.size(); };
 };
 
+//! calculate the rotated u from euler angles in zyz and starting coordinates (u, v, w)
+template <class T>
+T calculate_rotated_u(const T &u, const T &v, const T &w, const t_real alpha, const t_real beta,
+                      const t_real gamma) {
+  return u * (std::cos(alpha) * std::cos(beta) * std::cos(gamma) -
+              std::sin(alpha) * std::sin(gamma)) +
+         v * (-std::sin(alpha) * std::cos(beta) * std::cos(gamma) -
+              std::cos(alpha) * std::sin(gamma)) +
+         w * std::cos(alpha) * std::sin(beta);
+}
+//! calculate the rotated v from euler angles in zyz and starting coordinates (u, v, w)
+template <class T>
+T calculate_rotated_v(const T &u, const T &v, const T &w, const t_real alpha, const t_real beta,
+                      const t_real gamma) {
+  return u * (std::sin(alpha) * std::cos(beta) * std::cos(gamma) +
+              std::cos(alpha) * std::sin(gamma)) +
+         v * (-std::sin(alpha) * std::cos(beta) * std::sin(gamma) +
+              std::cos(alpha) * std::cos(gamma)) +
+         w * std::sin(alpha) * std::sin(beta);
+}
+//! calculate the rotated w from euler angles in zyz and starting coordinates (u, v, w)
+template <class T>
+T calculate_rotated_w(const T &u, const T &v, const T &w, const t_real alpha, const t_real beta,
+                      const t_real gamma) {
+  return u * (-std::sin(beta) * std::cos(gamma)) + v * (std::sin(beta) * std::sin(gamma)) +
+         w * std::cos(beta);
+}
+
 //! Generates a random visibility coverage
 utilities::vis_params random_sample_density(const t_int vis_num, const t_real mean,
                                             const t_real standard_deviation,
@@ -184,33 +212,6 @@ utilities::vis_params uv_scale(const utilities::vis_params &uv_vis, const t_int 
                                const t_int &ftsizev);
 //! reflects visibilities into the w >= 0 domain
 utilities::vis_params conjugate_w(const utilities::vis_params &uv_vis);
-//! calculate the rotated u from euler angles in zyz and starting coordinates (u, v, w)
-template <class T>
-T calculate_rotated_u(const T &u, const T &v, const T &w, const t_real alpha, const t_real beta,
-                      const t_real gamma) {
-  return u * (std::cos(alpha) * std::cos(beta) * std::cos(gamma) -
-              std::sin(alpha) * std::sin(gamma)) +
-         v * (-std::sin(alpha) * std::cos(beta) * std::cos(gamma) -
-              std::cos(alpha) * std::sin(gamma)) +
-         w * std::cos(alpha) * std::sin(beta);
-}
-//! calculate the rotated v from euler angles in zyz and starting coordinates (u, v, w)
-template <class T>
-T calculate_rotated_v(const T &u, const T &v, const T &w, const t_real alpha, const t_real beta,
-                      const t_real gamma) {
-  return u * (std::sin(alpha) * std::cos(beta) * std::cos(gamma) +
-              std::cos(alpha) * std::sin(gamma)) +
-         v * (-std::sin(alpha) * std::cos(beta) * std::sin(gamma) +
-              std::cos(alpha) * std::cos(gamma)) +
-         w * std::sin(alpha) * std::sin(beta);
-}
-//! calculate the rotated w from euler angles in zyz and starting coordinates (u, v, w)
-template <class T>
-T calculate_rotated_w(const T &u, const T &v, const T &w, const t_real alpha, const t_real beta,
-                      const t_real gamma) {
-  return u * (-std::sin(beta) * std::cos(gamma)) + v * (std::sin(beta) * std::sin(gamma)) +
-         w * std::cos(beta);
-}
 }  // namespace utilities
 }  // namespace purify
 
