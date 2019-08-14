@@ -64,14 +64,16 @@ int main(int nargs, char const** args) {
   const auto theta = [num_theta, num_phi](const t_int k) -> t_real {
     return utilities::ind2col(k, num_phi, num_theta) * 2 * constant::pi / num_theta;
   };
-  t_real const offset = constant::pi * 0. / 180.;
+  //
+  t_real const offset_dec = constant::pi * 0. / 180.;
+  t_real const offset_ra = constant::pi * 0. / 180.;
   const auto measure_op =
       spherical_resample::base_plane_degrid_wproj_operator<Vector<t_complex>,
                                                            std::function<t_real(t_int)>>(
-          number_of_samples, theta_0, phi_0 + offset, theta, phi,
-          spherical_resample::calculate_rotated_l(u, v, w, 0., offset, 0.),
-          spherical_resample::calculate_rotated_m(u, v, w, 0., offset, 0.),
-          spherical_resample::calculate_rotated_n(u, v, w, 0., offset, 0.), weights,
+          number_of_samples, theta_0 + offset_ra, phi_0 + offset_dec, theta, phi,
+          spherical_resample::calculate_rotated_l(u, v, w, 0., -offset_dec, -offset_ra),
+          spherical_resample::calculate_rotated_m(u, v, w, 0., -offset_dec, -offset_ra),
+          spherical_resample::calculate_rotated_n(u, v, w, 0., -offset_dec, -offset_ra), weights,
           oversample_ratio, oversample_ratio_image_domain, kernel, Ju, Jw, Jl, Jm, ft_plan,
           uvw_stacking, L, 1e-8, 1e-8);
 
@@ -86,21 +88,22 @@ int main(int nargs, char const** args) {
   Vector<t_real> ph = Vector<t_real>::Zero(number_of_samples);
   Vector<t_complex> fourier_mode = Vector<t_complex>::Zero(number_of_samples);
   for (t_int index = 0; index < number_of_samples; index++) {
-    l(index) = spherical_resample::calculate_l(theta(index), phi(index), 0., phi_0, theta_0);
-    m(index) = spherical_resample::calculate_m(theta(index), phi(index), 0., phi_0, theta_0);
-    n(index) = spherical_resample::calculate_n(theta(index), phi(index), 0., phi_0, theta_0);
+    l(index) = spherical_resample::calculate_l(theta(index), phi(index), theta_0, phi_0, 0.);
+    m(index) = spherical_resample::calculate_m(theta(index), phi(index), theta_0, phi_0, 0.);
+    n(index) = spherical_resample::calculate_n(theta(index), phi(index), theta_0, phi_0, 0.);
     th(index) = theta(index);
     ph(index) = phi(index);
   }
   const Vector<t_real> mask = spherical_resample::generate_mask(l, m, n, L, M);
   for (t_int index = 0; index < number_of_samples; index++) {
     fourier_mode(index) =
-        (mask(index) > 0)
-            ? std::conj(
-                  std::exp(-2 * constant::pi * t_complex(0., 1.) *
-                           (l(index) * u(0) + m(index) * v(0) +
-                            (std::sqrt(1 - l(index) * l(index) - m(index) * m(index)) - 1) * w(0))))
-            : 0.;
+        //       (mask(index) > 0)
+        // ?
+        std::conj(
+            std::exp(-2 * constant::pi * t_complex(0., 1.) *
+                     (l(index) * u(0) + m(index) * v(0) +
+                      (std::sqrt(1 - l(index) * l(index) - m(index) * m(index)) - 1) * w(0))));
+    //         : 0.;
   }
 
   pfitsio::write2d(Image<t_real>::Map(l.data(), num_theta, num_phi), "l_coordinates.fits");
