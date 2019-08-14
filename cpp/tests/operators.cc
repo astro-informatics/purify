@@ -60,6 +60,34 @@ TEST_CASE("Operators") {
   std::function<t_real(t_real)> kbu, kbv, ftkbu, ftkbv;
   std::tie(kbu, kbv, ftkbu, ftkbv) =
       create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
+  SECTION("Gridding on the fly") {
+    sopt::OperatorFunction<Vector<t_complex>> directG, indirectG;
+    std::tie(directG, indirectG) = operators::init_on_the_fly_gridding_matrix_2d<Vector<t_complex>>(
+        uv_vis.u, uv_vis.v, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex, oversample_ratio,
+        kbv, kbu, Ju, Jv);
+    Vector<t_complex> direct_output;
+    directG(direct_output,
+            Vector<t_complex>::Map(operators_test::direct_input.data(), ftsizeu * ftsizev));
+    CHECK(direct_output.size() == M);
+    CHECK(direct_output.size() == operators_test::expected_direct.size());
+    REQUIRE(direct_output.isApprox(Vector<t_complex>::Map(operators_test::expected_direct.data(),
+                                                          operators_test::expected_direct.size()),
+                                   1e-5));
+    Vector<t_complex> indirect_output;
+    indirectG(indirect_output, Vector<t_complex>::Map(operators_test::indirect_input.data(),
+                                                      operators_test::indirect_input.size()));
+    CHECK(indirect_output.size() == ftsizev * ftsizeu);
+    CAPTURE(Vector<t_complex>::Map(operators_test::expected_indirect.data(),
+                                   operators_test::expected_indirect.size())
+                .head(5));
+    CAPTURE((indirect_output - Vector<t_complex>::Map(operators_test::expected_indirect.data(),
+                                                      operators_test::expected_indirect.size()))
+                .head(5));
+    REQUIRE(
+        indirect_output.isApprox(Vector<t_complex>::Map(operators_test::expected_indirect.data(),
+                                                        operators_test::expected_indirect.size()),
+                                 1e-5));
+  }
   SECTION("Gridding") {
     sopt::OperatorFunction<Vector<t_complex>> directG, indirectG;
     std::tie(directG, indirectG) = operators::init_gridding_matrix_2d<Vector<t_complex>>(
