@@ -3,7 +3,7 @@
 
 #include <chrono>
 #include <benchmark/benchmark.h>
-#include "purify/utilities.h"
+#include "purify/uvw_utilities.h"
 #ifdef PURIFY_MPI
 #include <sopt/mpi/communicator.h>
 #endif
