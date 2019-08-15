@@ -98,7 +98,12 @@ class DegridOperatorFixturePar : public ::benchmark::Fixture {
     bool newImage = updateImage(state.range(0));
 
     // Generating random uv(w) coverage
-    bool newMeasurements = b_utilities::updateMeasurements(state.range(1), m_uv_data, m_world);
+    bool newMeasurements = m_uv_data.size() != state.range(1);
+    if (newMeasurements) {
+      b_utilities::updateMeasurements(state.range(1), m_uv_data, m_world);
+      t_real const sigma_m = constant::pi / 3;
+      m_uv_data = utilities::random_sample_density(state.range(1), 0, sigma_m);
+    }
 
     // Create measurement operators
     bool newKernel = m_kernel != state.range(2);
@@ -254,7 +259,7 @@ BENCHMARK_DEFINE_F(DegridOperatorAdjointFixtureMPI, Apply)(benchmark::State &sta
 }
 
 // -------------- Register benchmarks -------------------------//
-
+/*
 BENCHMARK_REGISTER_F(DegridOperatorCtorFixturePar, Distr)
     //->Apply(b_utilities::Arguments)
     ->Args({1024, 1000000, 4})
@@ -263,25 +268,6 @@ BENCHMARK_REGISTER_F(DegridOperatorCtorFixturePar, Distr)
     ->Repetitions(10)
     //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
-
-BENCHMARK_REGISTER_F(DegridOperatorDirectFixtureDistr, Apply)
-    //->Apply(b_utilities::Arguments)
-    ->Args({1024, 1000000, 4})
-    ->Args({1024, 10000000, 4})
-    ->UseManualTime()
-    ->Repetitions(10)
-    //->ReportAggregatesOnly(true)
-    ->Unit(benchmark::kMillisecond);
-
-BENCHMARK_REGISTER_F(DegridOperatorAdjointFixtureDistr, Apply)
-    //->Apply(b_utilities::Arguments)
-    ->Args({1024, 1000000, 4})
-    ->Args({1024, 10000000, 4})
-    ->UseManualTime()
-    ->Repetitions(10)
-    //->ReportAggregatesOnly(true)
-    ->Unit(benchmark::kMillisecond);
-
 BENCHMARK_REGISTER_F(DegridOperatorCtorFixturePar, MPI)
     //->Apply(b_utilities::Arguments)
     ->Args({1024, 1000000, 4})
@@ -290,21 +276,92 @@ BENCHMARK_REGISTER_F(DegridOperatorCtorFixturePar, MPI)
     ->Repetitions(10)
     //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
+    */
+
+BENCHMARK_REGISTER_F(DegridOperatorDirectFixtureDistr, Apply)
+    //->Apply(b_utilities::Arguments)
+    ->Args({1024, static_cast<t_int>(1e6), 4})
+    ->Args({2048, static_cast<t_int>(1e6), 4})
+    ->Args({4096, static_cast<t_int>(1e6), 4})
+    ->Args({8192, static_cast<t_int>(1e6), 4})
+    ->Args({16384, static_cast<t_int>(1e6), 4})
+    ->Args({1024, static_cast<t_int>(1e7), 4})
+    ->Args({2048, static_cast<t_int>(1e7), 4})
+    ->Args({4096, static_cast<t_int>(1e7), 4})
+    ->Args({8192, static_cast<t_int>(1e7), 4})
+    ->Args({16384, static_cast<t_int>(1e7), 4})
+    ->Args({1024, static_cast<t_int>(1e8), 4})
+    ->Args({2048, static_cast<t_int>(1e8), 4})
+    ->Args({4096, static_cast<t_int>(1e8), 4})
+    ->Args({8192, static_cast<t_int>(1e8), 4})
+    ->Args({16384, static_cast<t_int>(1e8), 4})
+    ->UseManualTime()
+    ->Repetitions(1)
+    //->ReportAggregatesOnly(true)
+    ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_REGISTER_F(DegridOperatorAdjointFixtureDistr, Apply)
+    //->Apply(b_utilities::Arguments)
+    ->Args({1024, static_cast<t_int>(1e6), 4})
+    ->Args({2048, static_cast<t_int>(1e6), 4})
+    ->Args({4096, static_cast<t_int>(1e6), 4})
+    ->Args({8192, static_cast<t_int>(1e6), 4})
+    ->Args({16384, static_cast<t_int>(1e6), 4})
+    ->Args({1024, static_cast<t_int>(1e7), 4})
+    ->Args({2048, static_cast<t_int>(1e7), 4})
+    ->Args({4096, static_cast<t_int>(1e7), 4})
+    ->Args({8192, static_cast<t_int>(1e7), 4})
+    ->Args({16384, static_cast<t_int>(1e7), 4})
+    ->Args({1024, static_cast<t_int>(1e8), 4})
+    ->Args({2048, static_cast<t_int>(1e8), 4})
+    ->Args({4096, static_cast<t_int>(1e8), 4})
+    ->Args({8192, static_cast<t_int>(1e8), 4})
+    ->Args({16384, static_cast<t_int>(1e8), 4})
+    ->UseManualTime()
+    ->Repetitions(1)
+    //->ReportAggregatesOnly(true)
+    ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorDirectFixtureMPI, Apply)
     //->Apply(b_utilities::Arguments)
-    ->Args({1024, 1000000, 4})
-    ->Args({1024, 10000000, 4})
+    ->Args({1024, static_cast<t_int>(1e6), 4})
+    ->Args({2048, static_cast<t_int>(1e6), 4})
+    ->Args({4096, static_cast<t_int>(1e6), 4})
+    ->Args({8192, static_cast<t_int>(1e6), 4})
+    ->Args({16384, static_cast<t_int>(1e6), 4})
+    ->Args({1024, static_cast<t_int>(1e7), 4})
+    ->Args({2048, static_cast<t_int>(1e7), 4})
+    ->Args({4096, static_cast<t_int>(1e7), 4})
+    ->Args({8192, static_cast<t_int>(1e7), 4})
+    ->Args({16384, static_cast<t_int>(1e7), 4})
+    ->Args({1024, static_cast<t_int>(1e8), 4})
+    ->Args({2048, static_cast<t_int>(1e8), 4})
+    ->Args({4096, static_cast<t_int>(1e8), 4})
+    ->Args({8192, static_cast<t_int>(1e8), 4})
+    ->Args({16384, static_cast<t_int>(1e8), 4})
     ->UseManualTime()
-    ->Repetitions(10)
+    ->Repetitions(1)
     //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorAdjointFixtureMPI, Apply)
     //->Apply(b_utilities::Arguments)
-    ->Args({1024, 1000000, 4})
-    ->Args({1024, 10000000, 4})
+    ->Args({1024, static_cast<t_int>(1e6), 4})
+    ->Args({2048, static_cast<t_int>(1e6), 4})
+    ->Args({4096, static_cast<t_int>(1e6), 4})
+    ->Args({8192, static_cast<t_int>(1e6), 4})
+    ->Args({16384, static_cast<t_int>(1e6), 4})
+    ->Args({1024, static_cast<t_int>(1e7), 4})
+    ->Args({2048, static_cast<t_int>(1e7), 4})
+    ->Args({4096, static_cast<t_int>(1e7), 4})
+    ->Args({8192, static_cast<t_int>(1e7), 4})
+    ->Args({16384, static_cast<t_int>(1e7), 4})
+    ->Args({1024, static_cast<t_int>(1e8), 4})
+    ->Args({2048, static_cast<t_int>(1e8), 4})
+    ->Args({4096, static_cast<t_int>(1e8), 4})
+    ->Args({8192, static_cast<t_int>(1e8), 4})
+    ->Args({16384, static_cast<t_int>(1e8), 4})
     ->UseManualTime()
-    ->Repetitions(10)
+    ->Repetitions(1)
     //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
