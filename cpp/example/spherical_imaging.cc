@@ -67,14 +67,23 @@ int main(int nargs, char const** args) {
   //
   t_real const offset_dec = constant::pi * 0. / 180.;
   t_real const offset_ra = constant::pi * 0. / 180.;
+  const Vector<t_real> rotated_u =
+      spherical_resample::calculate_rotated_l(u, v, w, 0., -(phi_0 + offset_dec) , -(theta_0 + offset_ra));
+  const Vector<t_real> rotated_v =
+      spherical_resample::calculate_rotated_m(u, v, w, 0., -(phi_0 + offset_dec) , -(theta_0 + offset_ra));
+  const Vector<t_real> rotated_w =
+      spherical_resample::calculate_rotated_n(u, v, w, 0., -(phi_0 + offset_dec) , -(theta_0 + offset_ra));
   const auto measure_op =
       spherical_resample::base_plane_degrid_wproj_operator<Vector<t_complex>,
                                                            std::function<t_real(t_int)>>(
           number_of_samples, theta_0 + offset_ra, phi_0 + offset_dec, theta, phi,
-          spherical_resample::calculate_rotated_l(u, v, w, 0., -offset_dec, -offset_ra),
-          spherical_resample::calculate_rotated_m(u, v, w, 0., -offset_dec, -offset_ra),
-          spherical_resample::calculate_rotated_n(u, v, w, 0., -offset_dec, -offset_ra), weights,
-          oversample_ratio, oversample_ratio_image_domain, kernel, Ju, Jw, Jl, Jm, ft_plan,
+          spherical_resample::calculate_rotated_l(rotated_u, rotated_v, rotated_w, -theta_0, -phi_0,
+                                                  0.),
+          spherical_resample::calculate_rotated_m(rotated_u, rotated_v, rotated_w, -theta_0, -phi_0,
+                                                  0.),
+          spherical_resample::calculate_rotated_n(rotated_u, rotated_v, rotated_w, -theta_0, -phi_0,
+                                                  0.),
+          weights, oversample_ratio, oversample_ratio_image_domain, kernel, Ju, Jw, Jl, Jm, ft_plan,
           uvw_stacking, L, 1e-8, 1e-8);
 
   sopt::LinearTransform<Vector<t_complex>> const m_op = sopt::LinearTransform<Vector<t_complex>>(
