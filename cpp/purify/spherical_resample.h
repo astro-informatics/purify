@@ -83,9 +83,9 @@ std::tuple<Vector<t_real>, Vector<t_real>, std::vector<t_int>> calculate_compres
   Vector<t_real> m = Vector<t_real>::Zero(number_of_samples);
   Vector<t_real> n = Vector<t_real>::Zero(number_of_samples);
   for (t_int k = 0; k < number_of_samples; k++) {
-    l(k) = calculate_l(theta(k), phi(k), 0., phi_0, theta_0);
-    m(k) = calculate_m(theta(k), phi(k), 0., phi_0, theta_0);
-    n(k) = calculate_n(theta(k), phi(k), 0., phi_0, theta_0);
+    l(k) = calculate_l(theta(k), phi(k), theta_0, phi_0, 0.);
+    m(k) = calculate_m(theta(k), phi(k), theta_0, phi_0, 0.);
+    n(k) = calculate_n(theta(k), phi(k), theta_0, phi_0, 0.);
   }
   const std::vector<t_int> indicies = generate_indicies(l, m, n, imsizex_upsampled * dl_upsampled,
                                                         imsizey_upsampled * dm_upsampled);
