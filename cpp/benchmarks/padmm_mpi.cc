@@ -25,9 +25,12 @@ class PadmmFixtureMPI : public ::benchmark::Fixture {
     // Reading image from file and update related quantities
     bool newImage = b_utilities::updateImage(state.range(0), m_image, m_imsizex, m_imsizey);
 
-    // Generating random uv(w) coverage and update related quantities
-    bool newMeasurements = b_utilities::updateMeasurements(state.range(1), m_uv_data, m_epsilon,
-                                                           newImage, m_image, m_world);
+    // Generating random uv(w) coverage
+    bool newMeasurements = m_uv_data.size() != state.range(1);
+    if (newMeasurements) {
+      t_real const sigma_m = constant::pi / 3;
+      m_uv_data = utilities::random_sample_density(state.range(1), 0, sigma_m);
+    }
 
     bool newKernel = m_kernel != state.range(2);
     if (newImage || newMeasurements || newKernel) {
@@ -37,13 +40,15 @@ class PadmmFixtureMPI : public ::benchmark::Fixture {
       const t_real cellsize = FoV / m_imsizex * 60. * 60.;
       const bool w_term = false;
       // algorithm 1
-      m_measurements1 = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
-          m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2,
-          kernels::kernel::kb, m_kernel, m_kernel, w_term);
+      if (state.range(3) == 1)
+        m_measurements1 = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+            m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2,
+            kernels::kernel::kb, m_kernel, m_kernel, w_term);
       // algorithm 3
-      m_measurements3 = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
-          m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2,
-          kernels::kernel::kb, m_kernel, m_kernel, w_term);
+      if (state.range(3) == 3)
+        m_measurements3 = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+            m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2,
+            kernels::kernel::kb, m_kernel, m_kernel, w_term);
     }
   }
 
@@ -164,8 +169,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo1)
     //->Apply(b_utilities::Arguments)
-    ->Args({1024, 1000000, 4})
-    ->Args({1024, 10000000, 4})
+    ->Args({1024, static_cast<t_int>(1e8), 4, 1})
     //->Args({128, 1000, 4})
     ->UseManualTime()
     ->Repetitions(10)  //->ReportAggregatesOnly(true)
@@ -173,8 +177,7 @@ BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo1)
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo3)
     //->Apply(b_utilities::Arguments)
-    ->Args({1024, 1000000, 4})
-    ->Args({1024, 10000000, 4})
+    ->Args({1024, static_cast<t_int>(1e8), 4, 3})
     //->Args({128, 1000, 4})
     ->UseManualTime()
     ->Repetitions(10)  //->ReportAggregatesOnly(true)
