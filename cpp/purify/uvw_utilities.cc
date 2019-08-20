@@ -34,33 +34,36 @@ Matrix<t_real> generate_antennas(const t_uint N, const t_real scale) {
 
 utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B, const t_real frequency,
                                           const t_real times, const t_real theta_ra,
-                                          const t_real phi_dec) {
+                                          const t_real phi_dec, const t_real latitude) {
   return antenna_to_coverage(B, std::vector<t_real>(1, frequency), std::vector<t_real>(1, times),
-                             theta_ra, phi_dec);
+                             theta_ra, phi_dec, latitude);
 }
 
 utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B, const t_real frequency,
                                           const std::vector<t_real> &times, const t_real theta_ra,
-                                          const t_real phi_dec) {
-  return antenna_to_coverage(B, std::vector<t_real>(1, frequency), times, theta_ra, phi_dec);
+                                          const t_real phi_dec, const t_real latitude) {
+  return antenna_to_coverage(B, std::vector<t_real>(1, frequency), times, theta_ra, phi_dec,
+                             latitude);
 }
 
 utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B,
                                           const std::vector<t_real> &frequency, const t_real times,
-                                          const t_real theta_ra, const t_real phi_dec) {
-  return antenna_to_coverage(B, frequency, std::vector<t_real>(1, times), theta_ra, phi_dec);
+                                          const t_real theta_ra, const t_real phi_dec,
+                                          const t_real latitude) {
+  return antenna_to_coverage(B, frequency, std::vector<t_real>(1, times), theta_ra, phi_dec,
+                             latitude);
 }
 
 utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B,
                                           const std::vector<t_real> &frequencies,
                                           const std::vector<t_real> times, const t_real theta_ra,
-                                          const t_real phi_dec) {
+                                          const t_real phi_dec, const t_real latitude) {
   auto const position_angle_RA_function = [theta_ra](const t_real t) -> t_real {
     return theta_ra + constant::omega_e * t;
   };
   auto const position_angle_DEC_function = [phi_dec](const t_real t) -> t_real { return phi_dec; };
   return antenna_to_coverage_general<std::function<t_real(t_real)>>(
-      B, frequencies, times, position_angle_RA_function, position_angle_DEC_function);
+      B, frequencies, times, position_angle_RA_function, position_angle_DEC_function, latitude);
 }
 
 Matrix<t_real> read_ant_positions(const std::string &pos_name) {
