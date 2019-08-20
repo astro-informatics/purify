@@ -90,7 +90,7 @@ utilities::vis_params random_sample_density(const t_int vis_num, const t_real me
 Matrix<t_real> generate_antennas(const t_uint N, const t_real scale);
 template <class T>
 utilities::vis_params antenna_to_coverage(const t_uint N, const t_real scale, const T &frequency) {
-  return antenna_to_coverage(generate_antennas(N, scale), frequency, 0., 0., 0.);
+  return antenna_to_coverage(generate_antennas(N, scale), frequency, 0., 0., 0., 0.);
 }
 //! Using guassianly distributed (sigma = pi) antenna positions generate a coverage
 utilities::vis_params antenna_to_coverage(const t_uint N);

@@ -227,7 +227,7 @@ TEST_CASE("generate_baseline") {
     const t_real theta_ra = 0.;
     const t_real latitude = 0.;
     const utilities::vis_params test_coverage =
-        utilities::antenna_to_coverage(B, frequency, times, theta_ra, phi_dec);
+        utilities::antenna_to_coverage(B, frequency, times, theta_ra, phi_dec, latitude);
     CHECK(test_coverage.units == utilities::vis_units::lambda);
     const utilities::vis_params test_coverage_xyz = utilities::antenna_to_coverage(
         B.col(0), B.col(1), B.col(2), frequency, times, theta_ra, phi_dec, latitude);
@@ -287,7 +287,7 @@ TEST_CASE("generate_baseline") {
         CAPTURE(f_index);
         CAPTURE(frequency.size());
         const utilities::vis_params test_coverage_f =
-            utilities::antenna_to_coverage(B, f, t, theta_ra, phi_dec);
+            utilities::antenna_to_coverage(B, f, t, theta_ra, phi_dec, latitude);
         const t_int index = (k + j * frequency.size()) * M;
         CAPTURE(test_coverage.u.segment(index, M).head(5));
         CAPTURE(test_coverage_f.u.head(5));
