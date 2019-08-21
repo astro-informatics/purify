@@ -33,7 +33,7 @@ int main(int nargs, char const **args) {
   auto const kernel = "kb";
   const t_int channels = 80;
 
-  const std::string pos_filename = mwa_filename("Phase2_config.txt");
+  const std::string pos_filename = mwa_filename("Phase1_config.txt");
   t_uint const number_of_pixels = imsizex * imsizey;
   // Generating random uv(w) coverage
   t_real const sigma_m = constant::pi / 3;
@@ -41,7 +41,8 @@ int main(int nargs, char const **args) {
   Vector<t_real> mem_node = Vector<t_real>::Zero(world.size());
   std::vector<t_real> frequencies;
   for (t_int k = 0; k < channels; k++)
-    frequencies.push_back(87.68e6 + (world.rank() * channels + k - channels * 0.5) * 40e3);
+    frequencies.push_back(87.68e6 +
+                          (world.rank() * channels + k - world.size() * channels * 0.5) * 40e3);
 
   const std::vector<t_real> times = {0.,  8.,  16., 24., 32., 40.,  48., 56.,
                                      64., 72., 80., 88., 96., 104., 112.};
