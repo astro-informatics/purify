@@ -43,7 +43,7 @@ int main(int nargs, char const** args) {
   const t_int Jm = 4;
   const t_int Ju = 4;
   const t_int Jv = 4;
-  const t_int Jw = 100;
+  const t_int Jw = 1000;
   const t_real oversample_ratio_image_domain = 2;
   const t_real oversample_ratio = 2;
   const kernels::kernel kernel = kernels::kernel::kb;
@@ -67,12 +67,12 @@ int main(int nargs, char const** args) {
   //
   t_real const offset_dec = constant::pi * 0. / 180.;
   t_real const offset_ra = constant::pi * 0. / 180.;
-  const Vector<t_real> rotated_u =
-      spherical_resample::calculate_rotated_l(u, v, w, 0., -(phi_0 + offset_dec) , -(theta_0 + offset_ra));
-  const Vector<t_real> rotated_v =
-      spherical_resample::calculate_rotated_m(u, v, w, 0., -(phi_0 + offset_dec) , -(theta_0 + offset_ra));
-  const Vector<t_real> rotated_w =
-      spherical_resample::calculate_rotated_n(u, v, w, 0., -(phi_0 + offset_dec) , -(theta_0 + offset_ra));
+  const Vector<t_real> rotated_u = spherical_resample::calculate_rotated_l(
+      u, v, w, 0., (phi_0 + offset_dec), (theta_0 + offset_ra));
+  const Vector<t_real> rotated_v = spherical_resample::calculate_rotated_m(
+      u, v, w, 0., (phi_0 + offset_dec), (theta_0 + offset_ra));
+  const Vector<t_real> rotated_w = spherical_resample::calculate_rotated_n(
+      u, v, w, 0., (phi_0 + offset_dec), (theta_0 + offset_ra));
   const auto measure_op =
       spherical_resample::base_plane_degrid_wproj_operator<Vector<t_complex>,
                                                            std::function<t_real(t_int)>>(
@@ -106,13 +106,12 @@ int main(int nargs, char const** args) {
   const Vector<t_real> mask = spherical_resample::generate_mask(l, m, n, L, M);
   for (t_int index = 0; index < number_of_samples; index++) {
     fourier_mode(index) =
-        //       (mask(index) > 0)
-        // ?
-        std::conj(
-            std::exp(-2 * constant::pi * t_complex(0., 1.) *
-                     (l(index) * u(0) + m(index) * v(0) +
-                      (std::sqrt(1 - l(index) * l(index) - m(index) * m(index)) - 1) * w(0))));
-    //         : 0.;
+        (mask(index) > 0)
+            ? std::conj(
+                  std::exp(-2 * constant::pi * t_complex(0., 1.) *
+                           (l(index) * u(0) + m(index) * v(0) +
+                            (std::sqrt(1 - l(index) * l(index) - m(index) * m(index)) - 1) * w(0))))
+            : 0.;
   }
 
   pfitsio::write2d(Image<t_real>::Map(l.data(), num_theta, num_phi), "l_coordinates.fits");
