@@ -465,7 +465,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
 
   const t_int imsizex = std::pow(
       2, std::ceil(std::log2(std::floor(
-             L / std::min({0.25 / ((u.array() - u_mean).cwiseAbs().maxCoeff()), L / Jw})))));
+             L / std::min({0.25 / ((u.array() - u_mean).cwiseAbs().maxCoeff()), L / Jw * 2})))));
   const t_int imsizey = imsizex;
   const t_real dl = L / imsizex;
   const t_real dm = dl;
