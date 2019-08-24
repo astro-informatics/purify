@@ -149,7 +149,7 @@ std::vector<t_real> kernel_samples(const t_int total_samples,
      */
   std::vector<t_real> samples(total_samples);
   for (Vector<t_real>::Index i = 0; i < static_cast<t_int>(total_samples); ++i) {
-    samples[i] = kernelu(static_cast<t_real>(i) / total_samples * J - J / 2);
+    samples[i] = kernelu(2 * static_cast<t_real>(i) / total_samples * J);
   }
   return samples;
 }
@@ -160,7 +160,7 @@ t_real kernel_zero_interp(const std::vector<t_real> &samples, const t_real x, co
      */
   const t_int total_samples = samples.size();
 
-  const t_real i_effective = (x + J / 2) * total_samples / J;
+  const t_real i_effective = 2 * std::abs(x) * total_samples / J;
 
   const t_real i_0 = std::floor(i_effective);
   if (i_0 < 0 or i_0 >= total_samples) return 0.;

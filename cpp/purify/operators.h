@@ -255,7 +255,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
   const t_int ju_max = std::min(Ju, ftsizeu_);
   const t_int jv_max = std::min(Jv, ftsizev_);
   const auto samples =
-      kernels::kernel_samples(1e6, [&](const t_real x) { return kernelu(x); }, ju_max);
+      kernels::kernel_samples(1e5, [&](const t_real x) { return kernelu(x); }, ju_max);
   const t_real total_samples = samples.size();
   const auto degrid = [rows, ju_max, jv_max, I, u_ptr, v_ptr, weights_ptr, samples, total_samples,
                        ftsizeu_, ftsizev_](T &output, const T &input) {
@@ -268,17 +268,21 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
       const t_real v_val = (*v_ptr)(m);
       const t_real k_u = std::floor(u_val - ju_max * 0.5);
       const t_real k_v = std::floor(v_val - jv_max * 0.5);
-      for (t_int ju = 1; ju < ju_max + 1; ++ju) {
-        const t_uint q = utilities::mod(k_u + ju, ftsizeu_);
-        const t_real i_0 = std::floor((u_val - (k_u + ju) + ju_max / 2) * total_samples / ju_max);
-        const t_real kernelu_val = samples[(static_cast<t_int>(i_0))];
-        for (t_int jv = 1; jv < jv_max + 1; ++jv) {
-          const t_uint p = utilities::mod(k_v + jv, ftsizev_);
-          const t_real c_0 = std::floor((v_val - (k_v + jv) + jv_max / 2) * total_samples / jv_max);
-          const t_real kernelv_val = samples[(static_cast<t_int>(c_0))];
+      for (t_int jv = 1; jv < jv_max + 1; ++jv) {
+        const t_uint p = utilities::mod(k_v + jv, ftsizev_);
+        const t_real c_0 = static_cast<t_int>(std::floor(2 * std::abs(v_val - (k_v + jv)) * total_samples / jv_max));
+        assert(c_0 >= 0);
+        assert(c_0 < total_samples);
+        const t_real kernelv_val = samples[c_0];
+        for (t_int ju = 1; ju < ju_max + 1; ++ju) {
+          const t_uint q = utilities::mod(k_u + ju, ftsizeu_);
+          const t_int i_0 = static_cast<t_int>(std::floor(2 * std::abs(u_val - (k_u + ju)) * total_samples / ju_max));
+          assert(i_0 >= 0);
+          assert(i_0 < total_samples);
+          const t_real kernelu_val = samples[i_0];
           const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
-          const t_real sign = (1 - 2 * (index % 2));
-          result += input(index) * kernelu_val * kernelv_val * sign;
+          const t_real sign = (1 - 2 * (index % 2)) * kernelu_val * kernelv_val;
+          result += input(index) * sign;
         }
       }
       output(m) = result;
