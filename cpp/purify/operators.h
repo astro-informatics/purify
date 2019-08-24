@@ -251,36 +251,39 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
   const std::shared_ptr<Vector<t_real>> v_ptr = std::make_shared<Vector<t_real>>(v);
   const std::shared_ptr<Vector<t_complex>> weights_ptr =
       std::make_shared<Vector<t_complex>>(weights);
-  const std::shared_ptr<std::function<t_real(t_real)>> kernelu_ptr =
-      std::make_shared<std::function<t_real(t_real)>>(kernelu);
-  const std::shared_ptr<std::function<t_real(t_real)>> kernelv_ptr =
-      std::make_shared<std::function<t_real(t_real)>>(kernelv);
-
   const t_complex I(0, 1);
   const t_int ju_max = std::min(Ju, ftsizeu_);
   const t_int jv_max = std::min(Jv, ftsizev_);
-  // If I collapse this for loop there is a crash when using MPI... Sparse<>::insert() doesn't work
-  // right
-  const auto degrid = [rows, ju_max, jv_max, I, u_ptr, v_ptr, weights_ptr, kernelu, kernelv,
+  const auto samples =
+      kernels::kernel_samples(1e6, [&](const t_real x) { return kernelu(x); }, ju_max);
+  const t_real total_samples = samples.size();
+  const auto degrid = [rows, ju_max, jv_max, I, u_ptr, v_ptr, weights_ptr, samples, total_samples,
                        ftsizeu_, ftsizev_](T &output, const T &input) {
     output = T::Zero(u_ptr->size());
     assert(input.size() == ftsizeu_ * ftsizev_);
 #pragma omp parallel for
     for (t_int m = 0; m < rows; ++m) {
+      t_complex result = 0;
+      const t_real u_val = (*u_ptr)(m);
+      const t_real v_val = (*v_ptr)(m);
+      const t_real k_u = std::floor(u_val - ju_max * 0.5);
+      const t_real k_v = std::floor(v_val - jv_max * 0.5);
       for (t_int ju = 1; ju < ju_max + 1; ++ju) {
+        const t_uint q = utilities::mod(k_u + ju, ftsizeu_);
+        const t_real i_0 = std::floor((u_val - (k_u + ju) + ju_max / 2) * total_samples / ju_max);
+        const t_real kernelu_val = samples[(static_cast<t_int>(i_0))];
         for (t_int jv = 1; jv < jv_max + 1; ++jv) {
-          const t_real k_u = std::floor((*u_ptr)(m)-ju_max * 0.5);
-          const t_real k_v = std::floor((*v_ptr)(m)-jv_max * 0.5);
-          const t_uint q = utilities::mod(k_u + ju, ftsizeu_);
           const t_uint p = utilities::mod(k_v + jv, ftsizev_);
+          const t_real c_0 = std::floor((v_val - (k_v + jv) + jv_max / 2) * total_samples / jv_max);
+          const t_real kernelv_val = samples[(static_cast<t_int>(c_0))];
           const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
-          output(m) += input(index) *
-                       std::exp(-2 * constant::pi * I * ((k_u + ju) * 0.5 + (k_v + jv) * 0.5)) *
-                       kernelu((*u_ptr)(m) - (k_u + ju)) * kernelv((*v_ptr)(m) - (k_v + jv)) *
-                       (*weights_ptr)(m);
+          const t_real sign = (1 - 2 * (index % 2));
+          result += input(index) * kernelu_val * kernelv_val * sign;
         }
       }
+      output(m) = result;
     }
+    output.array() *= (*weights_ptr).array();
   };
   const auto grid = [rows, ju_max, jv_max, I, u_ptr, v_ptr, weights_ptr, kernelu, kernelv, ftsizeu_,
                      ftsizev_](T &output, const T &input) {
