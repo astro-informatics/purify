@@ -47,10 +47,10 @@ t_real pswf(const t_real x, const t_real J);
 //! Fourier transform of PSWF kernel
 t_real ft_pswf(const t_real x, const t_real J);
 //! Calculates samples of a kernel
-Vector<t_real> kernel_samples(const t_real total_samples,
+std::vector<t_real> kernel_samples(const t_int total_samples,
                               const std::function<t_real(t_real)> kernelu, const t_real J);
 //! zeroth order interpolates from samples of kernel
-t_real kernel_zero_interp(const Vector<t_real> &samples, const t_real x, const t_real J);
+t_real kernel_zero_interp(const std::vector<t_real> &samples, const t_real x, const t_real J);
 //! linearly interpolates from samples of kernel
 t_real kernel_linear_interp(const Vector<t_real> &samples, const t_real x, const t_real J);
 //! Box car function for kernel
