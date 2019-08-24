@@ -16,7 +16,7 @@ class GridOperatorFixture : public ::benchmark::Fixture {
     const t_real oversample_ratio = 2;
     std::function<t_real(t_real)> kernelu, kernelv, ftkernelu, ftkernelv;
     std::tie(kernelu, kernelv, ftkernelu, ftkernelv) =
-        purify::create_kernels(kernels::kernel::kb_presample, Ju, Jv, m_imsizey, m_imsizey, oversample_ratio);
+        purify::create_kernels(kernels::kernel::kb, Ju, Jv, m_imsizey, m_imsizey, oversample_ratio);
     const auto uv_vis = b_utilities::random_measurements(M);
     Gop = purify::operators::init_on_the_fly_gridding_matrix_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, uv_vis.weights, m_imsizey, m_imsizex, oversample_ratio, kernelv,
@@ -53,7 +53,7 @@ BENCHMARK_DEFINE_F(GridOperatorFixture, Apply)(benchmark::State& state) {
 BENCHMARK_REGISTER_F(GridOperatorFixture, Apply)
     //->Apply(b_utilities::Arguments)
     ->RangeMultiplier(2)
-    ->Range(100000, 100000 << 5)
+    ->Range(100000, 100000 << 11)
     ->UseManualTime()
     ->Repetitions(10)
     ->ReportAggregatesOnly(true)
