@@ -153,6 +153,20 @@ Vector<t_real> kernel_samples(const t_real total_samples,
   }
   return samples;
 }
+t_real kernel_zero_interp(const Vector<t_real> &samples, const t_real x, const t_real J) {
+  /*
+     Calculates kernel using linear interpolation between pre-calculated samples. (see Rapid
+     gridding reconstruction with a minimal oversampling ratio, Beatty et. al. 2005)
+     */
+  const t_int total_samples = samples.size();
+
+  const t_real i_effective = (x + J / 2) * total_samples / J;
+
+  const t_real i_0 = std::floor(i_effective);
+  if (i_0 < 0 or i_0 >= total_samples) return 0.;
+
+  return samples(static_cast<t_int>(i_0));
+}
 
 t_real kernel_linear_interp(const Vector<t_real> &samples, const t_real x, const t_real J) {
   /*
@@ -246,6 +260,18 @@ create_kernels(const kernels::kernel kernel_name_, const t_uint Ju_, const t_uin
   case kernels::kernel::kb: {
     auto kbu = [=](const t_real x) { return kernels::kaiser_bessel(x, Ju_); };
     auto kbv = [=](const t_real x) { return kernels::kaiser_bessel(x, Jv_); };
+    auto ftkbu = [=](const t_real x) { return kernels::ft_kaiser_bessel(x / ftsizeu_ - 0.5, Ju_); };
+    auto ftkbv = [=](const t_real x) { return kernels::ft_kaiser_bessel(x / ftsizev_ - 0.5, Jv_); };
+    return std::make_tuple(kbu, kbv, ftkbu, ftkbv);
+    break;
+  }
+  case kernels::kernel::kb_presample: {
+    if (Ju_ != Jv_)
+      throw std::runtime_error("Ju and Jv must be the same support size for presampling kernels.");
+    const Vector<t_real> samples = kernels::kernel_samples(
+        1e5, [&](const t_real x) { return kernels::kaiser_bessel(x, Ju_); }, Ju_);
+    auto kbu = [=](const t_real x) { return kernels::kernel_zero_interp(samples, x, Ju_); };
+    auto kbv = [=](const t_real x) { return kernels::kernel_zero_interp(samples, x, Jv_); };
     auto ftkbu = [=](const t_real x) { return kernels::ft_kaiser_bessel(x / ftsizeu_ - 0.5, Ju_); };
     auto ftkbv = [=](const t_real x) { return kernels::ft_kaiser_bessel(x / ftsizev_ - 0.5, Jv_); };
     return std::make_tuple(kbu, kbv, ftkbu, ftkbv);
