@@ -54,7 +54,31 @@ BENCHMARK_DEFINE_F(GridOperatorFixture, Apply)(benchmark::State& state) {
   }
 }
 
+BENCHMARK_DEFINE_F(GridOperatorFixture, ApplyAdjoint)(benchmark::State& state) {
+  const t_real oversample_ratio = 2;
+  const t_uint N = m_imsizex * m_imsizey * oversample_ratio * oversample_ratio;
+  const auto& backward = std::get<1>(Gop);
+
+  const Vector<t_complex> input = Vector<t_complex>::Random(M);
+  Vector<t_complex> output = Vector<t_complex>::Zero(N);
+  backward(output, input);
+  while (state.KeepRunning()) {
+    auto start = std::chrono::high_resolution_clock::now();
+    backward(output, input);
+    auto end = std::chrono::high_resolution_clock::now();
+    state.SetIterationTime(b_utilities::duration(start, end));
+  }
+}
 BENCHMARK_REGISTER_F(GridOperatorFixture, Apply)
+    //->Apply(b_utilities::Arguments)
+    ->RangeMultiplier(2)
+    ->Range(100000, 100000 << 11)
+    ->UseManualTime()
+    ->Repetitions(10)
+    ->ReportAggregatesOnly(true)
+    ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_REGISTER_F(GridOperatorFixture, ApplyAdjoint)
     //->Apply(b_utilities::Arguments)
     ->RangeMultiplier(2)
     ->Range(100000, 100000 << 11)

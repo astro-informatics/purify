@@ -270,13 +270,15 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
       const t_real k_v = std::floor(v_val - jv_max * 0.5);
       for (t_int jv = 1; jv < jv_max + 1; ++jv) {
         const t_uint p = utilities::mod(k_v + jv, ftsizev_);
-        const t_real c_0 = static_cast<t_int>(std::floor(2 * std::abs(v_val - (k_v + jv)) * total_samples / jv_max));
+        const t_real c_0 = static_cast<t_int>(
+            std::floor(2 * std::abs(v_val - (k_v + jv)) * total_samples / jv_max));
         assert(c_0 >= 0);
         assert(c_0 < total_samples);
         const t_real kernelv_val = samples[c_0];
         for (t_int ju = 1; ju < ju_max + 1; ++ju) {
           const t_uint q = utilities::mod(k_u + ju, ftsizeu_);
-          const t_int i_0 = static_cast<t_int>(std::floor(2 * std::abs(u_val - (k_u + ju)) * total_samples / ju_max));
+          const t_int i_0 = static_cast<t_int>(
+              std::floor(2 * std::abs(u_val - (k_u + ju)) * total_samples / ju_max));
           assert(i_0 >= 0);
           assert(i_0 < total_samples);
           const t_real kernelu_val = samples[i_0];
@@ -289,25 +291,34 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
     }
     output.array() *= (*weights_ptr).array();
   };
-  const auto grid = [rows, ju_max, jv_max, I, u_ptr, v_ptr, weights_ptr, kernelu, kernelv, ftsizeu_,
-                     ftsizev_](T &output, const T &input) {
+  const auto grid = [rows, ju_max, jv_max, I, u_ptr, v_ptr, weights_ptr, samples, total_samples,
+                       ftsizeu_, ftsizev_](T &output, const T &input) {
     output = T::Zero(ftsizeu_ * ftsizev_);
     assert(output.size() == ftsizeu_ * ftsizev_);
 #pragma omp parallel for
     for (t_int m = 0; m < rows; ++m) {
-      for (t_int ju = 1; ju < ju_max + 1; ++ju) {
-        for (t_int jv = 1; jv < jv_max + 1; ++jv) {
-          const t_real k_u = std::floor((*u_ptr)(m)-ju_max * 0.5);
-          const t_real k_v = std::floor((*v_ptr)(m)-jv_max * 0.5);
+      const t_real u_val = (*u_ptr)(m);
+      const t_real v_val = (*v_ptr)(m);
+      const t_real k_u = std::floor(u_val - ju_max * 0.5);
+      const t_real k_v = std::floor(v_val - jv_max * 0.5);
+      const t_complex vis = input(m) * std::conj((*weights_ptr)(m));
+      for (t_int jv = 1; jv < jv_max + 1; ++jv) {
+        const t_uint p = utilities::mod(k_v + jv, ftsizev_);
+        const t_real c_0 = static_cast<t_int>(
+            std::floor(2 * std::abs(v_val - (k_v + jv)) * total_samples / jv_max));
+        assert(c_0 >= 0);
+        assert(c_0 < total_samples);
+        const t_real kernelv_val = samples[c_0];
+        for (t_int ju = 1; ju < ju_max + 1; ++ju) {
           const t_uint q = utilities::mod(k_u + ju, ftsizeu_);
-          const t_uint p = utilities::mod(k_v + jv, ftsizev_);
+          const t_int i_0 = static_cast<t_int>(
+              std::floor(2 * std::abs(u_val - (k_u + ju)) * total_samples / ju_max));
+          assert(i_0 >= 0);
+          assert(i_0 < total_samples);
+          const t_real kernelu_val = samples[i_0];
           const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
-#pragma omp critical(add_to_grid)
-          output(index) +=
-              input(m) *
-              std::conj(std::exp(-2 * constant::pi * I * ((k_u + ju) * 0.5 + (k_v + jv) * 0.5)) *
-                        kernelu((*u_ptr)(m) - (k_u + ju)) * kernelv((*v_ptr)(m) - (k_v + jv)) *
-                        (*weights_ptr)(m));
+          const t_real sign = (1 - 2 * (index % 2)) * kernelu_val * kernelv_val;
+          output(index) += vis * sign;
         }
       }
     }
