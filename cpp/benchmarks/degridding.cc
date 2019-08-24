@@ -10,17 +10,21 @@ using namespace purify;
 class GridOperatorFixture : public ::benchmark::Fixture {
  public:
   void SetUp(const ::benchmark::State& state) {
-    M = state.range(0);
     const t_uint Ju = 4;
     const t_uint Jv = 4;
     const t_real oversample_ratio = 2;
     std::function<t_real(t_real)> kernelu, kernelv, ftkernelu, ftkernelv;
     std::tie(kernelu, kernelv, ftkernelu, ftkernelv) =
         purify::create_kernels(kernels::kernel::kb, Ju, Jv, m_imsizey, m_imsizey, oversample_ratio);
-    const auto uv_vis = b_utilities::random_measurements(M);
-    Gop = purify::operators::init_on_the_fly_gridding_matrix_2d<Vector<t_complex>>(
-        uv_vis.u, uv_vis.v, uv_vis.weights, m_imsizey, m_imsizex, oversample_ratio, kernelv,
-        kernelu, Ju, Jv);
+    t_real const sigma_m = constant::pi / 3;
+    if (M != state.range(0)) {
+      M = state.range(0);
+      auto uv_vis = utilities::random_sample_density(M, 0, sigma_m, 0.);
+      uv_vis.units = utilities::vis_units::radians;
+      Gop = purify::operators::init_on_the_fly_gridding_matrix_2d<Vector<t_complex>>(
+          uv_vis.u, uv_vis.v, uv_vis.weights, m_imsizey, m_imsizex, oversample_ratio, kernelv,
+          kernelu, Ju, Jv);
+    }
   }
 
   void TearDown(const ::benchmark::State& state) {}
