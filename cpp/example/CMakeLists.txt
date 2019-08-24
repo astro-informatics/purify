@@ -20,6 +20,7 @@ add_example(sdmm_m31_simulation LIBRARIES libpurify NOTEST)
 add_example(padmm_simulation LIBRARIES libpurify NOTEST)
 add_example(padmm_reweighted_simulation LIBRARIES libpurify NOTEST)
 add_example(sara_padmm_random_coverage LIBRARIES libpurify NOTEST)
+add_example(spherical_reconstruction LIBRARIES libpurify NOTEST)
 
 
 
