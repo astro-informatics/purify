@@ -161,6 +161,7 @@ utilities::vis_params read_visibility(const std::string &vis_name, const bool w_
   t_real real;
   t_real imag;
   t_real entry;
+#pragma omp parallel for
   for (row = 0; row < vistemp.size(); ++row) {
     utemp(row) = streamtoreal(vis_file);
     vtemp(row) = streamtoreal(vis_file);
