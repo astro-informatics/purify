@@ -142,14 +142,14 @@ t_real ft_pswf(const t_real x, const t_real J) {
 }
 
 std::vector<t_real> kernel_samples(const t_int total_samples,
-                                   const std::function<t_real(t_real)> kernelu, const t_real J) {
+                                   const std::function<t_real(t_real)> kernelu) {
   /*
      Pre-calculates samples of a kernel, that can be used with linear interpolation (see Rapid
      gridding reconstruction with a minimal oversampling ratio, Beatty et. al. 2005)
      */
   std::vector<t_real> samples(total_samples);
   for (Vector<t_real>::Index i = 0; i < static_cast<t_int>(total_samples); ++i) {
-    samples[i] = kernelu(2 * static_cast<t_real>(i) / total_samples * J);
+    samples[i] = kernelu(static_cast<t_real>(i) / total_samples);
   }
   return samples;
 }
@@ -269,7 +269,7 @@ create_kernels(const kernels::kernel kernel_name_, const t_uint Ju_, const t_uin
     if (Ju_ != Jv_)
       throw std::runtime_error("Ju and Jv must be the same support size for presampling kernels.");
     const auto samples = kernels::kernel_samples(
-        1e5, [&](const t_real x) { return kernels::kaiser_bessel(x, Ju_); }, Ju_);
+        1e5, [&](const t_real x) { return kernels::kaiser_bessel(x, Ju_); });
     auto kbu = [=](const t_real x) { return kernels::kernel_zero_interp(samples, x, Ju_); };
     auto kbv = [=](const t_real x) { return kernels::kernel_zero_interp(samples, x, Jv_); };
     auto ftkbu = [=](const t_real x) { return kernels::ft_kaiser_bessel(x / ftsizeu_ - 0.5, Ju_); };

@@ -255,7 +255,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
   const t_int ju_max = std::min(Ju, ftsizeu_);
   const t_int jv_max = std::min(Jv, ftsizev_);
   const auto samples =
-      kernels::kernel_samples(1e5, [&](const t_real x) { return kernelu(x); }, ju_max);
+      kernels::kernel_samples(5e5, [&](const t_real x) { return kernelu(x * ju_max * 0.5); });
   const t_real total_samples = samples.size();
   const auto degrid = [rows, ju_max, jv_max, I, u_ptr, v_ptr, weights_ptr, samples, total_samples,
                        ftsizeu_, ftsizev_](T &output, const T &input) {
@@ -274,16 +274,16 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
             std::floor(2 * std::abs(v_val - (k_v + jv)) * total_samples / jv_max));
         assert(c_0 >= 0);
         assert(c_0 < total_samples);
-        const t_real kernelv_val = samples[c_0];
+        const t_real kernelv_val = samples[c_0] * (1. - (2 * (p % 2)));
         for (t_int ju = 1; ju < ju_max + 1; ++ju) {
           const t_uint q = utilities::mod(k_u + ju, ftsizeu_);
           const t_int i_0 = static_cast<t_int>(
               std::floor(2 * std::abs(u_val - (k_u + ju)) * total_samples / ju_max));
           assert(i_0 >= 0);
           assert(i_0 < total_samples);
-          const t_real kernelu_val = samples[i_0];
+          const t_real kernelu_val = samples[i_0] * (1. - (2 * (q % 2)));
           const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
-          const t_real sign = (1 - 2 * (index % 2)) * kernelu_val * kernelv_val;
+          const t_real sign = kernelu_val * kernelv_val;
           result += input(index) * sign;
         }
       }
@@ -292,7 +292,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
     output.array() *= (*weights_ptr).array();
   };
   const auto grid = [rows, ju_max, jv_max, I, u_ptr, v_ptr, weights_ptr, samples, total_samples,
-                       ftsizeu_, ftsizev_](T &output, const T &input) {
+                     ftsizeu_, ftsizev_](T &output, const T &input) {
     output = T::Zero(ftsizeu_ * ftsizev_);
     assert(output.size() == ftsizeu_ * ftsizev_);
 #pragma omp parallel for
@@ -308,16 +308,16 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
             std::floor(2 * std::abs(v_val - (k_v + jv)) * total_samples / jv_max));
         assert(c_0 >= 0);
         assert(c_0 < total_samples);
-        const t_real kernelv_val = samples[c_0];
+        const t_real kernelv_val = samples[c_0] * (1. - (2 * (p % 2)));
         for (t_int ju = 1; ju < ju_max + 1; ++ju) {
           const t_uint q = utilities::mod(k_u + ju, ftsizeu_);
           const t_int i_0 = static_cast<t_int>(
               std::floor(2 * std::abs(u_val - (k_u + ju)) * total_samples / ju_max));
           assert(i_0 >= 0);
           assert(i_0 < total_samples);
-          const t_real kernelu_val = samples[i_0];
+          const t_real kernelu_val = samples[i_0] * (1. - (2 * (q % 2)));
           const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
-          const t_real sign = (1 - 2 * (index % 2)) * kernelu_val * kernelv_val;
+          const t_real sign = kernelu_val * kernelv_val;
           output(index) += vis * sign;
         }
       }

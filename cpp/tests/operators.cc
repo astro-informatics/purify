@@ -70,6 +70,8 @@ TEST_CASE("Operators") {
             Vector<t_complex>::Map(operators_test::direct_input.data(), ftsizeu * ftsizev));
     CHECK(direct_output.size() == M);
     CHECK(direct_output.size() == operators_test::expected_direct.size());
+    CAPTURE(direct_output);
+    CAPTURE(operators_test::expected_direct);
     REQUIRE(direct_output.isApprox(Vector<t_complex>::Map(operators_test::expected_direct.data(),
                                                           operators_test::expected_direct.size()),
                                    1e-5));
