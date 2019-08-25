@@ -29,13 +29,13 @@ int main(int nargs, char const** args) {
       static_cast<TYPE>((nargs > ARGN) ? std::stod(static_cast<std::string>(args[ARGN])) : VALUE);
 
   ARGS_MACRO(L, 3, 1., t_real)
-  ARGS_MACRO(M, 4, 1., t_real)
-  ARGS_MACRO(u_val, 5, 0., t_real)
-  ARGS_MACRO(v_val, 6, 0., t_real)
-  ARGS_MACRO(w_val, 7, 0., t_real)
-  ARGS_MACRO(uvw_stacking, 8, 0., bool)
+  ARGS_MACRO(u_val, 4, 0., t_real)
+  ARGS_MACRO(v_val, 5, 0., t_real)
+  ARGS_MACRO(w_val, 6, 0., t_real)
+  ARGS_MACRO(uvw_stacking, 7, 0., bool)
+  ARGS_MACRO(coordinate_scaling, 8, 1., t_real)
 #undef ARGS_MACRO
-
+  const t_real M = L;
   const t_int num_theta = 1024;
   const t_int num_phi = 512;
   const t_int number_of_samples = num_theta * num_phi;
@@ -84,7 +84,7 @@ int main(int nargs, char const** args) {
           spherical_resample::calculate_rotated_n(rotated_u, rotated_v, rotated_w, -theta_0, -phi_0,
                                                   0.),
           weights, oversample_ratio, oversample_ratio_image_domain, kernel, Ju, Jw, Jl, Jm, ft_plan,
-          uvw_stacking, L, 1e-8, 1e-8);
+          uvw_stacking, L, 1e-8, 1e-8, coordinate_scaling);
 
   sopt::LinearTransform<Vector<t_complex>> const m_op = sopt::LinearTransform<Vector<t_complex>>(
       std::get<0>(measure_op), {0, 1, number_of_samples}, std::get<1>(measure_op), {0, 1, num_vis});
@@ -107,10 +107,11 @@ int main(int nargs, char const** args) {
   for (t_int index = 0; index < number_of_samples; index++) {
     fourier_mode(index) =
         (mask(index) > 0)
-            ? std::conj(
-                  std::exp(-2 * constant::pi * t_complex(0., 1.) *
-                           (l(index) * u(0) + m(index) * v(0) +
-                            (std::sqrt(1 - l(index) * l(index) - m(index) * m(index)) - 1) * w(0))))
+            ? std::conj(std::exp(-2 * constant::pi * t_complex(0., 1.) *
+                                 (l(index) * u(0) * coordinate_scaling +
+                                  m(index) * v(0) * coordinate_scaling +
+                                  (std::sqrt(1 - l(index) * l(index) - m(index) * m(index)) - 1) *
+                                      w(0) * coordinate_scaling)))
             : 0.;
   }
 
