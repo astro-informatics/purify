@@ -53,14 +53,12 @@ Vector<t_real> generate_mask(const Vector<t_real> &l, const Vector<t_real> &m,
   return mask;
 }
 
-Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<t_real> &m,
-                                          const t_int imsizey_upsampled,
-                                          const t_int imsizex_upsampled,
-                                          const std::function<t_real(t_real)> kernell,
-                                          const std::function<t_real(t_real)> kernelm,
-                                          const t_int Jl, const t_int Jm,
-                                          const std::function<t_complex(t_real, t_real)> &dde,
-                                          const t_real dl_upsampled, const t_real dm_upsampled) {
+Sparse<t_complex> init_resample_matrix_2d(
+    const Vector<t_real> &l, const Vector<t_real> &m, const t_int imsizey_upsampled,
+    const t_int imsizex_upsampled, const std::function<t_real(t_real)> kernell,
+    const std::function<t_real(t_real)> kernelm, const t_int Jl, const t_int Jm,
+    const std::function<t_complex(t_real, t_real)> &dde, const t_real dl_upsampled,
+    const t_real dm_upsampled) {
   const t_int rows = l.size();
   const t_int cols = imsizex_upsampled * imsizey_upsampled;
   if (l.size() != m.size())
@@ -78,12 +76,12 @@ Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<
   for (t_int k = 0; k < rows; ++k) {
     for (t_int jl = 1; jl < jl_max + 1; ++jl) {
       for (t_int jm = 1; jm < jm_max + 1; ++jm) {
-        const t_real k_l = std::floor(l(k) - jl_max * 0.5);
-        const t_real k_m = std::floor(m(k) - jm_max * 0.5);
+        const t_real k_l = std::floor(l(k)  - jl_max * 0.5);
+        const t_real k_m = std::floor(m(k)  - jm_max * 0.5);
         const t_int q = k_l + jl;
         const t_int p = k_m + jm;
-        const t_int index = utilities::sub2ind(std::floor(p + imsizey_upsampled * 0.5),
-                                               std::floor(q + imsizex_upsampled * 0.5),
+        const t_int index = utilities::sub2ind(std::floor((p + imsizey_upsampled * 0.5)),
+                                               std::floor((q + imsizex_upsampled * 0.5)),
                                                imsizey_upsampled, imsizex_upsampled);
         assert(k >= 0);
         assert(k < rows);

@@ -59,12 +59,6 @@ std::vector<t_int> generate_indicies(const Vector<t_real> &l, const Vector<t_rea
 Vector<t_real> generate_mask(const Vector<t_real> &l, const Vector<t_real> &m,
                              const Vector<t_real> &n, const t_real L, const t_real M);
 //! sparse matrix that degrids/grids between spherical sampling pattern and regular grid
-Sparse<t_complex> init_resample_matrix_2d(const Vector<t_real> &l, const Vector<t_real> &m,
-                                          const t_int imsizey_upsampled,
-                                          const t_int imsizex_upsampled,
-                                          const std::function<t_real(t_real)> kernell,
-                                          const std::function<t_real(t_real)> kernelm,
-                                          const t_int Jl, const t_int Jm);
 Sparse<t_complex> init_resample_matrix_2d(
     const Vector<t_real> &l, const Vector<t_real> &m, const t_int imsizey_upsampled,
     const t_int imsizex_upsampled, const std::function<t_real(t_real)> kernell,
@@ -157,7 +151,8 @@ std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_mask_and_r
     const T &phi, const t_int imsizey, const t_int imsizex,
     const t_real oversample_ratio_image_domain, const t_real dl, const t_real dm,
     const std::function<t_real(t_real)> &kernell, const std::function<t_real(t_real)> &kernelm,
-    const t_int Jl, const t_int Jm, const std::function<t_complex(t_real, t_real)> &dde) {
+    const t_int Jl, const t_int Jm, const std::function<t_complex(t_real, t_real)> &dde,
+    const t_real coordinate_scaling) {
   if ((Jl <= 0) or (Jm <= 0))
     throw std::runtime_error("Support size of resampling kernel is not positive");
   if ((imsizex <= 0) or (imsizey <= 0))
@@ -181,8 +176,9 @@ std::tuple<sopt::OperatorFunction<K>, sopt::OperatorFunction<K>> init_mask_and_r
   const auto cutting_operator = init_pop_indicies_operator<K>(indicies, number_of_samples);
   // Operator to perform resampling
   const auto gridding_operator = init_resample_operator_2d<K>(
-      number_of_samples, l_compressed, m_compressed, imsizey_upsampled, imsizex_upsampled, kernell,
-      kernelm, Jl, Jm, dde, dl_upsampled, dm_upsampled);
+      number_of_samples, l_compressed * coordinate_scaling, m_compressed * coordinate_scaling,
+      imsizey_upsampled, imsizex_upsampled, kernell, kernelm, Jl, Jm, dde, dl_upsampled,
+      dm_upsampled);
   // Combining them together
   auto direct =
       sopt::chained_operators<K>(std::get<0>(gridding_operator), std::get<0>(cutting_operator));
@@ -373,7 +369,8 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
     const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
     const t_uint Jl = 4, const t_uint Jm = 4,
     const operators::fftw_plan &ft_plan = operators::fftw_plan::measure,
-    const bool uvw_stacking = false, const t_real L = 1, const t_real M = 1) {
+    const bool uvw_stacking = false, const t_real L = 1, const t_real M = 1,
+    const t_real coordinate_scaling = 1.) {
   t_real const w_mean = uvw_stacking ? w.array().mean() : 0.;
   t_real const v_mean = uvw_stacking ? v.array().mean() : 0.;
   t_real const u_mean = uvw_stacking ? u.array().mean() : 0.;
@@ -422,7 +419,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
   sopt::OperatorFunction<T> directP, indirectP;
   std::tie(directP, indirectP) = init_mask_and_resample_operator_2d<T, K>(
       number_of_samples, theta_0, phi_0, theta, phi, imsizey, imsizex,
-      oversample_ratio_image_domain, dl, dm, kernell, kernelm, Jl, Jm, dde);
+      oversample_ratio_image_domain, dl, dm, kernell, kernelm, Jl, Jm, dde, coordinate_scaling);
   sopt::OperatorFunction<T> directZFZ, indirectZFZ;
   std::tie(directZFZ, indirectZFZ) =
       base_padding_and_FFT_2d<T>(ftkernelu, ftkernelv, ftkernell, ftkernelm, imsizey, imsizex,
@@ -458,7 +455,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
     const t_uint Jl = 4, const t_uint Jm = 4,
     const operators::fftw_plan &ft_plan = operators::fftw_plan::measure,
     const bool uvw_stacking = false, const t_real L = 1, const t_real absolute_error = 1e-6,
-    const t_real relative_error = 1e-6) {
+    const t_real relative_error = 1e-6, const t_real coordinate_scaling = 1.) {
   t_real const w_mean = uvw_stacking ? w.array().mean() : 0.;
   t_real const v_mean = uvw_stacking ? v.array().mean() : 0.;
   t_real const u_mean = uvw_stacking ? u.array().mean() : 0.;
@@ -510,7 +507,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
   sopt::OperatorFunction<T> directP, indirectP;
   std::tie(directP, indirectP) = init_mask_and_resample_operator_2d<T, K>(
       number_of_samples, theta_0, phi_0, theta, phi, imsizey, imsizex,
-      oversample_ratio_image_domain, dl, dm, kernell, kernelm, Jl, Jm, dde);
+      oversample_ratio_image_domain, dl, dm, kernell, kernelm, Jl, Jm, dde, coordinate_scaling);
 
   sopt::OperatorFunction<T> directZFZ, indirectZFZ;
   std::tie(directZFZ, indirectZFZ) =
@@ -524,8 +521,8 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
   PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
   sopt::OperatorFunction<T> directG, indirectG;
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
-      (u.array() - u_mean) / du, (v.array() - v_mean) / dv, w.array() - w_mean, weights, imsizey,
-      imsizex, oversample_ratio, ftkerneluv, kerneluv, Ju, Jw, du, dv, absolute_error,
+      (u.array() - u_mean) / du, (v.array() - v_mean) / dv, w.array() - w_mean, weights,
+      imsizey, imsizex, oversample_ratio, ftkerneluv, kerneluv, Ju, Jw, du, dv, absolute_error,
       relative_error, dde_type::wkernel_radial);
 
   const auto direct = sopt::chained_operators<T>(directG, directZFZ, directP);
