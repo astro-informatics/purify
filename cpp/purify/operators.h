@@ -277,9 +277,6 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
   const auto degrid = [rows, ju_max, jv_max, I, u_ptr, v_ptr, weights_ptr, samples, total_samples,
                        ftsizeu_, ftsizev_, nonZeros](T &output, const T &input) {
     output = T::Zero(u_ptr->size());
-    T input_compressed = T::Zero(nonZeros.size());
-    for (t_int index = 0; index < input_compressed.size(); index++)
-      input_compressed(index) = input(nonZeros.at(index));
     assert(input.size() == ftsizeu_ * ftsizev_);
 #pragma omp parallel for
     for (t_int m = 0; m < rows; ++m) {
@@ -304,7 +301,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
           const t_real kernelu_val = samples[i_0] * (1. - (2 * (q % 2)));
           const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
           const t_real sign = kernelu_val * kernelv_val;
-          result += input_compressed(nonZeros[index]) * sign;
+          result += input(index) * sign;
         }
       }
       output(m) = result;
@@ -347,7 +344,6 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
         }
       }
     }
-#pragma omp parallel for
     for (t_int index = 0; index < nonZeros.size(); index++)
       for (t_int m = 0; m < omp_get_max_threads(); m++){
         const t_int loop_shift = m * nonZeros.size();
