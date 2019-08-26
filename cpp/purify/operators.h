@@ -273,9 +273,15 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
       }
     }
   }
-  std::vector<t_int> nonZeros(nonZeros_set.begin(), nonZeros_set.end());
+  std::vector<t_int> nonZeros_vec(nonZeros_set.begin(), nonZeros_set.end());
+  std::sort(nonZeros_vec.data(), nonZeros_vec.data() + nonZeros_vec.size());
+  SparseVector<t_int> mapping(ftsizev_ * ftsizeu_);
+  mapping.reserve(nonZeros_vec.size());
+  for (t_int index = 0; index < nonZeros_vec.size(); index++)
+    mapping.coeffRef(nonZeros_vec[index]) = index;
+
   const auto degrid = [rows, ju_max, jv_max, I, u_ptr, v_ptr, weights_ptr, samples, total_samples,
-                       ftsizeu_, ftsizev_, nonZeros](T &output, const T &input) {
+                       ftsizeu_, ftsizev_](T &output, const T &input) {
     output = T::Zero(u_ptr->size());
     assert(input.size() == ftsizeu_ * ftsizev_);
 #pragma omp parallel for
@@ -310,15 +316,15 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
   };
 
   const auto grid = [rows, ju_max, jv_max, I, u_ptr, v_ptr, weights_ptr, samples, total_samples,
-                     ftsizeu_, ftsizev_, nonZeros](T &output, const T &input) {
+                     ftsizeu_, ftsizev_, mapping, nonZeros_vec](T &output, const T &input) {
     const t_int N = ftsizeu_ * ftsizev_;
     output = T::Zero(N);
-    T output_compressed = T::Zero(nonZeros.size() * omp_get_max_threads());
+    T output_compressed = T::Zero(nonZeros_vec.size() * omp_get_max_threads());
     assert(output.size() == N);
-    const t_int shift = omp_get_thread_num() * nonZeros.size();
 #pragma omp parallel for
     for (t_int m = 0; m < rows; ++m) {
       t_complex result = 0;
+      const t_int shift = omp_get_thread_num() * nonZeros_vec.size();
       const t_real u_val = (*u_ptr)(m);
       const t_real v_val = (*v_ptr)(m);
       const t_real k_u = std::floor(u_val - ju_max * 0.5);
@@ -338,17 +344,17 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
           assert(i_0 >= 0);
           assert(i_0 < total_samples);
           const t_real kernelu_val = samples[i_0] * (1. - (2 * (q % 2)));
-          const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
+          const t_int index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
           const t_complex result = kernelu_val * kernelv_val * vis;
-          output_compressed(nonZeros[index] + shift) += result;
+          output_compressed(mapping.coeff(index) + shift) += result;
         }
       }
     }
-    for (t_int index = 0; index < nonZeros.size(); index++)
-      for (t_int m = 0; m < omp_get_max_threads(); m++){
-        const t_int loop_shift = m * nonZeros.size();
-      output(nonZeros[index]) += output_compressed(index + loop_shift);
-    }
+    for (t_int index = 0; index < nonZeros_vec.size(); index++)
+      for (t_int m = 0; m < omp_get_max_threads(); m++) {
+        const t_int loop_shift = m * nonZeros_vec.size();
+        output(nonZeros_vec[index]) += output_compressed(index + loop_shift);
+      }
   };
   return std::make_tuple(degrid, grid);
 }
