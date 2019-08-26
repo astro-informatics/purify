@@ -257,9 +257,29 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
   const auto samples =
       kernels::kernel_samples(5e5, [&](const t_real x) { return kernelu(x * ju_max * 0.5); });
   const t_real total_samples = samples.size();
+  std::set<t_int> nonZeros_set;
+  for (t_int m = 0; m < rows; ++m) {
+    t_complex result = 0;
+    const t_real u_val = (*u_ptr)(m);
+    const t_real v_val = (*v_ptr)(m);
+    const t_real k_u = std::floor(u_val - ju_max * 0.5);
+    const t_real k_v = std::floor(v_val - jv_max * 0.5);
+    for (t_int jv = 1; jv < jv_max + 1; ++jv) {
+      const t_uint p = utilities::mod(k_v + jv, ftsizev_);
+      for (t_int ju = 1; ju < ju_max + 1; ++ju) {
+        const t_uint q = utilities::mod(k_u + ju, ftsizeu_);
+        const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
+        nonZeros_set.insert(index);
+      }
+    }
+  }
+  std::vector<t_int> nonZeros(nonZeros_set.begin(), nonZeros_set.end());
   const auto degrid = [rows, ju_max, jv_max, I, u_ptr, v_ptr, weights_ptr, samples, total_samples,
-                       ftsizeu_, ftsizev_](T &output, const T &input) {
+                       ftsizeu_, ftsizev_, nonZeros](T &output, const T &input) {
     output = T::Zero(u_ptr->size());
+    T input_compressed = T::Zero(nonZeros.size());
+    for (t_int index = 0; index < input_compressed.size(); index++)
+      input_compressed(index) = input(nonZeros.at(index));
     assert(input.size() == ftsizeu_ * ftsizev_);
 #pragma omp parallel for
     for (t_int m = 0; m < rows; ++m) {
@@ -284,19 +304,24 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
           const t_real kernelu_val = samples[i_0] * (1. - (2 * (q % 2)));
           const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
           const t_real sign = kernelu_val * kernelv_val;
-          result += input(index) * sign;
+          result += input_compressed(nonZeros[index]) * sign;
         }
       }
       output(m) = result;
     }
     output.array() *= (*weights_ptr).array();
   };
+
   const auto grid = [rows, ju_max, jv_max, I, u_ptr, v_ptr, weights_ptr, samples, total_samples,
-                     ftsizeu_, ftsizev_](T &output, const T &input) {
-    output = T::Zero(ftsizeu_ * ftsizev_);
-    assert(output.size() == ftsizeu_ * ftsizev_);
+                     ftsizeu_, ftsizev_, nonZeros](T &output, const T &input) {
+    const t_int N = ftsizeu_ * ftsizev_;
+    output = T::Zero(N);
+    T output_compressed = T::Zero(nonZeros.size() * omp_get_max_threads());
+    assert(output.size() == N);
+    const t_int shift = omp_get_thread_num() * nonZeros.size();
 #pragma omp parallel for
     for (t_int m = 0; m < rows; ++m) {
+      t_complex result = 0;
       const t_real u_val = (*u_ptr)(m);
       const t_real v_val = (*v_ptr)(m);
       const t_real k_u = std::floor(u_val - ju_max * 0.5);
@@ -317,10 +342,16 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
           assert(i_0 < total_samples);
           const t_real kernelu_val = samples[i_0] * (1. - (2 * (q % 2)));
           const t_uint index = utilities::sub2ind(p, q, ftsizev_, ftsizeu_);
-          const t_real sign = kernelu_val * kernelv_val;
-          output(index) += vis * sign;
+          const t_complex result = kernelu_val * kernelv_val * vis;
+          output_compressed(nonZeros[index] + shift) += result;
         }
       }
+    }
+#pragma omp parallel for
+    for (t_int index = 0; index < nonZeros.size(); index++)
+      for (t_int m = 0; m < omp_get_max_threads(); m++){
+        const t_int loop_shift = m * nonZeros.size();
+      output(nonZeros[index]) += output_compressed(index + loop_shift);
     }
   };
   return std::make_tuple(degrid, grid);
