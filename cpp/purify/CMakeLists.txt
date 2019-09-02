@@ -29,6 +29,7 @@ set(HEADERS
   wkernel_integration.h
   wproj_operators.h
   uvw_utilities.h
+  fly_operators.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(SOURCES utilities.cc pfitsio.cc
