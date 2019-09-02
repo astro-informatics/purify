@@ -3,6 +3,7 @@
 #include "purify/types.h"
 #include "catch.hpp"
 #include "purify/directories.h"
+#include "purify/fly_operators.h"
 #include "purify/kernels.h"
 #include "purify/logging.h"
 #include "purify/test_data.h"
@@ -64,7 +65,7 @@ TEST_CASE("Operators") {
     sopt::OperatorFunction<Vector<t_complex>> directG, indirectG;
     std::tie(directG, indirectG) = operators::init_on_the_fly_gridding_matrix_2d<Vector<t_complex>>(
         uv_vis.u, uv_vis.v, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex, oversample_ratio,
-        kbv, kbu, Ju, Jv);
+        kbu, Ju, 4e5);
     Vector<t_complex> direct_output;
     directG(direct_output,
             Vector<t_complex>::Map(operators_test::direct_input.data(), ftsizeu * ftsizev));
@@ -265,5 +266,63 @@ TEST_CASE("Degridding from multiple Images wproj") {
     for (t_int i = 1; i < images; i++)
       REQUIRE((i * backward.segment(0, ftsizeu * ftsizev))
                   .isApprox(backward.segment(ftsizeu * ftsizev * i, ftsizeu * ftsizev), 1e-7));
+  }
+}
+TEST_CASE("on the fly with more presamples") {
+  const t_uint M = 1e4;
+  const t_real oversample_ratio = 2;
+  const t_uint imsizex = 16;
+  const t_uint imsizey = 16;
+  const t_uint ftsizev = std::floor(imsizey * oversample_ratio);
+  const t_uint ftsizeu = std::floor(imsizex * oversample_ratio);
+  const t_uint Ju = 4;
+  const t_uint Jv = 4;
+  const t_uint power_iters = 1e4;
+  const t_real power_tol = 1e-9;
+  const kernels::kernel kernel = kernels::kernel::kb;
+  const std::string &weighting_type = "natural";
+  utilities::vis_params uv_vis;
+  uv_vis.u = Vector<t_real>::Random(M) * ftsizeu * 0.5;
+  uv_vis.v = Vector<t_real>::Random(M) * ftsizev * 0.5;
+  uv_vis.w = uv_vis.u * 0.;
+  uv_vis.weights = Vector<t_complex>::Random(M);
+  uv_vis.vis = Vector<t_complex>::Random(M);
+  uv_vis.units = utilities::vis_units::pixels;
+  std::function<t_real(t_real)> kbu, kbv, ftkbu, ftkbv;
+  std::tie(kbu, kbv, ftkbu, ftkbv) =
+      create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
+  SECTION("Gridding on the fly") {
+    sopt::OperatorFunction<Vector<t_complex>> directG, indirectG;
+    std::tie(directG, indirectG) = operators::init_gridding_matrix_2d<Vector<t_complex>>(
+        uv_vis.u, uv_vis.v, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex, oversample_ratio,
+        kbv, kbu, Ju, Jv);
+    sopt::OperatorFunction<Vector<t_complex>> flydirectG, flyindirectG;
+    std::tie(flydirectG, flyindirectG) =
+        operators::init_on_the_fly_gridding_matrix_2d<Vector<t_complex>>(
+            uv_vis.u, uv_vis.v, Vector<t_complex>::Constant(M, 1.), imsizey, imsizex,
+            oversample_ratio, kbu, Ju, 4e5);
+    SECTION("direct") {
+      Vector<t_complex> direct_output;
+      Vector<t_complex> flydirect_output;
+      const Vector<t_complex> direct_input = Vector<t_complex>::Random(ftsizev * ftsizeu);
+      directG(direct_output, direct_input);
+      flydirectG(flydirect_output, direct_input);
+      CHECK(direct_output.size() == M);
+      CHECK(direct_output.size() == flydirect_output.size());
+      CAPTURE(direct_output);
+      CAPTURE(flydirect_output);
+      REQUIRE(direct_output.isApprox(flydirect_output, 1e-5));
+    }
+    SECTION("indirect") {
+      Vector<t_complex> indirect_output;
+      Vector<t_complex> flyindirect_output;
+      const Vector<t_complex> indirect_input = Vector<t_complex>::Random(M);
+      indirectG(indirect_output, indirect_input);
+      flyindirectG(flyindirect_output, indirect_input);
+      CHECK(indirect_output.size() == ftsizev * ftsizeu);
+      CAPTURE(flyindirect_output.head(5));
+      CAPTURE((indirect_output - flyindirect_output).head(5));
+      REQUIRE(indirect_output.isApprox(flyindirect_output, 1e-5));
+    }
   }
 }
