@@ -2,6 +2,7 @@
 #include <benchmark/benchmark.h>
 #include "benchmarks/utilities.h"
 #include "purify/operators.h"
+#include "purify/fly_operators.h"
 
 using namespace purify;
 
@@ -22,8 +23,7 @@ class GridOperatorFixture : public ::benchmark::Fixture {
       auto uv_vis = utilities::random_sample_density(M, 0, sigma_m, 0.);
       uv_vis.units = utilities::vis_units::radians;
       Gop = purify::operators::init_on_the_fly_gridding_matrix_2d<Vector<t_complex>>(
-          uv_vis.u, uv_vis.v, uv_vis.weights, m_imsizey, m_imsizex, oversample_ratio, kernelv,
-          kernelu, Ju, Jv);
+          uv_vis.u, uv_vis.v, uv_vis.weights, m_imsizey, m_imsizex, oversample_ratio, kernelu, Ju, 4e5);
     }
   }
 
