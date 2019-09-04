@@ -39,7 +39,7 @@ class PadmmFixture : public ::benchmark::Fixture {
       sopt::LinearTransform<Vector<t_complex>> Psi =
           sopt::linear_transform<t_complex>(m_sara, m_imsizey, m_imsizex);
       m_padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(m_uv_data.vis);
-      m_padmm->itermax(2)
+      m_padmm->itermax(state.range(3) + 1)
           .gamma(m_gamma)
           .relative_variation(1e-3)
           .l2ball_proximal_epsilon(m_epsilon)
@@ -93,10 +93,9 @@ BENCHMARK_DEFINE_F(PadmmFixture, Apply)(benchmark::State &state) {
 
 BENCHMARK_REGISTER_F(PadmmFixture, Apply)
     //->Apply(b_utilities::Arguments)
-    ->Args({1024, 1000000, 4})
-    ->Args({1024, 10000000, 4})
+    ->Args({128, 10000, 4, 100})
     ->UseManualTime()
-    ->Repetitions(10)  //->ReportAggregatesOnly(true)
+    ->Repetitions(1)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();

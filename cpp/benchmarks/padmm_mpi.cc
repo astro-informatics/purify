@@ -40,12 +40,12 @@ class PadmmFixtureMPI : public ::benchmark::Fixture {
       const t_real cellsize = FoV / m_imsizex * 60. * 60.;
       const bool w_term = false;
       // algorithm 1
-      if (state.range(3) == 1)
+      if (state.range(4) == 1)
         m_measurements1 = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
             m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2,
             kernels::kernel::kb, m_kernel, m_kernel, w_term);
       // algorithm 3
-      if (state.range(3) == 3)
+      if (state.range(4) == 3)
         m_measurements3 = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
             m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2,
             kernels::kernel::kb, m_kernel, m_kernel, w_term);
@@ -87,7 +87,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
 
   std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm =
       std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(m_uv_data.vis);
-  padmm->itermax(2)
+  padmm->itermax(state.range(3) + 1)
       .gamma(gamma)
       .relative_variation(1e-3)
       .l2ball_proximal_epsilon(m_epsilon)
@@ -103,7 +103,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
       .lagrange_update_scale(0.9)
       .nu(1e0)
       .Psi(Psi)
-      .Phi(*m_measurements1);
+      .Phi(m_op);
 
   std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
   padmm->residual_convergence(
@@ -134,7 +134,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
 
   std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm =
       std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(m_uv_data.vis);
-  padmm->itermax(2)
+  padmm->itermax(state.range(3) + 1)
       .gamma(gamma)
       .relative_variation(1e-3)
       .l2ball_proximal_epsilon(m_epsilon)
@@ -150,7 +150,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
       .lagrange_update_scale(0.9)
       .nu(1e0)
       .Psi(Psi)
-      .Phi(*m_measurements3);
+      .Phi(m_op);
 
   std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
   padmm->residual_convergence(
@@ -169,16 +169,16 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo1)
     //->Apply(b_utilities::Arguments)
-    ->Args({1024, static_cast<t_int>(1e8), 4, 1})
+    ->Args({1024, static_cast<t_int>(1e8), 4, 100, 1})
     //->Args({128, 1000, 4})
     ->UseManualTime()
-    ->Repetitions(10)  //->ReportAggregatesOnly(true)
+    ->Repetitions(1)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo3)
     //->Apply(b_utilities::Arguments)
-    ->Args({1024, static_cast<t_int>(1e8), 4, 3})
+    ->Args({1024, static_cast<t_int>(1e8), 4, 100, 3})
     //->Args({128, 1000, 4})
     ->UseManualTime()
-    ->Repetitions(10)  //->ReportAggregatesOnly(true)
+    ->Repetitions(1)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
