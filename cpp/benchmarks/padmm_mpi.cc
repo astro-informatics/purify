@@ -103,7 +103,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
       .lagrange_update_scale(0.9)
       .nu(1e0)
       .Psi(Psi)
-      .Phi(m_op);
+      .Phi(*m_measurements1);
 
   std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
   padmm->residual_convergence(
@@ -150,7 +150,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
       .lagrange_update_scale(0.9)
       .nu(1e0)
       .Psi(Psi)
-      .Phi(m_op);
+      .Phi(*m_measurements3);
 
   std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
   padmm->residual_convergence(
