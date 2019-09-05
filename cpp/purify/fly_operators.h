@@ -5,6 +5,14 @@
 #include "purify/types.h"
 #include "purify/operators.h"
 
+#ifdef PURIFY_MPI
+#include "purify/AllToAllSparseVector.h"
+#include "purify/DistributeSparseVector.h"
+#include "purify/IndexMapping.h"
+#include "purify/mpi_utilities.h"
+#include <sopt/mpi/communicator.h>
+#endif
+
 namespace purify {
 namespace operators {
 //! on the fly application of the degridding operator using presampling

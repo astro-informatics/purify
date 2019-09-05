@@ -14,6 +14,7 @@
 #include "purify/wkernel_integration.h"
 #include <sopt/chained_operators.h>
 #include <sopt/linear_transform.h>
+#include "purify/fly_operators.h"
 
 #include <fftw3.h>
 
