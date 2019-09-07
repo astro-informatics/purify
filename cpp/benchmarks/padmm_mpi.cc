@@ -177,7 +177,7 @@ BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo1)
     ->Args({1024, static_cast<t_int>(5e8), 4, 10, 1})
     //->Args({128, 1000, 4})
     ->UseManualTime()
-    ->Repetitions(1)  //->ReportAggregatesOnly(true)
+    ->Repetitions(10)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo3)
@@ -190,5 +190,5 @@ BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo3)
     ->Args({1024, static_cast<t_int>(5e8), 4, 10, 3})
     //->Args({128, 1000, 4})
     ->UseManualTime()
-    ->Repetitions(1)  //->ReportAggregatesOnly(true)
+    ->Repetitions(10)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
