@@ -75,6 +75,33 @@ TEST_CASE("test basic l m n calculation") {
       CHECK(spherical_resample::calculate_n(phi_0) ==
             Approx(spherical_resample::calculate_n(0., 0., theta_0, phi_0, 0.)));
     }
+    SECTION("inverse") {
+      const t_real offset_alpha = constant::pi / 2.;
+      const t_real offset_beta = constant::pi / 3.;
+      const t_real offset_gamma = constant::pi / 3.;
+      const Vector<t_real> l = Vector<t_real>::Random(10);
+      const Vector<t_real> m = Vector<t_real>::Random(10);
+      const Vector<t_real> n = Vector<t_real>::Random(10);
+
+      const Vector<t_real> rotated_l =
+          spherical_resample::calculate_rotated_l(l, m, n, offset_alpha, offset_beta, offset_gamma);
+      const Vector<t_real> rotated_m =
+          spherical_resample::calculate_rotated_m(l, m, n, offset_alpha, offset_beta, offset_gamma);
+      const Vector<t_real> rotated_n =
+          spherical_resample::calculate_rotated_n(l, m, n, offset_alpha, offset_beta, offset_gamma);
+
+      const Vector<t_real> inv_l = spherical_resample::calculate_rotated_l(
+          rotated_l, rotated_m, rotated_n, (-offset_gamma), (-offset_beta), -offset_alpha);
+      const Vector<t_real> inv_m = spherical_resample::calculate_rotated_m(
+          rotated_l, rotated_m, rotated_n, (-offset_gamma), (-offset_beta), -offset_alpha);
+      const Vector<t_real> inv_n = spherical_resample::calculate_rotated_n(
+          rotated_l, rotated_m, rotated_n, (-offset_gamma), (-offset_beta), -offset_alpha);
+      CAPTURE(l);
+      CAPTURE(inv_l);
+      CHECK(l.isApprox(inv_l));
+      CHECK(m.isApprox(inv_m));
+      CHECK(n.isApprox(inv_n));
+    }
   }
 }
 

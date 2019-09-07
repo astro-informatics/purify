@@ -21,8 +21,8 @@ T calculate_rotated_l(const T &l, const T &m, const T &n, const t_real alpha, co
                       const t_real gamma) {
   return l * (std::cos(alpha) * std::cos(beta) * std::cos(gamma) -
               std::sin(alpha) * std::sin(gamma)) +
-         m * (-std::sin(alpha) * std::cos(beta) * std::cos(gamma) -
-              std::cos(alpha) * std::sin(gamma)) +
+         m * (-std::cos(alpha) * std::cos(beta) * std::sin(gamma) -
+              std::sin(alpha) * std::cos(gamma)) +
          n * std::cos(alpha) * std::sin(beta);
 }
 //! calculate the rotated m from euler angles in zyz and starting coordinates (l, m, n)
@@ -521,8 +521,8 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
   PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
   sopt::OperatorFunction<T> directG, indirectG;
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
-      (u.array() - u_mean) / du, (v.array() - v_mean) / dv, w.array() - w_mean, weights,
-      imsizey, imsizex, oversample_ratio, ftkerneluv, kerneluv, Ju, Jw, du, dv, absolute_error,
+      (u.array() - u_mean) / du, (v.array() - v_mean) / dv, w.array() - w_mean, weights, imsizey,
+      imsizex, oversample_ratio, ftkerneluv, kerneluv, Ju, Jw, du, dv, absolute_error,
       relative_error, dde_type::wkernel_radial);
 
   const auto direct = sopt::chained_operators<T>(directG, directZFZ, directP);
