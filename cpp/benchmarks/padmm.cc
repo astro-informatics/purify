@@ -19,9 +19,12 @@ class PadmmFixture : public ::benchmark::Fixture {
     // Reading image from file and update related quantities
     bool newImage = b_utilities::updateImage(state.range(0), m_image, m_imsizex, m_imsizey);
 
-    // Generating random uv(w) coverage and update related quantities
-    bool newMeasurements =
-        b_utilities::updateMeasurements(state.range(1), m_uv_data, m_epsilon, newImage, m_image);
+    // Generating random uv(w) coverage
+    bool newMeasurements = m_uv_data.size() != state.range(1);
+    if (newMeasurements) {
+      t_real const sigma_m = constant::pi / 3;
+      m_uv_data = utilities::random_sample_density(state.range(1), 0, sigma_m);
+    }
 
     bool newKernel = m_kernel != state.range(2);
     if (newImage || newMeasurements || newKernel) {
