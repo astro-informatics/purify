@@ -288,7 +288,7 @@ BENCHMARK_REGISTER_F(DegridOperatorDirectFixtureDistr, Apply)
     ->Args({1024, static_cast<t_int>(1e8), 4})
     ->Args({1024, static_cast<t_int>(1e9), 4})
     ->UseManualTime()
-    ->Repetitions(1)
+    ->Repetitions(10)
     //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
@@ -299,7 +299,7 @@ BENCHMARK_REGISTER_F(DegridOperatorAdjointFixtureDistr, Apply)
     ->Args({1024, static_cast<t_int>(1e8), 4})
     ->Args({1024, static_cast<t_int>(1e9), 4})
     ->UseManualTime()
-    ->Repetitions(1)
+    ->Repetitions(10)
     //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
@@ -310,7 +310,7 @@ BENCHMARK_REGISTER_F(DegridOperatorDirectFixtureMPI, Apply)
     ->Args({1024, static_cast<t_int>(1e8), 4})
     ->Args({1024, static_cast<t_int>(1e9), 4})
     ->UseManualTime()
-    ->Repetitions(1)
+    ->Repetitions(10)
     //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
@@ -321,6 +321,6 @@ BENCHMARK_REGISTER_F(DegridOperatorAdjointFixtureMPI, Apply)
     ->Args({1024, static_cast<t_int>(1e8), 4})
     ->Args({1024, static_cast<t_int>(1e9), 4})
     ->UseManualTime()
-    ->Repetitions(1)
+    ->Repetitions(10)
     //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
