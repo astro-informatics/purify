@@ -581,7 +581,35 @@ std::shared_ptr<sopt::LinearTransform<T>> nonplanar_degrid_wproj_operator(
   return std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(std::get<0>(m_op), outsize,
                                                                     std::get<1>(m_op), insize);
 }
+#ifdef PURIFY_MPI
+//! Returns linear transform that is the weighted degridding operator with mpi all sum all
+template <class T, class K>
+std::shared_ptr<sopt::LinearTransform<T>> nonplanar_degrid_wproj_operator(
+    const sopt::mpi::Communicator &comm, const t_int number_of_samples, const t_real theta_0,
+    const t_real phi_0, const K &theta, const K &phi, const utilities::vis_params &uv_data,
+    const t_real oversample_ratio = 2, const t_real oversample_ratio_image_domain = 2,
+    const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jw = 100,
+    const t_uint Jl = 4, const t_uint Jm = 4,
+    const operators::fftw_plan &ft_plan = operators::fftw_plan::measure,
+    const bool uvw_stacking = false, const t_real L = 1, const t_real absolute_error = 1e-6,
+    const t_real relative_error = 1e-6) {
+  if (uv_data.units != utilities::vis_units::lambda)
+    throw std::runtime_error("Units for spherical imaging must be in lambda");
+  const auto m_op = base_plane_degrid_wproj_operator<T, K>(
+      number_of_samples, theta_0, phi_0, theta, phi, uv_data.u, uv_data.v, uv_data.w,
+      uv_data.weights, oversample_ratio, oversample_ratio_image_domain, kernel, Ju, Jw, Jl, Jm,
+      ft_plan, uvw_stacking, L, absolute_error, relative_error);
+  const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
+  const auto &direct = std::get<0>(m_op);
+  const auto &indirect = sopt::chained_operators<T>(allsumall, std::get<1>(m_op));
 
+  const std::array<t_int, 3> outsize = {0, 1, static_cast<t_int>(uv_data.u.size())};
+  const std::array<t_int, 3> insize = {0, 1, number_of_samples};
+
+  return std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(direct, outsize, indirect,
+                                                                    insize);
+}
+#endif
 }  // namespace measurement_operator
 }  // namespace spherical_resample
 }  // namespace purify
