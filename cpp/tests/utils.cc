@@ -360,6 +360,33 @@ TEST_CASE("rotations") {
     CHECK(0. ==
           Approx(utilities::calculate_rotated_w(0., 0., 1., theta_0, phi_0, 0.)).margin(1e-6));
   }
+  SECTION("inverse") {
+    const t_real offset_alpha = constant::pi / 2.;
+    const t_real offset_beta = constant::pi / 3.;
+    const t_real offset_gamma = constant::pi / 3.;
+    const Vector<t_real> u = Vector<t_real>::Random(10);
+    const Vector<t_real> v = Vector<t_real>::Random(10);
+    const Vector<t_real> w = Vector<t_real>::Random(10);
+
+    const Vector<t_real> rotated_u =
+        utilities::calculate_rotated_u(u, v, w, offset_alpha, offset_beta, offset_gamma);
+    const Vector<t_real> rotated_v =
+        utilities::calculate_rotated_v(u, v, w, offset_alpha, offset_beta, offset_gamma);
+    const Vector<t_real> rotated_w =
+        utilities::calculate_rotated_w(u, v, w, offset_alpha, offset_beta, offset_gamma);
+
+    const Vector<t_real> inv_u = utilities::calculate_rotated_u(
+        rotated_u, rotated_v, rotated_w, (-offset_gamma), (-offset_beta), -offset_alpha);
+    const Vector<t_real> inv_v = utilities::calculate_rotated_v(
+        rotated_u, rotated_v, rotated_w, (-offset_gamma), (-offset_beta), -offset_alpha);
+    const Vector<t_real> inv_w = utilities::calculate_rotated_w(
+        rotated_u, rotated_v, rotated_w, (-offset_gamma), (-offset_beta), -offset_alpha);
+    CAPTURE(u);
+    CAPTURE(inv_u);
+    CHECK(u.isApprox(inv_u));
+    CHECK(v.isApprox(inv_v));
+    CHECK(w.isApprox(inv_w));
+  }
 }
 
 TEST_CASE("conjugate symmetry") {

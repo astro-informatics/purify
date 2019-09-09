@@ -60,8 +60,8 @@ T calculate_rotated_u(const T &u, const T &v, const T &w, const t_real alpha, co
                       const t_real gamma) {
   return u * (std::cos(alpha) * std::cos(beta) * std::cos(gamma) -
               std::sin(alpha) * std::sin(gamma)) +
-         v * (-std::sin(alpha) * std::cos(beta) * std::cos(gamma) -
-              std::cos(alpha) * std::sin(gamma)) +
+         v * (-std::cos(alpha) * std::cos(beta) * std::sin(gamma) -
+              std::sin(alpha) * std::cos(gamma)) +
          w * std::cos(alpha) * std::sin(beta);
 }
 //! calculate the rotated v from euler angles in zyz and starting coordinates (u, v, w)
