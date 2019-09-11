@@ -32,6 +32,8 @@ if(PURIFY_ARRAYFIRE)
   target_compile_definitions(example_padmm_random_coverage_gpu PRIVATE PURIFY_GPU)
 endif()
 if(PURIFY_MPI)
+  add_example(mpi_spherical_reconstruction NOTEST LIBRARIES libpurify)
+
   add_example(global_epsilon_replicated_grids_mpi padmm_mpi_random_coverage.cc NOTEST
     LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
   target_compile_definitions(example_global_epsilon_replicated_grids_mpi
