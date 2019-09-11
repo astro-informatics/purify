@@ -12,9 +12,6 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#ifdef PURIFY_GPU
-#include "purify/operators_gpu.h"
-#endif
 #include "purify/types.h"
 #include "purify/cimg.h"
 #include "purify/pfitsio.h"
