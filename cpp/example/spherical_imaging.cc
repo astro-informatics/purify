@@ -65,8 +65,8 @@ int main(int nargs, char const** args) {
     return utilities::ind2col(k, num_phi, num_theta) * 2 * constant::pi / num_theta;
   };
   //
-  t_real const offset_dec = constant::pi * 10. / 180.;
-  t_real const offset_ra = constant::pi * 10. / 180.;
+  t_real const offset_dec = constant::pi * 0. / 180.;
+  t_real const offset_ra = constant::pi * 0. / 180.;
   const auto measure_op =
       spherical_resample::base_plane_degrid_wproj_operator<Vector<t_complex>,
                                                            std::function<t_real(t_int)>>(
@@ -85,9 +85,9 @@ int main(int nargs, char const** args) {
   Vector<t_real> ph = Vector<t_real>::Zero(number_of_samples);
   Vector<t_complex> fourier_mode = Vector<t_complex>::Zero(number_of_samples);
   for (t_int index = 0; index < number_of_samples; index++) {
-    l(index) = spherical_resample::calculate_l(theta(index), phi(index), theta_0, phi_0, 0.);
-    m(index) = spherical_resample::calculate_m(theta(index), phi(index), theta_0, phi_0, 0.);
-    n(index) = spherical_resample::calculate_n(theta(index), phi(index), theta_0, phi_0, 0.);
+    l(index) = spherical_resample::calculate_l(theta(index), phi(index), 0, phi_0, theta_0);
+    m(index) = spherical_resample::calculate_m(theta(index), phi(index), 0, phi_0, theta_0);
+    n(index) = spherical_resample::calculate_n(theta(index), phi(index), 0, phi_0, theta_0);
     th(index) = theta(index);
     ph(index) = phi(index);
   }
@@ -112,7 +112,7 @@ int main(int nargs, char const** args) {
             ? std::conj(std::exp(-2 * constant::pi * t_complex(0., 1.) *
                                  (rotated_l(index) * rotated_u(0) * coordinate_scaling +
                                   rotated_m(index) * rotated_v(0) * coordinate_scaling +
-                                  rotated_n(index) * rotated_w(0) * coordinate_scaling)))
+                                  rotated_n(index) * rotated_w(0) * coordinate_scaling)))/n(index)
             : 0.;
   }
 
