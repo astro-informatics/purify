@@ -96,7 +96,7 @@ int main(int nargs, char const **args) {
             spherical_resample::measurement_operator::nonplanar_degrid_wproj_operator<
                 Vector<t_complex>, std::function<t_real(t_int)>>(
                 number_of_samples, theta_0, phi_0, theta, phi, uv_data, oversample_ratio,
-                oversample_ratio_image_domain, kernel, Ju , Jw, Jl, Jm, ft_plan, uvw_stacking, L,
+                oversample_ratio_image_domain, kernel, Ju, Jw, Jl, Jm, ft_plan, uvw_stacking, L,
                 1e-6, 1e-6),
             1000, 1e-4, Vector<t_complex>::Random(imsizex * imsizey).eval()));
     uv_data.vis =
@@ -121,7 +121,8 @@ int main(int nargs, char const **args) {
   if (comm.is_root()) pfitsio::write2d(dmap_image.real(), dirtyfile);
   // wavelet transform
   t_uint sara_size = 0.;
-  std::vector<std::tuple<std::string, t_uint>> const sara{std::make_tuple("Dirac", 3u)};
+  std::vector<std::tuple<std::string, t_uint>> const sara{std::make_tuple("dirac", 1u),
+                                                          std::make_tuple("db8", 5u)};
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
       factory::distributed_wavelet_operator::mpi_sara, sara, imsizey, imsizex, sara_size);
 
