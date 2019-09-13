@@ -13,7 +13,7 @@
 #include <casacore/tables/Tables/ArrayColumn.h>
 #include <casacore/tables/Tables/ScalarColumn.h>
 #include <casacore/tables/Tables/Table.h>
-#include "purify/utilities.h"
+#include "purify/uvw_utilities.h"
 #include <sopt/utilities.h>
 
 namespace purify {

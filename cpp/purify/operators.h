@@ -9,10 +9,12 @@
 #include "purify/kernels.h"
 #include "purify/logging.h"
 #include "purify/utilities.h"
+#include "purify/uvw_utilities.h"
 #include "purify/wide_field_utilities.h"
 #include "purify/wkernel_integration.h"
 #include <sopt/chained_operators.h>
 #include <sopt/linear_transform.h>
+#include "purify/fly_operators.h"
 
 #include <fftw3.h>
 
@@ -23,6 +25,8 @@
 #include "purify/mpi_utilities.h"
 #include <sopt/mpi/communicator.h>
 #endif
+
+#include "purify/fly_operators.h"
 
 namespace purify {
 
@@ -483,7 +487,8 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
     const Vector<t_complex> &weights, const t_uint &imsizey, const t_uint &imsizex,
     const t_real &oversample_ratio = 2, const kernels::kernel kernel = kernels::kernel::kb,
     const t_uint Ju = 4, const t_uint Jv = 4, const fftw_plan &ft_plan = fftw_plan::measure,
-    const bool w_stacking = false, const t_real &cellx = 1, const t_real &celly = 1) {
+    const bool w_stacking = false, const t_real &cellx = 1, const t_real &celly = 1,
+    const bool on_the_fly = true) {
   std::function<t_real(t_real)> kernelu, kernelv, ftkernelu, ftkernelv;
   std::tie(kernelu, kernelv, ftkernelu, ftkernelv) =
       purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
@@ -501,8 +506,12 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_ope
   PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   PURIFY_MEDIUM_LOG("Mean, w: {}, +/- {}", w_mean, (w.maxCoeff() - w.minCoeff()) * 0.5);
-  std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
-      u, v, weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv);
+  std::tie(directG, indirectG) =
+      (on_the_fly)
+          ? purify::operators::init_on_the_fly_gridding_matrix_2d<T>(
+                u, v, weights, imsizey, imsizex, oversample_ratio, kernelu, Ju, 4e5)
+          : purify::operators::init_gridding_matrix_2d<T>(
+                u, v, weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv);
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
   PURIFY_LOW_LOG("Finished consturction of Φ.");
@@ -517,7 +526,8 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_mpi_degrid
     const t_uint &imsizex, const t_real oversample_ratio = 2,
     const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
     const operators::fftw_plan ft_plan = operators::fftw_plan::measure,
-    const bool w_stacking = false, const t_real &cellx = 1, const t_real &celly = 1) {
+    const bool w_stacking = false, const t_real &cellx = 1, const t_real &celly = 1,
+    const bool on_the_fly = true) {
   std::function<t_real(t_real)> kernelu, kernelv, ftkernelu, ftkernelv;
   std::tie(kernelu, kernelv, ftkernelu, ftkernelv) =
       purify::create_kernels(kernel, Ju, Jv, imsizey, imsizex, oversample_ratio);
@@ -536,8 +546,12 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_mpi_degrid
                     imsizey * celly / (60. * 60.));
   PURIFY_LOW_LOG("Constructing Weighting and MPI Gridding Operators: WG");
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
-  std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
-      comm, u, v, weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv);
+  std::tie(directG, indirectG) =
+      (on_the_fly)
+          ? purify::operators::init_on_the_fly_gridding_matrix_2d<T>(
+                comm, u, v, weights, imsizey, imsizex, oversample_ratio, kernelu, Ju, 4e5)
+          : purify::operators::init_gridding_matrix_2d<T>(
+                comm, u, v, weights, imsizey, imsizex, oversample_ratio, kernelv, kernelu, Ju, Jv);
   auto direct = sopt::chained_operators<T>(directG, directFZ);
   auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
   PURIFY_LOW_LOG("Finished consturction of Φ.");

@@ -1,5 +1,5 @@
 ### Config file for Purify
-Version: 3.0.0
+Version: 3.1.0
 GeneralConfiguration:
   InputOutput:
     input:
@@ -13,73 +13,75 @@ GeneralConfiguration:
           - /path/to/measurment/set # path to the measurement set
         measurements_polarization: I # one from I Q V XX LL
         measurements_units: radians # one from lambda, radians, pixels
-        measurements_sigma: 1 # the noise level in the data
-        warm_start: /path/to/warm/start/image
+        measurements_sigma: 1 # the uncertainty of a visibility (RMS noise of a visibility in Jy)
+        warm_start: /path/to/warm/start/image #path to fits file image of previous purify solution (assumig the same cell size), otherwise leave as an empty quotation ""
       #simulation:
-      #  skymodel: /path/to/sky/image # path to the sky model image file
+      #  skymodel: /path/to/sky/image # path to the sky model image file, the ground truth image for the simulation
       #  signal_to_noise: 30 # signal-to-noise ratio to be added to the sky model
       #  number_of_measurements: 10000 # number of measurements per a node
       #  w_rms: 30. # RMS w value in random uvw coverage
-      #  sim_J: 8
+      #  sim_J: 8 # the minimum support for the kernel when simulating measurements
       #  coverage_files:  #path to converage units. This is only used if it is not an empty string
       #    - path/to/coverage/measurement/file
       #  coverage_units: lambda # one from lambda, radians, pixels
     output_prefix: /path/to/output/dir # results directory will be created inside this path, and called output_<timestamp>
 
   ### Execution parameters
-  logging: debug # How much logging you want (debug, critical, ..)
-  iterations: 100 # number of iterations (>= 0)
-  epsilonScaling: 1 # RMS noise (> 0)
+  logging: debug # How much logging you want (debug, critical, ..). debug maybe the most useful in some cases because it gives the most output.
+  iterations: 100 # number of iterations (>= 0). More iterations can give better results.
+  epsilonScaling: 1 # factor to scale measurements_sigma by. We suggest 1, but it can be useful to change.
 
 ########## Measure Operators ##########
 MeasureOperators:
-  pixelSize:
+  pixelSize: #pixel size in arcseconds. This should be estimated from the longest baseline (PURIFY should print out a suggestion)
     cellsizex: 1
     cellsizey: 1
-  imageSize: # for the moment: power of two
+  imageSize: # for the moment: power of two . For a simulation or when using a warm start, this must be same image size as the ground truth
     width: 1024
     height: 1024
-  J: # Interpolation pixels (default 4x4). Input either a value or pair
+  J: # Interpolation pixels for the anti-aliasing kernel (default 4x4). Input either a value or pair  (J == 6 is the only option for pswf)
     Jx: 4
     Jy: 4
     Jw: 30 #Maximum size of w kernel
-  kernel: kb # kernel, choose between: kb, Gauss, box
-  oversampling: 2 # value > 1
-  gpu: False
+  kernel: kb # kernel, choose between: kb, Gauss, box, pswf 
+  oversampling: 2 # value > 1. Value of 2 is the standard
+  gpu: False #This can be used when compiled with arrayfire gpu library
   powermethod:
-    iters: 100 # value > 0
-    tolerance: 1e-4 # value > 0
-    eigenvector: 
+    iters: 100 # value > 0. This is the maximum number of iterations used with the power method for calculating the measurement operator norm.
+    tolerance: 1e-4 # value > 0. This is the tolerance for convergence of the operator norm
+    eigenvector: #Here we can choose real and imaginary fits images of the operator eigenvector associated with the operator norm. This speeds up convergence for repeat runs.
       real:  ""
       imag:  ""
   wide-field:
     wprojection: False # using radially symmetric w projection kernel
     mpi_wstacking: False # applies average w-stack correction on each node (always True with wprojection)
-    mpi_all_to_all: False # performs all to all operation of the grid to even out computation 
+    mpi_all_to_all: False # performs all to all operation of the grid to even out computation. Highly recommended when using MPI for wide-field imaging!
     conjugate_w: True #reflects measurements onto the positive w-domain (can reduce computation)
     kmeans_iterations: 100 #number of iterations in w-stacking clustering algorithm
 
 ########## SARA ##########
 SARA:
   # wavelet bases, to choose from: Dirac, DB1, ..., DBn (where n=0 is dirac, and 1 <= n <= 35 is DB basis)
-  wavelet_dict: 0..8 # sequence of desired basis: 0,23,31 or 0,12..16,20
-  wavelet_levels: 4 # value for all
-  realValueConstraint: True # Boolean
-  positiveValueConstraint: True #boolean
+  wavelet_dict: 0..8 # sequence of desired basis: 0,23,31 or 0,12..16,20 . We typically use 0..8, this gives good results but will be expensive for large images.
+  wavelet_levels: 4 # maximum number of wavelet levels for each dictionary. More levels can be good for increasing quality of large scale structures in an image (we recommend 4 to 6).
+  realValueConstraint: True # Boolean, we recommend this to be True for Stokes I
+  positiveValueConstraint: True # Boolean, we recommend this to be True for Stokes I
 
 AlgorithmOptions:
-  algorithm: padmm # will just read the options of that one.
+  algorithm: primaldual # will just read the options of that one. We recommend the primal dual algorithm, especially for large image sizes.
   ########## PADMM ##########
   padmm: #solve the constrained problem
     # Following is only accepted when MPI is used
-    mpiAlgorithm: serial-equivalent  # one of none, serial-equivalent, fully-distributed
+    # none - no MPI used, used when on a laptop or no w-stacking
+    # serial-equivalent - gridding and degridding and visibilities split across nodes
+    mpiAlgorithm: serial-equivalent  # one of none, serial-equivalent
     # Be careful changing the following unless you know what you are doing
-    relVarianceConvergence: 1e-3 # (>0) relative converegence tolerance of objective function
-    epsilonConvergenceScaling: 1 # (>0) l2 convergence tolerance for residuals
-    dualFBVarianceConvergence: 1e-3 # (>0) relative convergence tolerance of l1 proximal
+    relVarianceConvergence: 1e-3 # (>0) relative converegence tolerance of objective function (we suggest at most 1e-3, but smaller might produce better results)
+    epsilonConvergenceScaling: 1 # (>0) l2 convergence tolerance for residuals (we suggest 1)
+    dualFBVarianceConvergence: 1e-3 # (>0) relative convergence tolerance of l1 proximal 
     stepsize:  # Stepsize, choose value between: default, variable, 100, x
       update_tolerance: 1e-1 #when predicted stepsize is greater than this value, it will be updated
-      update_iters: 0 #how many iterations to allow updating of step size
+      update_iters: 0 #how many iterations to allow updating of step size (we recommend 0 to 50)
   fb: #solve the unconstrained problem
     mpiAlgorithm: serial-equivalent # one of none, serial-equivalent
     regularisation_parameter: 1
@@ -88,11 +90,11 @@ AlgorithmOptions:
     dualFBVarianceConvergence: 1e-3 # (>0) relative convergence tolerance of l1 proximal
   primaldual: #solve the constrained problem
     # Following is only accepted when MPI is used
-    mpiAlgorithm: serial-equivalent # one of none, serial-equivalent, fully-distributed
+    mpiAlgorithm: serial-equivalent # one of none, serial-equivalent
     # Be careful changing the following unless you know what you are doing
-    relVarianceConvergence: 1e-3 # (>0) relative converegence tolerance of objective function
-    epsilonConvergenceScaling: 1 # (>0) l2 convergence tolerance for residuals
-    precondition_iters: 0 #use sampling density (based on field of view) to accelerate primal dual
+    relVarianceConvergence: 1e-3 # (>0) relative converegence tolerance of objective function (we suggest at most 1e-3, but smaller might produce better results)
+    epsilonConvergenceScaling: 1 # (>0) l2 convergence tolerance for residuals (we suggest 1)
+    precondition_iters: 0 #use sampling density (based on field of view) to accelerate primal dual (we recommend 1 or 0)
     stepsize:  # Stepsize, choose value between: default, variable, 100, x
       update_tolerance: 1e-1 #when predicted stepsize is greater than this value, it will be updated
-      update_iters: 0 #how many iterations to allow updating of step size
+      update_iters: 0 #how many iterations to allow updating of step size (we recommend 0 to 50)

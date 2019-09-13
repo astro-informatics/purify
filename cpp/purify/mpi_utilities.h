@@ -3,7 +3,7 @@
 
 #include "purify/config.h"
 #include <vector>
-#include "purify/utilities.h"
+#include "purify/uvw_utilities.h"
 #include <sopt/linear_transform.h>
 
 #ifdef PURIFY_MPI
@@ -51,14 +51,16 @@ utilities::vis_params set_cell_size(const sopt::mpi::Communicator &comm,
 //! \brief distribute data, sort into w-stacks using MPI, then distribute the stacks
 utilities::vis_params w_stacking(utilities::vis_params const &params,
                                  sopt::mpi::Communicator const &comm, const t_int iters,
-                                 const std::function<t_real(t_real)> &cost);
+                                 const std::function<t_real(t_real)> &cost,
+                                 const t_real k_means_rel_diff = 1e-5);
 //! \brief distribute data, sort into w-stacks using MPI, then distribute the stacks for all to all
 //! operator
 std::tuple<utilities::vis_params, std::vector<t_int>, std::vector<t_real>>
 w_stacking_with_all_to_all(utilities::vis_params const &params, const t_real du,
                            const t_int min_support, const t_int max_support,
                            sopt::mpi::Communicator const &comm, const t_int iters,
-                           const t_real fill_relaxation, const std::function<t_real(t_real)> &cost);
+                           const t_real fill_relaxation, const std::function<t_real(t_real)> &cost,
+                           const t_real k_means_rel_diff = 1e-5);
 #endif
 //! \brief Calculate step size using MPI (does not include factor of 1e-3)
 //! \param[in] vis: Vector of measurement data

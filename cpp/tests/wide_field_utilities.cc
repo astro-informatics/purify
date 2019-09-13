@@ -8,7 +8,7 @@
 #include "purify/convolution.h"
 #include "purify/directories.h"
 #include "purify/kernels.h"
-#include "purify/utilities.h"
+#include "purify/uvw_utilities.h"
 #include "purify/wide_field_utilities.h"
 
 using namespace purify;

@@ -33,9 +33,7 @@ bool updateImage(t_uint newSize, Image<t_complex> &image, t_uint &sizex, t_uint 
   if (sizex == newSize) {
     return false;
   }
-  const std::string &name = "M31_" + std::to_string(newSize);
-  std::string const fitsfile = image_filename(name + ".fits");
-  image = pfitsio::read2d(fitsfile);
+  image = Image<t_complex>::Random(newSize, newSize);
   sizex = image.cols();
   sizey = image.rows();
   t_real const max = image.array().abs().maxCoeff();

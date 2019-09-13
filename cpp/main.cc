@@ -36,6 +36,11 @@ int main(int argc, const char **argv) {
 
   std::string file_path = argv[1];
   YamlParser params = YamlParser(file_path);
+  if (params.version() != purify::version())
+    throw std::runtime_error(
+        "Using purify version " + purify::version() +
+        " but the configuration file expects version " + params.version() +
+        ". Please updated the config version manually to be compatable with the new version.");
 
   factory::distributed_measurement_operator mop_algo =
       (not params.gpu()) ? factory::distributed_measurement_operator::serial
@@ -304,7 +309,7 @@ int main(int argc, const char **argv) {
   PURIFY_LOW_LOG("Value of operator norm is {}", operator_norm);
   t_real const flux_scale = (params.source() == purify::utilities::vis_source::measurements)
                                 ? std::sqrt(std::floor(params.width() * params.oversampling()) *
-                                            std::floor(params.width() * params.oversampling())) *
+                                            std::floor(params.height() * params.oversampling())) *
                                       operator_norm
                                 : 1.;
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale;
