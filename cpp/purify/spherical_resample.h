@@ -481,6 +481,11 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
                     v.cwiseAbs().maxCoeff(), std::min(0.5 / v.cwiseAbs().maxCoeff(), 1.));
   PURIFY_MEDIUM_LOG("Maximum w value is {} lambda, sphere needs to be sampled at dn = {}.",
                     w.cwiseAbs().maxCoeff(), std::min(0.5 / w.cwiseAbs().maxCoeff(), 1.));
+  if (uvw_stacking) {
+    PURIFY_MEDIUM_LOG("Mean, u: {}, +/- {}", u_mean, (u.maxCoeff() - u.minCoeff()) * 0.5);
+    PURIFY_MEDIUM_LOG("Mean, v: {}, +/- {}", v_mean, (v.maxCoeff() - v.minCoeff()) * 0.5);
+    PURIFY_MEDIUM_LOG("Mean, w: {}, +/- {}", w_mean, (w.maxCoeff() - w.minCoeff()) * 0.5);
+  }
 
   auto const uvkernels = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
   const std::function<t_real(t_real)> &kerneluv = std::get<1>(uvkernels);
@@ -513,11 +518,6 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
   std::tie(directZFZ, indirectZFZ) =
       base_padding_and_FFT_2d<T>(ftkerneluv, ftkernell, ftkernelm, imsizey, imsizex,
                                  oversample_ratio, oversample_ratio_image_domain, ft_plan);
-  if (uvw_stacking) {
-    PURIFY_MEDIUM_LOG("Mean, u: {}, +/- {}", u_mean, (u.maxCoeff() - u.minCoeff()) * 0.5);
-    PURIFY_MEDIUM_LOG("Mean, v: {}, +/- {}", v_mean, (v.maxCoeff() - v.minCoeff()) * 0.5);
-    PURIFY_MEDIUM_LOG("Mean, w: {}, +/- {}", w_mean, (w.maxCoeff() - w.minCoeff()) * 0.5);
-  }
   PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
   sopt::OperatorFunction<T> directG, indirectG;
   std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
