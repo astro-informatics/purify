@@ -7,7 +7,7 @@ namespace distribute {
 std::vector<t_int> distribute_measurements(Vector<t_real> const &u, Vector<t_real> const &v,
                                            Vector<t_real> const &w, t_int const number_of_nodes,
                                            distribute::plan const distribution_plan,
-                                           t_int const &grid_size) {
+                                           t_int const grid_size) {
   // distrubte visibilities from a measurement
   Vector<t_int> index = Vector<t_int>::LinSpaced(u.size(), 0, u.size());
   t_int const patition_size =
@@ -32,6 +32,10 @@ std::vector<t_int> distribute_measurements(Vector<t_real> const &u, Vector<t_rea
   case plan::w_term: {
     index = w_distribution(w);
     plan_name = "w_term";
+    break;
+  }
+  case plan::uv_stack: {
+    index = uv_distribution(u, v, number_of_nodes);
     break;
   }
   default: {
@@ -73,9 +77,36 @@ Vector<t_int> distance_distribution(Vector<t_real> const &u, Vector<t_real> cons
   });
   return index;
 }
+Vector<t_int> uv_distribution(Vector<t_real> const &u, Vector<t_real> const &v, const t_int nodes) {
+  if (std::floor(std::sqrt(nodes)) != std::ceil(std::sqrt(nodes)))
+    throw std::runtime_error(
+        "Number of nodes is not square, which is required for this implimentation of uv_stacking. "
+        "Nodes = " +
+        std::to_string(nodes));
+  const t_real length = std::sqrt(nodes);
+  Vector<t_int> index = Vector<t_int>::Zero(u.size());
+  const t_real u_min = u.minCoeff() * 1.1;
+  const t_real u_max = u.maxCoeff() * 1.1;
+  const t_real v_min = v.minCoeff() * 1.1;
+  const t_real v_max = v.maxCoeff() * 1.1;
+  t_int count = 0;
+  for (t_int i = 0; i < u.size(); i++) {
+    for (t_int n = 0; n < nodes; n++) {
+      const t_int node_x = std::floor((u(i) - u_min) / (u_max - u_min) * length);
+      const t_int node_y = std::floor((v(i) - v_min) / (v_max - v_min) * length);
+      const t_int node_i = node_x * length + node_y;
+      if (node_i < 0) throw std::runtime_error("Can't have negative node.");
+      if (node_i > nodes)
+        throw std::runtime_error("Node is too large. Nodex = " + std::to_string(node_x) +
+                                 " Nodey = " + std::to_string(node_y));
+      if (n == node_i) index(i) = count++;
+    }
+  }
+  return index;
+}
 
 Vector<t_int> equal_distribution(Vector<t_real> const &u, Vector<t_real> const &v,
-                                 t_int const &grid_size) {
+                                 t_int const grid_size) {
   // distribute visibilities by density calculated from histogram
   t_real const max_u = u.array().maxCoeff();
   t_real const max_v = v.array().maxCoeff();

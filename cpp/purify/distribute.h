@@ -13,17 +13,17 @@
 
 namespace purify {
 namespace distribute {
-enum class plan { none, equal, radial, w_term };
+enum class plan { none, equal, radial, w_term, uv_stack };
 //! Distribute visiblities into groups
 std::vector<t_int> distribute_measurements(Vector<t_real> const &u, Vector<t_real> const &v,
                                            Vector<t_real> const &w, t_int const number_of_nodes,
                                            distribute::plan const distribution_plan = plan::equal,
-                                           t_int const &grid_size = 128);
+                                           t_int const grid_size = 128);
 
 #ifdef PURIFY_MPI
 inline std::vector<t_int> distribute_measurements(
     utilities::vis_params const &params, sopt::mpi::Communicator const &comm,
-    distribute::plan const distribution_plan = plan::equal, t_int const &grid_size = 128) {
+    distribute::plan const distribution_plan = plan::equal, t_int const grid_size = 128) {
   return distribute_measurements(params.u, params.v, params.w, comm.size(), distribution_plan,
                                  grid_size);
 }
@@ -55,7 +55,10 @@ Vector<t_int> w_distribution(Vector<t_real> const &w);
 Vector<t_int> distance_distribution(Vector<t_real> const &u, Vector<t_real> const &v);
 //! Distribute the visiblities into nodes in order of density
 Vector<t_int> equal_distribution(Vector<t_real> const &u, Vector<t_real> const &v,
-                                 t_int const &grid_size);
+                                 t_int const grid_size);
+//! Distribute the visiblities into nodes by making a grid
+Vector<t_int> uv_distribution(Vector<t_real> const &u, Vector<t_real> const &v,
+                                 t_int const nodes);
 }  // namespace distribute
 }  // namespace purify
 #endif
