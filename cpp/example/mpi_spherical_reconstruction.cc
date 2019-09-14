@@ -23,12 +23,23 @@
 using namespace purify;
 using namespace purify::notinstalled;
 
+utilities::vis_params dirty_visibilities(const utilities::vis_params &uv_data) {
+  const std::string &pos_filename = mwa_filename("Phase1_config.txt");
+  const auto times = std::vector<t_real>{0, 8, 16, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112};
+  auto uv_data_root =
+      utilities::read_ant_positions_to_coverage(pos_filename, 150e6, times, 0., 0., 0.);
+  uv_data_root.units = utilities::vis_units::lambda;
+  return uv_data_root;
+}
 utilities::vis_params dirty_visibilities(const utilities::vis_params &uv_data,
                                          sopt::mpi::Communicator const &comm) {
-  if (comm.size() == 1) return uv_data;
+  if (comm.size() == 1) return dirty_visibilities(uv_data);
   if (comm.is_root()) {
-    auto result = uv_data;
-    auto const order = distribute::distribute_measurements(result, comm, distribute::plan::radial);
+    auto result = dirty_visibilities(uv_data);
+    //  auto const order = distribute::distribute_measurements(result, comm,
+    //  distribute::plan::uv_stack);
+    auto const order = distribute::uv_distribution(result.u, result.v, comm.size());
+    //should use conjugate symmetry to make v >= 0 when stacking.
     return utilities::regroup_and_scatter(result, order, comm);
   }
   auto result = utilities::scatter_visibilities(comm);
@@ -44,7 +55,7 @@ int main(int nargs, char const **args) {
   auto const comm = sopt::mpi::Communicator::World();
 
   const std::string &name = "allsky400MHz";
-  const t_real L = 1.9;
+  const t_real L = 0.1;
   const t_real max_w = 0.;  // lambda
   const t_real snr = 30;
   std::string const fitsfile = image_filename(name + ".fits");
@@ -58,13 +69,8 @@ int main(int nargs, char const **args) {
   const t_real phi_0 = 90. * constant::pi / 180.;
 
   t_int const number_of_pxiels = all_sky_image.size();
-  t_int const number_of_vis = 1e5;
   // Generating random uv(w) coverage
   t_real const sigma_m = 500. / 4. / 3. / L;
-  auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, max_w);
-  uv_data.units = utilities::vis_units::lambda;
-  PURIFY_MEDIUM_LOG("Number of measurements / number of pixels: {}",
-                    uv_data.u.size() * 1. / number_of_pxiels);
   t_uint const imsizey = all_sky_image.rows();
   t_uint const imsizex = all_sky_image.cols();
   const t_int num_theta = all_sky_image.rows();
@@ -90,7 +96,9 @@ int main(int nargs, char const **args) {
   };
 
   t_real sigma = 0.;
+  utilities::vis_params uv_data;
   if (comm.is_root()) {
+    uv_data = dirty_visibilities(uv_data);
     std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> const sky_measurements =
         std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
             spherical_resample::measurement_operator::nonplanar_degrid_wproj_operator<

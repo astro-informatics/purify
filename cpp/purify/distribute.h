@@ -57,7 +57,7 @@ Vector<t_int> distance_distribution(Vector<t_real> const &u, Vector<t_real> cons
 Vector<t_int> equal_distribution(Vector<t_real> const &u, Vector<t_real> const &v,
                                  t_int const grid_size);
 //! Distribute the visiblities into nodes by making a grid
-Vector<t_int> uv_distribution(Vector<t_real> const &u, Vector<t_real> const &v,
+std::vector<t_int> uv_distribution(Vector<t_real> const &u, Vector<t_real> const &v,
                                  t_int const nodes);
 }  // namespace distribute
 }  // namespace purify
