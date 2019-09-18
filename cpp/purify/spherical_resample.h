@@ -371,6 +371,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
     const operators::fftw_plan &ft_plan = operators::fftw_plan::measure,
     const bool uvw_stacking = false, const t_real L = 1, const t_real M = 1,
     const t_real coordinate_scaling = 1.) {
+  bool on_the_fly = true;
   t_real const w_mean = uvw_stacking ? w.array().mean() : 0.;
   t_real const v_mean = uvw_stacking ? v.array().mean() : 0.;
   t_real const u_mean = uvw_stacking ? u.array().mean() : 0.;
@@ -434,9 +435,14 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
   const t_real du = widefield::dl2du(dl, imsizex, oversample_ratio);
   const t_real dv = widefield::dl2du(dm, imsizey, oversample_ratio);
   sopt::OperatorFunction<T> directG, indirectG;
-  std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
-      (u.array() - u_mean) / du, (v.array() - v_mean) / dv, weights, imsizey, imsizex,
-      oversample_ratio, kernelv, kernelu, Ju, Jv);
+  if (on_the_fly)
+    std::tie(directG, indirectG) = purify::operators::init_on_the_fly_gridding_matrix_2d<T>(
+        (u.array() - u_mean) / du, (v.array() - v_mean) / dv, weights, imsizey, imsizex,
+        oversample_ratio, kernelu, kernelv, Ju, Jv, 4e5);
+  else
+    std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_2d<T>(
+        (u.array() - u_mean) / du, (v.array() - v_mean) / dv, weights, imsizey, imsizex,
+        oversample_ratio, kernelv, kernelu, Ju, Jv);
 
   const auto direct = sopt::chained_operators<T>(directG, directZFZ, directP);
   const auto indirect = sopt::chained_operators<T>(indirectP, indirectZFZ, indirectG);
@@ -599,6 +605,34 @@ std::shared_ptr<sopt::LinearTransform<T>> nonplanar_degrid_wproj_operator(
       number_of_samples, theta_0, phi_0, theta, phi, uv_data.u, uv_data.v, uv_data.w,
       uv_data.weights, oversample_ratio, oversample_ratio_image_domain, kernel, Ju, Jw, Jl, Jm,
       ft_plan, uvw_stacking, L, absolute_error, relative_error);
+  const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
+  const auto &direct = std::get<0>(m_op);
+  const auto &indirect = sopt::chained_operators<T>(allsumall, std::get<1>(m_op));
+
+  const std::array<t_int, 3> outsize = {0, 1, static_cast<t_int>(uv_data.u.size())};
+  const std::array<t_int, 3> insize = {0, 1, number_of_samples};
+
+  return std::make_shared<sopt::LinearTransform<Vector<t_complex>>>(direct, outsize, indirect,
+                                                                    insize);
+}
+//! Returns linear transform that is the weighted degridding operator with mpi all sum all (for
+//! planar array)
+template <class T, class K>
+std::shared_ptr<sopt::LinearTransform<T>> planar_degrid_operator(
+    const sopt::mpi::Communicator &comm, const t_int number_of_samples, const t_real theta_0,
+    const t_real phi_0, const K &theta, const K &phi, const utilities::vis_params &uv_data,
+    const t_real oversample_ratio = 2, const t_real oversample_ratio_image_domain = 2,
+    const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
+    const t_uint Jl = 4, const t_uint Jm = 4,
+    const operators::fftw_plan &ft_plan = operators::fftw_plan::measure,
+    const bool uvw_stacking = false, const t_real L = 1, const t_real M = 1) {
+  if (uv_data.units != utilities::vis_units::lambda)
+    throw std::runtime_error("Units for spherical imaging must be in lambda");
+  const auto m_op = base_plane_degrid_operator<T, K>(
+      number_of_samples, theta_0, phi_0, theta, phi, uv_data.u, uv_data.v, uv_data.w,
+      uv_data.weights, oversample_ratio, oversample_ratio_image_domain, kernel, Ju, Jv, Jl, Jm,
+      ft_plan, uvw_stacking, L, M);
+
   const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
   const auto &direct = std::get<0>(m_op);
   const auto &indirect = sopt::chained_operators<T>(allsumall, std::get<1>(m_op));
