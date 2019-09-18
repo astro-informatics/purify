@@ -44,9 +44,9 @@ int main(int nargs, char const** args) {
   const t_int Ju = 4;
   const t_int Jv = 4;
   const t_int Jw = 1000;
-  const t_real oversample_ratio_image_domain = 2;
-  const t_real oversample_ratio = 2;
-  const kernels::kernel kernel = kernels::kernel::kb;
+  const t_real oversample_ratio_image_domain = 1;
+  const t_real oversample_ratio = 1.2;
+  const kernels::kernel kernel = kernels::kernel::kbmin;
   const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
 
   const t_int num_vis = 1;
@@ -110,9 +110,9 @@ int main(int nargs, char const** args) {
     fourier_mode(index) =
         (mask(index) > 0)
             ? std::conj(std::exp(-2 * constant::pi * t_complex(0., 1.) *
-                                 (rotated_l(index) * rotated_u(0) * coordinate_scaling +
-                                  rotated_m(index) * rotated_v(0) * coordinate_scaling +
-                                  rotated_n(index) * rotated_w(0) * coordinate_scaling)))/n(index)
+                                 (l(index) * u(0) * coordinate_scaling +
+                                  m(index) * v(0) * coordinate_scaling +
+                                  (n(index) - 1) * w(0) * coordinate_scaling)))/n(index)
             : 0.;
   }
 
