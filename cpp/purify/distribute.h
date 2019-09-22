@@ -34,6 +34,9 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     const std::function<t_real(t_real)> &cost = [](t_real x) { return x * x; },
     const t_real rel_diff = 1e-3);
 #ifdef PURIFY_MPI
+//! use mpi to distribute uv_stacks
+std::vector<t_int> uv_distribution(sopt::mpi::Communicator const &comm, Vector<t_real> const &u,
+                                   Vector<t_real> const &v, const t_int nodes);
 //! patition w terms using k-means over MPI
 //! Details returns a tuple (indices for group, centre mean for each group)
 std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
@@ -58,7 +61,10 @@ Vector<t_int> equal_distribution(Vector<t_real> const &u, Vector<t_real> const &
                                  t_int const grid_size);
 //! Distribute the visiblities into nodes by making a grid
 std::vector<t_int> uv_distribution(Vector<t_real> const &u, Vector<t_real> const &v,
-                                 t_int const nodes);
+                                   t_int const nodes);
+std::vector<t_int> uv_distribution(Vector<t_real> const &u, Vector<t_real> const &v,
+                                   const t_int nodes, const t_real u_min, const t_real u_max,
+                                   const t_real v_min, const t_real v_max);
 }  // namespace distribute
 }  // namespace purify
 #endif

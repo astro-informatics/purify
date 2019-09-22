@@ -200,6 +200,22 @@ utilities::vis_params w_stacking(utilities::vis_params const &params,
       distribute::kmeans_algo(params.w, comm.size(), iters, comm, cost, k_means_rel_diff));
   return utilities::regroup_and_all_to_all(params, image_index, comm);
 }
+utilities::vis_params uv_stacking(utilities::vis_params const &params,
+                                  sopt::mpi::Communicator const &comm) {
+  const std::vector<t_int> image_index =
+      distribute::uv_distribution(comm, params.u, params.v, comm.size());
+  const auto output_data = utilities::regroup_and_all_to_all(params, image_index, comm);
+  const t_real u_mean = output_data.u.mean();
+  const t_real v_mean = output_data.v.mean();
+  const t_real w_mean = output_data.w.mean();
+  PURIFY_DEBUG("Node {} has mean u = {} +/- {}. ", comm.rank(), u_mean,
+               (u_mean - output_data.u.array()).cwiseAbs().maxCoeff());
+  PURIFY_DEBUG("Node {} has mean v = {} +/- {}. ", comm.rank(), v_mean,
+               (v_mean - output_data.v.array()).cwiseAbs().maxCoeff());
+  PURIFY_DEBUG("Node {} has mean w = {} +/- {}. ", comm.rank(), w_mean,
+               (w_mean - output_data.w.array()).cwiseAbs().maxCoeff());
+  return output_data;
+}
 std::tuple<utilities::vis_params, std::vector<t_int>, std::vector<t_real>>
 w_stacking_with_all_to_all(utilities::vis_params const &params, const t_real du,
                            const t_int min_support, const t_int max_support,

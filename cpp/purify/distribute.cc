@@ -75,6 +75,17 @@ Vector<t_int> distance_distribution(Vector<t_real> const &u, Vector<t_real> cons
 }
 std::vector<t_int> uv_distribution(Vector<t_real> const &u, Vector<t_real> const &v,
                                    const t_int nodes) {
+  const t_real u_min = u.minCoeff();
+  const t_real u_max = u.maxCoeff();
+  const t_real v_min = v.minCoeff();
+  const t_real v_max = v.maxCoeff();
+  return uv_distribution(u, v, nodes, u_min, u_max, v_min, v_max);
+}
+std::vector<t_int> uv_distribution(Vector<t_real> const &u, Vector<t_real> const &v,
+                                   const t_int nodes, const t_real u_min, const t_real u_max,
+                                   const t_real v_min, const t_real v_max) {
+  PURIFY_DEBUG("u ranges {}  {}. ", u_min, u_max);
+  PURIFY_DEBUG("v ranges {}  {}. ", v_min, v_max);
   if (std::floor(std::sqrt(nodes)) != std::ceil(std::sqrt(nodes)))
     throw std::runtime_error(
         "Number of nodes is not square, which is required for this implimentation of uv_stacking. "
@@ -82,10 +93,6 @@ std::vector<t_int> uv_distribution(Vector<t_real> const &u, Vector<t_real> const
         std::to_string(nodes));
   const t_real length = std::sqrt(nodes);
   std::vector<t_int> node_index(u.size());
-  const t_real u_min = u.minCoeff();
-  const t_real u_max = u.maxCoeff();
-  const t_real v_min = v.minCoeff();
-  const t_real v_max = v.maxCoeff();
   t_int count = 0;
   for (t_int i = 0; i < u.size(); i++) {
     const t_int node_x = std::floor((u(i) - u_min) / (u_max - u_min) * length * 0.99);
@@ -175,6 +182,14 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
   return std::make_tuple(w_node, w_centre);
 }
 #ifdef PURIFY_MPI
+std::vector<t_int> uv_distribution(sopt::mpi::Communicator const &comm, Vector<t_real> const &u,
+                                   Vector<t_real> const &v, const t_int nodes) {
+  t_real const u_min = comm.all_reduce<t_real>(u.minCoeff(), MPI_MIN);
+  t_real const v_min = comm.all_reduce<t_real>(v.minCoeff(), MPI_MIN);
+  t_real const u_max = comm.all_reduce<t_real>(u.maxCoeff(), MPI_MAX);
+  t_real const v_max = comm.all_reduce<t_real>(v.maxCoeff(), MPI_MAX);
+  return uv_distribution(u, v, nodes, u_min, u_max, v_min, v_max);
+}
 std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters,
     sopt::mpi::Communicator const &comm, const std::function<t_real(t_real)> &cost,
