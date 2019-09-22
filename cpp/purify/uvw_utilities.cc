@@ -31,6 +31,39 @@ Matrix<t_real> generate_antennas(const t_uint N, const t_real scale) {
   }
   return B * scale;
 }
+utilities::vis_params remove_redundent(const utilities::vis_params &uv_data) {
+  Vector<t_int> filter = Vector<t_int>::Ones(uv_data.size());
+  for (t_int i = 0; i < uv_data.size(); i++) {
+    if (filter(i) > 0)
+      for (t_int j = i + 1; j < uv_data.size(); j++) {
+        if (filter(j) > 0)
+          if (std::abs(std::abs(uv_data.u(i) * uv_data.u(j) + uv_data.v(i) * uv_data.v(j) +
+                                uv_data.w(i) * uv_data.w(j)) -
+                       std::abs(uv_data.u(i) * uv_data.u(i) + uv_data.v(i) * uv_data.v(i) +
+                                uv_data.w(i) * uv_data.w(i))) < 1e-12)
+            filter(j) = 0;
+      }
+  }
+  utilities::vis_params output_data = uv_data;
+  assert(filter.sum() < = filter.size());
+  output_data.u = Vector<t_real>::Zero(filter.sum());
+  output_data.v = Vector<t_real>::Zero(filter.sum());
+  output_data.w = Vector<t_real>::Zero(filter.sum());
+  output_data.weights = Vector<t_complex>::Ones(filter.sum());
+  output_data.vis = Vector<t_complex>::Ones(filter.sum());
+  t_int count = 0;
+  for (t_int i = 0; i < uv_data.size(); i++) {
+    if (filter(i) > 0) {
+      output_data.u(count) = uv_data.u(i);
+      output_data.v(count) = uv_data.v(i);
+      output_data.w(count) = uv_data.w(i);
+      count++;
+      assert(count < output_data.u.size());
+    }
+  }
+  assert(count == filter.sum());
+  return output_data;
+}
 
 utilities::vis_params antenna_to_coverage(const Matrix<t_real> &B, const t_real frequency,
                                           const t_real times, const t_real theta_ra,

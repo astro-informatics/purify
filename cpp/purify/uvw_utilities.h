@@ -86,6 +86,8 @@ T calculate_rotated_w(const T &u, const T &v, const T &w, const t_real alpha, co
 utilities::vis_params random_sample_density(const t_int vis_num, const t_real mean,
                                             const t_real standard_deviation,
                                             const t_real rms_w = 0);
+//! Remove redundent baselines
+utilities::vis_params remove_redundent(const utilities::vis_params &uv_data);
 //! Generate guassianly distributed (sigma = scale) antenna positions
 Matrix<t_real> generate_antennas(const t_uint N, const t_real scale);
 template <class T>
