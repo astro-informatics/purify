@@ -81,9 +81,9 @@ int main(int nargs, char const **args) {
   const t_int Jm = 4;
   const t_int Ju = 4;
   const t_int Jv = 4;
-  const t_int Jw = 1024;
-  const t_real oversample_ratio_image_domain = 2;
-  const t_real oversample_ratio = 2;
+  const t_int Jw = 256;
+  const t_real oversample_ratio_image_domain = 1;
+  const t_real oversample_ratio = 1.5;
   const bool uvw_stacking = true;
   const kernels::kernel kernel = kernels::kernel::kb;
   const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
@@ -129,8 +129,7 @@ int main(int nargs, char const **args) {
   if (comm.is_root()) pfitsio::write2d(dmap_image.real(), dirtyfile);
   // wavelet transform
   t_uint sara_size = 0.;
-  std::vector<std::tuple<std::string, t_uint>> const sara{std::make_tuple("dirac", 1u),
-                                                          std::make_tuple("db8", 5u)};
+  std::vector<std::tuple<std::string, t_uint>> const sara{std::make_tuple("dirac", 1u)};
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
       factory::distributed_wavelet_operator::mpi_sara, sara, imsizey, imsizex, sara_size);
 
