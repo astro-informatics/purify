@@ -113,19 +113,19 @@ int main(int, char **) {
   // sopt::logging::set_level("debug");
   //  purify::logging::set_level("debug");
   const std::string &name = "allsky400MHz";
-  const t_real L = 0.5;
+  const t_real L = 1.7;
   const t_real max_w = 0.;  // lambda
-  const t_real snr = 30;
+  const t_real snr = 15;
   std::string const fitsfile = image_filename(name + ".fits");
   const auto all_sky_image = pfitsio::read2d(fitsfile);
   std::string const inputfile = output_filename(name + "_" + "input.fits");
 
   pfitsio::write2d(all_sky_image.real(), inputfile);
-  const t_real theta_0 = 180. * constant::pi / 180.;
-  const t_real phi_0 = 120. * constant::pi / 180.;
+  const t_real theta_0 = 0. * constant::pi / 180.;
+  const t_real phi_0 = 90. * constant::pi / 180.;
 
   t_int const number_of_pxiels = all_sky_image.size();
-  t_int const number_of_vis = 1e6;
+  t_int const number_of_vis = 1e5;
   // Generating random uv(w) coverage
   t_real const sigma_m = 1000. / 4. / 3. / L;
   auto uv_data = utilities::random_sample_density(number_of_vis, 0, sigma_m, max_w);
@@ -143,8 +143,10 @@ int main(int, char **) {
   const t_int Ju = 4;
   const t_int Jv = 4;
   const t_int Jw = 14;
-  const t_real oversample_ratio_image_domain = 2;
-  const t_real oversample_ratio = 2;
+  const t_real beam_l = 3;
+  const t_real beam_m = beam_l;
+  const t_real oversample_ratio_image_domain = 1.;
+  const t_real oversample_ratio = 1.5;
   const bool uvw_stacking = true;
   const kernels::kernel kernel = kernels::kernel::kb;
   const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
@@ -161,7 +163,7 @@ int main(int, char **) {
               Vector<t_complex>, std::function<t_real(t_int)>>(
               number_of_samples, theta_0, phi_0, theta, phi, uv_data, oversample_ratio,
               oversample_ratio_image_domain, kernel, Ju, Jw, Jl, Jm, ft_plan, uvw_stacking, L, 1e-6,
-              1e-6),
+              1e-6, beam_l, beam_m),
           1000, 1e-4, Vector<t_complex>::Random(imsizex * imsizey).eval()));
   uv_data.vis =
       (*sky_measurements) * Image<t_complex>::Map(all_sky_image.data(), all_sky_image.size(), 1);
@@ -171,6 +173,6 @@ int main(int, char **) {
 
   // adding noise to visibilities
   uv_data.vis = utilities::add_noise(y0, 0., sigma);
-  padmm(name + "30", all_sky_image, uv_data, sigma, sky_measurements);
+  padmm(name + std::to_string(snr), all_sky_image, uv_data, sigma, sky_measurements);
   return 0;
 }

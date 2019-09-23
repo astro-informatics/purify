@@ -36,16 +36,18 @@ int main(int nargs, char const** args) {
   ARGS_MACRO(coordinate_scaling, 8, 1., t_real)
 #undef ARGS_MACRO
   const t_real M = L;
-  const t_int num_theta = 1024;
-  const t_int num_phi = 512;
+  const t_int num_theta = 2096;
+  const t_int num_phi = 1024;
   const t_int number_of_samples = num_theta * num_phi;
+  const t_real beam_l = 3;
+  const t_real beam_m = beam_l;
   const t_int Jl = 4;
   const t_int Jm = 4;
   const t_int Ju = 4;
   const t_int Jv = 4;
   const t_int Jw = 1000;
   const t_real oversample_ratio_image_domain = 1;
-  const t_real oversample_ratio = 1.2;
+  const t_real oversample_ratio = 1.5;
   const kernels::kernel kernel = kernels::kernel::kbmin;
   const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
 
@@ -72,7 +74,7 @@ int main(int nargs, char const** args) {
                                                            std::function<t_real(t_int)>>(
           number_of_samples, theta_0, phi_0, theta, phi, u, v, w, weights, oversample_ratio,
           oversample_ratio_image_domain, kernel, Ju, Jw, Jl, Jm, ft_plan, uvw_stacking, L, 1e-8,
-          1e-8, coordinate_scaling);
+          1e-8, coordinate_scaling, beam_l, beam_m);
 
   sopt::LinearTransform<Vector<t_complex>> const m_op = sopt::LinearTransform<Vector<t_complex>>(
       std::get<0>(measure_op), {0, 1, number_of_samples}, std::get<1>(measure_op), {0, 1, num_vis});
@@ -108,12 +110,15 @@ int main(int nargs, char const** args) {
   const Vector<t_real> mask = spherical_resample::generate_mask(l, m, n, L, M);
   for (t_int index = 0; index < number_of_samples; index++) {
     fourier_mode(index) =
-        (mask(index) > 0)
-            ? std::conj(std::exp(-2 * constant::pi * t_complex(0., 1.) *
-                                 (l(index) * u(0) * coordinate_scaling +
-                                  m(index) * v(0) * coordinate_scaling +
-                                  (n(index) - 1) * w(0) * coordinate_scaling)))/n(index)
-            : 0.;
+        ((mask(index) > 0) ? std::conj(std::exp(-2 * constant::pi * t_complex(0., 1.) *
+                                                (l(index) * u(0) * coordinate_scaling +
+                                                 m(index) * v(0) * coordinate_scaling +
+                                                 (n(index) - 1) * w(0) * coordinate_scaling))) /
+                                 n(index)
+                           : 0.) *
+        boost::math::sinc_pi(beam_l * l(index) * constant::pi) *
+        boost::math::sinc_pi(beam_m * m(index) * constant::pi);
+    ;
   }
 
   pfitsio::write2d(Image<t_real>::Map(l.data(), num_theta, num_phi), "l_coordinates.fits");
