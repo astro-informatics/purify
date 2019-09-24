@@ -24,10 +24,10 @@ using namespace purify;
 using namespace purify::notinstalled;
 
 utilities::vis_params dirty_visibilities(const utilities::vis_params &uv_data) {
-  const std::string &pos_filename = mwa_filename("Phase1_config.txt");
-  const auto times = std::vector<t_real>{0, 8, 16, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112};
+  const std::string &pos_filename = mwa_filename("../chime/chime_config.txt");
+  const auto times = std::vector<t_real>{0};
   auto uv_data_root =
-      utilities::read_ant_positions_to_coverage(pos_filename, 150e6, times, 0., 0., 0.);
+      utilities::read_ant_positions_to_coverage(pos_filename, 400e6, times, 0., 0., 0.);
   uv_data_root.units = utilities::vis_units::lambda;
   return uv_data_root;
 }
@@ -39,7 +39,7 @@ utilities::vis_params dirty_visibilities(const utilities::vis_params &uv_data,
     //  auto const order = distribute::distribute_measurements(result, comm,
     //  distribute::plan::uv_stack);
     auto const order = distribute::uv_distribution(result.u, result.v, comm.size());
-    //should use conjugate symmetry to make v >= 0 when stacking.
+    // should use conjugate symmetry to make v >= 0 when stacking.
     return utilities::regroup_and_scatter(result, order, comm);
   }
   auto result = utilities::scatter_visibilities(comm);
@@ -55,7 +55,7 @@ int main(int nargs, char const **args) {
   auto const comm = sopt::mpi::Communicator::World();
 
   const std::string &name = "allsky400MHz";
-  const t_real L = 0.1;
+  const t_real L = 1.9;
   const t_real max_w = 0.;  // lambda
   const t_real snr = 30;
   std::string const fitsfile = image_filename(name + ".fits");
@@ -65,7 +65,8 @@ int main(int nargs, char const **args) {
   std::string const outfile_fits = output_filename(name + "_" + "solution.fits");
   std::string const residual_fits = output_filename(name + "_" + "residual.fits");
   if (comm.is_root()) pfitsio::write2d(all_sky_image.real(), inputfile);
-  const t_real theta_0 = 0. * constant::pi / 180.;
+  const t_real theta_0 =
+      0. * constant::pi / 180. + comm.rank() * constant::pi / 180. * comm.size() * 2;
   const t_real phi_0 = 90. * constant::pi / 180.;
 
   t_int const number_of_pxiels = all_sky_image.size();
@@ -97,32 +98,33 @@ int main(int nargs, char const **args) {
 
   t_real sigma = 0.;
   utilities::vis_params uv_data;
-  if (comm.is_root()) {
+  // if (comm.is_root()) {
+  {
     uv_data = dirty_visibilities(uv_data);
     std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> const sky_measurements =
         std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-            spherical_resample::measurement_operator::nonplanar_degrid_wproj_operator<
+            spherical_resample::measurement_operator::planar_degrid_operator<
                 Vector<t_complex>, std::function<t_real(t_int)>>(
-                number_of_samples, theta_0, phi_0, theta, phi, uv_data, oversample_ratio,
-                oversample_ratio_image_domain, kernel, Ju, Jw, Jl, Jm, ft_plan, uvw_stacking, L,
-                1e-6, 1e-6),
-            1000, 1e-4, Vector<t_complex>::Random(imsizex * imsizey).eval()));
+                comm, number_of_samples, theta_0, phi_0, theta, phi, uv_data, oversample_ratio,
+                oversample_ratio_image_domain, kernel, Ju, Jv, Jl, Jm, ft_plan, uvw_stacking, L, L,
+                0., 0.),
+            1000, 1e-3, Vector<t_complex>::Random(imsizex * imsizey).eval()));
     uv_data.vis =
         (*sky_measurements) * Image<t_complex>::Map(all_sky_image.data(), all_sky_image.size(), 1);
     // adding noise to visibilities
     sigma = utilities::SNR_to_standard_deviation(uv_data.vis, snr);
     uv_data.vis = utilities::add_noise(uv_data.vis, 0., sigma);
   }
-  uv_data = dirty_visibilities(uv_data, comm);
+  // uv_data = dirty_visibilities(uv_data, comm);
 
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> const measurements_transform =
       std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-          spherical_resample::measurement_operator::nonplanar_degrid_wproj_operator<
+          spherical_resample::measurement_operator::planar_degrid_operator<
               Vector<t_complex>, std::function<t_real(t_int)>>(
               comm, number_of_samples, theta_0, phi_0, theta, phi, uv_data, oversample_ratio,
-              oversample_ratio_image_domain, kernel, Ju, Jw, Jl, Jm, ft_plan, uvw_stacking, L, 1e-6,
-              1e-6),
-          1000, 1e-4,
+              oversample_ratio_image_domain, kernel, Ju, Jv, Jl, Jm, ft_plan, uvw_stacking, L, L,
+              0., 0.),
+          1000, 1e-3,
           comm.broadcast<Vector<t_complex>>(Vector<t_complex>::Random(imsizex * imsizey).eval())));
   Vector<t_complex> dmap = measurements_transform->adjoint() * uv_data.vis;
   Image<t_complex> dmap_image = Image<t_complex>::Map(dmap.data(), imsizey, imsizex);
