@@ -385,6 +385,9 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
   PURIFY_MEDIUM_LOG("FoV (width, height): {} x {} (deg x deg)",
                     std::asin(imsizex * dl / 2.) * 2. * 180. / constant::pi,
                     std::asin(imsizey * dm / 2.) * 2. * 180. / constant::pi);
+  PURIFY_MEDIUM_LOG("Primary Beam (width, height): {} x {} (deg x deg)",
+                    std::asin(beam_l / 2 / 2.) * 2. * 180. / constant::pi,
+                    std::asin(beam_m / 2. / 2) * 2. * 180. / constant::pi);
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   PURIFY_MEDIUM_LOG("Maximum u value is {} lambda, sphere needs to be sampled at dl = {}.",
                     u.cwiseAbs().maxCoeff(), std::min(0.5 / u.cwiseAbs().maxCoeff(), 1.));
@@ -408,12 +411,14 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
 
   const t_complex I(0., 1.);
   std::function<t_complex(t_real, t_real)> dde = [I, u_mean, v_mean, w_mean, imsizex, imsizey,
-                                                  oversample_ratio, oversample_ratio_image_domain](
+                                                  oversample_ratio, oversample_ratio_image_domain, beam_m, beam_l](
                                                      const t_real l, const t_real m) {
     return std::exp(-2 * constant::pi * I *
                     (u_mean * l + v_mean * m + w_mean * (std::sqrt(1. - l * l - m * m) - 1.))) /
            std::sqrt(1. - l * l - m * m) * (((l * l + m * m) < 1.) ? 1. : 0.) *
-           std::sqrt(imsizex * imsizey) * oversample_ratio * oversample_ratio_image_domain;
+           boost::math::sinc_pi(beam_l * l * constant::pi) *
+           boost::math::sinc_pi(beam_m * m * constant::pi) * std::sqrt(imsizex * imsizey) *
+           oversample_ratio * oversample_ratio_image_domain;
   };
 
   PURIFY_LOW_LOG("Constructing Spherical Resampling Operator: P");
@@ -482,8 +487,8 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_plane_degr
                     std::asin(imsizex * dl / 2.) * 2. * 180. / constant::pi,
                     std::asin(imsizey * dm / 2.) * 2. * 180. / constant::pi);
   PURIFY_MEDIUM_LOG("Primary Beam (width, height): {} x {} (deg x deg)",
-                    std::asin(1. / beam_l / 2.) * 2. * 180. / constant::pi,
-                    std::asin(1. / beam_m / 2.) * 2. * 180. / constant::pi);
+                    std::asin(beam_l / 2.) * 2. * 180. / constant::pi,
+                    std::asin(beam_m / 2.) * 2. * 180. / constant::pi);
   PURIFY_MEDIUM_LOG("Number of visibilities: {}", u.size());
   PURIFY_MEDIUM_LOG("Maximum u value is {} lambda, sphere needs to be sampled at dl = {}.",
                     u.cwiseAbs().maxCoeff(), std::min(0.5 / u.cwiseAbs().maxCoeff(), 1.));
@@ -632,13 +637,14 @@ std::shared_ptr<sopt::LinearTransform<T>> planar_degrid_operator(
     const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4, const t_uint Jv = 4,
     const t_uint Jl = 4, const t_uint Jm = 4,
     const operators::fftw_plan &ft_plan = operators::fftw_plan::measure,
-    const bool uvw_stacking = false, const t_real L = 1, const t_real M = 1) {
+    const bool uvw_stacking = false, const t_real L = 1, const t_real M = 1,
+    const t_real beam_l = 0., const t_real beam_m = 0.) {
   if (uv_data.units != utilities::vis_units::lambda)
     throw std::runtime_error("Units for spherical imaging must be in lambda");
   const auto m_op = base_plane_degrid_operator<T, K>(
       number_of_samples, theta_0, phi_0, theta, phi, uv_data.u, uv_data.v, uv_data.w,
       uv_data.weights, oversample_ratio, oversample_ratio_image_domain, kernel, Ju, Jv, Jl, Jm,
-      ft_plan, uvw_stacking, L, M);
+      ft_plan, uvw_stacking, L, M, 1, beam_l, beam_m);
 
   const auto allsumall = purify::operators::init_all_sum_all<T>(comm);
   const auto &direct = std::get<0>(m_op);
