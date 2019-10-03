@@ -213,3 +213,45 @@ TEST_CASE("normed operator") {
     }
   }
 }
+
+TEST_CASE("normed operator with no widths") {
+  const t_real oversample_ratio = 2;
+  const t_int power_iters = 1000;
+  const t_real power_tol = 1e-4;
+  Vector<t_real> u = Vector<t_real>::Random(10);
+  const Vector<t_real> widths = Vector<t_real>::Zero(u.size());
+  const t_uint M = u.size();
+  const Vector<t_complex> y = Vector<t_complex>::Ones(u.size());
+  SECTION("kb") {
+    const kernels::kernel kernel = kernels::kernel::kb;
+    for (auto& J : {4, 5, 6, 7, 8}) {
+      for (auto& imsize : {128, 256, 512}) {
+        const t_real cell = constant::pi / imsize;
+        const Vector<t_complex> init = Vector<t_complex>::Ones(imsize);
+        auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
+            measurementoperator::init_degrid_operator_1d<Vector<t_complex>>(
+                u * imsize / 2, Vector<t_complex>::Ones(M), imsize, cell, oversample_ratio, kernel,
+                J),
+            power_iters, power_tol, init);
+        const t_real norm = std::get<0>(power_method_result);
+        const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measure_op =
+            std::get<2>(power_method_result);
+
+        Vector<t_complex> input = Vector<t_complex>::Zero(imsize);
+        input(static_cast<t_int>(imsize * 0.5)) = 1.;
+        const Vector<t_complex> y_test =
+            (*measure_op * input).eval() *
+            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio);
+        CAPTURE(y_test.cwiseAbs().mean());
+        CAPTURE(y);
+        CAPTURE(y_test);
+        CAPTURE(J);
+        CAPTURE(imsize)
+        CHECK((y_test * norm).isApprox(y, 1e-3));
+        const Vector<t_complex> psf =
+            (measure_op->adjoint() * y) * std::sqrt(input.size() * oversample_ratio) / M * norm;
+        CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5))) == Approx(1.).margin(0.001));
+      }
+    }
+  }
+}

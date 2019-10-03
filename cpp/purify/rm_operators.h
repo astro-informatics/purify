@@ -170,6 +170,27 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
 
 template <class T>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_operator_1d(
+    const Vector<t_real> &u, const Vector<t_complex> &weights, const t_uint imsizex,
+    const t_real oversample_ratio, const kernels::kernel kernel, const t_uint Ju,
+    const fftw_plan ft_plan) {
+  std::function<t_real(t_real)> kernelu, ftkernelu;
+  std::tie(ftkernelu, kernelu) = purify::create_radial_ftkernel(kernel, Ju, oversample_ratio);
+  sopt::OperatorFunction<T> directFZ, indirectFZ;
+  std::tie(directFZ, indirectFZ) =
+      base_padding_and_FFT_1d<T>(ftkernelu, imsizex, oversample_ratio, ft_plan);
+  sopt::OperatorFunction<T> directG, indirectG;
+  PURIFY_LOW_LOG("Constructing Weighting and Gridding Operators: WG");
+  PURIFY_MEDIUM_LOG("Number of channels: {}", u.size());
+  std::tie(directG, indirectG) = purify::operators::init_gridding_matrix_1d<T>(
+      u, weights, imsizex, oversample_ratio, kernelu, Ju);
+  auto direct = sopt::chained_operators<T>(directG, directFZ);
+  auto indirect = sopt::chained_operators<T>(indirectFZ, indirectG);
+  PURIFY_LOW_LOG("Finished consturction of RM Φ.");
+  return std::make_tuple(direct, indirect);
+}
+
+template <class T>
+std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_degrid_operator_1d(
     const Vector<t_real> &u, const Vector<t_real> &widths, const Vector<t_complex> &weights,
     const t_uint imsizex, const t_real cell, const t_real oversample_ratio,
     const kernels::kernel kernel, const t_uint Ju, const t_uint J_max, const t_real abs_error,
@@ -223,6 +244,23 @@ std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_1d(
   std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_1d<T>(
       -u / du, widths, weights, imsizex, cell, oversample_ratio, kernel, Ju, J_max, abs_error,
       rel_error, ft_plan);
+  return std::make_shared<sopt::LinearTransform<T>>(directDegrid, M, indirectDegrid, N);
+}
+//! Return degridding operator with no channgel averaging
+template <class T>
+std::shared_ptr<sopt::LinearTransform<T>> init_degrid_operator_1d(
+    const Vector<t_real> &u, const Vector<t_complex> &weights, const t_uint imsizex,
+    const t_real cell, const t_real oversample_ratio = 2,
+    const kernels::kernel kernel = kernels::kernel::kb, const t_uint Ju = 4,
+    const t_uint J_max = 30, const t_real abs_error = 1e-6, const t_real rel_error = 1e-6) {
+  PURIFY_LOW_LOG("Cell size in Faraday Depth is {} rad/m^2", cell);
+  const t_real du = rm_details::pixel_to_lambda2(cell, imsizex, oversample_ratio);
+  const operators::fftw_plan ft_plan = operators::fftw_plan::measure;
+  std::array<t_int, 3> N = {0, 1, static_cast<t_int>(imsizex)};
+  std::array<t_int, 3> M = {0, 1, static_cast<t_int>(u.size())};
+  sopt::OperatorFunction<T> directDegrid, indirectDegrid;
+  std::tie(directDegrid, indirectDegrid) = purify::operators::base_degrid_operator_1d<T>(
+      -u / du, weights, imsizex, oversample_ratio, kernel, Ju, ft_plan);
   return std::make_shared<sopt::LinearTransform<T>>(directDegrid, M, indirectDegrid, N);
 }
 
