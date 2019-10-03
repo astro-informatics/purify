@@ -4,11 +4,14 @@ include_directories(SYSTEM ${Sopt_INCLUDE_DIRS})
 include_directories("${PROJECT_SOURCE_DIR}/cpp")
 
 add_example(gridding LIBRARIES libpurify NOTEST)
+add_example(rm_gridding_example LIBRARIES libpurify NOTEST)
 add_example(image_wproj_chirp LIBRARIES libpurify NOTEST)
+add_example(image_rm_window LIBRARIES libpurify NOTEST)
 add_example(compare_wprojection LIBRARIES libpurify NOTEST)
 add_example(generate_vis_data LIBRARIES libpurify NOTEST)
 
 add_example(plot_wkernel LIBRARIES libpurify NOTEST)
+add_example(plot_rmkernel LIBRARIES libpurify NOTEST)
 add_example(wavelet_decomposition LIBRARIES libpurify NOTEST)
 add_example(histogram_equalisation LIBRARIES libpurify NOTEST)
 
