@@ -86,18 +86,14 @@ TEST_CASE("flux units") {
                 imsize, imsize, oversample_ratio, kernel, J, J);
         Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
         input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
-        const Vector<t_complex> y_test =
-            (*measure_op * input).eval() *
-            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+        const Vector<t_complex> y_test = (*measure_op * input).eval();
         CAPTURE(y_test.cwiseAbs().mean());
         CAPTURE(y);
         CAPTURE(y_test);
         CAPTURE(J);
         CAPTURE(imsize)
         CHECK(y_test.isApprox(y, 1e-3));
-        const Vector<t_complex> psf =
-            (measure_op->adjoint() * y) *
-            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
         CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
               Approx(1.).margin(0.001));
       }
@@ -118,18 +114,14 @@ TEST_CASE("flux units") {
                   Vector<t_complex>::Ones(M), imsize, imsize, oversample_ratio, kernel, J, J);
           Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
           input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
-          const Vector<t_complex> y_test =
-              (*measure_op * input).eval() *
-              std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+          const Vector<t_complex> y_test = (*measure_op * input).eval();
           CAPTURE(y_test.cwiseAbs().mean());
           CAPTURE(y);
           CAPTURE(y_test);
           CAPTURE(J);
           CAPTURE(imsize)
           CHECK(y_test.isApprox(y, 1e-3));
-          const Vector<t_complex> psf =
-              (measure_op->adjoint() * y) *
-              std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+          const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
           CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
                 Approx(1.).margin(0.001));
         }
@@ -146,18 +138,14 @@ TEST_CASE("flux units") {
                 imsize, imsize, oversample_ratio, kernel, J, J);
         Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
         input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
-        const Vector<t_complex> y_test =
-            (*measure_op * input).eval() *
-            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+        const Vector<t_complex> y_test = (*measure_op * input).eval();
         CAPTURE(y_test.cwiseAbs().mean());
         CAPTURE(y);
         CAPTURE(y_test);
         CAPTURE(J);
         CAPTURE(imsize)
         CHECK(y_test.isApprox(y, 1e-2));
-        const Vector<t_complex> psf =
-            (measure_op->adjoint() * y) *
-            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
         CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
               Approx(1.).margin(0.01));
       }
@@ -173,18 +161,14 @@ TEST_CASE("flux units") {
                 imsize, imsize, oversample_ratio, kernel, J, J);
         Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
         input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
-        const Vector<t_complex> y_test =
-            (*measure_op * input).eval() *
-            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+        const Vector<t_complex> y_test = (*measure_op * input).eval();
         CAPTURE(y_test.cwiseAbs().mean());
         CAPTURE(y);
         CAPTURE(y_test);
         CAPTURE(J);
         CAPTURE(imsize)
         CHECK(y_test.isApprox(y, 1e-3));
-        const Vector<t_complex> psf =
-            (measure_op->adjoint() * y) *
-            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
         CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
               Approx(1.).margin(0.001));
       }
@@ -200,18 +184,14 @@ TEST_CASE("flux units") {
                 imsize, imsize, oversample_ratio, kernel, J, J, false, 1e-6, 1e-6);
         Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
         input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
-        const Vector<t_complex> y_test =
-            (*measure_op * input).eval() *
-            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+        const Vector<t_complex> y_test = (*measure_op * input).eval();
         CAPTURE(y_test.cwiseAbs().mean());
         CAPTURE(y);
         CAPTURE(y_test);
         CAPTURE(J);
         CAPTURE(imsize)
         CHECK(y_test.isApprox(y, 1e-3));
-        const Vector<t_complex> psf =
-            (measure_op->adjoint() * y) *
-            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
         CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
               Approx(1.).margin(0.001));
       }
@@ -233,18 +213,14 @@ TEST_CASE("flux units") {
                   1e-6, 1e-6);
           Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
           input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
-          const Vector<t_complex> y_test =
-              (*measure_op * input).eval() *
-              std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+          const Vector<t_complex> y_test = (*measure_op * input).eval();
           CAPTURE(y_test.cwiseAbs().mean());
           CAPTURE(y);
           CAPTURE(y_test);
           CAPTURE(J);
           CAPTURE(imsize)
           CHECK(y_test.isApprox(y, 1e-3));
-          const Vector<t_complex> psf =
-              (measure_op->adjoint() * y) *
-              std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+          const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
           CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
                 Approx(1.).margin(0.001));
         }
@@ -261,18 +237,14 @@ TEST_CASE("flux units") {
                 imsize, imsize, oversample_ratio, kernel, J, J, false, 1e-6, 1e-6);
         Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
         input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
-        const Vector<t_complex> y_test =
-            (*measure_op * input).eval() *
-            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+        const Vector<t_complex> y_test = (*measure_op * input).eval();
         CAPTURE(y_test.cwiseAbs().mean());
         CAPTURE(y);
         CAPTURE(y_test);
         CAPTURE(J);
         CAPTURE(imsize)
         CHECK(y_test.isApprox(y, 1e-2));
-        const Vector<t_complex> psf =
-            (measure_op->adjoint() * y) *
-            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
         CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
               Approx(1.).margin(0.01));
       }
@@ -288,18 +260,14 @@ TEST_CASE("flux units") {
                 imsize, imsize, oversample_ratio, kernel, J, J, false, 1e-6, 1e-6);
         Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
         input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
-        const Vector<t_complex> y_test =
-            (*measure_op * input).eval() *
-            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+        const Vector<t_complex> y_test = (*measure_op * input).eval();
         CAPTURE(y_test.cwiseAbs().mean());
         CAPTURE(y);
         CAPTURE(y_test);
         CAPTURE(J);
         CAPTURE(imsize)
         CHECK(y_test.isApprox(y, 1e-2));
-        const Vector<t_complex> psf =
-            (measure_op->adjoint() * y) *
-            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M;
+        const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
         CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
               Approx(1.).margin(0.001));
       }
@@ -330,18 +298,14 @@ TEST_CASE("normed operator") {
 
         Vector<t_complex> input = Vector<t_complex>::Zero(imsize * imsize);
         input(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize)) = 1.;
-        const Vector<t_complex> y_test =
-            (*measure_op * input).eval() *
-            std::sqrt(static_cast<t_int>(input.size()) * oversample_ratio * oversample_ratio);
+        const Vector<t_complex> y_test = (*measure_op * input).eval();
         CAPTURE(y_test.cwiseAbs().mean());
         CAPTURE(y);
         CAPTURE(y_test);
         CAPTURE(J);
         CAPTURE(imsize)
         CHECK((y_test * norm).isApprox(y, 1e-3));
-        const Vector<t_complex> psf =
-            (measure_op->adjoint() * y) *
-            std::sqrt(input.size() * oversample_ratio * oversample_ratio) / M * norm;
+        const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M * norm;
         CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
               Approx(1.).margin(0.001));
       }
