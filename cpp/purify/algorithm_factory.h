@@ -25,7 +25,7 @@
 namespace purify {
 namespace factory {
 enum class algorithm { padmm, primal_dual, sdmm, forward_backward };
-enum class algo_distribution { serial, mpi_serial, mpi_distributed };
+enum class algo_distribution { serial, mpi_serial, mpi_distributed, mpi_random_updates };
 const std::map<std::string, algo_distribution> algo_distribution_string = {
     {"none", algo_distribution::serial},
     {"serial-equivalent", algo_distribution::mpi_serial},
@@ -235,6 +235,35 @@ primaldual_factory(
   case (algo_distribution::mpi_distributed): {
     obj_conv = ConvergenceType::mpi_local;
     rel_conv = ConvergenceType::mpi_local;
+    break;
+  }
+  case (algo_distribution::mpi_random_updates): {
+    obj_conv = ConvergenceType::mpi_local;
+    rel_conv = ConvergenceType::mpi_local;
+    auto const comm = sopt::mpi::Communicator::World();
+    const t_int measurement_sampling_size = std::floor(0.5 * comm.size());
+    const t_int wavelet_sampling_size = std::floor(0.5 * comm.size());
+    std::shared_ptr<std::vector<t_int>> ind;
+    for (t_int i = 0; i < comm.size(); i++) ind->push_back(i);
+    auto random_measurement_updater = [measurement_sampling_size, ind, comm] -> bool {
+      if (comm.is_root()) std::random_shuffle(ind->begin(), ind->end());
+      *ind = comm.broadcast(*ind);
+      for (t_int i = 0; i < measurement_sampling_size; i++)
+        if (comm.rank() == ind->at(i)) return true;
+      return false;
+    };
+    auto random_wavelet_updater = [wavelet_sampling_size, ind, comm] -> bool {
+      if (comm.is_root()) std::random_shuffle(ind->begin(), ind->end());
+      *ind = comm.broadcast(*ind);
+      for (t_int i = 0; i < wavelet_sampling_size; i++)
+        if (comm.rank() == ind->at(i)) return true;
+      return false;
+    };
+    primaldual->random_measurement_updater(random_measurement_updater)
+        .random_wavelet_updater(random_wavelet_updater)
+        .v_all_sum_all_comm(comm)
+        .u_all_sum_all_comm(comm);
+
     break;
   }
 #endif
