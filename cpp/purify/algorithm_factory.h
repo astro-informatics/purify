@@ -6,6 +6,7 @@
 #include "purify/types.h"
 #include "purify/convergence_factory.h"
 #include "purify/logging.h"
+#include "purify/random_update_factory.h"
 #include "purify/utilities.h"
 
 #ifdef PURIFY_MPI
@@ -259,30 +260,18 @@ primaldual_factory(
               sigma / std::sqrt(2);
     obj_conv = ConvergenceType::mpi_local;
     rel_conv = ConvergenceType::mpi_local;
-    auto const comm = sopt::mpi::Communicator::World();
-    const t_int measurement_sampling_size = std::floor(0.5 * comm.size());
-    const t_int wavelet_sampling_size = std::floor(0.5 * comm.size());
-    std::shared_ptr<std::vector<t_int>> ind;
-    for (t_int i = 0; i < comm.size(); i++) ind->push_back(i);
-    auto random_measurement_updater = [measurement_sampling_size, ind, comm] -> bool {
-      if (comm.is_root()) std::random_shuffle(ind->begin(), ind->end());
-      *ind = comm.broadcast(*ind);
-      for (t_int i = 0; i < measurement_sampling_size; i++)
-        if (comm.rank() == ind->at(i)) return true;
-      return false;
-    };
-    auto random_wavelet_updater = [wavelet_sampling_size, ind, comm] -> bool {
-      if (comm.is_root()) std::random_shuffle(ind->begin(), ind->end());
-      *ind = comm.broadcast(*ind);
-      for (t_int i = 0; i < wavelet_sampling_size; i++)
-        if (comm.rank() == ind->at(i)) return true;
-      return false;
-    };
+    std::shared_ptr<bool> random_measurement_update_ptr = std::make_shared<bool>(true);
+    std::shared_ptr<bool> random_wavelet_update_ptr = std::make_shared<bool>(true);
+    const t_int update_size = std::floor(0.5 * comm.size());
+    auto random_measurement_updater = random_updater::random_updater(
+        comm, update_size, random_measurement_update_ptr, "measurements");
+    auto random_wavelet_updater = random_updater::random_updater(
+        comm, update_size, random_measurement_update_ptr, "wavelets");
+
     primaldual->random_measurement_updater(random_measurement_updater)
         .random_wavelet_updater(random_wavelet_updater)
         .v_all_sum_all_comm(comm)
         .u_all_sum_all_comm(comm);
-
     break;
   }
 #endif

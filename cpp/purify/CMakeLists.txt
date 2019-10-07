@@ -21,6 +21,8 @@ set(HEADERS
   logging.h kernels.h pfitsio.h  logging.disabled.h types.h
   IndexMapping.h logging.enabled.h utilities.h operators.h  wproj_utilities.h
   cimg.h uvfits.h convolution.h measurement_operator_factory.h wavelet_operator_factory.h distribute.h
+  update_factory.h
+  convergence_factory.h
   algorithm_factory.h
   read_measurements.h
   yaml-parser.h
@@ -42,8 +44,10 @@ endif()
 
 if(PURIFY_MPI)
   list(APPEND HEADERS mpi_utilities.h distribute.h DistributeSparseVector.h
+  random_update_factory.h
   AllToAllSparseVector.h)
-  list(APPEND SOURCES mpi_utilities.cc distribute.cc AllToAllSparseVector.cc)
+  list(APPEND SOURCES mpi_utilities.cc distribute.cc AllToAllSparseVector.cc
+  random_update_factory.cc)
 endif()
 
 add_library(libpurify SHARED ${SOURCES})
