@@ -50,14 +50,15 @@ TEST_CASE("padmm_factory") {
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
       factory::distributed_wavelet_operator::serial, sara, imsizey, imsizex);
-  t_real const sigma = 0.02378738741225;  // see test_parameters file
+  t_real const sigma = 0.016820222945913496;  // see test_parameters file
   auto const padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
       factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma, imsizey,
       imsizex, sara.size(), 1000, true, true, false, 1e-3, 1e-2, 50);
 
   auto const diagnostic = (*padmm)();
-  CHECK(diagnostic.niters == 139);
+  CHECK(diagnostic.niters == 123);
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
+  // pfitsio::write2d(image.real(), expected_solution_path);
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
@@ -66,6 +67,7 @@ TEST_CASE("padmm_factory") {
   const Vector<t_complex> residuals = measurements_transform->adjoint() *
                                       (uv_data.vis - ((*measurements_transform) * diagnostic.x));
   const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
+  // pfitsio::write2d(residual_image.real(), expected_residual_path);
   CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
   CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
@@ -103,14 +105,14 @@ TEST_CASE("primal_dual_factory") {
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
       factory::distributed_wavelet_operator::serial, sara, imsizey, imsizex);
-  t_real const sigma = 0.02378738741225;  // see test_parameters file
+  t_real const sigma = 0.016820222945913496;  // see test_parameters file
   auto const primaldual =
       factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
           factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma,
           imsizey, imsizex, sara.size(), 1000, true, true, 1e-3);
 
   auto const diagnostic = (*primaldual)();
-  CHECK(diagnostic.niters == 310);
+  CHECK(diagnostic.niters == 248);
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
   // pfitsio::write2d(image.real(), expected_solution_path);
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
@@ -159,7 +161,7 @@ TEST_CASE("fb_factory") {
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
       factory::distributed_wavelet_operator::serial, sara, imsizey, imsizex);
-  t_real const sigma = 0.02378738741225;  // see test_parameters file
+  t_real const sigma = 0.016820222945913496;  // see test_parameters file
   t_real const beta = sigma * sigma;
   t_real const gamma = 10;
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
@@ -167,9 +169,9 @@ TEST_CASE("fb_factory") {
       gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-3, 1e-3, 50);
 
   auto const diagnostic = (*fb)();
-  CHECK(diagnostic.niters == 21);
+  CHECK(diagnostic.niters == 28);
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
-  // pfitsio::write2d(image.real(), expected_solution_path);
+  //pfitsio::write2d(image.real(), expected_solution_path);
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
@@ -178,7 +180,7 @@ TEST_CASE("fb_factory") {
   const Vector<t_complex> residuals = measurements_transform->adjoint() *
                                       (uv_data.vis - ((*measurements_transform) * diagnostic.x));
   const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
-  // pfitsio::write2d(residual_image.real(), expected_residual_path);
+  //pfitsio::write2d(residual_image.real(), expected_residual_path);
   CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
   CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
@@ -216,7 +218,7 @@ TEST_CASE("joint_map_factory") {
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
       factory::distributed_wavelet_operator::serial, sara, imsizey, imsizex);
-  t_real const sigma = 0.02378738741225;  // see test_parameters file
+  t_real const sigma = 0.016820222945913496;  // see test_parameters file
   t_real const beta = sigma * sigma;
   t_real const gamma = 1;
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
