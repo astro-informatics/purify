@@ -55,7 +55,8 @@ padmm_factory(const algo_distribution dist,
     throw std::runtime_error(
         "l1 proximal not consistent: You say you are using a tight frame, but you have more than "
         "one wavelet basis.");
-  auto epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
+  auto epsilon =
+      std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size())) * sigma / std::sqrt(2);
   auto padmm = std::make_shared<Algorithm>(uv_data.vis);
   padmm->itermax(max_iterations)
       .relative_variation(relative_variation)
@@ -89,8 +90,9 @@ padmm_factory(const algo_distribution dist,
     obj_conv = ConvergenceType::mpi_global;
     rel_conv = ConvergenceType::mpi_global;
     auto const comm = sopt::mpi::Communicator::World();
-    epsilon =
-        utilities::calculate_l2_radius(comm.all_sum_all(uv_data.vis.size()), comm.broadcast(sigma));
+    epsilon = std::sqrt(2 * comm.all_sum_all(uv_data.size()) +
+                        2 * std::sqrt(4 * comm.all_sum_all(uv_data.size()))) *
+              sigma / std::sqrt(2);
     // communicator ensuring l2 norm in l2ball proximal is global
     padmm->l2ball_proximal_communicator(comm);
     break;
@@ -98,6 +100,11 @@ padmm_factory(const algo_distribution dist,
   case (algo_distribution::mpi_distributed): {
     obj_conv = ConvergenceType::mpi_local;
     rel_conv = ConvergenceType::mpi_local;
+    auto const comm = sopt::mpi::Communicator::World();
+    epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size()) *
+                                                 std::sqrt(comm.all_sum_all(4 * uv_data.size())) /
+                                                 comm.all_sum_all(std::sqrt(4 * uv_data.size()))) *
+              sigma / std::sqrt(2);
     break;
   }
 #endif
@@ -198,7 +205,8 @@ primaldual_factory(
     const bool real_constraint = true, const bool positive_constraint = true,
     const t_real relative_variation = 1e-3) {
   typedef typename Algorithm::Scalar t_scalar;
-  auto epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
+  auto epsilon =
+      std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size())) * sigma / std::sqrt(2);
   auto primaldual = std::make_shared<Algorithm>(uv_data.vis);
   primaldual->itermax(max_iterations)
       .relative_variation(relative_variation)
@@ -226,8 +234,9 @@ primaldual_factory(
     obj_conv = ConvergenceType::mpi_global;
     rel_conv = ConvergenceType::mpi_global;
     auto const comm = sopt::mpi::Communicator::World();
-    epsilon =
-        utilities::calculate_l2_radius(comm.all_sum_all(uv_data.vis.size()), comm.broadcast(sigma));
+    epsilon = std::sqrt(2 * comm.all_sum_all(uv_data.size()) +
+                        2 * std::sqrt(4 * comm.all_sum_all(uv_data.size()))) *
+              sigma;
     // communicator ensuring l2 norm in l2ball proximal is global
     primaldual->l2ball_proximal_communicator(comm);
     break;
@@ -235,9 +244,19 @@ primaldual_factory(
   case (algo_distribution::mpi_distributed): {
     obj_conv = ConvergenceType::mpi_local;
     rel_conv = ConvergenceType::mpi_local;
+    auto const comm = sopt::mpi::Communicator::World();
+    epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size()) *
+                                                 std::sqrt(comm.all_sum_all(4 * uv_data.size())) /
+                                                 comm.all_sum_all(std::sqrt(4 * uv_data.size()))) *
+              sigma / std::sqrt(2);
     break;
   }
   case (algo_distribution::mpi_random_updates): {
+    auto const comm = sopt::mpi::Communicator::World();
+    epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size()) *
+                                                 std::sqrt(comm.all_sum_all(4 * uv_data.size())) /
+                                                 comm.all_sum_all(std::sqrt(4 * uv_data.size()))) *
+              sigma / std::sqrt(2);
     obj_conv = ConvergenceType::mpi_local;
     rel_conv = ConvergenceType::mpi_local;
     auto const comm = sopt::mpi::Communicator::World();
