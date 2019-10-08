@@ -333,7 +333,7 @@ TEST_CASE("Serial vs. Serial with MPI Forward Backward") {
       beta, gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-3, 1e-3, 50);
 
   auto const diagnostic = (*fb)();
-  CHECK(diagnostic.niters == 21);
+  CHECK(diagnostic.niters == 28);
 
   const std::string &expected_solution_path =
       notinstalled::data_filename(test_dir + "solution.fits");

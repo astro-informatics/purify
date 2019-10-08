@@ -30,6 +30,7 @@ enum class algo_distribution { serial, mpi_serial, mpi_distributed, mpi_random_u
 const std::map<std::string, algo_distribution> algo_distribution_string = {
     {"none", algo_distribution::serial},
     {"serial-equivalent", algo_distribution::mpi_serial},
+    {"random-updates", algo_distribution::mpi_random_updates},
     {"fully-distributed", algo_distribution::mpi_distributed}};
 
 //! return chosen algorithm given parameters
