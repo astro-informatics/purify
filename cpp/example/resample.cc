@@ -64,7 +64,7 @@ int main(int nargs, char const** args) {
                                                              std::function<t_real(t_int)>>(
           number_of_samples, theta_0, phi_0, theta, phi, imsizey, imsizex,
           oversample_ratio_image_domain, dl, dm, kernell, kernelm, Jl, Jm,
-          [](t_real, t_real) { return 1.; });
+          [](t_real, t_real) { return 1.; }, 1);
   sopt::LinearTransform<Vector<t_complex>> const resampler =
       sopt::LinearTransform<Vector<t_complex>>(
           std::get<0>(resample_operator), {0, 1, number_of_samples}, std::get<1>(resample_operator),
