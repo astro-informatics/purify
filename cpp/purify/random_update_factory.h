@@ -15,7 +15,8 @@
 namespace purify {
 namespace random_updater {
 //! Creates lambda that controls random updates
-std::function<bool()> random_updater(const sopt::mpi::Communicator& comm, const t_int update_size,
+std::function<bool()> random_updater(const sopt::mpi::Communicator& comm, const t_int total,
+                                     const t_int update_size,
                                      const std::shared_ptr<bool> update_pointer,
                                      const std::string& update_name);
 }  // namespace random_updater

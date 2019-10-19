@@ -4,14 +4,15 @@
 
 namespace purify {
 namespace random_updater {
-std::function<bool()> random_updater(const sopt::mpi::Communicator& comm, const t_int update_size,
+std::function<bool()> random_updater(const sopt::mpi::Communicator& comm, const t_int total,
+                                     const t_int update_size,
                                      const std::shared_ptr<bool> update_pointer,
                                      const std::string& update_name) {
   if (update_size > comm.size())
     throw std::runtime_error(
         "Number of random updates cannot be greater than number of MPI processors in the "
         "communicator.");
-  std::shared_ptr<std::vector<t_int>> ind = std::make_shared<std::vector<t_int>>(comm.size(), 0);
+  std::shared_ptr<std::vector<t_int>> ind = std::make_shared<std::vector<t_int>>(total, 0);
   for (t_int i = 0; i < comm.size(); i++) (*ind)[i] = i;
   std::random_device rng;
   std::shared_ptr<std::mt19937> urng = std::make_shared<std::mt19937>(rng());
