@@ -13,7 +13,7 @@ std::function<bool()> random_updater(const sopt::mpi::Communicator& comm, const 
         "Number of random updates cannot be greater than number of MPI processors in the "
         "communicator.");
   std::shared_ptr<std::vector<t_int>> ind = std::make_shared<std::vector<t_int>>(total, 0);
-  for (t_int i = 0; i < comm.size(); i++) (*ind)[i] = i;
+  for (t_int i = 0; i < total; i++) (*ind)[i] = i;
   std::random_device rng;
   std::shared_ptr<std::mt19937> urng = std::make_shared<std::mt19937>(rng());
   return [update_pointer, update_size, update_name, ind, comm, urng]() -> bool {
