@@ -225,9 +225,14 @@ int main(int argc, const char **argv) {
                     params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
 #ifdef PURIFY_MPI
     auto const comm = sopt::mpi::Communicator::World();
-    sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-        sky_measurements, params.powMethod_iter(), params.powMethod_tolerance(),
-        comm.broadcast(measurement_op_eigen_vector)));
+    sky_measurements =
+        (params.mpiAlgorithm() != factory::algo_distribution::mpi_random_updates)
+            ? std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+                  sky_measurements, params.powMethod_iter(), params.powMethod_tolerance(),
+                  comm.broadcast(measurement_op_eigen_vector)))
+            : std::get<2>(sopt::algorithm::all_sum_all_normalise_operator<Vector<t_complex>>(
+                  comm, sky_measurements, params.powMethod_iter(), params.powMethod_tolerance(),
+                  comm.broadcast(measurement_op_eigen_vector)));
 #else
     sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
         sky_measurements, params.powMethod_iter(), params.powMethod_tolerance(),
