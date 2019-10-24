@@ -88,7 +88,6 @@ var searchData=
   ['distribute_2eh',['distribute.h',['../distribute_8h.html',1,'']]],
   ['distribute_5fmeasurements',['distribute_measurements',['../namespacepurify_1_1distribute.html#ac92e70bdd1349f71c586e2ae418aacac',1,'purify::distribute']]],
   ['distribute_5fparams',['distribute_params',['../namespacepurify_1_1utilities.html#a2120ca26a6a6f0797051d7701d96ad14',1,'purify::utilities']]],
-  ['distribute_5fsara',['distribute_sara',['http://astro-informatics.github.io/sopt/namespacesopt_1_1wavelets.html#ab9737357a4056306f3b6feca0f55b6c3',1,'sopt::wavelets']]],
   ['distribute_5fsparse_5fvector_2ecc',['distribute_sparse_vector.cc',['../distribute__sparse__vector_8cc.html',1,'']]],
   ['distributed_5fmeasurement_5foperator',['distributed_measurement_operator',['../namespacepurify_1_1factory.html#a6b8de5116c3d7d0d679cd6dd47a80248',1,'purify::factory']]],
   ['distributed_5fwavelet_5foperator',['distributed_wavelet_operator',['../namespacepurify_1_1factory.html#a5bbc6a01d0a2cdd30b656a6bb957221f',1,'purify::factory']]],

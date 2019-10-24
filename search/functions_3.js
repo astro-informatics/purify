@@ -22,7 +22,6 @@ var searchData=
   ['distance_5fdistribution',['distance_distribution',['../namespacepurify_1_1distribute.html#afa3ab873e06dd32e3f2ce5e968900b93',1,'purify::distribute']]],
   ['distribute_5fmeasurements',['distribute_measurements',['../namespacepurify_1_1distribute.html#ac92e70bdd1349f71c586e2ae418aacac',1,'purify::distribute']]],
   ['distribute_5fparams',['distribute_params',['../namespacepurify_1_1utilities.html#a2120ca26a6a6f0797051d7701d96ad14',1,'purify::utilities']]],
-  ['distribute_5fsara',['distribute_sara',['http://astro-informatics.github.io/sopt/namespacesopt_1_1wavelets.html#ab9737357a4056306f3b6feca0f55b6c3',1,'sopt::wavelets']]],
   ['duration',['duration',['../namespaceb__utilities.html#ac2c5b1baa8b1154965c0acbe63be33e1',1,'b_utilities']]],
   ['dynamic_5frange',['dynamic_range',['../namespacepurify_1_1utilities.html#ad55d48f38b4f24dfc7d703682fb3e26d',1,'purify::utilities']]]
 ];
