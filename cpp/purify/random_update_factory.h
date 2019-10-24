@@ -11,7 +11,6 @@
 #ifdef PURIFY_MPI
 #include "purify/mpi_utilities.h"
 #include <sopt/mpi/communicator.h>
-#endif
 namespace purify {
 namespace random_updater {
 //! Creates lambda that controls random updates
@@ -21,4 +20,5 @@ std::function<bool()> random_updater(const sopt::mpi::Communicator& comm, const 
                                      const std::string& update_name);
 }  // namespace random_updater
 }  // namespace purify
+#endif
 #endif
