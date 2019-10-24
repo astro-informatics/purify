@@ -121,7 +121,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
     const auto residual = pfitsio::read2d(expected_residual_path);
 
     const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
-    //if (world.is_root()) pfitsio::write2d(image.real(), expected_solution_path);
+    // if (world.is_root()) pfitsio::write2d(image.real(), expected_solution_path);
     CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
@@ -131,7 +131,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
                                         (uv_data.vis - ((*measurements_transform) * diagnostic.x));
     const Image<t_complex> residual_image =
         Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
-    //if (world.is_root()) pfitsio::write2d(residual_image.real(), expected_residual_path);
+    // if (world.is_root()) pfitsio::write2d(residual_image.real(), expected_residual_path);
     CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
     CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
@@ -223,7 +223,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
     const auto residual = pfitsio::read2d(expected_residual_path);
 
     const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
-    //if (world.is_root()) pfitsio::write2d(image.real(), expected_solution_path);
+    // if (world.is_root()) pfitsio::write2d(image.real(), expected_solution_path);
     CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
@@ -233,7 +233,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
                                         (uv_data.vis - ((*measurements_transform) * diagnostic.x));
     const Image<t_complex> residual_image =
         Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
-    //if (world.is_root()) pfitsio::write2d(residual_image.real(), expected_residual_path);
+    // if (world.is_root()) pfitsio::write2d(residual_image.real(), expected_residual_path);
     CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
     CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
@@ -246,14 +246,14 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
                 factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1,
                 2, kernels::kernel_from_string.at("kb"), 4, 4),
             1000, 1e-5, world.broadcast(Vector<t_complex>::Ones(imsizex * imsizey).eval())));
+    auto sara_dist = sopt::wavelets::distribute_sara(sara, world);
     auto const wavelets_serial = factory::wavelet_operator_factory<Vector<t_complex>>(
-        factory::distributed_wavelet_operator::serial, sopt::wavelets::distribute_sara(sara, world),
-        imsizey, imsizex);
+        factory::distributed_wavelet_operator::serial, sara_dist, imsizey, imsizex);
 
     auto const primaldual =
         factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
             factory::algo_distribution::mpi_random_updates, measurements_transform_serial,
-            wavelets_serial, uv_data, sigma, imsizey, imsizex, sara.size(), 500);
+            wavelets_serial, uv_data, sigma, imsizey, imsizex, sara_dist.size(), 500);
 
     auto const diagnostic = (*primaldual)();
     t_real const epsilon = utilities::calculate_l2_radius(world.all_sum_all(uv_data.vis.size()),
@@ -278,7 +278,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
       const auto residual = pfitsio::read2d(expected_residual_path);
 
       const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
-      //if (world.is_root()) pfitsio::write2d(image.real(), expected_solution_path);
+      // if (world.is_root()) pfitsio::write2d(image.real(), expected_solution_path);
       CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
       CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
       CAPTURE(
@@ -290,7 +290,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
           (uv_data.vis - ((*measurements_transform) * diagnostic.x));
       const Image<t_complex> residual_image =
           Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
-      //if (world.is_root()) pfitsio::write2d(residual_image.real(), expected_residual_path);
+      // if (world.is_root()) pfitsio::write2d(residual_image.real(), expected_residual_path);
       CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
       CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
       CHECK(residual_image.real().isApprox(residual.real(), 1e-3));
