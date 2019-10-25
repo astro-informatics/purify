@@ -261,7 +261,7 @@ primaldual_factory(
     rel_conv = ConvergenceType::mpi_local;
     std::shared_ptr<bool> random_measurement_update_ptr = std::make_shared<bool>(true);
     std::shared_ptr<bool> random_wavelet_update_ptr = std::make_shared<bool>(true);
-    const t_int update_size = std::floor(0.5 * comm.size());
+    const t_int update_size = std::max<t_int>(std::floor(0.5 * comm.size()), 1);
     auto random_measurement_updater = random_updater::random_updater(
         comm, comm.size(), update_size, random_measurement_update_ptr, "measurements");
     auto random_wavelet_updater = random_updater::random_updater(
