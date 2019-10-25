@@ -11,7 +11,8 @@ std::function<bool()> random_updater(const sopt::mpi::Communicator& comm, const 
   if (update_size > comm.size())
     throw std::runtime_error(
         "Number of random updates cannot be greater than number of MPI processors in the "
-        "communicator.");
+        "communicator " +
+        std::to_string(comm.size()) + " < " + std::to_string(update_size) + " .");
   std::shared_ptr<std::vector<t_int>> ind = std::make_shared<std::vector<t_int>>(total, 0);
   for (t_int i = 0; i < total; i++) (*ind)[i] = i;
   std::random_device rng;
