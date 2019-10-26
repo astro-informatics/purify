@@ -260,6 +260,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
                                                           world.broadcast(sigma));
     CHECK(sopt::mpi::l2_norm(diagnostic.residual, primaldual->l2ball_proximal_weights(), world) <
           epsilon);
+    if (world.size() > 2) return;
     // the algorithm depends on nodes, so other than a basic bounds check,
     // it is hard to know exact precision (might depend on probability theory...)
     if (world.size() == 0)
@@ -275,7 +276,6 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
       if (world.size() == 1) CHECK(diagnostic.niters == 248);
       if (world.size() == 2) CHECK(diagnostic.niters < 400);
 
-      if (world.size() > 2) return;
       const auto solution = pfitsio::read2d(expected_solution_path);
       const auto residual = pfitsio::read2d(expected_residual_path);
 
