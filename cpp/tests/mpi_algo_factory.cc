@@ -274,6 +274,8 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
                               : notinstalled::data_filename(test_dir + "residual.fits");
       if (world.size() == 1) CHECK(diagnostic.niters == 248);
       if (world.size() == 2) CHECK(diagnostic.niters < 400);
+
+      if (world.size() > 2) return;
       const auto solution = pfitsio::read2d(expected_solution_path);
       const auto residual = pfitsio::read2d(expected_residual_path);
 
