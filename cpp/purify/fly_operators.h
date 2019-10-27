@@ -3,6 +3,7 @@
 
 #include "purify/config.h"
 #include "purify/types.h"
+#include <set>
 #include "purify/operators.h"
 
 namespace purify {
