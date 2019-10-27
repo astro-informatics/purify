@@ -28,8 +28,10 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> base_padding_an
     const t_real celly) {
   sopt::OperatorFunction<T> directZ, indirectZ;
   sopt::OperatorFunction<T> directFFT, indirectFFT;
-  const Image<t_complex> S = purify::details::init_correction_radial_2d(
-      oversample_ratio, imsizey, imsizex, ftkerneluv, w_mean, cellx, celly);
+  const Image<t_complex> S =
+      purify::details::init_correction_radial_2d(oversample_ratio, imsizey, imsizex, ftkerneluv,
+                                                 w_mean, cellx, celly) *
+      std::sqrt(imsizex * imsizey) * oversample_ratio;
   PURIFY_LOW_LOG("Building Measurement Operator: WGFZDB");
   PURIFY_LOW_LOG(
       "Constructing Zero Padding "
