@@ -59,6 +59,7 @@ var searchData=
   ['mpi_5fmeasurement_5ffactory_2ecc',['mpi_measurement_factory.cc',['../mpi__measurement__factory_8cc.html',1,'']]],
   ['mpi_5fmeasurement_5foperator_2ecc',['mpi_measurement_operator.cc',['../mpi__measurement__operator_8cc.html',1,'']]],
   ['mpi_5fproximals_2ecc',['mpi_proximals.cc',['http://astro-informatics.github.io/sopt/mpi__proximals_8cc.html',1,'']]],
+  ['mpi_5frandom_5fupdates',['mpi_random_updates',['../namespacepurify_1_1factory.html#a862f0cad917b1ba718f965fd508f31f4a67e8f37794e0d9fed73a8b77c703f8e6',1,'purify::factory']]],
   ['mpi_5fread_5fmeasurements_2ecc',['mpi_read_measurements.cc',['../mpi__read__measurements_8cc.html',1,'']]],
   ['mpi_5fsara',['mpi_sara',['../namespacepurify_1_1factory.html#a5bbc6a01d0a2cdd30b656a6bb957221fad560be68e475e7680c1ea7f87a40926e',1,'purify::factory']]],
   ['mpi_5fserial',['mpi_serial',['../namespacepurify_1_1factory.html#a862f0cad917b1ba718f965fd508f31f4ac0fed08bcb99b1cd719f49ff80e9a912',1,'purify::factory']]],

@@ -1558,6 +1558,7 @@
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="convergence__factory_8h" name="convergence_factory.h" local="yes" imported="no">purify/convergence_factory.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
+    <includes id="random__update__factory_8h" name="random_update_factory.h" local="yes" imported="no">purify/random_update_factory.h</includes>
     <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
     <namespace>purify</namespace>
     <namespace>purify::factory</namespace>
@@ -1581,6 +1582,7 @@
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a862f0cad917b1ba718f965fd508f31f4a74136b24217cb75599440e6e1d807cf7">serial</enumvalue>
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a862f0cad917b1ba718f965fd508f31f4ac0fed08bcb99b1cd719f49ff80e9a912">mpi_serial</enumvalue>
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a862f0cad917b1ba718f965fd508f31f4afd592d6cd0b4eadd3f6fa268b995ff76">mpi_distributed</enumvalue>
+      <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a862f0cad917b1ba718f965fd508f31f4a67e8f37794e0d9fed73a8b77c703f8e6">mpi_random_updates</enumvalue>
     </member>
     <member kind="function">
       <type>std::shared_ptr&lt; Algorithm &gt;</type>
@@ -3494,6 +3496,30 @@
       <anchor>a252309ca86301bfadce2323718d01178</anchor>
       <arglist>(const std::string &amp;fits_name, Eigen::EigenBase&lt; T &gt; &amp;output, t_int &amp;rows, t_int &amp;cols, t_int &amp;channels, t_int &amp;pols)</arglist>
     </member>
+  </compound>
+  <compound kind="file">
+    <name>random_update_factory.cc</name>
+    <path>/mydata/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/random__update__factory_8cc</filename>
+    <includes id="random__update__factory_8h" name="random_update_factory.h" local="yes" imported="no">purify/random_update_factory.h</includes>
+    <namespace>purify</namespace>
+    <namespace>purify::random_updater</namespace>
+    <member kind="function">
+      <type>std::function&lt; bool()&gt;</type>
+      <name>random_updater</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1random__updater.html</anchorfile>
+      <anchor>aebd5a90028486e62a31619c45907fa85</anchor>
+      <arglist>(const sopt::mpi::Communicator &amp;comm, const t_int total, const t_int update_size, const std::shared_ptr&lt; bool &gt; update_pointer, const std::string &amp;update_name)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>random_update_factory.h</name>
+    <path>/mydata/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/random__update__factory_8h</filename>
+    <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
+    <includes id="convergence__factory_8h" name="convergence_factory.h" local="yes" imported="no">purify/convergence_factory.h</includes>
+    <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
+    <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
   </compound>
   <compound kind="file">
     <name>read_measurements.cc</name>
@@ -7372,6 +7398,7 @@
     <namespace>purify::operators</namespace>
     <namespace>purify::pfitsio</namespace>
     <namespace>purify::projection_kernels</namespace>
+    <namespace>purify::random_updater</namespace>
     <namespace>purify::read_measurements</namespace>
     <namespace>purify::utilities</namespace>
     <namespace>purify::widefield</namespace>
@@ -7853,6 +7880,7 @@
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a862f0cad917b1ba718f965fd508f31f4a74136b24217cb75599440e6e1d807cf7">serial</enumvalue>
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a862f0cad917b1ba718f965fd508f31f4ac0fed08bcb99b1cd719f49ff80e9a912">mpi_serial</enumvalue>
       <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a862f0cad917b1ba718f965fd508f31f4afd592d6cd0b4eadd3f6fa268b995ff76">mpi_distributed</enumvalue>
+      <enumvalue file="http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html" anchor="a862f0cad917b1ba718f965fd508f31f4a67e8f37794e0d9fed73a8b77c703f8e6">mpi_random_updates</enumvalue>
     </member>
     <member kind="enumeration">
       <type></type>
@@ -8732,6 +8760,17 @@
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1projection__kernels.html</anchorfile>
       <anchor>a3363eb7199ce493e3b828292c7ece53a</anchor>
       <arglist>(const t_real u, const t_real v, const t_real w, const t_real du, const t_real dv, const t_real oversample_ratio, const std::function&lt; t_complex(t_real)&gt; &amp;ftkernelu, const std::function&lt; t_complex(t_real)&gt; &amp;ftkernelv, const t_uint &amp;max_evaluations, const t_real &amp;absolute_error, const t_real &amp;relative_error, const integration::method method, t_uint &amp;evaluations)</arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>purify::random_updater</name>
+    <filename>http://astro-informatics.github.io/purify/http://astro-informatics.github.io/purify/namespacepurify_1_1random__updater.html</filename>
+    <member kind="function">
+      <type>std::function&lt; bool()&gt;</type>
+      <name>random_updater</name>
+      <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1random__updater.html</anchorfile>
+      <anchor>aebd5a90028486e62a31619c45907fa85</anchor>
+      <arglist>(const sopt::mpi::Communicator &amp;comm, const t_int total, const t_int update_size, const std::shared_ptr&lt; bool &gt; update_pointer, const std::string &amp;update_name)</arglist>
     </member>
   </compound>
   <compound kind="namespace">

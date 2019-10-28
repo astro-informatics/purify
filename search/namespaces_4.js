@@ -16,6 +16,7 @@ var searchData=
   ['pfitsio',['pfitsio',['../namespacepurify_1_1pfitsio.html',1,'purify']]],
   ['projection_5fkernels',['projection_kernels',['../namespacepurify_1_1projection__kernels.html',1,'purify']]],
   ['purify',['purify',['../namespacepurify.html',1,'']]],
+  ['random_5fupdater',['random_updater',['../namespacepurify_1_1random__updater.html',1,'purify']]],
   ['read_5fmeasurements',['read_measurements',['../namespacepurify_1_1read__measurements.html',1,'purify']]],
   ['utilities',['utilities',['../namespacepurify_1_1utilities.html',1,'purify']]],
   ['widefield',['widefield',['../namespacepurify_1_1widefield.html',1,'purify']]],

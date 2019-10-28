@@ -107,6 +107,7 @@ var searchData=
   ['purify_5fpadmm_5falgorithm',['PURIFY_PADMM_ALGORITHM',['../padmm__mpi__random__coverage_8cc.html#a361e852a4c304de1f7ee66e0b6a5f59a',1,'PURIFY_PADMM_ALGORITHM():&#160;padmm_mpi_random_coverage.cc'],['../padmm__mpi__real__data_8cc.html#a361e852a4c304de1f7ee66e0b6a5f59a',1,'PURIFY_PADMM_ALGORITHM():&#160;padmm_mpi_real_data.cc']]],
   ['purify_5ftrace',['PURIFY_TRACE',['../logging_8h.html#aa26a839bf9a37459472d1ac6fa8203be',1,'logging.h']]],
   ['purify_5fwarn',['PURIFY_WARN',['../logging_8h.html#a415aa1970a79c89dfda68d3ad9583aa7',1,'logging.h']]],
+  ['random_5fupdater',['random_updater',['../namespacepurify_1_1random__updater.html',1,'purify']]],
   ['read_5fmeasurements',['read_measurements',['../namespacepurify_1_1read__measurements.html',1,'purify']]],
   ['utilities',['utilities',['../namespacepurify_1_1utilities.html',1,'purify']]],
   ['widefield',['widefield',['../namespacepurify_1_1widefield.html',1,'purify']]],
