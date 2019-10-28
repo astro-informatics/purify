@@ -147,7 +147,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
         }
       }
     }
-    for (t_int m = 1; m < omp_get_max_threads(); m++) {
+    for (t_int m = 1; m < max_threads; m++) {
       const t_int loop_shift = m * nonZeros_vec.size();
       output_compressed.segment(0, nonZeros_vec.size()) +=
           output_compressed.segment(loop_shift, nonZeros_vec.size());
