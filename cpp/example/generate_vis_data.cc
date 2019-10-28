@@ -18,7 +18,7 @@ int main(int nargs, char const **args) {
 
   const std::string &pos_filename = mwa_filename("Phase1_config.txt");
   const std::string &vis_file = output_filename("mwa_snapshot_coverage.vis");
-  const auto times = std::vector<t_real> { 0, 8, 16, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112 };
+  const auto times = std::vector<t_real>{0, 8, 16, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112};
   auto uv_data = utilities::read_ant_positions_to_coverage(pos_filename, 150e6, times, 0., 0., 0.);
   uv_data.units = utilities::vis_units::lambda;
 

@@ -48,7 +48,7 @@ t_real pswf(const t_real x, const t_real J);
 t_real ft_pswf(const t_real x, const t_real J);
 //! Calculates samples of a kernel
 std::vector<t_real> kernel_samples(const t_int total_samples,
-                              const std::function<t_real(t_real)> kernelu);
+                                   const std::function<t_real(t_real)> kernelu);
 //! zeroth order interpolates from samples of kernel
 t_real kernel_zero_interp(const std::vector<t_real> &samples, const t_real x, const t_real J);
 //! linearly interpolates from samples of kernel

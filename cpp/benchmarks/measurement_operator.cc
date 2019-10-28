@@ -40,7 +40,6 @@ void degrid_operator_ctor(benchmark::State &state) {
                           sizeof(t_complex));
 }
 
-
 // ----------------- Application benchmarks -----------------------//
 
 class DegridOperatorFixture : public ::benchmark::Fixture {
