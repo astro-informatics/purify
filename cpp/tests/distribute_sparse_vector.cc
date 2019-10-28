@@ -147,7 +147,7 @@ TEST_CASE("recv_sizes") {
           std::numeric_limits<t_int>::max())
         CHECK_THROWS(all_to_all_recv_sizes<t_int>(local_indices, nodes, N));
       else {
-        std::vector<t_int> recv = all_to_all_recv_sizes(local_indices, nodes, N);
+        std::vector<t_int> recv = all_to_all_recv_sizes<t_int>(local_indices, nodes, N);
         for (const auto& a : recv) CHECK(a >= 0);
 
         CHECK(local_indices.size() == std::accumulate(recv.begin(), recv.end(), 0));

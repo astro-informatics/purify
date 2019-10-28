@@ -63,14 +63,14 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
       factory::distributed_wavelet_operator::mpi_sara, sara, imsizey, imsizex);
-  t_real const sigma = world.broadcast(0.02378738741225);  // see test_parameters file
+  t_real const sigma = world.broadcast(0.016820222945913496);  // see test_parameters file
   SECTION("global") {
     auto const padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
         factory::algo_distribution::mpi_serial, measurements_transform, wavelets, uv_data, sigma,
         imsizey, imsizex, sara.size(), 500);
 
     auto const diagnostic = (*padmm)();
-    CHECK(diagnostic.niters == 139);
+    CHECK(diagnostic.niters == 123);
 
     const std::string &expected_solution_path =
         notinstalled::data_filename(test_dir + "solution.fits");
@@ -81,6 +81,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
     const auto residual = pfitsio::read2d(expected_residual_path);
 
     const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
+    // if (world.is_root()) pfitsio::write2d(image.real(), expected_solution_path);
     CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
@@ -114,12 +115,13 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
     const std::string &expected_residual_path =
         (world.size() == 2) ? notinstalled::data_filename(test_dir + "mpi_residual.fits")
                             : notinstalled::data_filename(test_dir + "residual.fits");
-    if (world.size() == 1) CHECK(diagnostic.niters == 139);
-    if (world.size() == 2) CHECK(diagnostic.niters == 138);
+    if (world.size() == 1) CHECK(diagnostic.niters == 123);
+    if (world.size() == 2) CHECK(diagnostic.niters == 129);
     const auto solution = pfitsio::read2d(expected_solution_path);
     const auto residual = pfitsio::read2d(expected_residual_path);
 
     const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
+    // if (world.is_root()) pfitsio::write2d(image.real(), expected_solution_path);
     CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
@@ -129,6 +131,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
                                         (uv_data.vis - ((*measurements_transform) * diagnostic.x));
     const Image<t_complex> residual_image =
         Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
+    // if (world.is_root()) pfitsio::write2d(residual_image.real(), expected_residual_path);
     CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
     CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
@@ -161,7 +164,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
       factory::distributed_wavelet_operator::mpi_sara, sara, imsizey, imsizex);
-  t_real const sigma = world.broadcast(0.02378738741225);  // see test_parameters file
+  t_real const sigma = world.broadcast(0.016820222945913496);  // see test_parameters file
   SECTION("global") {
     auto const primaldual =
         factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
@@ -169,7 +172,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
             sigma, imsizey, imsizex, sara.size(), 500);
 
     auto const diagnostic = (*primaldual)();
-    CHECK(diagnostic.niters == 310);
+    CHECK(diagnostic.niters == 248);
 
     const std::string &expected_solution_path =
         notinstalled::data_filename(test_dir + "solution.fits");
@@ -214,13 +217,13 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
     const std::string &expected_residual_path =
         (world.size() == 2) ? notinstalled::data_filename(test_dir + "mpi_residual.fits")
                             : notinstalled::data_filename(test_dir + "residual.fits");
-    if (world.size() == 1) CHECK(diagnostic.niters == 310);
-    if (world.size() == 2) CHECK(diagnostic.niters == 304);
+    if (world.size() == 1) CHECK(diagnostic.niters == 248);
+    if (world.size() == 2) CHECK(diagnostic.niters == 254);
     const auto solution = pfitsio::read2d(expected_solution_path);
     const auto residual = pfitsio::read2d(expected_residual_path);
 
     const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
-    //  if (world.is_root()) pfitsio::write2d(image.real(), expected_solution_path);
+    // if (world.is_root()) pfitsio::write2d(image.real(), expected_solution_path);
     CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
@@ -230,10 +233,71 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
                                         (uv_data.vis - ((*measurements_transform) * diagnostic.x));
     const Image<t_complex> residual_image =
         Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
-    //   if (world.is_root()) pfitsio::write2d(residual_image.real(), expected_residual_path);
+    // if (world.is_root()) pfitsio::write2d(residual_image.real(), expected_residual_path);
     CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
     CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
+  }
+  SECTION("random update") {
+    auto const measurements_transform_serial =
+        std::get<2>(sopt::algorithm::all_sum_all_normalise_operator<Vector<t_complex>>(
+            world,
+            factory::measurement_operator_factory<Vector<t_complex>>(
+                factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1,
+                2, kernels::kernel_from_string.at("kb"), 4, 4),
+            1000, 1e-5, world.broadcast(Vector<t_complex>::Ones(imsizex * imsizey).eval())));
+    auto sara_dist = sopt::wavelets::distribute_sara(sara, world);
+    auto const wavelets_serial = factory::wavelet_operator_factory<Vector<t_complex>>(
+        factory::distributed_wavelet_operator::serial, sara_dist, imsizey, imsizex);
+
+    auto const primaldual =
+        factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
+            factory::algo_distribution::mpi_random_updates, measurements_transform_serial,
+            wavelets_serial, uv_data, sigma, imsizey, imsizex, sara_dist.size(), 500);
+
+    auto const diagnostic = (*primaldual)();
+    t_real const epsilon = utilities::calculate_l2_radius(world.all_sum_all(uv_data.vis.size()),
+                                                          world.broadcast(sigma));
+    CHECK(sopt::mpi::l2_norm(diagnostic.residual, primaldual->l2ball_proximal_weights(), world) <
+          epsilon);
+    if (world.size() > 1) return;
+    // the algorithm depends on nodes, so other than a basic bounds check,
+    // it is hard to know exact precision (might depend on probability theory...)
+    if (world.size() == 0)
+      return;
+    else if (world.size() == 2 or world.size() == 1) {
+      // testing the case where there are two nodes exactly.
+      const std::string &expected_solution_path =
+          (world.size() == 2) ? notinstalled::data_filename(test_dir + "mpi_random_solution.fits")
+                              : notinstalled::data_filename(test_dir + "solution.fits");
+      const std::string &expected_residual_path =
+          (world.size() == 2) ? notinstalled::data_filename(test_dir + "mpi_random_residual.fits")
+                              : notinstalled::data_filename(test_dir + "residual.fits");
+      if (world.size() == 1) CHECK(diagnostic.niters == 248);
+      if (world.size() == 2) CHECK(diagnostic.niters < 400);
+
+      const auto solution = pfitsio::read2d(expected_solution_path);
+      const auto residual = pfitsio::read2d(expected_residual_path);
+
+      const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
+      // if (world.is_root()) pfitsio::write2d(image.real(), expected_solution_path);
+      CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
+      CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
+      CAPTURE(
+          Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
+      CHECK(image.isApprox(solution, 1e-3));
+
+      const Vector<t_complex> residuals =
+          measurements_transform->adjoint() *
+          (uv_data.vis - ((*measurements_transform) * diagnostic.x));
+      const Image<t_complex> residual_image =
+          Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
+      // if (world.is_root()) pfitsio::write2d(residual_image.real(), expected_residual_path);
+      CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
+      CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
+      CHECK(residual_image.real().isApprox(residual.real(), 1e-3));
+    } else
+      return;
   }
 }
 
@@ -263,7 +327,7 @@ TEST_CASE("Serial vs. Serial with MPI Forward Backward") {
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
       factory::distributed_wavelet_operator::mpi_sara, sara, imsizey, imsizex);
-  t_real const sigma = world.broadcast(0.02378738741225);  // see test_parameters file
+  t_real const sigma = world.broadcast(0.016820222945913496);  // see test_parameters file
   t_real const beta = sigma * sigma;
   t_real const gamma = 10;
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
@@ -271,7 +335,7 @@ TEST_CASE("Serial vs. Serial with MPI Forward Backward") {
       beta, gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-3, 1e-3, 50);
 
   auto const diagnostic = (*fb)();
-  CHECK(diagnostic.niters == 21);
+  CHECK(diagnostic.niters == 28);
 
   const std::string &expected_solution_path =
       notinstalled::data_filename(test_dir + "solution.fits");
