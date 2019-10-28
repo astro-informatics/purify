@@ -117,7 +117,11 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
 #pragma omp parallel for
     for (t_int m = 0; m < rows; ++m) {
       t_complex result = 0;
-      const t_int shift = omp_get_thread_num() * nonZeros_vec.size();
+#ifdef PURIFY_OPENMP
+      const t_int shift = omp_get_thread_num() * nonZeros_size;
+#else
+      const t_int shift = 0;
+#endif
       const t_real u_val = (*u_ptr)(m);
       const t_real v_val = (*v_ptr)(m);
       const t_real k_u = std::floor(u_val - ju_max * 0.5);
@@ -268,7 +272,11 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
 #pragma omp parallel for
     for (t_int m = 0; m < rows; ++m) {
       t_complex result = 0;
+#ifdef PURIFY_OPENMP
       const t_int shift = omp_get_thread_num() * nonZeros_size;
+#else
+      const t_int shift = 0;
+#endif
       const t_real u_val = (*u_ptr)(m);
       const t_real v_val = (*v_ptr)(m);
       const t_real k_u = std::floor(u_val - ju_max * 0.5);
@@ -434,7 +442,11 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
 #pragma omp parallel for
     for (t_int m = 0; m < rows; ++m) {
       t_complex result = 0;
+#ifdef PURIFY_OPENMP
       const t_int shift = omp_get_thread_num() * nonZeros_size;
+#else
+      const t_int shift = 0;
+#endif
       const t_real u_val = (*u_ptr)(m);
       const t_real v_val = (*v_ptr)(m);
       const t_real k_u = std::floor(u_val - ju_max * 0.5);
