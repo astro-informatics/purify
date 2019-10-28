@@ -118,7 +118,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
     for (t_int m = 0; m < rows; ++m) {
       t_complex result = 0;
 #ifdef PURIFY_OPENMP
-      const t_int shift = omp_get_thread_num() * nonZeros_size;
+      const t_int shift = omp_get_thread_num() * nonZeros_vec.size();
 #else
       const t_int shift = 0;
 #endif
