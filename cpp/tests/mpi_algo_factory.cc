@@ -81,7 +81,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
     const auto residual = pfitsio::read2d(expected_residual_path);
 
     const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
-    if (world.is_root()) pfitsio::write2d(image.real(), expected_solution_path);
+    // if (world.is_root()) pfitsio::write2d(image.real(), expected_solution_path);
     CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
