@@ -72,7 +72,9 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
                        ftsizeu_, ftsizev_](T &output, const T &input) {
     output = T::Zero(u_ptr->size());
     assert(input.size() == ftsizeu_ * ftsizev_);
+#ifdef PURIFY_OPENMP
 #pragma omp parallel for
+#endif
     for (t_int m = 0; m < rows; ++m) {
       t_complex result = 0;
       const t_real u_val = (*u_ptr)(m);
@@ -114,7 +116,9 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
 #endif
     T output_compressed = T::Zero(nonZeros_vec.size() * max_threads);
     assert(output.size() == N);
+#ifdef PURIFY_OPENMP
 #pragma omp parallel for
+#endif
     for (t_int m = 0; m < rows; ++m) {
       t_complex result = 0;
 #ifdef PURIFY_OPENMP
@@ -153,10 +157,7 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
           output_compressed.segment(loop_shift, nonZeros_vec.size());
     }
     for (t_int index = 0; index < nonZeros_vec.size(); index++)
-      for (t_int m = 0; m < max_threads; m++) {
-        const t_int loop_shift = m * nonZeros_vec.size();
-        output(nonZeros_vec[index]) += output_compressed(index + loop_shift);
-      }
+      output(nonZeros_vec[index]) += output_compressed(index);
   };
   return std::make_tuple(degrid, grid);
 }
