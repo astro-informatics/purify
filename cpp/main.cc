@@ -68,6 +68,11 @@ int main(int argc, const char **argv) {
                      ? factory::distributed_measurement_operator::mpi_distribute_all_to_all
                      : factory::distributed_measurement_operator::gpu_mpi_distribute_all_to_all;
     wop_algo = factory::distributed_wavelet_operator::mpi_sara;
+    if (params.mpiAlgorithm() == factory::algo_distribution::mpi_random_updates) {
+      mop_algo = (not params.gpu()) ? factory::distributed_measurement_operator::serial
+                                    : factory::distributed_measurement_operator::serial;
+      wop_algo = factory::distributed_wavelet_operator::serial;
+    }
     using_mpi = true;
   }
 
@@ -220,9 +225,14 @@ int main(int argc, const char **argv) {
                     params.mpi_wstacking(), 1e-6, 1e-6, dde_type::wkernel_radial);
 #ifdef PURIFY_MPI
     auto const comm = sopt::mpi::Communicator::World();
-    sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-        sky_measurements, params.powMethod_iter(), params.powMethod_tolerance(),
-        comm.broadcast(measurement_op_eigen_vector)));
+    sky_measurements =
+        (params.mpiAlgorithm() != factory::algo_distribution::mpi_random_updates)
+            ? std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+                  sky_measurements, params.powMethod_iter(), params.powMethod_tolerance(),
+                  comm.broadcast(measurement_op_eigen_vector)))
+            : std::get<2>(sopt::algorithm::all_sum_all_normalise_operator<Vector<t_complex>>(
+                  comm, sky_measurements, params.powMethod_iter(), params.powMethod_tolerance(),
+                  comm.broadcast(measurement_op_eigen_vector)));
 #else
     sky_measurements = std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
         sky_measurements, params.powMethod_iter(), params.powMethod_tolerance(),
@@ -290,9 +300,14 @@ int main(int argc, const char **argv) {
 #ifdef PURIFY_MPI
   if (using_mpi) {
     auto const comm = sopt::mpi::Communicator::World();
-    auto power_method_result = sopt::algorithm::normalise_operator<Vector<t_complex>>(
-        measurements_transform, params.powMethod_iter(), params.powMethod_tolerance(),
-        comm.broadcast(measurement_op_eigen_vector));
+    auto power_method_result =
+        (params.mpiAlgorithm() != factory::algo_distribution::mpi_random_updates)
+            ? sopt::algorithm::normalise_operator<Vector<t_complex>>(
+                  measurements_transform, params.powMethod_iter(), params.powMethod_tolerance(),
+                  comm.broadcast(measurement_op_eigen_vector))
+            : sopt::algorithm::all_sum_all_normalise_operator<Vector<t_complex>>(
+                  comm, measurements_transform, params.powMethod_iter(),
+                  params.powMethod_tolerance(), measurement_op_eigen_vector);
     measurements_transform = std::get<2>(power_method_result);
     measurement_op_eigen_vector = std::get<1>(power_method_result);
     operator_norm = std::get<0>(power_method_result);
@@ -415,6 +430,13 @@ int main(int argc, const char **argv) {
   for (size_t i = 0; i < params.wavelet_basis().size(); i++)
     sara.push_back(std::make_tuple(params.wavelet_basis().at(i), params.wavelet_levels()));
   t_uint sara_size = 0;
+#ifdef PURIFY_MPI
+  {
+    auto const world = sopt::mpi::Communicator::World();
+    if (params.mpiAlgorithm() == factory::algo_distribution::mpi_random_updates)
+      sara = sopt::wavelets::distribute_sara(sara, world);
+  }
+#endif
   auto const wavelets_transform = factory::wavelet_operator_factory<Vector<t_complex>>(
       wop_algo, sara, params.height(), params.width(), sara_size);
 

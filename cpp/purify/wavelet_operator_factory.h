@@ -27,6 +27,12 @@ std::shared_ptr<sopt::LinearTransform<T> const> wavelet_operator_factory(
   case (distributed_wavelet_operator::serial): {
     PURIFY_LOW_LOG("Using serial wavelet operator.");
     sara_size = sara.size();
+    if (sara.size() == 0)
+      return std::make_shared<sopt::LinearTransform<T> const>(
+          [imsizex, imsizey](T& out, const T& x) { out = T::Zero(imsizey * imsizex); },
+          std::array<t_int, 3>{0, 1, static_cast<t_int>(imsizex * imsizey)},
+          [imsizex, imsizey](T& out, const T& x) { out = T::Zero(imsizey * imsizex); },
+          std::array<t_int, 3>{0, 1, static_cast<t_int>(imsizey * imsizex)});
     return std::make_shared<sopt::LinearTransform<T>>(
         sopt::linear_transform<typename T::Scalar>(sara, imsizey, imsizex));
   }

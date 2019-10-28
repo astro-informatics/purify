@@ -6,6 +6,7 @@
 #include "purify/types.h"
 #include "purify/convergence_factory.h"
 #include "purify/logging.h"
+#include "purify/random_update_factory.h"
 #include "purify/utilities.h"
 #include "purify/uvw_utilities.h"
 
@@ -26,10 +27,11 @@
 namespace purify {
 namespace factory {
 enum class algorithm { padmm, primal_dual, sdmm, forward_backward };
-enum class algo_distribution { serial, mpi_serial, mpi_distributed };
+enum class algo_distribution { serial, mpi_serial, mpi_distributed, mpi_random_updates };
 const std::map<std::string, algo_distribution> algo_distribution_string = {
     {"none", algo_distribution::serial},
     {"serial-equivalent", algo_distribution::mpi_serial},
+    {"random-updates", algo_distribution::mpi_random_updates},
     {"fully-distributed", algo_distribution::mpi_distributed}};
 
 //! return chosen algorithm given parameters
@@ -56,7 +58,7 @@ padmm_factory(const algo_distribution dist,
     throw std::runtime_error(
         "l1 proximal not consistent: You say you are using a tight frame, but you have more than "
         "one wavelet basis.");
-  auto epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
+  auto epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size())) * sigma;
   auto padmm = std::make_shared<Algorithm>(uv_data.vis);
   padmm->itermax(max_iterations)
       .relative_variation(relative_variation)
@@ -90,8 +92,9 @@ padmm_factory(const algo_distribution dist,
     obj_conv = ConvergenceType::mpi_global;
     rel_conv = ConvergenceType::mpi_global;
     auto const comm = sopt::mpi::Communicator::World();
-    epsilon =
-        utilities::calculate_l2_radius(comm.all_sum_all(uv_data.vis.size()), comm.broadcast(sigma));
+    epsilon = std::sqrt(2 * comm.all_sum_all(uv_data.size()) +
+                        2 * std::sqrt(4 * comm.all_sum_all(uv_data.size()))) *
+              sigma;
     // communicator ensuring l2 norm in l2ball proximal is global
     padmm->l2ball_proximal_communicator(comm);
     break;
@@ -99,6 +102,11 @@ padmm_factory(const algo_distribution dist,
   case (algo_distribution::mpi_distributed): {
     obj_conv = ConvergenceType::mpi_local;
     rel_conv = ConvergenceType::mpi_local;
+    auto const comm = sopt::mpi::Communicator::World();
+    epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size()) *
+                                                 std::sqrt(comm.all_sum_all(4 * uv_data.size())) /
+                                                 comm.all_sum_all(std::sqrt(4 * uv_data.size()))) *
+              sigma;
     break;
   }
 #endif
@@ -150,8 +158,8 @@ fb_factory(const algo_distribution dist,
   auto fb = std::make_shared<Algorithm>(uv_data.vis);
   fb->itermax(max_iterations)
       .gamma(reg_parameter)
-      .sigma(sigma)
-      .beta(step_size)
+      .sigma(sigma * std::sqrt(2))
+      .beta(step_size * std::sqrt(2))
       .relative_variation(relative_variation)
       .tight_frame(tight_frame)
       .l1_proximal_tolerance(l1_proximal_tolerance)
@@ -199,7 +207,7 @@ primaldual_factory(
     const bool real_constraint = true, const bool positive_constraint = true,
     const t_real relative_variation = 1e-3) {
   typedef typename Algorithm::Scalar t_scalar;
-  auto epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
+  auto epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size())) * sigma;
   auto primaldual = std::make_shared<Algorithm>(uv_data.vis);
   primaldual->itermax(max_iterations)
       .relative_variation(relative_variation)
@@ -227,8 +235,9 @@ primaldual_factory(
     obj_conv = ConvergenceType::mpi_global;
     rel_conv = ConvergenceType::mpi_global;
     auto const comm = sopt::mpi::Communicator::World();
-    epsilon =
-        utilities::calculate_l2_radius(comm.all_sum_all(uv_data.vis.size()), comm.broadcast(sigma));
+    epsilon = std::sqrt(2 * comm.all_sum_all(uv_data.size()) +
+                        2 * std::sqrt(4 * comm.all_sum_all(uv_data.size()))) *
+              sigma;
     // communicator ensuring l2 norm in l2ball proximal is global
     primaldual->l2ball_proximal_communicator(comm);
     break;
@@ -236,6 +245,35 @@ primaldual_factory(
   case (algo_distribution::mpi_distributed): {
     obj_conv = ConvergenceType::mpi_local;
     rel_conv = ConvergenceType::mpi_local;
+    auto const comm = sopt::mpi::Communicator::World();
+    epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size()) *
+                                                 std::sqrt(comm.all_sum_all(4 * uv_data.size())) /
+                                                 comm.all_sum_all(std::sqrt(4 * uv_data.size()))) *
+              sigma;
+    break;
+  }
+  case (algo_distribution::mpi_random_updates): {
+    auto const comm = sopt::mpi::Communicator::World();
+    epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size()) *
+                                                 std::sqrt(comm.all_sum_all(4 * uv_data.size())) /
+                                                 comm.all_sum_all(std::sqrt(4 * uv_data.size()))) *
+              sigma;
+    obj_conv = ConvergenceType::mpi_local;
+    rel_conv = ConvergenceType::mpi_local;
+    std::shared_ptr<bool> random_measurement_update_ptr = std::make_shared<bool>(true);
+    std::shared_ptr<bool> random_wavelet_update_ptr = std::make_shared<bool>(true);
+    const t_int update_size = std::max<t_int>(std::floor(0.5 * comm.size()), 1);
+    auto random_measurement_updater = random_updater::random_updater(
+        comm, comm.size(), update_size, random_measurement_update_ptr, "measurements");
+    auto random_wavelet_updater = random_updater::random_updater(
+        comm, std::max<t_int>(comm.size(), std::floor(comm.all_sum_all(sara_size))),
+        std::min<t_int>(update_size, std::floor(0.5 * comm.all_sum_all(sara_size))),
+        random_measurement_update_ptr, "wavelets");
+
+    primaldual->random_measurement_updater(random_measurement_updater)
+        .random_wavelet_updater(random_wavelet_updater)
+        .v_all_sum_all_comm(comm)
+        .u_all_sum_all_comm(comm);
     break;
   }
 #endif

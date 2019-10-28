@@ -105,9 +105,9 @@ t_real SNR_to_standard_deviation(const Vector<t_complex> &y0, const t_real &SNR)
   SNR:: signal to noise ratio
 
   This calculation follows Carrillo et al. (2014), PURIFY a new approach to radio interferometric
-  imaging
+  imaging but we have assumed that rms noise is for the real and imaginary parts
   */
-  return y0.stableNorm() / std::sqrt(y0.size()) * std::pow(10.0, -(SNR / 20.0));
+  return y0.stableNorm() / std::sqrt(2 * y0.size()) * std::pow(10.0, -(SNR / 20.0));
 }
 
 Vector<t_complex> add_noise(const Vector<t_complex> &y0, const t_complex &mean,
@@ -123,10 +123,8 @@ Vector<t_complex> add_noise(const Vector<t_complex> &y0, const t_complex &mean,
     std::random_device rd_imag;
     std::mt19937_64 rng_real(rd_real());
     std::mt19937_64 rng_imag(rd_imag());
-    static std::normal_distribution<t_real> normal_dist_real(std::real(mean),
-                                                             standard_deviation / std::sqrt(2));
-    static std::normal_distribution<t_real> normal_dist_imag(std::imag(mean),
-                                                             standard_deviation / std::sqrt(2));
+    static std::normal_distribution<t_real> normal_dist_real(std::real(mean), standard_deviation);
+    static std::normal_distribution<t_real> normal_dist_imag(std::imag(mean), standard_deviation);
     t_complex I(0, 1.);
     return normal_dist_real(rng_real) + I * normal_dist_imag(rng_imag);
   };
