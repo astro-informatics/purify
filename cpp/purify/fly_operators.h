@@ -6,6 +6,14 @@
 #include <set>
 #include "purify/operators.h"
 
+#ifdef PURIFY_MPI
+#include "purify/AllToAllSparseVector.h"
+#include "purify/DistributeSparseVector.h"
+#include "purify/IndexMapping.h"
+#include "purify/mpi_utilities.h"
+#include <sopt/mpi/communicator.h>
+#endif
+
 namespace purify {
 namespace operators {
 //! on the fly application of the degridding operator using presampling
@@ -134,6 +142,11 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_on_the_fly
           output_compressed(mapping.coeff(index) + shift) += result;
         }
       }
+    }
+    for (t_int m = 1; m < omp_get_max_threads(); m++) {
+      const t_int loop_shift = m * nonZeros_vec.size();
+      output_compressed.segment(0, nonZeros_vec.size()) +=
+          output_compressed.segment(loop_shift, nonZeros_vec.size());
     }
     for (t_int index = 0; index < nonZeros_vec.size(); index++)
       for (t_int m = 0; m < max_threads; m++) {

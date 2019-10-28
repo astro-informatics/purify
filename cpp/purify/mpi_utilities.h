@@ -3,7 +3,7 @@
 
 #include "purify/config.h"
 #include <vector>
-#include "purify/utilities.h"
+#include "purify/uvw_utilities.h"
 #include <sopt/linear_transform.h>
 
 #ifdef PURIFY_MPI

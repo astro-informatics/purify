@@ -7,6 +7,7 @@
 #include "purify/convergence_factory.h"
 #include "purify/logging.h"
 #include "purify/utilities.h"
+#include "purify/uvw_utilities.h"
 
 #ifdef PURIFY_MPI
 #include "purify/mpi_utilities.h"
