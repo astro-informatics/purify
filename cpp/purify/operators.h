@@ -6,7 +6,6 @@
 #include <iostream>
 #include <tuple>
 #include <type_traits>
-#include "purify/fly_operators.h"
 #include "purify/kernels.h"
 #include "purify/logging.h"
 #include "purify/utilities.h"
@@ -15,6 +14,8 @@
 #include "purify/wkernel_integration.h"
 #include <sopt/chained_operators.h>
 #include <sopt/linear_transform.h>
+
+#include "purify/fly_operators.h"
 
 #include <fftw3.h>
 
