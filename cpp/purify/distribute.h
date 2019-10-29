@@ -9,7 +9,7 @@
 #endif
 #include "purify/types.h"
 #include "purify/logging.h"
-#include "purify/utilities.h"
+#include "purify/uvw_utilities.h"
 
 namespace purify {
 namespace distribute {

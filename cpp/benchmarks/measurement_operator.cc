@@ -40,15 +40,6 @@ void degrid_operator_ctor(benchmark::State &state) {
                           sizeof(t_complex));
 }
 
-BENCHMARK(degrid_operator_ctor)
-    //->Apply(b_utilities::Arguments)
-    ->Args({1024, 1000000, 4})
-    ->Args({1024, 10000000, 4})
-    ->UseManualTime()
-    ->Repetitions(10)
-    //->ReportAggregatesOnly(true)
-    ->Unit(benchmark::kMillisecond);
-
 // ----------------- Application benchmarks -----------------------//
 
 class DegridOperatorFixture : public ::benchmark::Fixture {
@@ -61,7 +52,11 @@ class DegridOperatorFixture : public ::benchmark::Fixture {
     bool newImage = updateImage(state.range(0));
 
     // Generating random uv(w) coverage
-    bool newMeasurements = b_utilities::updateMeasurements(state.range(1), m_uv_data);
+    bool newMeasurements = m_uv_data.size() != state.range(1);
+    if (newMeasurements) {
+      t_real const sigma_m = constant::pi / 3;
+      m_uv_data = utilities::random_sample_density(state.range(1), 0, sigma_m);
+    }
 
     // Create measurement operator
     bool newKernel = m_kernel != state.range(2);

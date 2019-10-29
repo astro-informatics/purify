@@ -62,7 +62,7 @@ TEST_CASE("padmm_factory") {
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
-  CHECK(image.isApprox(solution, 1e-6));
+  CHECK(image.isApprox(solution, 1e-4));
 
   const Vector<t_complex> residuals = measurements_transform->adjoint() *
                                       (uv_data.vis - ((*measurements_transform) * diagnostic.x));
@@ -70,7 +70,7 @@ TEST_CASE("padmm_factory") {
   // pfitsio::write2d(residual_image.real(), expected_residual_path);
   CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
-  CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
+  CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
 }
 
 TEST_CASE("primal_dual_factory") {
@@ -118,7 +118,7 @@ TEST_CASE("primal_dual_factory") {
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
-  CHECK(image.isApprox(solution, 1e-6));
+  CHECK(image.isApprox(solution, 1e-4));
 
   const Vector<t_complex> residuals = measurements_transform->adjoint() *
                                       (uv_data.vis - ((*measurements_transform) * diagnostic.x));
@@ -126,7 +126,7 @@ TEST_CASE("primal_dual_factory") {
   // pfitsio::write2d(residual_image.real(), expected_residual_path);
   CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
-  CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
+  CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
 }
 
 TEST_CASE("fb_factory") {
@@ -175,7 +175,7 @@ TEST_CASE("fb_factory") {
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
-  CHECK(image.isApprox(solution, 1e-6));
+  CHECK(image.isApprox(solution, 1e-4));
 
   const Vector<t_complex> residuals = measurements_transform->adjoint() *
                                       (uv_data.vis - ((*measurements_transform) * diagnostic.x));
@@ -183,7 +183,7 @@ TEST_CASE("fb_factory") {
   // pfitsio::write2d(residual_image.real(), expected_residual_path);
   CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
-  CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
+  CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
 }
 
 TEST_CASE("joint_map_factory") {

@@ -85,7 +85,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
     CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
-    CHECK(image.isApprox(solution, 1e-6));
+    CHECK(image.isApprox(solution, 1e-4));
 
     const Vector<t_complex> residuals = measurements_transform->adjoint() *
                                         (uv_data.vis - ((*measurements_transform) * diagnostic.x));
@@ -93,7 +93,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
         Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
     CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
-    CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
+    CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
   }
   SECTION("local") {
     auto const padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
@@ -125,7 +125,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
     CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
-    CHECK(image.isApprox(solution, 1e-6));
+    CHECK(image.isApprox(solution, 1e-4));
 
     const Vector<t_complex> residuals = measurements_transform->adjoint() *
                                         (uv_data.vis - ((*measurements_transform) * diagnostic.x));
@@ -134,7 +134,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
     // if (world.is_root()) pfitsio::write2d(residual_image.real(), expected_residual_path);
     CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
-    CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
+    CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
   }
 }
 
@@ -186,7 +186,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
     CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
-    CHECK(image.isApprox(solution, 1e-6));
+    CHECK(image.isApprox(solution, 1e-4));
 
     const Vector<t_complex> residuals = measurements_transform->adjoint() *
                                         (uv_data.vis - ((*measurements_transform) * diagnostic.x));
@@ -194,7 +194,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
         Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
     CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
-    CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
+    CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
   }
   SECTION("local") {
     auto const primaldual =
@@ -227,7 +227,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
     CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
-    CHECK(image.isApprox(solution, 1e-6));
+    CHECK(image.isApprox(solution, 1e-4));
 
     const Vector<t_complex> residuals = measurements_transform->adjoint() *
                                         (uv_data.vis - ((*measurements_transform) * diagnostic.x));
@@ -236,7 +236,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
     // if (world.is_root()) pfitsio::write2d(residual_image.real(), expected_residual_path);
     CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
     CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
-    CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
+    CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
   }
   SECTION("random update") {
     auto const measurements_transform_serial =
@@ -349,12 +349,12 @@ TEST_CASE("Serial vs. Serial with MPI Forward Backward") {
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
-  CHECK(image.isApprox(solution, 1e-6));
+  CHECK(image.isApprox(solution, 1e-4));
 
   const Vector<t_complex> residuals = measurements_transform->adjoint() *
                                       (uv_data.vis - ((*measurements_transform) * diagnostic.x));
   const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
   CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
-  CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
+  CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
 }

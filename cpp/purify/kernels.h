@@ -12,10 +12,14 @@
 namespace purify {
 
 namespace kernels {
-enum class kernel { kb, gauss, box, pswf, kbmin, gauss_alt };
-const std::map<std::string, kernel> kernel_from_string = {
-    {"kb", kernel::kb},     {"gauss", kernel::gauss}, {"box", kernel::box},
-    {"pswf", kernel::pswf}, {"kbmin", kernel::kbmin}, {"gauss_alt", kernel::gauss_alt}};
+enum class kernel { kb, gauss, box, pswf, kbmin, gauss_alt, kb_presample };
+const std::map<std::string, kernel> kernel_from_string = {{"kb", kernel::kb},
+                                                          {"gauss", kernel::gauss},
+                                                          {"box", kernel::box},
+                                                          {"pswf", kernel::pswf},
+                                                          {"kbmin", kernel::kbmin},
+                                                          {"kb_presample", kernel::kb_presample},
+                                                          {"gauss_alt", kernel::gauss_alt}};
 
 //! Kaiser-Bessel kernel
 t_real kaiser_bessel(const t_real x, const t_real J);
@@ -43,8 +47,10 @@ t_real pswf(const t_real x, const t_real J);
 //! Fourier transform of PSWF kernel
 t_real ft_pswf(const t_real x, const t_real J);
 //! Calculates samples of a kernel
-Vector<t_real> kernel_samples(const t_real total_samples,
-                              const std::function<t_real(t_real)> kernelu, const t_real J);
+std::vector<t_real> kernel_samples(const t_int total_samples,
+                                   const std::function<t_real(t_real)> kernelu);
+//! zeroth order interpolates from samples of kernel
+t_real kernel_zero_interp(const std::vector<t_real> &samples, const t_real x, const t_real J);
 //! linearly interpolates from samples of kernel
 t_real kernel_linear_interp(const Vector<t_real> &samples, const t_real x, const t_real J);
 //! Box car function for kernel
