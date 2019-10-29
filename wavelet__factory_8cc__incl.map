@@ -1,13 +1,14 @@
 <map id="/mydata/cpp/tests/wavelet_factory.cc" name="/mydata/cpp/tests/wavelet_factory.cc">
-<area shape="rect" id="node3" href="$distribute_8h.html" title="purify/distribute.h" alt="" coords="216,184,355,211"/>
-<area shape="rect" id="node14" href="$logging_8h.html" title="purify/logging.h" alt="" coords="926,259,1050,285"/>
-<area shape="rect" id="node17" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="104,259,229,285"/>
-<area shape="rect" id="node20" href="$mpi__utilities_8h.html" title="purify/mpi_utilities.h" alt="" coords="323,102,480,129"/>
-<area shape="rect" id="node23" href="$wavelet__operator__factory_8h.html" title="purify/wavelet_operator\l_factory.h" alt="" coords="740,95,919,136"/>
-<area shape="rect" id="node8" href="$types_8h.html" title="purify/types.h" alt="" coords="460,333,572,360"/>
-<area shape="rect" id="node13" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="455,408,558,435"/>
-<area shape="rect" id="node15" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="897,333,1079,360"/>
-<area shape="rect" id="node22" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/linear__transform_8h.html" title="sopt/linear_transform.h" alt="" coords="430,184,605,211"/>
-<area shape="rect" id="node24" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/wavelets_8h.html" title="sopt/wavelets.h" alt="" coords="767,184,892,211"/>
-<area shape="rect" id="node25" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/sara_8h.html" title="sopt/wavelets/sara.h" alt="" coords="1017,184,1175,211"/>
+<area shape="rect" id="node3" href="$distribute_8h.html" title="purify/distribute.h" alt="" coords="328,184,467,211"/>
+<area shape="rect" id="node14" href="$logging_8h.html" title="purify/logging.h" alt="" coords="1113,259,1237,285"/>
+<area shape="rect" id="node20" href="$mpi__utilities_8h.html" title="purify/mpi_utilities.h" alt="" coords="601,102,759,129"/>
+<area shape="rect" id="node23" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="756,259,881,285"/>
+<area shape="rect" id="node24" href="$wavelet__operator__factory_8h.html" title="purify/wavelet_operator\l_factory.h" alt="" coords="905,95,1084,136"/>
+<area shape="rect" id="node8" href="$types_8h.html" title="purify/types.h" alt="" coords="276,333,388,360"/>
+<area shape="rect" id="node17" href="$uvw__utilities_8h.html" title="purify/uvw_utilities.h" alt="" coords="573,259,731,285"/>
+<area shape="rect" id="node13" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="166,408,269,435"/>
+<area shape="rect" id="node15" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="1083,333,1266,360"/>
+<area shape="rect" id="node22" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/linear__transform_8h.html" title="sopt/linear_transform.h" alt="" coords="593,184,767,211"/>
+<area shape="rect" id="node25" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/wavelets_8h.html" title="sopt/wavelets.h" alt="" coords="1032,184,1157,211"/>
+<area shape="rect" id="node26" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/sara_8h.html" title="sopt/wavelets/sara.h" alt="" coords="1181,184,1339,211"/>
 </map>

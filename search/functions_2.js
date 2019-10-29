@@ -2,6 +2,9 @@ var searchData=
 [
   ['calc_5ffor_5fpswf',['calc_for_pswf',['../namespacepurify_1_1kernels.html#a9ead940a0dfa9fcbc121c11a88e0b3dd',1,'purify::kernels']]],
   ['calculate_5fl2_5fradius',['calculate_l2_radius',['../namespacepurify_1_1utilities.html#af90182ef1213164564e72e51f8a83ac7',1,'purify::utilities']]],
+  ['calculate_5frotated_5fu',['calculate_rotated_u',['../namespacepurify_1_1utilities.html#a8ccffb5190febc2fe32e1dfafa87baf3',1,'purify::utilities']]],
+  ['calculate_5frotated_5fv',['calculate_rotated_v',['../namespacepurify_1_1utilities.html#a1f11f03f456e11cd436d3eb4ea43964f',1,'purify::utilities']]],
+  ['calculate_5frotated_5fw',['calculate_rotated_w',['../namespacepurify_1_1utilities.html#add5ddeaf382922171e6876c0b4e87d63',1,'purify::utilities']]],
   ['chained_5foperators',['chained_operators',['http://astro-informatics.github.io/sopt/namespacesopt.html#a5e8a990d75711b892ac8bf2f030d8c1e',1,'sopt']]],
   ['channel',['channel',['../classpurify_1_1casa_1_1MeasurementSet_1_1ChannelWrapper.html#ae03dfd380e1091a7ea589f09ca9c09be',1,'purify::casa::MeasurementSet::ChannelWrapper']]],
   ['channelwrapper',['ChannelWrapper',['../classpurify_1_1casa_1_1MeasurementSet_1_1ChannelWrapper.html#ad187c64f5f270cdaa0847fa667f2fea1',1,'purify::casa::MeasurementSet::ChannelWrapper']]],

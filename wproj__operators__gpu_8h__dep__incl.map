@@ -1,10 +1,11 @@
 <map id="/mydata/cpp/purify/wproj_operators_gpu.h" name="/mydata/cpp/purify/wproj_operators_gpu.h">
-<area shape="rect" id="node2" href="$measurement__operator__factory_8h.html" title="/mydata/cpp/purify\l/measurement_operator\l_factory.h" alt="" coords="486,95,665,151"/>
-<area shape="rect" id="node9" href="$operators__gpu_8cc.html" title="/mydata/cpp/tests/operators\l_gpu.cc" alt="" coords="689,102,894,143"/>
-<area shape="rect" id="node3" href="$time__w__algos_8cc.html" title="/mydata/cpp/example\l/time_w_algos.cc" alt="" coords="5,199,169,240"/>
-<area shape="rect" id="node4" href="$main_8cc.html" title="/mydata/cpp/main.cc" alt="" coords="193,206,352,233"/>
-<area shape="rect" id="node5" href="$algo__factory_8cc.html" title="/mydata/cpp/tests/algo\l_factory.cc" alt="" coords="377,199,547,240"/>
-<area shape="rect" id="node6" href="$measurement__factory_8cc.html" title="/mydata/cpp/tests/measurement\l_factory.cc" alt="" coords="571,199,806,240"/>
-<area shape="rect" id="node7" href="$mpi__algo__factory_8cc.html" title="/mydata/cpp/tests/mpi\l_algo_factory.cc" alt="" coords="830,199,998,240"/>
-<area shape="rect" id="node8" href="$mpi__measurement__factory_8cc.html" title="/mydata/cpp/tests/mpi\l_measurement_factory.cc" alt="" coords="1022,199,1211,240"/>
+<area shape="rect" id="node2" href="$measurement__operator__factory_8h.html" title="/mydata/cpp/purify\l/measurement_operator\l_factory.h" alt="" coords="561,95,739,151"/>
+<area shape="rect" id="node10" href="$operators__gpu_8cc.html" title="/mydata/cpp/tests/operators\l_gpu.cc" alt="" coords="763,102,969,143"/>
+<area shape="rect" id="node3" href="$mem__w__algos_8cc.html" title="/mydata/cpp/example\l/mem_w_algos.cc" alt="" coords="5,199,169,240"/>
+<area shape="rect" id="node4" href="$time__w__algos_8cc.html" title="/mydata/cpp/example\l/time_w_algos.cc" alt="" coords="193,199,357,240"/>
+<area shape="rect" id="node5" href="$main_8cc.html" title="/mydata/cpp/main.cc" alt="" coords="381,206,540,233"/>
+<area shape="rect" id="node6" href="$algo__factory_8cc.html" title="/mydata/cpp/tests/algo\l_factory.cc" alt="" coords="565,199,735,240"/>
+<area shape="rect" id="node7" href="$measurement__factory_8cc.html" title="/mydata/cpp/tests/measurement\l_factory.cc" alt="" coords="759,199,994,240"/>
+<area shape="rect" id="node8" href="$mpi__algo__factory_8cc.html" title="/mydata/cpp/tests/mpi\l_algo_factory.cc" alt="" coords="1018,199,1186,240"/>
+<area shape="rect" id="node9" href="$mpi__measurement__factory_8cc.html" title="/mydata/cpp/tests/mpi\l_measurement_factory.cc" alt="" coords="1210,199,1399,240"/>
 </map>

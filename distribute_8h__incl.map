@@ -1,7 +1,7 @@
 <map id="/mydata/cpp/purify/distribute.h" name="/mydata/cpp/purify/distribute.h">
 <area shape="rect" id="node6" href="$types_8h.html" title="purify/types.h" alt="" coords="647,169,759,196"/>
-<area shape="rect" id="node12" href="$logging_8h.html" title="purify/logging.h" alt="" coords="239,95,363,121"/>
-<area shape="rect" id="node15" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="396,95,521,121"/>
+<area shape="rect" id="node12" href="$logging_8h.html" title="purify/logging.h" alt="" coords="235,95,359,121"/>
+<area shape="rect" id="node15" href="$uvw__utilities_8h.html" title="purify/uvw_utilities.h" alt="" coords="387,95,546,121"/>
 <area shape="rect" id="node11" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="482,244,585,271"/>
 <area shape="rect" id="node13" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="73,169,255,196"/>
 </map>

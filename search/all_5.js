@@ -18,6 +18,7 @@ var searchData=
   ['fistamixing',['FistaMixing',['http://astro-informatics.github.io/sopt/classsopt_1_1proximal_1_1L1_1_1FistaMixing.html',1,'sopt::proximal::L1::FistaMixing'],['classsopt_1_1proximal_1_1L1_1_1FistaMixing.html#a076ea51478c1449de100880da31613f7',1,'sopt::proximal::L1::FistaMixing::FistaMixing()']]],
   ['fit_5ffwhm',['fit_fwhm',['../namespacepurify_1_1utilities.html#a2cfb96bc5695fb0394bab0d55ee1389d',1,'purify::utilities']]],
   ['fits_5fname',['fits_name',['../structpurify_1_1pfitsio_1_1header__params.html#a52ed16fe9c9d5deda4f7a32862fa5f1c',1,'purify::pfitsio::header_params']]],
+  ['fly_5foperators_2eh',['fly_operators.h',['../fly__operators_8h.html',1,'']]],
   ['format',['format',['../namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723c',1,'purify::read_measurements']]],
   ['forward_5fbackward',['forward_backward',['../namespacepurify_1_1factory.html#a61804e4c4f79fa94c6b864535459d5f8a9fd3baacb5ca6344ddb0ab9f5b71cb02',1,'purify::factory']]],
   ['forward_5fbackward_2ecc',['forward_backward.cc',['http://astro-informatics.github.io/sopt/forward__backward_8cc.html',1,'']]],

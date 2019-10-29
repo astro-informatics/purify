@@ -9,6 +9,7 @@ var searchData=
   ['measurement_5foperator_5ffactory_2eh',['measurement_operator_factory.h',['../measurement__operator__factory_8h.html',1,'']]],
   ['measurement_5foperator_5fmpi_2ecc',['measurement_operator_mpi.cc',['../measurement__operator__mpi_8cc.html',1,'']]],
   ['measurement_5foperator_5fwproj_2ecc',['measurement_operator_wproj.cc',['../measurement__operator__wproj_8cc.html',1,'']]],
+  ['mem_5fw_5falgos_2ecc',['mem_w_algos.cc',['../mem__w__algos_8cc.html',1,'']]],
   ['mpi_5falgo_5ffactory_2ecc',['mpi_algo_factory.cc',['../mpi__algo__factory_8cc.html',1,'']]],
   ['mpi_5fmeasurement_5ffactory_2ecc',['mpi_measurement_factory.cc',['../mpi__measurement__factory_8cc.html',1,'']]],
   ['mpi_5fmeasurement_5foperator_2ecc',['mpi_measurement_operator.cc',['../mpi__measurement__operator_8cc.html',1,'']]],

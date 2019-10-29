@@ -1,15 +1,17 @@
 <map id="/mydata/cpp/example/gridding.cc" name="/mydata/cpp/example/gridding.cc">
-<area shape="rect" id="node3" href="$types_8h.html" title="purify/types.h" alt="" coords="1216,333,1328,360"/>
-<area shape="rect" id="node9" href="$logging_8h.html" title="purify/logging.h" alt="" coords="1977,333,2101,360"/>
-<area shape="rect" id="node13" href="$operators_8h.html" title="purify/operators.h" alt="" coords="976,95,1115,121"/>
-<area shape="rect" id="node22" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="151,169,276,196"/>
-<area shape="rect" id="node31" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/power__method_8h.html" title="sopt/power_method.h" alt="" coords="1957,251,2120,278"/>
-<area shape="rect" id="node8" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="970,408,1073,435"/>
-<area shape="rect" id="node10" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="1827,408,2010,435"/>
-<area shape="rect" id="node17" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="934,169,1058,196"/>
-<area shape="rect" id="node24" href="$wide__field__utilities_8h.html" title="purify/wide_field_utilities.h" alt="" coords="1314,251,1513,278"/>
-<area shape="rect" id="node25" href="$wkernel__integration_8h.html" title="purify/wkernel_integration.h" alt="" coords="1646,169,1853,196"/>
-<area shape="rect" id="node28" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/chained__operators_8h.html" title="sopt/chained_operators.h" alt="" coords="1133,169,1320,196"/>
-<area shape="rect" id="node29" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/linear__transform_8h.html" title="sopt/linear_transform.h" alt="" coords="1537,251,1711,278"/>
-<area shape="rect" id="node26" href="$integration_8h.html" title="purify/integration.h" alt="" coords="1787,251,1933,278"/>
+<area shape="rect" id="node3" href="$types_8h.html" title="purify/types.h" alt="" coords="1264,333,1376,360"/>
+<area shape="rect" id="node9" href="$logging_8h.html" title="purify/logging.h" alt="" coords="476,333,600,360"/>
+<area shape="rect" id="node13" href="$operators_8h.html" title="purify/operators.h" alt="" coords="1610,95,1749,121"/>
+<area shape="rect" id="node22" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="2272,251,2397,278"/>
+<area shape="rect" id="node34" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/power__method_8h.html" title="sopt/power_method.h" alt="" coords="264,251,426,278"/>
+<area shape="rect" id="node8" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="1211,408,1314,435"/>
+<area shape="rect" id="node10" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="563,408,746,435"/>
+<area shape="rect" id="node17" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="1427,169,1551,196"/>
+<area shape="rect" id="node24" href="$uvw__utilities_8h.html" title="purify/uvw_utilities.h" alt="" coords="2038,251,2196,278"/>
+<area shape="rect" id="node25" href="$wide__field__utilities_8h.html" title="purify/wide_field_utilities.h" alt="" coords="40,251,239,278"/>
+<area shape="rect" id="node26" href="$wkernel__integration_8h.html" title="purify/wkernel_integration.h" alt="" coords="782,169,988,196"/>
+<area shape="rect" id="node29" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/chained__operators_8h.html" title="sopt/chained_operators.h" alt="" coords="1062,169,1249,196"/>
+<area shape="rect" id="node30" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/linear__transform_8h.html" title="sopt/linear_transform.h" alt="" coords="451,251,626,278"/>
+<area shape="rect" id="node31" href="$fly__operators_8h.html" title="purify/fly_operators.h" alt="" coords="1768,169,1930,196"/>
+<area shape="rect" id="node27" href="$integration_8h.html" title="purify/integration.h" alt="" coords="701,251,848,278"/>
 </map>

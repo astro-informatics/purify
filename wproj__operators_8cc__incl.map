@@ -1,15 +1,17 @@
 <map id="/mydata/cpp/purify/wproj_operators.cc" name="/mydata/cpp/purify/wproj_operators.cc">
-<area shape="rect" id="node2" href="$wproj__operators_8h.html" title="purify/wproj_operators.h" alt="" coords="484,95,665,121"/>
-<area shape="rect" id="node10" href="$operators_8h.html" title="purify/operators.h" alt="" coords="1083,169,1221,196"/>
-<area shape="rect" id="node25" href="$wide__field__utilities_8h.html" title="purify/wide_field_utilities.h" alt="" coords="1666,326,1865,353"/>
-<area shape="rect" id="node26" href="$wkernel__integration_8h.html" title="purify/wkernel_integration.h" alt="" coords="289,244,495,271"/>
-<area shape="rect" id="node4" href="$types_8h.html" title="purify/types.h" alt="" coords="832,408,944,435"/>
-<area shape="rect" id="node9" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="837,483,939,509"/>
-<area shape="rect" id="node14" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="813,244,937,271"/>
-<area shape="rect" id="node19" href="$logging_8h.html" title="purify/logging.h" alt="" coords="1442,408,1566,435"/>
-<area shape="rect" id="node23" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="149,326,275,353"/>
-<area shape="rect" id="node29" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/chained__operators_8h.html" title="sopt/chained_operators.h" alt="" coords="1059,244,1245,271"/>
-<area shape="rect" id="node30" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/linear__transform_8h.html" title="sopt/linear_transform.h" alt="" coords="1417,326,1591,353"/>
-<area shape="rect" id="node20" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="1814,483,1997,509"/>
-<area shape="rect" id="node27" href="$integration_8h.html" title="purify/integration.h" alt="" coords="299,326,445,353"/>
+<area shape="rect" id="node2" href="$wproj__operators_8h.html" title="purify/wproj_operators.h" alt="" coords="1712,95,1893,121"/>
+<area shape="rect" id="node10" href="$operators_8h.html" title="purify/operators.h" alt="" coords="1172,169,1311,196"/>
+<area shape="rect" id="node26" href="$wide__field__utilities_8h.html" title="purify/wide_field_utilities.h" alt="" coords="1122,326,1321,353"/>
+<area shape="rect" id="node27" href="$wkernel__integration_8h.html" title="purify/wkernel_integration.h" alt="" coords="1927,244,2134,271"/>
+<area shape="rect" id="node4" href="$types_8h.html" title="purify/types.h" alt="" coords="1621,408,1733,435"/>
+<area shape="rect" id="node9" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="1402,483,1505,509"/>
+<area shape="rect" id="node14" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="795,244,919,271"/>
+<area shape="rect" id="node19" href="$logging_8h.html" title="purify/logging.h" alt="" coords="1225,408,1349,435"/>
+<area shape="rect" id="node23" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="229,326,355,353"/>
+<area shape="rect" id="node25" href="$uvw__utilities_8h.html" title="purify/uvw_utilities.h" alt="" coords="46,326,205,353"/>
+<area shape="rect" id="node30" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/chained__operators_8h.html" title="sopt/chained_operators.h" alt="" coords="1656,244,1843,271"/>
+<area shape="rect" id="node31" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/linear__transform_8h.html" title="sopt/linear_transform.h" alt="" coords="1395,326,1570,353"/>
+<area shape="rect" id="node32" href="$fly__operators_8h.html" title="purify/fly_operators.h" alt="" coords="1369,244,1530,271"/>
+<area shape="rect" id="node20" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="1195,483,1378,509"/>
+<area shape="rect" id="node28" href="$integration_8h.html" title="purify/integration.h" alt="" coords="1965,326,2112,353"/>
 </map>

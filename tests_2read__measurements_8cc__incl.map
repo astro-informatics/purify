@@ -1,9 +1,9 @@
 <map id="/mydata/cpp/tests/read_measurements.cc" name="/mydata/cpp/tests/read_measurements.cc">
-<area shape="rect" id="node3" href="$types_8h.html" title="purify/types.h" alt="" coords="794,319,906,345"/>
+<area shape="rect" id="node3" href="$types_8h.html" title="purify/types.h" alt="" coords="796,319,908,345"/>
 <area shape="rect" id="node10" href="$logging_8h.html" title="purify/logging.h" alt="" coords="74,244,198,271"/>
 <area shape="rect" id="node16" href="$read__measurements_8h.html" title="purify/read_measurements.h" alt="" coords="329,95,540,121"/>
-<area shape="rect" id="node8" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="575,393,678,420"/>
+<area shape="rect" id="node8" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="576,393,679,420"/>
 <area shape="rect" id="node11" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="44,319,227,345"/>
 <area shape="rect" id="node17" href="$distribute_8h.html" title="purify/distribute.h" alt="" coords="372,169,510,196"/>
-<area shape="rect" id="node19" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="569,244,694,271"/>
+<area shape="rect" id="node19" href="$uvw__utilities_8h.html" title="purify/uvw_utilities.h" alt="" coords="570,244,728,271"/>
 </map>

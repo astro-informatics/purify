@@ -1,9 +1,9 @@
 <map id="/mydata/cpp/tests/wide_field_utilities.cc" name="/mydata/cpp/tests/wide_field_utilities.cc">
 <area shape="rect" id="node5" href="$logging_8h.html" title="purify/logging.h" alt="" coords="132,177,256,203"/>
 <area shape="rect" id="node9" href="$types_8h.html" title="purify/types.h" alt="" coords="332,177,444,203"/>
-<area shape="rect" id="node15" href="$convolution_8h.html" title="purify/convolution.h" alt="" coords="1154,95,1306,121"/>
+<area shape="rect" id="node15" href="$convolution_8h.html" title="purify/convolution.h" alt="" coords="1188,95,1340,121"/>
 <area shape="rect" id="node17" href="$kernels_8h.html" title="purify/kernels.h" alt="" coords="643,95,767,121"/>
-<area shape="rect" id="node23" href="$purify_2utilities_8h.html" title="purify/utilities.h" alt="" coords="792,95,917,121"/>
+<area shape="rect" id="node23" href="$uvw__utilities_8h.html" title="purify/uvw_utilities.h" alt="" coords="791,95,950,121"/>
 <area shape="rect" id="node26" href="$wide__field__utilities_8h.html" title="purify/wide_field_utilities.h" alt="" coords="260,95,459,121"/>
 <area shape="rect" id="node6" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="23,259,206,285"/>
 <area shape="rect" id="node14" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="839,259,942,285"/>
