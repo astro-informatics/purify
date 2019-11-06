@@ -266,7 +266,7 @@ primaldual_factory(
     auto random_measurement_updater = random_updater::random_updater(
         comm, comm.size(), update_size, random_measurement_update_ptr, "measurements");
     auto random_wavelet_updater = random_updater::random_updater(
-        comm, std::max<t_int>(comm.size(), std::floor(comm.all_sum_all(sara_size))),
+        comm, std::min<t_int>(comm.size(), std::floor(comm.all_sum_all(sara_size))),
         std::min<t_int>(update_size, std::floor(0.5 * comm.all_sum_all(sara_size))),
         random_measurement_update_ptr, "wavelets");
 
