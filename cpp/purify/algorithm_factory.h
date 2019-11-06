@@ -52,7 +52,8 @@ padmm_factory(const algo_distribution dist,
               const bool real_constraint = true, const bool positive_constraint = true,
               const bool tight_frame = false, const t_real relative_variation = 1e-3,
               const t_real l1_proximal_tolerance = 1e-2,
-              const t_uint maximum_proximal_iterations = 50) {
+              const t_uint maximum_proximal_iterations = 50,
+              const t_real residual_tolerance_scaling = 1) {
   typedef typename Algorithm::Scalar t_scalar;
   if (sara_size > 1 and tight_frame)
     throw std::runtime_error(
@@ -84,7 +85,7 @@ padmm_factory(const algo_distribution dist,
                     .maxCoeff() *
                 1e-3)
         .l2ball_proximal_epsilon(epsilon)
-        .residual_tolerance(epsilon);
+        .residual_tolerance(epsilon * residual_tolerance_scaling);
     return padmm;
   }
 #ifdef PURIFY_MPI
@@ -119,7 +120,7 @@ padmm_factory(const algo_distribution dist,
   auto const comm = sopt::mpi::Communicator::World();
   std::weak_ptr<Algorithm> const padmm_weak(padmm);
   // set epsilon
-  padmm->residual_tolerance(epsilon).l2ball_proximal_epsilon(epsilon);
+  padmm->residual_tolerance(epsilon * residual_tolerance_scaling).l2ball_proximal_epsilon(epsilon);
   // set gamma
   padmm->gamma(comm.all_reduce(
       utilities::step_size(uv_data.vis, measurements, wavelets, sara_size) * 1e-3, MPI_MAX));
@@ -205,7 +206,7 @@ primaldual_factory(
     const utilities::vis_params &uv_data, const t_real sigma, const t_uint imsizey,
     const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations = 500,
     const bool real_constraint = true, const bool positive_constraint = true,
-    const t_real relative_variation = 1e-3) {
+    const t_real relative_variation = 1e-3, const t_real residual_tolerance_scaling = 1) {
   typedef typename Algorithm::Scalar t_scalar;
   auto epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size())) * sigma;
   auto primaldual = std::make_shared<Algorithm>(uv_data.vis);
@@ -227,7 +228,7 @@ primaldual_factory(
                     .maxCoeff() *
                 1e-3)
         .l2ball_proximal_epsilon(epsilon)
-        .residual_tolerance(epsilon);
+        .residual_tolerance(epsilon * residual_tolerance_scaling);
     return primaldual;
   }
 #ifdef PURIFY_MPI
@@ -286,7 +287,8 @@ primaldual_factory(
   auto const comm = sopt::mpi::Communicator::World();
   std::weak_ptr<Algorithm> const primaldual_weak(primaldual);
   // set epsilon
-  primaldual->residual_tolerance(epsilon).l2ball_proximal_epsilon(epsilon);
+  primaldual->residual_tolerance(epsilon * residual_tolerance_scaling)
+      .l2ball_proximal_epsilon(epsilon);
   // set gamma
   primaldual->gamma(comm.all_reduce(
       utilities::step_size(uv_data.vis, measurements, wavelets, sara_size) * 1e-3, MPI_MAX));
