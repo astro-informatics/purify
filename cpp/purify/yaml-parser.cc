@@ -202,7 +202,7 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
   this->algorithm_ = get<std::string>(algorithmOptionsNode, {"algorithm"});
   if (this->algorithm_ == "padmm") {
     this->epsilonConvergenceScaling_ =
-        get<t_int>(algorithmOptionsNode, {"padmm", "epsilonConvergenceScaling"});
+        get<t_real>(algorithmOptionsNode, {"padmm", "epsilonConvergenceScaling"});
     this->mpiAlgorithm_ = factory::algo_distribution_string.at(
         get<std::string>(algorithmOptionsNode, {"padmm", "mpiAlgorithm"}));
     this->relVarianceConvergence_ =
@@ -235,7 +235,7 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
     }
   } else if (this->algorithm_ == "primaldual") {
     this->epsilonConvergenceScaling_ =
-        get<t_int>(algorithmOptionsNode, {"primaldual", "epsilonConvergenceScaling"});
+        get<t_real>(algorithmOptionsNode, {"primaldual", "epsilonConvergenceScaling"});
     this->mpiAlgorithm_ = factory::algo_distribution_string.at(
         get<std::string>(algorithmOptionsNode, {"primaldual", "mpiAlgorithm"}));
     this->relVarianceConvergence_ =
