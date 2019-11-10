@@ -58,7 +58,7 @@ TEST_CASE("padmm_factory") {
   auto const diagnostic = (*padmm)();
   CHECK(diagnostic.niters == 10);
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
-  pfitsio::write2d(image.real(), expected_solution_path);
+  // pfitsio::write2d(image.real(), expected_solution_path);
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
@@ -67,7 +67,7 @@ TEST_CASE("padmm_factory") {
   const Vector<t_complex> residuals = measurements_transform->adjoint() *
                                       (uv_data.vis - ((*measurements_transform) * diagnostic.x));
   const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
-  pfitsio::write2d(residual_image.real(), expected_residual_path);
+  // pfitsio::write2d(residual_image.real(), expected_residual_path);
   CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
   CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
   CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
