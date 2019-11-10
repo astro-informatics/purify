@@ -78,7 +78,7 @@ padmm_factory(const algo_distribution dist,
   ConvergenceType rel_conv = ConvergenceType::mpi_global;
 #endif
   switch (dist) {
-  case (algo_distribution::serial): {
+  case (algo_distribution::serial):
     padmm
         ->gamma((wavelets->adjoint() * (measurements->adjoint() * uv_data.vis).eval())
                     .cwiseAbs()
@@ -87,7 +87,8 @@ padmm_factory(const algo_distribution dist,
         .l2ball_proximal_epsilon(epsilon)
         .residual_tolerance(epsilon * residual_tolerance_scaling);
     return padmm;
-  }
+    break;
+
 #ifdef PURIFY_MPI
   case (algo_distribution::mpi_serial): {
     obj_conv = ConvergenceType::mpi_global;
@@ -98,8 +99,8 @@ padmm_factory(const algo_distribution dist,
               sigma;
     // communicator ensuring l2 norm in l2ball proximal is global
     padmm->l2ball_proximal_communicator(comm);
-    break;
-  }
+  } break;
+
   case (algo_distribution::mpi_distributed): {
     obj_conv = ConvergenceType::mpi_local;
     rel_conv = ConvergenceType::mpi_local;
@@ -108,8 +109,8 @@ padmm_factory(const algo_distribution dist,
                                                  std::sqrt(comm.all_sum_all(4 * uv_data.size())) /
                                                  comm.all_sum_all(std::sqrt(4 * uv_data.size()))) *
               sigma;
-    break;
-  }
+  } break;
+
 #endif
   default:
     throw std::runtime_error(
@@ -123,7 +124,9 @@ padmm_factory(const algo_distribution dist,
   padmm->residual_tolerance(epsilon * residual_tolerance_scaling).l2ball_proximal_epsilon(epsilon);
   // set gamma
   padmm->gamma(comm.all_reduce(
-      utilities::step_size(uv_data.vis, measurements, wavelets, sara_size) * 1e-3, MPI_MAX));
+      utilities::step_size<Vector<t_complex>>(uv_data.vis, measurements, wavelets, sara_size) *
+          1e-3,
+      MPI_MAX));
   // communicator ensuring l1 norm in l1 proximal is global
   padmm->l1_proximal_adjoint_space_comm(comm);
   padmm->residual_convergence(
@@ -245,8 +248,7 @@ primaldual_factory(
               sigma;
     // communicator ensuring l2 norm in l2ball proximal is global
     primaldual->l2ball_proximal_communicator(comm);
-    break;
-  }
+  } break;
   case (algo_distribution::mpi_distributed): {
     obj_conv = ConvergenceType::mpi_local;
     rel_conv = ConvergenceType::mpi_local;
@@ -255,8 +257,7 @@ primaldual_factory(
                                                  std::sqrt(comm.all_sum_all(4 * uv_data.size())) /
                                                  comm.all_sum_all(std::sqrt(4 * uv_data.size()))) *
               sigma;
-    break;
-  }
+  } break;
   case (algo_distribution::mpi_random_updates): {
     auto const comm = sopt::mpi::Communicator::World();
     epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size()) *
@@ -279,8 +280,7 @@ primaldual_factory(
         .random_wavelet_updater(random_wavelet_updater)
         .v_all_sum_all_comm(comm)
         .u_all_sum_all_comm(comm);
-    break;
-  }
+  } break;
 #endif
   default:
     throw std::runtime_error(
@@ -295,7 +295,9 @@ primaldual_factory(
       .l2ball_proximal_epsilon(epsilon);
   // set gamma
   primaldual->gamma(comm.all_reduce(
-      utilities::step_size(uv_data.vis, measurements, wavelets, sara_size) * 1e-3, MPI_MAX));
+      utilities::step_size<Vector<t_complex>>(uv_data.vis, measurements, wavelets, sara_size) *
+          1e-3,
+      MPI_MAX));
   // communicator ensuring l1 norm in l1 proximal is global
   primaldual->residual_convergence(
       purify::factory::l2_convergence_factory<typename Algorithm::Scalar>(rel_conv,
@@ -314,16 +316,16 @@ std::shared_ptr<Algorithm> algorithm_factory(const factory::algorithm algo, ARGS
     return padmm_factory<Algorithm>(std::forward<ARGS>(args)...);
     break;
     /*
-  case algorithm::primal_dual:
-    return pd_factory(std::forward<ARGS>(args)...);
-    break;
-  case algorithm::sdmm:
-    return sdmm_factory(std::forward<ARGS>(args)...);
-    break;
-  case algorithm::forward_backward:
-    return fb_factory(std::forward<ARGS>(args)...);
-    break;
-    */
+       case algorithm::primal_dual:
+       return pd_factory(std::forward<ARGS>(args)...);
+       break;
+       case algorithm::sdmm:
+       return sdmm_factory(std::forward<ARGS>(args)...);
+       break;
+       case algorithm::forward_backward:
+       return fb_factory(std::forward<ARGS>(args)...);
+       break;
+       */
   default:
     throw std::runtime_error("Algorithm not implimented.");
   }
