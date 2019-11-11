@@ -502,9 +502,11 @@ int main(int argc, const char **argv) {
   const Vector<t_complex> estimate_image =
       (params.warm_start() != "")
           ? Vector<t_complex>::Map(pfitsio::read2d(params.warm_start()).data(),
-                                   params.height() * params.width()).eval()
+                                   params.height() * params.width())
+                .eval()
           : Vector<t_complex>::Zero(params.height() * params.width()).eval();
-  const Vector<t_complex> estimate_res = (*measurements_transform * estimate_image).eval() - uv_data.vis;
+  const Vector<t_complex> estimate_res =
+      (*measurements_transform * estimate_image).eval() - uv_data.vis;
   if (params.algorithm() == "padmm") {
     // Apply algorithm
     auto const diagnostic = (*padmm)(std::make_tuple(estimate_image.eval(), estimate_res.eval()));
