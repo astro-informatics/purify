@@ -43,7 +43,7 @@ var searchData=
   ['sdmm_5fwarm_5fstart_2ecc',['sdmm_warm_start.cc',['http://astro-informatics.github.io/sopt/sdmm__warm__start_8cc.html',1,'']]],
   ['segment',['segment',['../structpurify_1_1utilities_1_1vis__params.html#a5c2e344d73e3f40fbfd98ca88f536f9e',1,'purify::utilities::vis_params']]],
   ['serial',['serial',['../namespacepurify_1_1factory.html#a862f0cad917b1ba718f965fd508f31f4a74136b24217cb75599440e6e1d807cf7',1,'purify::factory::serial()'],['../namespacepurify_1_1factory.html#a6b8de5116c3d7d0d679cd6dd47a80248a74136b24217cb75599440e6e1d807cf7',1,'purify::factory::serial()'],['../namespacepurify_1_1factory.html#a5bbc6a01d0a2cdd30b656a6bb957221fa74136b24217cb75599440e6e1d807cf7',1,'purify::factory::serial()']]],
-  ['serial_5fvs_5fparallel_5fpadmm_2ecc',['serial_vs_parallel_padmm.cc',['../serial__vs__parallel__padmm_8cc.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/serial__vs__parallel__padmm_8cc.html',1,'(Global Namespace)']]],
+  ['serial_5fvs_5fparallel_5fpadmm_2ecc',['serial_vs_parallel_padmm.cc',['http://astro-informatics.github.io/sopt/serial__vs__parallel__padmm_8cc.html',1,'']]],
   ['series',['series',['../namespacepurify_1_1wproj__utilities_1_1expansions.html#a92334b90f8de8f723450b3aca72d9e74',1,'purify::wproj_utilities::expansions']]],
   ['session_2ecc',['session.cc',['http://astro-informatics.github.io/sopt/session_8cc.html',1,'']]],
   ['session_2eh',['session.h',['http://astro-informatics.github.io/sopt/session_8h.html',1,'']]],

@@ -4,7 +4,7 @@ var searchData=
   ['f_5fproximal',['f_proximal',['classsopt_1_1algorithm_1_1PrimalDual.html#aa68279f9bc2127ea66e52012022d86d9',1,'sopt::algorithm::PrimalDual::f_proximal()'],['classsopt_1_1algorithm_1_1ProximalADMM.html#a96a4fb1c1b4e9aaf8c716d2c3d416538',1,'sopt::algorithm::ProximalADMM::f_proximal()']]],
   ['factory',['factory',['classsopt_1_1wavelets_1_1Wavelet.html#a127561e37a23c4cfde3ec8935ebded8f',1,'sopt::wavelets::Wavelet::factory()'],['http://astro-informatics.github.io/sopt/namespacesopt_1_1wavelets.html#a65aedf4b737bb07c94642b42fe99bfab',1,'sopt::wavelets::factory()']]],
   ['fallback',['Fallback',['http://astro-informatics.github.io/sopt/structsopt_1_1details_1_1HasValueType_1_1Fallback.html',1,'sopt::details::HasValueType']]],
-  ['fb_5ffactory',['fb_factory',['../namespacepurify_1_1factory.html#aa6f2e06bcd3586e4583b44f1feb07abd',1,'purify::factory']]],
+  ['fb_5ffactory',['fb_factory',['../namespacepurify_1_1factory.html#ada0480627523bc30f9b4a239adcb414f',1,'purify::factory']]],
   ['fft_2ecc',['fft.cc',['../fft_8cc.html',1,'']]],
   ['fftoperatorfixture',['FFTOperatorFixture',['../classFFTOperatorFixture.html',1,'']]],
   ['fftw_5fplan',['fftw_plan',['../namespacepurify_1_1operators.html#a39f06b7cbec98e0ab8c7d05f643d5db0',1,'purify::operators']]],

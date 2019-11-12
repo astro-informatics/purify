@@ -1431,22 +1431,22 @@
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingProximalADMM&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>padmm_factory</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html</anchorfile>
-      <anchor>ad14f66077e408cf7ea6015983bed1383</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50)</arglist>
+      <anchor>a69db909e3bb6edef074b5eb0e15cdb5b</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real residual_tolerance_scaling=1, const t_real op_norm=1)</arglist>
     </member>
     <member kind="function">
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingForwardBackward&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>fb_factory</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html</anchorfile>
-      <anchor>aa6f2e06bcd3586e4583b44f1feb07abd</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50)</arglist>
+      <anchor>ada0480627523bc30f9b4a239adcb414f</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real op_norm=1)</arglist>
     </member>
     <member kind="function">
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingPrimalDual&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>primaldual_factory</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html</anchorfile>
-      <anchor>a964df24d5921328c6d5eb9e8af749cc7</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const t_real relative_variation=1e-3)</arglist>
+      <anchor>a0b08dded6011adff0ab4e7cef53911fc</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const t_real relative_variation=1e-3, const t_real residual_tolerance_scaling=1, const t_real op_norm=1)</arglist>
     </member>
     <member kind="variable">
       <type>const std::map&lt; std::string, algo_distribution &gt;</type>
@@ -5555,11 +5555,6 @@
     </member>
   </compound>
   <compound kind="file">
-    <name>serial_vs_parallel_padmm.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/serial__vs__parallel__padmm_8cc</filename>
-  </compound>
-  <compound kind="file">
     <name>sparse.cc</name>
     <path>/mydata/cpp/tests/</path>
     <filename>http://astro-informatics.github.io/purify/sparse_8cc</filename>
@@ -8171,22 +8166,22 @@
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingProximalADMM&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>padmm_factory</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html</anchorfile>
-      <anchor>ad14f66077e408cf7ea6015983bed1383</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50)</arglist>
+      <anchor>a69db909e3bb6edef074b5eb0e15cdb5b</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real residual_tolerance_scaling=1, const t_real op_norm=1)</arglist>
     </member>
     <member kind="function">
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingForwardBackward&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>fb_factory</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html</anchorfile>
-      <anchor>aa6f2e06bcd3586e4583b44f1feb07abd</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50)</arglist>
+      <anchor>ada0480627523bc30f9b4a239adcb414f</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real op_norm=1)</arglist>
     </member>
     <member kind="function">
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingPrimalDual&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>primaldual_factory</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify_1_1factory.html</anchorfile>
-      <anchor>a964df24d5921328c6d5eb9e8af749cc7</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const t_real relative_variation=1e-3)</arglist>
+      <anchor>a0b08dded6011adff0ab4e7cef53911fc</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const t_real relative_variation=1e-3, const t_real residual_tolerance_scaling=1, const t_real op_norm=1)</arglist>
     </member>
     <member kind="function">
       <type>std::shared_ptr&lt; sopt::LinearTransform&lt; T &gt; &gt;</type>

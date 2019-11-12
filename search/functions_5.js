@@ -3,7 +3,7 @@ var searchData=
   ['f_5fgradient',['f_gradient',['classsopt_1_1algorithm_1_1ForwardBackward.html#ad5ff963c11f8f31a2fb3802daf99d16b',1,'sopt::algorithm::ForwardBackward']]],
   ['f_5fproximal',['f_proximal',['classsopt_1_1algorithm_1_1PrimalDual.html#aa68279f9bc2127ea66e52012022d86d9',1,'sopt::algorithm::PrimalDual::f_proximal()'],['classsopt_1_1algorithm_1_1ProximalADMM.html#a96a4fb1c1b4e9aaf8c716d2c3d416538',1,'sopt::algorithm::ProximalADMM::f_proximal()']]],
   ['factory',['factory',['http://astro-informatics.github.io/sopt/namespacesopt_1_1wavelets.html#a65aedf4b737bb07c94642b42fe99bfab',1,'sopt::wavelets']]],
-  ['fb_5ffactory',['fb_factory',['../namespacepurify_1_1factory.html#aa6f2e06bcd3586e4583b44f1feb07abd',1,'purify::factory']]],
+  ['fb_5ffactory',['fb_factory',['../namespacepurify_1_1factory.html#ada0480627523bc30f9b4a239adcb414f',1,'purify::factory']]],
   ['field_5fids',['field_ids',['../classpurify_1_1casa_1_1MeasurementSet_1_1ChannelWrapper.html#a1fa7d891f0d3ae941e541405078a055e',1,'purify::casa::MeasurementSet::ChannelWrapper']]],
   ['file_5fexists',['file_exists',['../namespacepurify_1_1read__measurements.html#a58ca8b3a5ff4855f72be8729145d3f54',1,'purify::read_measurements::file_exists()'],['../namespacepurify_1_1utilities.html#aa251252a271965c9568d3f3bd8e37259',1,'purify::utilities::file_exists()']]],
   ['filename',['filename',['../classpurify_1_1casa_1_1MeasurementSet.html#a30e4791dfd5fc60bc33273642fda93c9',1,'purify::casa::MeasurementSet::filename() const'],['../classpurify_1_1casa_1_1MeasurementSet.html#a18d5649b6f6ee6a6a0f6f2464e09a35b',1,'purify::casa::MeasurementSet::filename(std::string const &amp;filename)']]],
