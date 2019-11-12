@@ -298,13 +298,13 @@ std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_gridding_m
 //! Construct MPI broadcast operator
 template <class T>
 sopt::OperatorFunction<T> init_broadcaster(const sopt::mpi::Communicator &comm) {
-  return [=](T &output, const T &input) { output = comm.broadcast<T>(input); };
+  return [=](T &output, const T &input) { output = comm.broadcast<T>(input).eval(); };
 }
 
 //! Construct MPI all sum all operator
 template <class T>
 sopt::OperatorFunction<T> init_all_sum_all(const sopt::mpi::Communicator &comm) {
-  return [=](T &output, const T &input) { output = comm.all_sum_all<T>(input); };
+  return [=](T &output, const T &input) { output = comm.all_sum_all<T>(input).eval(); };
 }
 #endif
 //! constructs lambdas that apply degridding matrix with adjoint

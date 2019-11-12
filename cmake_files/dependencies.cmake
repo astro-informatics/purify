@@ -93,7 +93,7 @@ else()
     GIT_TAG ${Sopt_GIT_TAG})
 endif()
 
-lookup_package(CFitsIO REQUIRED 3.41 EXACT)
+lookup_package(CFitsIO REQUIRED)
 if(docimg)
   set(PURIFY_CImg TRUE)
   find_package(X11)

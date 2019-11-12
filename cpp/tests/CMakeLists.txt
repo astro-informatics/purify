@@ -76,7 +76,6 @@ if(PURIFY_MPI)
 
   add_catch_test(mpi_utilities LIBRARIES libpurify)
   add_mpi_test(parallel_mpi_utilities LIBRARIES libpurify)
-  add_mpi_test(serial_vs_parallel_padmm LIBRARIES libpurify)
   add_mpi_test(mpi_algo_factory LIBRARIES libpurify)
   add_mpi_test(mpi_measurement_operator LIBRARIES libpurify)
   add_mpi_test(mpi_measurement_factory LIBRARIES libpurify)
