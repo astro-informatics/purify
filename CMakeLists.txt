@@ -8,7 +8,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_files)
 # It contains a number of cmake recipes
 include(LookUp-GreatCMakeCookOff)
 
-option(tests          "Enable testing"                                  off)
+option(tests          "Enable testing"                                  on)
 option(examples       "Compile examples"                                off)
 option(benchmarks     "Enable benchmarking"                             off)
 option(openmp         "Enable OpenMP"                                   on)

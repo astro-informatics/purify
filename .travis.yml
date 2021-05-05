@@ -28,34 +28,34 @@ matrix:
   fast_finish: true
 
   include:
-    - os: osx
-      osx_image: xcode10.1
-      env:
-        - TITLE="XCode 10.1 - GCC"
-        - MPI=OFF
-        - openMP=OFF
+  #   - os: osx
+  #     osx_image: xcode10.1
+  #     env:
+  #       - TITLE="XCode 10.1 - GCC"
+  #       - MPI=OFF
+  #       - openMP=OFF
 
-    - os: osx
-      osx_image: xcode10.1
-      env:
-        - TITLE="XCode 10.1 - Clang"
-        - MPI=OFF
-        - openMP=OFF
+  #   - os: osx
+  #     osx_image: xcode10.1
+  #     env:
+  #       - TITLE="XCode 10.1 - Clang"
+  #       - MPI=OFF
+  #       - openMP=OFF
 
-    - os: osx
-      osx_image: xcode10.1
-      env:
-        - TITLE="XCode 10.1 - GCC - MPI"
-        - MPI=ON
-        - openMP=OFF
-        - MPI_PROCS=2
-        - CI_HELPERS='spack'
-      addons:
-        homebrew:
-          packages:
-            - *osx_sources
-            - modules
-            - lmod
+  #   - os: osx
+  #     osx_image: xcode10.1
+  #     env:
+  #       - TITLE="XCode 10.1 - GCC - MPI"
+  #       - MPI=ON
+  #       - openMP=OFF
+  #       - MPI_PROCS=2
+  #       - CI_HELPERS='spack'
+  #     addons:
+  #       homebrew:
+  #         packages:
+  #           - *osx_sources
+  #           - modules
+  #           - lmod
 
     - os: linux
       addons:
