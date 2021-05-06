@@ -113,39 +113,39 @@ matrix:
         - CI_HELPERS='openmpi'
         - MPI_EXTRA="--oversubscribe"
 
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - *basic_sources
-          packages:
-            - *native_deps
-            - *all_deps
-      env:
-        - TITLE="All dependencies - GCC - MPI - mpich"
-        - DEBUG=True
-        - LDFLAGS='-pthread'
-        - MPI=ON
-        - openMP=ON
-        - MPI_PROCS=4
-        - CI_HELPERS='mpich'
+    # - os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - *basic_sources
+    #       packages:
+    #         - *native_deps
+    #         - *all_deps
+    #   env:
+    #     - TITLE="All dependencies - GCC - MPI - mpich"
+    #     - DEBUG=True
+    #     - LDFLAGS='-pthread'
+    #     - MPI=ON
+    #     - openMP=ON
+    #     - MPI_PROCS=4
+    #     - CI_HELPERS='mpich'
 
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - *basic_sources
-          packages:
-            - *native_deps
-      env:
-        - TITLE="No dependencies - GCC - MPI"
-        - DEBUG=True
-        - LDFLAGS='-pthread'
-        - MPI=ON
-        - openMP=ON
-        - MPI_PROCS=2
-        - CI_HELPERS='openmpi'
-        - MPI_EXTRA="--oversubscribe"
+    # - os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - *basic_sources
+    #       packages:
+    #         - *native_deps
+    #   env:
+    #     - TITLE="No dependencies - GCC - MPI"
+    #     - DEBUG=True
+    #     - LDFLAGS='-pthread'
+    #     - MPI=ON
+    #     - openMP=ON
+    #     - MPI_PROCS=2
+    #     - CI_HELPERS='openmpi'
+    #     - MPI_EXTRA="--oversubscribe"
 
     - os: linux
       addons:
@@ -198,22 +198,22 @@ matrix:
         - chmod o+w . # To allow docker to create the build directory
         - docker run --rm -v $(pwd):/mydata uclrits/sopt /bin/sh -c "mkdir build; cd build; cmake .. -Ddocs=${DOCS} -Dweb=ON; eval ${BUILD_CMD}"
 
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - *basic_sources
-          packages:
-            - *native_deps
-      env:
-        - TITLE="Lint"
-        - DEBUG=True
-        - LDFLAGS='-pthread'
-        - MPI=OFF
-        - openMP=OFF
-        - DOCS=OFF
-        - BUILD_CMD="find ../ -regex '.*\.\(cc\|h\)' -not -iname '*.in.h' | xargs -I{} -P 10 clang-format-7 -i -style=file {}; git diff"
-        - TEST_CMD="git diff --exit-code || (echo '## NOTE: your code is not linted properly - fix the above'; false)"
+    # - os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - *basic_sources
+    #       packages:
+    #         - *native_deps
+    #   env:
+    #     - TITLE="Lint"
+    #     - DEBUG=True
+    #     - LDFLAGS='-pthread'
+    #     - MPI=OFF
+    #     - openMP=OFF
+    #     - DOCS=OFF
+    #     - BUILD_CMD="find ../ -regex '.*\.\(cc\|h\)' -not -iname '*.in.h' | xargs -I{} -P 10 clang-format-7 -i -style=file {}; git diff"
+    #     - TEST_CMD="git diff --exit-code || (echo '## NOTE: your code is not linted properly - fix the above'; false)"
 
   allow_failures:
     # Because boost error on finding files
