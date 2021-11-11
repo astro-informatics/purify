@@ -40,7 +40,12 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install Dependencies on Ubunutu
+      if: ${{ contains(matrix.os, 'ubuntu') }}
       run: sudo apt-get install libfftw3-dev libtiff5-dev openmpi-bin libopenmpi-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev ccache libcfitsio-dev casacore-dev
+
+    - name: Install Dependencies on MacOS
+      if: ${{ contains(matrix.os, 'macos') }}
+      run: brew install fftw libtiff open-mpi boost eigen libyaml cfitsio ccache
 
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
