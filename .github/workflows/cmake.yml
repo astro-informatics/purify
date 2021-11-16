@@ -46,7 +46,7 @@ jobs:
 
     - name: Install Dependencies on MacOS
       if: ${{ contains(matrix.os, 'macos') }}
-      run: brew install fftw libtiff open-mpi boost eigen libyaml cfitsio ccache
+      run: brew install fftw libtiff open-mpi boost libyaml cfitsio ccache
 
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
@@ -67,6 +67,9 @@ jobs:
           ${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}
           ${{ matrix.os }}-${{ matrix.cxx }}
           ${{ matrix.os }}
+
+    - name: Clear ccache
+      run: ccache --clear
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
