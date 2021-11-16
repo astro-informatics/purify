@@ -19,7 +19,8 @@ jobs:
     # cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ${{matrix.os}}
-
+    env:
+      CXX: ${{ matrix.cxx }}
     strategy:
       fail-fast: false
       matrix:
@@ -41,7 +42,7 @@ jobs:
 
     - name: Install Dependencies on Ubunutu
       if: ${{ contains(matrix.os, 'ubuntu') }}
-      run: sudo apt install libfftw3-dev libtiff5-dev openmpi-bin libopenmpi-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev ccache libcfitsio-dev casacore-dev; sudo update-ccache-symlinks
+      run: sudo apt install libfftw3-dev libtiff5-dev openmpi-bin libopenmpi-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev ccache libcfitsio-dev casacore-dev
 
     - name: Install Dependencies on MacOS
       if: ${{ contains(matrix.os, 'macos') }}
