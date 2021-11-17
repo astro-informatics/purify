@@ -20,6 +20,7 @@ jobs:
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ${{matrix.os}}
     env:
+      CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
     strategy:
       fail-fast: false
@@ -27,6 +28,9 @@ jobs:
           os:
             - ubuntu-20.04
             - macos-11
+          cc:
+            - gcc
+            - clang
           cxx:
             - g++
             - clang++
@@ -36,6 +40,11 @@ jobs:
           omp:
             - "ON"
             - "OFF"
+          exclude:
+            - cc: gcc
+              cxx: clang++
+            - cc: clang
+              cxx: g++
 
     steps:
     - uses: actions/checkout@v2
