@@ -29,10 +29,10 @@ jobs:
             - ubuntu-20.04
             - macos-11
           cc:
-            - gcc
+            - gcc-9
             - clang
           cxx:
-            - g++
+            - g++-9
             - clang++
           mpi:
             - "ON"
@@ -41,10 +41,10 @@ jobs:
             - "ON"
             - "OFF"
           exclude:
-            - cc: gcc
+            - cc: gcc-9
               cxx: clang++
             - cc: clang
-              cxx: g++
+              cxx: g++-9
 
     steps:
     - uses: actions/checkout@v2
