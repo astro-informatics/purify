@@ -20,8 +20,10 @@ jobs:
         # or just run all the commands like:
         #run: docker pull uclrits/sopt
         
+      - name: Give write permission
+        run: chmod o+w . #do we need this? Yep
+        
       - name: Build sopt docs  
-        #run: chmod o+w . #do we need this?
         run: docker run --rm -v $(pwd):/mydata uclrits/sopt /bin/sh -c "mkdir build; cd build; cmake .. -Ddocs=ON -Dweb=ON; eval 'make docweb VERBOSE=1'"
 
       - name: Install purify dependencies
