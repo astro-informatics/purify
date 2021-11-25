@@ -24,7 +24,7 @@ jobs:
       #  run: docker run --rm -v $(pwd):/mydata uclrits/sopt /bin/sh -c "mkdir build; cd build; cmake .. -Ddocs=ON -Dweb=ON; eval 'make docweb VERBOSE=1'"
         
       - name: Install Purify and sopt dependencies
-        run: sudo apt install libfftw3-dev libtiff5-dev openmpi-bin libopenmpi-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev ccache libcfitsio-dev casacore-dev
+        run: sudo apt install libfftw3-dev libtiff5-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev ccache libcfitsio-dev casacore-dev doxygen graphviz
         
       - name: Pull sopt repo and build
         run : |
@@ -32,7 +32,7 @@ jobs:
           cd sopt
           mkdir build
           cd build
-          cmake .. -Ddocs=${DOCS} -Dweb=ON
+          cmake .. -Ddocs=ON -Dweb=ON
           make docweb VERBOSE=1
 
         
