@@ -11,11 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
-        
-      - name: Install Purify and sopt dependencies
+      - name: Install dependencies
         run: sudo apt install libfftw3-dev libtiff5-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev libcfitsio-dev casacore-dev doxygen graphviz
         
-      - name: Pull sopt repo and build
+      - name: Pull sopt repo and build docs
         run : |
           git clone https://github.com/astro-informatics/sopt.git
           cd sopt
@@ -24,11 +23,10 @@ jobs:
           cmake .. -Ddocs=ON -Dweb=ON -Ddompi=OFF -Dopenmp=OFF
           make docweb VERBOSE=1
 
-        
       - name: Check out Purify
         uses: actions/checkout@v2
  
-      - name: Configure and build Purify
+      - name: Configure and build docs
         run: | 
           mkdir build
           cd build
@@ -40,22 +38,8 @@ jobs:
           make docweb VERBOSE=1
         
       - name: Deploy to GH pages
-
         if: ${{github.event_name == 'push'}}
         uses: JamesIves/github-pages-deploy-action@4.1.6
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: build/cpp/docs/html # The folder the action should deploy.
-          
-      
-#deploy:
-#  provider: pages
-#  skip-cleanup: true
-#  github-token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
-#  keep-history: true
-#  local-dir: build/cpp/docs/html
-#  verbose: true # FIXME: just at first to see logs
-#  on:
-#    branch: development
-#    condition: $TITLE = "Documentation - GCC"
-
