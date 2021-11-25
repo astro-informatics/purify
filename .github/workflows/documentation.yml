@@ -1,0 +1,66 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ development ]
+  pull_request:
+    branches: [ development ]
+  
+jobs:
+  make-documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+        
+      - name: Pull sopt docker and build
+      
+        # is it better to use premade actions like:
+        uses: docker://uclrits/sopt
+        # or just run all the commands like:
+        #run: docker pull uclrits/sopt
+        
+      - name: Build sopt docs  
+        #run: chmod o+w . #do we need this?
+        run: docker run --rm -v $(pwd):/mydata uclrits/sopt /bin/sh -c "mkdir build; cd build; cmake .. -Ddocs=ON -Dweb=ON; eval 'make docweb VERBOSE=1'"
+
+      - name: Install purify dependencies
+        run: sudo apt install libfftw3-dev libtiff5-dev openmpi-bin libopenmpi-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev ccache libcfitsio-dev casacore-dev
+        
+        
+        # from Travis:      
+      - name: Configure
+        run: | 
+          cmake .. -DCMAKE_BUILD_TYPE=Release \
+          -Dtests=${Tests-ON} \
+          -Ddompi=${MPI} \
+          -Dexamples=${EXAMPLES-OFF} \
+          -Dopenmp=${openMP} \
+          -Ddocs=ON \
+          -Ddocasa=${CASA-OFF} \
+          -Dbenchmarks=${Benchmarks-OFF} \
+          -Dcoverage=${COVERAGE-OFF} \
+          -DPURIFY_TEST_LOG_LEVEL=${test_level-critical} \
+          -DGreatCMakeCookOff_DIR:PATH=/tmp/GreatCMakeCookOff/cmake \
+          -DCFitsIO_URL=https://github.com/UCL-RITS/BinaryBlobs-dependencies/raw/master/Astronomy/cfitsio3410.tar.gz \
+          ${CMAKE_CMD_EXTRA} -DMPIEXEC_PREFLAGS="${MPI_EXTRA-}"
+        
+         
+      - name: build
+        run: eval 'make docweb VERBOSE=1'
+        
+      - name: test
+        run: eval 'ctest -T test --output-on-failure -V'
+      
+      # from Tuomas's GH Actions:
+      #- name: Configure CMake 
+      #  run: |
+      #    cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+      #    -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+      #    -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
+      #    -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}}
+     # 
+     # - name: Build Purify
+     #   run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --parallel 2
+      
+
