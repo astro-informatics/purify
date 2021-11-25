@@ -40,6 +40,7 @@ jobs:
           make docweb VERBOSE=1
         
       - name: Deploy to GH pages
+
         if: ${{github.event_name == "push"}}
         uses: JamesIves/github-pages-deploy-action@4.1.6
         with:
