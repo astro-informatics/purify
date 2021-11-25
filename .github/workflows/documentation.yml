@@ -44,18 +44,21 @@ jobs:
         # This is straight from Travis, can make it shorter like Tuomas's GHA?  
       - name: Configure
         run: | 
+          mkdir build
+          cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release \
-          -Dtests=${Tests-ON} \
+          `#-Dtests=${Tests-ON}` \
           -Ddompi=OFF \
-          -Dexamples=${EXAMPLES-OFF} \
+          `#-Dexamples=${EXAMPLES-OFF}` \
           -Dopenmp=OFF \
           -Ddocs=ON \
-          -Ddocasa=${CASA-OFF} \
-          -Dbenchmarks=${Benchmarks-OFF} \
-          -Dcoverage=${COVERAGE-OFF} \
-          -DPURIFY_TEST_LOG_LEVEL=${test_level-critical} \
-          -DGreatCMakeCookOff_DIR:PATH=/tmp/GreatCMakeCookOff/cmake \
-          -DCFitsIO_URL=https://github.com/UCL-RITS/BinaryBlobs-dependencies/raw/master/Astronomy/cfitsio3410.tar.gz 
+          -Dweb=ON \
+          `#-Ddocasa=${CASA-OFF}` \
+          `#-Dbenchmarks=${Benchmarks-OFF}` \
+          `#-Dcoverage=${COVERAGE-OFF}` \
+          `#-DPURIFY_TEST_LOG_LEVEL=${test_level-critical}` \
+          `#-DGreatCMakeCookOff_DIR:PATH=/tmp/GreatCMakeCookOff/cmake` \
+          `#-DCFitsIO_URL=https://github.com/UCL-RITS/BinaryBlobs-dependencies/raw/master/Astronomy/cfitsio3410.tar.gz`
         
       - name: build
         run: make docweb VERBOSE=1
