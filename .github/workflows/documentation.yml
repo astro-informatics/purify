@@ -11,23 +11,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
-      - name: Pull sopt docker
-        # is it better to use premade actions like:
-        uses: docker://uclrits/sopt
-        # or just run the commands like:
-        #run: docker pull uclrits/sopt
+      #- name: Pull sopt docker
+      #  # is it better to use premade actions like:
+      #  uses: docker://uclrits/sopt
+      #  # or just run the commands like:
+      #  #run: docker pull uclrits/sopt
+      #  
+      #- name: Give write permission
+      #  run: chmod o+w . #do we need this? Yep
+      #  
+      #- name: Build sopt docs  
+      #  run: docker run --rm -v $(pwd):/mydata uclrits/sopt /bin/sh -c "mkdir build; cd build; cmake .. -Ddocs=ON -Dweb=ON; eval 'make docweb VERBOSE=1'"
         
-      - name: Give write permission
-        run: chmod o+w . #do we need this? Yep
+      - name: Install Purify and sopt dependencies
+        run: sudo apt install libfftw3-dev libtiff5-dev openmpi-bin libopenmpi-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev ccache libcfitsio-dev casacore-dev
         
-      - name: Build sopt docs  
-        run: docker run --rm -v $(pwd):/mydata uclrits/sopt /bin/sh -c "mkdir build; cd build; cmake .. -Ddocs=ON -Dweb=ON; eval 'make docweb VERBOSE=1'"
+      - name: Pull sopt repo and build
+        run : |
+          git clone https://github.com/astro-informatics/sopt.git
+          cd sopt
+          mkdir build
+          cd build
+          cmake .. -Ddocs=${DOCS} -Dweb=ON
+          make docweb VERBOSE=1
+
         
       - name: Check out Purify
         uses: actions/checkout@v2
 
-      - name: Install purify dependencies
-        run: sudo apt install libfftw3-dev libtiff5-dev openmpi-bin libopenmpi-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev ccache libcfitsio-dev casacore-dev
+
         
         # This is straight from Travis, can make it shorter like Tuomas's GHA?  
       - name: Configure
@@ -51,5 +63,18 @@ jobs:
       - name: test # do we need to do this step?
         run: ctest -T test --output-on-failure -V
         
-      #- name: Deploy to GH pages   
+      #- name: Deploy to GH pages
+      
+      
+      
+#deploy:
+#  provider: pages
+#  skip-cleanup: true
+#  github-token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+#  keep-history: true
+#  local-dir: build/cpp/docs/html
+#  verbose: true # FIXME: just at first to see logs
+#  on:
+#    branch: development
+#    condition: $TITLE = "Documentation - GCC"
 
