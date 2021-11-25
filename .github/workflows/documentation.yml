@@ -11,20 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
-      #- name: Pull sopt docker
-      #  # is it better to use premade actions like:
-      #  uses: docker://uclrits/sopt
-      #  # or just run the commands like:
-      #  #run: docker pull uclrits/sopt
-      #  
-      #- name: Give write permission
-      #  run: chmod o+w . #do we need this? Yep
-      #  
-      #- name: Build sopt docs  
-      #  run: docker run --rm -v $(pwd):/mydata uclrits/sopt /bin/sh -c "mkdir build; cd build; cmake .. -Ddocs=ON -Dweb=ON; eval 'make docweb VERBOSE=1'"
         
       - name: Install Purify and sopt dependencies
-        run: sudo apt install libfftw3-dev libtiff5-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev ccache libcfitsio-dev casacore-dev doxygen graphviz
+        run: sudo apt install libfftw3-dev libtiff5-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev libcfitsio-dev casacore-dev doxygen graphviz
         
       - name: Pull sopt repo and build
         run : |
@@ -32,17 +21,14 @@ jobs:
           cd sopt
           mkdir build
           cd build
-          cmake .. -Ddocs=ON -Dweb=ON
+          cmake .. -Ddocs=ON -Dweb=ON -Ddompi=OFF -Dopenmp=OFF
           make docweb VERBOSE=1
 
         
       - name: Check out Purify
         uses: actions/checkout@v2
-
-
-        
-        # This is straight from Travis, can make it shorter like Tuomas's GHA?  
-      - name: Configure
+ 
+      - name: Configure and build Purify
         run: | 
           mkdir build
           cd build
@@ -53,9 +39,13 @@ jobs:
           -Dweb=ON 
           make docweb VERBOSE=1
         
-      #- name: Deploy to GH pages
-      
-      
+      - name: Deploy to GH pages
+        if: ${{github.event.action=="push"}}
+        uses: JamesIves/github-pages-deploy-action@4.1.6
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: build/cpp/docs/html # The folder the action should deploy.
+          
       
 #deploy:
 #  provider: pages
