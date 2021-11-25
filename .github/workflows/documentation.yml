@@ -46,25 +46,12 @@ jobs:
         run: | 
           mkdir build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release \
-          `#-Dtests=${Tests-ON}` \
+          cmake .. \
           -Ddompi=OFF \
-          `#-Dexamples=${EXAMPLES-OFF}` \
           -Dopenmp=OFF \
           -Ddocs=ON \
-          -Dweb=ON \
-          `#-Ddocasa=${CASA-OFF}` \
-          `#-Dbenchmarks=${Benchmarks-OFF}` \
-          `#-Dcoverage=${COVERAGE-OFF}` \
-          `#-DPURIFY_TEST_LOG_LEVEL=${test_level-critical}` \
-          `#-DGreatCMakeCookOff_DIR:PATH=/tmp/GreatCMakeCookOff/cmake` \
-          `#-DCFitsIO_URL=https://github.com/UCL-RITS/BinaryBlobs-dependencies/raw/master/Astronomy/cfitsio3410.tar.gz`
-        
-      - name: build
-        run: make docweb VERBOSE=1
-        
-      - name: test # do we need to do this step?
-        run: ctest -T test --output-on-failure -V
+          -Dweb=ON 
+          make docweb VERBOSE=1
         
       #- name: Deploy to GH pages
       
