@@ -26,6 +26,9 @@ endif()
 find_package(OpenMP)
 if(OPENMP_FOUND AND NOT TARGET openmp::openmp)
   add_library(openmp::openmp INTERFACE IMPORTED GLOBAL)
+  set_target_properties(openmp::openmp PROPERTIES
+    INTERFACE_COMPILE_OPTIONS "-pthread"
+    INTERFACE_LINK_LIBRARIES  "${CMAKE_THREAD_LIBS_INIT}")
 endif()
 if(openmp AND NOT OPENMP_FOUND)
   message(STATUS "Could not find OpenMP. Compiling without.")
