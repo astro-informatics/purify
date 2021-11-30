@@ -14,14 +14,6 @@ if(docs)
   endif()
 endif()
 
-# Look for external software
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  find_package(Threads)
-  if(THREADS_FOUND)
-    add_compile_options(-pthread)
-  endif(THREADS_FOUND)
-endif()
-
 # Always find open-mp, since it may be used by sopt
 find_package(OpenMP)
 if(OPENMP_FOUND AND NOT TARGET openmp::openmp)
@@ -56,6 +48,13 @@ if(dompi)
 endif()
 find_package(TIFF REQUIRED)
 
+# Look for external software
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  find_package(Threads)
+  if(THREADS_FOUND AND OPENMP_FOUND)
+    add_compile_options(-pthread)
+  endif(THREADS_FOUND)
+endif()
 
 lookup_package(Boost REQUIRED COMPONENTS filesystem)
 

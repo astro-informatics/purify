@@ -48,6 +48,9 @@ jobs:
             - os: ubuntu-20.04
               cc: clang
               cxx: clang++
+            - os: macos-11 # Temporary to speed things up
+              cc: clang
+              cxx: clang++
 
     steps:
     - uses: actions/checkout@v2
