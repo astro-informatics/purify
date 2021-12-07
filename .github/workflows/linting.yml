@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v2
     
       - name: Install dependencies
-	run: sudo apt install libfftw3-dev libtiff5-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev libcfitsio-dev casacore-dev libllvm7 
+        run: sudo apt install libfftw3-dev libtiff5-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev libcfitsio-dev casacore-dev libllvm7 
     
       - name: before script #extra dependencies? trusty?
         run: |
