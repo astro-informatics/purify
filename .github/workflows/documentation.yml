@@ -3,8 +3,6 @@ name: Documentation
 on:
   push:
     branches: [ development ]
-  pull_request:
-    branches: [ development ]
   
 jobs:
   make-documentation:
