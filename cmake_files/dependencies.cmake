@@ -27,14 +27,18 @@ find_package(OpenMP)
 if(OPENMP_FOUND AND NOT TARGET openmp::openmp)
   add_library(openmp::openmp INTERFACE IMPORTED GLOBAL)
   set_target_properties(openmp::openmp PROPERTIES
-    INTERFACE_COMPILE_OPTIONS "${OpenMP_CXX_FLAGS}"
-    INTERFACE_LINK_LIBRARIES  "${OpenMP_CXX_FLAGS}")
+    INTERFACE_COMPILE_OPTIONS "-pthread"
+    INTERFACE_LINK_LIBRARIES  "${CMAKE_THREAD_LIBS_INIT}")
 endif()
 if(openmp AND NOT OPENMP_FOUND)
   message(STATUS "Could not find OpenMP. Compiling without.")
 endif()
 set(PURIFY_OPENMP_FFTW FALSE)
 if(openmp AND OPENMP_FOUND)
+  set_target_properties(openmp::openmp PROPERTIES
+    INTERFACE_COMPILE_OPTIONS "${OpenMP_CXX_FLAGS}"
+    INTERFACE_LINK_LIBRARIES  "${OpenMP_CXX_FLAGS}")
+
   set(PURIFY_OPENMP TRUE)
   find_package(FFTW3 REQUIRED DOUBLE SERIAL COMPONENTS OPENMP)
   set(FFTW3_DOUBLE_LIBRARY fftw3::double::serial)
