@@ -42,6 +42,10 @@ include(logging)
 # include exernal dependencies
 include(dependencies)
 
+if(NOT PURIFY_OPENMP)
+  set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+endif()
 
 if(tests)  # Adds ctest
   enable_testing()
