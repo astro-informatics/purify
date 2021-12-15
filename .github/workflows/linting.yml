@@ -1,0 +1,43 @@
+name: Linting
+
+on:
+  push:
+    branches: [ sj/ga-migrate-linting ]
+
+  
+jobs:
+  make-documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        
+      - run: sudo apt-get update
+    
+      - name: Install dependencies
+        run: sudo apt install libfftw3-dev libtiff5-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev libcfitsio-dev casacore-dev libllvm7 
+    
+      - name: before script #extra dependencies? trusty?
+        run: |
+          curl https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal main" | sudo tee -a /etc/apt/sources.list
+          sudo apt-get update -y -qq 
+          sudo apt-get install clang-format
+          
+      - name: Configure
+        run: | 
+          mkdir build
+          cd build
+          cmake .. \
+          -Ddompi=OFF \
+          -Dopenmp=OFF \
+          -Ddocs=OFF 
+
+      - name: Build #?
+        run: | 
+          find ../ -regex '.*\.\(cc\|h\)' -not -iname '*.in.h' | xargs -I{} -P 10 clang-format -i -style=file {}; git diff
+          
+      - name: Test # Report results of lint?
+        run: | 
+          git diff --exit-code || (echo '## NOTE: your code is not linted properly - fix the above'; false)
+ 
