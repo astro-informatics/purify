@@ -13,18 +13,16 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
-        
-      - run: sudo apt-get update
-      
+    
       - name: Install dependencies
         run: sudo apt install libfftw3-dev libtiff5-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev libcfitsio-dev casacore-dev libllvm7 
     
-      - name: before script #extra dependencies
+      - name: before script #extra dependencies? trusty?
         run: |
           curl https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal main" | sudo tee -a /etc/apt/sources.list
+          echo "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-7 main" | sudo tee -a /etc/apt/sources.list
           sudo apt-get update -y -qq 
-          sudo apt-get install clang-format
+          sudo apt-get install clang-format-7
           
       - name: Configure
         run: | 
@@ -37,7 +35,7 @@ jobs:
 
       - name: Build #?
         run: | 
-          find ../ -regex '.*\.\(cc\|h\)' -not -iname '*.in.h' | xargs -I{} -P 10 clang-format -i -style=file {}; git diff
+          find ../ -regex '.*\.\(cc\|h\)' -not -iname '*.in.h' | xargs -I{} -P 10 clang-format-7 -i -style=file {}; git diff
           
       - name: Test # Report results of lint?
         run: | 
