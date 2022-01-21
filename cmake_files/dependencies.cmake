@@ -24,22 +24,27 @@ endif()
 
 # Always find open-mp, since it may be used by sopt
 find_package(OpenMP)
-if(OPENMP_FOUND AND NOT TARGET openmp::openmp)
-  add_library(openmp::openmp INTERFACE IMPORTED GLOBAL)
-  set_target_properties(openmp::openmp PROPERTIES
-    INTERFACE_COMPILE_OPTIONS "-pthread"
-    INTERFACE_LINK_LIBRARIES  "${CMAKE_THREAD_LIBS_INIT}")
-endif()
 if(openmp AND NOT OPENMP_FOUND)
   message(STATUS "Could not find OpenMP. Compiling without.")
 endif()
 set(PURIFY_OPENMP_FFTW FALSE)
 if(openmp AND OPENMP_FOUND)
+  # Set PURIFY_OPENMP to TRUE when OpenMP is both found and requested
+  set(PURIFY_OPENMP TRUE)
+
+  # Add the OpenMP Library
+  add_library(openmp::openmp INTERFACE IMPORTED GLOBAL)
+
+  # Set compiler and linker options to the defaults for CXX
+  # TODO: Should this be done automatically?
+  #       Check when we update CMake and the OpenMP linking to
+  #       https://cliutils.gitlab.io/modern-cmake/chapters/packages/OpenMP.html
+  #       possibly using
+  #       https://cmake.org/cmake/help/latest/module/FindOpenMP.html
   set_target_properties(openmp::openmp PROPERTIES
     INTERFACE_COMPILE_OPTIONS "${OpenMP_CXX_FLAGS}"
     INTERFACE_LINK_LIBRARIES  "${OpenMP_CXX_FLAGS}")
 
-  set(PURIFY_OPENMP TRUE)
   find_package(FFTW3 REQUIRED DOUBLE SERIAL COMPONENTS OPENMP)
   set(FFTW3_DOUBLE_LIBRARY fftw3::double::serial)
   if(TARGET fftw3::double::openmp)
@@ -47,6 +52,7 @@ if(openmp AND OPENMP_FOUND)
     set(PURIFY_OPENMP_FFTW TRUE)
   endif()
 else()
+  # Set to FALSE when OpenMP is not found or not requested
   set(PURIFY_OPENMP FALSE)
   find_package(FFTW3 REQUIRED DOUBLE)
   set(FFTW3_DOUBLE_LIBRARY fftw3::double::serial)
