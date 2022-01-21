@@ -1,8 +1,10 @@
 <map id="DegridOperatorFixturePar" name="DegridOperatorFixturePar">
-<area shape="rect" id="node3" href="$classDegridOperatorAdjointFixturePar.html" title="DegridOperatorAdjointFixturePar" alt="" coords="355,71,587,98"/>
-<area shape="rect" id="node6" href="$classDegridOperatorDirectFixturePar.html" title="DegridOperatorDirectFixturePar" alt="" coords="358,130,583,157"/>
-<area shape="rect" id="node4" href="$classDegridOperatorAdjointFixtureDistr.html" title="DegridOperatorAdjointFixture\lDistr" alt="" coords="646,5,858,47"/>
-<area shape="rect" id="node5" href="$classDegridOperatorAdjointFixtureMPI.html" title="DegridOperatorAdjointFixtureMPI" alt="" coords="635,71,869,98"/>
-<area shape="rect" id="node7" href="$classDegridOperatorDirectFixtureDistr.html" title="DegridOperatorDirectFixture\lDistr" alt="" coords="649,123,855,164"/>
-<area shape="rect" id="node8" href="$classDegridOperatorDirectFixtureMPI.html" title="DegridOperatorDirectFixtureMPI" alt="" coords="638,189,866,215"/>
+<area shape="rect" id="node1" title=" " alt="" coords="120,101,307,127"/>
+<area shape="rect" id="node3" href="$classDegridOperatorAdjointFixturePar.html" title=" " alt="" coords="355,71,588,98"/>
+<area shape="rect" id="node6" href="$classDegridOperatorDirectFixturePar.html" title=" " alt="" coords="358,130,585,157"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,101,72,127"/>
+<area shape="rect" id="node4" href="$classDegridOperatorAdjointFixtureDistr.html" title=" " alt="" coords="648,5,861,47"/>
+<area shape="rect" id="node5" href="$classDegridOperatorAdjointFixtureMPI.html" title=" " alt="" coords="636,71,873,98"/>
+<area shape="rect" id="node7" href="$classDegridOperatorDirectFixtureDistr.html" title=" " alt="" coords="651,123,858,164"/>
+<area shape="rect" id="node8" href="$classDegridOperatorDirectFixtureMPI.html" title=" " alt="" coords="639,189,870,215"/>
 </map>

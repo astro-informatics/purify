@@ -2,8 +2,8 @@
 <tagfile>
   <compound kind="file">
     <name>degridding.cc</name>
-    <path>/mydata/cpp/benchmarks/</path>
-    <filename>http://astro-informatics.github.io/purify/degridding_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>http://astro-informatics.github.io/purify/degridding_8cc.html</filename>
     <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
     <class kind="class">GridOperatorFixture</class>
@@ -38,8 +38,8 @@
   </compound>
   <compound kind="file">
     <name>fft.cc</name>
-    <path>/mydata/cpp/benchmarks/</path>
-    <filename>http://astro-informatics.github.io/purify/fft_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>http://astro-informatics.github.io/purify/fft_8cc.html</filename>
     <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
     <class kind="class">FFTOperatorFixture</class>
@@ -67,8 +67,8 @@
   </compound>
   <compound kind="file">
     <name>main.cc</name>
-    <path>/mydata/cpp/benchmarks/</path>
-    <filename>http://astro-informatics.github.io/purify/benchmarks_2main_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>http://astro-informatics.github.io/purify/benchmarks_2main_8cc.html</filename>
     <class kind="class">NullReporter</class>
     <member kind="function">
       <type>int</type>
@@ -80,8 +80,8 @@
   </compound>
   <compound kind="file">
     <name>main.cc</name>
-    <path>/mydata/cpp/</path>
-    <filename>http://astro-informatics.github.io/purify/main_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/</path>
+    <filename>http://astro-informatics.github.io/purify/main_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="algorithm__factory_8h" name="algorithm_factory.h" local="yes" imported="no">purify/algorithm_factory.h</includes>
     <includes id="cimg_8h" name="cimg.h" local="yes" imported="no">purify/cimg.h</includes>
@@ -103,8 +103,8 @@
   </compound>
   <compound kind="file">
     <name>measurement_operator.cc</name>
-    <path>/mydata/cpp/benchmarks/</path>
-    <filename>http://astro-informatics.github.io/purify/benchmarks_2measurement__operator_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>http://astro-informatics.github.io/purify/benchmarks_2measurement__operator_8cc.html</filename>
     <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
     <class kind="class">DegridOperatorFixture</class>
@@ -155,8 +155,8 @@
   </compound>
   <compound kind="file">
     <name>measurement_operator.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/tests_2measurement__operator_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/tests_2measurement__operator_8cc.html</filename>
     <includes id="kernels_8h" name="kernels.h" local="yes" imported="no">purify/kernels.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
     <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
@@ -186,8 +186,8 @@
   </compound>
   <compound kind="file">
     <name>measurement_operator_af.cc</name>
-    <path>/mydata/cpp/benchmarks/</path>
-    <filename>http://astro-informatics.github.io/purify/measurement__operator__af_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>http://astro-informatics.github.io/purify/measurement__operator__af_8cc.html</filename>
     <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
     <includes id="operators__gpu_8h" name="operators_gpu.h" local="yes" imported="no">purify/operators_gpu.h</includes>
     <class kind="class">DegridOperatorFixture</class>
@@ -245,8 +245,8 @@
   </compound>
   <compound kind="file">
     <name>measurement_operator_mpi.cc</name>
-    <path>/mydata/cpp/benchmarks/</path>
-    <filename>http://astro-informatics.github.io/purify/measurement__operator__mpi_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>http://astro-informatics.github.io/purify/measurement__operator__mpi_8cc.html</filename>
     <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
     <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
@@ -331,8 +331,8 @@
   </compound>
   <compound kind="file">
     <name>measurement_operator_wproj.cc</name>
-    <path>/mydata/cpp/benchmarks/</path>
-    <filename>http://astro-informatics.github.io/purify/measurement__operator__wproj_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>http://astro-informatics.github.io/purify/measurement__operator__wproj_8cc.html</filename>
     <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
     <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
@@ -363,8 +363,8 @@
   </compound>
   <compound kind="file">
     <name>padmm.cc</name>
-    <path>/mydata/cpp/benchmarks/</path>
-    <filename>http://astro-informatics.github.io/purify/padmm_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>http://astro-informatics.github.io/purify/padmm_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
@@ -394,8 +394,8 @@
   </compound>
   <compound kind="file">
     <name>padmm_mpi.cc</name>
-    <path>/mydata/cpp/benchmarks/</path>
-    <filename>http://astro-informatics.github.io/purify/padmm__mpi_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>http://astro-informatics.github.io/purify/padmm__mpi_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
     <includes id="convergence__factory_8h" name="convergence_factory.h" local="yes" imported="no">purify/convergence_factory.h</includes>
@@ -471,8 +471,8 @@
   </compound>
   <compound kind="file">
     <name>utilities.cc</name>
-    <path>/mydata/cpp/benchmarks/</path>
-    <filename>http://astro-informatics.github.io/purify/benchmarks_2utilities_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>http://astro-informatics.github.io/purify/benchmarks_2utilities_8cc.html</filename>
     <includes id="benchmarks_2utilities_8h" name="utilities.h" local="no" imported="no">benchmarks/utilities.h</includes>
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
     <includes id="mpi__utilities_8h" name="mpi_utilities.h" local="yes" imported="no">purify/mpi_utilities.h</includes>
@@ -538,8 +538,8 @@
   </compound>
   <compound kind="file">
     <name>utilities.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/purify_2utilities_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/purify_2utilities_8cc.html</filename>
     <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
@@ -653,8 +653,8 @@
   </compound>
   <compound kind="file">
     <name>utilities.h</name>
-    <path>/mydata/cpp/benchmarks/</path>
-    <filename>http://astro-informatics.github.io/purify/benchmarks_2utilities_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>http://astro-informatics.github.io/purify/benchmarks_2utilities_8h.html</filename>
     <includes id="uvw__utilities_8h" name="uvw_utilities.h" local="yes" imported="no">purify/uvw_utilities.h</includes>
     <namespace>b_utilities</namespace>
     <member kind="function">
@@ -716,8 +716,8 @@
   </compound>
   <compound kind="file">
     <name>utilities.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/purify_2utilities_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/purify_2utilities_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <namespace>purify</namespace>
     <namespace>purify::utilities</namespace>
@@ -864,8 +864,8 @@
   </compound>
   <compound kind="file">
     <name>wavelet_operator.cc</name>
-    <path>/mydata/cpp/benchmarks/</path>
-    <filename>http://astro-informatics.github.io/purify/wavelet__operator_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>http://astro-informatics.github.io/purify/wavelet__operator_8cc.html</filename>
     <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
     <includes id="wavelet__operator__factory_8h" name="wavelet_operator_factory.h" local="yes" imported="no">purify/wavelet_operator_factory.h</includes>
     <class kind="class">WaveletOperatorFixture</class>
@@ -908,8 +908,8 @@
   </compound>
   <compound kind="file">
     <name>wavelet_operator_mpi.cc</name>
-    <path>/mydata/cpp/benchmarks/</path>
-    <filename>http://astro-informatics.github.io/purify/wavelet__operator__mpi_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>http://astro-informatics.github.io/purify/wavelet__operator__mpi_8cc.html</filename>
     <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
     <includes id="wavelet__operator__factory_8h" name="wavelet_operator_factory.h" local="yes" imported="no">purify/wavelet_operator_factory.h</includes>
     <class kind="class">WaveletOperatorMPIFixture</class>
@@ -937,18 +937,18 @@
   </compound>
   <compound kind="file">
     <name>PURIFY_CONTRIBUTORS.md</name>
-    <path>/mydata/cpp/docs/</path>
-    <filename>http://astro-informatics.github.io/purify/PURIFY__CONTRIBUTORS_8md</filename>
+    <path>/home/runner/work/purify/purify/cpp/docs/</path>
+    <filename>http://astro-informatics.github.io/purify/PURIFY__CONTRIBUTORS_8md.html</filename>
   </compound>
   <compound kind="file">
     <name>README.md</name>
-    <path>/mydata/cpp/docs/</path>
-    <filename>http://astro-informatics.github.io/purify/README_8md</filename>
+    <path>/home/runner/work/purify/purify/cpp/docs/</path>
+    <filename>http://astro-informatics.github.io/purify/README_8md.html</filename>
   </compound>
   <compound kind="file">
     <name>casa.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/casa_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/casa_8cc.html</filename>
     <includes id="casacore_8h" name="casacore.h" local="yes" imported="no">purify/casacore.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <member kind="define">
@@ -975,8 +975,8 @@
   </compound>
   <compound kind="file">
     <name>compare_wprojection.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/compare__wprojection_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/compare__wprojection_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
@@ -1001,8 +1001,8 @@
   </compound>
   <compound kind="file">
     <name>generate_vis_data.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/generate__vis__data_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/generate__vis__data_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
@@ -1018,8 +1018,8 @@
   </compound>
   <compound kind="file">
     <name>gridding.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/gridding_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/gridding_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
@@ -1034,8 +1034,8 @@
   </compound>
   <compound kind="file">
     <name>histogram_equalisation.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/histogram__equalisation_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/histogram__equalisation_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="cimg_8h" name="cimg.h" local="yes" imported="no">purify/cimg.h</includes>
     <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
@@ -1049,8 +1049,8 @@
   </compound>
   <compound kind="file">
     <name>image_wproj_chirp.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/image__wproj__chirp_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/image__wproj__chirp_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
@@ -1075,8 +1075,8 @@
   </compound>
   <compound kind="file">
     <name>mem_w_algos.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/mem__w__algos_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/mem__w__algos_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="measurement__operator__factory_8h" name="measurement_operator_factory.h" local="yes" imported="no">purify/measurement_operator_factory.h</includes>
@@ -1091,8 +1091,8 @@
   </compound>
   <compound kind="file">
     <name>padmm_mpi_random_coverage.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/padmm__mpi__random__coverage_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/padmm__mpi__random__coverage_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
@@ -1139,8 +1139,8 @@
   </compound>
   <compound kind="file">
     <name>padmm_mpi_real_data.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/padmm__mpi__real__data_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/padmm__mpi__real__data_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
@@ -1188,8 +1188,8 @@
   </compound>
   <compound kind="file">
     <name>padmm_random_coverage.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/padmm__random__coverage_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/padmm__random__coverage_8cc.html</filename>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
     <includes id="wproj__operators_8h" name="wproj_operators.h" local="yes" imported="no">purify/wproj_operators.h</includes>
@@ -1214,8 +1214,8 @@
   </compound>
   <compound kind="file">
     <name>padmm_real_data.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/padmm__real__data_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/padmm__real__data_8cc.html</filename>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
@@ -1241,8 +1241,8 @@
   </compound>
   <compound kind="file">
     <name>padmm_reweighted_simulation.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/padmm__reweighted__simulation_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/padmm__reweighted__simulation_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
@@ -1258,8 +1258,8 @@
   </compound>
   <compound kind="file">
     <name>padmm_simulation.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/padmm__simulation_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/padmm__simulation_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
@@ -1275,8 +1275,8 @@
   </compound>
   <compound kind="file">
     <name>plot_wkernel.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/plot__wkernel_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/plot__wkernel_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="kernels_8h" name="kernels.h" local="yes" imported="no">purify/kernels.h</includes>
@@ -1300,8 +1300,8 @@
   </compound>
   <compound kind="file">
     <name>sara_padmm_random_coverage.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/sara__padmm__random__coverage_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/sara__padmm__random__coverage_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
     <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
@@ -1316,8 +1316,8 @@
   </compound>
   <compound kind="file">
     <name>sdmm_m31_simulation.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/sdmm__m31__simulation_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/sdmm__m31__simulation_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
@@ -1333,8 +1333,8 @@
   </compound>
   <compound kind="file">
     <name>show_image.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/show__image_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/show__image_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="cimg_8h" name="cimg.h" local="yes" imported="no">purify/cimg.h</includes>
     <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
@@ -1348,8 +1348,8 @@
   </compound>
   <compound kind="file">
     <name>time_w_algos.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/time__w__algos_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/time__w__algos_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="measurement__operator__factory_8h" name="measurement_operator_factory.h" local="yes" imported="no">purify/measurement_operator_factory.h</includes>
@@ -1364,8 +1364,8 @@
   </compound>
   <compound kind="file">
     <name>wavelet_decomposition.cc</name>
-    <path>/mydata/cpp/example/</path>
-    <filename>http://astro-informatics.github.io/purify/wavelet__decomposition_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/example/</path>
+    <filename>http://astro-informatics.github.io/purify/wavelet__decomposition_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
@@ -1388,8 +1388,8 @@
   </compound>
   <compound kind="file">
     <name>algorithm_factory.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/algorithm__factory_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/algorithm__factory_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="convergence__factory_8h" name="convergence_factory.h" local="yes" imported="no">purify/convergence_factory.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
@@ -1458,8 +1458,8 @@
   </compound>
   <compound kind="file">
     <name>AllToAllSparseVector.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/AllToAllSparseVector_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/AllToAllSparseVector_8cc.html</filename>
     <includes id="AllToAllSparseVector_8h" name="AllToAllSparseVector.h" local="yes" imported="no">purify/AllToAllSparseVector.h</includes>
     <namespace>purify</namespace>
     <member kind="function">
@@ -1472,13 +1472,13 @@
   </compound>
   <compound kind="file">
     <name>AllToAllSparseVector.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/AllToAllSparseVector_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/AllToAllSparseVector_8h.html</filename>
   </compound>
   <compound kind="file">
     <name>casacore.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/purify_2casacore_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/purify_2casacore_8cc.html</filename>
     <includes id="casacore_8h" name="casacore.h" local="yes" imported="no">purify/casacore.h</includes>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
@@ -1529,8 +1529,8 @@
   </compound>
   <compound kind="file">
     <name>casacore.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/tests_2casacore_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/tests_2casacore_8cc.html</filename>
     <includes id="casacore_8h" name="casacore.h" local="yes" imported="no">purify/casacore.h</includes>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
@@ -1588,8 +1588,8 @@
   </compound>
   <compound kind="file">
     <name>casacore.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/casacore_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/casacore_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="uvw__utilities_8h" name="uvw_utilities.h" local="yes" imported="no">purify/uvw_utilities.h</includes>
     <class kind="class">purify::casa::MeasurementSet</class>
@@ -1734,14 +1734,14 @@
   </compound>
   <compound kind="file">
     <name>cimg.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/cimg_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/cimg_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
   </compound>
   <compound kind="file">
     <name>config.in.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/config_8in_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/config_8in_8h.html</filename>
     <namespace>purify</namespace>
     <member kind="define">
       <type>#define</type>
@@ -1844,8 +1844,8 @@
   </compound>
   <compound kind="file">
     <name>convergence_factory.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/convergence__factory_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/convergence__factory_8h.html</filename>
     <namespace>purify</namespace>
     <namespace>purify::factory</namespace>
     <member kind="enumeration">
@@ -1860,8 +1860,8 @@
   </compound>
   <compound kind="file">
     <name>convolution.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/convolution_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/convolution_8h.html</filename>
     <namespace>purify</namespace>
     <namespace>purify::convol</namespace>
     <member kind="function">
@@ -1902,8 +1902,8 @@
   </compound>
   <compound kind="file">
     <name>distribute.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/purify_2distribute_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/purify_2distribute_8cc.html</filename>
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
     <includes id="wide__field__utilities_8h" name="wide_field_utilities.h" local="yes" imported="no">purify/wide_field_utilities.h</includes>
     <namespace>purify</namespace>
@@ -1953,8 +1953,8 @@
   </compound>
   <compound kind="file">
     <name>distribute.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/tests_2distribute_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/tests_2distribute_8cc.html</filename>
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
@@ -1968,8 +1968,8 @@
   </compound>
   <compound kind="file">
     <name>distribute.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/distribute_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/distribute_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="uvw__utilities_8h" name="uvw_utilities.h" local="yes" imported="no">purify/uvw_utilities.h</includes>
@@ -2031,13 +2031,13 @@
   </compound>
   <compound kind="file">
     <name>DistributeSparseVector.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/DistributeSparseVector_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/DistributeSparseVector_8h.html</filename>
   </compound>
   <compound kind="file">
     <name>fly_operators.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/fly__operators_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/fly__operators_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
     <namespace>purify</namespace>
@@ -2052,8 +2052,8 @@
   </compound>
   <compound kind="file">
     <name>IndexMapping.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/IndexMapping_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/IndexMapping_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <class kind="class">purify::IndexMapping</class>
     <namespace>purify</namespace>
@@ -2074,8 +2074,8 @@
   </compound>
   <compound kind="file">
     <name>integration.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/purify_2integration_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/purify_2integration_8cc.html</filename>
     <includes id="integration_8h" name="integration.h" local="yes" imported="no">purify/integration.h</includes>
     <namespace>purify</namespace>
     <namespace>purify::integration</namespace>
@@ -2124,8 +2124,8 @@
   </compound>
   <compound kind="file">
     <name>integration.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/tests_2integration_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/tests_2integration_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="integration_8h" name="integration.h" local="yes" imported="no">purify/integration.h</includes>
@@ -2154,8 +2154,8 @@
   </compound>
   <compound kind="file">
     <name>integration.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/integration_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/integration_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <namespace>purify</namespace>
@@ -2233,8 +2233,8 @@
   </compound>
   <compound kind="file">
     <name>kernels.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/kernels_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/kernels_8cc.html</filename>
     <includes id="kernels_8h" name="kernels.h" local="yes" imported="no">purify/kernels.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <namespace>purify</namespace>
@@ -2368,8 +2368,8 @@
   </compound>
   <compound kind="file">
     <name>kernels.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/kernels_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/kernels_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <namespace>purify</namespace>
     <namespace>purify::kernels</namespace>
@@ -2523,8 +2523,8 @@
   </compound>
   <compound kind="file">
     <name>logging.disabled.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/logging_8disabled_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/logging_8disabled_8h.html</filename>
     <namespace>purify</namespace>
     <namespace>purify::logging</namespace>
     <member kind="define">
@@ -2593,8 +2593,8 @@
   </compound>
   <compound kind="file">
     <name>logging.enabled.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/logging_8enabled_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/logging_8enabled_8h.html</filename>
     <namespace>purify</namespace>
     <namespace>purify::logging</namespace>
     <member kind="define">
@@ -2649,8 +2649,8 @@
   </compound>
   <compound kind="file">
     <name>logging.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/logging_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/logging_8h.html</filename>
     <includes id="logging_8disabled_8h" name="logging.disabled.h" local="yes" imported="no">purify/logging.disabled.h</includes>
     <member kind="define">
       <type>#define</type>
@@ -2718,8 +2718,8 @@
   </compound>
   <compound kind="file">
     <name>measurement_operator_factory.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/measurement__operator__factory_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/measurement__operator__factory_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
@@ -2760,8 +2760,8 @@
   </compound>
   <compound kind="file">
     <name>mpi_utilities.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/purify_2mpi__utilities_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/purify_2mpi__utilities_8cc.html</filename>
     <includes id="mpi__utilities_8h" name="mpi_utilities.h" local="yes" imported="no">purify/mpi_utilities.h</includes>
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
     <namespace>purify</namespace>
@@ -2853,8 +2853,8 @@
   </compound>
   <compound kind="file">
     <name>mpi_utilities.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/tests_2mpi__utilities_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/tests_2mpi__utilities_8cc.html</filename>
     <includes id="mpi__utilities_8h" name="mpi_utilities.h" local="yes" imported="no">purify/mpi_utilities.h</includes>
     <member kind="function">
       <type></type>
@@ -2866,8 +2866,8 @@
   </compound>
   <compound kind="file">
     <name>mpi_utilities.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/mpi__utilities_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/mpi__utilities_8h.html</filename>
     <includes id="uvw__utilities_8h" name="uvw_utilities.h" local="yes" imported="no">purify/uvw_utilities.h</includes>
     <namespace>purify</namespace>
     <namespace>purify::utilities</namespace>
@@ -2881,8 +2881,8 @@
   </compound>
   <compound kind="file">
     <name>operators.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/purify_2operators_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/purify_2operators_8cc.html</filename>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
     <includes id="wide__field__utilities_8h" name="wide_field_utilities.h" local="yes" imported="no">purify/wide_field_utilities.h</includes>
     <namespace>purify</namespace>
@@ -2904,8 +2904,8 @@
   </compound>
   <compound kind="file">
     <name>operators.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/tests_2operators_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/tests_2operators_8cc.html</filename>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="fly__operators_8h" name="fly_operators.h" local="yes" imported="no">purify/fly_operators.h</includes>
@@ -3000,8 +3000,8 @@
   </compound>
   <compound kind="file">
     <name>operators.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/operators_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/operators_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="kernels_8h" name="kernels.h" local="yes" imported="no">purify/kernels.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
@@ -3131,16 +3131,16 @@
   </compound>
   <compound kind="file">
     <name>operators_gpu.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/operators__gpu_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/operators__gpu_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
   </compound>
   <compound kind="file">
     <name>pfitsio.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/pfitsio_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/pfitsio_8cc.html</filename>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
     <namespace>purify</namespace>
@@ -3218,8 +3218,8 @@
   </compound>
   <compound kind="file">
     <name>pfitsio.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/pfitsio_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/pfitsio_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="uvw__utilities_8h" name="uvw_utilities.h" local="yes" imported="no">purify/uvw_utilities.h</includes>
@@ -3376,8 +3376,8 @@
   </compound>
   <compound kind="file">
     <name>random_update_factory.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/random__update__factory_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/random__update__factory_8cc.html</filename>
     <includes id="random__update__factory_8h" name="random_update_factory.h" local="yes" imported="no">purify/random_update_factory.h</includes>
     <namespace>purify</namespace>
     <namespace>purify::random_updater</namespace>
@@ -3391,8 +3391,8 @@
   </compound>
   <compound kind="file">
     <name>random_update_factory.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/random__update__factory_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/random__update__factory_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="convergence__factory_8h" name="convergence_factory.h" local="yes" imported="no">purify/convergence_factory.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
@@ -3400,8 +3400,8 @@
   </compound>
   <compound kind="file">
     <name>read_measurements.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/purify_2read__measurements_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/purify_2read__measurements_8cc.html</filename>
     <includes id="read__measurements_8h" name="read_measurements.h" local="yes" imported="no">purify/read_measurements.h</includes>
     <includes id="uvfits_8h" name="uvfits.h" local="yes" imported="no">purify/uvfits.h</includes>
     <namespace>purify</namespace>
@@ -3451,8 +3451,8 @@
   </compound>
   <compound kind="file">
     <name>read_measurements.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/tests_2read__measurements_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/tests_2read__measurements_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="read__measurements_8h" name="read_measurements.h" local="yes" imported="no">purify/read_measurements.h</includes>
@@ -3473,8 +3473,8 @@
   </compound>
   <compound kind="file">
     <name>read_measurements.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/read__measurements_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/read__measurements_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
     <includes id="uvw__utilities_8h" name="uvw_utilities.h" local="yes" imported="no">purify/uvw_utilities.h</includes>
@@ -3549,8 +3549,8 @@
   </compound>
   <compound kind="file">
     <name>types.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/types_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/types_8h.html</filename>
     <namespace>purify</namespace>
     <namespace>purify::wproj_utilities</namespace>
     <namespace>purify::wproj_utilities::expansions</namespace>
@@ -3660,8 +3660,8 @@
   </compound>
   <compound kind="file">
     <name>update_factory.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/update__factory_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/update__factory_8h.html</filename>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="algorithm__factory_8h" name="algorithm_factory.h" local="yes" imported="no">purify/algorithm_factory.h</includes>
     <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
@@ -3678,8 +3678,8 @@
   </compound>
   <compound kind="file">
     <name>uvfits.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/purify_2uvfits_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/purify_2uvfits_8cc.html</filename>
     <includes id="uvfits_8h" name="uvfits.h" local="yes" imported="no">purify/uvfits.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <namespace>purify</namespace>
@@ -3799,8 +3799,8 @@
   </compound>
   <compound kind="file">
     <name>uvfits.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/tests_2uvfits_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/tests_2uvfits_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="uvfits_8h" name="uvfits.h" local="yes" imported="no">purify/uvfits.h</includes>
@@ -3814,8 +3814,8 @@
   </compound>
   <compound kind="file">
     <name>uvfits.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/uvfits_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/uvfits_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="uvw__utilities_8h" name="uvw_utilities.h" local="yes" imported="no">purify/uvw_utilities.h</includes>
@@ -3936,8 +3936,8 @@
   </compound>
   <compound kind="file">
     <name>uvw_utilities.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/uvw__utilities_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/uvw__utilities_8cc.html</filename>
     <includes id="uvw__utilities_8h" name="uvw_utilities.h" local="yes" imported="no">purify/uvw_utilities.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
@@ -4065,8 +4065,8 @@
   </compound>
   <compound kind="file">
     <name>uvw_utilities.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/uvw__utilities_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/uvw__utilities_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <class kind="struct">purify::utilities::vis_params</class>
     <namespace>purify</namespace>
@@ -4268,8 +4268,8 @@
   </compound>
   <compound kind="file">
     <name>wavelet_operator_factory.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/wavelet__operator__factory_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/wavelet__operator__factory_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <namespace>purify</namespace>
@@ -4300,8 +4300,8 @@
   </compound>
   <compound kind="file">
     <name>wide_field_utilities.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/purify_2wide__field__utilities_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/purify_2wide__field__utilities_8cc.html</filename>
     <includes id="wide__field__utilities_8h" name="wide_field_utilities.h" local="yes" imported="no">purify/wide_field_utilities.h</includes>
     <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
     <namespace>purify</namespace>
@@ -4365,8 +4365,8 @@
   </compound>
   <compound kind="file">
     <name>wide_field_utilities.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/tests_2wide__field__utilities_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/tests_2wide__field__utilities_8cc.html</filename>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="convolution_8h" name="convolution.h" local="yes" imported="no">purify/convolution.h</includes>
@@ -4404,8 +4404,8 @@
   </compound>
   <compound kind="file">
     <name>wide_field_utilities.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/wide__field__utilities_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/wide__field__utilities_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <namespace>purify</namespace>
@@ -4483,8 +4483,8 @@
   </compound>
   <compound kind="file">
     <name>wkernel_integration.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/wkernel__integration_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/wkernel__integration_8cc.html</filename>
     <includes id="wkernel__integration_8h" name="wkernel_integration.h" local="yes" imported="no">wkernel_integration.h</includes>
     <namespace>purify</namespace>
     <namespace>purify::projection_kernels</namespace>
@@ -4519,8 +4519,8 @@
   </compound>
   <compound kind="file">
     <name>wkernel_integration.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/wkernel__integration_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/wkernel__integration_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="integration_8h" name="integration.h" local="yes" imported="no">purify/integration.h</includes>
@@ -4557,8 +4557,8 @@
   </compound>
   <compound kind="file">
     <name>wproj_operators.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/wproj__operators_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/wproj__operators_8cc.html</filename>
     <includes id="wproj__operators_8h" name="wproj_operators.h" local="yes" imported="no">purify/wproj_operators.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
     <includes id="wide__field__utilities_8h" name="wide_field_utilities.h" local="yes" imported="no">purify/wide_field_utilities.h</includes>
@@ -4582,8 +4582,8 @@
   </compound>
   <compound kind="file">
     <name>wproj_operators.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/wproj__operators_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/wproj__operators_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
     <namespace>purify</namespace>
@@ -4628,15 +4628,15 @@
   </compound>
   <compound kind="file">
     <name>wproj_operators_gpu.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/wproj__operators__gpu_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/wproj__operators__gpu_8h.html</filename>
     <includes id="operators__gpu_8h" name="operators_gpu.h" local="yes" imported="no">purify/operators_gpu.h</includes>
     <includes id="wproj__operators_8h" name="wproj_operators.h" local="yes" imported="no">purify/wproj_operators.h</includes>
   </compound>
   <compound kind="file">
     <name>wproj_utilities.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/wproj__utilities_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/wproj__utilities_8cc.html</filename>
     <includes id="wproj__utilities_8h" name="wproj_utilities.h" local="yes" imported="no">purify/wproj_utilities.h</includes>
     <namespace>purify</namespace>
     <namespace>purify::utilities</namespace>
@@ -4728,8 +4728,8 @@
   </compound>
   <compound kind="file">
     <name>wproj_utilities.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/wproj__utilities_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/wproj__utilities_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
@@ -4887,8 +4887,8 @@
   </compound>
   <compound kind="file">
     <name>yaml-parser.cc</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/yaml-parser_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/yaml-parser_8cc.html</filename>
     <includes id="yaml-parser_8h" name="yaml-parser.h" local="yes" imported="no">purify/yaml-parser.h</includes>
     <includes id="read__measurements_8h" name="read_measurements.h" local="yes" imported="no">purify/read_measurements.h</includes>
     <namespace>purify</namespace>
@@ -4896,14 +4896,14 @@
       <type>T</type>
       <name>get_vector</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify.html</anchorfile>
-      <anchor>a05b6872149a85881d90befe9d341da05</anchor>
-      <arglist>(const YAML::Node &amp;node_map, const std::initializer_list&lt; const char *&gt; indicies)</arglist>
+      <anchor>a981e10b7581eca93431393b74c4c50b5</anchor>
+      <arglist>(const YAML::Node &amp;node_map, const std::initializer_list&lt; const char * &gt; indicies)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>yaml-parser.h</name>
-    <path>/mydata/cpp/purify/</path>
-    <filename>http://astro-informatics.github.io/purify/yaml-parser_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>http://astro-informatics.github.io/purify/yaml-parser_8h.html</filename>
     <includes id="algorithm__factory_8h" name="algorithm_factory.h" local="yes" imported="no">purify/algorithm_factory.h</includes>
     <class kind="class">purify::YamlParser</class>
     <namespace>purify</namespace>
@@ -4917,8 +4917,8 @@
   </compound>
   <compound kind="file">
     <name>algo_factory.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/algo__factory_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/algo__factory_8cc.html</filename>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
@@ -4957,18 +4957,62 @@
   </compound>
   <compound kind="file">
     <name>common_catch_main.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/common__catch__main_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/common__catch__main_8cc.html</filename>
+    <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
+    <member kind="define">
+      <type>#define</type>
+      <name>CATCH_CONFIG_RUNNER</name>
+      <anchorfile>common__catch__main_8cc.html</anchorfile>
+      <anchor>a34b4c3eca7342fbc4cba090d02139902</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>std::unique_ptr&lt; std::mt19937_64 &gt;</type>
+      <name>mersenne</name>
+      <anchorfile>common__catch__main_8cc.html</anchorfile>
+      <anchor>afd7b13def75c5d7feb77ac1ea2df5d0b</anchor>
+      <arglist>(new std::mt19937_64(0))</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>main</name>
+      <anchorfile>common__catch__main_8cc.html</anchorfile>
+      <anchor>a3c04138a5bfe5d72780bb7e82a18e627</anchor>
+      <arglist>(int argc, char **argv)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>common_mpi_catch_main.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/common__mpi__catch__main_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/common__mpi__catch__main_8cc.html</filename>
+    <includes id="logging_8h" name="logging.h" local="no" imported="no">purify/logging.h</includes>
+    <member kind="define">
+      <type>#define</type>
+      <name>CATCH_CONFIG_RUNNER</name>
+      <anchorfile>common__mpi__catch__main_8cc.html</anchorfile>
+      <anchor>a34b4c3eca7342fbc4cba090d02139902</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>std::unique_ptr&lt; std::mt19937_64 &gt;</type>
+      <name>mersenne</name>
+      <anchorfile>common__mpi__catch__main_8cc.html</anchorfile>
+      <anchor>afd7b13def75c5d7feb77ac1ea2df5d0b</anchor>
+      <arglist>(new std::mt19937_64(0))</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>main</name>
+      <anchorfile>common__mpi__catch__main_8cc.html</anchorfile>
+      <anchor>a217dbf8b442f20279ea00b898af96f52</anchor>
+      <arglist>(int argc, const char **argv)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>convolution.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/convolution_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/convolution_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="convolution_8h" name="convolution.h" local="yes" imported="no">purify/convolution.h</includes>
@@ -5003,8 +5047,8 @@
   </compound>
   <compound kind="file">
     <name>data.in.h</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/data_8in_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/data_8in_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <namespace>purify</namespace>
     <namespace>purify::notinstalled</namespace>
@@ -5032,8 +5076,8 @@
   </compound>
   <compound kind="file">
     <name>directories.in.h</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/directories_8in_8h</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/directories_8in_8h.html</filename>
     <namespace>purify</namespace>
     <namespace>purify::notinstalled</namespace>
     <member kind="function">
@@ -5137,8 +5181,8 @@
   </compound>
   <compound kind="file">
     <name>distribute_sparse_vector.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/distribute__sparse__vector_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/distribute__sparse__vector_8cc.html</filename>
     <includes id="AllToAllSparseVector_8h" name="AllToAllSparseVector.h" local="no" imported="no">purify/AllToAllSparseVector.h</includes>
     <includes id="DistributeSparseVector_8h" name="DistributeSparseVector.h" local="no" imported="no">purify/DistributeSparseVector.h</includes>
     <member kind="function">
@@ -5179,8 +5223,8 @@
   </compound>
   <compound kind="file">
     <name>index_mapping.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/index__mapping_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/index__mapping_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="IndexMapping_8h" name="IndexMapping.h" local="yes" imported="no">purify/IndexMapping.h</includes>
     <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
@@ -5215,8 +5259,8 @@
   </compound>
   <compound kind="file">
     <name>kmeans.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/kmeans_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/kmeans_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
     <includes id="mpi__utilities_8h" name="mpi_utilities.h" local="yes" imported="no">purify/mpi_utilities.h</includes>
@@ -5245,8 +5289,8 @@
   </compound>
   <compound kind="file">
     <name>measurement_factory.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/measurement__factory_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/measurement__factory_8cc.html</filename>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="measurement__operator__factory_8h" name="measurement_operator_factory.h" local="yes" imported="no">purify/measurement_operator_factory.h</includes>
     <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
@@ -5267,8 +5311,8 @@
   </compound>
   <compound kind="file">
     <name>mpi_algo_factory.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/mpi__algo__factory_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/mpi__algo__factory_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
@@ -5316,8 +5360,8 @@
   </compound>
   <compound kind="file">
     <name>mpi_measurement_factory.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/mpi__measurement__factory_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/mpi__measurement__factory_8cc.html</filename>
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="measurement__operator__factory_8h" name="measurement_operator_factory.h" local="yes" imported="no">purify/measurement_operator_factory.h</includes>
@@ -5341,8 +5385,8 @@
   </compound>
   <compound kind="file">
     <name>mpi_measurement_operator.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/mpi__measurement__operator_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/mpi__measurement__operator_8cc.html</filename>
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="mpi__utilities_8h" name="mpi_utilities.h" local="yes" imported="no">purify/mpi_utilities.h</includes>
@@ -5401,8 +5445,8 @@
   </compound>
   <compound kind="file">
     <name>mpi_read_measurements.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/mpi__read__measurements_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/mpi__read__measurements_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="read__measurements_8h" name="read_measurements.h" local="yes" imported="no">purify/read_measurements.h</includes>
@@ -5416,8 +5460,8 @@
   </compound>
   <compound kind="file">
     <name>mpi_wavelet_factory.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/mpi__wavelet__factory_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/mpi__wavelet__factory_8cc.html</filename>
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="mpi__utilities_8h" name="mpi_utilities.h" local="yes" imported="no">purify/mpi_utilities.h</includes>
@@ -5433,8 +5477,8 @@
   </compound>
   <compound kind="file">
     <name>mpi_wide_field_utilities.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/mpi__wide__field__utilities_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/mpi__wide__field__utilities_8cc.html</filename>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="wide__field__utilities_8h" name="wide_field_utilities.h" local="yes" imported="no">purify/wide_field_utilities.h</includes>
@@ -5448,8 +5492,8 @@
   </compound>
   <compound kind="file">
     <name>operators_gpu.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/operators__gpu_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/operators__gpu_8cc.html</filename>
     <includes id="operators__gpu_8h" name="operators_gpu.h" local="yes" imported="no">purify/operators_gpu.h</includes>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="kernels_8h" name="kernels.h" local="yes" imported="no">purify/kernels.h</includes>
@@ -5473,8 +5517,8 @@
   </compound>
   <compound kind="file">
     <name>parallel_mpi_utilities.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/parallel__mpi__utilities_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/parallel__mpi__utilities_8cc.html</filename>
     <includes id="mpi__utilities_8h" name="mpi_utilities.h" local="yes" imported="no">purify/mpi_utilities.h</includes>
     <member kind="function">
       <type></type>
@@ -5486,8 +5530,8 @@
   </compound>
   <compound kind="file">
     <name>parser_test.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/parser__test_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/parser__test_8cc.html</filename>
     <includes id="yaml-parser_8h" name="yaml-parser.h" local="yes" imported="no">purify/yaml-parser.h</includes>
     <member kind="function">
       <type></type>
@@ -5499,8 +5543,8 @@
   </compound>
   <compound kind="file">
     <name>purify_fitsio.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/purify__fitsio_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/purify__fitsio_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
@@ -5556,8 +5600,8 @@
   </compound>
   <compound kind="file">
     <name>sparse.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/sparse_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/sparse_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <member kind="function">
@@ -5570,8 +5614,8 @@
   </compound>
   <compound kind="file">
     <name>utils.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/utils_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/utils_8cc.html</filename>
     <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
     <includes id="uvw__utilities_8h" name="uvw_utilities.h" local="yes" imported="no">purify/uvw_utilities.h</includes>
     <member kind="function">
@@ -5668,8 +5712,8 @@
   </compound>
   <compound kind="file">
     <name>wavelet_factory.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/wavelet__factory_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/wavelet__factory_8cc.html</filename>
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="mpi__utilities_8h" name="mpi_utilities.h" local="yes" imported="no">purify/mpi_utilities.h</includes>
@@ -5685,8 +5729,8 @@
   </compound>
   <compound kind="file">
     <name>wkernel.cc</name>
-    <path>/mydata/cpp/tests/</path>
-    <filename>http://astro-informatics.github.io/purify/wkernel_8cc</filename>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>http://astro-informatics.github.io/purify/wkernel_8cc.html</filename>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="kernels_8h" name="kernels.h" local="yes" imported="no">purify/kernels.h</includes>
@@ -5941,10 +5985,10 @@
       <arglist></arglist>
     </member>
     <member kind="typedef">
-      <type>value_type const  &amp;</type>
+      <type>const value_type &amp;</type>
       <name>reference</name>
       <anchorfile>classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html</anchorfile>
-      <anchor>a297d8194c6e9116a5cdcfea2ba67db49</anchor>
+      <anchor>a33cf13daf3828016b23bcab1a1bd791a</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
@@ -6070,7 +6114,6 @@
   <compound kind="class">
     <name>DegridOperatorAdjointFixture</name>
     <filename>http://astro-informatics.github.io/purify/classDegridOperatorAdjointFixture.html</filename>
-    <base>DegridOperatorFixture</base>
     <base>DegridOperatorFixture</base>
     <member kind="function" virtualness="virtual">
       <type>virtual bool</type>
@@ -6242,7 +6285,6 @@
   <compound kind="class">
     <name>DegridOperatorDirectFixture</name>
     <filename>http://astro-informatics.github.io/purify/classDegridOperatorDirectFixture.html</filename>
-    <base>DegridOperatorFixture</base>
     <base>DegridOperatorFixture</base>
     <member kind="function" virtualness="virtual">
       <type>virtual bool</type>
@@ -6710,7 +6752,7 @@
   <compound kind="class">
     <name>purify::IndexMapping</name>
     <filename>http://astro-informatics.github.io/purify/classpurify_1_1IndexMapping.html</filename>
-    <templarg>STORAGE_INDEX_TYPE</templarg>
+    <templarg></templarg>
     <member kind="function">
       <type></type>
       <name>IndexMapping</name>
@@ -6788,10 +6830,10 @@
       <arglist>(MeasurementSet const &amp;c)</arglist>
     </member>
     <member kind="function">
-      <type>std::string const  &amp;</type>
+      <type>const std::string &amp;</type>
       <name>filename</name>
       <anchorfile>classpurify_1_1casa_1_1MeasurementSet.html</anchorfile>
-      <anchor>a30e4791dfd5fc60bc33273642fda93c9</anchor>
+      <anchor>a0fb9da315482c39ed3490bf2bfa244d4</anchor>
       <arglist>() const</arglist>
     </member>
     <member kind="function">
@@ -6802,10 +6844,10 @@
       <arglist>(std::string const &amp;filename)</arglist>
     </member>
     <member kind="function">
-      <type>::casacore::Table const  &amp;</type>
+      <type>const ::casacore::Table &amp;</type>
       <name>table</name>
       <anchorfile>classpurify_1_1casa_1_1MeasurementSet.html</anchorfile>
-      <anchor>a62ee30f2803db3061fa4467c1f709391</anchor>
+      <anchor>a2fea6e32228fe1a61294efc657ab15ea</anchor>
       <arglist>(std::string const &amp;name=&quot;&quot;) const</arglist>
     </member>
     <member kind="function">
@@ -6893,10 +6935,10 @@
       <arglist>(t_real tolerance=1e-8, std::string const &amp;filter=&quot;&quot;) const</arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static std::string const</type>
+      <type>static const std::string</type>
       <name>default_filter</name>
       <anchorfile>classpurify_1_1casa_1_1MeasurementSet.html</anchorfile>
-      <anchor>a894d32452f89fd9c5bd634cbd3f61d30</anchor>
+      <anchor>a2bb01d59c4a3350198e7869ef9ed99f3</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -7127,10 +7169,10 @@
       <arglist>()</arglist>
     </member>
     <member kind="function">
-      <type>casa::MeasurementSet const  &amp;</type>
+      <type>const casa::MeasurementSet &amp;</type>
       <name>operator*</name>
       <anchorfile>classTmpMS.html</anchorfile>
-      <anchor>ac320ac074bc08683e0eb6f8e29a6e514</anchor>
+      <anchor>a066b8260f05110ff866052dd5dc25072</anchor>
       <arglist>() const</arglist>
     </member>
     <member kind="function">
@@ -7141,10 +7183,10 @@
       <arglist>()</arglist>
     </member>
     <member kind="function">
-      <type>casa::MeasurementSet const  *</type>
+      <type>const casa::MeasurementSet *</type>
       <name>operator-&gt;</name>
       <anchorfile>classTmpMS.html</anchorfile>
-      <anchor>ae522e888f2a0fd4c7828e69c6c02c04a</anchor>
+      <anchor>a58b1e199b524f55a4ec27e83de1cdbc2</anchor>
       <arglist>() const</arglist>
     </member>
     <member kind="function">
@@ -7173,10 +7215,10 @@
       <arglist>()</arglist>
     </member>
     <member kind="function">
-      <type>boost::filesystem::path const  &amp;</type>
+      <type>const boost::filesystem::path &amp;</type>
       <name>path</name>
       <anchorfile>classTmpPath.html</anchorfile>
-      <anchor>ad14673d5ef0f1e258bd8027bddb570a3</anchor>
+      <anchor>a094ac77b24c66ba28f9aec10d160c68f</anchor>
       <arglist>() const</arglist>
     </member>
   </compound>
@@ -7804,8 +7846,8 @@
       <type>T</type>
       <name>get_vector</name>
       <anchorfile>http://astro-informatics.github.io/purify/namespacepurify.html</anchorfile>
-      <anchor>a05b6872149a85881d90befe9d341da05</anchor>
-      <arglist>(const YAML::Node &amp;node_map, const std::initializer_list&lt; const char *&gt; indicies)</arglist>
+      <anchor>a981e10b7581eca93431393b74c4c50b5</anchor>
+      <arglist>(const YAML::Node &amp;node_map, const std::initializer_list&lt; const char * &gt; indicies)</arglist>
     </member>
     <member kind="variable">
       <type>const std::map&lt; stokes, t_int &gt;</type>

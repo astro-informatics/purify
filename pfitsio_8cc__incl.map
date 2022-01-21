@@ -1,8 +1,19 @@
-<map id="/mydata/cpp/purify/pfitsio.cc" name="/mydata/cpp/purify/pfitsio.cc">
-<area shape="rect" id="node3" href="$logging_8h.html" title="purify/logging.h" alt="" coords="23,169,147,196"/>
-<area shape="rect" id="node7" href="$pfitsio_8h.html" title="purify/pfitsio.h" alt="" coords="362,95,478,121"/>
-<area shape="rect" id="node4" href="$logging_8disabled_8h.html" title="purify/logging.disabled.h" alt="" coords="199,244,382,271"/>
-<area shape="rect" id="node8" href="$types_8h.html" title="purify/types.h" alt="" coords="508,244,620,271"/>
-<area shape="rect" id="node15" href="$uvw__utilities_8h.html" title="purify/uvw_utilities.h" alt="" coords="509,169,667,196"/>
-<area shape="rect" id="node13" href="/mydata/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html" title="sopt/types.h" alt="" coords="922,319,1025,345"/>
+<map id="/home/runner/work/purify/purify/cpp/purify/pfitsio.cc" name="/home/runner/work/purify/purify/cpp/purify/pfitsio.cc">
+<area shape="rect" id="node1" title=" " alt="" coords="5,5,199,47"/>
+<area shape="rect" id="node2" title=" " alt="" coords="91,319,206,345"/>
+<area shape="rect" id="node3" href="$logging_8h.html" title=" " alt="" coords="41,169,163,196"/>
+<area shape="rect" id="node7" href="$pfitsio_8h.html" title=" " alt="" coords="381,95,495,121"/>
+<area shape="rect" id="node4" href="$logging_8disabled_8h.html" title=" " alt="" coords="217,244,400,271"/>
+<area shape="rect" id="node5" title=" " alt="" coords="249,319,326,345"/>
+<area shape="rect" id="node6" title=" " alt="" coords="350,319,409,345"/>
+<area shape="rect" id="node8" href="$types_8h.html" title=" " alt="" coords="527,244,637,271"/>
+<area shape="rect" id="node14" title=" " alt="" coords="710,169,777,196"/>
+<area shape="rect" id="node15" href="$uvw__utilities_8h.html" title=" " alt="" coords="527,169,685,196"/>
+<area shape="rect" id="node9" title=" " alt="" coords="433,319,512,345"/>
+<area shape="rect" id="node10" title=" " alt="" coords="536,319,628,345"/>
+<area shape="rect" id="node11" title=" " alt="" coords="652,319,755,345"/>
+<area shape="rect" id="node12" title=" " alt="" coords="779,319,915,345"/>
+<area shape="rect" id="node13" href="/home/runner/work/purify/purify/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html.html" title=" " alt="" coords="940,319,1043,345"/>
+<area shape="rect" id="node16" title=" " alt="" coords="661,244,735,271"/>
+<area shape="rect" id="node17" title=" " alt="" coords="759,244,851,271"/>
 </map>

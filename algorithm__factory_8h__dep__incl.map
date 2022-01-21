@@ -1,9 +1,10 @@
-<map id="/mydata/cpp/purify/algorithm_factory.h" name="/mydata/cpp/purify/algorithm_factory.h">
-<area shape="rect" id="node2" href="$main_8cc.html" title="/mydata/cpp/main.cc" alt="" coords="12,191,171,218"/>
-<area shape="rect" id="node3" href="$update__factory_8h.html" title="/mydata/cpp/purify\l/update_factory.h" alt="" coords="25,95,171,136"/>
-<area shape="rect" id="node4" href="$yaml-parser_8h.html" title="/mydata/cpp/purify\l/yaml&#45;parser.h" alt="" coords="195,95,340,136"/>
-<area shape="rect" id="node7" href="$algo__factory_8cc.html" title="/mydata/cpp/tests/algo\l_factory.cc" alt="" coords="365,95,535,136"/>
-<area shape="rect" id="node8" href="$mpi__algo__factory_8cc.html" title="/mydata/cpp/tests/mpi\l_algo_factory.cc" alt="" coords="559,95,727,136"/>
-<area shape="rect" id="node5" href="$yaml-parser_8cc.html" title="/mydata/cpp/purify\l/yaml&#45;parser.cc" alt="" coords="195,184,340,225"/>
-<area shape="rect" id="node6" href="$parser__test_8cc.html" title="/mydata/cpp/tests/parser\l_test.cc" alt="" coords="365,184,549,225"/>
+<map id="/home/runner/work/purify/purify/cpp/purify/algorithm_factory.h" name="/home/runner/work/purify/purify/cpp/purify/algorithm_factory.h">
+<area shape="rect" id="node1" title=" " alt="" coords="232,5,431,61"/>
+<area shape="rect" id="node2" href="$main_8cc.html" title=" " alt="" coords="28,221,214,262"/>
+<area shape="rect" id="node3" href="$update__factory_8h.html" title=" " alt="" coords="28,109,214,165"/>
+<area shape="rect" id="node4" href="$yaml-parser_8h.html" title=" " alt="" coords="238,109,425,165"/>
+<area shape="rect" id="node7" href="$algo__factory_8cc.html" title=" " alt="" coords="449,109,636,165"/>
+<area shape="rect" id="node8" href="$mpi__algo__factory_8cc.html" title=" " alt="" coords="660,109,851,165"/>
+<area shape="rect" id="node5" href="$yaml-parser_8cc.html" title=" " alt="" coords="238,213,425,269"/>
+<area shape="rect" id="node6" href="$parser__test_8cc.html" title=" " alt="" coords="449,213,636,269"/>
 </map>

@@ -1,7 +1,8 @@
-<map id="/mydata/cpp/purify/uvfits.h" name="/mydata/cpp/purify/uvfits.h">
-<area shape="rect" id="node2" href="$padmm__mpi__real__data_8cc.html" title="/mydata/cpp/example\l/padmm_mpi_real_data.cc" alt="" coords="5,95,200,136"/>
-<area shape="rect" id="node3" href="$padmm__real__data_8cc.html" title="/mydata/cpp/example\l/padmm_real_data.cc" alt="" coords="225,95,389,136"/>
-<area shape="rect" id="node4" href="$purify_2read__measurements_8cc.html" title="/mydata/cpp/purify\l/read_measurements.cc" alt="" coords="413,95,592,136"/>
-<area shape="rect" id="node5" href="$purify_2uvfits_8cc.html" title="/mydata/cpp/purify\l/uvfits.cc" alt="" coords="617,95,762,136"/>
-<area shape="rect" id="node6" href="$tests_2uvfits_8cc.html" title="/mydata/cpp/tests/uvfits.cc" alt="" coords="787,102,984,129"/>
+<map id="/home/runner/work/purify/purify/cpp/purify/uvfits.h" name="/home/runner/work/purify/purify/cpp/purify/uvfits.h">
+<area shape="rect" id="node1" title=" " alt="" coords="464,5,651,47"/>
+<area shape="rect" id="node2" href="$padmm__mpi__real__data_8cc.html" title=" " alt="" coords="5,95,211,151"/>
+<area shape="rect" id="node3" href="$padmm__real__data_8cc.html" title=" " alt="" coords="235,95,440,151"/>
+<area shape="rect" id="node4" href="$purify_2read__measurements_8cc.html" title=" " alt="" coords="464,95,651,151"/>
+<area shape="rect" id="node5" href="$purify_2uvfits_8cc.html" title=" " alt="" coords="675,102,864,143"/>
+<area shape="rect" id="node6" href="$tests_2uvfits_8cc.html" title=" " alt="" coords="888,102,1075,143"/>
 </map>

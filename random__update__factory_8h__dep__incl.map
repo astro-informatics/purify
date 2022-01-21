@@ -1,11 +1,12 @@
-<map id="/mydata/cpp/purify/random_update_factory.h" name="/mydata/cpp/purify/random_update_factory.h">
-<area shape="rect" id="node2" href="$algorithm__factory_8h.html" title="/mydata/cpp/purify\l/algorithm_factory.h" alt="" coords="191,95,343,136"/>
-<area shape="rect" id="node10" href="$random__update__factory_8cc.html" title="/mydata/cpp/purify\l/random_update_factory.cc" alt="" coords="367,95,565,136"/>
-<area shape="rect" id="node3" href="$main_8cc.html" title="/mydata/cpp/main.cc" alt="" coords="12,281,171,307"/>
-<area shape="rect" id="node4" href="$update__factory_8h.html" title="/mydata/cpp/purify\l/update_factory.h" alt="" coords="25,184,171,225"/>
-<area shape="rect" id="node5" href="$yaml-parser_8h.html" title="/mydata/cpp/purify\l/yaml&#45;parser.h" alt="" coords="195,184,340,225"/>
-<area shape="rect" id="node8" href="$algo__factory_8cc.html" title="/mydata/cpp/tests/algo\l_factory.cc" alt="" coords="365,184,535,225"/>
-<area shape="rect" id="node9" href="$mpi__algo__factory_8cc.html" title="/mydata/cpp/tests/mpi\l_algo_factory.cc" alt="" coords="559,184,727,225"/>
-<area shape="rect" id="node6" href="$yaml-parser_8cc.html" title="/mydata/cpp/purify\l/yaml&#45;parser.cc" alt="" coords="195,273,340,315"/>
-<area shape="rect" id="node7" href="$parser__test_8cc.html" title="/mydata/cpp/tests/parser\l_test.cc" alt="" coords="365,273,549,315"/>
+<map id="/home/runner/work/purify/purify/cpp/purify/random_update_factory.h" name="/home/runner/work/purify/purify/cpp/purify/random_update_factory.h">
+<area shape="rect" id="node1" title=" " alt="" coords="346,5,533,61"/>
+<area shape="rect" id="node2" href="$algorithm__factory_8h.html" title=" " alt="" coords="232,109,431,165"/>
+<area shape="rect" id="node10" href="$random__update__factory_8cc.html" title=" " alt="" coords="456,109,642,165"/>
+<area shape="rect" id="node3" href="$main_8cc.html" title=" " alt="" coords="28,325,214,366"/>
+<area shape="rect" id="node4" href="$update__factory_8h.html" title=" " alt="" coords="28,213,214,269"/>
+<area shape="rect" id="node5" href="$yaml-parser_8h.html" title=" " alt="" coords="238,213,425,269"/>
+<area shape="rect" id="node8" href="$algo__factory_8cc.html" title=" " alt="" coords="449,213,636,269"/>
+<area shape="rect" id="node9" href="$mpi__algo__factory_8cc.html" title=" " alt="" coords="660,213,851,269"/>
+<area shape="rect" id="node6" href="$yaml-parser_8cc.html" title=" " alt="" coords="238,317,425,373"/>
+<area shape="rect" id="node7" href="$parser__test_8cc.html" title=" " alt="" coords="449,317,636,373"/>
 </map>
