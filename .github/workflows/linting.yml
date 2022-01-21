@@ -1,0 +1,30 @@
+name: Linting
+
+on:
+  push:
+    branches: [ development ]
+  pull-request:
+    branches: [development]    
+
+  
+jobs:
+  linting:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        
+    
+      - name: Install dependencies
+        run: |
+          sudo apt install clang-format
+          
+# Check code meets Google C++ style guide https://google.github.io/styleguide/cppguide.html
+      - name: Run linting
+        run: | 
+          find ../ -regex '.*\.\(cc\|h\)' -not -iname '*.in.h' | xargs -I{} -P 10 clang-format -i -style=file {}; git diff
+          
+      - name: Report results
+        run: | 
+          git diff --exit-code || (echo '## NOTE: your code is not linted properly - please commit the suggested changes'; false)
+ 
