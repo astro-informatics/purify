@@ -3,7 +3,7 @@ include(EnvironmentScript)
 # Look up packages: if not found, installs them
 include(PackageLookup)
 # Get the yaml reader
-lookup_package(Yamlcpp REQUIRED  ARGUMENTS GIT_TAG "yaml-cpp-0.6.2")
+#lookup_package(Yamlcpp REQUIRED  ARGUMENTS GIT_TAG "yaml-cpp-0.6.2")
 
 if(docs)
   cmake_policy(SET CMP0057 NEW)
@@ -66,9 +66,9 @@ endif()
 find_package(TIFF REQUIRED)
 
 
-lookup_package(Boost REQUIRED COMPONENTS filesystem)
+#lookup_package(Boost REQUIRED COMPONENTS filesystem)
 
-lookup_package(Eigen3 REQUIRED ARGUMENTS MD5 9e30f67e8531477de4117506fe44669b URL https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz)
+#lookup_package(Eigen3 REQUIRED ARGUMENTS MD5 9e30f67e8531477de4117506fe44669b URL https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz)
 if(NOT EIGEN3_FOUND)
   set(EIGEN3_INCLUDE_DIR "")
 endif()
@@ -79,9 +79,9 @@ if(doaf)
   set(PURIFY_ARRAYFIRE TRUE)
 endif()
 
-if(logging)
-  lookup_package(spdlog REQUIRED)
-endif()
+#if(logging)
+#  lookup_package(spdlog REQUIRED)
+#endif()
 # Look up packages: if not found, installs them
 # Unless otherwise specified, if purify is not on master, then sopt will be
 # downloaded from development branch.
@@ -103,7 +103,7 @@ else()
     GIT_TAG ${Sopt_GIT_TAG})
 endif()
 
-lookup_package(CFitsIO REQUIRED)
+#lookup_package(CFitsIO REQUIRED)
 if(docimg)
   set(PURIFY_CImg TRUE)
   find_package(X11)
