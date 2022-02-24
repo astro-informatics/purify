@@ -1,0 +1,10 @@
+[requires]
+eigen/3.3.7
+libtiff/4.0.9
+spdlog/1.9.2
+catch2/2.13.7
+benchmark/1.6.0
+fftw/3.3.9
+
+[generators]
+cmake
