@@ -5,6 +5,7 @@ on:
     branches: [ development ]
   pull_request:
     branches: [ development ]
+    if: github.event.pull_request.draft == false
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -54,11 +55,13 @@ jobs:
 
     - name: Install Dependencies on Ubunutu
       if: ${{ contains(matrix.os, 'ubuntu') }}
-      run: sudo apt install libfftw3-dev libtiff5-dev openmpi-bin libopenmpi-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev ccache libcfitsio-dev casacore-dev
+      run: |
+        sudo apt install libfftw3-dev libtiff5-dev openmpi-bin libopenmpi-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev ccache libcfitsio-dev casacore-dev
+        pip install conan
 
     - name: Install Dependencies on MacOS
       if: ${{ contains(matrix.os, 'macos') }}
-      run: brew install fftw libtiff open-mpi boost libyaml cfitsio ccache
+      run: brew install fftw libtiff open-mpi boost libyaml cfitsio ccache conan
 
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
@@ -66,9 +69,11 @@ jobs:
       run: |
         string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
         message("::set-output name=timestamp::${current_date}")
+
     - name: Set ccache cache directory
       shell: bash
       run: echo "CCACHE_DIR=${{runner.workspace}}/.ccache" >> "${GITHUB_ENV}"
+
     - name: Cache ccache files
       uses: actions/cache@v2
       with:
@@ -82,6 +87,14 @@ jobs:
 
 #    - name: Clear ccache
 #      run: ccache --clear
+
+    - name: Conan install on gcc
+      if: ${{ contains(matrix.cxx, 'g++-9') }}
+      run: conan install ${{github.workspace}} -if ${{github.workspace}}/build -s compiler.libcxx=libstdc++11 --build missing
+
+    - name: Conan install on apple-clang
+      if: ${{ contains(matrix.cxx, 'clang++') }}
+      run: conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
