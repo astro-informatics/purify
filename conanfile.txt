@@ -9,8 +9,8 @@ fftw/3.3.9
 
 # New for purify
 yaml-cpp/0.6.3 # previously specified 0.6.2 but 0.6.3 is available from conan
-boost # not sure how to specify components
-cfitsio
+boost/1.78.0 # not sure how to specify components
+cfitsio/4.0.0
 
 # lookup_package(ArrayFire) in dependencies.cmake but this package isn't in Conan
 # also lookup_package(sopt)

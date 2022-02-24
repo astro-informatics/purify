@@ -67,6 +67,8 @@ if(PURIFY_ARRAYFIRE)
   target_link_libraries(libpurify ${ArrayFire_LIBRARIES})
 endif()
 
+target_link_libraries(libpurify ${CONAN_LIBS})
+
 target_include_directories(libpurify PUBLIC
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/cpp>
