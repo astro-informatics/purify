@@ -43,7 +43,7 @@ include(logging)
 include(dependencies)
 
 include(${PROJECT_SOURCE_DIR}/build/conanbuildinfo.cmake)
-conan_basic_setup()
+conan_basic_setup(KEEP_RPATHS)
 
 # If PURIFY_OPENMP is set to False in dependencies, link libpthread here so that the linker finds it
 # Following advice from https://stackoverflow.com/questions/1620918/cmake-and-libpthread

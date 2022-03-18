@@ -36,11 +36,11 @@ jobs:
             - g++-9
             - clang++
           mpi:
-            - "ON"
-            - "OFF"
+            - "on"
+            - "off"
           omp:
-            - "ON"
-            - "OFF"
+            - "on"
+            - "off"
           exclude:
             - cc: gcc-9
               cxx: clang++
@@ -90,27 +90,18 @@ jobs:
 
     - name: Conan install on gcc
       if: ${{ contains(matrix.cxx, 'g++-9') }}
-      run: conan install ${{github.workspace}} -if ${{github.workspace}}/build -s compiler.libcxx=libstdc++11 --build missing
+      run: conan install ${{github.workspace}} -if ${{github.workspace}}/build -s compiler.libcxx=libstdc++11 --build missing  -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: Conan install on apple-clang
       if: ${{ contains(matrix.cxx, 'clang++') }}
-      run: conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing
-
-    - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: |
-        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-        -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-        -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
-        -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}}
+      run: conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing  -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: Build
       # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --parallel 2
+      run: conan build ${{github.workspace}} -bf ${{github.workspace}}/build
 
     - name: Test
       working-directory: ${{github.workspace}}/build
       # Execute tests defined by the CMake configuration.
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C ${{env.BUILD_TYPE}}
+      run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
