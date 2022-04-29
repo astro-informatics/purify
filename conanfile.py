@@ -1,6 +1,6 @@
 from conans import ConanFile, CMake
 
-class SoptConan(ConanFile):
+class PurifyConan(ConanFile):
     requires = ["eigen/3.3.7","spdlog/1.9.2","catch2/2.13.7","benchmark/1.6.0","yaml-cpp/0.6.3", "boost/1.78.0", "cfitsio/4.0.0"]
     generators = "cmake"
     options = {"regressions": ['on','off'],
