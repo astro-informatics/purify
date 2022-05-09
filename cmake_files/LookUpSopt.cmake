@@ -41,7 +41,6 @@ ExternalProject_Add(
       -DBUILD_SHARED_LIBS=OFF
       -DCMAKE_BUILD_TYPE=${Sopt_BUILD_TYPE}
       -Ddompi=${Sopt_MPI}
-      -Dregressions=OFF
       -Dtests=OFF
       -Dpython=OFF
       -Dexamples=OFF
