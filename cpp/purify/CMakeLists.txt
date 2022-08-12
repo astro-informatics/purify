@@ -82,15 +82,13 @@ add_include_dir(
   ${sopt_INCLUDE_DIR}
   )
 target_link_libraries(libpurify
-  ${FFTW3_DOUBLE_LIBRARY}
-  ${CFitsIO_LIBRARY}
-  ${sopt_CPP_LIBRARY}
-  ${X11_X11_LIB}
-  ${Yamlcpp_LIBRARY}
   ${Cubature_LIBRARIES}
-  ${Boost_FILESYSTEM_LIBRARY}
-  ${Boost_SYSTEM_LIBRARY}
-  ${CONAN_LIBS}
+  FFTW3::fftw3
+  cfitsio::cfitsio
+  sopt::sopt
+  yaml-cpp
+  Boost::filesystem
+  Boost::system
   )
 if(TARGET casacore::casa)
   target_link_libraries(libpurify casacore::ms)
@@ -106,16 +104,6 @@ if(spdlog_FOUND)
   target_link_libraries(libpurify spdlog::spdlog)
   target_include_directories(libpurify SYSTEM PUBLIC ${spdlog_INCLUDE_DIR})
 endif()
-# # Add Eigen3 as direct dependency
-# # On different platforms the CMakeDeps generator in conan seems to install eigen
-# # as either "eigen" or "Eigen3" because the recipe does not explicitly define the
-# # name (yet). To work around this we have to check for both.
-# if(eigen_FOUND)
-#   target_include_directories(libpurify SYSTEM PUBLIC ${eigen_INCLUDE_DIR})
-# endif()
-# if(Eigen3_FOUND)
-#   target_include_directories(libpurify SYSTEM PUBLIC ${Eigen3_INCLUDE_DIR})
-# endif()
 
 install(FILES ${HEADERS} DESTINATION include/purify)
 install(TARGETS libpurify

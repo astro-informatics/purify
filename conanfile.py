@@ -12,7 +12,7 @@ class PurifyConan(ConanFile):
 
 
     settings = "os", "compiler", "build_type", "arch"
-    requires = ["fftw/3.3.9", "eigen/3.3.7","spdlog/1.9.2","catch2/2.13.7","benchmark/1.6.0","yaml-cpp/0.6.3", "boost/1.78.0", "cfitsio/4.0.0", "sopt/4.0.0@demo/testing"]
+    requires = ["fftw/3.3.9", "eigen/3.3.7","spdlog/1.9.2","catch2/2.13.9","benchmark/1.6.0","yaml-cpp/0.6.3", "boost/1.78.0", "cfitsio/4.0.0", "sopt/4.0.0@demo/testing"]
     generators = "CMakeDeps"
     exports_sources = "cpp/*", "cmake_files/*", "CMakeLists.txt"
     options = {"docs":['on','off'],
@@ -37,7 +37,7 @@ class PurifyConan(ConanFile):
                        "af": 'off',
                        "cimg": 'off',
                        "casa": 'off'}
-    
+
     def requirements(self):
 
         if self.options.docs == 'on' or self.options.examples == 'on':
@@ -54,7 +54,9 @@ class PurifyConan(ConanFile):
         if self.options.docs == 'on':
             self.requires("doxygen/1.9.2")
 
-    
+        if self.options.cimg == 'on':
+            self.requires("cimg/3.0.2")
+
     def generate(self):
         tc = CMakeToolchain(self)
 
@@ -75,14 +77,15 @@ class PurifyConan(ConanFile):
             tc.variables['CMAKE_C_COMPILER_LAUNCHER'] = "ccache"
             tc.variables['CMAKE_CXX_COMPILER_LAUNCHER'] = "ccache"
 
-        tc.variables['CMAKE_VERBOSE_MAKEFILE:BOOL'] = "ON"        
+        tc.variables['CMAKE_VERBOSE_MAKEFILE:BOOL'] = "ON"
+        tc.variables['MPIEXEC_MAX_NUMPROCS'] = 2
         tc.generate()
-    
+
     def build(self):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
-        
+
     def package(self):
         cmake = CMake(self)
         cmake.configure()
@@ -91,15 +94,15 @@ class PurifyConan(ConanFile):
     def package_info(self):
         self.cpp_info.libs = ["purify"]
 
-            
+
     # def build(self):
     #   cmake = CMake(self)
-      
+
     #   if self.options.docs == 'off':
     #       cmake.definitions['CMAKE_C_COMPILER_LAUNCHER'] = "ccache"
     #       cmake.definitions['CMAKE_CXX_COMPILER_LAUNCHER'] = "ccache"
 
     #   # TODO: Switch this on for Debug, off for Release
-    #   cmake.definitions['CMAKE_VERBOSE_MAKEFILE:BOOL'] = "ON"      
+    #   cmake.definitions['CMAKE_VERBOSE_MAKEFILE:BOOL'] = "ON"
     #   cmake.configure()
     #   cmake.build()

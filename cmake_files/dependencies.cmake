@@ -20,7 +20,7 @@ if(NOT cfitsio_FOUND)
   message(FATAL_ERROR "CFitsIO is required")
 endif()
 
-find_package(Boost)
+find_package(Boost COMPONENTS system filesystem REQUIRED)
 if(NOT Boost_FOUND)
   message(FATAL_ERROR "Boost is required")
 endif()
@@ -95,7 +95,6 @@ else()
 endif()
 
 find_package(FFTW3)
-set(FFTW3_DOUBLE_LIBRARY FFTW3::fftw3)
 
 set(PURIFY_MPI FALSE)
 if(dompi)
@@ -113,7 +112,7 @@ endif()
 set(PURIFY_CImg FALSE)
 if(docimg)
   find_package(X11)
-  lookup_package(CImg REQUIRED)
+  find_package(cimg)
   set(PURIFY_CImg TRUE)
 endif()
 
@@ -128,24 +127,3 @@ endif()
 
 # Add script to execute to make sure libraries in the build tree can be found
 add_to_ld_path("${EXTERNAL_ROOT}/lib")
-
-# # Look up packages: if not found, installs them
-# # Unless otherwise specified, if purify is not on master, then sopt will be
-# # downloaded from development branch.
-# if(NOT Sopt_GIT_TAG)
-#   set(Sopt_GIT_TAG development CACHE STRING "Branch/tag when downloading sopt")
-# endif()
-# if(NOT Sopt_GIT_REPOSITORY)
-#   set(Sopt_GIT_REPOSITORY https://www.github.com/astro-informatics/sopt.git
-#     CACHE STRING "Location when downloading sopt")
-# endif()
-# if(dompi)
-#   lookup_package(Sopt REQUIRED COMPONENTS mpi ARGUMENTS
-#     GIT_REPOSITORY ${Sopt_GIT_REPOSITORY}
-#     GIT_TAG ${Sopt_GIT_TAG}
-#     MPI "TRUE")
-# else()
-#   lookup_package(Sopt REQUIRED ARGUMENTS
-#     GIT_REPOSITORY ${Sopt_GIT_REPOSITORY}
-#     GIT_TAG ${Sopt_GIT_TAG})
-# endif()

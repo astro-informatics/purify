@@ -45,7 +45,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
 
   auto uv_data = dirty_visibilities({input_data_path}, world);
   uv_data.units = utilities::vis_units::radians;
-  if (world.is_root()) CAPTURE(uv_data.vis.head(5));
+  // if (world.is_root()) CAPTURE(uv_data.vis.head(5));
   REQUIRE(world.all_sum_all(uv_data.size()) == 13107);
 
   t_uint const imsizey = 128;
@@ -147,7 +147,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
 
   auto uv_data = dirty_visibilities({input_data_path}, world);
   uv_data.units = utilities::vis_units::radians;
-  if (world.is_root()) CAPTURE(uv_data.vis.head(5));
+  // if (world.is_root()) CAPTURE(uv_data.vis.head(5));
   REQUIRE(world.all_sum_all(uv_data.size()) == 13107);
 
   t_uint const imsizey = 128;
@@ -314,7 +314,7 @@ TEST_CASE("Serial vs. Serial with MPI Forward Backward") {
 
   auto uv_data = dirty_visibilities({input_data_path}, world);
   uv_data.units = utilities::vis_units::radians;
-  if (world.is_root()) CAPTURE(uv_data.vis.head(5));
+  // if (world.is_root()) CAPTURE(uv_data.vis.head(5));
   REQUIRE(world.all_sum_all(uv_data.size()) == 13107);
 
   t_uint const imsizey = 128;

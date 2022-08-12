@@ -17,13 +17,15 @@ function(add_include_dir)
 endfunction()
 
 add_include_dir(
+  ${Eigen3_INCLUDE_DIR}
+  ${eigen_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
-  ${EIGEN3_INCLUDE_DIR}
-  ${CFitsIO_INCLUDE_DIR}
-  ${CImg_INCLUDE_DIR}
+  ${cfitsio_INCLUDE_DIR}
+  ${yaml-cpp_INCLUDE_DIR}
   ${Cubature_INCLUDE_DIR}
-  ${Yamlcpp_INCLUDE_DIR}
-)
+  ${CImg_INCLUDE_DIR}
+  )
+
 
 add_subdirectory(purify)
 if(tests OR examples OR benchmarks)
