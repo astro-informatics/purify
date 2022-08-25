@@ -53,6 +53,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Check out sopt
+      uses: actions/checkout@v2
+      with:
+        respository: astro-informatics/sopt
+
     - name: Install Dependencies on Ubunutu
       if: ${{ contains(matrix.os, 'ubuntu') }}
       run: |
@@ -62,6 +67,14 @@ jobs:
     - name: Install Dependencies on MacOS
       if: ${{ contains(matrix.os, 'macos') }}
       run: brew install fftw libtiff open-mpi boost libyaml cfitsio ccache conan
+
+    - name: create sopt package on gcc
+      if: ${{ contains(matrix.cxx, 'g++-9') }}
+      run: conan create ${{github.workspace}}/sopt -if ${{github.workspace}}/sopt/build -s compiler.libcxx=libstdc++11 --build missing  -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
+
+    - name: create sopt package on apple-clang
+      if: ${{ contains(matrix.cxx, 'clang++') }}
+      run: conan create ${{github.workspace}}/sopt -if ${{github.workspace}}/sopt/build --build missing  -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
