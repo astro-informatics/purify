@@ -64,12 +64,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Check out sopt
-      uses: actions/checkout@v2
       with:
-        repository: astro-informatics/sopt
-        path: './sopt'
+        submodules: true
 
     - name: Install Dependencies on Ubunutu
       if: ${{ contains(matrix.os, 'ubuntu') }}
