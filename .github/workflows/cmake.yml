@@ -85,16 +85,6 @@ jobs:
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
       if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
-      
-    - name: create sopt package on gcc
-      if: ${{ contains(matrix.cxx, 'g++-9') }}
-      run: |
-        conan create ${{github.workspace}}/sopt -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
-
-    - name: create sopt package on apple-clang
-      if: ${{ contains(matrix.cxx, 'clang++') }}
-      run: |
-        conan create ${{github.workspace}}/sopt -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
@@ -120,6 +110,16 @@ jobs:
 
 #    - name: Clear ccache
 #      run: ccache --clear
+
+    - name: create sopt package on gcc
+      if: ${{ contains(matrix.cxx, 'g++-9') }}
+      run: |
+        conan create ${{github.workspace}}/sopt -s:b compiler.libcxx=libstdc++11 -o:b mpi=${{matrix.mpi}} -o:b openmp=${{matrix.omp}}
+
+    - name: create sopt package on apple-clang
+      if: ${{ contains(matrix.cxx, 'clang++') }}
+      run: |
+        conan create ${{github.workspace}}/sopt -o:b mpi=${{matrix.mpi}} -o:b openmp=${{matrix.omp}}
 
     - name: Conan install on gcc
       if: ${{ contains(matrix.cxx, 'g++-9') }}
