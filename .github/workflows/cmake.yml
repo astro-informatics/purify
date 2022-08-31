@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ development ]
     if: github.event.pull_request.draft == false
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -80,6 +86,11 @@ jobs:
       run: |
         conan config set general.skip_broken_symlinks_check=True
         conan create ${{github.workspace}}/sopt -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
+
+   # Enable tmate debugging of manually-triggered workflows if the input option was provided
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
 
     - name: create sopt package on apple-clang
       if: ${{ contains(matrix.cxx, 'clang++') }}
