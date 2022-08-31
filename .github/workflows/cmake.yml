@@ -11,6 +11,7 @@ env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
   OMP_NUM_THREADS: 4
+  CONAN_SKIP_BROKEN_SYMLINKS_CHECK: True
 
 jobs:
   build:
@@ -70,11 +71,11 @@ jobs:
 
     - name: create sopt package on gcc
       if: ${{ contains(matrix.cxx, 'g++-9') }}
-      run: conan create ${{github.workspace}}/sopt -if ${{github.workspace}}/sopt/build -s compiler.libcxx=libstdc++11 --build missing  -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
+      run: conan create ${{github.workspace}}/sopt -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: create sopt package on apple-clang
       if: ${{ contains(matrix.cxx, 'clang++') }}
-      run: conan create ${{github.workspace}}/sopt -if ${{github.workspace}}/sopt/build --build missing  -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
+      run: conan create ${{github.workspace}}/sopt -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
