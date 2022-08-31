@@ -113,13 +113,11 @@ jobs:
 
     - name: create sopt package on gcc
       if: ${{ contains(matrix.cxx, 'g++-9') }}
-      run: |
-        conan create ${{github.workspace}}/sopt -s:b compiler.libcxx=libstdc++11 -o:b mpi=${{matrix.mpi}} -o:b openmp=${{matrix.omp}}
+      run: conan create ${{github.workspace}}/sopt --build missing -s:b compiler.libcxx=libstdc++11 -o:b mpi=${{matrix.mpi}} -o:b openmp=${{matrix.omp}}
 
     - name: create sopt package on apple-clang
       if: ${{ contains(matrix.cxx, 'clang++') }}
-      run: |
-        conan create ${{github.workspace}}/sopt -o:b mpi=${{matrix.mpi}} -o:b openmp=${{matrix.omp}}
+      run: conan create ${{github.workspace}}/sopt --build missing -o:b mpi=${{matrix.mpi}} -o:b openmp=${{matrix.omp}}
 
     - name: Conan install on gcc
       if: ${{ contains(matrix.cxx, 'g++-9') }}
