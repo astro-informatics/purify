@@ -50,6 +50,8 @@ jobs:
             - os: ubuntu-20.04
               cc: clang
               cxx: clang++
+            - os: macos-11
+              mpi: "on"
 
     steps:
     - uses: actions/checkout@v2
@@ -72,11 +74,15 @@ jobs:
 
     - name: create sopt package on gcc
       if: ${{ contains(matrix.cxx, 'g++-9') }}
-      run: conan create ${{github.workspace}}/sopt -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
+      run: |
+        conan config set general.skip_broken_symlinks_check=True
+        conan create ${{github.workspace}}/sopt -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: create sopt package on apple-clang
       if: ${{ contains(matrix.cxx, 'clang++') }}
-      run: conan create ${{github.workspace}}/sopt -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
+      run: |
+        conan config set general.skip_broken_symlinks_check=True
+        conan create ${{github.workspace}}/sopt -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
