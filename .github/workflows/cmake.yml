@@ -10,8 +10,6 @@ on:
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
-  OMP_NUM_THREADS: 4
-  CONAN_SKIP_BROKEN_SYMLINKS_CHECK: True
 
 jobs:
   build:
@@ -24,6 +22,11 @@ jobs:
     env:
       CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
+      OMP_NUM_THREADS: 2
+      CONAN_SKIP_BROKEN_SYMLINKS_CHECK: True
+      CONAN_PRINT_RUN_COMMANDS: 1
+      CONAN_CPU_COUNT: 2
+
     strategy:
       fail-fast: false
       matrix:
