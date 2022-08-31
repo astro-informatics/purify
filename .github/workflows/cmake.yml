@@ -29,7 +29,7 @@ jobs:
       CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
       OMP_NUM_THREADS: 2
-      CONAN_SKIP_BROKEN_SYMLINKS_CHECK: True
+      CONAN_SKIP_BROKEN_SYMLINKS_CHECK: 'True'
       CONAN_PRINT_RUN_COMMANDS: 1
       CONAN_CPU_COUNT: 2
 
@@ -89,13 +89,11 @@ jobs:
     - name: create sopt package on gcc
       if: ${{ contains(matrix.cxx, 'g++-9') }}
       run: |
-        conan config set general.skip_broken_symlinks_check=True
         conan create ${{github.workspace}}/sopt -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: create sopt package on apple-clang
       if: ${{ contains(matrix.cxx, 'clang++') }}
       run: |
-        conan config set general.skip_broken_symlinks_check=True
         conan create ${{github.workspace}}/sopt -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: Prepare ccache timestamp
