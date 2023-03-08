@@ -1,0 +1,3 @@
+[submodule "sopt"]
+	path = sopt
+	url = https://github.com/astro-informatics/sopt.git

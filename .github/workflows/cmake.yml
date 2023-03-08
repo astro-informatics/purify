@@ -6,11 +6,16 @@ on:
   pull_request:
     branches: [ development ]
     if: github.event.pull_request.draft == false
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
-  OMP_NUM_THREADS: 4
 
 jobs:
   build:
@@ -23,6 +28,11 @@ jobs:
     env:
       CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
+      OMP_NUM_THREADS: 2
+      CONAN_SKIP_BROKEN_SYMLINKS_CHECK: 'True'
+      CONAN_PRINT_RUN_COMMANDS: 1
+      CONAN_CPU_COUNT: 2
+
     strategy:
       fail-fast: false
       matrix:
@@ -49,9 +59,13 @@ jobs:
             - os: ubuntu-20.04
               cc: clang
               cxx: clang++
+            - os: macos-11
+              mpi: "on"
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: true
 
     - name: Install Dependencies on Ubunutu
       if: ${{ contains(matrix.os, 'ubuntu') }}
@@ -62,6 +76,11 @@ jobs:
     - name: Install Dependencies on MacOS
       if: ${{ contains(matrix.os, 'macos') }}
       run: brew install fftw libtiff open-mpi boost libyaml cfitsio ccache conan
+
+   # Enable tmate debugging of manually-triggered workflows if the input option was provided
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
 
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
@@ -87,6 +106,14 @@ jobs:
 
 #    - name: Clear ccache
 #      run: ccache --clear
+
+    - name: create sopt package on gcc
+      if: ${{ contains(matrix.cxx, 'g++-9') }}
+      run: conan create ${{github.workspace}}/sopt --build missing -s:b compiler.libcxx=libstdc++11 -o:b mpi=${{matrix.mpi}} -o:b openmp=${{matrix.omp}}
+
+    - name: create sopt package on apple-clang
+      if: ${{ contains(matrix.cxx, 'clang++') }}
+      run: conan create ${{github.workspace}}/sopt --build missing -o:b mpi=${{matrix.mpi}} -o:b openmp=${{matrix.omp}}
 
     - name: Conan install on gcc
       if: ${{ contains(matrix.cxx, 'g++-9') }}
