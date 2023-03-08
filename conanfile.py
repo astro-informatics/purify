@@ -39,7 +39,6 @@ class PurifyConan(ConanFile):
                        "casa": 'off'}
 
     def requirements(self):
-
         if self.options.docs == 'on' or self.options.examples == 'on':
             # To prevent a conflict in the version of zlib required by libtiff and
             # doxygen, override the version of zlib when either of them is required
