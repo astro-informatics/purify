@@ -23,16 +23,22 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
+#include <sopt/l1_g_proximal.h>
+#include <sopt/tf_g_proximal.h>
 
 namespace purify {
 namespace factory {
 enum class algorithm { padmm, primal_dual, sdmm, forward_backward };
 enum class algo_distribution { serial, mpi_serial, mpi_distributed, mpi_random_updates };
+enum class g_proximal_type { sopt::algorithm::L1GProximal, sopt::algorithm::TFGProximal };
 const std::map<std::string, algo_distribution> algo_distribution_string = {
     {"none", algo_distribution::serial},
     {"serial-equivalent", algo_distribution::mpi_serial},
     {"random-updates", algo_distribution::mpi_random_updates},
     {"fully-distributed", algo_distribution::mpi_distributed}};
+const std::map<std::string, g_proximal_type> g_proximal_type_string = {
+  {"l1", sopt::algorithm::L1GProximal},
+  {"learned", sopt::algorithm::TFGProximal}};
 
 //! return chosen algorithm given parameters
 template <class Algorithm, class... ARGS>
@@ -153,7 +159,7 @@ fb_factory(const algo_distribution dist,
            const bool real_constraint = true, const bool positive_constraint = true,
            const bool tight_frame = false, const t_real relative_variation = 1e-3,
            const t_real l1_proximal_tolerance = 1e-2, const t_uint maximum_proximal_iterations = 50,
-           const t_real op_norm = 1) {
+           const t_real op_norm = 1, const std::String model_path, const g_proximal_type g_proximal) {
   typedef typename Algorithm::Scalar t_scalar;
   if (sara_size > 1 and tight_frame)
     throw std::runtime_error(
@@ -161,19 +167,39 @@ fb_factory(const algo_distribution dist,
         "one wavelet basis.");
   auto fb = std::make_shared<Algorithm>(uv_data.vis);
   fb->itermax(max_iterations)
-      .gamma(reg_parameter)
-      .sigma(sigma * std::sqrt(2))
-      .beta(step_size * std::sqrt(2))
-      .relative_variation(relative_variation)
-      .tight_frame(tight_frame)
-      .l1_proximal_tolerance(l1_proximal_tolerance)
+    .gamma(reg_parameter)
+    .sigma(sigma * std::sqrt(2))
+    .beta(step_size * std::sqrt(2))
+    .relative_variation(relative_variation)
+    .tight_frame(tight_frame)
+    .nu(op_norm * op_norm)
+    .Phi(*measurements);
+
+  std::shared_ptr<GProximal> gp;
+
+  switch (g_proximal) {
+  case(L1GProximal): {
+    // Create a shared pointer to an instance of the L1GProximal class
+    // and set its properties
+    gp = std::make_shared<sopt::algorithm::L1GProximal<Scalar>>(false);
+    gp->l1_proximal_tolerance(l1_proximal_tolerance)
       .l1_proximal_nu(1.)
       .l1_proximal_itermax(maximum_proximal_iterations)
       .l1_proximal_positivity_constraint(positive_constraint)
       .l1_proximal_real_constraint(real_constraint)
-      .nu(op_norm * op_norm)
-      .Psi(*wavelets)
-      .Phi(*measurements);
+      .Psi(*wavelets);
+  }
+  case(TFGProximal): {
+    // Create a shared pointer to an instance of the TFGProximal class
+    gp = std::make_shared<sopt::algorithm::TFGProximal<Scalar>>(model_path);
+  }
+  default(): {
+    throw std::runtime_error("Type of g_proximal operator not recognised.");
+      }
+  }
+
+  fb->g_proximal(gp);
+
   switch (dist) {
   case (algo_distribution::serial): {
     break;
