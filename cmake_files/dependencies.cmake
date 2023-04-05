@@ -67,6 +67,12 @@ if(examples)
   endif()
 endif()
 
+
+if(cppflow)
+  find_package(cppflow)
+  find_library(TENSORFLOW_LIB tensorflow REQUIRED)
+endif()
+
 # Always find open-mp, since it may be used by sopt
 find_package(OpenMP)
 if(openmp AND NOT OPENMP_FOUND)

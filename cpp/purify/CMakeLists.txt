@@ -70,6 +70,19 @@ target_include_directories(libpurify PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/cpp>
   $<INSTALL_INTERFACE:include/>)
 
+if (cppflow)
+  target_link_libraries(libpurify "${TENSORFLOW_LIB}")
+  # Make cppflow include directory public. Install interface can't point to source directory,
+  # so it needs to be separately defined, explained in
+  # https://stackoverflow.com/questions/25676277/cmake-target-include-directories-prints-an-error-when-i-try-to-add-the-source
+  # Add /usr/local/include for default location of TensorFlow headers
+  target_include_directories(libpurify PUBLIC
+    $<BUILD_INTERFACE:${cppflow_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:/usr/local/include>
+    $<INSTALL_INTERFACE:cppflow/include/>
+    )
+endif()
+
 
 add_include_dir(
   ${Eigen3_INCLUDE_DIR}

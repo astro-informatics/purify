@@ -40,6 +40,17 @@ class PurifyConan(ConanFile):
                        "casa": 'off',
                        "cppflow": 'off'}
 
+    def configure(self):
+
+        if self.options.cppflow == 'on':
+            self.options["sopt"].cppflow = 'on'
+        if self.options.logging == 'off':
+            self.options["sopt"].logging = 'off'
+        if self.options.mpi == 'off':
+            self.options["sopt"].mpi = 'off'
+        if self.options.openmp == 'off':
+            self.options["sopt"].openmp = 'off'
+
     def requirements(self):
         # To prevent a conflict in the version of zlib required by libtiff and
         # doxygen, override the version of zlib when either of them is required
@@ -56,6 +67,9 @@ class PurifyConan(ConanFile):
 
         if self.options.cimg == 'on':
             self.requires("cimg/3.0.2")
+
+        if self.options.cppflow == 'on':
+            self.requires("cppflow/2.0.0")
 
     def generate(self):
         tc = CMakeToolchain(self)
