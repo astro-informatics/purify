@@ -142,7 +142,7 @@ class YamlParser {
 
   YAML_MACRO(std::string, model_path, "")
   YAML_MACRO(factory::g_proximal_type, gProximalType, sopt::algorithm::L1GProximal)
-  
+
 #undef YAML_MACRO
  private:
   YAML::Node config_file;
