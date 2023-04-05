@@ -193,7 +193,7 @@ fb_factory(const algo_distribution dist,
     // Create a shared pointer to an instance of the TFGProximal class
     gp = std::make_shared<sopt::algorithm::TFGProximal<Scalar>>(model_path);
   }
-    default(): { throw std::runtime_error("Type of g_proximal operator not recognised."); }
+    default() : { throw std::runtime_error("Type of g_proximal operator not recognised."); }
   }
 
   fb->g_proximal(gp);
