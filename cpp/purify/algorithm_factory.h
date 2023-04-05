@@ -26,8 +26,6 @@
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
 
-
-
 namespace purify {
 namespace factory {
 enum class algorithm { padmm, primal_dual, sdmm, forward_backward };
@@ -39,7 +37,7 @@ const std::map<std::string, algo_distribution> algo_distribution_string = {
     {"random-updates", algo_distribution::mpi_random_updates},
     {"fully-distributed", algo_distribution::mpi_distributed}};
 const std::map<std::string, g_proximal_type> g_proximal_type_string = {
-  {"l1", sopt::algorithm::L1GProximal}, {"learned", sopt::algorithm::TFGProximal}};
+    {"l1", sopt::algorithm::L1GProximal}, {"learned", sopt::algorithm::TFGProximal}};
 
 //! return chosen algorithm given parameters
 template <class Algorithm, class... ARGS>
@@ -160,7 +158,7 @@ fb_factory(const algo_distribution dist,
            const bool real_constraint = true, const bool positive_constraint = true,
            const bool tight_frame = false, const t_real relative_variation = 1e-3,
            const t_real l1_proximal_tolerance = 1e-2, const t_uint maximum_proximal_iterations = 50,
-           const t_real op_norm = 1, const std::String model_path, 
+           const t_real op_norm = 1, const std::String model_path,
            const g_proximal_type g_proximal) {
   typedef typename Algorithm::Scalar t_scalar;
   if (sara_size > 1 and tight_frame)
@@ -195,7 +193,7 @@ fb_factory(const algo_distribution dist,
     // Create a shared pointer to an instance of the TFGProximal class
     gp = std::make_shared<sopt::algorithm::TFGProximal<Scalar>>(model_path);
   }
-  default(): { throw std::runtime_error("Type of g_proximal operator not recognised."); }
+    default(): { throw std::runtime_error("Type of g_proximal operator not recognised."); }
   }
 
   fb->g_proximal(gp);
