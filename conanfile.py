@@ -25,7 +25,8 @@ class PurifyConan(ConanFile):
                "coverage":['on','off'],
                "af": ['on', 'off'],
                "cimg": ['on','off'],
-               "casa": ['on','off']}
+               "casa": ['on','off'],
+               "cppflow": ['on', 'off']}
     default_options = {"docs": 'off',
                        "examples":'off',
                        "tests": 'on',
@@ -36,7 +37,8 @@ class PurifyConan(ConanFile):
                        "coverage": 'off',
                        "af": 'off',
                        "cimg": 'off',
-                       "casa": 'off'}
+                       "casa": 'off',
+                       "cppflow": 'off'}
 
     def requirements(self):
         # To prevent a conflict in the version of zlib required by libtiff and
@@ -69,6 +71,7 @@ class PurifyConan(ConanFile):
         tc.variables['doaf'] = self.options.af
         tc.variables['docimg'] = self.options.cimg
         tc.variables['docasa'] = self.options.casa
+        tc.variables['cppflow'] = self.options.cppflow
 
         # List cases where we don't use ccache
         if ('GITHUB_ACTIONS' in os.environ.keys() and self.options.docs == 'off'):
