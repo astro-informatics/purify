@@ -30,14 +30,14 @@ namespace purify {
 namespace factory {
 enum class algorithm { padmm, primal_dual, sdmm, forward_backward };
 enum class algo_distribution { serial, mpi_serial, mpi_distributed, mpi_random_updates };
-enum class g_proximal_type { sopt::algorithm::L1GProximal, sopt::algorithm::TFGProximal };
+enum class g_proximal_type { L1GProximal, TFGProximal };
 const std::map<std::string, algo_distribution> algo_distribution_string = {
     {"none", algo_distribution::serial},
     {"serial-equivalent", algo_distribution::mpi_serial},
     {"random-updates", algo_distribution::mpi_random_updates},
     {"fully-distributed", algo_distribution::mpi_distributed}};
 const std::map<std::string, g_proximal_type> g_proximal_type_string = {
-    {"l1", sopt::algorithm::L1GProximal}, {"learned", sopt::algorithm::TFGProximal}};
+    {"l1", g_proximal_type::L1GProximal}, {"learned", g_proximal_type::TFGProximal}};
 
 //! return chosen algorithm given parameters
 template <class Algorithm, class... ARGS>
@@ -158,8 +158,8 @@ fb_factory(const algo_distribution dist,
            const bool real_constraint = true, const bool positive_constraint = true,
            const bool tight_frame = false, const t_real relative_variation = 1e-3,
            const t_real l1_proximal_tolerance = 1e-2, const t_uint maximum_proximal_iterations = 50,
-           const t_real op_norm = 1, const std::String model_path,
-           const g_proximal_type g_proximal) {
+           const t_real op_norm = 1, const std::string model_path="",
+           const g_proximal_type g_proximal=g_proximal_type::L1GProximal) {
   typedef typename Algorithm::Scalar t_scalar;
   if (sara_size > 1 and tight_frame)
     throw std::runtime_error(
@@ -175,25 +175,26 @@ fb_factory(const algo_distribution dist,
       .nu(op_norm * op_norm)
       .Phi(*measurements);
 
-  std::shared_ptr<GProximal> gp;
+  std::shared_ptr<GProximal<t_scalar> > gp;
 
   switch (g_proximal) {
-  case (L1GProximal): {
+  case (g_proximal_type::L1GProximal): {
     // Create a shared pointer to an instance of the L1GProximal class
     // and set its properties
-    gp = std::make_shared<sopt::algorithm::L1GProximal<Scalar>>(false);
-    gp->l1_proximal_tolerance(l1_proximal_tolerance)
+    auto l1_gp = std::make_shared<sopt::algorithm::L1GProximal<t_scalar>>(false);
+    l1_gp->l1_proximal_tolerance(l1_proximal_tolerance)
         .l1_proximal_nu(1.)
         .l1_proximal_itermax(maximum_proximal_iterations)
         .l1_proximal_positivity_constraint(positive_constraint)
         .l1_proximal_real_constraint(real_constraint)
         .Psi(*wavelets);
+    gp = l1_gp;
   }
-  case (TFGProximal): {
+  case (g_proximal_type::TFGProximal): {
     // Create a shared pointer to an instance of the TFGProximal class
-    gp = std::make_shared<sopt::algorithm::TFGProximal<Scalar>>(model_path);
+    gp = std::make_shared<sopt::algorithm::TFGProximal<t_scalar>>(model_path);
   }
-    default() : { throw std::runtime_error("Type of g_proximal operator not recognised."); }
+    default: { throw std::runtime_error("Type of g_proximal operator not recognised."); }
   }
 
   fb->g_proximal(gp);
@@ -205,7 +206,7 @@ fb_factory(const algo_distribution dist,
 #ifdef PURIFY_MPI
   case (algo_distribution::mpi_serial): {
     auto const comm = sopt::mpi::Communicator::World();
-    fb->l1_proximal_adjoint_space_comm(comm);
+    // fb->l1_proximal_adjoint_space_comm(comm);
     fb->obj_comm(comm);
     break;
   }
