@@ -17,7 +17,7 @@ This documentation outlines the necessary and optional [dependencies](#dependenc
 Dependencies installation
 -------------------------
 
-**PURIFY** is written in `C++11`. Pre-requisites and dependencies are listed in following and minimal versions required are tested against `Travis CI` meaning that they come natively with OSX and the Ubuntu Trusty release. These are also the default ones fetched by `CMake` (an internet connection is required for this).
+**PURIFY** is written in `C++11`. Pre-requisites and dependencies are listed in following and minimal versions required are meaning that they come natively with OSX and the Ubuntu Trusty release. These are also the default ones fetched by `CMake` (an internet connection is required for this).
 
 `C++` minimal dependencies:
 
@@ -51,32 +51,43 @@ Dependencies installation
 Installing and building PURIFY
 -------------------------------------
 
-**PURIFY** can be installed through the software packet manager on Linux Debian distributions:
+To build Purify:
 
-```
-sudo apt-get install purify
-```
+1. Install [TensorFlow C API](https://www.tensorflow.org/install/lang_c)
+1. Clone the UCL fork of cppflow and create a conan package using
 
-Alternatively, you can build **PURIFY** entirely from the source code. Once the mandatory dependencies are present, `git clone` from the [GitHub repository](https://github.com/astro-informatics/purify):
+    ``` bash
+    git clone git@github.com:UCL/cppflow.git
+    conan create ./cppflow/ -pr:h=default -pr:b=default
+    ```
 
-```
-git clone https://github.com/astro-informatics/purify.git
-```
+1. Clone sopt and create a conan package using
+  
+    ``` bash
+    git clone git@github.com:astro-informatics/sopt.git
+    conan create ./sopt/ --build missing -s compiler.libcxx=libstdc++11 -o cppflow=on  -pr:h=default -pr:b=default
+    ```
 
-Then, the program can be built using Conan:
+1. Once the mandatory dependencies are present, `git clone` from the [GitHub repository](https://github.com/astro-informatics/purify):
 
-``` bash
-cd /path/to/code
-mkdir build
-conan install . -if ./build --build missing 
-conan build . -bf ./build
-```
+    ``` bash
+    git clone https://github.com/astro-informatics/purify.git
+    ```
 
-You can turn the various options on and off by adding flags to the `conan install` command, e.g.
+1. Then, the program can be built using Conan:
 
-```bash
-conan install . -if ./build --build missing -o openmp=on -o mpi=off
-```
+    ``` bash
+    cd /path/to/code
+    mkdir build
+    conan install .. --build missing -pr:h=default -pr:b=default
+        conan build ..
+    ```
+
+    You can turn the various options on and off by adding flags to the `conan install` command, e.g.
+
+    ```bash
+    conan install .. --build missing -o cppflow=on -o openmp=on -o mpi=off -pr:h=default -pr:b=default
+    ```
 
 To test everything went all right:
 
