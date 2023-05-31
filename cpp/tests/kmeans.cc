@@ -82,8 +82,8 @@ TEST_CASE("distribute w") {
   auto const comm = sopt::mpi::Communicator::World();
 
   const auto params = utilities::random_sample_density(M, 0, constant::pi / 3, 100);
-  const auto kmeans = distribute::kmeans_algo(params.w, comm.size(), 100, comm,
-                                              [](t_real x) { return x * x; }, 1e-5);
+  const auto kmeans = distribute::kmeans_algo(
+      params.w, comm.size(), 100, comm, [](t_real x) { return x * x; }, 1e-5);
   const std::vector<t_int> image_index = std::get<0>(kmeans);
   const std::vector<t_real> w_stacks = std::get<1>(kmeans);
   const std::vector<t_int> groups =

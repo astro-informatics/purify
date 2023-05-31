@@ -222,6 +222,10 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
         get<t_real>(algorithmOptionsNode, {"fb", "regularisation_parameter"});
     this->dualFBVarianceConvergence_ =
         get<t_real>(algorithmOptionsNode, {"fb", "dualFBVarianceConvergence"});
+    this->gProximalType_ = factory::g_proximal_type_string.at(
+        get<std::string>(algorithmOptionsNode, {"fb", "gProximalType"}));
+    this->model_path_ = 
+        get<std::string>(algorithmOptionsNode, {"fb", "modelPath"});
     if (this->algorithm_ == "fb_joint_map") {
       this->jmap_iters_ =
           get<t_uint>(algorithmOptionsNode, {"fb", "joint_map_estimation", "iters"});

@@ -54,7 +54,7 @@ Installing and building PURIFY
 **PURIFY** can be installed through the software packet manager on Linux Debian distributions:
 
 ```
-apt-get install purify
+sudo apt-get install purify
 ```
 
 Alternatively, you can build **PURIFY** entirely from the source code. Once the mandatory dependencies are present, `git clone` from the [GitHub repository](https://github.com/astro-informatics/purify):
@@ -63,19 +63,24 @@ Alternatively, you can build **PURIFY** entirely from the source code. Once the 
 git clone https://github.com/astro-informatics/purify.git
 ```
 
-Then, the program can be built with standard `CMake` command:
+Then, the program can be built using Conan:
 
-```
+``` bash
 cd /path/to/code
 mkdir build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
-make
+conan install . -if ./build --build missing 
+conan build . -bf ./build
+```
+
+You can turn the various options on and off by adding flags to the `conan install` command, e.g.
+
+```bash
+conan install . -if ./build --build missing -o openmp=on -o mpi=off
 ```
 
 To test everything went all right:
 
-```
+``` bash
 cd /path/to/code/build
 ctest .
 ```

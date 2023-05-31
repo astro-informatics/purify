@@ -4,15 +4,27 @@ on:
   push:
     branches: [ development ]
   pull_request:
-    branches: [ development ]
+    # CI runs when new commits are pushed or when draft PR is marked ready for review
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
-  OMP_NUM_THREADS: 4
+  OMP_NUM_THREADS: 2
+  CONAN_PRINT_RUN_COMMANDS: 1
+  CONAN_CPU_COUNT: 2
+  CONAN_SKIP_BROKEN_SYMLINKS_CHECK: 'True'
 
 jobs:
   build:
+    # Skip CI if PR is a draft
+    if: github.event.pull_request.draft == false
     name: ${{matrix.os}}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}}
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Windows or Mac.  You can convert this to a matrix build if you need
@@ -35,11 +47,11 @@ jobs:
             - g++-9
             - clang++
           mpi:
-            - "ON"
-            - "OFF"
+            - "on"
+            - "off"
           omp:
-            - "ON"
-            - "OFF"
+            - "on"
+            - "off"
           exclude:
             - cc: gcc-9
               cxx: clang++
@@ -48,32 +60,74 @@ jobs:
             - os: ubuntu-20.04
               cc: clang
               cxx: clang++
+            - os: macos-11
+              mpi: "on"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+   # Enable tmate debugging of manually-triggered workflows if the input option was provided
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
 
     - name: Install Dependencies on Ubunutu
       if: ${{ contains(matrix.os, 'ubuntu') }}
-      run: sudo apt install libfftw3-dev libtiff5-dev openmpi-bin libopenmpi-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev ccache libcfitsio-dev casacore-dev
+      run: |
+        sudo apt update
+        sudo apt install libfftw3-dev libtiff5-dev openmpi-bin libopenmpi-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev ccache libcfitsio-dev casacore-dev
 
     - name: Install Dependencies on MacOS
       if: ${{ contains(matrix.os, 'macos') }}
-      run: brew install fftw libtiff open-mpi boost libyaml cfitsio ccache
+      run: |
+        # Brew update has bugs but we don't seem to be affected, see
+        # https://github.com/actions/setup-python/issues/577
+        brew update
+        brew install fftw libtiff open-mpi boost libyaml cfitsio ccache conan
+        echo "CMAKE_PREFIX_PATH=/usr/local/opt/libomp" >> $GITHUB_ENV
+
+    - name: Install Tensorflow API on Ubuntu
+      # TODO could this be combined with mac version somehow? if/else?
+      if: ${{ contains(matrix.os, 'ubuntu') }}
+      uses: UCL/install-tensorflow-action@main
+      with:
+        version: 2.11.0
+        os: linux
+
+    - name: Install Tensorflow API on MacOS
+      if: ${{ contains(matrix.os, 'macos') }}
+      uses: UCL/install-tensorflow-action@main
+      with:
+        version: 2.11.0
+        os: darwin
+
+    - name: Select Python 3.10
+      # otherwise turtlebrowser/get-conan@v1.1 fails on macos-12
+      # ref: https://github.com/turtlebrowser/get-conan/issues/4
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install Conan
+      id: conan
+      uses: turtlebrowser/get-conan@main
+      with:
+        version: 1.59.0
 
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
       shell: cmake -P {0}
-      run: |
-        string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
-        message("::set-output name=timestamp::${current_date}")
+      run: echo "{date_and_time}={$(date +'%Y-%m-%d-%H;%M;%S')}" >> $GITHUB_OUTPUT
     - name: Set ccache cache directory
       shell: bash
       run: echo "CCACHE_DIR=${{runner.workspace}}/.ccache" >> "${GITHUB_ENV}"
     - name: Cache ccache files
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ${{runner.workspace}}/.ccache
-        key: ${{matrix.os}}-${{matrix.cxx}}-${{matrix.mpi}}-${{matrix.omp}}-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+        key: ${{matrix.os}}-${{matrix.cxx}}-${{matrix.mpi}}-${{matrix.omp}}-${{ steps.ccache_cache_timestamp.outputs.date_and_time }}
         restore-keys: |
           ${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
           ${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}
@@ -83,21 +137,28 @@ jobs:
 #    - name: Clear ccache
 #      run: ccache --clear
 
-    - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: |
-        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-        -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-        -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
-        -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}}
+    - name: create sopt package on gcc
+      if: ${{ contains(matrix.cxx, 'g++-9') }}
+      run: conan create ${{github.workspace}}/sopt --build missing -s:b compiler.libcxx=libstdc++11 -o:b mpi=${{matrix.mpi}} -o:b openmp=${{matrix.omp}}  -pr:h=default -pr:b=default
+
+    - name: create sopt package on apple-clang
+      if: ${{ contains(matrix.cxx, 'clang++') }}
+      run: conan create ${{github.workspace}}/sopt --build missing -o:b mpi=${{matrix.mpi}} -o:b openmp=${{matrix.omp}}  -pr:h=default -pr:b=default
+
+    - name: Conan install on gcc
+      if: ${{ contains(matrix.cxx, 'g++-9') }}
+      run: conan install ${{github.workspace}} -if ${{github.workspace}}/build -s compiler.libcxx=libstdc++11 --build missing  -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}  -pr:h=default -pr:b=default
+
+    - name: Conan install on apple-clang
+      if: ${{ contains(matrix.cxx, 'clang++') }}
+      run: conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing  -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}  -pr:h=default -pr:b=default
 
     - name: Build
       # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --parallel 2
+      run: conan build ${{github.workspace}} -bf ${{github.workspace}}/build
 
     - name: Test
       working-directory: ${{github.workspace}}/build
       # Execute tests defined by the CMake configuration.
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C ${{env.BUILD_TYPE}}
+      run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure

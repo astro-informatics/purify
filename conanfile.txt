@@ -1,0 +1,20 @@
+[requires]
+# These are the same as sopt
+eigen/3.3.7
+libtiff/4.0.9
+spdlog/1.9.2
+catch2/2.13.7
+benchmark/1.6.0
+fftw/3.3.9
+
+# New for purify
+yaml-cpp/0.6.3 # previously specified 0.6.2 but 0.6.3 is available from conan
+boost/1.78.0 # not sure how to specify components
+cfitsio/4.0.0
+
+# lookup_package(ArrayFire) in dependencies.cmake but this package isn't in Conan
+# also lookup_package(sopt)
+# and lookup_package( Cubature)
+
+[generators]
+cmake

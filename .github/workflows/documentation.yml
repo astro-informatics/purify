@@ -3,15 +3,17 @@ name: Documentation
 on:
   push:
     branches: [ development ]
-  
+
 jobs:
   make-documentation:
     runs-on: ubuntu-20.04
     steps:
-    
+
       - name: Install dependencies
-        run: sudo apt install libfftw3-dev libtiff5-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev libcfitsio-dev casacore-dev doxygen graphviz
-        
+        run: |
+            sudo apt install libfftw3-dev libtiff5-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev libcfitsio-dev casacore-dev doxygen graphviz
+            pip install conan
+
       - name: Pull sopt repo and build docs
         run : |
           git clone https://github.com/astro-informatics/sopt.git
@@ -23,21 +25,23 @@ jobs:
 
       - name: Check out Purify
         uses: actions/checkout@v2
- 
+
       - name: Configure and build docs
         run: | 
           mkdir build
           cd build
+          conan install ..
           cmake .. \
           -Ddompi=OFF \
           -Dopenmp=OFF \
           -Ddocs=ON \
           -Dweb=ON 
           make docweb VERBOSE=1
-        
+
       - name: Deploy to GH pages
         if: ${{github.event_name == 'push'}}
         uses: JamesIves/github-pages-deploy-action@4.1.6
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: build/cpp/docs/html # The folder the action should deploy.
+

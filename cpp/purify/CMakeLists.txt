@@ -13,8 +13,6 @@ function(add_include_dir)
   endif()
 endfunction()
 
-
-
 configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(HEADERS
@@ -72,18 +70,38 @@ target_include_directories(libpurify PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/cpp>
   $<INSTALL_INTERFACE:include/>)
 
+if (cppflow)
+  target_link_libraries(libpurify "${TENSORFLOW_LIB}")
+  # Make cppflow include directory public. Install interface can't point to source directory,
+  # so it needs to be separately defined, explained in
+  # https://stackoverflow.com/questions/25676277/cmake-target-include-directories-prints-an-error-when-i-try-to-add-the-source
+  # Add /usr/local/include for default location of TensorFlow headers
+  target_include_directories(libpurify PUBLIC
+    $<BUILD_INTERFACE:${cppflow_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:/usr/local/include>
+    $<INSTALL_INTERFACE:cppflow/include/>
+    )
+endif()
+
 
 add_include_dir(
-  ${EIGEN3_INCLUDE_DIR}
+  ${Eigen3_INCLUDE_DIR}
+  ${eigen_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
-  ${CFitsIO_INCLUDE_DIR}
-  ${Yamlcpp_INCLUDE_DIR}
+  ${cfitsio_INCLUDE_DIR}
+  ${yaml-cpp_INCLUDE_DIR}
   ${Cubature_INCLUDE_DIR}
   ${CImg_INCLUDE_DIR}
-)
+  ${sopt_INCLUDE_DIR}
+  )
 target_link_libraries(libpurify
-  ${FFTW3_DOUBLE_LIBRARY}  ${CFitsIO_LIBRARY} ${Sopt_CPP_LIBRARY} ${X11_X11_LIB} ${Yamlcpp_LIBRARY} ${Cubature_LIBRARIES}
-  ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY}
+  ${Cubature_LIBRARIES}
+  FFTW3::fftw3
+  cfitsio::cfitsio
+  sopt::sopt
+  yaml-cpp
+  Boost::filesystem
+  Boost::system
   )
 if(TARGET casacore::casa)
   target_link_libraries(libpurify casacore::ms)
@@ -94,7 +112,11 @@ endif()
 
 add_dependencies(libpurify lookup_dependencies)
 
-
+# Add spdlog as direct dependency
+if(spdlog_FOUND)
+  target_link_libraries(libpurify spdlog::spdlog)
+  target_include_directories(libpurify SYSTEM PUBLIC ${spdlog_INCLUDE_DIR})
+endif()
 
 install(FILES ${HEADERS} DESTINATION include/purify)
 install(TARGETS libpurify

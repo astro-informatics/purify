@@ -185,9 +185,9 @@ t_complex convolution(const Vector<t_real> &x0, const Vector<t_real> &xmin,
                       const std::function<t_complex(Vector<t_real>)> &func2, const norm_type norm,
                       const t_real required_abs_error, const t_real required_rel_error,
                       const t_uint max_evaluations, const method methodtype) {
-  return integrate(xmin, xmax,
-                   [=](const Vector<t_real> &x) -> t_complex { return func1(x0 - x) * func2(x); },
-                   norm, required_abs_error, required_rel_error, max_evaluations, methodtype);
+  return integrate(
+      xmin, xmax, [=](const Vector<t_real> &x) -> t_complex { return func1(x0 - x) * func2(x); },
+      norm, required_abs_error, required_rel_error, max_evaluations, methodtype);
 }
 }  // namespace integration
 }  // namespace purify
