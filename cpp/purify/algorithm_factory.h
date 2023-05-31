@@ -189,10 +189,12 @@ fb_factory(const algo_distribution dist,
         .l1_proximal_real_constraint(real_constraint)
         .Psi(*wavelets);
     gp = l1_gp;
+    break;
   }
   case (g_proximal_type::TFGProximal): {
     // Create a shared pointer to an instance of the TFGProximal class
     gp = std::make_shared<sopt::algorithm::TFGProximal<t_scalar>>(model_path);
+    break;
   }
     default: { throw std::runtime_error("Type of g_proximal operator not recognised."); }
   }
