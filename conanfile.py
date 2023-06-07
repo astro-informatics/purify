@@ -50,6 +50,10 @@ class PurifyConan(ConanFile):
             self.options["sopt"].mpi = 'off'
         if self.options.openmp == 'off':
             self.options["sopt"].openmp = 'off'
+        # When building the sopt package, switch off sopt tests and examples,
+        # they are not going to be run.
+        self.options["sopt"].examples = 'off'
+        self.options["sopt"].tests = 'off'
 
     def requirements(self):
         # To prevent a conflict in the version of zlib required by libtiff and
