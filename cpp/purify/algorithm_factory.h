@@ -188,6 +188,11 @@ fb_factory(const algo_distribution dist,
         .l1_proximal_positivity_constraint(positive_constraint)
         .l1_proximal_real_constraint(real_constraint)
         .Psi(*wavelets);
+#ifdef PURIFY_MPI
+    auto const comm = sopt::mpi::Communicator::World();
+    l1_gp->l1_proximal_adjoint_space_comm(comm);
+    l1_gp->l1_proximal_direct_space_comm(comm);
+#endif
     gp = l1_gp;
     break;
   }
@@ -208,7 +213,7 @@ fb_factory(const algo_distribution dist,
 #ifdef PURIFY_MPI
   case (algo_distribution::mpi_serial): {
     auto const comm = sopt::mpi::Communicator::World();
-    // fb->l1_proximal_adjoint_space_comm(comm);
+    fb->adjoint_space_comm(comm);
     fb->obj_comm(comm);
     break;
   }
