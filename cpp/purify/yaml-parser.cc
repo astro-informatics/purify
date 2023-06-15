@@ -225,7 +225,7 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
     this->gProximalType_ = factory::g_proximal_type_string.at(
         get<std::string>(algorithmOptionsNode, {"fb", "gProximalType"}));
     this->model_path_ = 
-        get<std::string>(algorithmOptionsNode, {"fb", "modelPath"}));
+        get<std::string>(algorithmOptionsNode, {"fb", "modelPath"});
     if (this->algorithm_ == "fb_joint_map") {
       this->jmap_iters_ =
           get<t_uint>(algorithmOptionsNode, {"fb", "joint_map_estimation", "iters"});
