@@ -41,10 +41,10 @@ jobs:
             - ubuntu-20.04
             - macos-11
           cc:
-            - gcc-9
+            - gcc-10
             - clang
           cxx:
-            - g++-9
+            - g++-10
             - clang++
           mpi:
             - "on"
@@ -53,10 +53,10 @@ jobs:
             - "on"
             - "off"
           exclude:
-            - cc: gcc-9
+            - cc: gcc-10
               cxx: clang++
             - cc: clang
-              cxx: g++-9
+              cxx: g++-10
             - os: ubuntu-20.04
               cc: clang
               cxx: clang++
@@ -140,7 +140,7 @@ jobs:
 #      run: ccache --clear
 
     - name: create sopt package on gcc
-      if: ${{ contains(matrix.cxx, 'g++-9') }}
+      if: ${{ contains(matrix.cxx, 'g++-10') }}
       run: conan create ${{github.workspace}}/sopt --build missing -s:b compiler.libcxx=libstdc++11 -o:b mpi=${{matrix.mpi}} -o:b openmp=${{matrix.omp}}  -pr:h=default -pr:b=default
 
     - name: create sopt package on apple-clang
@@ -148,7 +148,7 @@ jobs:
       run: conan create ${{github.workspace}}/sopt --build missing -o:b mpi=${{matrix.mpi}} -o:b openmp=${{matrix.omp}}  -pr:h=default -pr:b=default
 
     - name: Conan install on gcc
-      if: ${{ contains(matrix.cxx, 'g++-9') }}
+      if: ${{ contains(matrix.cxx, 'g++-10') }}
       run: conan install ${{github.workspace}} -if ${{github.workspace}}/build -s compiler.libcxx=libstdc++11 --build missing  -o mpi=${{matrix.mpi}} -o openmp=${{matrix.omp}}  -pr:h=default -pr:b=default
 
     - name: Conan install on apple-clang
