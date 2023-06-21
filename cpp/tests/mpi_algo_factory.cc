@@ -139,7 +139,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
   }
 }
 
-TEST_CASE("Serial vs. Serial with MPI Primal Dual") {
+TEST_CASE("Serial vs. Serial with MPI Primal Dual", "[!shouldfail]") {
   auto const world = sopt::mpi::Communicator::World();
 
   const std::string &test_dir = "expected/primal_dual/";

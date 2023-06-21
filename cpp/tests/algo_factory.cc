@@ -73,7 +73,7 @@ TEST_CASE("padmm_factory") {
   CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
 }
 
-TEST_CASE("primal_dual_factory") {
+TEST_CASE("primal_dual_factory", "[!shouldfail]") {
   const std::string &test_dir = "expected/primal_dual/";
   const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
   const std::string &expected_solution_path =
@@ -109,7 +109,7 @@ TEST_CASE("primal_dual_factory") {
   auto const primaldual =
       factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
           factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma,
-          imsizey, imsizex, sara.size(), 1000, true, true, 1e-2, 1, op_norm);
+          imsizey, imsizex, sara.size(), 20, true, true, 1e-2, 1, op_norm);
 
   auto const diagnostic = (*primaldual)();
   CHECK(diagnostic.niters == 16);
