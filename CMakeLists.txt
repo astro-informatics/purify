@@ -20,6 +20,7 @@ option(docimg         "Enable CImg"                                     off)
 option(docasa         "Enable CASA"                                     off)
 option(docs           "Build documentation"                             off)
 option(coverage       "Build coverage"                                  off)
+option(cppflow        "Build with TensorFlow interface"                 off)
 
 if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "Setting build type to 'Relese' as none was specified.")

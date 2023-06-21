@@ -131,5 +131,11 @@ if(docasa)
   set(PURIFY_CASACORE TRUE)
 endif()
 
+if(cppflow)
+  find_package(cppflow)
+  find_library(TENSORFLOW_LIB tensorflow REQUIRED)
+  set(PURIFY_CPPFLOW TRUE)
+endif()
+
 # Add script to execute to make sure libraries in the build tree can be found
 add_to_ld_path("${EXTERNAL_ROOT}/lib")

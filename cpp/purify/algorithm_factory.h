@@ -21,10 +21,12 @@
 #include <sopt/joint_map.h>
 #include <sopt/l1_g_proximal.h>
 #include <sopt/relative_variation.h>
-#include <sopt/tf_g_proximal.h>
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
+#ifdef PURIFY_CPPFLOW
+#include <sopt/tf_g_proximal.h>
+#endif
 
 namespace purify {
 namespace factory {
@@ -200,9 +202,13 @@ fb_factory(const algo_distribution dist,
     break;
   }
   case (g_proximal_type::TFGProximal): {
+#ifdef PURIFY_CPPFLOW
     // Create a shared pointer to an instance of the TFGProximal class
     gp = std::make_shared<sopt::algorithm::TFGProximal<t_scalar>>(model_path);
     break;
+#else
+    throw std::runtime_error("Type TFGProximal not recognized because purify was built with cppflow=off");
+#endif
   }
     default: { throw std::runtime_error("Type of g_proximal operator not recognised."); }
   }
