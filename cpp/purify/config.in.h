@@ -19,6 +19,9 @@
 //! Whether PURIFY is running with mpi
 #cmakedefine PURIFY_MPI
 
+//! Whether PUFIY is using cppflow / tensorflow
+#cmakedefine PURIFY_CPPFLOW
+
 //! Whether PURIFY is running with arrayfire
 #cmakedefine PURIFY_ARRAYFIRE
 
