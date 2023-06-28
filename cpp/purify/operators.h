@@ -221,7 +221,7 @@ Image<t_complex> init_correction2d(const t_real &oversample_ratio, const t_uint 
 
 //! Construct gridding matrix with mixing
 template <class T, class... ARGS>
-Sparse<t_complex> init_gridding_matrix_2d(const Sparse<T> &mixing_matrix, ARGS &&... args) {
+Sparse<t_complex> init_gridding_matrix_2d(const Sparse<T> &mixing_matrix, ARGS &&...args) {
   if (mixing_matrix.rows() * mixing_matrix.cols() < 2)
     return init_gridding_matrix_2d(std::forward<ARGS>(args)...);
   const Sparse<t_complex> G = init_gridding_matrix_2d(std::forward<ARGS>(args)...);
@@ -238,7 +238,7 @@ namespace operators {
 //! Constructs degridding operator using MPI
 template <class T, class... ARGS>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_gridding_matrix_2d(
-    const sopt::mpi::Communicator &comm, ARGS &&... args) {
+    const sopt::mpi::Communicator &comm, ARGS &&...args) {
   Sparse<t_complex> interpolation_matrix_original =
       details::init_gridding_matrix_2d(std::forward<ARGS>(args)...);
   const DistributeSparseVector distributor(interpolation_matrix_original, comm);
@@ -272,7 +272,7 @@ template <class T, class STORAGE_INDEX_TYPE, class... ARGS>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_gridding_matrix_2d_all_to_all(
     const sopt::mpi::Communicator &comm, const STORAGE_INDEX_TYPE local_grid_size,
     const STORAGE_INDEX_TYPE start_index, const t_uint number_of_images,
-    const std::vector<t_int> &image_index, ARGS &&... args) {
+    const std::vector<t_int> &image_index, ARGS &&...args) {
   Sparse<t_complex, STORAGE_INDEX_TYPE> interpolation_matrix_original =
       details::init_gridding_matrix_2d<STORAGE_INDEX_TYPE>(number_of_images, image_index,
                                                            std::forward<ARGS>(args)...);
@@ -310,7 +310,7 @@ sopt::OperatorFunction<T> init_all_sum_all(const sopt::mpi::Communicator &comm) 
 //! constructs lambdas that apply degridding matrix with adjoint
 template <class T, class... ARGS>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_gridding_matrix_2d(
-    ARGS &&... args) {
+    ARGS &&...args) {
   const std::shared_ptr<const Sparse<t_complex>> interpolation_matrix =
       std::make_shared<const Sparse<t_complex>>(
           details::init_gridding_matrix_2d(std::forward<ARGS>(args)...));

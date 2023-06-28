@@ -92,7 +92,7 @@ init_af_zero_padding_2d(const Image<t_complexf> &S, const t_real &oversample_rat
 
 template <class... ARGS>
 std::tuple<sopt::OperatorFunction<af::array>, sopt::OperatorFunction<af::array>>
-init_af_gridding_matrix_2d(const Vector<t_real> &u, ARGS &&... args) {
+init_af_gridding_matrix_2d(const Vector<t_real> &u, ARGS &&...args) {
   const Sparse<t_complex> interpolation_matrix =
       details::init_gridding_matrix_2d(u, std::forward<ARGS>(args)...);
   const Sparse<t_complex> adjoint = interpolation_matrix.adjoint();
