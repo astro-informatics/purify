@@ -36,6 +36,8 @@ set(Sopt_GIT_TAG "development" CACHE STRING "Branch/tag when downloading sopt")
 #include(AddCPP11Flags)
 # c++17 is required when using cppflow with learned algorithms
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # sets up rpath so libraries can be found
 include(rpath)
