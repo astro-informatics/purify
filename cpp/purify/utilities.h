@@ -70,7 +70,7 @@ sparse_multiply_matrix(const Eigen::SparseMatrixBase<T0> &M, const Eigen::Matrix
   auto const &derived = M.derived();
 // parallel sparse matrix multiplication with vector.
 #pragma omp parallel for
-  //#pragma omp simd
+  // #pragma omp simd
   for (t_int k = 0; k < M.outerSize(); ++k)
     for (typename Sparse<typename T0::Scalar>::InnerIterator it(derived, k); it; ++it)
       y(k) += it.value() * x(it.index());

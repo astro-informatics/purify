@@ -43,7 +43,7 @@ const std::map<std::string, g_proximal_type> g_proximal_type_string = {
 
 //! return chosen algorithm given parameters
 template <class Algorithm, class... ARGS>
-std::shared_ptr<Algorithm> algorithm_factory(const factory::algorithm algo, ARGS &&... args);
+std::shared_ptr<Algorithm> algorithm_factory(const factory::algorithm algo, ARGS &&...args);
 //! return shared pointer to padmm object
 template <class Algorithm>
 typename std::enable_if<
@@ -160,8 +160,8 @@ fb_factory(const algo_distribution dist,
            const bool real_constraint = true, const bool positive_constraint = true,
            const bool tight_frame = false, const t_real relative_variation = 1e-3,
            const t_real l1_proximal_tolerance = 1e-2, const t_uint maximum_proximal_iterations = 50,
-           const t_real op_norm = 1, const std::string model_path="",
-           const g_proximal_type g_proximal=g_proximal_type::L1GProximal) {
+           const t_real op_norm = 1, const std::string model_path = "",
+           const g_proximal_type g_proximal = g_proximal_type::L1GProximal) {
   typedef typename Algorithm::Scalar t_scalar;
   if (sara_size > 1 and tight_frame)
     throw std::runtime_error(
@@ -177,7 +177,7 @@ fb_factory(const algo_distribution dist,
       .nu(op_norm * op_norm)
       .Phi(*measurements);
 
-  std::shared_ptr<GProximal<t_scalar> > gp;
+  std::shared_ptr<GProximal<t_scalar>> gp;
 
   switch (g_proximal) {
   case (g_proximal_type::L1GProximal): {
@@ -191,8 +191,7 @@ fb_factory(const algo_distribution dist,
         .l1_proximal_real_constraint(real_constraint)
         .Psi(*wavelets);
 #ifdef PURIFY_MPI
-    if(dist == algo_distribution::mpi_serial)
-    {
+    if (dist == algo_distribution::mpi_serial) {
       auto const comm = sopt::mpi::Communicator::World();
       l1_gp->l1_proximal_adjoint_space_comm(comm);
       l1_gp->l1_proximal_direct_space_comm(comm);
@@ -207,10 +206,13 @@ fb_factory(const algo_distribution dist,
     gp = std::make_shared<sopt::algorithm::TFGProximal<t_scalar>>(model_path);
     break;
 #else
-    throw std::runtime_error("Type TFGProximal not recognized because purify was built with cppflow=off");
+    throw std::runtime_error(
+        "Type TFGProximal not recognized because purify was built with cppflow=off");
 #endif
   }
-    default: { throw std::runtime_error("Type of g_proximal operator not recognised."); }
+  default: {
+    throw std::runtime_error("Type of g_proximal operator not recognised.");
+  }
   }
 
   fb->g_proximal(gp);
@@ -351,7 +353,7 @@ primaldual_factory(
 }
 
 template <class Algorithm, class... ARGS>
-std::shared_ptr<Algorithm> algorithm_factory(const factory::algorithm algo, ARGS &&... args) {
+std::shared_ptr<Algorithm> algorithm_factory(const factory::algorithm algo, ARGS &&...args) {
   switch (algo) {
   case algorithm::padmm:
     return padmm_factory<Algorithm>(std::forward<ARGS>(args)...);
