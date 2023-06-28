@@ -21,6 +21,7 @@ jobs:
           source: '.'
           extensions: 'h,cc'
           clangFormatVersion: 16
+          inplace: True
 
       - name: Report results
         run: |
