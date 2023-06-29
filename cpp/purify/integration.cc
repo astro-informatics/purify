@@ -1,4 +1,5 @@
 #include "purify/integration.h"
+#include <array>
 
 namespace purify {
 namespace integration {
@@ -41,8 +42,8 @@ t_complex integrate(const Vector<t_real> &xmin, const Vector<t_real> &xmax,
                     const t_real required_abs_error, const t_real required_rel_error,
                     const t_uint max_evaluations, const method methodtype) {
   assert(xmin.size() == xmax.size());
-  std::array<t_real, 2> val{{0., 0.}};
-  std::array<t_real, 2> err{{0., 0.}};
+  std::array<t_real, 2> val{0., 0.};
+  std::array<t_real, 2> err{0., 0.};
   auto wrap_integrand = [](unsigned ndim, const t_real *x, void *fdata, unsigned fdim,
                            double *fval) -> int {
     assert(fdim == 2);
