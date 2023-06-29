@@ -55,6 +55,8 @@ class PurifyConan(ConanFile):
         self.options["sopt"].examples = 'off'
         self.options["sopt"].tests = 'off'
 
+        self.options["boost"].without_fiber = True
+
     def requirements(self):
         # To prevent a conflict in the version of zlib required by libtiff and
         # doxygen, override the version of zlib when either of them is required
