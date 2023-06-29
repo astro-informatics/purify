@@ -1,4 +1,5 @@
 #include "purify/integration.h"
+#include <array>
 
 namespace purify {
 namespace integration {
