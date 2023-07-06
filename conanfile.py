@@ -55,6 +55,12 @@ class PurifyConan(ConanFile):
         self.options["sopt"].examples = 'off'
         self.options["sopt"].tests = 'off'
 
+        # Exclude boost features we don't need. without_fiber is required when
+        # building from source on MacOS with gcc.
+        # The rest are to speed up building from source.
+        self.options["boost"].without_fiber = True
+        self.options["boost"].without_python = True
+
     def requirements(self):
         # To prevent a conflict in the version of zlib required by libtiff and
         # doxygen, override the version of zlib when either of them is required

@@ -79,7 +79,7 @@ jobs:
       if: ${{ contains(matrix.os, 'ubuntu') }}
       run: |
         sudo apt update
-        sudo apt install libfftw3-dev libtiff5-dev openmpi-bin libopenmpi-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev ccache libcfitsio-dev casacore-dev
+        sudo apt install openmpi-bin libopenmpi-dev ccache casacore-dev
 
     - name: Install Dependencies on MacOS
       if: ${{ contains(matrix.os, 'macos') }}
@@ -89,7 +89,7 @@ jobs:
         # brew update is very slow because it's updating a lot of unrelated packages
         # workflow seems to run fine with default versions
         # brew update
-        brew install fftw libtiff open-mpi boost libyaml cfitsio ccache conan
+        brew install open-mpi libomp ccache
         echo "CMAKE_PREFIX_PATH=/usr/local/opt/libomp" >> $GITHUB_ENV
 
     - name: Install Tensorflow API on Ubuntu
