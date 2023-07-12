@@ -25,11 +25,11 @@ Dependencies installation
 
 In order to build **PURIFY**, you should have the following installed on your system.
 
-- [CMake](http://www.cmake.org/) v3.5.1 (Trusty as `cmake3`) A free software that allows cross-platform compilation
+- [CMake](http://www.cmake.org/) v3.5.1 A free software that allows cross-platform compilation
 - [conan](https://conan.io/) v1.60.1 `C/C++` package manager. **NOTE** Conan 2.0 and later are not supported.
 - [GCC](https://gcc.gnu.org) v7.3.0 GNU compiler for `C++`
-- [OpenMP](http://openmp.org/wp/) v4.8.4 (Trusty) - Optional - Speeds up some of the operations.
-- [MPI](https://www.open-mpi.org) v3.1.1 (Trusty) - Optional - Parallelisation paradigm to speed up operations.
+- [OpenMP](http://openmp.org/wp/) v4.8.4 - Optional - Speeds up some of the operations.
+- [MPI](https://www.open-mpi.org) v3.1.1 - Optional - Parallelisation paradigm to speed up operations.
 
 ## Automatically included libraries
 
@@ -77,7 +77,7 @@ To build **PURIFY**:
     cd /path/to/code
     mkdir build
     conan install .. --build missing -pr:h=default -pr:b=default
-        conan build ..
+    conan build ..
     ```
 
     You can turn the various options on and off by adding flags to the `conan install` command, e.g.
