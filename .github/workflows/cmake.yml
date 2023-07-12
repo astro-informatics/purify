@@ -118,7 +118,7 @@ jobs:
       id: conan
       uses: turtlebrowser/get-conan@main
       with:
-        version: 1.59.0
+        version: 1.60.1
 
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp

@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
 # Check code meets Google C++ style guide https://google.github.io/styleguide/cppguide.html
       - name: Run linting

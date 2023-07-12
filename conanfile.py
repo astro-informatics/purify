@@ -62,8 +62,7 @@ class PurifyConan(ConanFile):
         self.options["boost"].without_python = True
 
     def requirements(self):
-        # To prevent a conflict in the version of zlib required by libtiff and
-        # doxygen, override the version of zlib when either of them is required
+        # Override version of zlib to prevent a conflict between versions of zlib required by depedencies
         self.requires("zlib/1.2.12", override=True)
 
         if self.options.examples == 'on':
@@ -120,14 +119,3 @@ class PurifyConan(ConanFile):
         self.cpp_info.libs = ["purify"]
 
 
-    # def build(self):
-    #   cmake = CMake(self)
-
-    #   if self.options.docs == 'off':
-    #       cmake.definitions['CMAKE_C_COMPILER_LAUNCHER'] = "ccache"
-    #       cmake.definitions['CMAKE_CXX_COMPILER_LAUNCHER'] = "ccache"
-
-    #   # TODO: Switch this on for Debug, off for Release
-    #   cmake.definitions['CMAKE_VERBOSE_MAKEFILE:BOOL'] = "ON"
-    #   cmake.configure()
-    #   cmake.build()
