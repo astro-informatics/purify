@@ -68,13 +68,13 @@ To build **PURIFY**:
 1. Create a `conan` package for `sopt`
 
     ```bash
-    conan create ./sopt/ --build missing -s compiler.libcxx=libstdc++11 -pr:h=default -pr:b=default
+    conan create /path/to/purify/sopt/ --build missing -s compiler.libcxx=libstdc++11 -pr:h=default -pr:b=default
     ```
 
 1. Then, the program can be built using `conan`:
 
     ``` bash
-    cd /path/to/code
+    cd /path/to/purify
     mkdir build
     conan install .. --build missing -pr:h=default -pr:b=default
     conan build ..
@@ -97,7 +97,7 @@ The `sopt` library includes an interface to TensorFlow for using trained models 
 
     ``` bash
     git clone git@github.com:UCL/cppflow.git
-    conan create ./cppflow/ -pr:h=default -pr:b=default
+    conan create /path/to/cppflow/ -pr:h=default -pr:b=default
     ```
 1. Once the mandatory user-provided dependencies are present, `git clone` from the [GitHub repository](https://github.com/astro-informatics/purify):
 
@@ -107,13 +107,13 @@ The `sopt` library includes an interface to TensorFlow for using trained models 
 1. Create a `conan` package for `sopt` with the `cppflow` option set to "on"
 
     ```bash
-    conan create ./sopt/ --build missing -s compiler.libcxx=libstdc++11 -o cppflow=on  -pr:h=default -pr:b=default
+    conan create /path/to/purify/sopt/ --build missing -s compiler.libcxx=libstdc++11 -o cppflow=on  -pr:h=default -pr:b=default
     ```
 
 1. Then, the program can be built using `conan` with the `cppflow` option set to "on":
 
     ``` bash
-    cd /path/to/code
+    cd /path/to/purify
     mkdir build
     conan install .. --build missing -o cppflow=on -pr:h=default -pr:b=default
     conan build ..
@@ -125,7 +125,7 @@ Testing
 To check everything went all right, run the test suite:
 
 ```
-cd /path/to/code/build
+cd /path/to/purify/build
 ctest .
 ```
 
