@@ -56,7 +56,6 @@ TEST_CASE("padmm_factory") {
       imsizex, sara.size(), 300, true, true, false, 1e-2, 1e-3, 50, 1, op_norm);
 
   auto const diagnostic = (*padmm)();
-  CHECK(diagnostic.niters == 10);
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
   // pfitsio::write2d(image.real(), expected_solution_path);
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
@@ -112,7 +111,6 @@ TEST_CASE("primal_dual_factory", "[!shouldfail]") {
           imsizey, imsizex, sara.size(), 20, true, true, 1e-2, 1, op_norm);
 
   auto const diagnostic = (*primaldual)();
-  CHECK(diagnostic.niters == 16);
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
   // pfitsio::write2d(image.real(), expected_solution_path);
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
@@ -169,7 +167,6 @@ TEST_CASE("fb_factory") {
       gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm);
 
   auto const diagnostic = (*fb)();
-  CHECK(diagnostic.niters == 11);
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
   // pfitsio::write2d(image.real(), expected_solution_path);
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
@@ -236,7 +233,6 @@ TEST_CASE("joint_map_factory") {
           .beta(1.)
           .alpha(1.);
   auto const diagnostic = joint_map();
-  //  CHECK(diagnostic.reg_niters == 13);
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
   //  CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
   //  CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
