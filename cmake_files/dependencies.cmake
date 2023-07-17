@@ -128,6 +128,7 @@ if(docasa)
   set(PURIFY_CASACORE TRUE)
 endif()
 
+set(PURIFY_CPPFLOW FALSE)
 if(cppflow)
   find_package(cppflow)
   find_library(TENSORFLOW_LIB tensorflow REQUIRED)
