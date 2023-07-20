@@ -72,6 +72,8 @@ TEST_CASE("padmm_factory") {
   CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
 }
 
+// This test does not converge and is therefore set to shouldfail.
+// See https://github.com/astro-informatics/purify/issues/317 for details.
 TEST_CASE("primal_dual_factory", "[!shouldfail]") {
   const std::string &test_dir = "expected/primal_dual/";
   const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
