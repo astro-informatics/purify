@@ -76,6 +76,7 @@ To build **PURIFY**:
     ``` bash
     cd /path/to/purify
     mkdir build
+	cd build
     conan install .. --build missing -pr:h=default -pr:b=default
     conan build ..
     ```
