@@ -116,6 +116,7 @@ The `sopt` library includes an interface to TensorFlow for using trained models 
     ``` bash
     cd /path/to/purify
     mkdir build
+    cd build
     conan install .. --build missing -o cppflow=on -pr:h=default -pr:b=default
     conan build ..
     ```
