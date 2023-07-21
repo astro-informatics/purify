@@ -70,7 +70,7 @@ To build **PURIFY**:
     ```bash
     conan create /path/to/purify/sopt/ --build missing -s compiler.libcxx=libstdc++11 -pr:h=default -pr:b=default
     ```
-
+If you get an error about broken symlinks you can set `skip_broken_symlinks_check = True` in your `~/.conan/conan.conf` file or [set an environment variable](https://docs.conan.io/en/1.46/reference/env_vars.html#conan-skip-broken-symlinks-check)
 1. Then, the program can be built using `conan`:
 
     ``` bash
