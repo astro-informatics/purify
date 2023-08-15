@@ -118,7 +118,7 @@ utilities::vis_params random_sample_density(const t_int vis_num, const t_real me
   uv_vis.u = Vector<t_real>::Zero(vis_num);
   uv_vis.v = Vector<t_real>::Zero(vis_num);
   uv_vis.w = Vector<t_real>::Zero(vis_num);
-  //#pragma omp parallel for
+  // #pragma omp parallel for
   for (t_uint i = 0; i < vis_num; i++) {
     uv_vis.u(i) = sample();
     uv_vis.v(i) = sample();

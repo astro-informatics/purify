@@ -140,6 +140,9 @@ class YamlParser {
   YAML_MACRO(t_real, jmap_alpha, 1)
   YAML_MACRO(t_real, jmap_beta, 1)
 
+  YAML_MACRO(std::string, model_path, "")
+  YAML_MACRO(factory::g_proximal_type, gProximalType, factory::g_proximal_type::L1GProximal)
+
 #undef YAML_MACRO
  private:
   YAML::Node config_file;

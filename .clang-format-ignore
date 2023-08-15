@@ -1,0 +1,2 @@
+#ignore .in.h template files
+**/*.in.h

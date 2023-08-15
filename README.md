@@ -17,76 +17,109 @@ This documentation outlines the necessary and optional [dependencies](#dependenc
 Dependencies installation
 -------------------------
 
-**PURIFY** is written in `C++11`. Pre-requisites and dependencies are listed in following and minimal versions required are tested against `Travis CI` meaning that they come natively with OSX and the Ubuntu Trusty release. These are also the default ones fetched by `CMake` (an internet connection is required for this).
+**PURIFY** is written in `C++11`. Required software and libraries, and their minimum supported versions, are listed below. The build system will attempt to automatically download and build the automatically included libraries. (an internet connection is required for this). Most dependencies are handled by the `conan` package manager.
 
-`C++` minimal dependencies:
+`C++` dependencies:
 
-- [CMake](http://www.cmake.org/) v3.5.1 (Trusty as `cmake3`) A free software that allows cross-platform compilation
+## User-provided libraries
+
+In order to build **PURIFY**, you should have the following installed on your system.
+
+- [CMake](http://www.cmake.org/) v3.5.1 A free software that allows cross-platform compilation
+- [conan](https://conan.io/) v1.60.1 `C/C++` package manager. **NOTE** Conan 2.0 and later are not supported.
 - [GCC](https://gcc.gnu.org) v7.3.0 GNU compiler for `C++`
+- [OpenMP](http://openmp.org/wp/) v4.8.4 - Optional - Speeds up some of the operations.
+- [MPI](https://www.open-mpi.org) v3.1.1 - Optional - Parallelisation paradigm to speed up operations.
+
+## Automatically included libraries
+
+The build system of **PURIFY** will attempt to download and build these additional dependencies, depending on the build options passed to `conan`. Most of them are automatically handled by `conan`.
+
+- [astro-informatics/sopt](https://github.com/astro-informatics/sopt) v4.0.0: Sparse Optimization
+  Compressed Sensing library. Included as a submodule.
 - [UCL/GreatCMakeCookOff](https://github.com/UCL/GreatCMakeCookOff) Collection of `CMake` recipes.
-  Downloaded automatically if absent
-- [Boost](https://www.boost.org/) v1.54 (Trusty). A set of free peer-reviewed
-  portable C++ libraries. V1.65 downloaded automatically if absent but needs a
-  cmake >= 3.9.2.
-- [fftw3](www.fftw.org): Fastest Fourier Transform in the West
-- [Eigen3](http://eigen.tuxfamily.org/index.php?title=Main_Page) v3.3.7 (Trusty) Modern `C++` linear algebra.
   Downloaded automatically if absent.
-- [tiff](http://www.libtiff.org/) v4.0.3 (Trusty) Tag Image File Format library
-- [astro-informatics/sopt](https://github.com/astro-informatics/sopt) v* Sparse Optimization
-  Compressed Sensing library. Downloaded automatically if absent.
-- [cfitsio](http://heasarc.gsfc.nasa.gov/fitsio/fitsio.html) v* Library of `C` and `Fortran` subroutines
-  for reading and writing data files in FITS (Flexible Image Transport System) data format.
-  Downloaded automatically if absent.
+- [Boost](https://www.boost.org/) v1.78.0: A set of free peer-reviewed
+  portable C++ libraries. Downloaded automatically by conan.
+- [fftw3](www.fftw.org) v3.3.9: Fastest Fourier Transform in the West. Downloaded automatically by conan.
+- [Eigen3](http://eigen.tuxfamily.org/index.php?title=Main_Page) v3.3.7: Modern `C++` linear algebra. Downloaded automatically by conan.
+- [tiff](http://www.libtiff.org/) v4.0.9: Tag Image File Format library. Downloaded automatically by conan.
+- [cfitsio](http://heasarc.gsfc.nasa.gov/fitsio/fitsio.html): v4.0.0: Library of `C` and `Fortran` subroutines for reading and writing data files in FITS (Flexible Image Transport System) data format. Downloaded automatically by conan.
+- [yaml-cpp](https://github.com/jbeder/yaml-cpp) v0.6.3: YAML parser and emitter in `C++`. Downloaded automatically by conan.
 - [casacore](http://casacore.github.io/casacore/) - Optional - Needed to interface with measurement
-  sets. The main purify program requires this library (and its dependencies)
-- [OpenMP](http://openmp.org/wp/) v4.8.4 (Trusty) - Optional - Speeds up some of the operations.
-- [MPI](https://www.open-mpi.org) v3.1.1 (Trusty) - Optional - Parallelisation paradigm to speed up operations.
-- [spdlog](https://github.com/gabime/spdlog) v* - Optional - Logging library. Downloaded automatically if
-  absent.
-- [Catch2](https://github.com/catchorg/Catch2) v2.3.0 - Optional -  A `C++`
-  unit-testing framework only needed for testing. Downloaded automatically if absent.
-- [google/benchmark](https://github.com/google/benchmark) `v1.3.0` - Optional - A `C++`
-  micro-benchmarking framework only needed for benchmarks. Downloaded automatically if absent.
+  sets. The main **PURIFY** program requires this library (and its dependencies)
+- [spdlog](https://github.com/gabime/spdlog) v1.9.2: Optional - Logging library. Downloaded automatically by conan.
+- [Catch2](https://github.com/catchorg/Catch2) v2.13.9: Optional -  A `C++`
+  unit-testing framework only needed for testing. Downloaded automatically by conan.
+- [google/benchmark](https://github.com/google/benchmark) v1.6.0: Optional - A `C++`
+  micro-benchmarking framework only needed for benchmarks. Downloaded automatically by conan.
 
 Installing and building PURIFY
 -------------------------------------
 
-**PURIFY** can be installed through the software packet manager on Linux Debian distributions:
+To build **PURIFY**:
 
-```
-apt-get install purify
-```
+1. Once the mandatory user-provided dependencies are present, `git clone` from the [GitHub repository](https://github.com/astro-informatics/purify):
 
-Alternatively, you can build **PURIFY** entirely from the source code. Once the mandatory dependencies are present, `git clone` from the [GitHub repository](https://github.com/astro-informatics/purify):
+    ``` bash
+    git clone --recurse-submodules https://github.com/astro-informatics/purify.git
+    ```
 
-```
-git clone https://github.com/astro-informatics/purify.git
-```
+1. Create a `conan` package for `sopt`
 
-Then, the program can be built with standard `CMake` command:
+    ```bash
+    conan create /path/to/purify/sopt/ --build missing -s compiler.libcxx=libstdc++11 -pr:h=default -pr:b=default
+    ```
+If you get an error about broken symlinks you can set `skip_broken_symlinks_check = True` in your `~/.conan/conan.conf` file or [set an environment variable](https://docs.conan.io/en/1.46/reference/env_vars.html#conan-skip-broken-symlinks-check)
+1. Then, the program can be built using `conan`:
 
-```
-cd /path/to/code
-mkdir build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
-make
-```
+    ``` bash
+    cd /path/to/purify
+    mkdir build
+	cd build
+    conan install .. --build missing -pr:h=default -pr:b=default
+    conan build ..
+    ```
 
-To test everything went all right:
+    You can turn the various options on and off by adding flags to the `conan install` command, e.g.
+	The full list of build options can be found in the [conanfile](./conanfile.py).
 
-```
-cd /path/to/code/build
-ctest .
-```
+    ```bash
+    conan install .. --build missing -o cppflow=on -o openmp=on -o mpi=off -pr:h=default -pr:b=default
+    ```
 
-To install in directory `/X`, with libraries going to `X/' do:
+Installing and building PURIFY with TensorFlow
+-------
 
-```
-cd /path/to/code/build
-cmake -DCMAKE_INSTALL_PREFIX=/X ..
-make install
-```
+The `sopt` library includes an interface to TensorFlow for using trained models as priors in the Forward-Backward optimization algorithm. To build **PURIFY** with TensorFlow capability, some extra steps are currently required. We aim to simplify the build process in a future release.
+
+1. Install the [TensorFlow C API](https://www.tensorflow.org/install/lang_c)
+1. Clone the UCL fork of `cppflow` and create a `conan` package using
+
+    ``` bash
+    git clone git@github.com:UCL/cppflow.git
+    conan create /path/to/cppflow/ -pr:h=default -pr:b=default
+    ```
+1. Once the mandatory user-provided dependencies are present, `git clone` from the [GitHub repository](https://github.com/astro-informatics/purify):
+
+    ``` bash
+    git clone --recurse-submodules https://github.com/astro-informatics/purify.git
+    ```
+1. Create a `conan` package for `sopt` with the `cppflow` option set to "on"
+
+    ```bash
+    conan create /path/to/purify/sopt/ --build missing -s compiler.libcxx=libstdc++11 -o cppflow=on  -pr:h=default -pr:b=default
+    ```
+
+1. Then, the program can be built using `conan` with the `cppflow` option set to "on":
+
+    ``` bash
+    cd /path/to/purify
+    mkdir build
+    cd build
+    conan install .. --build missing -o cppflow=on -pr:h=default -pr:b=default
+    conan build ..
+    ```
 
 Testing
 -------
@@ -94,26 +127,29 @@ Testing
 To check everything went all right, run the test suite:
 
 ```
-cd /path/to/code/build
+cd /path/to/purify/build
 ctest .
 ```
 
 Usage
 ------
 
-The main purify executable lives either in the build directory or in the in the `bin` subdirectory
+The main `purify` executable lives either in the build directory or in the in the `bin` subdirectory
 of the installation directory. `purify` has one required argument, it a string for the file path of the config file containing the settings.
 
 `purify path/to/config.yaml`.
 
 A [template with a description of the settings](https://github.com/astro-informatics/purify/blob/development/data/config/config.yaml)
-is included in the `data/config` directory.`
+is included in the `data/config` directory.
 When `purify` runs a directory will be created, and the output images will be
 saved and time-stamped. Additionally, a config file with the settings used will
 be saved and time-stamped, helping for reproducibility and book-keeping.
 
 Docker
 -------
+
+A Dockerfile is available on DockerHub. We are currently not maintaining it, and cannot
+guarantee it is up to date. Use the below documentation at your own risk.
 
 If you want to use Docker instead, you can build an image using the Dockerfile
 available in the repository or pulling it from
@@ -166,24 +202,6 @@ If you use **PURIFY** for work that results in publication, please reference the
    Roy. Astron. Soc._ **462(4):4314-4335** (2016) [arXiv:1601.04026](http://arxiv.org/abs/arXiv:1601.04026)
 5. R. E. Carrillo, J. D. McEwen and Y. Wiaux.  "PURIFY: a new approach to radio-interferometric
    imaging". _Mon. Not. Roy. Astron. Soc._ **439(4):3591-3604** (2014) [arXiv:1307.4370](http://arxiv.org/abs/1307.4370)
-
-CMake Tips
-----------
-
-It is possible to tell ``CMake`` exactly which libraries to compile and link against. The general
-idea is to add ``-DVARIABLE=something`` to the command-line arguments of CMake. CMake can be called
-any number of times: previous settings will not be overwritten unless specifically
-requested. Some of the more common options are the following:
-
--  ``CMAKE_PREFIX_PATH``: CMake will look in "CMAKE_PREFIX_PATH/lib"
-   for libraries, "CMAKE_PREFIX_PATH/include" for headers, etc.
--  ``FFTW3_LIBRARIES``, ``FFTW3_INCLUDE_DIR``
--  ``BLAS_INCLUDE_DIRS``, ``BLAS_LIBRARIES``
-
-All these variables and more can be found and modified in the ``CMakeCache.txt`` file in the build
-directory. There are extra CMake options sepcific to purify. ``-Ddompi=ON`` will turn MPI on in the build, ``-Dopenmp=ON`` will turn openmp on for the build. ``-Dtests=ON`` will make sure tests are built.
-
-``ctest`` should be run to make sure the unit tests pass.
 
 License
 --------

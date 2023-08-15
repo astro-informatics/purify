@@ -42,7 +42,7 @@ void check_complex_for_gpu() {
 template <class T, class... ARGS>
 std::shared_ptr<sopt::LinearTransform<T>> all_to_all_measurement_operator_factory(
     const distributed_measurement_operator distribute, const std::vector<t_int> &image_stacks,
-    const std::vector<t_real> &w_stacks, ARGS &&... args) {
+    const std::vector<t_real> &w_stacks, ARGS &&...args) {
   switch (distribute) {
 #ifdef PURIFY_MPI
   case (distributed_measurement_operator::mpi_distribute_all_to_all): {
@@ -61,7 +61,7 @@ std::shared_ptr<sopt::LinearTransform<T>> all_to_all_measurement_operator_factor
 //! distributed measurement operator factory
 template <class T, class... ARGS>
 std::shared_ptr<sopt::LinearTransform<T>> measurement_operator_factory(
-    const distributed_measurement_operator distribute, ARGS &&... args) {
+    const distributed_measurement_operator distribute, ARGS &&...args) {
   switch (distribute) {
   case (distributed_measurement_operator::serial): {
     PURIFY_LOW_LOG("Using serial measurement operator.");

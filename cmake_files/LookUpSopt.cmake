@@ -48,7 +48,8 @@ ExternalProject_Add(
       -Dlogging=${logging}
       -DNOEXPORT=TRUE
       -Dopenmp=${openmp}
-      -Ddocs=OFF
+      -Ddocs=${docs}
+      -Dcppflow=${cppflow}
     INSTALL_DIR ${EXTERNAL_ROOT}
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON

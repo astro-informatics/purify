@@ -3,41 +3,73 @@ name: Documentation
 on:
   push:
     branches: [ development ]
-  
+
 jobs:
   make-documentation:
     runs-on: ubuntu-20.04
     steps:
-    
-      - name: Install dependencies
-        run: sudo apt install libfftw3-dev libtiff5-dev libboost-all-dev libeigen3-dev libyaml-cpp-dev libcfitsio-dev casacore-dev doxygen graphviz
-        
-      - name: Pull sopt repo and build docs
-        run : |
-          git clone https://github.com/astro-informatics/sopt.git
-          cd sopt
-          mkdir build
-          cd build
-          cmake .. -Ddocs=ON -Dweb=ON -Ddompi=OFF -Dopenmp=OFF
-          make docweb VERBOSE=1
 
       - name: Check out Purify
-        uses: actions/checkout@v2
- 
-      - name: Configure and build docs
-        run: | 
-          mkdir build
-          cd build
-          cmake .. \
-          -Ddompi=OFF \
-          -Dopenmp=OFF \
-          -Ddocs=ON \
-          -Dweb=ON 
-          make docweb VERBOSE=1
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+            sudo apt update
+            sudo apt install openmpi-bin libopenmpi-dev casacore-dev doxygen graphviz
+
+      - name: Install Tensorflow API on Ubuntu
+        uses: UCL/install-tensorflow-action@main
+        with:
+          version: 2.11.0
+          os: linux
+  
+      - name: Install Conan
+        id: conan
+        uses: turtlebrowser/get-conan@main
+        with:
+          version: 1.60.1
+
+      - name: Checkout cppflow repo
+        uses: actions/checkout@v3
+        with:
+          repository: UCL/cppflow.git
+          path: cppflow
+          ref: master
+
+      - name: Create cppflow package
+        run: conan create ./cppflow/ -pr:h=default -pr:b=default
         
+      - name: Checkout SOPT
+        uses: actions/checkout@v3
+        with:
+          repository: astroinformatics/sopt.git
+          path: sopt
+          ref: development
+
+      - name: Create SOPT package
+        run : |
+          conan create ./sopt --build missing -s:b compiler.libcxx=libstdc++11 -o mpi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
+
+      - name: Configure
+        run: |
+          # Need to install this specific version of doxygen because the other Conan build are broken on Conan v1
+          conan install doxygen/1.9.4@#2af713e135f12722e3536808017ba086 --update
+          conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing  -s compiler.libcxx=libstdc++11 -o mpi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
+  
+      - name: Build
+        run: conan build ${{github.workspace}} -bf ${{github.workspace}}/build
+  
+      - name: Make Docweb
+        run: |
+          cd build
+          make docweb VERBOSE=1
+          
       - name: Deploy to GH pages
         if: ${{github.event_name == 'push'}}
         uses: JamesIves/github-pages-deploy-action@4.1.6
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: build/cpp/docs/html # The folder the action should deploy.
+

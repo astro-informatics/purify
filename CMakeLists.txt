@@ -3,6 +3,7 @@ project(Purify C CXX)
 
 # Location of extra cmake includes for the project
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_files)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/build)
 
 # Downloads and installs GreatCMakeCookOff
 # It contains a number of cmake recipes
@@ -19,6 +20,7 @@ option(docimg         "Enable CImg"                                     off)
 option(docasa         "Enable CASA"                                     off)
 option(docs           "Build documentation"                             off)
 option(coverage       "Build coverage"                                  off)
+option(cppflow        "Build with TensorFlow interface"                 off)
 
 if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "Setting build type to 'Relese' as none was specified.")
@@ -30,8 +32,12 @@ message(STATUS "Building purify in ${CMAKE_BUILD_TYPE} mode")
 include(version)
 set(Sopt_GIT_TAG "development" CACHE STRING "Branch/tag when downloading sopt")
 
-# we are doing c++11
-include(AddCPP11Flags)
+## we are doing c++11
+#include(AddCPP11Flags)
+# c++17 is required when using cppflow with learned algorithms
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # sets up rpath so libraries can be found
 include(rpath)
@@ -52,7 +58,7 @@ endif()
 
 if(tests)  # Adds ctest
   enable_testing()
-  find_package(Catch 2.3.0 EXACT)
+  find_package(Catch)
   include(AddCatchTest)
 endif()
 

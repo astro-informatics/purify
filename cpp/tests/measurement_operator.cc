@@ -91,7 +91,7 @@ TEST_CASE("flux units") {
         CAPTURE(y);
         CAPTURE(y_test);
         CAPTURE(J);
-        CAPTURE(imsize)
+        CAPTURE(imsize);
         CHECK(y_test.isApprox(y, 1e-3));
         const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
         CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
@@ -119,7 +119,7 @@ TEST_CASE("flux units") {
           CAPTURE(y);
           CAPTURE(y_test);
           CAPTURE(J);
-          CAPTURE(imsize)
+          CAPTURE(imsize);
           CHECK(y_test.isApprox(y, 1e-3));
           const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
           CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
@@ -143,7 +143,7 @@ TEST_CASE("flux units") {
         CAPTURE(y);
         CAPTURE(y_test);
         CAPTURE(J);
-        CAPTURE(imsize)
+        CAPTURE(imsize);
         CHECK(y_test.isApprox(y, 1e-2));
         const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
         CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
@@ -166,7 +166,7 @@ TEST_CASE("flux units") {
         CAPTURE(y);
         CAPTURE(y_test);
         CAPTURE(J);
-        CAPTURE(imsize)
+        CAPTURE(imsize);
         CHECK(y_test.isApprox(y, 1e-3));
         const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
         CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
@@ -189,7 +189,7 @@ TEST_CASE("flux units") {
         CAPTURE(y);
         CAPTURE(y_test);
         CAPTURE(J);
-        CAPTURE(imsize)
+        CAPTURE(imsize);
         CHECK(y_test.isApprox(y, 1e-3));
         const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
         CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
@@ -218,7 +218,7 @@ TEST_CASE("flux units") {
           CAPTURE(y);
           CAPTURE(y_test);
           CAPTURE(J);
-          CAPTURE(imsize)
+          CAPTURE(imsize);
           CHECK(y_test.isApprox(y, 1e-3));
           const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
           CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
@@ -242,7 +242,7 @@ TEST_CASE("flux units") {
         CAPTURE(y);
         CAPTURE(y_test);
         CAPTURE(J);
-        CAPTURE(imsize)
+        CAPTURE(imsize);
         CHECK(y_test.isApprox(y, 1e-2));
         const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
         CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
@@ -265,7 +265,7 @@ TEST_CASE("flux units") {
         CAPTURE(y);
         CAPTURE(y_test);
         CAPTURE(J);
-        CAPTURE(imsize)
+        CAPTURE(imsize);
         CHECK(y_test.isApprox(y, 1e-2));
         const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M;
         CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
@@ -303,7 +303,7 @@ TEST_CASE("normed operator") {
         CAPTURE(y);
         CAPTURE(y_test);
         CAPTURE(J);
-        CAPTURE(imsize)
+        CAPTURE(imsize);
         CHECK((y_test * norm).isApprox(y, 1e-3));
         const Vector<t_complex> psf = (measure_op->adjoint() * y) * 1. / M * norm;
         CHECK(std::real(psf(static_cast<t_int>(imsize * 0.5 + imsize * 0.5 * imsize))) ==
