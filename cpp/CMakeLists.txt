@@ -17,16 +17,16 @@ function(add_include_dir)
 endfunction()
 
 add_include_dir(
-  ${Eigen3_INCLUDE_DIR}
-  ${eigen_INCLUDE_DIR}
+  ${EIGEN3_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
   ${cfitsio_INCLUDE_DIR}
   ${yaml-cpp_INCLUDE_DIR}
   ${Cubature_INCLUDE_DIR}
   ${CImg_INCLUDE_DIR}
-  )
+)
 
 
+link_directories(${FFTW3_LIBRARY_DIRS} ${YAML_CPP_LIBRARY_DIR} ${Cubature_LIBRARY_DIR})
 add_subdirectory(purify)
 if(tests OR examples OR benchmarks)
   configure_file(tests/directories.in.h "${PROJECT_BINARY_DIR}/include/purify/directories.h")
@@ -46,12 +46,12 @@ if (docs)
 endif()
 
 add_executable(purify main.cc)
-target_link_libraries(purify libpurify)
 set_target_properties(purify PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+target_link_libraries(purify libpurify ${Sopt_LIBRARIES})
 
 install(TARGETS purify
   EXPORT PurifyTargets
   DESTINATION share/cmake/Purify
   RUNTIME DESTINATION bin
-  )
+)
 

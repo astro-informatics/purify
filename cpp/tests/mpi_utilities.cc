@@ -1,7 +1,8 @@
 #include "purify/mpi_utilities.h"
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 
 using namespace purify;
+using Catch::Approx;
 
 TEST_CASE("re-group visibilities in order of processes") {
   auto const N = 5;

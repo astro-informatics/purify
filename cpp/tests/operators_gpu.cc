@@ -3,7 +3,7 @@
 #include "purify/types.h"
 #include <arrayfire.h>
 #include <iostream>
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "purify/directories.h"
 #include "purify/kernels.h"
 #include "purify/logging.h"

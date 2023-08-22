@@ -14,7 +14,7 @@
 #include "purify/types.h"
 #include "purify/utilities.h"
 
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 using namespace ::casacore;
 
 using namespace purify::notinstalled;

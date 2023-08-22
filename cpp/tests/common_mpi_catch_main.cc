@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_RUNNER
 
 #include <purify/config.h>
-#include <catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <memory>
 #include <mpi.h>
 #include <random>

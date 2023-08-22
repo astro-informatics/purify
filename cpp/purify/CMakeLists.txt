@@ -13,6 +13,8 @@ function(add_include_dir)
   endif()
 endfunction()
 
+link_directories(${FFTW3_LIBRARY_DIRS} ${YAML_CPP_LIBRARY_DIR} ${Cubature_LIBRARY_DIR})
+
 configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(HEADERS
@@ -55,6 +57,9 @@ set(version "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}.${Purify_VERSION_PA
 set(soversion "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}")
 set_target_properties(libpurify PROPERTIES VERSION ${version} SOVERSION ${soversion})
 set_target_properties(libpurify PROPERTIES OUTPUT_NAME purify)
+if(PURIFY_OPENMP)
+  target_link_libraries(libpurify OpenMP::OpenMP_CXX)
+endif()
 if(PURIFY_MPI)
   target_link_libraries(libpurify ${MPI_LIBRARIES})
   target_include_directories(libpurify SYSTEM PUBLIC ${MPI_CXX_INCLUDE_PATH})
@@ -85,24 +90,24 @@ endif()
 
 
 add_include_dir(
-  ${Eigen3_INCLUDE_DIR}
-  ${eigen_INCLUDE_DIR}
+  ${EIGEN3_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
   ${cfitsio_INCLUDE_DIR}
   ${yaml-cpp_INCLUDE_DIR}
   ${Cubature_INCLUDE_DIR}
   ${CImg_INCLUDE_DIR}
-  ${sopt_INCLUDE_DIR}
-  )
+  ${Sopt_INCLUDE_DIRS}
+)
+
 target_link_libraries(libpurify
   ${Cubature_LIBRARIES}
-  FFTW3::fftw3
-  cfitsio::cfitsio
-  sopt::sopt
+  ${FFTW3_LIBRARIES}
+  cfitsio
+  sopt
   yaml-cpp
   Boost::filesystem
   Boost::system
-  )
+)
 if(TARGET casacore::casa)
   target_link_libraries(libpurify casacore::ms)
 endif()
@@ -110,7 +115,7 @@ if(TARGET openmp::openmp)
   target_link_libraries(libpurify openmp::openmp)
 endif()
 
-add_dependencies(libpurify lookup_dependencies)
+add_dependencies(libpurify Lookup-Cubature)
 
 # Add spdlog as direct dependency
 if(spdlog_FOUND)
@@ -126,4 +131,4 @@ install(TARGETS libpurify
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
   INCLUDES DESTINATION include
-  )
+)

@@ -1,12 +1,12 @@
 #define CATCH_CONFIG_RUNNER
 
 #include "purify/config.h"
+#include "purify/logging.h"
 #include <sopt/config.h>
-#include <catch.hpp>
+#include <sopt/logging.h>
+#include <catch2/catch_all.hpp>
 #include <memory>
 #include <random>
-#include "purify/logging.h"
-#include <sopt/logging.h>
 
 std::unique_ptr<std::mt19937_64> mersenne(new std::mt19937_64(0));
 

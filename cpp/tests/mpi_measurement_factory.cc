@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "purify/distribute.h"
 #include "purify/logging.h"
 #include "purify/measurement_operator_factory.h"
