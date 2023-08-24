@@ -225,7 +225,7 @@ t_real median(const Vector<t_real> &input) {
   std::copy(input.data(), input.data() + size, x.data());
   std::sort(x.data(), x.data() + size);
   if (std::floor(size / 2) - std::ceil(size / 2) == 0)
-    return 0.5*(x(int(std::floor(size / 2) - 1)) + x(int(std::floor(size / 2))));
+    return 0.5 * (x(int(std::floor(size / 2) - 1)) + x(int(std::floor(size / 2))));
   return x(int(std::ceil(size / 2)));
 }
 

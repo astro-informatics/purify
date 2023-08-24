@@ -1,12 +1,12 @@
 #define CATCH_CONFIG_RUNNER
 
 #include <purify/config.h>
-#include <catch2/catch_all.hpp>
 #include <memory>
 #include <mpi.h>
 #include <random>
 #include <regex>
 #include <vector>
+#include <catch2/catch_all.hpp>
 #include <purify/logging.h>
 #include <sopt/logging.h>
 #include <sopt/mpi/session.h>
