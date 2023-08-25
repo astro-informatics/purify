@@ -53,7 +53,6 @@ The build system of **PURIFY** will attempt to download and build these addition
 
 ## Installing and building PURIFY
 
-
 ### Using Conan vs (recommended)
 
 To build **PURIFY**:
@@ -70,9 +69,9 @@ To build **PURIFY**:
     ```bash
     conan create /path/to/purify/sopt/ --build missing
     ```
-If you get an error about broken symlinks you can set `skip_broken_symlinks_check = True` in
-your `~/.conan/conan.conf` file or
-[set an environment variable](https://docs.conan.io/en/1.46/reference/env_vars.html#conan-skip-broken-symlinks-check)
+    If you get an error about broken symlinks you can set `skip_broken_symlinks_check = True` in
+    your `~/.conan/conan.conf` file or
+    [set an environment variable](https://docs.conan.io/en/1.46/reference/env_vars.html#conan-skip-broken-symlinks-check)
 
 1. Then, the program can be built using `conan`:
 
@@ -84,19 +83,19 @@ your `~/.conan/conan.conf` file or
     conan build .. -of .
     ```
 
-    You can turn the various options on and off by adding flags to the `conan install` command, e.g.
+You can turn the various options on and off by adding flags to the `conan install` command, e.g.
 
-    ```bash
-    conan install .. -of . --build missing -o cppflow=on -o openmp=on -o mpi=off
-    conan build .. -of .
-    ```
+  ```bash
+  conan install .. -of . --build missing -o cppflow=on -o openmp=on -o mpi=off
+  conan build .. -of .
+  ```
 
-	  The full list of build options can be found in the [conanfile](./conanfile.py).
-    To install in directory `INSTALL_FOLDER`, add the following options to the conan build command:
+The full list of build options can be found in the [conanfile](./conanfile.py).
+To install in directory `INSTALL_FOLDER`, add the following options to the conan build command:
 
-    ``` bash
-    conan build .. -of INSTALL_FOLDER
-    ```
+  ``` bash
+  conan build .. -of INSTALL_FOLDER
+  ```
 
 
 ### Using CMake
