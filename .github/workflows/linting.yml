@@ -10,7 +10,6 @@ on:
 jobs:
   linting:
     runs-on: ubuntu-20.04
-    allow_failure: true
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -26,5 +25,5 @@ jobs:
 
       - name: Report results
         run: |
-          git diff --exit-code || (echo '## NOTE: your code is not linted properly - please commit the suggested changes'; false)
+          git diff || (echo '## NOTE: your code is not linted properly - please commit the suggested changes'; false)
 
