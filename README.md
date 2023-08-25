@@ -56,7 +56,8 @@ The build system of **PURIFY** will attempt to download and build these addition
 
 ### Using Conan vs (recommended)
 
-In order to build **PURIFY**:
+[Conan](https://docs.conan.io/en/latest/installation.html) is a C++ package manager that helps deal with most of the
+C++ dependencies as well as the **PURIFY** installation:
 
 1. Once the mandatory user-provided dependencies are present,
    `git clone` from the [GitHub repository](https://github.com/astro-informatics/purify):
