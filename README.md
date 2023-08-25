@@ -54,7 +54,7 @@ The build system of **PURIFY** will attempt to download and build these addition
 
 ## Installing and building PURIFY
 
-### Using Conan vs (recommended)
+**Using Conan vs (recommended)**
 
 [Conan](https://docs.conan.io/en/latest/installation.html) is a C++ package manager that helps deal with most of the
 C++ dependencies as well as the **PURIFY** installation:
@@ -98,7 +98,7 @@ To install in directory `INSTALL_FOLDER`, add the following options to the conan
   ```
 
 
-### Using CMake
+**Using CMake**
 
 If the dependencies are already available on your system, you can also install **PURIFY** manually like so
 
