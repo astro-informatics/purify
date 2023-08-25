@@ -51,37 +51,36 @@ The build system of **PURIFY** will attempt to download and build these addition
 - [google/benchmark](https://github.com/google/benchmark) v1.6.0: Optional - A `C++`
   micro-benchmarking framework only needed for benchmarks. Downloaded automatically by conan.
 
+
 ## Installing and building PURIFY
 
 ### Using Conan vs (recommended)
 
-To build **PURIFY**:
+In order to build **PURIFY**:
 
 1. Once the mandatory user-provided dependencies are present,
    `git clone` from the [GitHub repository](https://github.com/astro-informatics/purify):
 
-    ``` bash
-    git clone --recurse-submodules https://github.com/astro-informatics/purify.git
-    ```
-
+   ``` bash
+   git clone --recurse-submodules https://github.com/astro-informatics/purify.git
+   ```
 1. Create a `conan` package for `sopt`
 
-    ```bash
-    conan create /path/to/purify/sopt/ --build missing
-    ```
-    If you get an error about broken symlinks you can set `skip_broken_symlinks_check = True` in
-    your `~/.conan/conan.conf` file or
-    [set an environment variable](https://docs.conan.io/en/1.46/reference/env_vars.html#conan-skip-broken-symlinks-check)
-
+   ```bash
+   conan create /path/to/purify/sopt/ --build missing
+   ```
+   If you get an error about broken symlinks you can set `skip_broken_symlinks_check = True` in
+   your `~/.conan/conan.conf` file or
+   [set an environment variable](https://docs.conan.io/en/1.46/reference/env_vars.html#conan-skip-broken-symlinks-check)
 1. Then, the program can be built using `conan`:
 
-    ``` bash
-    cd /path/to/purify
-    mkdir build
-    cd build
-    conan install .. -o . --build missing
-    conan build .. -of .
-    ```
+   ``` bash
+   cd /path/to/purify
+   mkdir build
+   cd build
+   conan install .. -o . --build missing
+   conan build .. -of .
+   ```
 
 You can turn the various options on and off by adding flags to the `conan install` command, e.g.
 
