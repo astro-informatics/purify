@@ -19,7 +19,7 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 find_package(yaml-cpp REQUIRED)
 
-find_package(sopt REQUIRED)
+find_package(Sopt REQUIRED)
 
 find_package(Cubature QUIET)
 if(NOT Cubature_FOUND)

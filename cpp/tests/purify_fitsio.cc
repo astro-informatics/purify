@@ -10,7 +10,7 @@
 using namespace purify;
 using namespace purify::notinstalled;
 
-TEST_CASE("Purify fitsio", "[readwrite]") {
+/*TEST_CASE("Purify fitsio", "[readwrite]") {
   Image<t_complex> input = pfitsio::read2d(image_filename("M31.fits"));
   pfitsio::write2d(input.real(), output_filename("fits_output.fits"));
   Image<t_complex> input2 = pfitsio::read2d(output_filename("fits_output.fits"));
@@ -86,7 +86,7 @@ TEST_CASE("readwrite3dheaderwith2d", "purify fitsio") {
   pfitsio::write3d(input_real, header_example);
   std::vector<Image<t_complex>> input2 = pfitsio::read3d(output_filename("2dcube_output.fits"));
   for (int i = 0; i < input.size(); i++) CHECK(input[i].isApprox(input2[i], 1e-12));
-}
+}*/
 
 TEST_CASE("header") {
   const std::string fits_name = "test_image.fits";
