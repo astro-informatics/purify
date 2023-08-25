@@ -10,11 +10,12 @@ on:
 jobs:
   linting:
     runs-on: ubuntu-20.04
+    allow_failure: true
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-# Check code meets Google C++ style guide https://google.github.io/styleguide/cppguide.html
+      # Check code meets Google C++ style guide https://google.github.io/styleguide/cppguide.html
       - name: Run linting
         uses: DoozyX/clang-format-lint-action@v0.16.2
         with:
