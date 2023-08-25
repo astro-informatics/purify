@@ -53,6 +53,7 @@ The build system of **PURIFY** will attempt to download and build these addition
 
 ## Installing and building PURIFY
 
+
 ### Using Conan vs (recommended)
 
 To build **PURIFY**:
@@ -97,6 +98,7 @@ your `~/.conan/conan.conf` file or
     conan build .. -of INSTALL_FOLDER
     ```
 
+
 ### Using CMake
 
 If the dependencies are already available on your system, you can also install **PURIFY** manually like so
@@ -115,6 +117,7 @@ On MacOS, you can also install most of the dependencies with Homebrew e.g.
  ``` bash
  brew install boost fftw  eigen yaml-cpp spdlog catch2
  ```
+
 
 ### TensorFlow support
 
