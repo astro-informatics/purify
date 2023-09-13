@@ -6,7 +6,7 @@ include(EnvironmentScript)
 # On different platforms the CMakeDeps generator in conan seems to install eigen
 # as either "eigen" or "Eigen3" because the recipe does not explicitly define the
 # name (yet). To work around this we have to check for both.
-find_package(Eigen3 NAMES eigen eigen3)
+find_package(eigen NAMES Eigen3)
 if(eigen_FOUND OR Eigen3_FOUND)
   if(eigen_INCLUDE_DIR)
     set(EIGEN3_INCLUDE_DIR ${eigen_INCLUDE_DIR} CACHE INTERNAL "")
@@ -23,7 +23,7 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 find_package(yaml-cpp REQUIRED)
 
-find_package(Sopt REQUIRED)
+find_package(sopt REQUIRED)
 
 find_package(Cubature QUIET)
 if(NOT Cubature_FOUND)

@@ -1,23 +1,22 @@
-if(logging)
-  add_library(common_catch_main_object OBJECT "common_catch_main.cc")
-  if(spdlog_FOUND)
-    target_link_libraries(common_catch_main_object spdlog::spdlog)
-  endif()
-  if(Catch2_FOUND)
-    target_link_libraries(common_catch_main_object Catch2::Catch2)
-  endif()
-  if(Sopt_INCLUDE_DIRS)
-    target_include_directories(common_catch_main_object SYSTEM PUBLIC ${Sopt_INCLUDE_DIRS})
-  endif()
-  if(EIGEN3_INCLUDE_DIR)
-    target_include_directories(common_catch_main_object SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})
-  endif()
-  target_include_directories(common_catch_main_object PUBLIC
-    "${PROJECT_BINARY_DIR}/include/"
-    "${CMAKE_CURRENT_SOURCE_DIR}/.."
-  )
+
+include_directories("${PROJECT_SOURCE_DIR}/cpp" "${PROJECT_BINARY_DIR}/include")
+add_library(common_catch_main_object OBJECT "common_catch_main.cc")
+if(spdlog_FOUND)
+  target_link_libraries(common_catch_main_object spdlog::spdlog)
 endif()
-include_directories("${PROJECT_SOURCE_DIR}/cpp" "${CMAKE_CURRENT_BINARY_DIR}/include")
+if(Catch2_FOUND)
+  target_link_libraries(common_catch_main_object Catch2::Catch2)
+endif()
+if(EIGEN3_INCLUDE_DIR)
+target_include_directories(common_catch_main_object SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})
+endif()
+if(sopt_FOUND)
+  target_include_directories(common_catch_main_object SYSTEM PUBLIC ${sopt_INCLUDE_DIR})
+endif()
+target_include_directories(common_catch_main_object PUBLIC
+  "${EXTERNAL_ROOT}/include/"
+  "${PROJECT_BINARY_DIR}/include/"
+)
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/outputs")
 
 
@@ -49,15 +48,14 @@ if(PURIFY_ARRAYFIRE)
 endif()
 
 if(PURIFY_MPI)
-  add_library(common_mpi_catch_main_object OBJECT common_mpi_catch_main.cc)
+  add_library(common_mpi_catch_main_object OBJECT "common_mpi_catch_main.cc")
   target_include_directories(common_mpi_catch_main_object
-    PUBLIC ${Sopt_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/cpp
-    ${PROJECT_BINARY_DIR}/include ${MPI_CXX_INCLUDE_PATH})
+    PUBLIC ${PROJECT_BINARY_DIR}/include ${MPI_CXX_INCLUDE_PATH})
   if(spdlog_FOUND)
     target_link_libraries(common_mpi_catch_main_object spdlog::spdlog)
   endif()
-  if(CATCH_INCLUDE_DIR)
-    target_include_directories(common_mpi_catch_main_object SYSTEM PUBLIC ${CATCH_INCLUDE_DIR})
+  if(Catch2_FOUND)
+    target_link_libraries(common_mpi_catch_main_object Catch2::Catch2)
   endif()
   if(sopt_FOUND)
     target_include_directories(common_mpi_catch_main_object SYSTEM PUBLIC ${sopt_INCLUDE_DIR})

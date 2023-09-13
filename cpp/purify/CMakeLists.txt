@@ -96,14 +96,14 @@ add_include_dir(
   ${YAML_CPP_INCLUDE_DIR}
   ${Cubature_INCLUDE_DIR}
   ${CImg_INCLUDE_DIR}
-  ${Sopt_INCLUDE_DIRS}
+  ${sopt_INCLUDE_DIR}
 )
 
 target_link_libraries(libpurify
   ${Cubature_LIBRARIES}
   ${FFTW3_LIBRARIES}
   cfitsio
-  sopt
+  ${sopt_LIBRARIES}
   yaml-cpp
   Boost::filesystem
   Boost::system

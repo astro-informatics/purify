@@ -47,7 +47,7 @@ endif()
 
 add_executable(purify main.cc)
 set_target_properties(purify PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-target_link_libraries(purify libpurify ${Sopt_LIBRARIES})
+target_link_libraries(purify libpurify ${sopt_LIBRARIES})
 
 install(TARGETS purify
   EXPORT PurifyTargets
