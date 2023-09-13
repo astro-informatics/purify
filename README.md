@@ -79,7 +79,7 @@ C++ dependencies as well as the **PURIFY** installation:
    cd /path/to/purify
    mkdir build
    cd build
-   conan install .. -o . --build missing
+   conan install .. -of . --build missing
    conan build .. -of .
    ```
 
