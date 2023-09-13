@@ -6,11 +6,13 @@ include(EnvironmentScript)
 # On different platforms the CMakeDeps generator in conan seems to install eigen
 # as either "eigen" or "Eigen3" because the recipe does not explicitly define the
 # name (yet). To work around this we have to check for both.
-find_package(eigen NAMES Eigen3 REQUIRED)
+find_package(Eigen3 NAMES eigen eigen3)
 if(eigen_INCLUDE_DIR)
   set(EIGEN3_INCLUDE_DIR ${eigen_INCLUDE_DIR} CACHE INTERNAL "")
 elseif(Eigen3_INCLUDE_DIR)
   set(EIGEN3_INCLUDE_DIR ${Eigen3_INCLUDE_DIR} CACHE INTERNAL "")
+else()
+  message(FATAL_ERROR "Eigen is required")
 endif()
 
 find_package(CFitsIO MODULE REQUIRED)
