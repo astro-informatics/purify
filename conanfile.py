@@ -105,6 +105,9 @@ class PurifyConan(ConanFile):
         tc.variables['MPIEXEC_MAX_NUMPROCS'] = 2
         tc.generate()
 
+        deps = CMakeDeps(self)
+        deps.generate()
+
     def build(self):
         cmake = CMake(self)
         cmake.configure()
