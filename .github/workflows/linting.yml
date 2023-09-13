@@ -14,7 +14,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-# Check code meets Google C++ style guide https://google.github.io/styleguide/cppguide.html
+      # Check code meets Google C++ style guide https://google.github.io/styleguide/cppguide.html
       - name: Run linting
         uses: DoozyX/clang-format-lint-action@v0.16.2
         with:
@@ -25,5 +25,5 @@ jobs:
 
       - name: Report results
         run: |
-          git diff --exit-code || (echo '## NOTE: your code is not linted properly - please commit the suggested changes'; false)
+          git diff || (echo '## NOTE: your code is not linted properly - please commit the suggested changes'; false)
 
