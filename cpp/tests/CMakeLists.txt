@@ -20,7 +20,7 @@ target_include_directories(common_catch_main_object PUBLIC
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/outputs")
 
 
-#add_catch_test(algo_factory LIBRARIES libpurify)
+add_catch_test(algo_factory LIBRARIES libpurify)
 add_catch_test(convolution LIBRARIES libpurify)
 add_catch_test(distribute LIBRARIES libpurify)
 add_catch_test(index_mapping LIBRARIES libpurify)

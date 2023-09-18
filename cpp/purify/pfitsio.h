@@ -125,9 +125,9 @@ typename std::enable_if<std::is_scalar<T>::value, void>::type write_key(fitsfile
 template <typename T>
 T read_key(fitsfile *fptr, const std::string& key, int *status) {
   T value;
-  std::string comment = "";
+  char comment[FLEN_COMMENT];
   if constexpr (std::is_same_v<T, std::string>) {
-    if (fits_read_key(fptr, TSTRING, key.data(), value.data(), comment.data(), status)) {
+    if (fits_read_key(fptr, TSTRING, key.data(), value.data(), comment, status)) {
       throw std::runtime_error("Error reading value from key " + key);
     }
   }
@@ -145,7 +145,7 @@ T read_key(fitsfile *fptr, const std::string& key, int *status) {
       throw std::runtime_error("Key type of value not supported by PURIFY template for " + key);
     }
 
-    if (fits_read_key(fptr, datatype, key.data(), &value, comment.data(), status)) {
+    if (fits_read_key(fptr, datatype, key.data(), &value, comment, status)) {
       throw std::runtime_error("Error reading value from key " + key);
     }
   }
