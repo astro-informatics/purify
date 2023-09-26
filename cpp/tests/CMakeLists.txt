@@ -82,7 +82,7 @@ if(PURIFY_MPI)
 
   add_mpi_test(distribute_sparse_vector LIBRARIES libpurify)
   add_mpi_test(kmeans LIBRARIES libpurify)
-  #add_mpi_test(mpi_algo_factory LIBRARIES libpurify)
+  add_mpi_test(mpi_algo_factory LIBRARIES libpurify)
   add_mpi_test(mpi_measurement_factory LIBRARIES libpurify)
   add_mpi_test(mpi_measurement_operator LIBRARIES libpurify)
   add_mpi_test(mpi_read_measurements LIBRARIES libpurify)
