@@ -7,16 +7,6 @@
 
 using VectorC = sopt::Vector<std::complex<double>>;
 
-double Posterior(const VectorC &image,
-                 const VectorC &measurements,
-                 const sopt::LinearTransform<VectorC> &measurement_operator,
-                 const double sigma,
-                 const double gamma)
-{
-  const auto residuals = (measurement_operator * image) - measurements;
-  return residuals.squaredNorm() / (2 * sigma * sigma) + image.cwiseAbs().sum() * gamma;
-}
-
 int main(int argc, char **argv)
 {
     if(argc != 7)
@@ -81,23 +71,15 @@ int main(int argc, char **argv)
     // posterior = likelihood + prior
     // Likelihood = |y - Phi(x)|^2 / sigma^2  (L2 norm)
     // Prior = Sum(|x_i|) * gamma  (L1 norm)
-    //auto Posterior = [&measurement_data, measurement_operator, sigma,
-    //                  gamma](const VectorC &image) {
-    //  {
-    //    
-    //  }
-    //};
+    auto Posterior = [&measurement_data, measurement_operator, sigma, gamma](const VectorC &image) {
+      {
+        const auto residuals = (*measurement_operator * image) - measurement_data.vis;
+        return residuals.squaredNorm() / (2 * sigma * sigma) + image.cwiseAbs().sum() * gamma;
+      }
+    };
 
-    const double reference_posterior = Posterior(reference_vector,
-                                                 measurement_data.vis,
-                                                 *measurement_operator,
-                                                 sigma,
-                                                 gamma);
-    const double surrogate_posterior = Posterior(surrogate_vector,
-                                                 measurement_data.vis,
-                                                 *measurement_operator,
-                                                 sigma,
-                                                 gamma);
+    const double reference_posterior = Posterior(reference_vector);
+    const double surrogate_posterior = Posterior(surrogate_vector);
 
     // Threshold for surrogate image posterior to be within confidence limit
     const double N = imsize_x * imsize_y;
