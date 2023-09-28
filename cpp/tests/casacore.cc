@@ -15,7 +15,7 @@
 #include "purify/utilities.h"
 
 #include "catch2/catch_all.hpp"
-using namespace ::casacore;
+namespace casa = casacore;
 
 using namespace purify::notinstalled;
 TEST_CASE("Casacore") {

@@ -112,10 +112,7 @@ endif()
 
 set(PURIFY_CASACORE FALSE)
 if(docasa)
-  find_package(CasaCore OPTIONAL_COMPONENTS ms)
-  if(NOT CasaCore_FOUND)
-    message(FATAL_ERROR "CasaCore was requested but could not be found")
-  endif()
+  find_package(CasaCore OPTIONAL_COMPONENTS ms REQUIRED)
   set(PURIFY_CASACORE TRUE)
 endif()
 
