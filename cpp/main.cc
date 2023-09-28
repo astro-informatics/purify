@@ -22,6 +22,30 @@
 #include <sopt/reweighted.h>
 using namespace purify;
 
+struct waveletInfo
+{
+  std::shared_ptr<const sopt::LinearTransform<Eigen::VectorXcd>> transform;
+  t_uint sara_size;
+};
+
+waveletInfo createWaveletOperator(YamlParser &params, const factory::distributed_wavelet_operator &wop_algo)
+{
+    std::vector<std::tuple<std::string, t_uint>> sara;
+  for (size_t i = 0; i < params.wavelet_basis().size(); i++)
+    sara.push_back(std::make_tuple(params.wavelet_basis().at(i), params.wavelet_levels()));
+  t_uint sara_size = 0;
+#ifdef PURIFY_MPI
+  {
+    auto const world = sopt::mpi::Communicator::World();
+    if (params.mpiAlgorithm() == factory::algo_distribution::mpi_random_updates)
+      sara = sopt::wavelets::distribute_sara(sara, world);
+  }
+#endif
+  auto const wavelets_transform = factory::wavelet_operator_factory<Vector<t_complex>>(
+      wop_algo, sara, params.height(), params.width(), sara_size);
+  return {wavelets_transform, sara_size};
+}
+
 int main(int argc, const char **argv) {
   std::srand(static_cast<t_uint>(std::time(0)));
   std::mt19937 mersnne(std::time(0));
@@ -409,19 +433,7 @@ int main(int argc, const char **argv) {
     pfitsio::write2d(dirty_image / beam_units, dirty_header, true);
   }
   // create wavelet operator
-  std::vector<std::tuple<std::string, t_uint>> sara;
-  for (size_t i = 0; i < params.wavelet_basis().size(); i++)
-    sara.push_back(std::make_tuple(params.wavelet_basis().at(i), params.wavelet_levels()));
-  t_uint sara_size = 0;
-#ifdef PURIFY_MPI
-  {
-    auto const world = sopt::mpi::Communicator::World();
-    if (params.mpiAlgorithm() == factory::algo_distribution::mpi_random_updates)
-      sara = sopt::wavelets::distribute_sara(sara, world);
-  }
-#endif
-  auto const wavelets_transform = factory::wavelet_operator_factory<Vector<t_complex>>(
-      wop_algo, sara, params.height(), params.width(), sara_size);
+  const waveletInfo wavelets = createWaveletOperator(params, wop_algo);
 
   // Create algorithm
   std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm;
@@ -429,8 +441,8 @@ int main(int argc, const char **argv) {
   std::shared_ptr<sopt::algorithm::ImagingPrimalDual<t_complex>> primaldual;
   if (params.algorithm() == "padmm")
     padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
-        params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
-        sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(), sara_size,
+        params.mpiAlgorithm(), measurements_transform, wavelets.transform, uv_data,
+        sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(), wavelets.sara_size,
         params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
         (params.wavelet_basis().size() < 2) and (not params.realValueConstraint()) and
             (not params.positiveValueConstraint()),
@@ -438,10 +450,10 @@ int main(int argc, const char **argv) {
         params.epsilonConvergenceScaling(), operator_norm);
   if (params.algorithm() == "fb")
     fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
-        params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
+        params.mpiAlgorithm(), measurements_transform, wavelets.transform, uv_data,
         sigma * params.epsilonScaling() / flux_scale,
         params.stepsize() * std::pow(sigma * params.epsilonScaling() / flux_scale, 2),
-        params.regularisation_parameter(), params.height(), params.width(), sara_size,
+        params.regularisation_parameter(), params.height(), params.width(), wavelets.sara_size,
         params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
         (params.wavelet_basis().size() < 2) and (not params.realValueConstraint()) and
             (not params.positiveValueConstraint()),
@@ -449,8 +461,8 @@ int main(int argc, const char **argv) {
         params.model_path(), params.gProximalType());
   if (params.algorithm() == "primaldual")
     primaldual = factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
-        params.mpiAlgorithm(), measurements_transform, wavelets_transform, uv_data,
-        sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(), sara_size,
+        params.mpiAlgorithm(), measurements_transform, wavelets.transform, uv_data,
+        sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(), wavelets.sara_size,
         params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
         params.relVarianceConvergence(), params.epsilonConvergenceScaling(), operator_norm);
   // Add primal dual preconditioning
@@ -478,21 +490,21 @@ int main(int argc, const char **argv) {
     // Adding step size update to algorithm
     factory::add_updater<t_complex, sopt::algorithm::ImagingProximalADMM<t_complex>>(
         algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
-        update_header_res, params.height(), params.width(), sara_size, using_mpi, beam_units);
+        update_header_res, params.height(), params.width(), wavelets.sara_size, using_mpi, beam_units);
   }
   if (params.algorithm() == "primaldual") {
     const std::weak_ptr<sopt::algorithm::ImagingPrimalDual<t_complex>> algo_weak(primaldual);
     // Adding step size update to algorithm
     factory::add_updater<t_complex, sopt::algorithm::ImagingPrimalDual<t_complex>>(
         algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
-        update_header_res, params.height(), params.width(), sara_size, using_mpi, beam_units);
+        update_header_res, params.height(), params.width(), wavelets.sara_size, using_mpi, beam_units);
   }
   if (params.algorithm() == "fb") {
     const std::weak_ptr<sopt::algorithm::ImagingForwardBackward<t_complex>> algo_weak(fb);
     // Adding step size update to algorithm
     factory::add_updater<t_complex, sopt::algorithm::ImagingForwardBackward<t_complex>>(
         algo_weak, 0, params.update_tolerance(), 0, update_header_sol, update_header_res,
-        params.height(), params.width(), sara_size, using_mpi, beam_units);
+        params.height(), params.width(), wavelets.sara_size, using_mpi, beam_units);
   }
 
   PURIFY_HIGH_LOG("Starting sopt!");
