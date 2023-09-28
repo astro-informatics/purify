@@ -4,31 +4,57 @@
 #include "purify/measurement_operator_factory.h"
 #include "sopt/objective_functions.h"
 #include <stdlib.h>
+#include "yaml-cpp/yaml.h"
+#include "purify/yaml-parser.h"
 
 using VectorC = sopt::Vector<std::complex<double>>;
 
 int main(int argc, char **argv)
 {
-    if(argc != 7)
+    if(argc != 2)
     {
-        std::cout << "Please provide the following six arguments: " << std::endl;
-        std::cout << "Path for measurement data." << std::endl;
-        std::cout << "Path for reference image (.fits file)." << std::endl;
-        std::cout << "Path for surrogate iamge (.fits file)." << std::endl;
-        std::cout << "Confidence interval." << std::endl;
-        std::cout << "sigma (Gaussian Likelihood parameter)." << std::endl;
-        std::cout << "gamma (scaling of L1-norm prior)." << std::endl;
+        std::cout << "purify_UQ should be run using a single additional argument, which is the path to the config (yaml) file." << std::endl;
+        std::cout << "purify_UQ <config_path>" << std::endl;
+        std::cout << std::endl;
+        std::cout << "For more information about the contents of the config file please consult the README." << std::endl;
         return 1;
     }
 
-    const std::string measurements_path = argv[1];
-    const std::string ref_image_path = argv[2];
-    const std::string surrogate_image_path = argv[3];
-    const double confidence = strtod(argv[4], nullptr);
-    const double alpha = 1 - confidence;
-    const double sigma = strtod(argv[5], nullptr);
-    const double gamma = strtod(argv[6], nullptr);
-    
+    // Load and parse the config for parameters 
+    const std::string config_path = argv[1];
+    const YAML::Node UQ_config = YAML::LoadFile(config_path);
+
+    const std::string measurements_path = UQ_config["measurements_path"].as<std::string>();
+    const std::string ref_image_path = UQ_config["reference_image_path"].as<std::string>();
+    const std::string surrogate_image_path = UQ_config["surrogate_image_path"].as<std::string>();
+    const std::string purify_config_path = UQ_config["purify_config_path"].as<std::string>();
+    double confidence;
+    double alpha;
+    if((UQ_config["confidence_interval"]) && (UQ_config["alpha"]))
+    {
+        std::cout << "Config should only contain one of 'confidence_interval' or 'alpha'." << std::endl;
+        return 1;
+    }
+    if(UQ_config["confidence_interval"])
+    {
+        confidence = UQ_config["confidence_interval"].as<double>();
+        alpha = 1-confidence;
+    }
+    else if(UQ_config["alpha"])
+    {
+        alpha = UQ_config["alpha"].as<double>();
+        confidence = 1 - alpha;
+    }
+    else
+    {
+        std::cout << "Config file must contain either 'confidence_interval' or 'alpha' as a parameter." << std::endl;
+        return 1;
+    }
+    const double sigma = UQ_config["sigma"].as<double>();
+    const double gamma = UQ_config["gamma"].as<double>();
+    purify::YamlParser purify_config = purify::YamlParser(purify_config_path);
+
+    // Load the images and measurements
     const purify::utilities::vis_params measurement_data = purify::utilities::read_visibility(measurements_path, false);
 
     const auto reference_image = purify::pfitsio::read2d(ref_image_path);
@@ -53,12 +79,11 @@ int main(int argc, char **argv)
             measurement_data,
             imsize_y,
             imsize_x,
-            1,
-            1,
-            2,
-            purify::kernels::kernel_from_string.at("kb"),
-            4,
-            4
+            purify_config.cellsizey(),
+            purify_config.cellsizex(),
+            purify_config.oversampling(),
+            purify::kernels::kernel_from_string.at(purify_config.kernel()),
+            purify_config.sim_J()
         );
 
     if( ((*measurement_operator) * reference_vector).size() != measurement_data.vis.size())
