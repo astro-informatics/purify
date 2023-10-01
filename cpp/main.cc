@@ -384,6 +384,9 @@ int main(int argc, const char **argv) {
                                                                           uv_data,
                                                                           measurement_op_eigen_vector);
 
+  // create wavelet operator
+  const waveletInfo wavelets = createWaveletOperator(params, wop_algo);
+
   PURIFY_LOW_LOG("Value of operator norm is {}", operator_norm);
   t_real const flux_scale = 1.;
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale;
@@ -487,8 +490,7 @@ int main(int argc, const char **argv) {
   } else {
     pfitsio::write2d(dirty_image / beam_units, dirty_header, true);
   }
-  // create wavelet operator
-  const waveletInfo wavelets = createWaveletOperator(params, wop_algo);
+
 
   // Create algorithm
   std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm;
