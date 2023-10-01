@@ -81,7 +81,7 @@ class YamlParser {
   TYPE NAME##_ = VALUE;               \
                                       \
  public:                              \
-  TYPE NAME() { return NAME##_; };
+  TYPE NAME() const { return NAME##_; };
 
   YAML_MACRO(std::string, filepath, "")
   YAML_MACRO(std::string, version, "")
@@ -143,9 +143,15 @@ class YamlParser {
   YAML_MACRO(std::string, model_path, "")
   YAML_MACRO(factory::g_proximal_type, gProximalType, factory::g_proximal_type::L1GProximal)
 
+  std::string output_path() const
+  {
+    return out_path;
+  }
+
 #undef YAML_MACRO
  private:
   YAML::Node config_file;
+  std::string out_path;
 
   template <typename T>
   T get(const YAML::Node& node_map, const std::initializer_list<const char*> indicies);
