@@ -46,7 +46,14 @@ waveletInfo createWaveletOperator(YamlParser &params, const factory::distributed
   return {wavelets_transform, sara_size};
 }
 
-std::tuple<factory::distributed_measurement_operator, factory::distributed_wavelet_operator, bool> selectOperators(YamlParser &params)
+struct OperatorsInfo
+{
+  factory::distributed_measurement_operator mop_algo;
+  factory::distributed_wavelet_operator wop_algo;
+  bool using_mpi;
+};
+
+OperatorsInfo selectOperators(YamlParser &params)
 {
   factory::distributed_measurement_operator mop_algo =
       (not params.gpu()) ? factory::distributed_measurement_operator::serial
