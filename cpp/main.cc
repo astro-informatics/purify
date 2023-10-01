@@ -75,7 +75,7 @@ std::tuple<factory::distributed_measurement_operator, factory::distributed_wavel
   return {mop_algo, wop_algo, using_mpi};
 }
 
-struct input_data
+struct inputData
 {
   utilities::vis_params uv_data;
   t_real sigma;
@@ -84,7 +84,7 @@ struct input_data
   std::vector<t_real> w_stacks;
 };
 
-input_data getInputData(YamlParser &params,
+inputData getInputData(YamlParser &params,
                                     const factory::distributed_measurement_operator mop_algo,
                                     const factory::distributed_wavelet_operator wop_algo,
                                     const bool using_mpi)
@@ -269,41 +269,22 @@ input_data getInputData(YamlParser &params,
   return {uv_data, sigma, measurement_op_eigen_vector, image_index, w_stacks};
 }
 
-int main(int argc, const char **argv) {
-  std::srand(static_cast<t_uint>(std::time(0)));
-  std::mt19937 mersnne(std::time(0));
-  sopt::logging::initialize();
-  purify::logging::initialize();
+struct measurementOpInfo
+{
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measurement_transform;
+  t_real operator_norm;
+};
 
-  // Read config file path from command line
-  if (argc == 1) {
-    PURIFY_HIGH_LOG("Specify the config file full path. Aborting.");
-    return 1;
-  }
-
-  std::string file_path = argv[1];
-  YamlParser params = YamlParser(file_path);
-  if (params.version() != purify::version())
-    throw std::runtime_error(
-        "Using purify version " + purify::version() +
-        " but the configuration file expects version " + params.version() +
-        ". Please updated the config version manually to be compatable with the new version.");
-
-#ifdef PURIFY_MPI
-  auto const session = sopt::mpi::init(argc, argv);
-#endif
-
-  const auto [mop_algo, wop_algo, using_mpi] = selectOperators(params);
-
-  sopt::logging::set_level(params.logging());
-  purify::logging::set_level(params.logging());
-
-  // Read or generate input data
-  auto [uv_data, sigma, measurement_op_eigen_vector, image_index, w_stacks] =
-      getInputData(params, mop_algo, wop_algo, using_mpi);
-
-  // create measurement operator
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measurements_transform;
+measurementOpInfo createMeasurementOperator(YamlParser &params,
+                                            const factory::distributed_measurement_operator mop_algo,
+                                            const factory::distributed_wavelet_operator wop_algo,
+                                            const bool using_mpi,
+                                            const std::vector<t_int> &image_index,
+                                            const std::vector<t_real> &w_stacks,
+                                            const utilities::vis_params &uv_data,
+                                            Vector<t_complex> &measurement_op_eigen_vector)
+{
+    std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measurements_transform;
   if (mop_algo != factory::distributed_measurement_operator::mpi_distribute_all_to_all and
       mop_algo != factory::distributed_measurement_operator::gpu_mpi_distribute_all_to_all)
     measurements_transform =
@@ -354,6 +335,55 @@ int main(int argc, const char **argv) {
     measurement_op_eigen_vector = std::get<1>(power_method_result);
     operator_norm = std::get<0>(power_method_result);
   }
+
+  return {measurements_transform, operator_norm};
+}
+
+int main(int argc, const char **argv) {
+  std::srand(static_cast<t_uint>(std::time(0)));
+  std::mt19937 mersnne(std::time(0));
+  sopt::logging::initialize();
+  purify::logging::initialize();
+
+  // Read config file path from command line
+  if (argc == 1) {
+    PURIFY_HIGH_LOG("Specify the config file full path. Aborting.");
+    return 1;
+  }
+
+  std::string file_path = argv[1];
+  YamlParser params = YamlParser(file_path);
+  if (params.version() != purify::version())
+    throw std::runtime_error(
+        "Using purify version " + purify::version() +
+        " but the configuration file expects version " + params.version() +
+        ". Please updated the config version manually to be compatable with the new version.");
+
+#ifdef PURIFY_MPI
+  auto const session = sopt::mpi::init(argc, argv);
+#endif
+
+  const auto [mop_algo, wop_algo, using_mpi] = selectOperators(params);
+
+  sopt::logging::set_level(params.logging());
+  purify::logging::set_level(params.logging());
+
+  // Read or generate input data
+  auto [uv_data, sigma, measurement_op_eigen_vector, image_index, w_stacks] = getInputData(params,
+                                                                                           mop_algo,
+                                                                                           wop_algo,
+                                                                                           using_mpi);
+
+  // create measurement operator
+  auto [measurements_transform, operator_norm] = createMeasurementOperator(params,
+                                                                          mop_algo,
+                                                                          wop_algo,
+                                                                          using_mpi,
+                                                                          image_index,
+                                                                          w_stacks,
+                                                                          uv_data,
+                                                                          measurement_op_eigen_vector);
+
   PURIFY_LOW_LOG("Value of operator norm is {}", operator_norm);
   t_real const flux_scale = 1.;
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale;
