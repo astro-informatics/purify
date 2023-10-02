@@ -46,7 +46,8 @@ jobs:
         with:
           repository: UCL/cppflow.git
           path: cppflow
-          ref: master
+          #ref: master
+          ref: cg_cmake_tweaks
 
       - name: Create cppflow package
         run: |
