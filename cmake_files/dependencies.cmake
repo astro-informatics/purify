@@ -85,7 +85,7 @@ else()
   set(PURIFY_OPENMP FALSE)
 endif()
 
-find_package(FFTW3 NAMES fftw3 REQUIRED)
+find_package(fftw3 NAMES FFTW3 REQUIRED)
 
 set(PURIFY_MPI FALSE)
 if(dompi)
