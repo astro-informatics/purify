@@ -7,6 +7,9 @@
 #include "yaml-cpp/yaml.h"
 #include "purify/yaml-parser.h"
 #include "purify/setup_utils.h"
+#include <vector>
+#include <tuple>
+#include <string>
 
 using VectorC = sopt::Vector<std::complex<double>>;
 
@@ -38,9 +41,14 @@ int main(int argc, char **argv)
     const uint imsize_y = reference_image.rows();
 
     // Prepare operators and data using either purify config 
-    // If no purify config use basic version for now
+    // If no purify config use basic version for now based on algo_factory test images 
     purify::utilities::vis_params measurement_data;
-    std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measurement_operator;
+    std::shared_ptr<sopt::LinearTransform<VectorC>> measurement_operator;
+    std::shared_ptr<const sopt::LinearTransform<VectorC>> wavelet_operator;
+    std::vector<std::tuple<std::string, t_uint>> const sara{
+        std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
+        std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
+        std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
     if(UQ_config["purify_config_file"])
     {
         YamlParser purify_config = YamlParser(UQ_config["purify_config_file"].as<std::string>());
@@ -67,18 +75,19 @@ int main(int argc, char **argv)
 
         measurement_data = uv_data;
         measurement_operator = transform;
+        wavelet_operator = wavelets.transform;
     }
     else
     {
         const std::string measurements_path = UQ_config["measurements_path"].as<std::string>();
         // Load the images and measurements
-        const purify::utilities::vis_params uv_data = purify::utilities::read_visibility(measurements_path, false);
+        measurement_data = purify::utilities::read_visibility(measurements_path, false);
 
         // This is the measurement operator used in the test but this should probably be selectable
-        auto const transform = 
+        measurement_operator = 
         purify::factory::measurement_operator_factory<sopt::Vector<std::complex<double>>>(
             purify::factory::distributed_measurement_operator::serial,
-            uv_data,
+            measurement_data,
             imsize_y,
             imsize_x,
             1,
@@ -88,8 +97,8 @@ int main(int argc, char **argv)
             4,
             4);
 
-        measurement_operator = transform;
-        measurement_data = uv_data;
+        wavelet_operator = purify::factory::wavelet_operator_factory<Vector<t_complex>>(
+            factory::distributed_wavelet_operator::serial, sara, imsize_y, imsize_x);
     }
 
     // Set up confidence and objective function params
@@ -137,11 +146,14 @@ int main(int argc, char **argv)
     // Calculate the posterior function for the reference image
     // posterior = likelihood + prior
     // Likelihood = |y - Phi(x)|^2 / sigma^2  (L2 norm)
-    // Prior = Sum(|x_i|) * gamma  (L1 norm)
-    auto Posterior = [&measurement_data, measurement_operator, sigma, gamma](const VectorC &image) {
+    // Prior = Sum(Psi^t * |x_i|) * gamma  (L1 norm)
+    auto Posterior = [&measurement_data, measurement_operator, wavelet_operator, sigma, gamma](const VectorC &image) {
       {
         const auto residuals = (*measurement_operator * image) - measurement_data.vis;
-        return residuals.squaredNorm() / (2 * sigma * sigma) + image.cwiseAbs().sum() * gamma;
+        auto likelihood =  residuals.squaredNorm() / (2 * sigma * sigma);
+        const VectorC wavelet_rep = wavelet_operator->adjoint() * image;
+        auto prior = wavelet_rep.cwiseAbs().sum() * gamma;
+        return likelihood + prior;
       }
     };
 
