@@ -17,8 +17,8 @@ jobs:
 
       - name: Check out Purify
         uses: actions/checkout@v3
-        with:
-          submodules: recursive
+        #with:
+        #  submodules: recursive
 
       - name: Install dependencies
         run: |
@@ -83,14 +83,14 @@ jobs:
       - name: Create SOPT package
         run : |
           if [[ "USE_CONAN" = 1 ]]; then
-            conan create ./sopt --build missing -s:b compiler.libcxx=libstdc++11 -o mpi=off -o openmp=off -o cppflow=on -pr:h=default -pr:b=default
+            conan create ./sopt --build missing -s:b compiler.libcxx=libstdc++11 -o mpi=off -o openmp=off -o docs=off -o cppflow=on -pr:h=default -pr:b=default
           else
             export PATH=${{github.workspace}}/cppflow/build:$PATH
             export PATH=${{github.workspace}}/Catch2/build:$PATH
             export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake/Catch2:$CMAKE_PREFIX_PATH
             mkdir sopt/build
             cd sopt/build
-            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON -Dcppflow=ON
+            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dcppflow=ON
             make -j$(nproc --ignore 1) install
           fi
 
@@ -117,6 +117,7 @@ jobs:
             conan build ${{github.workspace}} -bf ${{github.workspace}}/build
           else
             export PATH=${{github.workspace}}/cppflow/build:$PATH
+            export PATH=${{github.workspace}}/fftw-3.3.10/build:$PATH
             export PATH=${{github.workspace}}/Catch2/build:$PATH
             export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake/Catch2:$CMAKE_PREFIX_PATH
             export PATH=${{github.workspace}}/sopt/build:$PATH
