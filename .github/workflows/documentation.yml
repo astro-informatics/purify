@@ -85,8 +85,8 @@ jobs:
           if [[ "USE_CONAN" = 1 ]]; then
             conan create ./sopt --build missing -o mpi=off -o openmp=off -o docs=off -o cppflow=on -pr:h=default -pr:b=default
           else
-            export PATH=${{github.workspace}}/cppflow/build:$PATH
-            export PATH=${{github.workspace}}/Catch2/build:$PATH
+            export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
+            #export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build:$CMAKE_PREFIX_PATH
             export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake/Catch2:$CMAKE_PREFIX_PATH
             mkdir sopt/build
             cd sopt/build
@@ -101,11 +101,11 @@ jobs:
             #conan install doxygen/1.9.4@#2af713e135f12722e3536808017ba086 --update
             conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing -o mpi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
           else
-            export PATH=${{github.workspace}}/cppflow/build:$PATH
-            export PATH=${{github.workspace}}/fftw-3.3.10/build:$PATH
-            export PATH=${{github.workspace}}/Catch2/build:$PATH
+            export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
+            export CMAKE_PREFIX_PATH=${{github.workspace}}/fftw-3.3.10/build:$CMAKE_PREFIX_PATH
+            #export PATH=${{github.workspace}}/Catch2/build:$CMAKE_PREFIX_PATH
             export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake/Catch2:$CMAKE_PREFIX_PATH
-            export PATH=${{github.workspace}}/sopt/build:$PATH
+            export CMAKE_PREFIX_PATH=${{github.workspace}}/sopt/build:$CMAKE_PREFIX_PATH
             mkdir ${{github.workspace}}/build
             cd ${{github.workspace}}/build
             cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON -Dcppflow=ON
@@ -116,9 +116,9 @@ jobs:
           if [[ "USE_CONAN" = 1 ]]; then
             conan build ${{github.workspace}} -bf ${{github.workspace}}/build
           else
-            export PATH=${{github.workspace}}/cppflow/build:$PATH
-            export PATH=${{github.workspace}}/fftw-3.3.10/build:$PATH
-            export PATH=${{github.workspace}}/Catch2/build:$PATH
+            export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
+            export CMAKE_PREFIX_PATH=${{github.workspace}}/fftw-3.3.10/build:$CMAKE_PREFIX_PATH
+            #export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build:$CMAKE_PREFIX_PATH
             export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake/Catch2:$CMAKE_PREFIX_PATH
             export PATH=${{github.workspace}}/sopt/build:$PATH
             cd ${{github.workspace}}/build
