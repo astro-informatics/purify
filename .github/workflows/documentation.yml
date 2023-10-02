@@ -24,6 +24,9 @@ jobs:
         run: |
             sudo apt update
             sudo apt install openmpi-bin libopenmpi-dev casacore-dev doxygen graphviz
+            if [[ "$USE_CONAN" = 0 ]]; then
+              sudo apt install libeigen3-dev libspdlog-dev libtiff-dev
+            fi
 
       - name: Install Tensorflow API on Ubuntu
         uses: UCL/install-tensorflow-action@main
