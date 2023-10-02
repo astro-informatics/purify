@@ -3,6 +3,9 @@ name: Documentation
 on:
   push:
     branches: [ development ]
+  pull_request:
+    branches: [ development ]
+    if: github.event.pull_request.draft == false
 
 env:
   USE_CONAN: 0
