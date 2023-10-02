@@ -4,6 +4,9 @@ on:
   push:
     branches: [ development ]
 
+env:
+  USE_CONAN: 0
+
 jobs:
   make-documentation:
     runs-on: ubuntu-20.04
@@ -24,9 +27,10 @@ jobs:
         with:
           version: 2.11.0
           os: linux
-  
+
       - name: Install Conan
         id: conan
+        if: env.USE_CONAN != '0'
         uses: turtlebrowser/get-conan@main
         with:
           version: 1.60.1
@@ -39,8 +43,17 @@ jobs:
           ref: master
 
       - name: Create cppflow package
-        run: conan create ./cppflow/ -pr:h=default -pr:b=default
-        
+        run: |
+          if [[ "USE_CONAN" = 1 ]]; then
+            conan create ./cppflow/ -pr:h=default -pr:b=default
+          else
+            mkdir cppflow/build
+            cd cppflow/build
+            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD}
+            make -j$(nproc --ignore 1)
+            make -j$(nproc --ignore 1) install
+          fi
+
       - name: Checkout SOPT
         uses: actions/checkout@v3
         with:
@@ -50,22 +63,48 @@ jobs:
 
       - name: Create SOPT package
         run : |
-          conan create ./sopt --build missing -s:b compiler.libcxx=libstdc++11 -o mpi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
+          if [[ "USE_CONAN" = 1 ]]; then
+            conan create ./sopt --build missing -s:b compiler.libcxx=libstdc++11 -o mpi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
+          else
+            export PATH=${{github.workspace}}/cppflow/build:$PATH
+            mkdir sopt/build
+            cd sopt/build
+            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON -Dcppflow=ON
+            make -j$(nproc --ignore 1)
+            make -j$(nproc --ignore 1) install
+          fi
 
       - name: Configure
         run: |
-          # Need to install this specific version of doxygen because the other Conan build are broken on Conan v1
-          conan install doxygen/1.9.4@#2af713e135f12722e3536808017ba086 --update
-          conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing  -s compiler.libcxx=libstdc++11 -o mpi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
-  
+          if [[ "USE_CONAN" = 1 ]]; then
+            # Doxygen currently broken in Conan v1 and v2
+            #conan install doxygen/1.9.4@#2af713e135f12722e3536808017ba086 --update
+            conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing  -s compiler.libcxx=libstdc++11 -o mpi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
+          else
+            export PATH=${{github.workspace}}/cppflow/build:$PATH
+            export PATH=${{github.workspace}}/sopt/build:$PATH
+            mkdir ${{github.workspace}}/build
+            cd ${{github.workspace}}/build
+            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON -Dcppflow=ON
+          fi
+
       - name: Build
-        run: conan build ${{github.workspace}} -bf ${{github.workspace}}/build
-  
-      - name: Make Docweb
         run: |
-          cd build
-          make docweb VERBOSE=1
-          
+          if [[ "USE_CONAN" = 1 ]]; then
+            conan build ${{github.workspace}} -bf ${{github.workspace}}/build
+          else
+                export PATH=${{github.workspace}}/cppflow/build:$PATH
+                export PATH=${{github.workspace}}/sopt/build:$PATH
+                cd ${{github.workspace}}/build
+                make -j$(nproc --ignore 1)
+                make -j$(nproc --ignore 1) install
+          fi
+
+      #- name: Make Docweb
+      #  run: |
+      #    cd build
+      #    make docweb VERBOSE=1
+
       - name: Deploy to GH pages
         if: ${{github.event_name == 'push'}}
         uses: JamesIves/github-pages-deploy-action@4.1.6
