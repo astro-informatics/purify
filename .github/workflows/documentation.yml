@@ -33,7 +33,7 @@ jobs:
               cmake .. -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${PWD}
               make -j$(nproc --ignore 1) install
               cd -
-              wget --no-check-certificate --no-verbose http://www.fftw.org/fftw-3.3.10.tar.gz -O- tar --no-same-owner -xz;
+              wget --no-check-certificate --no-verbose http://www.fftw.org/fftw-3.3.10.tar.gz -O- | tar --no-same-owner -xz;
               cd fftw-3.3.10
               ./configure --prefix=${PWD}/build
               make -j$(nproc --ignore 1) install
