@@ -34,6 +34,7 @@ jobs:
               make -j$(nproc --ignore 1)
               make -j$(nproc --ignore 1) install
               cd -
+              dpkg -L libfftw3-dev
             fi
 
       - name: Install Tensorflow API on Ubuntu
@@ -79,7 +80,7 @@ jobs:
       - name: Create SOPT package
         run : |
           if [[ "USE_CONAN" = 1 ]]; then
-            conan create ./sopt --build missing -s:b compiler.libcxx=libstdc++11 -o mpi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
+            conan create ./sopt --build missing -s:b compiler.libcxx=libstdc++11 -o mpi=off -o openmp=off -o cppflow=on -pr:h=default -pr:b=default
           else
             export PATH=${{github.workspace}}/cppflow/build:$PATH
             export PATH=${{github.workspace}}/Catch2/build:$PATH
