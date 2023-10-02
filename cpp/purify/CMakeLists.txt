@@ -71,8 +71,8 @@ if(PURIFY_ARRAYFIRE)
 endif()
 
 target_include_directories(libpurify PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/cpp>
   $<INSTALL_INTERFACE:include/>)
 
 if (cppflow)
