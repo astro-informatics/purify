@@ -9,6 +9,7 @@ on:
 
 env:
   USE_CONAN: 0
+  MAKE: make -j$(nproc --ignore 1)
 
 jobs:
   make-documentation:
@@ -26,15 +27,18 @@ jobs:
             sudo apt install openmpi-bin libopenmpi-dev casacore-dev doxygen graphviz
             if [[ "$USE_CONAN" = 0 ]]; then
               sudo apt install libeigen3-dev libspdlog-dev libtiff-dev libcfitsio-dev
-              sudo apt install libbenchmark-dev libfftw3-dev libboost-all-dev libyaml-cpp-dev
+              sudo apt install libbenchmark-dev libboost-all-dev libyaml-cpp-dev
               git clone https://github.com/catchorg/Catch2.git -b v3.4.0
               mkdir Catch2/build
               cd Catch2/build
               cmake .. -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${PWD}
-              make -j$(nproc --ignore 1)
-              make -j$(nproc --ignore 1) install
+              ${MAKE} install
               cd -
-              dpkg -L libfftw3-dev
+              wget --no-check-certificate --no-verbose http://www.fftw.org/fftw-3.3.10.tar.gz -O- tar --no-same-owner -xz;
+              cd fftw-3.3.10
+              ./configure --prefix=${PWD}/build
+              ${MAKE} install
+              cd -
             fi
 
       - name: Install Tensorflow API on Ubuntu
@@ -55,8 +59,7 @@ jobs:
         with:
           repository: UCL/cppflow.git
           path: cppflow
-          #ref: master
-          ref: cg_cmake_tweaks
+          ref: master
 
       - name: Create cppflow package
         run: |
@@ -66,8 +69,7 @@ jobs:
             mkdir cppflow/build
             cd cppflow/build
             cmake .. -DCMAKE_INSTALL_PREFIX=${PWD}
-            make -j$(nproc --ignore 1)
-            make -j$(nproc --ignore 1) install
+            ${MAKE} install
           fi
 
       - name: Checkout SOPT
@@ -88,8 +90,7 @@ jobs:
             mkdir sopt/build
             cd sopt/build
             cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON -Dcppflow=ON
-            make -j$(nproc --ignore 1)
-            make -j$(nproc --ignore 1) install
+            ${MAKE} install
           fi
 
       - name: Configure
@@ -100,6 +101,7 @@ jobs:
             conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing  -s compiler.libcxx=libstdc++11 -o mpi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
           else
             export PATH=${{github.workspace}}/cppflow/build:$PATH
+            export PATH=${{github.workspace}}/fftw-3.3.10/build:$PATH
             export PATH=${{github.workspace}}/Catch2/build:$PATH
             export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake/Catch2:$CMAKE_PREFIX_PATH
             export PATH=${{github.workspace}}/sopt/build:$PATH
@@ -118,8 +120,7 @@ jobs:
             export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake/Catch2:$CMAKE_PREFIX_PATH
             export PATH=${{github.workspace}}/sopt/build:$PATH
             cd ${{github.workspace}}/build
-            make -j$(nproc --ignore 1)
-            make -j$(nproc --ignore 1) install
+            ${MAKE} install
           fi
 
       #- name: Make Docweb
