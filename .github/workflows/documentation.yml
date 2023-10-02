@@ -92,7 +92,7 @@ jobs:
             export PATH=${{github.workspace}}/sopt/build:$PATH
             mkdir ${{github.workspace}}/build
             cd ${{github.workspace}}/build
-            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON -Dcppflow=ON
+            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Dtests=OFF -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON -Dcppflow=ON
           fi
 
       - name: Build
