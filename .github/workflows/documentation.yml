@@ -9,7 +9,6 @@ on:
 
 env:
   USE_CONAN: 0
-  MAKE: make -j$(nproc --ignore 1)
 
 jobs:
   make-documentation:
@@ -32,12 +31,12 @@ jobs:
               mkdir Catch2/build
               cd Catch2/build
               cmake .. -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${PWD}
-              ${MAKE} install
+              make -j$(nproc --ignore 1) install
               cd -
               wget --no-check-certificate --no-verbose http://www.fftw.org/fftw-3.3.10.tar.gz -O- tar --no-same-owner -xz;
               cd fftw-3.3.10
               ./configure --prefix=${PWD}/build
-              ${MAKE} install
+              make -j$(nproc --ignore 1) install
               cd -
             fi
 
@@ -69,7 +68,7 @@ jobs:
             mkdir cppflow/build
             cd cppflow/build
             cmake .. -DCMAKE_INSTALL_PREFIX=${PWD}
-            ${MAKE} install
+            make -j$(nproc --ignore 1) install
           fi
 
       - name: Checkout SOPT
@@ -90,7 +89,7 @@ jobs:
             mkdir sopt/build
             cd sopt/build
             cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON -Dcppflow=ON
-            ${MAKE} install
+            make -j$(nproc --ignore 1) install
           fi
 
       - name: Configure
@@ -120,7 +119,7 @@ jobs:
             export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake/Catch2:$CMAKE_PREFIX_PATH
             export PATH=${{github.workspace}}/sopt/build:$PATH
             cd ${{github.workspace}}/build
-            ${MAKE} install
+            make -j$(nproc --ignore 1) install
           fi
 
       #- name: Make Docweb
