@@ -83,7 +83,7 @@ jobs:
       - name: Create SOPT package
         run : |
           if [[ "USE_CONAN" = 1 ]]; then
-            conan create ./sopt --build missing -s:b compiler.libcxx=libstdc++11 -o mpi=off -o openmp=off -o docs=off -o cppflow=on -pr:h=default -pr:b=default
+            conan create ./sopt --build missing -o mpi=off -o openmp=off -o docs=off -o cppflow=on -pr:h=default -pr:b=default
           else
             export PATH=${{github.workspace}}/cppflow/build:$PATH
             export PATH=${{github.workspace}}/Catch2/build:$PATH
@@ -99,7 +99,7 @@ jobs:
           if [[ "USE_CONAN" = 1 ]]; then
             # Doxygen currently broken in Conan v1 and v2
             #conan install doxygen/1.9.4@#2af713e135f12722e3536808017ba086 --update
-            conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing  -s compiler.libcxx=libstdc++11 -o mpi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
+            conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing -o mpi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
           else
             export PATH=${{github.workspace}}/cppflow/build:$PATH
             export PATH=${{github.workspace}}/fftw-3.3.10/build:$PATH
