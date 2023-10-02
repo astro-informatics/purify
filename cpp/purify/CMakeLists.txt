@@ -89,10 +89,10 @@ if (cppflow)
     )
 endif()
 
-#target_include_directories(libpurify PUBLIC
-#  $<BUILD_INTERFACE:${sopt_INCLUDE_DIR}>
-#  $<INSTALL_INTERFACE:sopt/include/>
-#)
+target_include_directories(libpurify PUBLIC
+  $<BUILD_INTERFACE:${sopt_INCLUDE_DIR}>
+  $<INSTALL_INTERFACE:sopt/include/>
+)
 
 add_include_dir(
   ${EIGEN3_INCLUDE_DIR}
@@ -101,7 +101,7 @@ add_include_dir(
   ${YAML_CPP_INCLUDE_DIR}
   ${Cubature_INCLUDE_DIR}
   ${CImg_INCLUDE_DIR}
-  ${sopt_INCLUDE_DIR}
+  #${sopt_INCLUDE_DIR}
 )
 
 target_link_libraries(libpurify
