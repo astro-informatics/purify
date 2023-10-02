@@ -96,6 +96,7 @@ endif()
 #  $<INSTALL_INTERFACE:sopt/include/>
 #)
 
+message(STATUS "soptINC=${sopt_INCLUDE_DIR}")
 add_include_dir(
   ${EIGEN3_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
@@ -103,7 +104,7 @@ add_include_dir(
   ${YAML_CPP_INCLUDE_DIR}
   ${Cubature_INCLUDE_DIR}
   ${CImg_INCLUDE_DIR}
-  #${sopt_INCLUDE_DIR}
+  ${sopt_INCLUDE_DIR}
 )
 
 target_link_libraries(libpurify

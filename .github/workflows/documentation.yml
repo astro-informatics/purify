@@ -25,7 +25,6 @@ jobs:
             sudo apt update
             sudo apt install openmpi-bin libopenmpi-dev casacore-dev doxygen graphviz
             if [[ "$USE_CONAN" = 0 ]]; then
-              ls ${{github.workspace}}
               sudo apt install libeigen3-dev libspdlog-dev libtiff-dev libcfitsio-dev
               sudo apt install libbenchmark-dev libboost-all-dev libyaml-cpp-dev
               git clone https://github.com/catchorg/Catch2.git -b v3.4.0
@@ -118,7 +117,7 @@ jobs:
             export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
             export CMAKE_PREFIX_PATH=${{github.workspace}}/fftw-3.3.10/build/lib/cmake:$CMAKE_PREFIX_PATH
             export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
-            export CMAKE_PREFIX_PATH=${{github.workspace}}/sopt/build:$CMAKE_PREFIX_PATH
+            #export CMAKE_PREFIX_PATH=${{github.workspace}}/sopt/build:$CMAKE_PREFIX_PATH
             cd ${{github.workspace}}/build
             make -j$(nproc --ignore 1) install
           fi

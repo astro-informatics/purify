@@ -19,7 +19,7 @@ option(coverage       "Build coverage"                                  off)
 option(cppflow        "Build with TensorFlow interface"                 off)
 
 if(NOT CMAKE_BUILD_TYPE)
-  message(STATUS "Setting build type to 'Relese' as none was specified.")
+  message(STATUS "Setting build type to 'Release' as none was specified.")
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build Type" FORCE)
 endif()
 message(STATUS "Building purify in ${CMAKE_BUILD_TYPE} mode")
