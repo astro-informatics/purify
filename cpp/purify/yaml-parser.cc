@@ -303,7 +303,7 @@ void YamlParser::writeOutput() {
       base_file_name.substr((file_path.size() ? file_path.size() + 1 : 0), base_file_name.size());
   // Construct output directory structure and file name
   boost::filesystem::path const path(this->output_prefix_);
-  std::string const out_path = output_prefix_ + "/output_" + std::string(this->timestamp());
+  out_path = output_prefix_ + "/output_" + std::string(this->timestamp());
   mkdir_recursive(out_path);
   std::string out_filename = out_path + "/" + base_file_name + "_save.yaml";
 

@@ -145,6 +145,32 @@ When `purify` runs a directory will be created, and the output images will be
 saved and time-stamped. Additionally, a config file with the settings used will
 be saved and time-stamped, helping for reproducibility and book-keeping.
 
+Uncertainty Quantification
+--------------------------
+
+Bayesian hypothesis testing may be performed with the `purify_UQ` application, which can be located in the `build` directory. 
+
+This application takes a config yaml file with the following parameters:
+- `confidence_interval` or `alpha`. (alpha = 1 - confidence interval.))
+- `measurements_path`: path to measurements data (.vis file)
+- `reference_image_path`: path to reference image i.e. output from purify run. (.fits files)
+- `surrogate_image_path`: path to surrogate image i.e. doctored image with blurring or structural change that you want to test. (.fits file)
+- `sigma`: standard deviation for Gaussian likelihood. 
+- `gamma`: multiplicative factor for prior.
+- `purify_config`: path to purify config used to generate the reference image. **This should be used if available in order to ensure consistency of things like measurement and wavelet operators.**
+
+You can then run the uncertainty quantification with the command:
+```
+purify_UQ <path to UQ_config yaml>
+```
+
+The application will report the value of the objective function for each image, the threshold value calculated from the reference image, and whether the surrogate image is ruled out or not. 
+
+Presently this is designed to work for the unconstrained problem where:
+- The negative log-likelihood is a scaled L2-norm i.e. $ \frac{1}{2 \sigma^2} \sum (y_i - \Phi x_i)$ for some data $y$, image $x$, and measurement operator $\Phi$. (Equivalent to indepdendent multivariate Gaussian likelihood.)
+- The negative log prior is a scaled L1-norm in _wavelet space_ i.e. $\gamma \sum (\Psi^\dag x)_i$ for some image $x$ and wavelet operator $\Psi$.
+- The objective function is the sum of these two terms.
+
 Docker
 -------
 
