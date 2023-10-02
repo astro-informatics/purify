@@ -26,6 +26,13 @@ jobs:
             sudo apt install openmpi-bin libopenmpi-dev casacore-dev doxygen graphviz
             if [[ "$USE_CONAN" = 0 ]]; then
               sudo apt install libeigen3-dev libspdlog-dev libtiff-dev
+              git clone https://github.com/catchorg/Catch2.git -b v3.4.0
+              mkdir Catch2/build
+              cd Catch2/build
+              cmake .. -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${PWD}
+              make -j$(nproc --ignore 1)
+              make -j$(nproc --ignore 1) install
+              cd -
             fi
 
       - name: Install Tensorflow API on Ubuntu
@@ -74,6 +81,8 @@ jobs:
             conan create ./sopt --build missing -s:b compiler.libcxx=libstdc++11 -o mpi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
           else
             export PATH=${{github.workspace}}/cppflow/build:$PATH
+            export PATH=${{github.workspace}}/Catch2/build:$PATH
+            export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake/Catch2:$CMAKE_PREFIX_PATH
             mkdir sopt/build
             cd sopt/build
             cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON -Dcppflow=ON
@@ -89,10 +98,12 @@ jobs:
             conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing  -s compiler.libcxx=libstdc++11 -o mpi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
           else
             export PATH=${{github.workspace}}/cppflow/build:$PATH
+            export PATH=${{github.workspace}}/Catch2/build:$PATH
+            export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake/Catch2:$CMAKE_PREFIX_PATH
             export PATH=${{github.workspace}}/sopt/build:$PATH
             mkdir ${{github.workspace}}/build
             cd ${{github.workspace}}/build
-            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Dtests=OFF -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON -Dcppflow=ON
+            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON -Dcppflow=ON
           fi
 
       - name: Build
@@ -100,11 +111,13 @@ jobs:
           if [[ "USE_CONAN" = 1 ]]; then
             conan build ${{github.workspace}} -bf ${{github.workspace}}/build
           else
-                export PATH=${{github.workspace}}/cppflow/build:$PATH
-                export PATH=${{github.workspace}}/sopt/build:$PATH
-                cd ${{github.workspace}}/build
-                make -j$(nproc --ignore 1)
-                make -j$(nproc --ignore 1) install
+            export PATH=${{github.workspace}}/cppflow/build:$PATH
+            export PATH=${{github.workspace}}/Catch2/build:$PATH
+            export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake/Catch2:$CMAKE_PREFIX_PATH
+            export PATH=${{github.workspace}}/sopt/build:$PATH
+            cd ${{github.workspace}}/build
+            make -j$(nproc --ignore 1)
+            make -j$(nproc --ignore 1) install
           fi
 
       #- name: Make Docweb
