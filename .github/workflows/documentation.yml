@@ -60,9 +60,9 @@ jobs:
       - name: Checkout SOPT
         uses: actions/checkout@v3
         with:
-          repository: astroinformatics/sopt.git
+          repository: astro-informatics/sopt.git
           path: sopt
-          ref: development
+          ref: chrisg_build_tweaks
 
       - name: Create SOPT package
         run : |
