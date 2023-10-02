@@ -70,11 +70,13 @@ if(PURIFY_ARRAYFIRE)
   target_link_libraries(libpurify ${ArrayFire_LIBRARIES})
 endif()
 
+message(STATUS "CCSD=${CMAKE_CURRENT_SOURCE_DIR}")
+message(STATUS "PSD=${PROJECT_SOURCE_DIR}")
+message(STATUS "PBD=${PROJECT_BINARY_DIR}")
 target_include_directories(libpurify PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/cpp>
   $<INSTALL_INTERFACE:include/>)
-  #$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
 
 if (cppflow)
   target_link_libraries(libpurify "${TENSORFLOW_LIB}")
@@ -89,10 +91,10 @@ if (cppflow)
     )
 endif()
 
-target_include_directories(libpurify PUBLIC
-  $<BUILD_INTERFACE:${sopt_INCLUDE_DIR}>
-  $<INSTALL_INTERFACE:sopt/include/>
-)
+#target_include_directories(libpurify PUBLIC
+#  $<BUILD_INTERFACE:${sopt_INCLUDE_DIR}>
+#  $<INSTALL_INTERFACE:sopt/include/>
+#)
 
 add_include_dir(
   ${EIGEN3_INCLUDE_DIR}
