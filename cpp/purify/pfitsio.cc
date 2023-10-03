@@ -91,4 +91,4 @@ void write3d(const std::vector<Image<t_real>> &eigen_images, const std::string &
   write3d(eigen_images, header, overwrite);
 }
 
-} // namespace purify::pfitsio
+}  // namespace purify::pfitsio
