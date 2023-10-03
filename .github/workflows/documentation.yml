@@ -35,8 +35,8 @@ jobs:
               cd -
               wget --no-check-certificate --no-verbose http://www.fftw.org/fftw-3.3.10.tar.gz -O- | tar --no-same-owner -xz;
               cd fftw-3.3.10
-              ./configure --prefix=${{github.workspace}}/build CXX_FLAGS=-fPIC
-              make -j$(nproc --ignore 1) install
+              ./configure --prefix=${{github.workspace}}/build --enable-shared
+              make -j$(nproc --ignore 1) install CFLAGS=-fPIC
               # Fix bug in FFT3 (cf. https://github.com/FFTW/fftw3/issues/332)
               sed -i -e 's/^.*FFTW3LibraryDepends.cmake.*$//1' ${{github.workspace}}/build/lib*/cmake/*/FFTW3Config.cmake
               cd -
