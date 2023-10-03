@@ -95,7 +95,7 @@ endif()
 #  $<BUILD_INTERFACE:${sopt_INCLUDE_DIR}>
 #  $<INSTALL_INTERFACE:sopt/include/>
 #)
-target_include_directories(sopt PUBLIC
+target_include_directories(libpurify PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include/>
