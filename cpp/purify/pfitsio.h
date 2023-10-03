@@ -288,7 +288,7 @@ typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::
 }
 
 template <typename T, typename = std::enable_if_t<std::is_same_v<double, typename T::Scalar>>>
-void read3d(const std::string& fits_name, Eigen::EigenBase<T> &output, int &rows, int &cols,
+void read3d(const std::string &fits_name, Eigen::EigenBase<T> &output, int &rows, int &cols,
             int &channels, int &pols) {
   /*
      Reads in a cube from a fits file and returns the vector of images.
