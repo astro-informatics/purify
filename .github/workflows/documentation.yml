@@ -115,7 +115,8 @@ jobs:
             conan build ${{github.workspace}} -bf ${{github.workspace}}/build
           else
             export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
-            export CMAKE_PREFIX_PATH=${{github.workspace}}/fftw-3.3.10/build/lib/cmake:$CMAKE_PREFIX_PATH
+            #export CMAKE_PREFIX_PATH=${{github.workspace}}/fftw-3.3.10/build/lib/cmake:$CMAKE_PREFIX_PATH
+            export CMAKE_PREFIX_PATH=${{github.workspace}}/fftw-3.3.10/build:$CMAKE_PREFIX_PATH
             export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
             #export CMAKE_PREFIX_PATH=${{github.workspace}}/sopt/build:$CMAKE_PREFIX_PATH
             cd ${{github.workspace}}/build
