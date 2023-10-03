@@ -98,7 +98,7 @@ add_include_dir(
   ${EIGEN3_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
   ${cfitsio_INCLUDE_DIR}
-  ${FFTW3_INCLUDE_DIR}
+  ${FFTW3_INCLUDE_DIRS}
   ${YAML_CPP_INCLUDE_DIR}
   ${Cubature_INCLUDE_DIR}
   ${CImg_INCLUDE_DIR}
