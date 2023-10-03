@@ -70,9 +70,6 @@ if(PURIFY_ARRAYFIRE)
   target_link_libraries(libpurify ${ArrayFire_LIBRARIES})
 endif()
 
-message(STATUS "CCSD=${CMAKE_CURRENT_SOURCE_DIR}")
-message(STATUS "PSD=${PROJECT_SOURCE_DIR}")
-message(STATUS "PBD=${PROJECT_BINARY_DIR}")
 target_include_directories(libpurify PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
@@ -91,27 +88,21 @@ if (cppflow)
   )
 endif()
 
-#target_include_directories(libpurify PUBLIC
-#  $<BUILD_INTERFACE:${sopt_INCLUDE_DIR}>
-#  $<INSTALL_INTERFACE:sopt/include/>
-#)
 target_include_directories(libpurify PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include/>
 )
 
-message(STATUS "soptINC=${sopt_INCLUDE_DIR}")
-message(STATUS "CIID=${CMAKE_INSTALL_INCLUDE_DIR}")
 add_include_dir(
   ${EIGEN3_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
   ${cfitsio_INCLUDE_DIR}
+  ${FFTW3_INCLUDE_DIR}
   ${YAML_CPP_INCLUDE_DIR}
   ${Cubature_INCLUDE_DIR}
   ${CImg_INCLUDE_DIR}
 )
-#  ${sopt_INCLUDE_DIR}
 
 target_link_libraries(libpurify
   ${Cubature_LIBRARIES}
