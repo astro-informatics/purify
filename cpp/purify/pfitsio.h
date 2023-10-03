@@ -91,7 +91,6 @@ typename std::enable_if<std::is_scalar<T>::value, void>::type write_history(
   write_history(fptr, context, std::to_string(value), status);
 }
 
-
 template <class T>
 typename std::enable_if<std::is_scalar<T>::value, void>::type write_key(fitsfile *fptr,
                                                                         const std::string &key,
@@ -289,8 +288,8 @@ typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::
 }
 
 template <typename T, typename = std::enable_if_t<std::is_same_v<double, typename T::Scalar>>>
-void read3d(const std::string& fits_name, Eigen::EigenBase<T>& output, int &rows, int &cols,
-            int& channels, int& pols) {
+void read3d(const std::string& fits_name, Eigen::EigenBase<T> &output, int &rows, int &cols,
+            int &channels, int &pols) {
   /*
      Reads in a cube from a fits file and returns the vector of images.
      fits_name:: name of fits file
@@ -337,7 +336,7 @@ std::vector<Image<t_complex>> read3d(const std::string &fits_name) {
 }
 
 //! Read image from fits file
-Image<t_complex> read2d(const std::string& fits_name) {
+Image<t_complex> read2d(const std::string &fits_name) {
   /*
     Reads in an image from a fits file and returns the image.
 
