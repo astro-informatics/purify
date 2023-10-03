@@ -14,12 +14,10 @@ void write_key(fitsfile *fptr, const std::string &key, const std::string &value,
     throw std::runtime_error("Problem writing key in fits file: " + key);
 }
 
-
 void write_key(fitsfile *fptr, const std::string &key, const char *value,
                const std::string &comment, int *status) {
   write_key(fptr, key, std::string(value), comment, status);
 }
-
 
 void write_history(fitsfile *fptr, const std::string &context, const std::string &history,
                    int *status) {
@@ -27,7 +25,6 @@ void write_history(fitsfile *fptr, const std::string &context, const std::string
   if (fits_write_history(fptr, const_cast<char *>(entry.c_str()), status))
     throw std::runtime_error("Problem writing comments in fits file");
 }
-
 
 //! Write image to fits file
 void write2d(const Image<t_real> &eigen_image, const pfitsio::header_params &header,
@@ -63,7 +60,6 @@ void write2d(const Image<t_real> &eigen_image, const std::string &fits_name,
   write2d(eigen_image, header, overwrite);
 }
 
-
 void write3d(const std::vector<Image<t_real>> &eigen_images, const pfitsio::header_params &header,
              const bool &overwrite) {
   std::vector<long> naxes = {static_cast<long>(eigen_images.at(0).rows()),
@@ -95,4 +91,4 @@ void write3d(const std::vector<Image<t_real>> &eigen_images, const std::string &
   write3d(eigen_images, header, overwrite);
 }
 
-}
+} // namespace purify::pfitsio

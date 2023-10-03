@@ -74,14 +74,12 @@ struct header_params {
   bool operator!=(const header_params &h2) const { return not(*this == h2); }
 };
 
-
 //! write key to fits file header
 void write_key(fitsfile *fptr, const std::string &key, const std::string &value,
                const std::string &comment, int *status);
 
 void write_key(fitsfile *fptr, const std::string &key, const char *value,
                const std::string &comment, int *status);
-
 
 //! write history to fits file
 void write_history(fitsfile *fptr, const std::string &context, const std::string &history,
@@ -122,7 +120,7 @@ typename std::enable_if<std::is_scalar<T>::value, void>::type write_key(fitsfile
 
 //! read fits key and return as tuple
 template <typename T>
-T read_key(fitsfile *fptr, const std::string& key, int *status) {
+T read_key(fitsfile *fptr, const std::string &key, int *status) {
   T value;
   char comment[FLEN_COMMENT];
   if constexpr (std::is_same_v<T, std::string>) {
@@ -291,7 +289,7 @@ typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::
 }
 
 template <typename T, typename = std::enable_if_t<std::is_same_v<double, typename T::Scalar>>>
-void read3d(const std::string& fits_name, Eigen::EigenBase<T>& output, int& rows, int& cols,
+void read3d(const std::string& fits_name, Eigen::EigenBase<T>& output, int &rows, int &cols,
             int& channels, int& pols) {
   /*
      Reads in a cube from a fits file and returns the vector of images.
@@ -325,7 +323,7 @@ void read3d(const std::string& fits_name, Eigen::EigenBase<T>& output, int& rows
 }
 
 //! Read cube from fits file
-std::vector<Image<t_complex>> read3d(const std::string& fits_name) {
+std::vector<Image<t_complex>> read3d(const std::string &fits_name) {
   std::vector<Image<t_complex>> eigen_images;
   Vector<double> image;
   int rows, cols, channels, pols = 1;

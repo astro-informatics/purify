@@ -17,7 +17,7 @@ void set_level(std::string const &level, std::string const &name = "");
 inline spdlogPtr initialize(std::string const &name = "") {
   const std::string loggerName = default_logger_name() + name;
   const spdlogPtr result = spdlog::stdout_logger_mt(default_logger_name() + name);
-  if (!spdlog::get(loggerName))  spdlog::register_logger(result);
+  if (!spdlog::get(loggerName)) spdlog::register_logger(result);
   set_level(default_logging_level(), name);
   return result;
 }
