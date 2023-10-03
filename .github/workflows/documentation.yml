@@ -87,6 +87,7 @@ jobs:
           else
             #export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
             #export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
+            export CMAKE_PREFIX_PATH=${{github.workspace}}/build/:$CMAKE_PREFIX_PATH
             export CMAKE_PREFIX_PATH=${{github.workspace}}/build/lib/cmake:$CMAKE_PREFIX_PATH
             mkdir sopt/build
             cd sopt/build
