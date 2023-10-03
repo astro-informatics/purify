@@ -35,7 +35,7 @@ jobs:
               cd -
               wget --no-check-certificate --no-verbose http://www.fftw.org/fftw-3.3.10.tar.gz -O- | tar --no-same-owner -xz;
               cd fftw-3.3.10
-              ./configure --prefix=${{github.workspace}}/build
+              ./configure --prefix=${{github.workspace}}/build CXX_FLAGS=-fPIC
               make -j$(nproc --ignore 1) install
               # Fix bug in FFT3 (cf. https://github.com/FFTW/fftw3/issues/332)
               sed -i -e 's/^.*FFTW3LibraryDepends.cmake.*$//1' ${{github.workspace}}/build/lib*/cmake/*/FFTW3Config.cmake
@@ -105,10 +105,6 @@ jobs:
             conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing -o mpi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
           else
             export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
-            ##export CMAKE_PREFIX_PATH=${{github.workspace}}/fftw-3.3.10/build/lib/cmake:$CMAKE_PREFIX_PATH
-            #export CMAKE_PREFIX_PATH=${{github.workspace}}/fftw-3.3.10/build:$CMAKE_PREFIX_PATH
-            #export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake/:$CMAKE_PREFIX_PATH
-            ##export CMAKE_PREFIX_PATH=${{github.workspace}}/sopt/build:$CMAKE_PREFIX_PATH
             export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
             mkdir -p ${{github.workspace}}/build
             cd ${{github.workspace}}/build
