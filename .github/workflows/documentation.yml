@@ -38,7 +38,7 @@ jobs:
               ./configure --prefix=${{github.workspace}}/build
               make -j$(nproc --ignore 1) install
               # Fix bug in FFT3 (cf. https://github.com/FFTW/fftw3/issues/332)
-              sed -i -e 's/^.*FFTW3LibraryDepends.cmake.*$//1' build/lib*/cmake/*/FFTW3Config.cmake
+              sed -i -e 's/^.*FFTW3LibraryDepends.cmake.*$//1' ${{github.workspace}}/build/lib*/cmake/*/FFTW3Config.cmake
               cd -
             fi
 
