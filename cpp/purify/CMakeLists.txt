@@ -14,7 +14,7 @@ function(add_include_dir)
   endif()
 endfunction()
 
-link_directories(${FFTW3_LIBRARY_DIRS} ${YAML_CPP_LIBRARY_DIR} ${Cubature_LIBRARY_DIR})
+#link_directories(${FFTW3_LIBRARY_DIRS} ${YAML_CPP_LIBRARY_DIR} ${Cubature_LIBRARY_DIR})
 
 configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
