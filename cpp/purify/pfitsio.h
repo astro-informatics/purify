@@ -59,7 +59,7 @@ struct header_params {
   };
   //! create empty fits header
   header_params(){};
-  #define PURIFY_MACRO(VAR, H2) (this->VAR == H2.VAR)
+#define PURIFY_MACRO(VAR, H2) (this->VAR == H2.VAR)
   bool operator==(const header_params &h2) const {
     return PURIFY_MACRO(mean_frequency, h2) and PURIFY_MACRO(cell_x, h2) and
            PURIFY_MACRO(cell_y, h2) and PURIFY_MACRO(ra, h2) and PURIFY_MACRO(dec, h2) and
@@ -70,7 +70,7 @@ struct header_params {
            PURIFY_MACRO(relative_variation, h2) and PURIFY_MACRO(residual_convergence, h2) and
            PURIFY_MACRO(epsilon, h2);
   }
-  #undef PURIFY_MACRO
+#undef PURIFY_MACRO
   bool operator!=(const header_params &h2) const { return not(*this == h2); }
 };
 
@@ -120,7 +120,6 @@ typename std::enable_if<std::is_scalar<T>::value, void>::type write_key(fitsfile
     throw std::runtime_error("Problem writing key in fits file: " + key);
 }
 
-
 //! read fits key and return as tuple
 template <typename T>
 T read_key(fitsfile *fptr, const std::string& key, int *status) {
@@ -130,8 +129,7 @@ T read_key(fitsfile *fptr, const std::string& key, int *status) {
     if (fits_read_key(fptr, TSTRING, key.data(), value.data(), comment, status)) {
       throw std::runtime_error("Error reading value from key " + key);
     }
-  }
-  else {
+  } else {
     int datatype = 0;
     if (std::is_same<T, double>::value)
       datatype = TDOUBLE;
@@ -152,7 +150,6 @@ T read_key(fitsfile *fptr, const std::string& key, int *status) {
   return value;
 }
 
-
 //! Write image to fits file using header information
 void write2d(const Image<t_real> &image, const pfitsio::header_params &header,
              const bool &overwrite = true);
@@ -160,7 +157,6 @@ void write2d(const Image<t_real> &image, const pfitsio::header_params &header,
 //! Write image to fits file
 void write2d(const Image<t_real> &image, const std::string &fits_name,
              const std::string &pix_units = "Jy/Beam", const bool &overwrite = true);
-
 
 template <typename DERIVED>
 void write2d(const Eigen::EigenBase<DERIVED> &input, int nx, int ny, const std::string &fits_name,
@@ -182,7 +178,6 @@ void write3d(const std::vector<Image<t_real>> &image, const pfitsio::header_para
 //! Write cube to fits file
 void write3d(const std::vector<Image<t_real>> &image, const std::string &fits_name,
              const std::string &pix_units = "Jy/Beam", const bool &overwrite = true);
-
 
 template <typename DERIVED>
 void write3d(const std::vector<Eigen::EigenBase<DERIVED>> &input, int nx, int ny,
@@ -249,7 +244,7 @@ typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::
                      const_cast<t_real *>(image.derived().data()), &status))
     throw std::runtime_error("Problem writing image in fits file:" + header.fits_name);
 
-  #define PURIFY_MACRO(KEY, VALUE, COMMENT) write_key(fptr, KEY, VALUE, COMMENT, &status);
+#define PURIFY_MACRO(KEY, VALUE, COMMENT) write_key(fptr, KEY, VALUE, COMMENT, &status);
 
   // Writing to fits header
   PURIFY_MACRO("BUNIT", header.pix_units, "");                  // units
@@ -277,7 +272,7 @@ typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::
   PURIFY_MACRO("BTYPE", "intensity", "");
   PURIFY_MACRO("EQUINOX", 2000, "");
 
-  #undef PURIFY_MACRO
+#undef PURIFY_MACRO
   write_history(fptr, "SOFTWARE", "Purify", &status);
   write_history(fptr, "PURIFY-NITERS", header.niters, &status);
   if (header.hasconverged) {
@@ -296,8 +291,8 @@ typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::
 }
 
 template <typename T, typename = std::enable_if_t<std::is_same_v<double, typename T::Scalar>>>
-void read3d(const std::string& fits_name, Eigen::EigenBase<T>& output,
-            int& rows, int& cols, int& channels, int& pols) {
+void read3d(const std::string& fits_name, Eigen::EigenBase<T>& output, int& rows, int& cols,
+            int& channels, int& pols) {
   /*
      Reads in a cube from a fits file and returns the vector of images.
      fits_name:: name of fits file

@@ -25,5 +25,5 @@ jobs:
 
       - name: Report results
         run: |
-          git diff || (echo '## NOTE: your code is not linted properly - please commit the suggested changes'; false)
+          git diff --exit-code || (echo '## NOTE: your code is not linted properly - please commit the suggested changes'; false)
 
