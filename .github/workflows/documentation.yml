@@ -92,7 +92,8 @@ jobs:
             #export CMAKE_PREFIX_PATH=${{github.workspace}}/build/lib/cmake:$CMAKE_PREFIX_PATH
             mkdir sopt/build
             cd sopt/build
-            cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dcppflow=ON
+            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dcppflow=ON
+            #cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dcppflow=ON
             make -j$(nproc --ignore 1) install
           fi
 
