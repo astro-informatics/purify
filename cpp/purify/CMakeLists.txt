@@ -9,12 +9,9 @@ function(add_include_dir)
     endif()
   endforeach()
   if(publics)
-    message(STATUS "publics=${publics}")
     target_include_directories(libpurify SYSTEM PUBLIC ${publics})
   endif()
 endfunction()
-
-#link_directories(${FFTW3_LIBRARY_DIRS} ${YAML_CPP_LIBRARY_DIR} ${Cubature_LIBRARY_DIR})
 
 configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
@@ -88,12 +85,6 @@ if (cppflow)
     $<INSTALL_INTERFACE:cppflow/include/>
   )
 endif()
-
-target_include_directories(libpurify PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include/>
-)
 
 add_include_dir(
   ${EIGEN3_INCLUDE_DIR}

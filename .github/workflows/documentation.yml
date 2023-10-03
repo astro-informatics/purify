@@ -126,11 +126,6 @@ jobs:
             make -j$(nproc --ignore 1) install
           fi
 
-      #- name: Make Docweb
-      #  run: |
-      #    cd build
-      #    make docweb VERBOSE=1
-
       - name: Deploy to GH pages
         if: ${{github.event_name == 'push'}}
         uses: JamesIves/github-pages-deploy-action@4.1.6
