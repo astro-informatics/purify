@@ -69,7 +69,7 @@ jobs:
           else
             mkdir cppflow/build
             cd cppflow/build
-            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD}
+            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD}/build
             #cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build
             make -j$(nproc --ignore 1) install
           fi
