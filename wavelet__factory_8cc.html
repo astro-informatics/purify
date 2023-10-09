@@ -81,7 +81,7 @@ $(function() {
 <div class="title">wavelet_factory.cc File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;catch.hpp&quot;</code><br />
+<div class="textblock"><code>#include &quot;catch2/catch_all.hpp&quot;</code><br />
 <code>#include &quot;<a class="el" href="distribute_8h_source.html">purify/distribute.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="logging_8h_source.html">purify/logging.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="mpi__utilities_8h_source.html">purify/mpi_utilities.h</a>&quot;</code><br />
@@ -94,32 +94,32 @@ $(function() {
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="wavelet__factory_8cc__incl.png" border="0" usemap="#_2home_2runner_2work_2purify_2purify_2cpp_2tests_2wavelet__factory_8cc" alt=""/></div>
 <map name="_2home_2runner_2work_2purify_2purify_2cpp_2tests_2wavelet__factory_8cc" id="_2home_2runner_2work_2purify_2purify_2cpp_2tests_2wavelet__factory_8cc">
-<area shape="rect" title=" " alt="" coords="524,5,711,61"/>
-<area shape="rect" title=" " alt="" coords="381,117,467,143"/>
-<area shape="rect" href="distribute_8h.html" title=" " alt="" coords="329,199,466,225"/>
-<area shape="rect" href="logging_8h.html" title=" " alt="" coords="1113,273,1236,300"/>
-<area shape="rect" href="mpi__utilities_8h.html" title=" " alt="" coords="602,117,758,143"/>
-<area shape="rect" href="purify_2utilities_8h.html" title=" " alt="" coords="755,273,879,300"/>
-<area shape="rect" href="wavelet__operator__factory_8h.html" title=" " alt="" coords="906,109,1083,151"/>
-<area shape="rect" title=" " alt="" coords="861,423,976,449"/>
-<area shape="rect" title=" " alt="" coords="167,273,247,300"/>
-<area shape="rect" title=" " alt="" coords="271,273,337,300"/>
-<area shape="rect" title=" " alt="" coords="696,423,755,449"/>
-<area shape="rect" href="types_8h.html" title=" " alt="" coords="277,348,387,375"/>
-<area shape="rect" href="uvw__utilities_8h.html" title=" " alt="" coords="573,273,731,300"/>
-<area shape="rect" title=" " alt="" coords="293,423,371,449"/>
-<area shape="rect" title=" " alt="" coords="395,423,487,449"/>
-<area shape="rect" title=" " alt="" coords="511,423,614,449"/>
-<area shape="rect" title=" " alt="" coords="5,423,141,449"/>
-<area shape="rect" href="http://astro-informatics.github.io/sopt/types_8h.html.html" title=" " alt="" coords="166,423,269,449"/>
-<area shape="rect" href="logging_8disabled_8h.html" title=" " alt="" coords="1083,348,1266,375"/>
-<area shape="rect" title=" " alt="" coords="1136,423,1213,449"/>
-<area shape="rect" title=" " alt="" coords="615,348,689,375"/>
-<area shape="rect" title=" " alt="" coords="713,348,805,375"/>
-<area shape="rect" title=" " alt="" coords="843,199,906,225"/>
-<area shape="rect" href="http://astro-informatics.github.io/sopt/linear__transform_8h.html.html" title=" " alt="" coords="593,199,767,225"/>
-<area shape="rect" href="http://astro-informatics.github.io/sopt/wavelets_8h.html.html" title=" " alt="" coords="1032,199,1157,225"/>
-<area shape="rect" href="http://astro-informatics.github.io/sopt/sara_8h.html.html" title=" " alt="" coords="1181,199,1339,225"/>
+<area shape="rect" title=" " alt="" coords="484,5,670,61"/>
+<area shape="rect" title=" " alt="" coords="98,117,253,143"/>
+<area shape="rect" href="distribute_8h.html" title=" " alt="" coords="278,117,415,143"/>
+<area shape="rect" href="logging_8h.html" title=" " alt="" coords="285,199,408,225"/>
+<area shape="rect" href="mpi__utilities_8h.html" title=" " alt="" coords="699,117,855,143"/>
+<area shape="rect" href="purify_2utilities_8h.html" title=" " alt="" coords="615,199,739,225"/>
+<area shape="rect" href="wavelet__operator__factory_8h.html" title=" " alt="" coords="1076,109,1254,151"/>
+<area shape="rect" title=" " alt="" coords="404,348,518,375"/>
+<area shape="rect" title=" " alt="" coords="40,199,120,225"/>
+<area shape="rect" title=" " alt="" coords="144,199,210,225"/>
+<area shape="rect" title=" " alt="" coords="282,348,341,375"/>
+<area shape="rect" href="types_8h.html" title=" " alt="" coords="1035,273,1146,300"/>
+<area shape="rect" href="uvw__utilities_8h.html" title=" " alt="" coords="432,199,591,225"/>
+<area shape="rect" title=" " alt="" coords="942,348,1020,375"/>
+<area shape="rect" title=" " alt="" coords="1044,348,1136,375"/>
+<area shape="rect" title=" " alt="" coords="1160,348,1263,375"/>
+<area shape="rect" title=" " alt="" coords="1288,348,1424,375"/>
+<area shape="rect" title=" " alt="" coords="815,348,918,375"/>
+<area shape="rect" href="logging_8disabled_8h.html" title=" " alt="" coords="39,273,222,300"/>
+<area shape="rect" title=" " alt="" coords="92,348,169,375"/>
+<area shape="rect" title=" " alt="" coords="450,273,523,300"/>
+<area shape="rect" title=" " alt="" coords="547,273,639,300"/>
+<area shape="rect" title=" " alt="" coords="1064,199,1127,225"/>
+<area shape="rect" title=" " alt="" coords="866,199,1040,225"/>
+<area shape="rect" title=" " alt="" coords="1434,199,1560,225"/>
+<area shape="rect" title=" " alt="" coords="1202,199,1360,225"/>
 </map>
 </div>
 </div>
@@ -156,7 +156,7 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;      std::make_tuple(<span class="stringliteral">&quot;DB6&quot;</span>, 3<a class="code" href="namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5">u</a>),   std::make_tuple(<span class="stringliteral">&quot;DB7&quot;</span>, 3<a class="code" href="namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5">u</a>), std::make_tuple(<span class="stringliteral">&quot;DB8&quot;</span>, 3<a class="code" href="namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5">u</a>)};</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> imsizey = 128;</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> imsizex = 128;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> sara = <a class="codeRef" href="http://astro-informatics.github.io/sopt/classsopt_1_1wavelets_1_1SARA.html">sopt::wavelets::SARA</a>(wavelets.begin(), wavelets.end());</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> sara = sopt::wavelets::SARA(wavelets.begin(), wavelets.end());</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keyword">auto</span> phi = sopt::linear_transform&lt;t_complex&gt;(sara, imsizey, imsizex);</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">auto</span> op = std::make_shared&lt;sopt::LinearTransform&lt;Vector&lt;t_complex&gt;&gt; <span class="keyword">const</span>&gt;(phi);</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keyword">auto</span> factory_op = factory::wavelet_operator_factory&lt;Vector&lt;t_complex&gt;&gt;(</div>
@@ -164,24 +164,22 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  CAPTURE(sara.size());</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  SECTION(<span class="stringliteral">&quot;forward&quot;</span>) {</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keyword">const</span> <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_complex&gt;</a> input = <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_complex&gt;::Random</a>(sara.size() * imsizex * imsizey);</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keyword">const</span> Vector&lt;t_complex&gt; input = Vector&lt;t_complex&gt;::Random(sara.size() * imsizex * imsizey);</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    REQUIRE((*op * input).isApprox(*factory_op * input));</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  }</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  SECTION(<span class="stringliteral">&quot;backward&quot;</span>) {</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">const</span> <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_complex&gt;</a> input = <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_complex&gt;::Random</a>(imsizex * imsizey);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">const</span> Vector&lt;t_complex&gt; input = Vector&lt;t_complex&gt;::Random(imsizex * imsizey);</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    REQUIRE((op-&gt;adjoint() * input).isApprox(factory_op-&gt;adjoint() * input));</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  }</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;}</div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="namespacepurify_1_1factory.html#a5bbc6a01d0a2cdd30b656a6bb957221fa74136b24217cb75599440e6e1d807cf7">purify::factory::serial</a>, <a class="el" href="logging_8disabled_8h_source.html#l00017">purify::logging::set_level()</a>, and <a class="el" href="tests_2operators_8cc_source.html#l00019">operators_test::u</a>.</p>
+<p class="reference">References <a class="el" href="namespacepurify_1_1factory.html#a5bbc6a01d0a2cdd30b656a6bb957221fa74136b24217cb75599440e6e1d807cf7">purify::factory::serial</a>, <a class="el" href="logging_8disabled_8h_source.html#l00016">purify::logging::set_level()</a>, and <a class="el" href="tests_2operators_8cc_source.html#l00019">operators_test::u</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
-<div class="ttc" id="anamespacesopt_html_ac4dd3feebe1bf49ebd44d72b05064c19"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector</a></div><div class="ttdeci">Eigen::Matrix&lt; T, Eigen::Dynamic, 1 &gt; Vector</div></div>
-<div class="ttc" id="anamespacepurify_1_1logging_html_a46c69647ca4c2d4fe100e50884d6b442"><div class="ttname"><a href="namespacepurify_1_1logging.html#a46c69647ca4c2d4fe100e50884d6b442">purify::logging::set_level</a></div><div class="ttdeci">void set_level(std::string const &amp;, std::string const &amp;)</div><div class="ttdoc">Sets loggin level.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8disabled_8h_source.html#l00017">logging.disabled.h:17</a></div></div>
+<div class="ttc" id="anamespacepurify_1_1logging_html_a46c69647ca4c2d4fe100e50884d6b442"><div class="ttname"><a href="namespacepurify_1_1logging.html#a46c69647ca4c2d4fe100e50884d6b442">purify::logging::set_level</a></div><div class="ttdeci">void set_level(std::string const &amp;, std::string const &amp;)</div><div class="ttdoc">Sets logging level.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8disabled_8h_source.html#l00016">logging.disabled.h:16</a></div></div>
 <div class="ttc" id="anamespaceoperators__test_html_a694d86dbaf57f62a716d96eb8ce87bd5"><div class="ttname"><a href="namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5">operators_test::u</a></div><div class="ttdeci">const std::vector&lt; t_real &gt; u</div><div class="ttdoc">data for u coordinate</div><div class="ttdef"><b>Definition:</b> <a href="tests_2operators_8cc_source.html#l00019">operators.cc:19</a></div></div>
-<div class="ttc" id="aclasssopt_1_1wavelets_1_1SARA_html"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/classsopt_1_1wavelets_1_1SARA.html">sopt::wavelets::SARA</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

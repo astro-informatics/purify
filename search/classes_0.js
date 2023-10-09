@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['appliedfunction_982',['AppliedFunction',['http://astro-informatics.github.io/sopt/classsopt_1_1details_1_1AppliedFunction.html',1,'sopt::details']]]
+  ['channelwrapper_602',['ChannelWrapper',['../classpurify_1_1casa_1_1MeasurementSet_1_1ChannelWrapper.html',1,'purify::casa::MeasurementSet']]],
+  ['const_5fiterator_603',['const_iterator',['../classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html',1,'purify::casa::MeasurementSet']]]
 ];

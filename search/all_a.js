@@ -1,17 +1,15 @@
 var searchData=
 [
-  ['kaiser_5fbessel_374',['kaiser_bessel',['../namespacepurify_1_1kernels.html#a5ebd5a33dc46d12eca370fb011c6d20a',1,'purify::kernels']]],
-  ['kaiser_5fbessel_5fgeneral_375',['kaiser_bessel_general',['../namespacepurify_1_1kernels.html#a95321ed82db7eb7e34a706bf0de8135a',1,'purify::kernels']]],
-  ['kb_376',['kb',['../namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668aba34ea40525a4379add785228e37fe86',1,'purify::kernels']]],
-  ['kb_5fpresample_377',['kb_presample',['../namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a6aa53115b88dffbf79eb9c4aa0e0ba20',1,'purify::kernels']]],
-  ['kbmin_378',['kbmin',['../namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668ac8f9b2014e544adacfc19dfeba3718e8',1,'purify::kernels']]],
-  ['kernel_379',['kernel',['../namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668',1,'purify::kernels']]],
-  ['kernel_5ffrom_5fstring_380',['kernel_from_string',['../namespacepurify_1_1kernels.html#a1e2f3c37e5c0c6e2f2a3282110891f31',1,'purify::kernels']]],
-  ['kernel_5flinear_5finterp_381',['kernel_linear_interp',['../namespacepurify_1_1kernels.html#add23bd0781527fd3fb7adfbdcd540c90',1,'purify::kernels']]],
-  ['kernel_5fsamples_382',['kernel_samples',['../namespacepurify_1_1kernels.html#a57f3f5095a015db5353a7fd7a3002bf8',1,'purify::kernels']]],
-  ['kernel_5fzero_5finterp_383',['kernel_zero_interp',['../namespacepurify_1_1kernels.html#a62e978dd425d45ba985630786104d89c',1,'purify::kernels']]],
-  ['kernels_2ecc_384',['kernels.cc',['../kernels_8cc.html',1,'']]],
-  ['kernels_2eh_385',['kernels.h',['../kernels_8h.html',1,'']]],
-  ['kmeans_2ecc_386',['kmeans.cc',['../kmeans_8cc.html',1,'']]],
-  ['kmeans_5falgo_387',['kmeans_algo',['../namespacepurify_1_1distribute.html#a63f1d94d4471ff67adec654d547dff4a',1,'purify::distribute']]]
+  ['l1_224',['l1',['../namespacepurify_1_1integration.html#a5d8cd1673befa0bfd8cc7618ff5a9816a377fd569971eedeba8fbea28434a390a',1,'purify::integration']]],
+  ['l1gproximal_225',['L1GProximal',['../namespacepurify_1_1factory.html#a3e81ddc8925844c225faea9371315d1fadada0c23c1236ccc934a3556a1725e94',1,'purify::factory']]],
+  ['l2_226',['l2',['../namespacepurify_1_1integration.html#a5d8cd1673befa0bfd8cc7618ff5a9816abec25675775e9e0a0d783a5018b463e3',1,'purify::integration']]],
+  ['lambda_227',['lambda',['../namespacepurify_1_1utilities.html#aa2af2ee7e4f1bb93a42235b9d973983da945f3fc449518a73b9f5f32868db466c',1,'purify::utilities']]],
+  ['linear_5fconvol_5f1d_228',['linear_convol_1d',['../namespacepurify_1_1convol.html#adf71b9fa393f32b36d0cbc545d831360',1,'purify::convol']]],
+  ['linear_5fconvol_5f2d_229',['linear_convol_2d',['../namespacepurify_1_1convol.html#a8243104c62ca603ba048c521ca99be92',1,'purify::convol::linear_convol_2d(const Vector&lt; T &gt; &amp;kernelfu, const Vector&lt; T &gt; &amp;kernelfv, const Matrix&lt; T &gt; &amp;kernelg)'],['../namespacepurify_1_1convol.html#a8d09d81178acd9e2b707396697b39c1a',1,'purify::convol::linear_convol_2d(const std::function&lt; T(t_int)&gt; &amp;kernelu, const std::function&lt; T(t_int)&gt; &amp;kernelv, const std::function&lt; T(t_int, t_int)&gt; &amp;kernelw, const t_uint &amp;Jfu, const t_uint &amp;Jfv, const t_uint &amp;Jgu, const t_uint &amp;Jgv)']]],
+  ['linf_230',['linf',['../namespacepurify_1_1integration.html#a5d8cd1673befa0bfd8cc7618ff5a9816a707f3c5e9c59c9e5f347d2cbec59c66b',1,'purify::integration']]],
+  ['ll_231',['LL',['../namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a67824ecf84f5816f07b74fa956bdbcd2',1,'purify']]],
+  ['logging_2edisabled_2eh_232',['logging.disabled.h',['../logging_8disabled_8h.html',1,'']]],
+  ['logging_2eenabled_2eh_233',['logging.enabled.h',['../logging_8enabled_8h.html',1,'']]],
+  ['logging_2eh_234',['logging.h',['../logging_8h.html',1,'']]],
+  ['lr_235',['LR',['../namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a90a7c45eaffbd575ca6fb361e6d170a4',1,'purify']]]
 ];

@@ -83,7 +83,7 @@ $(function() {
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="types_8h.html">purify/types.h</a>&quot;</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;numeric&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;random&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;catch.hpp&quot;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;catch2/catch_all.hpp&quot;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="IndexMapping_8h.html">purify/IndexMapping.h</a>&quot;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="purify_2utilities_8h.html">purify/utilities.h</a>&quot;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
@@ -92,11 +92,11 @@ $(function() {
 <div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="index__mapping_8cc.html#a5ecfe1eae6567db81af76102ce0df2d7">   11</a></span>&#160;<a class="code" href="index__mapping_8cc.html#a5ecfe1eae6567db81af76102ce0df2d7">TEST_CASE</a>(<span class="stringliteral">&quot;Index mapping operator&quot;</span>) {</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  SECTION(<span class="stringliteral">&quot;No overlap&quot;</span>) {</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    std::vector&lt;t_int&gt; indices{1, 3, 5, 2};</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_int&gt;</a> input(10);</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    Vector&lt;t_int&gt; input(10);</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    std::iota(input.data(), input.data() + input.size(), 0);</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="keyword">auto</span> mapper = <a class="code" href="classpurify_1_1IndexMapping.html">IndexMapping&lt;t_int&gt;</a>(indices, input.size());</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_int&gt;</a> output;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    Vector&lt;t_int&gt; output;</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    mapper(input, output);</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    SECTION(<span class="stringliteral">&quot;Direct application&quot;</span>) {</div>
@@ -105,7 +105,7 @@ $(function() {
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;      <span class="keywordflow">for</span> (<span class="keyword">auto</span> <span class="keyword">const</span> &amp;index : indices) <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(output(i++) == index);</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    }</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_int&gt;</a> adjoint;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    Vector&lt;t_int&gt; adjoint;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    mapper.adjoint(output, adjoint);</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    SECTION(<span class="stringliteral">&quot;Adjoint application&quot;</span>) {</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(adjoint.size() == input.size());</div>
@@ -118,11 +118,11 @@ $(function() {
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  }</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  SECTION(<span class="stringliteral">&quot;With overlap&quot;</span>) {</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    std::vector&lt;t_int&gt; indices{1, 2, 5, 2};</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_int&gt;</a> input(10);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    Vector&lt;t_int&gt; input(10);</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    std::iota(input.data(), input.data() + input.size(), 0);</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keyword">auto</span> mapper = <a class="code" href="classpurify_1_1IndexMapping.html">IndexMapping&lt;t_int&gt;</a>(indices, input.size());</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_int&gt;</a> output;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    Vector&lt;t_int&gt; output;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    mapper(input, output);</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    SECTION(<span class="stringliteral">&quot;Direct application&quot;</span>) {</div>
@@ -132,7 +132,7 @@ $(function() {
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    }</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    SECTION(<span class="stringliteral">&quot;Adjoint application&quot;</span>) {</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_int&gt;</a> adjoint;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      Vector&lt;t_int&gt; adjoint;</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      mapper.adjoint(output, adjoint);</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(adjoint.size() == input.size());</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      <span class="keywordflow">for</span> (<span class="keyword">auto</span> <span class="keyword">const</span> &amp;index : std::set&lt;t_int&gt;(indices.begin(), indices.end())) {</div>
@@ -168,22 +168,22 @@ $(function() {
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;}</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
 <div class="line"><a name="l00089"></a><span class="lineno"><a class="line" href="index__mapping_8cc.html#a531eabfc1f8c07f37db1dace00d8a486">   89</a></span>&#160;<a class="code" href="index__mapping_8cc.html#a5ecfe1eae6567db81af76102ce0df2d7">TEST_CASE</a>(<span class="stringliteral">&quot;Vector-shrinked matrix multiplication&quot;</span>) {</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> <a class="codeRef" href="benchmarks_2wavelets_8cc.html#a61a80266d367e479ef40417f4f681bea">N</a> = 10;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> N = 10;</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="keyword">extern</span> std::unique_ptr&lt;std::mt19937_64&gt; <a class="code" href="common__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne</a>;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  std::uniform_int_distribution&lt;sopt::t_int&gt; uniform_dist(0, <a class="codeRef" href="benchmarks_2wavelets_8cc.html#a61a80266d367e479ef40417f4f681bea">N</a> - 1);</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#adedb6b3e862bd2968bf3026599121630">Matrix&lt;t_int&gt;</a> matrix = (<a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a7d7971e5566e597eb907614917e30c78">Image&lt;uint8_t&gt;::Random</a>(<a class="codeRef" href="benchmarks_2wavelets_8cc.html#a61a80266d367e479ef40417f4f681bea">N</a>, <a class="codeRef" href="benchmarks_2wavelets_8cc.html#a61a80266d367e479ef40417f4f681bea">N</a>) &lt; uint8_t(64))</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  std::uniform_int_distribution&lt;sopt::t_int&gt; uniform_dist(0, N - 1);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  Matrix&lt;t_int&gt; matrix = (Image&lt;uint8_t&gt;::Random(N, N) &lt; uint8_t(64))</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;                             .matrix()</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                             .select(<a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#adedb6b3e862bd2968bf3026599121630">Matrix&lt;uint8_t&gt;::Random</a>(<a class="codeRef" href="benchmarks_2wavelets_8cc.html#a61a80266d367e479ef40417f4f681bea">N</a>, <a class="codeRef" href="benchmarks_2wavelets_8cc.html#a61a80266d367e479ef40417f4f681bea">N</a>), <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#adedb6b3e862bd2968bf3026599121630">Matrix&lt;uint8_t&gt;::Zero</a>(<a class="codeRef" href="benchmarks_2wavelets_8cc.html#a61a80266d367e479ef40417f4f681bea">N</a>, <a class="codeRef" href="benchmarks_2wavelets_8cc.html#a61a80266d367e479ef40417f4f681bea">N</a>))</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                             .select(Matrix&lt;uint8_t&gt;::Random(N, N), Matrix&lt;uint8_t&gt;::Zero(N, N))</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;                             .cast&lt;t_int&gt;();</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  matrix.row(uniform_dist(*<a class="code" href="common__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne</a>)).fill(0);</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  matrix.row(uniform_dist(*<a class="code" href="common__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne</a>)).fill(0);</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  <a class="code" href="namespacepurify.html#ae523b7b9a1588d740b890c191ed57fd4">Sparse&lt;t_int&gt;</a> <span class="keyword">const</span> sparse = matrix.sparseView();</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_int&gt;</a> <span class="keyword">const</span> input = <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;uint8_t&gt;::Random</a>(<a class="codeRef" href="benchmarks_2wavelets_8cc.html#a61a80266d367e479ef40417f4f681bea">N</a>).cast&lt;<a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a31ab3e07b254312a99a9fe2918b0a625">t_int</a>&gt;();</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  Vector&lt;t_int&gt; <span class="keyword">const</span> input = Vector&lt;uint8_t&gt;::Random(N).cast&lt;t_int&gt;();</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <a class="code" href="namespacepurify.html#ae523b7b9a1588d740b890c191ed57fd4">Sparse&lt;t_int&gt;</a> <span class="keyword">const</span> compressed = <a class="code" href="namespacepurify.html#ae5a8e573961b3d00cc5603cf4e5e647f">compress_outer</a>(sparse);</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> mapper = <a class="code" href="classpurify_1_1IndexMapping.html">IndexMapping&lt;t_int&gt;</a>(<a class="code" href="namespacepurify.html#ae1142fb0bf079e99cbceb3e29027418c">non_empty_outers</a>(sparse), input.size());</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_int&gt;</a> comp_input;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  Vector&lt;t_int&gt; comp_input;</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  mapper(input, comp_input);</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(sparse * input == compressed * comp_input);</div>
@@ -191,22 +191,17 @@ $(function() {
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(<a class="code" href="namespacepurify_1_1utilities.html#a0ff3f9b89549f7e5a46cf56524e4e7cc">utilities::sparse_multiply_matrix</a>(compressed, comp_input) == compressed * comp_input);</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="anamespacesopt_html_adedb6b3e862bd2968bf3026599121630"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt.html#adedb6b3e862bd2968bf3026599121630">Matrix</a></div><div class="ttdeci">Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; Matrix</div></div>
 <div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div></div>
 <div class="ttc" id="acasa_8cc_html_a2f04a5b42b147fe2ac9c62e73fa66364"><div class="ttname"><a href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a></div><div class="ttdeci">#define CHECK(CONDITION, ERROR)</div><div class="ttdef"><b>Definition:</b> <a href="casa_8cc_source.html#l00006">casa.cc:6</a></div></div>
-<div class="ttc" id="anamespacesopt_html_ac4dd3feebe1bf49ebd44d72b05064c19"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector</a></div><div class="ttdeci">Eigen::Matrix&lt; T, Eigen::Dynamic, 1 &gt; Vector</div></div>
 <div class="ttc" id="aindex__mapping_8cc_html_a5ecfe1eae6567db81af76102ce0df2d7"><div class="ttname"><a href="index__mapping_8cc.html#a5ecfe1eae6567db81af76102ce0df2d7">TEST_CASE</a></div><div class="ttdeci">TEST_CASE(&quot;Index mapping operator&quot;)</div><div class="ttdef"><b>Definition:</b> <a href="index__mapping_8cc_source.html#l00011">index_mapping.cc:11</a></div></div>
 <div class="ttc" id="aIndexMapping_8h_html"><div class="ttname"><a href="IndexMapping_8h.html">IndexMapping.h</a></div></div>
-<div class="ttc" id="anamespacepurify_html"><div class="ttname"><a href="namespacepurify.html">purify</a></div><div class="ttdef"><b>Definition:</b> <a href="algorithm__factory_8h_source.html#l00027">algorithm_factory.h:27</a></div></div>
+<div class="ttc" id="anamespacepurify_html"><div class="ttname"><a href="namespacepurify.html">purify</a></div><div class="ttdef"><b>Definition:</b> <a href="algorithm__factory_8h_source.html#l00031">algorithm_factory.h:31</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1utilities_html_a0ff3f9b89549f7e5a46cf56524e4e7cc"><div class="ttname"><a href="namespacepurify_1_1utilities.html#a0ff3f9b89549f7e5a46cf56524e4e7cc">purify::utilities::sparse_multiply_matrix</a></div><div class="ttdeci">std::enable_if&lt; std::is_same&lt; typename T0::Scalar, typename T1::Scalar &gt;::value and T0::IsRowMajor, Vector&lt; typename T0::Scalar &gt; &gt;::type sparse_multiply_matrix(const Eigen::SparseMatrixBase&lt; T0 &gt; &amp;M, const Eigen::MatrixBase&lt; T1 &gt; &amp;x)</div><div class="ttdoc">Parallel multiplication with a sparse matrix and vector.</div><div class="ttdef"><b>Definition:</b> <a href="purify_2utilities_8h_source.html#l00067">utilities.h:67</a></div></div>
 <div class="ttc" id="acommon__catch__main_8cc_html_afd7b13def75c5d7feb77ac1ea2df5d0b"><div class="ttname"><a href="common__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne</a></div><div class="ttdeci">std::unique_ptr&lt; std::mt19937_64 &gt; mersenne(new std::mt19937_64(0))</div></div>
 <div class="ttc" id="anamespacepurify_html_ae1142fb0bf079e99cbceb3e29027418c"><div class="ttname"><a href="namespacepurify.html#ae1142fb0bf079e99cbceb3e29027418c">purify::non_empty_outers</a></div><div class="ttdeci">std::set&lt; STORAGE_INDEX_TYPE &gt; non_empty_outers(Eigen::SparseMatrixBase&lt; T0 &gt; const &amp;matrix)</div><div class="ttdoc">Indices of non empty outer indices.</div><div class="ttdef"><b>Definition:</b> <a href="IndexMapping_8h_source.html#l00061">IndexMapping.h:61</a></div></div>
 <div class="ttc" id="anamespacepurify_html_ae5a8e573961b3d00cc5603cf4e5e647f"><div class="ttname"><a href="namespacepurify.html#ae5a8e573961b3d00cc5603cf4e5e647f">purify::compress_outer</a></div><div class="ttdeci">Sparse&lt; typename T0::Scalar &gt; compress_outer(T0 const &amp;matrix)</div><div class="ttdoc">Indices of non empty outer indices.</div><div class="ttdef"><b>Definition:</b> <a href="IndexMapping_8h_source.html#l00071">IndexMapping.h:71</a></div></div>
-<div class="ttc" id="abenchmarks_2wavelets_8cc_html_a61a80266d367e479ef40417f4f681bea"><div class="ttname"><a href="benchmarks_2wavelets_8cc.html#a61a80266d367e479ef40417f4f681bea">N</a></div><div class="ttdeci">const auto N</div></div>
 <div class="ttc" id="anamespacepurify_html_ae523b7b9a1588d740b890c191ed57fd4"><div class="ttname"><a href="namespacepurify.html#ae523b7b9a1588d740b890c191ed57fd4">purify::Sparse</a></div><div class="ttdeci">Eigen::SparseMatrix&lt; T, Eigen::RowMajor, I &gt; Sparse</div><div class="ttdoc">A matrix of a given type.</div><div class="ttdef"><b>Definition:</b> <a href="types_8h_source.html#l00028">types.h:28</a></div></div>
 <div class="ttc" id="apurify_2utilities_8h_html"><div class="ttname"><a href="purify_2utilities_8h.html">utilities.h</a></div></div>
-<div class="ttc" id="anamespacesopt_html_a31ab3e07b254312a99a9fe2918b0a625"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt.html#a31ab3e07b254312a99a9fe2918b0a625">t_int</a></div><div class="ttdeci">int t_int</div></div>
-<div class="ttc" id="anamespacesopt_html_a7d7971e5566e597eb907614917e30c78"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt.html#a7d7971e5566e597eb907614917e30c78">Image</a></div><div class="ttdeci">Eigen::Array&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; Image</div></div>
 <div class="ttc" id="aclasspurify_1_1IndexMapping_html"><div class="ttname"><a href="classpurify_1_1IndexMapping.html">purify::IndexMapping</a></div><div class="ttdef"><b>Definition:</b> <a href="IndexMapping_8h_source.html#l00011">IndexMapping.h:11</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

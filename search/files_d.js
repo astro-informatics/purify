@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['objective_5ffunctions_2eh_1224',['objective_functions.h',['http://astro-informatics.github.io/sopt/objective__functions_8h.html.html',1,'']]],
-  ['operators_2ecc_1225',['operators.cc',['../purify_2operators_8cc.html',1,'(Global Namespace)'],['../tests_2operators_8cc.html',1,'(Global Namespace)']]],
-  ['operators_2eh_1226',['operators.h',['../operators_8h.html',1,'']]],
-  ['operators_5fgpu_2ecc_1227',['operators_gpu.cc',['../operators__gpu_8cc.html',1,'']]],
-  ['operators_5fgpu_2eh_1228',['operators_gpu.h',['../operators__gpu_8h.html',1,'']]]
+  ['sara_5fpadmm_5frandom_5fcoverage_2ecc_731',['sara_padmm_random_coverage.cc',['../sara__padmm__random__coverage_8cc.html',1,'']]],
+  ['sdmm_5fm31_5fsimulation_2ecc_732',['sdmm_m31_simulation.cc',['../sdmm__m31__simulation_8cc.html',1,'']]],
+  ['show_5fimage_2ecc_733',['show_image.cc',['../show__image_8cc.html',1,'']]],
+  ['sparse_2ecc_734',['sparse.cc',['../sparse_8cc.html',1,'']]]
 ];

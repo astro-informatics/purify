@@ -1,13 +1,18 @@
 var searchData=
 [
-  ['l1_5fnorm_2ecc_1193',['l1_norm.cc',['http://astro-informatics.github.io/sopt/l1__norm_8cc.html.html',1,'']]],
-  ['l1_5fproximal_2ecc_1194',['l1_proximal.cc',['http://astro-informatics.github.io/sopt/benchmarks_2l1__proximal_8cc.html.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/examples_2l1__proximal_8cc.html.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/regressions_2l1__proximal_8cc.html.html',1,'(Global Namespace)']]],
-  ['l1_5fproximal_2eh_1195',['l1_proximal.h',['http://astro-informatics.github.io/sopt/l1__proximal_8h.html.html',1,'']]],
-  ['l2_5fforward_5fbackward_2eh_1196',['l2_forward_backward.h',['http://astro-informatics.github.io/sopt/l2__forward__backward_8h.html.html',1,'']]],
-  ['l2_5fprimal_5fdual_2eh_1197',['l2_primal_dual.h',['http://astro-informatics.github.io/sopt/l2__primal__dual_8h.html.html',1,'']]],
-  ['linear_5ftransform_2ecc_1198',['linear_transform.cc',['http://astro-informatics.github.io/sopt/linear__transform_8cc.html.html',1,'']]],
-  ['linear_5ftransform_2eh_1199',['linear_transform.h',['http://astro-informatics.github.io/sopt/linear__transform_8h.html.html',1,'']]],
-  ['logging_2edisabled_2eh_1200',['logging.disabled.h',['../logging_8disabled_8h.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/logging_8disabled_8h.html.html',1,'(Global Namespace)']]],
-  ['logging_2eenabled_2eh_1201',['logging.enabled.h',['../logging_8enabled_8h.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/logging_8enabled_8h.html.html',1,'(Global Namespace)']]],
-  ['logging_2eh_1202',['logging.h',['../logging_8h.html',1,'(Global Namespace)'],['http://astro-informatics.github.io/sopt/logging_8h.html.html',1,'(Global Namespace)']]]
+  ['padmm_2ecc_711',['padmm.cc',['../padmm_8cc.html',1,'']]],
+  ['padmm_5fmpi_2ecc_712',['padmm_mpi.cc',['../padmm__mpi_8cc.html',1,'']]],
+  ['padmm_5fmpi_5frandom_5fcoverage_2ecc_713',['padmm_mpi_random_coverage.cc',['../padmm__mpi__random__coverage_8cc.html',1,'']]],
+  ['padmm_5fmpi_5freal_5fdata_2ecc_714',['padmm_mpi_real_data.cc',['../padmm__mpi__real__data_8cc.html',1,'']]],
+  ['padmm_5frandom_5fcoverage_2ecc_715',['padmm_random_coverage.cc',['../padmm__random__coverage_8cc.html',1,'']]],
+  ['padmm_5freal_5fdata_2ecc_716',['padmm_real_data.cc',['../padmm__real__data_8cc.html',1,'']]],
+  ['padmm_5freweighted_5fsimulation_2ecc_717',['padmm_reweighted_simulation.cc',['../padmm__reweighted__simulation_8cc.html',1,'']]],
+  ['padmm_5fsimulation_2ecc_718',['padmm_simulation.cc',['../padmm__simulation_8cc.html',1,'']]],
+  ['parallel_5fmpi_5futilities_2ecc_719',['parallel_mpi_utilities.cc',['../parallel__mpi__utilities_8cc.html',1,'']]],
+  ['parser_5ftest_2ecc_720',['parser_test.cc',['../parser__test_8cc.html',1,'']]],
+  ['pfitsio_2ecc_721',['pfitsio.cc',['../pfitsio_8cc.html',1,'']]],
+  ['pfitsio_2eh_722',['pfitsio.h',['../pfitsio_8h.html',1,'']]],
+  ['plot_5fwkernel_2ecc_723',['plot_wkernel.cc',['../plot__wkernel_8cc.html',1,'']]],
+  ['purify_5fcontributors_2emd_724',['PURIFY_CONTRIBUTORS.md',['../PURIFY__CONTRIBUTORS_8md.html',1,'']]],
+  ['purify_5ffitsio_2ecc_725',['purify_fitsio.cc',['../purify__fitsio_8cc.html',1,'']]]
 ];

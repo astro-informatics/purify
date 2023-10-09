@@ -87,8 +87,8 @@ $(function() {
 <code>#include &quot;<a class="el" href="types_8h_source.html">purify/types.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="logging_8h_source.html">purify/logging.h</a>&quot;</code><br />
 <code>#include &lt;vector&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://astro-informatics.github.io/sopt/wavelets_8h.html">sopt/wavelets.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://astro-informatics.github.io/sopt/sara_8h.html">sopt/wavelets/sara.h</a>&gt;</code><br />
+<code>#include &lt;sopt/wavelets.h&gt;</code><br />
+<code>#include &lt;sopt/wavelets/sara.h&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for wavelet_operator_factory.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
@@ -96,21 +96,21 @@ $(function() {
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="wavelet__operator__factory_8h__incl.png" border="0" usemap="#_2home_2runner_2work_2purify_2purify_2cpp_2purify_2wavelet__operator__factory_8h" alt=""/></div>
 <map name="_2home_2runner_2work_2purify_2purify_2cpp_2purify_2wavelet__operator__factory_8h" id="_2home_2runner_2work_2purify_2purify_2cpp_2purify_2wavelet__operator__factory_8h">
-<area shape="rect" title=" " alt="" coords="325,5,512,61"/>
-<area shape="rect" title=" " alt="" coords="207,333,321,360"/>
-<area shape="rect" href="types_8h.html" title=" " alt="" coords="235,109,346,136"/>
-<area shape="rect" href="logging_8h.html" title=" " alt="" coords="676,184,799,211"/>
-<area shape="rect" title=" " alt="" coords="422,109,485,136"/>
-<area shape="rect" href="http://astro-informatics.github.io/sopt/wavelets_8h.html.html" title=" " alt="" coords="509,109,635,136"/>
-<area shape="rect" href="http://astro-informatics.github.io/sopt/sara_8h.html.html" title=" " alt="" coords="659,109,816,136"/>
-<area shape="rect" title=" " alt="" coords="42,184,121,211"/>
-<area shape="rect" title=" " alt="" coords="145,184,237,211"/>
-<area shape="rect" title=" " alt="" coords="261,184,363,211"/>
-<area shape="rect" title=" " alt="" coords="388,184,524,211"/>
-<area shape="rect" href="http://astro-informatics.github.io/sopt/types_8h.html.html" title=" " alt="" coords="549,184,651,211"/>
-<area shape="rect" href="logging_8disabled_8h.html" title=" " alt="" coords="470,259,653,285"/>
-<area shape="rect" title=" " alt="" coords="476,333,553,360"/>
-<area shape="rect" title=" " alt="" coords="577,333,636,360"/>
+<area shape="rect" title=" " alt="" coords="534,5,720,61"/>
+<area shape="rect" title=" " alt="" coords="291,259,406,285"/>
+<area shape="rect" href="types_8h.html" title=" " alt="" coords="254,109,365,136"/>
+<area shape="rect" href="logging_8h.html" title=" " alt="" coords="507,109,630,136"/>
+<area shape="rect" title=" " alt="" coords="654,109,717,136"/>
+<area shape="rect" title=" " alt="" coords="742,109,867,136"/>
+<area shape="rect" title=" " alt="" coords="891,109,1048,136"/>
+<area shape="rect" title=" " alt="" coords="40,184,118,211"/>
+<area shape="rect" title=" " alt="" coords="142,184,234,211"/>
+<area shape="rect" title=" " alt="" coords="258,184,361,211"/>
+<area shape="rect" title=" " alt="" coords="386,184,522,211"/>
+<area shape="rect" title=" " alt="" coords="546,184,649,211"/>
+<area shape="rect" href="logging_8disabled_8h.html" title=" " alt="" coords="725,184,908,211"/>
+<area shape="rect" title=" " alt="" coords="731,259,808,285"/>
+<area shape="rect" title=" " alt="" coords="832,259,891,285"/>
 </map>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -151,11 +151,11 @@ Enumerations</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a2ffd3209dbb03d7390df879572cea326"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a2ffd3209dbb03d7390df879572cea326"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="elRef" href="http://astro-informatics.github.io/sopt/classsopt_1_1LinearTransform.html">sopt::LinearTransform</a>&lt; T &gt; const  &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1factory.html#a2ffd3209dbb03d7390df879572cea326">purify::factory::wavelet_operator_factory</a> (const distributed_wavelet_operator distribute, const std::vector&lt; std::tuple&lt; std::string, <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a96a6515fd2aa0c9f5789d33e09fa6477">t_uint</a> &gt;&gt; &amp;wavelets, const <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a96a6515fd2aa0c9f5789d33e09fa6477">t_uint</a> imsizey, const <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a96a6515fd2aa0c9f5789d33e09fa6477">t_uint</a> imsizex, <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a96a6515fd2aa0c9f5789d33e09fa6477">t_uint</a> &amp;sara_size)</td></tr>
+<tr class="memitem:a2ffd3209dbb03d7390df879572cea326"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; sopt::LinearTransform&lt; T &gt; const  &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1factory.html#a2ffd3209dbb03d7390df879572cea326">purify::factory::wavelet_operator_factory</a> (const distributed_wavelet_operator distribute, const std::vector&lt; std::tuple&lt; std::string, t_uint &gt;&gt; &amp;wavelets, const t_uint imsizey, const t_uint imsizex, t_uint &amp;sara_size)</td></tr>
 <tr class="memdesc:a2ffd3209dbb03d7390df879572cea326"><td class="mdescLeft">&#160;</td><td class="mdescRight">construct sara wavelet operator  <a href="namespacepurify_1_1factory.html#a2ffd3209dbb03d7390df879572cea326">More...</a><br /></td></tr>
 <tr class="separator:a2ffd3209dbb03d7390df879572cea326"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5c435fa169cac5a8135922b5558f3ae6"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a5c435fa169cac5a8135922b5558f3ae6"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="elRef" href="http://astro-informatics.github.io/sopt/classsopt_1_1LinearTransform.html">sopt::LinearTransform</a>&lt; T &gt; const  &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1factory.html#a5c435fa169cac5a8135922b5558f3ae6">purify::factory::wavelet_operator_factory</a> (const distributed_wavelet_operator distribute, const std::vector&lt; std::tuple&lt; std::string, <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a96a6515fd2aa0c9f5789d33e09fa6477">t_uint</a> &gt;&gt; &amp;wavelets, const <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a96a6515fd2aa0c9f5789d33e09fa6477">t_uint</a> imsizey, const <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a96a6515fd2aa0c9f5789d33e09fa6477">t_uint</a> imsizex)</td></tr>
+<tr class="memitem:a5c435fa169cac5a8135922b5558f3ae6"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; sopt::LinearTransform&lt; T &gt; const  &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1factory.html#a5c435fa169cac5a8135922b5558f3ae6">purify::factory::wavelet_operator_factory</a> (const distributed_wavelet_operator distribute, const std::vector&lt; std::tuple&lt; std::string, t_uint &gt;&gt; &amp;wavelets, const t_uint imsizey, const t_uint imsizex)</td></tr>
 <tr class="separator:a5c435fa169cac5a8135922b5558f3ae6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->

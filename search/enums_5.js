@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['method_1932',['method',['../namespacepurify_1_1integration.html#a29ad3e35748f2774b6fe751c8f9a4cc9',1,'purify::integration']]]
+  ['kernel_1121',['kernel',['../namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668',1,'purify::kernels']]]
 ];

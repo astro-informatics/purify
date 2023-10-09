@@ -76,57 +76,102 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a href="https://travis-ci.com/astro-informatics/purify"><object type="image/svg+xml" data="https://travis-ci.com/astro-informatics/purify.svg?branch=development" style="pointer-events: none;">Build Status</object></a> <a href="https://codecov.io/gh/astro-informatics/purify"><object type="image/svg+xml" data="https://codecov.io/gh/astro-informatics/purify/branch/development/graph/badge.svg" style="pointer-events: none;">codecov</object></a> <a href="https://doi.org/10.5281/zenodo.2555252"><object type="image/svg+xml" data="https://zenodo.org/badge/DOI/10.5281/zenodo.2555252.svg" style="pointer-events: none;">DOI</object></a></p>
-<h1>Description </h1>
+<h1>Description</h1>
 <p><b>PURIFY</b> is an open-source collection of routines written in <code>C++</code> available under the <a href="#license">license</a> below. It implements different tools and high-level to perform radio interferometric imaging, <em>i.e.</em> to recover images from the Fourier measurements taken by radio interferometric telescopes.</p>
 <p><b>PURIFY</b> leverages recent developments in the field of compressive sensing and convex optimization. Low-level functionality to solve the resulting convex optimisation is factored into the open-source companion code, <a href="https://github.com/astro-informatics/sopt"><b>SOPT</b></a>, also written by the authors of <b>PURIFY</b>. For further background please see the <a href="#references-and-citation">reference</a> section.</p>
 <p>This documentation outlines the necessary and optional <a href="#dependencies-installation">dependencies</a> upon which <b>PURIFY</b> should be built, before describing <a href="#installing-and-building-PURIFY">installation</a>, <a href="#testing">testing</a> and <a href="#usage">usage</a> details. <a href="#contributors">Contributors</a>, <a href="#references-and-citation">references</a> and <a href="#license">license</a> information then follows.</p>
-<h1>Dependencies installation </h1>
-<p><b>PURIFY</b> is written in <code>C++11</code>. Pre-requisites and dependencies are listed in following and minimal versions required are tested against <code>Travis CI</code> meaning that they come natively with OSX and the Ubuntu Trusty release. These are also the default ones fetched by <code>CMake</code> (an internet connection is required for this).</p>
-<p><code>C++</code> minimal dependencies:</p>
+<h1>Dependencies installation</h1>
+<p><b>PURIFY</b> is written in <code>C++11</code>. Required software and libraries, and their minimum supported versions, are listed below. The build system will attempt to automatically download and build the automatically included libraries. (an internet connection is required for this). Most dependencies are handled by the <code>conan</code> package manager.</p>
+<p><code>C++</code> dependencies:</p>
+<h2>User-provided libraries</h2>
+<p>In order to build <b>PURIFY</b>, you should have the following installed on your system.</p>
 <ul>
-<li><a href="http://www.cmake.org/">CMake</a> v3.5.1 (Trusty as <code>cmake3</code>) A free software that allows cross-platform compilation</li>
+<li><a href="http://www.cmake.org/">CMake</a> v3.5.1 A free software that allows cross-platform compilation</li>
+<li><a href="https://conan.io/">conan</a> v1.60.1 <code>C/C++</code> package manager. <b>NOTE</b> Conan 2.0 and later are not supported.</li>
 <li><a href="https://gcc.gnu.org">GCC</a> v7.3.0 GNU compiler for <code>C++</code></li>
-<li><a href="https://github.com/UCL/GreatCMakeCookOff">UCL/GreatCMakeCookOff</a> Collection of <code>CMake</code> recipes. Downloaded automatically if absent</li>
-<li><a href="https://www.boost.org/">Boost</a> v1.54 (Trusty). A set of free peer-reviewed portable C++ libraries. V1.65 downloaded automatically if absent but needs a cmake &gt;= 3.9.2.</li>
-<li><a href="www.fftw.org">fftw3</a>: Fastest Fourier Transform in the West</li>
-<li><a href="http://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen3</a> v3.3.7 (Trusty) Modern <code>C++</code> linear algebra. Downloaded automatically if absent.</li>
-<li><a href="http://www.libtiff.org/">tiff</a> v4.0.3 (Trusty) Tag Image File Format library</li>
-<li><a href="https://github.com/astro-informatics/sopt">astro-informatics/sopt</a> v* Sparse Optimization Compressed Sensing library. Downloaded automatically if absent.</li>
-<li><a href="http://heasarc.gsfc.nasa.gov/fitsio/fitsio.html">cfitsio</a> v* Library of <code>C</code> and <code>Fortran</code> subroutines for reading and writing data files in FITS (Flexible Image Transport System) data format. Downloaded automatically if absent.</li>
-<li><a href="http://casacore.github.io/casacore/">casacore</a> - Optional - Needed to interface with measurement sets. The main purify program requires this library (and its dependencies)</li>
-<li><a href="http://openmp.org/wp/">OpenMP</a> v4.8.4 (Trusty) - Optional - Speeds up some of the operations.</li>
-<li><a href="https://www.open-mpi.org">MPI</a> v3.1.1 (Trusty) - Optional - Parallelisation paradigm to speed up operations.</li>
-<li><a href="https://github.com/gabime/spdlog">spdlog</a> v* - Optional - Logging library. Downloaded automatically if absent.</li>
-<li><a href="https://github.com/catchorg/Catch2">Catch2</a> v2.3.0 - Optional - A <code>C++</code> unit-testing framework only needed for testing. Downloaded automatically if absent.</li>
-<li><a href="https://github.com/google/benchmark">google/benchmark</a> <code>v1.3.0</code> - Optional - A <code>C++</code> micro-benchmarking framework only needed for benchmarks. Downloaded automatically if absent.</li>
+<li><a href="http://openmp.org/wp/">OpenMP</a> v4.8.4 - Optional - Speeds up some of the operations.</li>
+<li><a href="https://www.open-mpi.org">MPI</a> v3.1.1 - Optional - Parallelisation paradigm to speed up operations.</li>
 </ul>
-<h1>Installing and building PURIFY </h1>
-<p><b>PURIFY</b> can be installed through the software packet manager on Linux Debian distributions:</p>
-<div class="fragment"><div class="line">apt-get install purify</div>
-</div><!-- fragment --><p>Alternatively, you can build <b>PURIFY</b> entirely from the source code. Once the mandatory dependencies are present, <code>git clone</code> from the <a href="https://github.com/astro-informatics/purify">GitHub repository</a>:</p>
-<div class="fragment"><div class="line">git clone https://github.com/astro-informatics/purify.git</div>
-</div><!-- fragment --><p>Then, the program can be built with standard <code>CMake</code> command:</p>
+<h2>Automatically included libraries</h2>
+<p>The build system of <b>PURIFY</b> will attempt to download and build these additional dependencies, depending on the build options passed to <code>conan</code>. Most of them are automatically handled by <code>conan</code>.</p>
+<ul>
+<li><a href="https://github.com/astro-informatics/sopt">astro-informatics/sopt</a> v4.0.0: Sparse Optimization Compressed Sensing library. Included as a submodule.</li>
+<li><a href="https://github.com/UCL/GreatCMakeCookOff">UCL/GreatCMakeCookOff</a> Collection of <code>CMake</code> recipes. Downloaded automatically if absent.</li>
+<li><a href="https://www.boost.org/">Boost</a> v1.78.0: A set of free peer-reviewed portable C++ libraries. Downloaded automatically by conan.</li>
+<li><a href="www.fftw.org">fftw3</a> v3.3.9: Fastest Fourier Transform in the West. Downloaded automatically by conan.</li>
+<li><a href="http://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen3</a> v3.3.7: Modern <code>C++</code> linear algebra. Downloaded automatically by conan.</li>
+<li><a href="http://www.libtiff.org/">tiff</a> v4.0.9: Tag Image File Format library. Downloaded automatically by conan.</li>
+<li><a href="http://heasarc.gsfc.nasa.gov/fitsio/fitsio.html">cfitsio</a>: v4.0.0: Library of <code>C</code> and <code>Fortran</code> subroutines for reading and writing data files in FITS (Flexible Image Transport System) data format. Downloaded automatically by conan.</li>
+<li><a href="https://github.com/jbeder/yaml-cpp">yaml-cpp</a> v0.6.3: YAML parser and emitter in <code>C++</code>. Downloaded automatically by conan.</li>
+<li><a href="http://casacore.github.io/casacore/">casacore</a> - Optional - Needed to interface with measurement sets. The main <b>PURIFY</b> program requires this library (and its dependencies)</li>
+<li><a href="https://github.com/gabime/spdlog">spdlog</a> v1.9.2: Optional - Logging library. Downloaded automatically by conan.</li>
+<li><a href="https://github.com/catchorg/Catch2">Catch2</a> v2.13.9: Optional - A <code>C++</code> unit-testing framework only needed for testing. Downloaded automatically by conan.</li>
+<li><a href="https://github.com/google/benchmark">google/benchmark</a> v1.6.0: Optional - A <code>C++</code> micro-benchmarking framework only needed for benchmarks. Downloaded automatically by conan.</li>
+</ul>
+<h1>Installing and building PURIFY</h1>
+<p><b>Using Conan (recommended)</b></p>
+<p><a href="https://docs.conan.io/en/latest/installation.html">Conan</a> is a C++ package manager that helps deal with most of the C++ dependencies as well as the <b>PURIFY</b> installation:</p>
+<ol type="1">
+<li>Once the mandatory user-provided dependencies are present, <code>git clone</code> from the <a href="https://github.com/astro-informatics/purify">GitHub repository</a>:</li>
+</ol>
+<div class="fragment"><div class="line">git clone --recurse-submodules https://github.com/astro-informatics/purify.git</div>
+</div><!-- fragment --><ol type="1">
+<li>Create a <code>conan</code> package for <code>sopt</code></li>
+</ol>
+<div class="fragment"><div class="line">conan create /path/to/purify/sopt/ --build missing</div>
+</div><!-- fragment --><p>If you get an error about broken symlinks you can set <code>skip_broken_symlinks_check = True</code> in your <code>~/.conan/conan.conf</code> file or <a href="https://docs.conan.io/en/1.46/reference/env_vars.html#conan-skip-broken-symlinks-check">set an environment variable</a></p><ol type="1">
+<li>Then, the program can be built using <code>conan</code>:</li>
+</ol>
+<div class="fragment"><div class="line">cd /path/to/purify</div>
+<div class="line">mkdir build</div>
+<div class="line">cd build</div>
+<div class="line">conan install .. -of . --build missing</div>
+<div class="line">conan build .. -of .</div>
+</div><!-- fragment --><p>You can turn the various options on and off by adding flags to the <code>conan install</code> command, e.g.</p>
+<div class="fragment"><div class="line">conan install .. -of . --build missing -o cppflow=on -o openmp=on -o mpi=off</div>
+<div class="line">conan build .. -of .</div>
+</div><!-- fragment --><p>The full list of build options can be found in the <a href="./conanfile.py">conanfile</a>. To install in directory <code>INSTALL_FOLDER</code>, add the following options to the conan build command:</p>
+<div class="fragment"><div class="line">conan build .. -of INSTALL_FOLDER</div>
+</div><!-- fragment --><p><b>Using CMake</b></p>
+<p>If the dependencies are already available on your system, you can also install <b>PURIFY</b> manually like so</p>
 <div class="fragment"><div class="line">cd /path/to/code</div>
 <div class="line">mkdir build</div>
 <div class="line">cd build</div>
-<div class="line">cmake -DCMAKE_BUILD_TYPE=Release ..</div>
-<div class="line">make</div>
-</div><!-- fragment --><p>To test everything went all right:</p>
-<div class="fragment"><div class="line">cd /path/to/code/build</div>
-<div class="line">ctest .</div>
-</div><!-- fragment --><p>To install in directory <code>/X</code>, with libraries going to &lsquo;X/&rsquo; do:</p>
-<div class="fragment"><div class="line">cd /path/to/code/build</div>
-<div class="line">cmake -DCMAKE_INSTALL_PREFIX=/X ..</div>
-<div class="line">make install</div>
-</div><!-- fragment --><h1>Testing </h1>
+<div class="line">cmake .. -DCMAKE_INSTALL_PREFIX=${PWD}/../local</div>
+<div class="line">make -j</div>
+<div class="line">make -j install</div>
+</div><!-- fragment --><p>On MacOS, you can also install most of the dependencies with Homebrew e.g.</p>
+<div class="fragment"><div class="line">brew install boost fftw  eigen yaml-cpp spdlog catch2</div>
+</div><!-- fragment --><h2>TensorFlow support</h2>
+<p>The <b>SOPT</b> library includes an interface to TensorFlow for using trained models as priors in the Forward-Backward optimization algorithm. To build <b>PURIFY</b> with TensorFlow capability, some extra steps are currently required. We aim to simplify the build process in a future release.</p>
+<ol type="1">
+<li>Install the <a href="https://www.tensorflow.org/install/lang_c">TensorFlow C API</a></li>
+</ol>
+<ol type="1">
+<li>Clone the UCL fork of <code>cppflow</code> and create a <code>conan</code> package using</li>
+</ol>
+<div class="fragment"><div class="line">git clone git@github.com:UCL/cppflow.git</div>
+<div class="line">conan create /path/to/cppflow/</div>
+</div><!-- fragment --><ol type="1">
+<li><p class="startli">Follow the nominal build instructions, making sure you enable the <code>cppflow</code> option when building <b>SOPT</b> ...</p>
+<p class="startli">```bash conan create /path/to/purify/sopt/ &ndash;build missing -o cppflow=on ```</p>
+</li>
+</ol>
+<ol type="1">
+<li><p class="startli">... and <b>PURIFY</b>:</p>
+<p class="startli">``` bash cd /path/to/purify mkdir build cd build conan install .. &ndash;build missing -o cppflow=on conan build .. ```</p>
+</li>
+</ol>
+<h1>Testing</h1>
 <p>To check everything went all right, run the test suite:</p>
-<div class="fragment"><div class="line">cd /path/to/code/build</div>
+<div class="fragment"><div class="line">cd /path/to/purify/build</div>
 <div class="line">ctest .</div>
-</div><!-- fragment --><h1>Usage </h1>
-<p>The main purify executable lives either in the build directory or in the in the <code>bin</code> subdirectory of the installation directory. <code>purify</code> has one required argument, it a string for the file path of the config file containing the settings.</p>
+</div><!-- fragment --><h1>Usage</h1>
+<p>The main <code>purify</code> executable lives either in the build directory or in the in the <code>bin</code> subdirectory of the installation directory. <code>purify</code> has one required argument, it a string for the file path of the config file containing the settings.</p>
 <p><code>purify path/to/config.yaml</code>.</p>
-<p>A <a href="https://github.com/astro-informatics/purify/blob/development/data/config/config.yaml">template with a description of the settings</a> is included in the <code>data/config</code> directory.<code> When</code>purify` runs a directory will be created, and the output images will be saved and time-stamped. Additionally, a config file with the settings used will be saved and time-stamped, helping for reproducibility and book-keeping.</p>
-<h1>Docker </h1>
+<p>A <a href="https://github.com/astro-informatics/purify/blob/development/data/config/config.yaml">template with a description of the settings</a> is included in the <code>data/config</code> directory. When <code>purify</code> runs a directory will be created, and the output images will be saved and time-stamped. Additionally, a config file with the settings used will be saved and time-stamped, helping for reproducibility and book-keeping.</p>
+<h1>Docker</h1>
+<p>A Dockerfile is available on DockerHub. We are currently not maintaining it, and cannot guarantee it is up to date. Use the below documentation at your own risk.</p>
 <p>If you want to use Docker instead, you can build an image using the Dockerfile available in the repository or pulling it from <a href="https://hub.docker.com/r/uclrits/purify">DockerHub</a>.</p>
 <div class="fragment"><div class="line">docker build -t purify .</div>
 </div><!-- fragment --><p>or</p>
@@ -134,9 +179,9 @@ $(function() {
 </div><!-- fragment --><p>Then to use it, you should mount the directory with your data and config files to <code>/mydata</code> in the container. To run the container and mount the directory is with:</p>
 <div class="fragment"><div class="line">docker run -it --name purify -v /full/path/to/data:/mydata uclrits/purify</div>
 </div><!-- fragment --><p>That will start a shell inside the container in the <code>/mydata</code> directory where you can see all the files from your <code>/full/path/to/data</code>. There you can run <code>purify</code> as shown above.`</p>
-<h1>Contributors </h1>
+<h1>Contributors</h1>
 <p>Check the <a class="el" href="purify_contributors.html">contributors</a> page (<a class="el" href="PURIFY__CONTRIBUTORS_8md.html">github</a>).</p>
-<h1>References and citation </h1>
+<h1>References and citation</h1>
 <p>If you use <b>PURIFY</b> for work that results in publication, please reference the <a href="#webpage">webpage</a> and our related academic papers:</p>
 <ol type="1">
 <li>L. Pratley, et al. "Distributed convex optimization for Radio Interferometry with PURIFY". Link will be here soon!</li>
@@ -147,30 +192,21 @@ $(function() {
 <li>R. E. Carrillo, J. D. McEwen and Y. Wiaux. "PURIFY: a new approach to radio-interferometric
    imaging". <em>Mon. Not. Roy. Astron. Soc.</em> <b>439(4):3591-3604</b> (2014) <a href="http://arxiv.org/abs/1307.4370">arXiv:1307.4370</a></li>
 </ol>
-<h1>CMake Tips </h1>
-<p>It is possible to tell <code>CMake</code> exactly which libraries to compile and link against. The general idea is to add <code>-DVARIABLE=something</code> to the command-line arguments of CMake. CMake can be called any number of times: previous settings will not be overwritten unless specifically requested. Some of the more common options are the following:</p>
-<ul>
-<li><code>CMAKE_PREFIX_PATH</code>: CMake will look in "CMAKE_PREFIX_PATH/lib" for libraries, "CMAKE_PREFIX_PATH/include" for headers, etc.</li>
-<li><code>FFTW3_LIBRARIES</code>, <code>FFTW3_INCLUDE_DIR</code></li>
-<li><code>BLAS_INCLUDE_DIRS</code>, <code>BLAS_LIBRARIES</code></li>
-</ul>
-<p>All these variables and more can be found and modified in the <code>CMakeCache.txt</code> file in the build directory. There are extra CMake options sepcific to purify. <code>-Ddompi=ON</code> will turn MPI on in the build, <code>-Dopenmp=ON</code> will turn openmp on for the build. <code>-Dtests=ON</code> will make sure tests are built.</p>
-<p><code>ctest</code> should be run to make sure the unit tests pass.</p>
-<h1>License </h1>
+<h1>License</h1>
 <blockquote class="doxtable">
 <p>PURIFY Copyright (C) 2013-2019</p>
 <p>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.</p>
 <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details (LICENSE.txt).</p>
 <p>You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. </p>
 </blockquote>
-<h1>Webpage </h1>
+<h1>Webpage</h1>
 <ul>
 <li><a href="http://astro-informatics.github.io/purify">Documentation</a></li>
 <li><a href="https://github.com/astro-informatics/purify">Repository</a></li>
 </ul>
-<h1>Support </h1>
+<h1>Support</h1>
 <p>For any questions or comments, feel free to contact <a href="http://www.jasonmcewen.org">Jason McEwen</a>, or add an issue to the <a href="https://github.com/astro-informatics/purify/issues">issue tracker</a>.</p>
-<h1>Notes </h1>
+<h1>Notes</h1>
 <p>The code is given for educational purpose. The code is in beta and still under development. </p>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->

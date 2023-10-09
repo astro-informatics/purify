@@ -83,15 +83,15 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;purify/config.h&gt;</code><br />
-<code>#include &lt;catch.hpp&gt;</code><br />
 <code>#include &lt;memory&gt;</code><br />
 <code>#include &lt;mpi.h&gt;</code><br />
 <code>#include &lt;random&gt;</code><br />
 <code>#include &lt;regex&gt;</code><br />
 <code>#include &lt;vector&gt;</code><br />
+<code>#include &lt;catch2/catch_all.hpp&gt;</code><br />
 <code>#include &lt;<a class="el" href="logging_8h_source.html">purify/logging.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://astro-informatics.github.io/sopt/logging_8h.html">sopt/logging.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://astro-informatics.github.io/sopt/session_8h.html">sopt/mpi/session.h</a>&gt;</code><br />
+<code>#include &lt;sopt/logging.h&gt;</code><br />
+<code>#include &lt;sopt/mpi/session.h&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for common_mpi_catch_main.cc:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
@@ -99,19 +99,19 @@ $(function() {
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="common__mpi__catch__main_8cc__incl.png" border="0" usemap="#_2home_2runner_2work_2purify_2purify_2cpp_2tests_2common__mpi__catch__main_8cc" alt=""/></div>
 <map name="_2home_2runner_2work_2purify_2purify_2cpp_2tests_2common__mpi__catch__main_8cc" id="_2home_2runner_2work_2purify_2purify_2cpp_2tests_2common__mpi__catch__main_8cc">
-<area shape="rect" title=" " alt="" coords="356,5,542,61"/>
-<area shape="rect" title=" " alt="" coords="144,259,258,285"/>
-<area shape="rect" title=" " alt="" coords="30,109,116,136"/>
-<area shape="rect" title=" " alt="" coords="648,259,725,285"/>
-<area shape="rect" title=" " alt="" coords="286,109,345,136"/>
-<area shape="rect" title=" " alt="" coords="369,109,441,136"/>
-<area shape="rect" title=" " alt="" coords="465,109,524,136"/>
-<area shape="rect" title=" " alt="" coords="548,109,611,136"/>
-<area shape="rect" href="logging_8h.html" title=" " alt="" coords="140,109,262,136"/>
-<area shape="rect" href="http://astro-informatics.github.io/sopt/logging_8h.html.html" title=" " alt="" coords="636,109,750,136"/>
-<area shape="rect" href="http://astro-informatics.github.io/sopt/session_8h.html.html" title=" " alt="" coords="825,109,969,136"/>
-<area shape="rect" href="logging_8disabled_8h.html" title=" " alt="" coords="403,184,586,211"/>
-<area shape="rect" title=" " alt="" coords="465,259,524,285"/>
+<area shape="rect" title=" " alt="" coords="335,5,522,61"/>
+<area shape="rect" title=" " alt="" coords="11,259,126,285"/>
+<area shape="rect" title=" " alt="" coords="466,259,543,285"/>
+<area shape="rect" title=" " alt="" coords="178,109,236,136"/>
+<area shape="rect" title=" " alt="" coords="260,109,332,136"/>
+<area shape="rect" title=" " alt="" coords="356,109,415,136"/>
+<area shape="rect" title=" " alt="" coords="440,109,502,136"/>
+<area shape="rect" title=" " alt="" coords="527,109,682,136"/>
+<area shape="rect" href="logging_8h.html" title=" " alt="" coords="31,109,154,136"/>
+<area shape="rect" title=" " alt="" coords="756,109,871,136"/>
+<area shape="rect" title=" " alt="" coords="895,109,1039,136"/>
+<area shape="rect" href="logging_8disabled_8h.html" title=" " alt="" coords="106,184,289,211"/>
+<area shape="rect" title=" " alt="" coords="168,259,227,285"/>
 </map>
 </div>
 </div>
@@ -177,7 +177,7 @@ Functions</h2></td></tr>
 <div class="fragment"><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;                                      {</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  Catch::Session session;  <span class="comment">// There must be exactly once instance</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> mpi_session = <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt_1_1mpi.html#ad052cd83bbb11581f623f15e2a97b796">sopt::mpi::init</a>(argc, argv);</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> mpi_session = sopt::mpi::init(argc, argv);</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="comment">// The following mess transforms the input arguments so that output files have different names</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="comment">// on different processors</span></div>
@@ -199,24 +199,24 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  }</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="comment">// transforms the modified arguments to a C-style array of pointers.</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  std::vector&lt;char const *&gt; <a class="codeRef" href="mpi__session_8cc.html#a8a6282f51259c130e01e0e59e8201cf7">cargs</a>(arguments.size());</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  std::transform(arguments.begin(), arguments.end(), <a class="codeRef" href="mpi__session_8cc.html#a8a6282f51259c130e01e0e59e8201cf7">cargs</a>.begin(),</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  std::vector&lt;char const *&gt; cargs(arguments.size());</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  std::transform(arguments.begin(), arguments.end(), cargs.begin(),</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;                 [](std::string <span class="keyword">const</span> &amp;<a class="code" href="namespacepurify_1_1constant.html#a289e794ad6812bcd3de2fdcc68dfb01b">c</a>) { return c.c_str(); });</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordtype">int</span> returnCode = session.applyCommandLine(<a class="codeRef" href="mpi__session_8cc.html#a8a6282f51259c130e01e0e59e8201cf7">cargs</a>.size(), <span class="keyword">const_cast&lt;</span><span class="keywordtype">char</span> **<span class="keyword">&gt;</span>(<a class="codeRef" href="mpi__session_8cc.html#a8a6282f51259c130e01e0e59e8201cf7">cargs</a>.data()));</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordtype">int</span> returnCode = session.applyCommandLine(cargs.size(), <span class="keyword">const_cast&lt;</span><span class="keywordtype">char</span> **<span class="keyword">&gt;</span>(cargs.data()));</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordflow">if</span> (returnCode != 0)  <span class="comment">// Indicates a command line error</span></div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordflow">return</span> returnCode;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="common__mpi__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne</a>.reset(<span class="keyword">new</span> std::mt19937_64(session.configData().rngSeed));</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt_1_1logging.html#a120bb1caf65f04fc7d86c0914bb68713">sopt::logging::initialize</a>();</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <a class="code" href="namespacepurify_1_1logging.html#a766221e3a05f736017082766ede24d4a">purify::logging::initialize</a>();</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <a class="code" href="namespacepurify_1_1logging.html#a9cb706fbf61a8982965095e1265f3172">sopt::logging::initialize</a>();</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <a class="code" href="namespacepurify_1_1logging.html#a9cb706fbf61a8982965095e1265f3172">purify::logging::initialize</a>();</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> result = session.run();</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keywordflow">return</span> result;</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;}</div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="types_8h_source.html#l00060">purify::constant::c</a>, <a class="elRef" href="mpi__session_8cc.html#a8a6282f51259c130e01e0e59e8201cf7">cargs</a>, <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt_1_1mpi.html#ad052cd83bbb11581f623f15e2a97b796">sopt::mpi::init()</a>, <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt_1_1logging.html#a120bb1caf65f04fc7d86c0914bb68713">sopt::logging::initialize()</a>, <a class="el" href="logging_8disabled_8h_source.html#l00013">purify::logging::initialize()</a>, and <a class="el" href="common__mpi__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne()</a>.</p>
+<p class="reference">References <a class="el" href="types_8h_source.html#l00060">purify::constant::c</a>, <a class="el" href="logging_8disabled_8h_source.html#l00012">purify::logging::initialize()</a>, and <a class="el" href="common__mpi__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne()</a>.</p>
 
 </div>
 </div>
@@ -242,11 +242,8 @@ Functions</h2></td></tr>
 </div>
 </div><!-- contents -->
 <div class="ttc" id="anamespacepurify_1_1constant_html_a289e794ad6812bcd3de2fdcc68dfb01b"><div class="ttname"><a href="namespacepurify_1_1constant.html#a289e794ad6812bcd3de2fdcc68dfb01b">purify::constant::c</a></div><div class="ttdeci">const t_real c</div><div class="ttdoc">speed of light in vacuum</div><div class="ttdef"><b>Definition:</b> <a href="types_8h_source.html#l00060">types.h:60</a></div></div>
-<div class="ttc" id="anamespacepurify_1_1logging_html_a766221e3a05f736017082766ede24d4a"><div class="ttname"><a href="namespacepurify_1_1logging.html#a766221e3a05f736017082766ede24d4a">purify::logging::initialize</a></div><div class="ttdeci">std::shared_ptr&lt; int &gt; initialize(std::string const &amp;)</div><div class="ttdoc">Initializes a logger.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8disabled_8h_source.html#l00013">logging.disabled.h:13</a></div></div>
-<div class="ttc" id="anamespacesopt_1_1logging_html_a120bb1caf65f04fc7d86c0914bb68713"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt_1_1logging.html#a120bb1caf65f04fc7d86c0914bb68713">sopt::logging::initialize</a></div><div class="ttdeci">std::shared_ptr&lt; int &gt; initialize(std::string const &amp;name=&quot;&quot;)</div></div>
-<div class="ttc" id="ampi__session_8cc_html_a8a6282f51259c130e01e0e59e8201cf7"><div class="ttname"><a href="mpi__session_8cc.html#a8a6282f51259c130e01e0e59e8201cf7">cargs</a></div><div class="ttdeci">std::vector&lt; char const * &gt; cargs</div></div>
+<div class="ttc" id="anamespacepurify_1_1logging_html_a9cb706fbf61a8982965095e1265f3172"><div class="ttname"><a href="namespacepurify_1_1logging.html#a9cb706fbf61a8982965095e1265f3172">purify::logging::initialize</a></div><div class="ttdeci">std::shared_ptr&lt; int &gt; initialize(std::string const &amp;)</div><div class="ttdoc">Initializes a logger.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8disabled_8h_source.html#l00012">logging.disabled.h:12</a></div></div>
 <div class="ttc" id="acommon__mpi__catch__main_8cc_html_afd7b13def75c5d7feb77ac1ea2df5d0b"><div class="ttname"><a href="common__mpi__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne</a></div><div class="ttdeci">std::unique_ptr&lt; std::mt19937_64 &gt; mersenne(new std::mt19937_64(0))</div></div>
-<div class="ttc" id="anamespacesopt_1_1mpi_html_ad052cd83bbb11581f623f15e2a97b796"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt_1_1mpi.html#ad052cd83bbb11581f623f15e2a97b796">sopt::mpi::init</a></div><div class="ttdeci">std::shared_ptr&lt; details::initializer &gt; init(int argc, const char **argv)</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

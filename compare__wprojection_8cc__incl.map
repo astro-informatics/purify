@@ -1,41 +1,41 @@
 <map id="/home/runner/work/purify/purify/cpp/example/compare_wprojection.cc" name="/home/runner/work/purify/purify/cpp/example/compare_wprojection.cc">
-<area shape="rect" id="node1" title=" " alt="" coords="1483,5,1695,61"/>
-<area shape="rect" id="node2" title=" " alt="" coords="1716,572,1831,599"/>
-<area shape="rect" id="node3" href="$types_8h.html" title=" " alt="" coords="1225,423,1335,449"/>
-<area shape="rect" id="node9" title=" " alt="" coords="2917,109,2984,136"/>
-<area shape="rect" id="node10" title=" " alt="" coords="3008,109,3152,136"/>
-<area shape="rect" id="node11" href="$logging_8h.html" title=" " alt="" coords="493,423,616,449"/>
-<area shape="rect" id="node15" href="$operators_8h.html" title=" " alt="" coords="1649,184,1786,211"/>
-<area shape="rect" id="node24" href="$purify_2utilities_8h.html" title=" " alt="" coords="1771,341,1895,367"/>
-<area shape="rect" id="node27" href="$wide__field__utilities_8h.html" title=" " alt="" coords="773,341,971,367"/>
-<area shape="rect" id="node36" href="$pfitsio_8h.html" title=" " alt="" coords="241,259,356,285"/>
-<area shape="rect" id="node38" href="$wproj__operators_8h.html" title=" " alt="" coords="1627,109,1807,136"/>
-<area shape="rect" id="node39" href="/home/runner/work/purify/purify/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/power__method_8h.html.html" title=" " alt="" coords="387,341,549,367"/>
-<area shape="rect" id="node4" title=" " alt="" coords="1254,497,1333,524"/>
-<area shape="rect" id="node5" title=" " alt="" coords="1357,497,1449,524"/>
-<area shape="rect" id="node6" title=" " alt="" coords="1473,497,1575,524"/>
-<area shape="rect" id="node7" title=" " alt="" coords="967,497,1103,524"/>
-<area shape="rect" id="node8" href="/home/runner/work/purify/purify/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html.html" title=" " alt="" coords="1127,497,1230,524"/>
-<area shape="rect" id="node12" href="$logging_8disabled_8h.html" title=" " alt="" coords="550,497,733,524"/>
-<area shape="rect" id="node13" title=" " alt="" coords="603,572,680,599"/>
-<area shape="rect" id="node14" title=" " alt="" coords="501,572,560,599"/>
-<area shape="rect" id="node16" title=" " alt="" coords="1872,259,1952,285"/>
-<area shape="rect" id="node17" title=" " alt="" coords="2022,341,2077,367"/>
-<area shape="rect" id="node18" title=" " alt="" coords="1753,423,1845,449"/>
-<area shape="rect" id="node19" href="$kernels_8h.html" title=" " alt="" coords="2259,259,2381,285"/>
-<area shape="rect" id="node26" href="$uvw__utilities_8h.html" title=" " alt="" coords="1521,341,1679,367"/>
-<area shape="rect" id="node28" href="$wkernel__integration_8h.html" title=" " alt="" coords="1046,259,1250,285"/>
-<area shape="rect" id="node31" href="/home/runner/work/purify/purify/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/chained__operators_8h.html.html" title=" " alt="" coords="1325,259,1512,285"/>
-<area shape="rect" id="node32" href="/home/runner/work/purify/purify/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/linear__transform_8h.html.html" title=" " alt="" coords="574,341,749,367"/>
-<area shape="rect" id="node33" href="$fly__operators_8h.html" title=" " alt="" coords="1637,259,1797,285"/>
-<area shape="rect" id="node35" title=" " alt="" coords="2027,259,2093,285"/>
-<area shape="rect" id="node20" title=" " alt="" coords="2635,341,2691,367"/>
-<area shape="rect" id="node21" title=" " alt="" coords="2203,341,2253,367"/>
-<area shape="rect" id="node22" title=" " alt="" coords="2277,333,2440,375"/>
-<area shape="rect" id="node23" title=" " alt="" coords="2464,333,2611,375"/>
-<area shape="rect" id="node25" title=" " alt="" coords="1603,423,1677,449"/>
-<area shape="rect" id="node29" href="$integration_8h.html" title=" " alt="" coords="995,341,1141,367"/>
-<area shape="rect" id="node30" title=" " alt="" coords="909,423,1000,449"/>
-<area shape="rect" id="node34" title=" " alt="" coords="1704,341,1747,367"/>
-<area shape="rect" id="node37" title=" " alt="" coords="195,341,261,367"/>
+<area shape="rect" id="node1" title=" " alt="" coords="2010,5,2222,61"/>
+<area shape="rect" id="node2" title=" " alt="" coords="1261,572,1376,599"/>
+<area shape="rect" id="node3" href="$types_8h.html" title=" " alt="" coords="1286,423,1397,449"/>
+<area shape="rect" id="node9" title=" " alt="" coords="2400,109,2467,136"/>
+<area shape="rect" id="node10" title=" " alt="" coords="2491,109,2635,136"/>
+<area shape="rect" id="node11" href="$logging_8h.html" title=" " alt="" coords="231,423,353,449"/>
+<area shape="rect" id="node15" href="$operators_8h.html" title=" " alt="" coords="1521,184,1658,211"/>
+<area shape="rect" id="node24" href="$purify_2utilities_8h.html" title=" " alt="" coords="781,341,905,367"/>
+<area shape="rect" id="node27" href="$wide__field__utilities_8h.html" title=" " alt="" coords="1081,341,1279,367"/>
+<area shape="rect" id="node36" href="$pfitsio_8h.html" title=" " alt="" coords="85,259,200,285"/>
+<area shape="rect" id="node38" href="$wproj__operators_8h.html" title=" " alt="" coords="2026,109,2206,136"/>
+<area shape="rect" id="node39" title=" " alt="" coords="2659,109,2821,136"/>
+<area shape="rect" id="node4" title=" " alt="" coords="1302,497,1381,524"/>
+<area shape="rect" id="node5" title=" " alt="" coords="1405,497,1497,524"/>
+<area shape="rect" id="node6" title=" " alt="" coords="1521,497,1623,524"/>
+<area shape="rect" id="node7" title=" " alt="" coords="1015,497,1151,524"/>
+<area shape="rect" id="node8" title=" " alt="" coords="1175,497,1278,524"/>
+<area shape="rect" id="node12" href="$logging_8disabled_8h.html" title=" " alt="" coords="193,497,375,524"/>
+<area shape="rect" id="node13" title=" " alt="" coords="245,572,323,599"/>
+<area shape="rect" id="node14" title=" " alt="" coords="100,572,159,599"/>
+<area shape="rect" id="node16" title=" " alt="" coords="1143,259,1223,285"/>
+<area shape="rect" id="node17" title=" " alt="" coords="1866,341,1921,367"/>
+<area shape="rect" id="node18" title=" " alt="" coords="797,423,889,449"/>
+<area shape="rect" id="node19" href="$kernels_8h.html" title=" " alt="" coords="1247,259,1369,285"/>
+<area shape="rect" id="node26" href="$uvw__utilities_8h.html" title=" " alt="" coords="598,341,757,367"/>
+<area shape="rect" id="node28" href="$wkernel__integration_8h.html" title=" " alt="" coords="458,259,662,285"/>
+<area shape="rect" id="node31" title=" " alt="" coords="1393,259,1580,285"/>
+<area shape="rect" id="node32" title=" " alt="" coords="1605,259,1779,285"/>
+<area shape="rect" id="node33" href="$fly__operators_8h.html" title=" " alt="" coords="1996,259,2156,285"/>
+<area shape="rect" id="node35" title=" " alt="" coords="1804,259,1871,285"/>
+<area shape="rect" id="node20" title=" " alt="" coords="1711,341,1767,367"/>
+<area shape="rect" id="node21" title=" " alt="" coords="1791,341,1841,367"/>
+<area shape="rect" id="node22" title=" " alt="" coords="1303,333,1465,375"/>
+<area shape="rect" id="node23" title=" " alt="" coords="1489,333,1636,375"/>
+<area shape="rect" id="node25" title=" " alt="" coords="699,423,773,449"/>
+<area shape="rect" id="node29" href="$integration_8h.html" title=" " alt="" coords="376,341,523,367"/>
+<area shape="rect" id="node30" title=" " alt="" coords="381,423,472,449"/>
+<area shape="rect" id="node34" title=" " alt="" coords="2097,341,2140,367"/>
+<area shape="rect" id="node37" title=" " alt="" coords="32,341,99,367"/>
 </map>

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['have_1882',['Have',['structsopt_1_1details_1_1HasValueType.html#a91b3c444ea1587572e61f7d66e6e0001',1,'sopt::details::HasValueType']]],
-  ['havenot_1883',['HaveNot',['structsopt_1_1details_1_1HasValueType.html#aa68cd5507073731b86725d4e21c1bf25',1,'sopt::details::HasValueType']]]
+  ['t_5fcomplexf_1109',['t_complexf',['../namespacepurify.html#a426969d60456233432af96386b69e341',1,'purify']]],
+  ['t_5ftripletlist_1110',['t_tripletList',['../namespacepurify.html#a854f899505b10ffd6c555674141c65cd',1,'purify']]]
 ];

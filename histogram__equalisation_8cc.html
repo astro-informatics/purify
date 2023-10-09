@@ -103,11 +103,11 @@ $(function() {
 <area shape="rect" title=" " alt="" coords="5,333,97,360"/>
 <area shape="rect" title=" " alt="" coords="121,333,224,360"/>
 <area shape="rect" title=" " alt="" coords="249,333,385,360"/>
-<area shape="rect" href="http://astro-informatics.github.io/sopt/types_8h.html.html" title=" " alt="" coords="409,333,512,360"/>
+<area shape="rect" title=" " alt="" coords="409,333,512,360"/>
 <area shape="rect" href="logging_8h.html" title=" " alt="" coords="911,184,1034,211"/>
 <area shape="rect" title=" " alt="" coords="1210,333,1269,360"/>
-<area shape="rect" title=" " alt="" coords="1058,184,1125,211"/>
 <area shape="rect" href="uvw__utilities_8h.html" title=" " alt="" coords="712,184,871,211"/>
+<area shape="rect" title=" " alt="" coords="1058,184,1125,211"/>
 <area shape="rect" href="logging_8disabled_8h.html" title=" " alt="" coords="1019,259,1201,285"/>
 <area shape="rect" title=" " alt="" coords="1071,333,1149,360"/>
 <area shape="rect" title=" " alt="" coords="869,259,943,285"/>
@@ -155,12 +155,12 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> input_name =</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;      (nargs &gt; 1) ? <span class="keyword">static_cast&lt;</span>std::string<span class="keyword">&gt;</span>(args[1]) : <a class="code" href="namespacepurify_1_1notinstalled.html#adcd4a748b6eaf349d7a41cfc85428883">image_filename</a>(<span class="stringliteral">&quot;M31.fits&quot;</span>);</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> output_name = (nargs &gt; 2) ? <span class="keyword">static_cast&lt;</span>std::string<span class="keyword">&gt;</span>(args[2]) : <span class="stringliteral">&quot;M31_heq.fits&quot;</span>;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a7d7971e5566e597eb907614917e30c78">Image&lt;t_real&gt;</a> <span class="keyword">const</span> input = <a class="code" href="namespacepurify_1_1pfitsio.html#a2d7e29052f62225e3af9b8e8f1420fb4">pfitsio::read2d</a>(input_name).real();</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  Image&lt;t_real&gt; <span class="keyword">const</span> input = <a class="code" href="namespacepurify_1_1pfitsio.html#a2ae1f0721ea099a29b30eaed0c47c771">pfitsio::read2d</a>(input_name).real();</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifdef PURIFY_CImg</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  CDisplay display = cimg::make_display&lt;Image&lt;t_real&gt;&gt;(input, <span class="stringliteral">&quot;Image&quot;</span>);</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> img1 = cimg::make_image(input.real().eval()).get_normalize(0, 1);</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> results = img1.get_equalize(256, 0.01, 1);</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">const</span> <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a7d7971e5566e597eb907614917e30c78">Image&lt;t_real&gt;</a> &amp;output = <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a7d7971e5566e597eb907614917e30c78">Image&lt;t_real&gt;::Map</a>(<span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span><a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac63d8bc953beeb56a063f174ce7f2a0a">t_real</a> *<span class="keyword">&gt;</span>(results.data()),</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">const</span> Image&lt;t_real&gt; &amp;output = Image&lt;t_real&gt;::Map(<span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span>t_real *<span class="keyword">&gt;</span>(results.data()),</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;                                                   input.rows(), input.cols());</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(output, output_name);</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#else</span></div>
@@ -168,16 +168,14 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;}</div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00032">purify::notinstalled::image_filename()</a>, <a class="el" href="pfitsio_8cc_source.html#l00067">purify::pfitsio::read2d()</a>, and <a class="el" href="pfitsio_8cc_source.html#l00034">purify::pfitsio::write2d()</a>.</p>
+<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00032">purify::notinstalled::image_filename()</a>, <a class="el" href="pfitsio_8h_source.html#l00339">purify::pfitsio::read2d()</a>, and <a class="el" href="pfitsio_8cc_source.html#l00030">purify::pfitsio::write2d()</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
+<div class="ttc" id="anamespacepurify_1_1pfitsio_html_a2ae1f0721ea099a29b30eaed0c47c771"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#a2ae1f0721ea099a29b30eaed0c47c771">purify::pfitsio::read2d</a></div><div class="ttdeci">Image&lt; t_complex &gt; read2d(const std::string &amp;fits_name)</div><div class="ttdoc">Read image from fits file.</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8h_source.html#l00339">pfitsio.h:339</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1notinstalled_html_adcd4a748b6eaf349d7a41cfc85428883"><div class="ttname"><a href="namespacepurify_1_1notinstalled.html#adcd4a748b6eaf349d7a41cfc85428883">purify::notinstalled::image_filename</a></div><div class="ttdeci">std::string image_filename(std::string const &amp;filename)</div><div class="ttdoc">Image filename.</div><div class="ttdef"><b>Definition:</b> <a href="directories_8in_8h_source.html#l00032">directories.in.h:32</a></div></div>
-<div class="ttc" id="anamespacesopt_html_ac63d8bc953beeb56a063f174ce7f2a0a"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac63d8bc953beeb56a063f174ce7f2a0a">t_real</a></div><div class="ttdeci">double t_real</div></div>
-<div class="ttc" id="anamespacepurify_1_1pfitsio_html_a2d7e29052f62225e3af9b8e8f1420fb4"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#a2d7e29052f62225e3af9b8e8f1420fb4">purify::pfitsio::read2d</a></div><div class="ttdeci">Image&lt; t_complex &gt; read2d(const std::string &amp;fits_name)</div><div class="ttdoc">Read image from fits file.</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8cc_source.html#l00067">pfitsio.cc:67</a></div></div>
-<div class="ttc" id="anamespacepurify_1_1pfitsio_html_a05de3285d7ec5d5a6e43d2e5761e8b12"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">purify::pfitsio::write2d</a></div><div class="ttdeci">void write2d(const Image&lt; t_real &gt; &amp;eigen_image, const pfitsio::header_params &amp;header, const bool &amp;overwrite)</div><div class="ttdoc">Write image to fits file.</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8cc_source.html#l00034">pfitsio.cc:34</a></div></div>
-<div class="ttc" id="anamespacesopt_html_a7d7971e5566e597eb907614917e30c78"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt.html#a7d7971e5566e597eb907614917e30c78">Image</a></div><div class="ttdeci">Eigen::Array&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; Image</div></div>
+<div class="ttc" id="anamespacepurify_1_1pfitsio_html_a05de3285d7ec5d5a6e43d2e5761e8b12"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">purify::pfitsio::write2d</a></div><div class="ttdeci">void write2d(const Image&lt; t_real &gt; &amp;eigen_image, const pfitsio::header_params &amp;header, const bool &amp;overwrite)</div><div class="ttdoc">Write image to fits file.</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8cc_source.html#l00030">pfitsio.cc:30</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

@@ -89,10 +89,10 @@ Functions</h2></td></tr>
 <tr class="memdesc:af7cc59cd1e20fb709a98750d5acfc541"><td class="mdescLeft">&#160;</td><td class="mdescRight">read real values from data file  <a href="namespacepurify_1_1notinstalled.html#af7cc59cd1e20fb709a98750d5acfc541">More...</a><br /></td></tr>
 <tr class="separator:af7cc59cd1e20fb709a98750d5acfc541"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6de72df1755781a71f9b5d0b26585f73"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a6de72df1755781a71f9b5d0b26585f73"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt; std::is_same&lt; <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a7d57def65a6a53f6b5b39dd9b4bb870c">t_complex</a>, T &gt;::value, std::vector&lt; T &gt; &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1notinstalled.html#a6de72df1755781a71f9b5d0b26585f73">read_data</a> (const std::string &amp;filename)</td></tr>
+<tr class="memitem:a6de72df1755781a71f9b5d0b26585f73"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt; std::is_same&lt; t_complex, T &gt;::value, std::vector&lt; T &gt; &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1notinstalled.html#a6de72df1755781a71f9b5d0b26585f73">read_data</a> (const std::string &amp;filename)</td></tr>
 <tr class="memdesc:a6de72df1755781a71f9b5d0b26585f73"><td class="mdescLeft">&#160;</td><td class="mdescRight">read complex values from data file  <a href="namespacepurify_1_1notinstalled.html#a6de72df1755781a71f9b5d0b26585f73">More...</a><br /></td></tr>
 <tr class="separator:a6de72df1755781a71f9b5d0b26585f73"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9fecf19b08db444e65ca342e7e599e53"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a7d57def65a6a53f6b5b39dd9b4bb870c">t_complex</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1notinstalled.html#a9fecf19b08db444e65ca342e7e599e53">read_data</a> (const std::vector&lt; <a class="elRef" href="forward__backward_8cc.html#a06ea74880cd1ee9d09d85ebee340d286">t_real</a> &gt; &amp;input)</td></tr>
+<tr class="memitem:a9fecf19b08db444e65ca342e7e599e53"><td class="memItemLeft" align="right" valign="top">std::vector&lt; t_complex &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1notinstalled.html#a9fecf19b08db444e65ca342e7e599e53">read_data</a> (const std::vector&lt; t_real &gt; &amp;input)</td></tr>
 <tr class="separator:a9fecf19b08db444e65ca342e7e599e53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a9204ef1ce008b33ce31abbe59045bf"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1notinstalled.html#a2a9204ef1ce008b33ce31abbe59045bf">data_directory</a> ()</td></tr>
 <tr class="memdesc:a2a9204ef1ce008b33ce31abbe59045bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds data and such.  <a href="namespacepurify_1_1notinstalled.html#a2a9204ef1ce008b33ce31abbe59045bf">More...</a><br /></td></tr>
@@ -234,7 +234,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="directories_8in_8h_source.html#l00012">12</a> of file <a class="el" href="directories_8in_8h_source.html">directories.in.h</a>.</p>
 <div class="fragment"><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;                                                          {</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  <span class="keywordflow">return</span> <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt_1_1notinstalled.html#a1fcff7fb7b9de6604362ab009611d37f">data_directory</a>() + <span class="stringliteral">&quot;/&quot;</span> + filename;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacepurify_1_1notinstalled.html#a2a9204ef1ce008b33ce31abbe59045bf">data_directory</a>() + <span class="stringliteral">&quot;/&quot;</span> + filename;</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;}</div>
 </div><!-- fragment -->
 <p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00010">data_directory()</a>.</p>
@@ -346,7 +346,7 @@ Functions</h2></td></tr>
 </div><!-- fragment -->
 <p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00012">data_filename()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="histogram__equalisation_8cc_source.html#l00009">main()</a>, and <a class="el" href="purify__fitsio_8cc_source.html#l00013">TEST_CASE()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="histogram__equalisation_8cc_source.html#l00009">main()</a>.</p>
 
 </div>
 </div>
@@ -383,7 +383,7 @@ Functions</h2></td></tr>
 </div><!-- fragment -->
 <p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00012">data_filename()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="generate__vis__data_8cc_source.html#l00013">main()</a>, and <a class="el" href="utils_8cc_source.html#l00302">TEST_CASE()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="generate__vis__data_8cc_source.html#l00013">main()</a>, and <a class="el" href="utils_8cc_source.html#l00303">TEST_CASE()</a>.</p>
 
 </div>
 </div>
@@ -477,7 +477,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="directories_8in_8h_source.html#l00063">63</a> of file <a class="el" href="directories_8in_8h_source.html">directories.in.h</a>.</p>
 <div class="fragment"><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                                                            {</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keywordflow">return</span> <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt_1_1notinstalled.html#a41591b69e6406ef3a36ded99be530efd">output_directory</a>() + <span class="stringliteral">&quot;/&quot;</span> + filename;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacepurify_1_1notinstalled.html#a6e559eebbb8daf09c4a6a297982e9533">output_directory</a>() + <span class="stringliteral">&quot;/&quot;</span> + filename;</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;}</div>
 </div><!-- fragment -->
 <p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00061">output_directory()</a>.</p>
@@ -531,7 +531,7 @@ template&lt;class T &gt; </div>
 template&lt;class T &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::enable_if&lt;std::is_same&lt;<a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a7d57def65a6a53f6b5b39dd9b4bb870c">t_complex</a>, T&gt;::value, std::vector&lt;T&gt; &gt;::type purify::notinstalled::read_data </td>
+          <td class="memname">std::enable_if&lt;std::is_same&lt;t_complex, T&gt;::value, std::vector&lt;T&gt; &gt;::type purify::notinstalled::read_data </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>filename</em></td><td>)</td>
@@ -571,9 +571,9 @@ template&lt;class T &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;<a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a7d57def65a6a53f6b5b39dd9b4bb870c">t_complex</a>&gt; purify::notinstalled::read_data </td>
+          <td class="memname">std::vector&lt;t_complex&gt; purify::notinstalled::read_data </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; <a class="elRef" href="forward__backward_8cc.html#a06ea74880cd1ee9d09d85ebee340d286">t_real</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const std::vector&lt; t_real &gt; &amp;&#160;</td>
           <td class="paramname"><em>input</em></td><td>)</td>
           <td></td>
         </tr>
@@ -584,12 +584,10 @@ template&lt;class T &gt; </div>
 <div class="fragment"><div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;                                                                 {</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    std::vector&lt;t_complex&gt; output;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> a = input.begin(); a != input.end(); a++ )</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    output.push_back(<a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a7d57def65a6a53f6b5b39dd9b4bb870c">t_complex</a>(*a, 0.));</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    output.push_back(t_complex(*a, 0.));</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keywordflow">return</span> output;</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  }</div>
 </div><!-- fragment -->
-<p class="reference">References <a class="elRef" href="bisection__method_8cc.html#a6d7237bd6650f7fc770cd55be22e4245">a</a>.</p>
-
 </div>
 </div>
 <a id="a39f480c23d66c09cc02801c33ea7dc28"></a>
@@ -748,10 +746,9 @@ template&lt;class T &gt; </div>
 </div><!-- contents -->
 <div class="ttc" id="anamespacepurify_1_1notinstalled_html_a31500447173c424a79ff41f27ce64804"><div class="ttname"><a href="namespacepurify_1_1notinstalled.html#a31500447173c424a79ff41f27ce64804">purify::notinstalled::data_filename</a></div><div class="ttdeci">std::string data_filename(std::string const &amp;filename)</div><div class="ttdoc">Holds data and such.</div><div class="ttdef"><b>Definition:</b> <a href="directories_8in_8h_source.html#l00012">directories.in.h:12</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1notinstalled_html_ad1628b70a7db77d2fee2aa5b1c79fbc8"><div class="ttname"><a href="namespacepurify_1_1notinstalled.html#ad1628b70a7db77d2fee2aa5b1c79fbc8">purify::notinstalled::scratch_filename</a></div><div class="ttdeci">std::string scratch_filename(std::string const &amp;filename)</div><div class="ttdoc">Holds data and such in Scratch (useful for legion)</div><div class="ttdef"><b>Definition:</b> <a href="directories_8in_8h_source.html#l00028">directories.in.h:28</a></div></div>
+<div class="ttc" id="anamespacepurify_1_1notinstalled_html_a2a9204ef1ce008b33ce31abbe59045bf"><div class="ttname"><a href="namespacepurify_1_1notinstalled.html#a2a9204ef1ce008b33ce31abbe59045bf">purify::notinstalled::data_directory</a></div><div class="ttdeci">std::string data_directory()</div><div class="ttdoc">Holds data and such.</div><div class="ttdef"><b>Definition:</b> <a href="directories_8in_8h_source.html#l00010">directories.in.h:10</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1notinstalled_html_a39f480c23d66c09cc02801c33ea7dc28"><div class="ttname"><a href="namespacepurify_1_1notinstalled.html#a39f480c23d66c09cc02801c33ea7dc28">purify::notinstalled::scratch_directory</a></div><div class="ttdeci">std::string scratch_directory()</div><div class="ttdoc">Holds data and such in Scratch (useful for legion)</div><div class="ttdef"><b>Definition:</b> <a href="directories_8in_8h_source.html#l00016">directories.in.h:16</a></div></div>
-<div class="ttc" id="anamespacesopt_html_a7d57def65a6a53f6b5b39dd9b4bb870c"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt.html#a7d57def65a6a53f6b5b39dd9b4bb870c">t_complex</a></div><div class="ttdeci">std::complex&lt; t_real &gt; t_complex</div></div>
-<div class="ttc" id="anamespacesopt_1_1notinstalled_html_a41591b69e6406ef3a36ded99be530efd"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt_1_1notinstalled.html#a41591b69e6406ef3a36ded99be530efd">output_directory</a></div><div class="ttdeci">std::string output_directory()</div></div>
-<div class="ttc" id="anamespacesopt_1_1notinstalled_html_a1fcff7fb7b9de6604362ab009611d37f"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt_1_1notinstalled.html#a1fcff7fb7b9de6604362ab009611d37f">data_directory</a></div><div class="ttdeci">std::string data_directory()</div></div>
+<div class="ttc" id="anamespacepurify_1_1notinstalled_html_a6e559eebbb8daf09c4a6a297982e9533"><div class="ttname"><a href="namespacepurify_1_1notinstalled.html#a6e559eebbb8daf09c4a6a297982e9533">purify::notinstalled::output_directory</a></div><div class="ttdeci">std::string output_directory()</div><div class="ttdoc">Where test outputs go.</div><div class="ttdef"><b>Definition:</b> <a href="directories_8in_8h_source.html#l00061">directories.in.h:61</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

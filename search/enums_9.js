@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['vis_5fsource_1938',['vis_source',['../namespacepurify_1_1utilities.html#af608b7e6a570ae7289e797c577850a64',1,'purify::utilities']]],
-  ['vis_5funits_1939',['vis_units',['../namespacepurify_1_1utilities.html#aa2af2ee7e4f1bb93a42235b9d973983d',1,'purify::utilities']]]
+  ['series_1125',['series',['../namespacepurify_1_1wproj__utilities_1_1expansions.html#a92334b90f8de8f723450b3aca72d9e74',1,'purify::wproj_utilities::expansions']]],
+  ['sigma_1126',['Sigma',['../classpurify_1_1casa_1_1MeasurementSet_1_1ChannelWrapper.html#a8a3486e632c38521b251686813425338',1,'purify::casa::MeasurementSet::ChannelWrapper']]],
+  ['stokes_1127',['stokes',['../namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8',1,'purify']]]
 ];

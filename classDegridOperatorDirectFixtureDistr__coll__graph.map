@@ -1,10 +1,13 @@
 <map id="DegridOperatorDirectFixtureDistr" name="DegridOperatorDirectFixtureDistr">
-<area shape="rect" id="node1" title=" " alt="" coords="56,409,263,451"/>
-<area shape="rect" id="node2" href="$classDegridOperatorDirectFixturePar.html" title=" " alt="" coords="46,333,273,360"/>
-<area shape="rect" id="node3" href="$classDegridOperatorFixturePar.html" title=" " alt="" coords="66,257,253,284"/>
-<area shape="rect" id="node4" title=" " alt="" coords="105,161,171,187"/>
-<area shape="rect" id="node5" href="$structpurify_1_1utilities_1_1vis__params.html" title=" " alt="" coords="195,153,318,195"/>
-<area shape="rect" id="node6" title=" " alt="" coords="5,5,167,32"/>
-<area shape="rect" id="node7" title=" " alt="" coords="191,5,322,32"/>
-<area shape="rect" id="node8" title=" " alt="" coords="346,5,477,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="180,467,387,508"/>
+<area shape="rect" id="node2" href="$classDegridOperatorDirectFixturePar.html" title=" " alt="" coords="170,391,397,417"/>
+<area shape="rect" id="node3" href="$classDegridOperatorFixturePar.html" title=" " alt="" coords="91,301,278,328"/>
+<area shape="rect" id="node4" title=" " alt="" coords="65,161,131,187"/>
+<area shape="rect" id="node5" title=" " alt="" coords="155,161,214,187"/>
+<area shape="rect" id="node6" href="$structpurify_1_1utilities_1_1vis__params.html" title=" " alt="" coords="238,153,361,195"/>
+<area shape="rect" id="node7" title=" " alt="" coords="5,5,167,32"/>
+<area shape="rect" id="node8" title=" " alt="" coords="191,5,250,32"/>
+<area shape="rect" id="node9" title=" " alt="" coords="311,5,442,32"/>
+<area shape="rect" id="node10" title=" " alt="" coords="466,5,597,32"/>
+<area shape="rect" id="node11" title=" " alt="" coords="303,301,464,328"/>
 </map>

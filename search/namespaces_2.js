@@ -1,5 +1,24 @@
 var searchData=
 [
-  ['eigen_1084',['Eigen',['http://astro-informatics.github.io/sopt/namespaceEigen.html',1,'']]],
-  ['internal_1085',['internal',['http://astro-informatics.github.io/sopt/namespaceEigen_1_1internal.html',1,'Eigen']]]
+  ['casa_632',['casa',['../namespacepurify_1_1casa.html',1,'purify']]],
+  ['constant_633',['constant',['../namespacepurify_1_1constant.html',1,'purify']]],
+  ['convol_634',['convol',['../namespacepurify_1_1convol.html',1,'purify']]],
+  ['details_635',['details',['../namespacepurify_1_1casa_1_1details.html',1,'purify::casa::details'],['../namespacepurify_1_1details.html',1,'purify::details']]],
+  ['distribute_636',['distribute',['../namespacepurify_1_1distribute.html',1,'purify']]],
+  ['expansions_637',['expansions',['../namespacepurify_1_1wproj__utilities_1_1expansions.html',1,'purify::wproj_utilities']]],
+  ['factory_638',['factory',['../namespacepurify_1_1factory.html',1,'purify']]],
+  ['integration_639',['integration',['../namespacepurify_1_1integration.html',1,'purify']]],
+  ['kernels_640',['kernels',['../namespacepurify_1_1kernels.html',1,'purify']]],
+  ['logging_641',['logging',['../namespacepurify_1_1logging.html',1,'purify']]],
+  ['measurementoperator_642',['measurementoperator',['../namespacepurify_1_1measurementoperator.html',1,'purify']]],
+  ['notinstalled_643',['notinstalled',['../namespacepurify_1_1notinstalled.html',1,'purify']]],
+  ['operators_644',['operators',['../namespacepurify_1_1operators.html',1,'purify']]],
+  ['pfitsio_645',['pfitsio',['../namespacepurify_1_1pfitsio.html',1,'purify']]],
+  ['projection_5fkernels_646',['projection_kernels',['../namespacepurify_1_1projection__kernels.html',1,'purify']]],
+  ['purify_647',['purify',['../namespacepurify.html',1,'']]],
+  ['random_5fupdater_648',['random_updater',['../namespacepurify_1_1random__updater.html',1,'purify']]],
+  ['read_5fmeasurements_649',['read_measurements',['../namespacepurify_1_1read__measurements.html',1,'purify']]],
+  ['utilities_650',['utilities',['../namespacepurify_1_1utilities.html',1,'purify']]],
+  ['widefield_651',['widefield',['../namespacepurify_1_1widefield.html',1,'purify']]],
+  ['wproj_5futilities_652',['wproj_utilities',['../namespacepurify_1_1wproj__utilities.html',1,'purify']]]
 ];

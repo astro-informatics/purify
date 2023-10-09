@@ -84,11 +84,11 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &quot;purify/config.h&quot;</code><br />
 <code>#include &lt;sopt/config.h&gt;</code><br />
-<code>#include &lt;catch.hpp&gt;</code><br />
 <code>#include &lt;memory&gt;</code><br />
 <code>#include &lt;random&gt;</code><br />
+<code>#include &lt;catch2/catch_all.hpp&gt;</code><br />
 <code>#include &quot;<a class="el" href="logging_8h_source.html">purify/logging.h</a>&quot;</code><br />
-<code>#include &lt;<a class="elRef" href="http://astro-informatics.github.io/sopt/logging_8h.html">sopt/logging.h</a>&gt;</code><br />
+<code>#include &lt;sopt/logging.h&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for common_catch_main.cc:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
@@ -96,16 +96,16 @@ $(function() {
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="common__catch__main_8cc__incl.png" border="0" usemap="#_2home_2runner_2work_2purify_2purify_2cpp_2tests_2common__catch__main_8cc" alt=""/></div>
 <map name="_2home_2runner_2work_2purify_2purify_2cpp_2tests_2common__catch__main_8cc" id="_2home_2runner_2work_2purify_2purify_2cpp_2tests_2common__catch__main_8cc">
-<area shape="rect" title=" " alt="" coords="240,5,427,61"/>
-<area shape="rect" title=" " alt="" coords="276,259,391,285"/>
-<area shape="rect" title=" " alt="" coords="33,109,138,136"/>
-<area shape="rect" title=" " alt="" coords="163,109,248,136"/>
-<area shape="rect" title=" " alt="" coords="591,259,668,285"/>
-<area shape="rect" title=" " alt="" coords="419,109,491,136"/>
-<area shape="rect" href="logging_8h.html" title=" " alt="" coords="272,109,395,136"/>
-<area shape="rect" href="http://astro-informatics.github.io/sopt/logging_8h.html.html" title=" " alt="" coords="515,109,630,136"/>
-<area shape="rect" href="logging_8disabled_8h.html" title=" " alt="" coords="409,184,592,211"/>
-<area shape="rect" title=" " alt="" coords="471,259,530,285"/>
+<area shape="rect" title=" " alt="" coords="249,5,435,61"/>
+<area shape="rect" title=" " alt="" coords="98,259,213,285"/>
+<area shape="rect" title=" " alt="" coords="29,109,135,136"/>
+<area shape="rect" title=" " alt="" coords="478,259,555,285"/>
+<area shape="rect" title=" " alt="" coords="306,109,378,136"/>
+<area shape="rect" title=" " alt="" coords="402,109,557,136"/>
+<area shape="rect" href="logging_8h.html" title=" " alt="" coords="159,109,282,136"/>
+<area shape="rect" title=" " alt="" coords="631,109,746,136"/>
+<area shape="rect" href="logging_8disabled_8h.html" title=" " alt="" coords="193,184,376,211"/>
+<area shape="rect" title=" " alt="" coords="255,259,314,285"/>
 </map>
 </div>
 </div>
@@ -176,13 +176,13 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keywordflow">return</span> returnCode;</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <a class="code" href="common__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne</a>.reset(<span class="keyword">new</span> std::mt19937_64(session.configData().rngSeed));</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt_1_1logging.html#a120bb1caf65f04fc7d86c0914bb68713">sopt::logging::initialize</a>();</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <a class="code" href="namespacepurify_1_1logging.html#a766221e3a05f736017082766ede24d4a">purify::logging::initialize</a>();</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <a class="code" href="namespacepurify_1_1logging.html#a9cb706fbf61a8982965095e1265f3172">sopt::logging::initialize</a>();</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <a class="code" href="namespacepurify_1_1logging.html#a9cb706fbf61a8982965095e1265f3172">purify::logging::initialize</a>();</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keywordflow">return</span> session.run();</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;}</div>
 </div><!-- fragment -->
-<p class="reference">References <a class="elRef" href="http://astro-informatics.github.io/sopt/namespacesopt_1_1logging.html#a120bb1caf65f04fc7d86c0914bb68713">sopt::logging::initialize()</a>, <a class="el" href="logging_8disabled_8h_source.html#l00013">purify::logging::initialize()</a>, and <a class="el" href="common__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne()</a>.</p>
+<p class="reference">References <a class="el" href="logging_8disabled_8h_source.html#l00012">purify::logging::initialize()</a>, and <a class="el" href="common__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne()</a>.</p>
 
 </div>
 </div>
@@ -207,9 +207,8 @@ Functions</h2></td></tr>
 </div>
 </div>
 </div><!-- contents -->
-<div class="ttc" id="anamespacepurify_1_1logging_html_a766221e3a05f736017082766ede24d4a"><div class="ttname"><a href="namespacepurify_1_1logging.html#a766221e3a05f736017082766ede24d4a">purify::logging::initialize</a></div><div class="ttdeci">std::shared_ptr&lt; int &gt; initialize(std::string const &amp;)</div><div class="ttdoc">Initializes a logger.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8disabled_8h_source.html#l00013">logging.disabled.h:13</a></div></div>
 <div class="ttc" id="acommon__catch__main_8cc_html_afd7b13def75c5d7feb77ac1ea2df5d0b"><div class="ttname"><a href="common__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne</a></div><div class="ttdeci">std::unique_ptr&lt; std::mt19937_64 &gt; mersenne(new std::mt19937_64(0))</div></div>
-<div class="ttc" id="anamespacesopt_1_1logging_html_a120bb1caf65f04fc7d86c0914bb68713"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt_1_1logging.html#a120bb1caf65f04fc7d86c0914bb68713">sopt::logging::initialize</a></div><div class="ttdeci">std::shared_ptr&lt; int &gt; initialize(std::string const &amp;name=&quot;&quot;)</div></div>
+<div class="ttc" id="anamespacepurify_1_1logging_html_a9cb706fbf61a8982965095e1265f3172"><div class="ttname"><a href="namespacepurify_1_1logging.html#a9cb706fbf61a8982965095e1265f3172">purify::logging::initialize</a></div><div class="ttdeci">std::shared_ptr&lt; int &gt; initialize(std::string const &amp;)</div><div class="ttdoc">Initializes a logger.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8disabled_8h_source.html#l00012">logging.disabled.h:12</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

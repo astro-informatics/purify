@@ -1,9 +1,11 @@
 <map id="PadmmFixtureMPI" name="PadmmFixtureMPI">
-<area shape="rect" id="node1" title=" " alt="" coords="107,257,247,284"/>
+<area shape="rect" id="node1" title=" " alt="" coords="229,287,369,313"/>
 <area shape="rect" id="node2" title=" " alt="" coords="5,161,72,187"/>
-<area shape="rect" id="node3" href="/home/runner/work/purify/purify/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/classsopt_1_1wavelets_1_1SARA.html" title=" " alt="" coords="97,161,258,187"/>
-<area shape="rect" id="node4" href="$structpurify_1_1utilities_1_1vis__params.html" title=" " alt="" coords="283,153,405,195"/>
-<area shape="rect" id="node5" title=" " alt="" coords="93,5,254,32"/>
-<area shape="rect" id="node6" title=" " alt="" coords="279,5,409,32"/>
-<area shape="rect" id="node7" title=" " alt="" coords="433,5,564,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="112,5,171,32"/>
+<area shape="rect" id="node6" href="$structpurify_1_1utilities_1_1vis__params.html" title=" " alt="" coords="237,153,360,195"/>
+<area shape="rect" id="node4" title=" " alt="" coords="385,161,546,187"/>
+<area shape="rect" id="node5" title=" " alt="" coords="571,161,629,187"/>
+<area shape="rect" id="node7" title=" " alt="" coords="217,5,378,32"/>
+<area shape="rect" id="node8" title=" " alt="" coords="403,5,533,32"/>
+<area shape="rect" id="node9" title=" " alt="" coords="557,5,688,32"/>
 </map>

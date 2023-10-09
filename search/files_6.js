@@ -1,5 +1,8 @@
 var searchData=
 [
-  ['generate_5fvis_5fdata_2ecc_1172',['generate_vis_data.cc',['../generate__vis__data_8cc.html',1,'']]],
-  ['gridding_2ecc_1173',['gridding.cc',['../gridding_8cc.html',1,'']]]
+  ['image_5fwproj_5fchirp_2ecc_680',['image_wproj_chirp.cc',['../image__wproj__chirp_8cc.html',1,'']]],
+  ['index_5fmapping_2ecc_681',['index_mapping.cc',['../index__mapping_8cc.html',1,'']]],
+  ['indexmapping_2eh_682',['IndexMapping.h',['../IndexMapping_8h.html',1,'']]],
+  ['integration_2ecc_683',['integration.cc',['../purify_2integration_8cc.html',1,'(Global Namespace)'],['../tests_2integration_8cc.html',1,'(Global Namespace)']]],
+  ['integration_2eh_684',['integration.h',['../integration_8h.html',1,'']]]
 ];

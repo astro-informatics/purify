@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['dde_5ftype_1926',['dde_type',['../namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5',1,'purify']]],
-  ['distributed_5fmeasurement_5foperator_1927',['distributed_measurement_operator',['../namespacepurify_1_1factory.html#a6b8de5116c3d7d0d679cd6dd47a80248',1,'purify::factory']]],
-  ['distributed_5fwavelet_5foperator_1928',['distributed_wavelet_operator',['../namespacepurify_1_1factory.html#a5bbc6a01d0a2cdd30b656a6bb957221f',1,'purify::factory']]]
+  ['dde_5ftype_1115',['dde_type',['../namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5',1,'purify']]],
+  ['distributed_5fmeasurement_5foperator_1116',['distributed_measurement_operator',['../namespacepurify_1_1factory.html#a6b8de5116c3d7d0d679cd6dd47a80248',1,'purify::factory']]],
+  ['distributed_5fwavelet_5foperator_1117',['distributed_wavelet_operator',['../namespacepurify_1_1factory.html#a5bbc6a01d0a2cdd30b656a6bb957221f',1,'purify::factory']]]
 ];

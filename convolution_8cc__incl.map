@@ -1,17 +1,17 @@
 <map id="/home/runner/work/purify/purify/cpp/tests/convolution.cc" name="/home/runner/work/purify/purify/cpp/tests/convolution.cc">
-<area shape="rect" id="node1" title=" " alt="" coords="300,5,524,47"/>
+<area shape="rect" id="node1" title=" " alt="" coords="335,5,559,47"/>
 <area shape="rect" id="node2" title=" " alt="" coords="288,244,403,271"/>
 <area shape="rect" id="node3" href="$types_8h.html" title=" " alt="" coords="130,95,241,121"/>
 <area shape="rect" id="node9" title=" " alt="" coords="265,95,345,121"/>
-<area shape="rect" id="node10" title=" " alt="" coords="369,95,455,121"/>
-<area shape="rect" id="node11" title=" " alt="" coords="479,95,623,121"/>
-<area shape="rect" id="node12" href="$logging_8h.html" title=" " alt="" coords="647,95,769,121"/>
-<area shape="rect" id="node16" href="$convolution_8h.html" title=" " alt="" coords="794,95,945,121"/>
+<area shape="rect" id="node10" title=" " alt="" coords="369,95,524,121"/>
+<area shape="rect" id="node11" title=" " alt="" coords="548,95,692,121"/>
+<area shape="rect" id="node12" href="$logging_8h.html" title=" " alt="" coords="716,95,839,121"/>
+<area shape="rect" id="node16" href="$convolution_8h.html" title=" " alt="" coords="863,95,1014,121"/>
 <area shape="rect" id="node4" title=" " alt="" coords="37,169,115,196"/>
 <area shape="rect" id="node5" title=" " alt="" coords="139,169,231,196"/>
 <area shape="rect" id="node6" title=" " alt="" coords="255,169,358,196"/>
 <area shape="rect" id="node7" title=" " alt="" coords="383,169,519,196"/>
-<area shape="rect" id="node8" href="/home/runner/work/purify/purify/build/cpp/docs/sopt/sopt.tag$http://astro-informatics.github.io/sopt/types_8h.html.html" title=" " alt="" coords="543,169,646,196"/>
+<area shape="rect" id="node8" title=" " alt="" coords="543,169,646,196"/>
 <area shape="rect" id="node13" href="$logging_8disabled_8h.html" title=" " alt="" coords="722,169,905,196"/>
 <area shape="rect" id="node14" title=" " alt="" coords="728,244,805,271"/>
 <area shape="rect" id="node15" title=" " alt="" coords="829,244,888,271"/>

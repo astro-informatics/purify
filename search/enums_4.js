@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['kernel_1931',['kernel',['../namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668',1,'purify::kernels']]]
+  ['g_5fproximal_5ftype_1120',['g_proximal_type',['../namespacepurify_1_1factory.html#a3e81ddc8925844c225faea9371315d1f',1,'purify::factory']]]
 ];

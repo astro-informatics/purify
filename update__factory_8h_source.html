@@ -86,7 +86,7 @@ $(function() {
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="logging_8h.html">purify/logging.h</a>&quot;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="http://astro-informatics.github.io/sopt/communicator_8h.html">sopt/mpi/communicator.h</a>&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;sopt/mpi/communicator.h&gt;</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="algorithm__factory_8h.html">purify/algorithm_factory.h</a>&quot;</span></div>
@@ -95,7 +95,7 @@ $(function() {
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="cimg_8h.html">purify/cimg.h</a>&quot;</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacepurify.html">purify</a> {</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">namespace </span><a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt_1_1wavelets.html#a65aedf4b737bb07c94642b42fe99bfab">factory</a> {</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">namespace </span>factory {</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T, <span class="keyword">class</span> Algo&gt;</div>
 <div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="namespacepurify_1_1factory.html#ae435915935df4c9974225b14dcd03083">   20</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="namespacepurify_1_1factory.html#ae435915935df4c9974225b14dcd03083">add_updater</a>(std::weak_ptr&lt;Algo&gt; <span class="keyword">const</span> algo_weak, <span class="keyword">const</span> t_real step_size_scale,</div>
@@ -126,8 +126,8 @@ $(function() {
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <span class="keyword">auto</span> algo = algo_weak.lock();</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      <span class="keywordflow">if</span> (comm.is_root()) <a class="code" href="logging_8h.html#ad2207dcfa3c2c44fa0fccbb9d0a3b21c">PURIFY_MEDIUM_LOG</a>(<span class="stringliteral">&quot;Step size γ {}&quot;</span>, algo-&gt;gamma());</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      <span class="keywordflow">if</span> (algo-&gt;gamma() &gt; 0) {</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        Vector&lt;t_complex&gt; <span class="keyword">const</span> alpha = algo-&gt;Psi().adjoint() * x;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keyword">const</span> <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac63d8bc953beeb56a063f174ce7f2a0a">t_real</a> new_gamma =</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        Vector&lt;t_complex&gt; <span class="keyword">const</span> alpha = algo-&gt;g_proximal()-&gt;Psi().adjoint() * x;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keyword">const</span> t_real new_gamma =</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;            comm.all_reduce((sara_size &gt; 0) ? alpha.real().cwiseAbs().maxCoeff() : 0., MPI_MAX) *</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;            step_size_scale;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <span class="keywordflow">if</span> (comm.is_root()) <a class="code" href="logging_8h.html#ad2207dcfa3c2c44fa0fccbb9d0a3b21c">PURIFY_MEDIUM_LOG</a>(<span class="stringliteral">&quot;Step size γ update {}&quot;</span>, new_gamma);</div>
@@ -169,8 +169,8 @@ $(function() {
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;      <span class="keyword">auto</span> algo = algo_weak.lock();</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      <span class="keywordflow">if</span> (algo-&gt;gamma() &gt; 0) {</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <a class="code" href="logging_8h.html#ad2207dcfa3c2c44fa0fccbb9d0a3b21c">PURIFY_MEDIUM_LOG</a>(<span class="stringliteral">&quot;Step size γ {}&quot;</span>, algo-&gt;gamma());</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        Vector&lt;T&gt; <span class="keyword">const</span> alpha = algo-&gt;Psi().adjoint() * x;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <span class="keyword">const</span> <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac63d8bc953beeb56a063f174ce7f2a0a">t_real</a> new_gamma = alpha.real().cwiseAbs().maxCoeff() * step_size_scale;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        Vector&lt;T&gt; <span class="keyword">const</span> alpha = algo-&gt;g_proximal()-&gt;Psi().adjoint() * x;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <span class="keyword">const</span> t_real new_gamma = alpha.real().cwiseAbs().maxCoeff() * step_size_scale;</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <a class="code" href="logging_8h.html#ad2207dcfa3c2c44fa0fccbb9d0a3b21c">PURIFY_MEDIUM_LOG</a>(<span class="stringliteral">&quot;Step size γ update {}&quot;</span>, new_gamma);</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        <span class="comment">// updating parameter</span></div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        algo-&gt;gamma(((std::abs((algo-&gt;gamma() - new_gamma) / algo-&gt;gamma()) &gt; update_tol) and</div>
@@ -210,16 +210,13 @@ $(function() {
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="acimg_8h_html"><div class="ttname"><a href="cimg_8h.html">cimg.h</a></div></div>
-<div class="ttc" id="anamespacepurify_html"><div class="ttname"><a href="namespacepurify.html">purify</a></div><div class="ttdef"><b>Definition:</b> <a href="algorithm__factory_8h_source.html#l00027">algorithm_factory.h:27</a></div></div>
-<div class="ttc" id="acommunicator_8h.html_html"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/communicator_8h.html">communicator.h</a></div></div>
-<div class="ttc" id="astructpurify_1_1pfitsio_1_1header__params_html"><div class="ttname"><a href="structpurify_1_1pfitsio_1_1header__params.html">purify::pfitsio::header_params</a></div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8h_source.html#l00014">pfitsio.h:14</a></div></div>
-<div class="ttc" id="anamespacesopt_1_1wavelets_html_a65aedf4b737bb07c94642b42fe99bfab"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt_1_1wavelets.html#a65aedf4b737bb07c94642b42fe99bfab">factory</a></div><div class="ttdeci">Wavelet factory(std::string name=&quot;DB1&quot;, t_uint nlevels=1)</div></div>
-<div class="ttc" id="anamespacesopt_html_ac63d8bc953beeb56a063f174ce7f2a0a"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac63d8bc953beeb56a063f174ce7f2a0a">t_real</a></div><div class="ttdeci">double t_real</div></div>
+<div class="ttc" id="anamespacepurify_html"><div class="ttname"><a href="namespacepurify.html">purify</a></div><div class="ttdef"><b>Definition:</b> <a href="algorithm__factory_8h_source.html#l00031">algorithm_factory.h:31</a></div></div>
+<div class="ttc" id="astructpurify_1_1pfitsio_1_1header__params_html"><div class="ttname"><a href="structpurify_1_1pfitsio_1_1header__params.html">purify::pfitsio::header_params</a></div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8h_source.html#l00013">pfitsio.h:13</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1factory_html_ae435915935df4c9974225b14dcd03083"><div class="ttname"><a href="namespacepurify_1_1factory.html#ae435915935df4c9974225b14dcd03083">purify::factory::add_updater</a></div><div class="ttdeci">void add_updater(std::weak_ptr&lt; Algo &gt; const algo_weak, const t_real step_size_scale, const t_real update_tol, const t_uint update_iters, const pfitsio::header_params &amp;update_solution_header, const pfitsio::header_params &amp;update_residual_header, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const bool using_mpi, const t_real beam_units=1)</div><div class="ttdef"><b>Definition:</b> <a href="update__factory_8h_source.html#l00020">update_factory.h:20</a></div></div>
 <div class="ttc" id="alogging_8h_html_ad2207dcfa3c2c44fa0fccbb9d0a3b21c"><div class="ttname"><a href="logging_8h.html#ad2207dcfa3c2c44fa0fccbb9d0a3b21c">PURIFY_MEDIUM_LOG</a></div><div class="ttdeci">#define PURIFY_MEDIUM_LOG(...)</div><div class="ttdoc">Medium priority message.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8h_source.html#l00030">logging.h:30</a></div></div>
 <div class="ttc" id="alogging_8h_html"><div class="ttname"><a href="logging_8h.html">logging.h</a></div></div>
 <div class="ttc" id="apfitsio_8h_html"><div class="ttname"><a href="pfitsio_8h.html">pfitsio.h</a></div></div>
-<div class="ttc" id="anamespacepurify_1_1pfitsio_html_a05de3285d7ec5d5a6e43d2e5761e8b12"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">purify::pfitsio::write2d</a></div><div class="ttdeci">void write2d(const Image&lt; t_real &gt; &amp;eigen_image, const pfitsio::header_params &amp;header, const bool &amp;overwrite)</div><div class="ttdoc">Write image to fits file.</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8cc_source.html#l00034">pfitsio.cc:34</a></div></div>
+<div class="ttc" id="anamespacepurify_1_1pfitsio_html_a05de3285d7ec5d5a6e43d2e5761e8b12"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">purify::pfitsio::write2d</a></div><div class="ttdeci">void write2d(const Image&lt; t_real &gt; &amp;eigen_image, const pfitsio::header_params &amp;header, const bool &amp;overwrite)</div><div class="ttdoc">Write image to fits file.</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8cc_source.html#l00030">pfitsio.cc:30</a></div></div>
 <div class="ttc" id="aalgorithm__factory_8h_html"><div class="ttname"><a href="algorithm__factory_8h.html">algorithm_factory.h</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

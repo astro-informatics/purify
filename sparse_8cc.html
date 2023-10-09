@@ -84,7 +84,7 @@ $(function() {
 <div class="textblock"><code>#include &quot;purify/config.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="types_8h_source.html">purify/types.h</a>&quot;</code><br />
 <code>#include &lt;iostream&gt;</code><br />
-<code>#include &quot;catch.hpp&quot;</code><br />
+<code>#include &quot;catch2/catch_all.hpp&quot;</code><br />
 <code>#include &quot;purify/directories.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="logging_8h_source.html">purify/logging.h</a>&quot;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -94,21 +94,21 @@ $(function() {
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="sparse_8cc__incl.png" border="0" usemap="#_2home_2runner_2work_2purify_2purify_2cpp_2tests_2sparse_8cc" alt=""/></div>
 <map name="_2home_2runner_2work_2purify_2purify_2cpp_2tests_2sparse_8cc" id="_2home_2runner_2work_2purify_2purify_2cpp_2tests_2sparse_8cc">
-<area shape="rect" title=" " alt="" coords="275,5,466,47"/>
-<area shape="rect" title=" " alt="" coords="300,244,415,271"/>
-<area shape="rect" href="types_8h.html" title=" " alt="" coords="142,95,253,121"/>
-<area shape="rect" title=" " alt="" coords="277,95,357,121"/>
-<area shape="rect" title=" " alt="" coords="381,95,467,121"/>
-<area shape="rect" title=" " alt="" coords="491,95,635,121"/>
-<area shape="rect" href="logging_8h.html" title=" " alt="" coords="659,95,781,121"/>
-<area shape="rect" title=" " alt="" coords="49,169,127,196"/>
-<area shape="rect" title=" " alt="" coords="151,169,243,196"/>
-<area shape="rect" title=" " alt="" coords="267,169,370,196"/>
-<area shape="rect" title=" " alt="" coords="395,169,531,196"/>
-<area shape="rect" href="http://astro-informatics.github.io/sopt/types_8h.html.html" title=" " alt="" coords="555,169,658,196"/>
-<area shape="rect" href="logging_8disabled_8h.html" title=" " alt="" coords="734,169,917,196"/>
-<area shape="rect" title=" " alt="" coords="740,244,817,271"/>
-<area shape="rect" title=" " alt="" coords="841,244,900,271"/>
+<area shape="rect" title=" " alt="" coords="281,5,471,47"/>
+<area shape="rect" title=" " alt="" coords="288,244,403,271"/>
+<area shape="rect" href="types_8h.html" title=" " alt="" coords="130,95,241,121"/>
+<area shape="rect" title=" " alt="" coords="265,95,345,121"/>
+<area shape="rect" title=" " alt="" coords="369,95,524,121"/>
+<area shape="rect" title=" " alt="" coords="548,95,692,121"/>
+<area shape="rect" href="logging_8h.html" title=" " alt="" coords="716,95,839,121"/>
+<area shape="rect" title=" " alt="" coords="37,169,115,196"/>
+<area shape="rect" title=" " alt="" coords="139,169,231,196"/>
+<area shape="rect" title=" " alt="" coords="255,169,358,196"/>
+<area shape="rect" title=" " alt="" coords="383,169,519,196"/>
+<area shape="rect" title=" " alt="" coords="543,169,646,196"/>
+<area shape="rect" href="logging_8disabled_8h.html" title=" " alt="" coords="722,169,905,196"/>
+<area shape="rect" title=" " alt="" coords="728,244,805,271"/>
+<area shape="rect" title=" " alt="" coords="829,244,888,271"/>
 </map>
 </div>
 </div>
@@ -148,20 +148,20 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="sparse_8cc_source.html#l00010">10</a> of file <a class="el" href="sparse_8cc_source.html">sparse.cc</a>.</p>
 <div class="fragment"><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;                                             {</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a31ab3e07b254312a99a9fe2918b0a625">t_int</a> NZnum = 40;</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  t_int NZnum = 40;</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  std::vector&lt;t_tripletList&gt; entries;</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  entries.reserve(NZnum);</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_int&gt;</a> <a class="codeRef" href="credible__region_8cc.html#a1cc6c6d663c5f0c6cbd63b69ca306721">rows</a> = <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_int&gt;::LinSpaced</a>(NZnum, 0, 2 * NZnum);</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_int&gt;</a> <a class="codeRef" href="credible__region_8cc.html#a4f8d1cebdd1d0572b0f5ff58464b9216">cols</a> = <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;t_int&gt;::LinSpaced</a>(NZnum, 0, 3 * NZnum);</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  Vector&lt;t_int&gt; rows = Vector&lt;t_int&gt;::LinSpaced(NZnum, 0, 2 * NZnum);</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  Vector&lt;t_int&gt; cols = Vector&lt;t_int&gt;::LinSpaced(NZnum, 0, 3 * NZnum);</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keywordflow">for</span> (<a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a31ab3e07b254312a99a9fe2918b0a625">t_int</a> i = 0; i &lt; NZnum; ++i) {</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    entries.emplace_back(<a class="codeRef" href="credible__region_8cc.html#a1cc6c6d663c5f0c6cbd63b69ca306721">rows</a>(i), <a class="codeRef" href="credible__region_8cc.html#a4f8d1cebdd1d0572b0f5ff58464b9216">cols</a>(i), i);</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keywordflow">for</span> (t_int i = 0; i &lt; NZnum; ++i) {</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    entries.emplace_back(rows(i), cols(i), i);</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  }</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keyword">const</span> <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a31ab3e07b254312a99a9fe2918b0a625">t_int</a> total_rows = 5 * NZnum;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keyword">const</span> <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a31ab3e07b254312a99a9fe2918b0a625">t_int</a> total_cols = 4 * NZnum;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keyword">const</span> t_int total_rows = 5 * NZnum;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keyword">const</span> t_int total_cols = 4 * NZnum;</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <a class="code" href="namespacepurify.html#ae523b7b9a1588d740b890c191ed57fd4">Sparse&lt;t_complex&gt;</a> G(total_rows, total_cols);</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  G.setFromTriplets(entries.begin(), entries.end());</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keywordflow">for</span> (<a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a31ab3e07b254312a99a9fe2918b0a625">t_int</a> i = 0; i &lt; total_cols; ++i) {</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keywordflow">for</span> (t_int i = 0; i &lt; total_cols; ++i) {</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordflow">for</span> (<a class="code" href="namespacepurify.html#ae523b7b9a1588d740b890c191ed57fd4">Sparse&lt;t_complex&gt;::InnerIterator</a> pix(G, i); pix; ++pix) {</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      <a class="code" href="logging_8h.html#a4c0fef90efd9093d28b6dc8e10cb577d">PURIFY_HIGH_LOG</a>(<span class="stringliteral">&quot;{} {} {}&quot;</span>, pix.row(), pix.col(), std::real(pix.value()));</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    }</div>
@@ -169,17 +169,13 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="comment">// CHECK(expected.isApprox(output, 1e-13));</span></div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;}</div>
 </div><!-- fragment -->
-<p class="reference">References <a class="elRef" href="credible__region_8cc.html#a4f8d1cebdd1d0572b0f5ff58464b9216">cols</a>, <a class="el" href="logging_8h_source.html#l00028">PURIFY_HIGH_LOG</a>, and <a class="elRef" href="credible__region_8cc.html#a1cc6c6d663c5f0c6cbd63b69ca306721">rows</a>.</p>
+<p class="reference">References <a class="el" href="logging_8h_source.html#l00028">PURIFY_HIGH_LOG</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <div class="ttc" id="alogging_8h_html_a4c0fef90efd9093d28b6dc8e10cb577d"><div class="ttname"><a href="logging_8h.html#a4c0fef90efd9093d28b6dc8e10cb577d">PURIFY_HIGH_LOG</a></div><div class="ttdeci">#define PURIFY_HIGH_LOG(...)</div><div class="ttdoc">High priority message.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8h_source.html#l00028">logging.h:28</a></div></div>
-<div class="ttc" id="anamespacesopt_html_ac4dd3feebe1bf49ebd44d72b05064c19"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector</a></div><div class="ttdeci">Eigen::Matrix&lt; T, Eigen::Dynamic, 1 &gt; Vector</div></div>
-<div class="ttc" id="acredible__region_8cc_html_a1cc6c6d663c5f0c6cbd63b69ca306721"><div class="ttname"><a href="credible__region_8cc.html#a1cc6c6d663c5f0c6cbd63b69ca306721">rows</a></div><div class="ttdeci">t_uint rows</div></div>
 <div class="ttc" id="anamespacepurify_html_ae523b7b9a1588d740b890c191ed57fd4"><div class="ttname"><a href="namespacepurify.html#ae523b7b9a1588d740b890c191ed57fd4">purify::Sparse</a></div><div class="ttdeci">Eigen::SparseMatrix&lt; T, Eigen::RowMajor, I &gt; Sparse</div><div class="ttdoc">A matrix of a given type.</div><div class="ttdef"><b>Definition:</b> <a href="types_8h_source.html#l00028">types.h:28</a></div></div>
-<div class="ttc" id="acredible__region_8cc_html_a4f8d1cebdd1d0572b0f5ff58464b9216"><div class="ttname"><a href="credible__region_8cc.html#a4f8d1cebdd1d0572b0f5ff58464b9216">cols</a></div><div class="ttdeci">t_uint cols</div></div>
-<div class="ttc" id="anamespacesopt_html_a31ab3e07b254312a99a9fe2918b0a625"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt.html#a31ab3e07b254312a99a9fe2918b0a625">t_int</a></div><div class="ttdeci">int t_int</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

@@ -87,14 +87,14 @@ $(function() {
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="types_8h.html">purify/types.h</a>&quot;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;numeric&gt;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="IndexMapping_8h.html">purify/IndexMapping.h</a>&quot;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;<a class="codeRef" href="http://astro-informatics.github.io/sopt/communicator_8h.html">sopt/mpi/communicator.h</a>&quot;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;sopt/mpi/communicator.h&quot;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacepurify.html">purify</a> {</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> STORAGE_INDEX_TYPE&gt;</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;std::vector&lt;t_int&gt; all_to_all_recv_sizes(<span class="keyword">const</span> std::vector&lt;STORAGE_INDEX_TYPE&gt; &amp;local_indices,</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;                                         <span class="keyword">const</span> <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a31ab3e07b254312a99a9fe2918b0a625">t_int</a> nodes, <span class="keyword">const</span> STORAGE_INDEX_TYPE N) {</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;                                         <span class="keyword">const</span> t_int nodes, <span class="keyword">const</span> STORAGE_INDEX_TYPE N) {</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  std::vector&lt;t_int&gt; recv_sizes;</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  STORAGE_INDEX_TYPE group = 0;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#a31ab3e07b254312a99a9fe2918b0a625">t_int</a> count = 0;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  t_int count = 0;</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keywordflow">if</span> (<span class="keyword">static_cast&lt;</span>std::int64_t<span class="keyword">&gt;</span>(N) * <span class="keyword">static_cast&lt;</span>std::int64_t<span class="keyword">&gt;</span>(nodes) &gt;</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      std::numeric_limits&lt;STORAGE_INDEX_TYPE&gt;::max())</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(</div>
@@ -103,7 +103,7 @@ $(function() {
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        <span class="stringliteral">&quot;data types, i.e. long long int.&quot;</span>);</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">const</span> STORAGE_INDEX_TYPE &amp;index : local_indices) {</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">const</span> STORAGE_INDEX_TYPE index_group = index / <a class="codeRef" href="benchmarks_2wavelets_8cc.html#a61a80266d367e479ef40417f4f681bea">N</a>;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">const</span> STORAGE_INDEX_TYPE index_group = index / N;</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordflow">if</span> (index_group &lt; group)</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;local indices are out of order for columns of gridding matrix, &quot;</span> +</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;                               std::to_string(index_group) + <span class="stringliteral">&quot; &lt; &quot;</span> + std::to_string(group) +</div>
@@ -175,7 +175,7 @@ $(function() {
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <span class="keyword">template</span> &lt;<span class="keyword">class</span> T0, <span class="keyword">class</span> T1&gt;</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <span class="keywordtype">void</span> recv_grid(Eigen::MatrixBase&lt;T0&gt; <span class="keyword">const</span> &amp;input, Eigen::MatrixBase&lt;T1&gt; <span class="keyword">const</span> &amp;output)<span class="keyword"> const </span>{</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    assert(input.cols() == 1);</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <a class="codeRef" href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector&lt;typename T0::Scalar&gt;</a> buffer;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    Vector&lt;typename T0::Scalar&gt; buffer;</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    mapping(input, buffer);</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    assert(buffer.size() == std::accumulate(send_sizes.begin(), send_sizes.end(), 0));</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    output.const_cast_derived() =</div>
@@ -202,13 +202,9 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="anamespacepurify_html_ad40efb8e8768a0bf074af57e89d2e64c"><div class="ttname"><a href="namespacepurify.html#ad40efb8e8768a0bf074af57e89d2e64c">purify::all_to_all_send_sizes</a></div><div class="ttdeci">std::vector&lt; t_int &gt; all_to_all_send_sizes(const std::vector&lt; t_int &gt; &amp;recv_sizes, const sopt::mpi::Communicator &amp;comm)</div><div class="ttdef"><b>Definition:</b> <a href="AllToAllSparseVector_8cc_source.html#l00005">AllToAllSparseVector.cc:5</a></div></div>
 <div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div></div>
-<div class="ttc" id="anamespacesopt_html_ac4dd3feebe1bf49ebd44d72b05064c19"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt.html#ac4dd3feebe1bf49ebd44d72b05064c19">Vector</a></div><div class="ttdeci">Eigen::Matrix&lt; T, Eigen::Dynamic, 1 &gt; Vector</div></div>
 <div class="ttc" id="aIndexMapping_8h_html"><div class="ttname"><a href="IndexMapping_8h.html">IndexMapping.h</a></div></div>
-<div class="ttc" id="anamespacepurify_html"><div class="ttname"><a href="namespacepurify.html">purify</a></div><div class="ttdef"><b>Definition:</b> <a href="algorithm__factory_8h_source.html#l00027">algorithm_factory.h:27</a></div></div>
-<div class="ttc" id="acommunicator_8h.html_html"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/communicator_8h.html">communicator.h</a></div></div>
+<div class="ttc" id="anamespacepurify_html"><div class="ttname"><a href="namespacepurify.html">purify</a></div><div class="ttdef"><b>Definition:</b> <a href="algorithm__factory_8h_source.html#l00031">algorithm_factory.h:31</a></div></div>
 <div class="ttc" id="anamespacepurify_html_ae1142fb0bf079e99cbceb3e29027418c"><div class="ttname"><a href="namespacepurify.html#ae1142fb0bf079e99cbceb3e29027418c">purify::non_empty_outers</a></div><div class="ttdeci">std::set&lt; STORAGE_INDEX_TYPE &gt; non_empty_outers(Eigen::SparseMatrixBase&lt; T0 &gt; const &amp;matrix)</div><div class="ttdoc">Indices of non empty outer indices.</div><div class="ttdef"><b>Definition:</b> <a href="IndexMapping_8h_source.html#l00061">IndexMapping.h:61</a></div></div>
-<div class="ttc" id="abenchmarks_2wavelets_8cc_html_a61a80266d367e479ef40417f4f681bea"><div class="ttname"><a href="benchmarks_2wavelets_8cc.html#a61a80266d367e479ef40417f4f681bea">N</a></div><div class="ttdeci">const auto N</div></div>
-<div class="ttc" id="anamespacesopt_html_a31ab3e07b254312a99a9fe2918b0a625"><div class="ttname"><a href="http://astro-informatics.github.io/sopt/namespacesopt.html#a31ab3e07b254312a99a9fe2918b0a625">t_int</a></div><div class="ttdeci">int t_int</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
