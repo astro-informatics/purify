@@ -79,7 +79,7 @@ jobs:
         with:
           repository: astro-informatics/sopt.git
           path: sopt
-          ref: master
+          ref: development
 
       - name: Create SOPT package
         run : |
