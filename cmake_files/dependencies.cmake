@@ -1,38 +1,35 @@
-include(PackageLookup)  # check for existence, or install external projects
-# Scripts to run purify from build directory. Good for testing/debuggin.
+#include(PackageLookup)  # check for existence, or install external projects
+# Scripts to run purify from build directory. Good for testing/debugging.
 include(EnvironmentScript)
 # Look up packages: if not found, installs them
 
 # On different platforms the CMakeDeps generator in conan seems to install eigen
 # as either "eigen" or "Eigen3" because the recipe does not explicitly define the
 # name (yet). To work around this we have to check for both.
-find_package(eigen)
-find_package(Eigen3)
-if(NOT (eigen_FOUND OR Eigen3_FOUND))
+find_package(eigen NAMES Eigen3)
+if(eigen_FOUND OR Eigen3_FOUND)
+  if(eigen_INCLUDE_DIR)
+    set(EIGEN3_INCLUDE_DIR ${eigen_INCLUDE_DIR} CACHE INTERNAL "")
+  elseif(Eigen3_INCLUDE_DIR)
+    set(EIGEN3_INCLUDE_DIR ${Eigen3_INCLUDE_DIR} CACHE INTERNAL "")
+  endif()
+else()
   message(FATAL_ERROR "Eigen is required")
 endif()
 
-find_package(cfitsio)
-if(NOT cfitsio_FOUND)
-  message(FATAL_ERROR "CFitsIO is required")
-endif()
+find_package(CFitsIO MODULE REQUIRED)
 
 find_package(Boost COMPONENTS system filesystem REQUIRED)
-if(NOT Boost_FOUND)
-  message(FATAL_ERROR "Boost is required")
-endif()
 
-find_package(yaml-cpp)
-if(NOT yaml-cpp_FOUND)
-  message(FATAL_ERROR "Yaml-cpp is required")
-endif()
+find_package(yaml-cpp REQUIRED)
 
-find_package(sopt)
-if(NOT sopt_FOUND)
-  message(FATAL_ERROR "sopt is required")
-endif()
+find_package(sopt REQUIRED)
 
-lookup_package(Cubature REQUIRED)
+find_package(Cubature QUIET)
+if(NOT Cubature_FOUND)
+  message(STATUS "Cubature not found. Attempt to install...")
+  include(LookUpCubature)
+endif()
 
 # Look for external software
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -43,25 +40,16 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 if(logging)
-  find_package(spdlog)
-  if(NOT spdlog_FOUND)
-    message(FATAL_ERROR "logging requires spdlog")
-  endif()
+  find_package(spdlog REQUIRED)
 endif()
 
 if(docs)
   cmake_policy(SET CMP0057 NEW)
-  find_package(doxygen REQUIRED dot)
-  if(NOT doxygen_FOUND)
-    mesage(FATAL_ERROR "Could not find Doxygen or dot")
-  endif()
+  find_package(Doxygen REQUIRED dot)
 endif()
 
 if(examples)
-  find_package(TIFF)
-  if(NOT TIFF_FOUND)
-    message(FATAL_ERROR "Examples require TIFF")
-  endif()
+  find_package(TIFF REQUIRED)
 endif()
 
 
@@ -97,7 +85,7 @@ else()
   set(PURIFY_OPENMP FALSE)
 endif()
 
-find_package(FFTW3)
+find_package(fftw3 NAMES FFTW3 REQUIRED)
 
 set(PURIFY_MPI FALSE)
 if(dompi)
@@ -121,10 +109,7 @@ endif()
 
 set(PURIFY_CASACORE FALSE)
 if(docasa)
-  find_package(CasaCore OPTIONAL_COMPONENTS ms)
-  if(NOT CasaCore_FOUND)
-    message(FATAL_ERROR "CasaCore was requested but could not be found")
-  endif()
+  find_package(CasaCore OPTIONAL_COMPONENTS ms REQUIRED)
   set(PURIFY_CASACORE TRUE)
 endif()
 

@@ -1,7 +1,7 @@
 #include "purify/operators.h"
 #include "purify/config.h"
 #include "purify/types.h"
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "purify/directories.h"
 #include "purify/fly_operators.h"
 #include "purify/kernels.h"

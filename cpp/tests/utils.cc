@@ -1,11 +1,12 @@
 #include <random>
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "purify/directories.h"
 #include "purify/utilities.h"
 #include "purify/uvw_utilities.h"
 
 using namespace purify;
 using namespace purify::notinstalled;
+using Catch::Approx;
 
 TEST_CASE("utilities [mod]", "[mod]") {
   Array<t_real> range;

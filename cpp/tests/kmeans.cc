@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 
 #include "purify/config.h"
 #include "purify/types.h"
@@ -9,6 +9,7 @@
 #include <sopt/mpi/communicator.h>
 
 using namespace purify;
+using Catch::Approx;
 
 TEST_CASE("k-means") {
   auto const world = sopt::mpi::Communicator::World();

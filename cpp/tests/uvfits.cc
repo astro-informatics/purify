@@ -1,6 +1,6 @@
 #include "purify/config.h"
 #include "purify/types.h"
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "purify/logging.h"
 
 #include <iostream>
@@ -8,6 +8,7 @@
 #include "purify/uvfits.h"
 using namespace purify;
 using namespace purify::notinstalled;
+using Catch::Approx;
 
 TEST_CASE("readfile") {
   purify::logging::set_level("debug");

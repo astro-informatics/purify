@@ -5,10 +5,6 @@ project(Purify C CXX)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_files)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/build)
 
-# Downloads and installs GreatCMakeCookOff
-# It contains a number of cmake recipes
-include(LookUp-GreatCMakeCookOff)
-
 option(tests          "Enable testing"                                  on)
 option(examples       "Compile examples"                                off)
 option(benchmarks     "Enable benchmarking"                             off)
@@ -23,7 +19,7 @@ option(coverage       "Build coverage"                                  off)
 option(cppflow        "Build with TensorFlow interface"                 off)
 
 if(NOT CMAKE_BUILD_TYPE)
-  message(STATUS "Setting build type to 'Relese' as none was specified.")
+  message(STATUS "Setting build type to 'Release' as none was specified.")
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build Type" FORCE)
 endif()
 message(STATUS "Building purify in ${CMAKE_BUILD_TYPE} mode")
@@ -58,9 +54,11 @@ endif()
 
 if(tests)  # Adds ctest
   enable_testing()
-  find_package(Catch)
+  find_package(Catch2)
   include(AddCatchTest)
 endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-command-line-argument")
 
 if(tests AND coverage)
   # Enable code coverage.

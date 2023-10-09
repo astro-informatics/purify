@@ -1,12 +1,10 @@
-PURIFY
-=======
+# PURIFY
 
 [![Build Status](https://travis-ci.com/astro-informatics/purify.svg?branch=development)](https://travis-ci.com/astro-informatics/purify)
 [![codecov](https://codecov.io/gh/astro-informatics/purify/branch/development/graph/badge.svg)](https://codecov.io/gh/astro-informatics/purify)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2555252.svg)](https://doi.org/10.5281/zenodo.2555252)
 
-Description
--------------
+## Description
 
 **PURIFY** is an open-source collection of routines written in `C++` available under the [license](#license) below. It implements different tools and high-level to perform radio interferometric imaging, _i.e._ to recover images from the Fourier measurements taken by radio interferometric telescopes. 
 
@@ -14,14 +12,13 @@ Description
 
 This documentation outlines the necessary and optional [dependencies](#dependencies-installation) upon which **PURIFY** should be built, before describing [installation](#installing-and-building-PURIFY), [testing](#testing) and [usage](#usage) details. [Contributors](#contributors), [references](#references-and-citation) and [license](#license) information then follows.
 
-Dependencies installation
--------------------------
+## Dependencies installation
 
 **PURIFY** is written in `C++11`. Required software and libraries, and their minimum supported versions, are listed below. The build system will attempt to automatically download and build the automatically included libraries. (an internet connection is required for this). Most dependencies are handled by the `conan` package manager.
 
 `C++` dependencies:
 
-## User-provided libraries
+### User-provided libraries
 
 In order to build **PURIFY**, you should have the following installed on your system.
 
@@ -31,7 +28,7 @@ In order to build **PURIFY**, you should have the following installed on your sy
 - [OpenMP](http://openmp.org/wp/) v4.8.4 - Optional - Speeds up some of the operations.
 - [MPI](https://www.open-mpi.org) v3.1.1 - Optional - Parallelisation paradigm to speed up operations.
 
-## Automatically included libraries
+### Automatically included libraries
 
 The build system of **PURIFY** will attempt to download and build these additional dependencies, depending on the build options passed to `conan`. Most of them are automatically handled by `conan`.
 
@@ -54,75 +51,105 @@ The build system of **PURIFY** will attempt to download and build these addition
 - [google/benchmark](https://github.com/google/benchmark) v1.6.0: Optional - A `C++`
   micro-benchmarking framework only needed for benchmarks. Downloaded automatically by conan.
 
-Installing and building PURIFY
--------------------------------------
 
-To build **PURIFY**:
+## Installing and building PURIFY
 
-1. Once the mandatory user-provided dependencies are present, `git clone` from the [GitHub repository](https://github.com/astro-informatics/purify):
+**Using Conan (recommended)**
 
-    ``` bash
-    git clone --recurse-submodules https://github.com/astro-informatics/purify.git
-    ```
+[Conan](https://docs.conan.io/en/latest/installation.html) is a C++ package manager that helps deal with most of the
+C++ dependencies as well as the **PURIFY** installation:
 
+1. Once the mandatory user-provided dependencies are present,
+   `git clone` from the [GitHub repository](https://github.com/astro-informatics/purify):
+
+   ``` bash
+   git clone --recurse-submodules https://github.com/astro-informatics/purify.git
+   ```
 1. Create a `conan` package for `sopt`
 
-    ```bash
-    conan create /path/to/purify/sopt/ --build missing -s compiler.libcxx=libstdc++11 -pr:h=default -pr:b=default
-    ```
-If you get an error about broken symlinks you can set `skip_broken_symlinks_check = True` in your `~/.conan/conan.conf` file or [set an environment variable](https://docs.conan.io/en/1.46/reference/env_vars.html#conan-skip-broken-symlinks-check)
+   ```bash
+   conan create /path/to/purify/sopt/ --build missing
+   ```
+   If you get an error about broken symlinks you can set `skip_broken_symlinks_check = True` in
+   your `~/.conan/conan.conf` file or
+   [set an environment variable](https://docs.conan.io/en/1.46/reference/env_vars.html#conan-skip-broken-symlinks-check)
 1. Then, the program can be built using `conan`:
 
-    ``` bash
-    cd /path/to/purify
-    mkdir build
-	cd build
-    conan install .. --build missing -pr:h=default -pr:b=default
-    conan build ..
-    ```
+   ``` bash
+   cd /path/to/purify
+   mkdir build
+   cd build
+   conan install .. -of . --build missing
+   conan build .. -of .
+   ```
 
-    You can turn the various options on and off by adding flags to the `conan install` command, e.g.
-	The full list of build options can be found in the [conanfile](./conanfile.py).
+You can turn the various options on and off by adding flags to the `conan install` command, e.g.
 
-    ```bash
-    conan install .. --build missing -o cppflow=on -o openmp=on -o mpi=off -pr:h=default -pr:b=default
-    ```
+  ```bash
+  conan install .. -of . --build missing -o cppflow=on -o openmp=on -o mpi=off
+  conan build .. -of .
+  ```
 
-Installing and building PURIFY with TensorFlow
--------
+The full list of build options can be found in the [conanfile](./conanfile.py).
+To install in directory `INSTALL_FOLDER`, add the following options to the conan build command:
 
-The `sopt` library includes an interface to TensorFlow for using trained models as priors in the Forward-Backward optimization algorithm. To build **PURIFY** with TensorFlow capability, some extra steps are currently required. We aim to simplify the build process in a future release.
+  ``` bash
+  conan build .. -of INSTALL_FOLDER
+  ```
+
+
+**Using CMake**
+
+If the dependencies are already available on your system, you can also install **PURIFY** manually like so
+
+  ``` bash
+  cd /path/to/code
+  mkdir build
+  cd build
+  cmake .. -DCMAKE_INSTALL_PREFIX=${PWD}/../local
+  make -j
+  make -j install
+  ```
+
+On MacOS, you can also install most of the dependencies with Homebrew e.g.
+
+ ``` bash
+ brew install boost fftw  eigen yaml-cpp spdlog catch2
+ ```
+
+
+### TensorFlow support
+
+The **SOPT** library includes an interface to TensorFlow for using trained models
+as priors in the Forward-Backward optimization algorithm. To build **PURIFY** with
+TensorFlow capability, some extra steps are currently required.
+We aim to simplify the build process in a future release.
 
 1. Install the [TensorFlow C API](https://www.tensorflow.org/install/lang_c)
 1. Clone the UCL fork of `cppflow` and create a `conan` package using
 
-    ``` bash
-    git clone git@github.com:UCL/cppflow.git
-    conan create /path/to/cppflow/ -pr:h=default -pr:b=default
-    ```
-1. Once the mandatory user-provided dependencies are present, `git clone` from the [GitHub repository](https://github.com/astro-informatics/purify):
-
-    ``` bash
-    git clone --recurse-submodules https://github.com/astro-informatics/purify.git
-    ```
-1. Create a `conan` package for `sopt` with the `cppflow` option set to "on"
+  ``` bash
+  git clone git@github.com:UCL/cppflow.git
+  conan create /path/to/cppflow/
+  ```
+1. Follow the nominal build instructions, making sure you enable the `cppflow`
+  option when building **SOPT** ...
 
     ```bash
-    conan create /path/to/purify/sopt/ --build missing -s compiler.libcxx=libstdc++11 -o cppflow=on  -pr:h=default -pr:b=default
+    conan create /path/to/purify/sopt/ --build missing -o cppflow=on
     ```
 
-1. Then, the program can be built using `conan` with the `cppflow` option set to "on":
+1. ... and **PURIFY**:
 
     ``` bash
     cd /path/to/purify
     mkdir build
     cd build
-    conan install .. --build missing -o cppflow=on -pr:h=default -pr:b=default
+    conan install .. --build missing -o cppflow=on
     conan build ..
     ```
 
-Testing
--------
+## Testing
 
 To check everything went all right, run the test suite:
 
@@ -131,8 +158,7 @@ cd /path/to/purify/build
 ctest .
 ```
 
-Usage
-------
+## Usage
 
 The main `purify` executable lives either in the build directory or in the in the `bin` subdirectory
 of the installation directory. `purify` has one required argument, it a string for the file path of the config file containing the settings.
@@ -145,8 +171,7 @@ When `purify` runs a directory will be created, and the output images will be
 saved and time-stamped. Additionally, a config file with the settings used will
 be saved and time-stamped, helping for reproducibility and book-keeping.
 
-Docker
--------
+## Docker
 
 A Dockerfile is available on DockerHub. We are currently not maintaining it, and cannot
 guarantee it is up to date. Use the below documentation at your own risk.
@@ -178,13 +203,11 @@ you can see all the files from your `/full/path/to/data`. There you can run
 `purify` as shown above.`
 
 
-Contributors
-------------
+## Contributors
 
 Check the [contributors](@ref purify_contributors) page ([github](cpp/docs/PURIFY_CONTRIBUTORS.md)).
 
-References and citation
------------------------
+## References and citation
 
 If you use **PURIFY** for work that results in publication, please reference the [webpage](#webpage) and our related academic papers:
 
@@ -203,8 +226,7 @@ If you use **PURIFY** for work that results in publication, please reference the
 5. R. E. Carrillo, J. D. McEwen and Y. Wiaux.  "PURIFY: a new approach to radio-interferometric
    imaging". _Mon. Not. Roy. Astron. Soc._ **439(4):3591-3604** (2014) [arXiv:1307.4370](http://arxiv.org/abs/1307.4370)
 
-License
---------
+## License
 
 >    PURIFY Copyright (C) 2013-2019
 >
@@ -222,20 +244,17 @@ License
 >    with this program; if not, write to the Free Software Foundation, Inc.,
 >    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-Webpage
--------
+## Webpage
 
 - [Documentation](http://astro-informatics.github.io/purify)
 - [Repository](https://github.com/astro-informatics/purify)
 
-Support
--------
+## Support
 
 For any questions or comments, feel free to contact [Jason McEwen](http://www.jasonmcewen.org), or add
 an issue to the [issue tracker](https://github.com/astro-informatics/purify/issues).
 
-Notes
------
+## Notes
 
 The code is given for educational purpose. The code is in beta and still under development.
 

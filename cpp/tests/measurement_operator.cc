@@ -1,5 +1,5 @@
 #include <iomanip>
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 
 #include "purify/directories.h"
 #include "purify/kernels.h"
@@ -12,6 +12,7 @@
 
 using namespace purify::notinstalled;
 using namespace purify;
+using Catch::Approx;
 
 TEST_CASE("regression_degrid") {
   const t_int imsizex = 256;

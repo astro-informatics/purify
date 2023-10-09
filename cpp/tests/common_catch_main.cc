@@ -2,9 +2,9 @@
 
 #include "purify/config.h"
 #include <sopt/config.h>
-#include <catch.hpp>
 #include <memory>
 #include <random>
+#include <catch2/catch_all.hpp>
 #include "purify/logging.h"
 #include <sopt/logging.h>
 

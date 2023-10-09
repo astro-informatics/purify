@@ -1,7 +1,7 @@
-#include <catch.hpp>
 #include <numeric>
 #include <random>
 #include <utility>
+#include <catch2/catch_all.hpp>
 
 #include "purify/types.h"
 #include "purify/directories.h"

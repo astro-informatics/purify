@@ -24,7 +24,13 @@ add_custom_target(doc ALL
 
 
 if (web)
-   add_custom_target(docweb
-     COMMAND sed -i -e 's@namespacepurify@http://astro-informatics.github.io/purify/&@g' -e 's@<filename>@&http://astro-informatics.github.io/purify/@g' ${CMAKE_CURRENT_BINARY_DIR}/html/purify.tag
-     DEPENDS doc)
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    add_custom_target(docweb
+      COMMAND sed -i '' -e 's@namespacesopt@http://astro-informatics.github.io/purify/&@g' -e 's@<filename>@&http://astro-informatics.github.io/purify/@g' ${CMAKE_CURRENT_BINARY_DIR}/html/purify.tag
+      DEPENDS doc)
+  else()
+    add_custom_target(docweb
+      COMMAND sed -i -e 's@namespacepurify@http://astro-informatics.github.io/purify/&@g' -e 's@<filename>@&http://astro-informatics.github.io/purify/@g' ${CMAKE_CURRENT_BINARY_DIR}/html/purify.tag
+      DEPENDS doc)
+  endif()
 endif()

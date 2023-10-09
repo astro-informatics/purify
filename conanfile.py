@@ -12,8 +12,8 @@ class PurifyConan(ConanFile):
 
 
     settings = "os", "compiler", "build_type", "arch"
-    requires = ["fftw/3.3.9", "eigen/3.3.7","spdlog/1.9.2","catch2/2.13.9","benchmark/1.6.0","yaml-cpp/0.6.3", "boost/1.78.0", "cfitsio/4.0.0", "sopt/4.0.0"]
-    generators = "CMakeDeps"
+    requires = ["fftw/3.3.9", "eigen/3.4.0","catch2/3.4.0","benchmark/1.8.2","yaml-cpp/0.7.0", "boost/1.82.0", "cfitsio/4.2.0", "sopt/4.0.0"]
+    #generators = "CMakeDeps"
     exports_sources = "cpp/*", "cmake_files/*", "CMakeLists.txt"
     options = {"docs":['on','off'],
                "examples":['on','off'],
@@ -66,10 +66,10 @@ class PurifyConan(ConanFile):
         self.requires("zlib/1.2.12", override=True)
 
         if self.options.examples == 'on':
-            self.requires("libtiff/4.0.9")
+            self.requires("libtiff/4.5.1")
 
         if self.options.logging == 'on':
-            self.requires("spdlog/1.9.2")
+            self.requires("spdlog/1.12.0")
 
         if self.options.docs == 'on':
             self.requires("doxygen/1.9.2")
@@ -104,6 +104,9 @@ class PurifyConan(ConanFile):
         tc.variables['CMAKE_VERBOSE_MAKEFILE:BOOL'] = "ON"
         tc.variables['MPIEXEC_MAX_NUMPROCS'] = 2
         tc.generate()
+
+        deps = CMakeDeps(self)
+        deps.generate()
 
     def build(self):
         cmake = CMake(self)

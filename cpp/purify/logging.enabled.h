@@ -6,24 +6,28 @@
 #include <spdlog/sinks/stdout_sinks.h>
 #include <spdlog/spdlog.h>
 
-namespace purify {
-namespace logging {
+using spdlogPtr = std::shared_ptr<spdlog::logger>;
+
+namespace purify::logging {
+
 void set_level(std::string const &level, std::string const &name = "");
 
 //! \brief Initializes a logger.
 //! \details Logger only exists as long as return is kept alive.
-inline std::shared_ptr<spdlog::logger> initialize(std::string const &name = "") {
-  auto const result = spdlog::stdout_logger_mt(default_logger_name() + name);
+inline spdlogPtr initialize(std::string const &name = "") {
+  const std::string loggerName = default_logger_name() + name;
+  const spdlogPtr result = spdlog::stdout_logger_mt(default_logger_name() + name);
+  if (!spdlog::get(loggerName)) spdlog::register_logger(result);
   set_level(default_logging_level(), name);
   return result;
 }
 
 //! Returns shared pointer to logger or null if it does not exist
-inline std::shared_ptr<spdlog::logger> get(std::string const &name = "") {
+inline spdlogPtr get(std::string const &name = "") {
   return spdlog::get(default_logger_name() + name);
 }
 
-//! \brief Sets loggin level
+//! \brief Sets logging level
 //! \details Levels can be one of
 //!     - "trace"
 //!     - "debug"
@@ -33,7 +37,7 @@ inline std::shared_ptr<spdlog::logger> get(std::string const &name = "") {
 //!     - "critical"
 //!     - "off"
 inline void set_level(std::string const &level, std::string const &name) {
-  auto const logger = get(name);
+  const spdlogPtr logger = get(name);
   if (not logger) throw std::runtime_error("No logger by the name of " + std::string(name));
 #define PURIFY_MACRO(LEVEL) \
   if (level == #LEVEL) logger->set_level(spdlog::level::LEVEL)
@@ -49,7 +53,7 @@ inline void set_level(std::string const &level, std::string const &name) {
 }
 
 inline bool has_level(std::string const &level, std::string const &name = "") {
-  auto const logger = get(name);
+  const spdlogPtr logger = get(name);
   if (not logger) return false;
 
 #define PURIFY_MACRO(LEVEL) \
@@ -64,8 +68,8 @@ inline bool has_level(std::string const &level, std::string const &name = "") {
 #undef PURIFY_MACRO
   else throw std::runtime_error("Unknown logging level " + std::string(level));
 }
-}  // namespace logging
-}  // namespace purify
+
+}  // namespace purify::logging
 
 //! \macro For internal use only
 #define PURIFY_LOG_(NAME, TYPE, ...)                                            \
