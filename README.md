@@ -132,7 +132,7 @@ We aim to simplify the build process in a future release.
   git clone git@github.com:UCL/cppflow.git
   conan create /path/to/cppflow/
   ```
-1. Follow the nominal build instrations, making sure you enable the `cppflow`
+1. Follow the nominal build instructions, making sure you enable the `cppflow`
   option when building **SOPT** ...
 
     ```bash
