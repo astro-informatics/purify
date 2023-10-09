@@ -79,7 +79,7 @@ jobs:
         with:
           repository: astro-informatics/sopt.git
           path: sopt
-          ref: chrisg_build_tweaks
+          ref: master
 
       - name: Create SOPT package
         run : |
