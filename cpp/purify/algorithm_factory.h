@@ -255,7 +255,7 @@ primaldual_factory(
     const t_real relative_variation = 1e-3, const t_real residual_tolerance_scaling = 1,
     const t_real op_norm = 1) {
   typedef typename Algorithm::Scalar t_scalar;
-  auto epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size())) * sigma;
+  auto epsilon = std::sqrt(2 * uv_data.size() + 4 * std::sqrt(uv_data.size())) * sigma;
   auto primaldual = std::make_shared<Algorithm>(uv_data.vis);
   primaldual->itermax(max_iterations)
       .relative_variation(relative_variation)
