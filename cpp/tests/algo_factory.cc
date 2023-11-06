@@ -74,13 +74,16 @@ TEST_CASE("padmm_factory") {
 
 // This test does not converge and is therefore set to shouldfail.
 // See https://github.com/astro-informatics/purify/issues/317 for details.
-TEST_CASE("primal_dual_factory", "[!shouldfail]") {
+TEST_CASE("primal_dual_factory") {
   const std::string &test_dir = "expected/primal_dual/";
   const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
   const std::string &expected_solution_path =
       notinstalled::data_filename(test_dir + "solution.fits");
+      const std::string &output_path =
+      notinstalled::data_filename(test_dir + "pd_output.fits");
   const std::string &expected_residual_path =
       notinstalled::data_filename(test_dir + "residual.fits");
+  const std::string &dirty_image_path = notinstalled::data_filename(test_dir + "dirty.fits");
 
   const auto solution = pfitsio::read2d(expected_solution_path);
   const auto residual = pfitsio::read2d(expected_residual_path);
@@ -106,18 +109,20 @@ TEST_CASE("primal_dual_factory", "[!shouldfail]") {
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
       factory::distributed_wavelet_operator::serial, sara, imsizey, imsizex);
-  t_real const sigma = 0.016820222945913496 * std::sqrt(2);  // see test_parameters file
+  t_real const sigma = 0.016820222945913496 * std::sqrt(2) * 1e5;  // see test_parameters file
   auto const primaldual =
       factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
           factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma,
           imsizey, imsizex, sara.size(), 20, true, true, 1e-2, 1, op_norm);
-
+  
   auto const diagnostic = (*primaldual)();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
+  const Image<t_real> real_image = image.real(); //* max;
+  pfitsio::write2d(real_image, output_path);
   // pfitsio::write2d(image.real(), expected_solution_path);
   CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
-  CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
-  CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
+  CAPTURE(Vector<t_real>::Map(real_image.data(), real_image.size()).head(10));
+  CAPTURE(Vector<t_real>::Map((real_image / solution.real()).eval().data(), real_image.size()).head(10));
   CHECK(image.isApprox(solution, 1e-4));
 
   const Vector<t_complex> residuals = measurements_transform->adjoint() *
