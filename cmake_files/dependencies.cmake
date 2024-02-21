@@ -29,6 +29,7 @@ find_package(Cubature QUIET)
 if(NOT Cubature_FOUND)
   message(STATUS "Cubature not found. Attempt to install...")
   include(LookUpCubature)
+  set(PURIFY_CUBATURE_LOOKUP TRUE)
 endif()
 
 # Look for external software
@@ -109,7 +110,12 @@ endif()
 
 set(PURIFY_CASACORE FALSE)
 if(docasa)
-  find_package(CasaCore OPTIONAL_COMPONENTS ms REQUIRED)
+  find_package(CasaCore OPTIONAL_COMPONENTS ms QUIET)
+  if(NOT CasaCore_FOUND)
+    message(STATUS "Casacore requested but not found. Attempt to install...")
+    include(LookUpCasaCore)
+    set(PURIFY_CASACORE_LOOKUP TRUE)
+  endif()
   set(PURIFY_CASACORE TRUE)
 endif()
 

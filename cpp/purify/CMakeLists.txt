@@ -37,7 +37,7 @@ set(SOURCES utilities.cc pfitsio.cc
   read_measurements.cc distribute.cc integration.cc wide_field_utilities.cc wkernel_integration.cc
   wproj_operators.cc uvw_utilities.cc)
 
-if(TARGET casacore::ms)
+if(PURIFY_CASACORE)
   list(APPEND SOURCES casacore.cc)
   list(APPEND HEADERS casacore.h)
 endif()
@@ -105,14 +105,19 @@ target_link_libraries(libpurify
   Boost::filesystem
   Boost::system
 )
-if(TARGET casacore::casa)
-  target_link_libraries(libpurify casacore::ms)
+if(PURIFY_CASACORE)
+  target_link_libraries(libpurify ${CasaCore_LIBRARIES})
 endif()
 if(TARGET openmp::openmp)
   target_link_libraries(libpurify openmp::openmp)
 endif()
 
-add_dependencies(libpurify Lookup-Cubature)
+if(PURIFY_CUBATURE_LOOKUP)
+  add_dependencies(libpurify Lookup-Cubature)
+endif()
+if(PURIFY_CASACORE_LOOKUP)
+  add_dependencies(libpurify Lookup-CasaCore)
+endif()
 
 # Add spdlog as direct dependency
 if(spdlog_FOUND)
