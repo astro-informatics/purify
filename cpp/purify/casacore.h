@@ -108,7 +108,7 @@ class MeasurementSet {
 namespace details {
 template <class C>
 Matrix<C> get_taql_array(::casacore::TaQLResult const &taql) {
-  auto const col = ::casacore::ArrayColumn<C>(taql, "R");
+  auto const col = ::casacore::ArrayColumn<C>(taql.table(), "R");
   auto const data_column = col.getColumn();
   auto const shape = col.shape(0);
   auto nsize =
@@ -118,7 +118,7 @@ Matrix<C> get_taql_array(::casacore::TaQLResult const &taql) {
 }
 template <class C>
 Matrix<C> get_taql_scalar(::casacore::TaQLResult const &taql) {
-  auto const col = ::casacore::ScalarColumn<C>(taql, "R");
+  auto const col = ::casacore::ScalarColumn<C>(taql.table(), "R");
   auto const data_column = col.getColumn();
   typedef Eigen::Matrix<C, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Matrix;
   return Matrix::Map(data_column.data(), col.nrow(), 1);
@@ -136,13 +136,13 @@ Matrix<T> table_column(::casacore::Table const &table, std::string const &column
   switch (vtable.tableDesc().columnDesc("R").trueDataType()) {
 #define PURIFY_MACRO(NAME, TYPE) \
   case ::casacore::Tp##NAME:     \
-    return details::get_taql_scalar<::casacore::TYPE>(vtable).template cast<T>();
+    return details::get_taql_scalar<::casacore::TYPE>(taql_table).template cast<T>();
     PURIFY_MACRO(Complex, Complex);
     PURIFY_MACRO(DComplex, DComplex);
 #undef PURIFY_MACRO
 #define PURIFY_MACRO(NAME, TYPE)  \
   case ::casacore::TpArray##NAME: \
-    return details::get_taql_array<::casacore::TYPE>(vtable).template cast<T>();
+    return details::get_taql_array<::casacore::TYPE>(taql_table).template cast<T>();
     PURIFY_MACRO(Complex, Complex);
     PURIFY_MACRO(DComplex, DComplex);
 #undef PURIFY_MACRO
@@ -166,7 +166,7 @@ Matrix<T> table_column(::casacore::Table const &table, std::string const &column
   switch (vtable.tableDesc().columnDesc("R").trueDataType()) {
 #define PURIFY_MACRO(NAME, TYPE) \
   case ::casacore::Tp##NAME:     \
-    return details::get_taql_scalar<::casacore::TYPE>(vtable).template cast<T>();
+    return details::get_taql_scalar<::casacore::TYPE>(taql_table).template cast<T>();
     PURIFY_MACRO(Bool, Bool);
     PURIFY_MACRO(Char, Char);
     PURIFY_MACRO(UChar, uChar);
@@ -179,7 +179,7 @@ Matrix<T> table_column(::casacore::Table const &table, std::string const &column
 #undef PURIFY_MACRO
 #define PURIFY_MACRO(NAME, TYPE)  \
   case ::casacore::TpArray##NAME: \
-    return details::get_taql_array<::casacore::TYPE>(vtable).template cast<T>();
+    return details::get_taql_array<::casacore::TYPE>(taql_table).template cast<T>();
     PURIFY_MACRO(Bool, Bool);
     PURIFY_MACRO(Char, Char);
     PURIFY_MACRO(UChar, uChar);

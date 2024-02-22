@@ -38,7 +38,7 @@ add_catch_test(wavelet_factory LIBRARIES libpurify)
 add_catch_test(wide_field_utilities LIBRARIES libpurify)
 add_catch_test(wkernel LIBRARIES libpurify)
 
-if(docasa)
+if(PURIFY_CASACORE)
   add_catch_test(casacore LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} DEPENDS lookup_dependencies)
 endif()
 
