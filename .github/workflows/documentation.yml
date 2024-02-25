@@ -84,7 +84,7 @@ jobs:
       - name: Create SOPT package
         run : |
           if [[ "USE_CONAN" = 1 ]]; then
-            conan create ./sopt --build missing -o mpi=off -o openmp=off -o docs=off -o cppflow=on -pr:h=default -pr:b=default
+            conan create ./sopt --build missing -o dompi=off -o docasa=off -o openmp=off -o docs=off -o cppflow=on -pr:h=default -pr:b=default
           else
             export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
             #export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
@@ -92,7 +92,7 @@ jobs:
             #export CMAKE_PREFIX_PATH=${{github.workspace}}/build/lib/cmake:$CMAKE_PREFIX_PATH
             mkdir sopt/build
             cd sopt/build
-            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dcppflow=ON
+            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddocasa=OFF -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dcppflow=ON
             #cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dcppflow=ON
             make -j$(nproc --ignore 1) install
           fi
@@ -102,7 +102,7 @@ jobs:
           if [[ "USE_CONAN" = 1 ]]; then
             # Doxygen currently broken in Conan v1 and v2
             #conan install doxygen/1.9.4@#2af713e135f12722e3536808017ba086 --update
-            conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing -o mpi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
+            conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing -o docasa=off -o dompi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
           else
             export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
             export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH

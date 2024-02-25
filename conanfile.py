@@ -8,7 +8,7 @@ class PurifyConan(ConanFile):
     version = "3.0.1"
     url = "https://github.com/astro-informatics/purify"
     license = "GPL-2.0"
-    descpriton = "PURIFY is an open-source collection of routines written in C++ available under the license below. It implements different tools and high-level to perform radio interferometric imaging, i.e. to recover images from the Fourier measurements taken by radio interferometric telescopes."
+    description = "PURIFY is an open-source collection of routines written in C++ available under the license below. It implements different tools and high-level to perform radio interferometric imaging, i.e. to recover images from the Fourier measurements taken by radio interferometric telescopes."
 
 
     settings = "os", "compiler", "build_type", "arch"
@@ -21,35 +21,31 @@ class PurifyConan(ConanFile):
                "benchmarks":['on','off'],
                "logging":['on','off'],
                "openmp":['on','off'],
-               "mpi":['on','off'],
+               "dompi":['on','off'],
                "coverage":['on','off'],
                "af": ['on', 'off'],
                "cimg": ['on','off'],
-               "casa": ['on','off'],
+               "docasa": ['on','off'],
                "cppflow": ['on', 'off']}
     default_options = {"docs": 'off',
                        "examples":'off',
                        "tests": 'on',
                        "benchmarks": 'off',
                        "logging": 'on',
-                       "openmp": 'on',
-                       "mpi": 'on',
+                       "openmp": 'off',
+                       "dompi": 'off',
                        "coverage": 'off',
                        "af": 'off',
                        "cimg": 'off',
-                       "casa": 'off',
+                       "docasa": 'on',
                        "cppflow": 'off'}
 
     def configure(self):
 
-        if self.options.cppflow == 'on':
-            self.options["sopt"].cppflow = 'on'
-        if self.options.logging == 'off':
-            self.options["sopt"].logging = 'off'
-        if self.options.mpi == 'off':
-            self.options["sopt"].mpi = 'off'
-        if self.options.openmp == 'off':
-            self.options["sopt"].openmp = 'off'
+        self.options["sopt"].cppflow = self.options.cppflow
+        self.options["sopt"].logging = self.options.logging
+        self.options["sopt"].mpi = self.options.mpi
+        self.options["sopt"].openmp = self.options.openmp
         # When building the sopt package, switch off sopt tests and examples,
         # they are not going to be run.
         self.options["sopt"].examples = 'off'
@@ -83,26 +79,26 @@ class PurifyConan(ConanFile):
     def generate(self):
         tc = CMakeToolchain(self)
 
-        tc.variables['docs'] = self.options.docs
-        tc.variables['examples'] = self.options.examples
-        tc.variables['tests'] = self.options.tests
-        tc.variables['benchmarks'] = self.options.benchmarks
-        tc.variables['logging'] = self.options.logging
-        tc.variables['openmp'] = self.options.openmp
-        tc.variables['dompi'] = self.options.mpi
-        tc.variables['coverage'] = self.options.coverage
-        tc.variables['doaf'] = self.options.af
-        tc.variables['docimg'] = self.options.cimg
-        tc.variables['docasa'] = self.options.casa
-        tc.variables['cppflow'] = self.options.cppflow
+        tc.cache_variables['docs'] = self.options.docs
+        tc.cache_variables['examples'] = self.options.examples
+        tc.cache_variables['tests'] = self.options.tests
+        tc.cache_variables['benchmarks'] = self.options.benchmarks
+        tc.cache_variables['logging'] = self.options.logging
+        tc.cache_variables['openmp'] = self.options.openmp
+        tc.cache_variables['dompi'] = self.options.dompi
+        tc.cache_variables['coverage'] = self.options.coverage
+        tc.cache_variables['doaf'] = self.options.af
+        tc.cache_variables['docimg'] = self.options.cimg
+        tc.cache_variables['docasa'] = self.options.docasa
+        tc.cache_variables['cppflow'] = self.options.cppflow
 
         # List cases where we don't use ccache
         if ('GITHUB_ACTIONS' in os.environ.keys() and self.options.docs == 'off'):
-            tc.variables['CMAKE_C_COMPILER_LAUNCHER'] = "ccache"
-            tc.variables['CMAKE_CXX_COMPILER_LAUNCHER'] = "ccache"
+            tc.cache_variables['CMAKE_C_COMPILER_LAUNCHER'] = "ccache"
+            tc.cache_variables['CMAKE_CXX_COMPILER_LAUNCHER'] = "ccache"
 
-        tc.variables['CMAKE_VERBOSE_MAKEFILE:BOOL'] = "ON"
-        tc.variables['MPIEXEC_MAX_NUMPROCS'] = 2
+        tc.cache_variables['CMAKE_VERBOSE_MAKEFILE:BOOL'] = "ON"
+        tc.cache_variables['MPIEXEC_MAX_NUMPROCS'] = 2
         tc.generate()
 
         deps = CMakeDeps(self)
