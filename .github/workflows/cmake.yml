@@ -147,23 +147,27 @@ jobs:
 
     - name: create sopt package on gcc
       if: ${{ contains(matrix.cxx, 'g++-10') }}
-      run: conan create ${{github.workspace}}/sopt --build missing -s:b compiler.libcxx=libstdc++11 -o docasa=off -o:b mpi=${{matrix.mpi}} -o:b openmp=${{matrix.omp}}  -pr:h=default -pr:b=default
+      run: |
+        conan profile detect
+        conan create ${{github.workspace}}/sopt --build missing -s compiler.libcxx=libstdc++11 -o docasa=off -o dompi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: create sopt package on apple-clang
       if: ${{ contains(matrix.cxx, 'clang++') }}
-      run: conan create ${{github.workspace}}/sopt --build missing -o docasa=off -o:b mpi=${{matrix.mpi}} -o:b openmp=${{matrix.omp}}  -pr:h=default -pr:b=default
+      run: |
+        conan profile detect
+        conan create ${{github.workspace}}/sopt --build missing -o docasa=off -o dompi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: Conan install on gcc
       if: ${{ contains(matrix.cxx, 'g++-10') }}
-      run: conan install ${{github.workspace}} -if ${{github.workspace}}/build -s compiler.libcxx=libstdc++11 --build missing -o docasa=off -o dompi=${{matrix.mpi}} -o openmp=${{matrix.omp}}  -pr:h=default -pr:b=default
+      run: conan install ${{github.workspace}} -of ${{github.workspace}}/build -s compiler.libcxx=libstdc++11 --build missing -o docasa=off -o dompi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: Conan install on apple-clang
       if: ${{ contains(matrix.cxx, 'clang++') }}
-      run: conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing -o docasa=off -o dompi=${{matrix.mpi}} -o openmp=${{matrix.omp}}  -pr:h=default -pr:b=default
+      run: conan install  ${{github.workspace}} -of ${{github.workspace}}/build --build missing -o docasa=off -o dompi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: Build
       # Build your program with the given configuration
-      run: conan build ${{github.workspace}} -bf ${{github.workspace}}/build
+      run: conan build ${{github.workspace}} -of ${{github.workspace}}/build
 
     - name: Test
       working-directory: ${{github.workspace}}/build
