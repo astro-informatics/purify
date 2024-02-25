@@ -80,6 +80,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install openmpi-bin libopenmpi-dev ccache casacore-dev
+        pip install conan
 
     - name: Install Dependencies on MacOS
       if: ${{ contains(matrix.os, 'macos') }}
@@ -89,7 +90,7 @@ jobs:
         # brew update is very slow because it's updating a lot of unrelated packages
         # workflow seems to run fine with default versions
         # brew update
-        brew install open-mpi libomp ccache
+        brew install open-mpi libomp ccache conan
         echo "CMAKE_PREFIX_PATH=/usr/local/opt/libomp" >> $GITHUB_ENV
 
     - name: Install Tensorflow API on Ubuntu
@@ -115,10 +116,14 @@ jobs:
         python-version: '3.10'
 
     - name: Install Conan
-      id: conan
-      uses: turtlebrowser/get-conan@main
-      with:
-        version: 1.60.1
+      if: ${{ contains(matrix.os, 'ubuntu') }}
+      run: |
+        pip install conan
+      #id: conan
+      #uses: turtlebrowser/get-conan@main
+      #with:
+      #  #version: 1.60.1
+      #  version: 2.0.11
 
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
