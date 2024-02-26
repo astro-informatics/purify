@@ -44,7 +44,7 @@ class PurifyConan(ConanFile):
 
         self.options["sopt"].cppflow = self.options.cppflow
         self.options["sopt"].logging = self.options.logging
-        self.options["sopt"].mpi = self.options.mpi
+        self.options["sopt"].dompi = self.options.dompi
         self.options["sopt"].openmp = self.options.openmp
         # When building the sopt package, switch off sopt tests and examples,
         # they are not going to be run.
