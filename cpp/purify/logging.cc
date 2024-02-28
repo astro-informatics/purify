@@ -17,10 +17,10 @@ bool Log::useShellColors = true;
 const int Log::end_color;
 
 
-Log::Log(const string& name) : _name(name), _level(info) { }
+Log::Log(const string& name) : _name(name), _level(info) {}
 
 
-Log::Log(const string& name, int level) : _name(name), _level(level) { }
+Log::Log(const string& name, int level) : _name(name), _level(level) {}
 
 
 /// @todo Add single static setLevel
@@ -112,8 +112,8 @@ string Log::getColorCode(int level) {
   if (!IS_TTY) return "";
 
   static const ColorCodes TTY_CODES = {
-    {trace, "\033[0;36m"}, {debug, "\033[0;34m"},    {info, "\033[0;32m"}, {warn, "\033[0;33m"},
-    {error, "\033[0;31m"}, {critical, "\033[0;31m"}, {end_color, "\033[0m"} // end-color code
+      {trace, "\033[0;36m"}, {debug, "\033[0;34m"},    {info, "\033[0;32m"}, {warn, "\033[0;33m"},
+      {error, "\033[0;31m"}, {critical, "\033[0;31m"}, {end_color, "\033[0m"} // end-color code
   };
   try {
     return TTY_CODES.at(level);
@@ -164,9 +164,9 @@ string Log::formatMessage(int level, const string& message) {
 
 void Log::log(int level, const string& message) {
   if (isActive(level)) {
-      if (level > warning)
+    if (level > warning)
       cerr << formatMessage(level, message) << '\n';
-  else
+    else
       cout << formatMessage(level, message) << '\n';
   }
 }
@@ -185,4 +185,4 @@ ostream& operator<<(Log& log, int level) {
     return devNull;
   }
 }
-} // namespace purify::logging
+}  // namespace purify::logging
