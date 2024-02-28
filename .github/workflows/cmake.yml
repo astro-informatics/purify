@@ -134,7 +134,7 @@ jobs:
     - name: Build sopt
       run: |
         conan profile detect
-        conan create ${{github.workspace}}/sopt --build missing -s compiler.cppstd=17 -o docasa=off -o dompi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
+        conan create ${{github.workspace}}/sopt --build missing -s compiler.cppstd=17 -o dompi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: Dependencies
       run: conan install ${{github.workspace}} -of ${{github.workspace}}/build -s compiler.cppstd=17 --build missing -o docasa=off -o dompi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
