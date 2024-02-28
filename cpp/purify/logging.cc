@@ -8,7 +8,6 @@ using namespace std;
 
 namespace purify::logging {
 
-
 thread_local Log::LogMap Log::existingLogs;
 thread_local Log::LevelMap Log::defaultLevels;
 bool Log::showTimestamp = false;
@@ -18,18 +17,17 @@ bool Log::useShellColors = true;
 const int Log::end_color;
 
 
-Log::Log(const string& name)
-  : _name(name), _level(info) { }
+Log::Log(const string& name) : _name(name), _level(info) { }
 
 
-Log::Log(const string& name, int level)
-  : _name(name), _level(level) { }
+Log::Log(const string& name, int level) : _name(name), _level(level) { }
 
 
 /// @todo Add single static setLevel
 void _updateLevels(const Log::LevelMap& defaultLevels, Log::LogMap& existingLogs) {
   /// @todo Check ordering - "Foo" should come before "Foo.Bar"
-  for (Log::LevelMap::const_iterator lev = defaultLevels.begin(); lev != defaultLevels.end(); ++lev) {
+  for (Log::LevelMap::const_iterator lev = defaultLevels.begin(); lev != defaultLevels.end();
+       ++lev) {
     for (Log::LogMap::iterator log = existingLogs.begin(); log != existingLogs.end(); ++log) {
       if (log->first.find(lev->first) == 0) {
         log->second.setLevel(lev->second);
@@ -38,13 +36,11 @@ void _updateLevels(const Log::LevelMap& defaultLevels, Log::LogMap& existingLogs
   }
 }
 
-
 void Log::setLevel(const string& name, int level) {
   defaultLevels[name] = level;
-  //cout << name << " -> " << level << '\n';
+  // cout << name << " -> " << level << '\n';
   _updateLevels(defaultLevels, existingLogs);
 }
-
 
 void Log::setLevels(const LevelMap& logLevels) {
   for (LevelMap::const_iterator lev = logLevels.begin(); lev != logLevels.end(); ++lev) {
@@ -53,7 +49,6 @@ void Log::setLevels(const LevelMap& logLevels) {
   _updateLevels(defaultLevels, existingLogs);
 }
 
-
 Log& Log::getLog(const string& name) {
   auto theLog = existingLogs.find(name);
   if (theLog == existingLogs.end()) {
@@ -61,7 +56,7 @@ Log& Log::getLog(const string& name) {
     // Try running through all parent classes to find an existing level
     string tmpname = name;
     bool triedAllParents = false;
-    while (! triedAllParents) {
+    while (!triedAllParents) {
       // Is there a default level?
       if (defaultLevels.find(tmpname) != defaultLevels.end()) {
         level = defaultLevels.find(tmpname)->second;
@@ -91,9 +86,8 @@ Log& Log::getLog(const string& name) {
   return theLog->second;
 }
 
-
 string Log::getLevelName(int level) {
-  switch(level) {
+  switch (level) {
   case trace:
     return "trace";
   case debug:
@@ -111,7 +105,6 @@ string Log::getLevelName(int level) {
   }
 }
 
-
 string Log::getColorCode(int level) {
   // Skip codes if
   if (!Log::useShellColors) return "";
@@ -119,13 +112,8 @@ string Log::getColorCode(int level) {
   if (!IS_TTY) return "";
 
   static const ColorCodes TTY_CODES = {
-    {trace, "\033[0;36m"},
-    {debug, "\033[0;34m"},
-    {info, "\033[0;32m"},
-    {warn, "\033[0;33m"},
-    {error, "\033[0;31m"},
-    {critical, "\033[0;31m"},
-    {end_color, "\033[0m"} // end-color code
+    {trace, "\033[0;36m"}, {debug, "\033[0;34m"},    {info, "\033[0;32m"}, {warn, "\033[0;33m"},
+    {error, "\033[0;31m"}, {critical, "\033[0;31m"}, {end_color, "\033[0m"} // end-color code
   };
   try {
     return TTY_CODES.at(level);
@@ -133,7 +121,6 @@ string Log::getColorCode(int level) {
     return "";
   }
 }
-
 
 Log::Level Log::getLevelFromName(const string& level) {
   if (level == "trace") return trace;
@@ -145,14 +132,13 @@ Log::Level Log::getLevelFromName(const string& level) {
   throw std::runtime_error("Couldn't create a log level from string '" + level + "'");
 }
 
-
 string Log::formatMessage(int level, const string& message) {
   string out;
   out += getColorCode(level);
 
   if (Log::showLoggerName) {
     out += getName();
-    //out += ": ";
+    // out += ": ";
   }
 
   if (Log::showLogLevel) {
@@ -176,7 +162,6 @@ string Log::formatMessage(int level, const string& message) {
   return out;
 }
 
-
 void Log::log(int level, const string& message) {
   if (isActive(level)) {
       if (level > warning)
@@ -186,21 +171,18 @@ void Log::log(int level, const string& message) {
   }
 }
 
-
 ostream& operator<<(Log& log, int level) {
   if (log.isActive(level)) {
     if (level > Log::warning) {
-        cerr << log.formatMessage(level, "");
-        return cerr;
-      } else {
-        cout << log.formatMessage(level, "");
-        return cout;
-      }
+      cerr << log.formatMessage(level, "");
+      return cerr;
+    } else {
+      cout << log.formatMessage(level, "");
+      return cout;
+    }
   } else {
     static ostream devNull(nullptr);
     return devNull;
   }
 }
-
-}
-
+} // namespace purify::logging
