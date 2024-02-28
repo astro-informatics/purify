@@ -133,7 +133,7 @@ std::ostream& operator<<(Log& log, int level);
 inline Log& getLog() { return Log::getLog("purify::"); }
 
 /// Method to set the logging level of the default Log object
-inline void set_level(const std::string &level) { getLog().setLevel(Log::getLevelFromName(level)); }
+inline void set_level(const std::string& level) { getLog().setLevel(Log::getLevelFromName(level)); }
 
 /// Helper method to ireplace a set of curly braces with
 /// the template argument @a arg in a string stream
