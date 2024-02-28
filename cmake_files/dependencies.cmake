@@ -40,10 +40,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   endif(THREADS_FOUND)
 endif()
 
-if(logging)
-  find_package(spdlog REQUIRED)
-endif()
-
 if(docs)
   cmake_policy(SET CMP0057 NEW)
   find_package(Doxygen REQUIRED dot)
@@ -60,30 +56,16 @@ if(cppflow)
 endif()
 
 # Always find open-mp, since it may be used by sopt
-find_package(OpenMP)
-if(openmp AND NOT OPENMP_FOUND)
-  message(STATUS "Could not find OpenMP. Compiling without.")
-endif()
-set(PURIFY_OPENMP_FFTW FALSE)
-if(openmp AND OPENMP_FOUND)
-  # Set PURIFY_OPENMP to TRUE when OpenMP is both found and requested
-  set(PURIFY_OPENMP TRUE)
-
-  # Add the OpenMP Library
-  add_library(openmp::openmp INTERFACE IMPORTED GLOBAL)
-
-  # Set compiler and linker options to the defaults for CXX
-  # TODO: Should this be done automatically?
-  #       Check when we update CMake and the OpenMP linking to
-  #       https://cliutils.gitlab.io/modern-cmake/chapters/packages/OpenMP.html
-  #       possibly using
-  #       https://cmake.org/cmake/help/latest/module/FindOpenMP.html
-  set_target_properties(openmp::openmp PROPERTIES
-    INTERFACE_COMPILE_OPTIONS "${OpenMP_CXX_FLAGS}"
-    INTERFACE_LINK_LIBRARIES  "${OpenMP_CXX_FLAGS}")
-else()
-  # Set to FALSE when OpenMP is not found or not requested
-  set(PURIFY_OPENMP FALSE)
+if (openmp)
+  find_package(OpenMP)
+  if (OPENMP_FOUND)
+    # Set PURIFY_OPENMP to TRUE when OpenMP is both found and requested
+    set(PURIFY_OPENMP TRUE)
+  else()
+    # Set to FALSE when OpenMP is not found or not requested
+    set(PURIFY_OPENMP_FFTW FALSE)
+    message(STATUS "Could not find OpenMP. Compiling without.")
+  endif()
 endif()
 
 find_package(fftw3 NAMES FFTW3 REQUIRED)

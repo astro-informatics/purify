@@ -19,7 +19,6 @@ class PurifyConan(ConanFile):
                "examples":['on','off'],
                "tests":['on','off'],
                "benchmarks":['on','off'],
-               "logging":['on','off'],
                "openmp":['on','off'],
                "dompi":['on','off'],
                "coverage":['on','off'],
@@ -31,7 +30,6 @@ class PurifyConan(ConanFile):
                        "examples":'off',
                        "tests": 'on',
                        "benchmarks": 'off',
-                       "logging": 'on',
                        "openmp": 'off',
                        "dompi": 'off',
                        "coverage": 'off',
@@ -43,7 +41,6 @@ class PurifyConan(ConanFile):
     def configure(self):
 
         self.options["sopt"].cppflow = self.options.cppflow
-        self.options["sopt"].logging = self.options.logging
         self.options["sopt"].dompi = self.options.dompi
         self.options["sopt"].openmp = self.options.openmp
         # When building the sopt package, switch off sopt tests and examples,
@@ -64,9 +61,6 @@ class PurifyConan(ConanFile):
         if self.options.examples == 'on':
             self.requires("libtiff/4.5.1")
 
-        if self.options.logging == 'on':
-            self.requires("spdlog/1.12.0")
-
         if self.options.docs == 'on':
             self.requires("doxygen/1.9.2")
 
@@ -83,7 +77,6 @@ class PurifyConan(ConanFile):
         tc.cache_variables['examples'] = self.options.examples
         tc.cache_variables['tests'] = self.options.tests
         tc.cache_variables['benchmarks'] = self.options.benchmarks
-        tc.cache_variables['logging'] = self.options.logging
         tc.cache_variables['openmp'] = self.options.openmp
         tc.cache_variables['dompi'] = self.options.dompi
         tc.cache_variables['coverage'] = self.options.coverage

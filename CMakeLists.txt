@@ -9,7 +9,6 @@ option(tests          "Enable testing"                                  on)
 option(examples       "Compile examples"                                off)
 option(benchmarks     "Enable benchmarking"                             off)
 option(openmp         "Enable OpenMP"                                   on)
-option(logging        "Enable logging"                                  on)
 option(dompi          "Enable MPI"                                      on)
 option(doaf           "Enable ArrayFire"                                off)
 option(docimg         "Enable CImg"                                     off)
@@ -38,15 +37,15 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # sets up rpath so libraries can be found
 include(rpath)
 
-# adds logging variables
-include(logging)
-
 # include exernal dependencies
 include(dependencies)
 
+set(PURIFY_TEST_LOG_LEVEL critical CACHE STRING "Level when logging tests")
+set_property(CACHE PURIFY_TEST_LOG_LEVEL
+             PROPERTY STRINGS off critical error warn info debug trace)
+
 # If PURIFY_OPENMP is set to False in dependencies, link libpthread here so that the linker finds it
 # Following advice from https://stackoverflow.com/questions/1620918/cmake-and-libpthread
-
 if(NOT PURIFY_OPENMP)
   set(CMAKE_THREAD_LIBS_INIT "-lpthread")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")

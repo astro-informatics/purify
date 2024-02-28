@@ -12,7 +12,6 @@ using namespace purify::notinstalled;
 int main(int nargs, char const **args) {
   auto const session = sopt::mpi::init(nargs, args);
   auto const world = sopt::mpi::Communicator::World();
-  purify::logging::initialize();
   purify::logging::set_level("debug");
   // Gridding example
   auto const oversample_ratio = 2;

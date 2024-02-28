@@ -145,8 +145,6 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
 }
 
 int main(int, char **) {
-  sopt::logging::initialize();
-  purify::logging::initialize();
   sopt::logging::set_level("debug");
   purify::logging::set_level("debug");
   const std::string &name = "real_data";

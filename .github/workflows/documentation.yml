@@ -23,8 +23,10 @@ jobs:
       - name: Install dependencies
         run: |
             sudo apt update
-            sudo apt install openmpi-bin libopenmpi-dev casacore-dev doxygen graphviz
-            if [[ "$USE_CONAN" = 0 ]]; then
+            sudo apt install openmpi-bin libopenmpi-dev ccache casacore-dev doxygen graphviz
+            if [[ "$USE_CONAN" = 1 ]]; then
+              pip install conan
+            else
               sudo apt install libeigen3-dev libspdlog-dev libtiff-dev libcfitsio-dev
               sudo apt install libbenchmark-dev libboost-all-dev libyaml-cpp-dev
               git clone https://github.com/catchorg/Catch2.git -b v3.4.0
@@ -48,13 +50,6 @@ jobs:
           version: 2.11.0
           os: linux
 
-      - name: Install Conan
-        id: conan
-        if: env.USE_CONAN != '0'
-        uses: turtlebrowser/get-conan@main
-        with:
-          version: 1.60.1
-
       - name: Checkout cppflow repo
         uses: actions/checkout@v3
         with:
@@ -65,7 +60,8 @@ jobs:
       - name: Create cppflow package
         run: |
           if [[ "USE_CONAN" = 1 ]]; then
-            conan create ./cppflow/ -pr:h=default -pr:b=default
+            conan detect profile
+            conan create ./cppflow -s compiler.cppstd=17
           else
             mkdir cppflow/build
             cd cppflow/build
@@ -84,7 +80,7 @@ jobs:
       - name: Create SOPT package
         run : |
           if [[ "USE_CONAN" = 1 ]]; then
-            conan create ./sopt --build missing -o dompi=off -o docasa=off -o openmp=off -o docs=off -o cppflow=on -pr:h=default -pr:b=default
+            conan create ./sopt -s compiler.cppstd=17 --build missing -o dompi=off -o docasa=off -o openmp=off -o docs=off -o cppflow=on
           else
             export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
             #export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
@@ -102,7 +98,7 @@ jobs:
           if [[ "USE_CONAN" = 1 ]]; then
             # Doxygen currently broken in Conan v1 and v2
             #conan install doxygen/1.9.4@#2af713e135f12722e3536808017ba086 --update
-            conan install ${{github.workspace}} -if ${{github.workspace}}/build --build missing -o docasa=off -o dompi=off -o openmp=off -o docs=on -o cppflow=on -pr:h=default -pr:b=default
+            conan install ${{github.workspace}} -if ${{github.workspace}}/build -s compiler.cppstd=17 --build missing -o docasa=off -o dompi=off -o openmp=off -o docs=on -o cppflow=on
           else
             export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
             export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
@@ -114,7 +110,7 @@ jobs:
       - name: Build
         run: |
           if [[ "USE_CONAN" = 1 ]]; then
-            conan build ${{github.workspace}} -bf ${{github.workspace}}/build
+            conan build ${{github.workspace}} -of ${{github.workspace}}/build -s compiler.cppstd=17 -o docasa=off -o dompi=off -o openmp=off -o docs=on -o cppflow=on
           else
             export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
             ##export CMAKE_PREFIX_PATH=${{github.workspace}}/fftw-3.3.10/build/lib/cmake:$CMAKE_PREFIX_PATH
