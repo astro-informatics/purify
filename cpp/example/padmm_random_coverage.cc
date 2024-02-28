@@ -133,10 +133,8 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
 }
 
 int main(int, char **) {
-  sopt::logging::initialize();
-  purify::logging::initialize();
   // sopt::logging::set_level("debug");
-  //  purify::logging::set_level("debug");
+  // purify::logging::set_level("debug");
   const std::string &name = "M31";
   const t_real FoV = 15;     // deg
   const t_real max_w = 15.;  // lambda

@@ -22,7 +22,6 @@ int main(int nargs, char const **args) {
   ARGS_MACRO(imsize, 2, 256, t_uint)
   ARGS_MACRO(cell, 3, 2400, t_real)
 #undef ARGS_MACRO
-  purify::logging::initialize();
   purify::logging::set_level("debug");
   // Gridding example
   auto const oversample_ratio = 2;

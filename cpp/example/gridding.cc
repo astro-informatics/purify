@@ -8,7 +8,6 @@
 using namespace purify;
 
 int main(int nargs, char const **args) {
-  purify::logging::initialize();
   purify::logging::set_level("debug");
   // Gridding example
   auto const oversample_ratio = 2;

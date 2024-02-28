@@ -27,8 +27,6 @@ int main(int nargs, char const **args) {
 
   using namespace purify;
   using namespace purify::notinstalled;
-  sopt::logging::initialize();
-  purify::logging::initialize();
   sopt::logging::set_level("debug");
 
   std::string const kernel = args[1];

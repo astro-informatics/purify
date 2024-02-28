@@ -16,8 +16,8 @@ endfunction()
 configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(HEADERS
-  logging.h kernels.h pfitsio.h  logging.disabled.h types.h
-  IndexMapping.h logging.enabled.h utilities.h operators.h  wproj_utilities.h
+  logging.h kernels.h pfitsio.h  types.h
+  IndexMapping.h utilities.h operators.h  wproj_utilities.h
   cimg.h uvfits.h convolution.h measurement_operator_factory.h wavelet_operator_factory.h distribute.h
   update_factory.h
   convergence_factory.h
@@ -32,7 +32,7 @@ set(HEADERS
   fly_operators.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
-set(SOURCES utilities.cc pfitsio.cc
+set(SOURCES utilities.cc pfitsio.cc logging.cc
   kernels.cc wproj_utilities.cc operators.cc uvfits.cc yaml-parser.cc
   read_measurements.cc distribute.cc integration.cc wide_field_utilities.cc wkernel_integration.cc
   wproj_operators.cc uvw_utilities.cc)
@@ -55,9 +55,11 @@ set(version "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}.${Purify_VERSION_PA
 set(soversion "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}")
 set_target_properties(libpurify PROPERTIES VERSION ${version} SOVERSION ${soversion})
 set_target_properties(libpurify PROPERTIES OUTPUT_NAME purify)
+
 if(PURIFY_OPENMP)
   target_link_libraries(libpurify OpenMP::OpenMP_CXX)
 endif()
+
 if(PURIFY_MPI)
   target_link_libraries(libpurify ${MPI_LIBRARIES})
   target_include_directories(libpurify SYSTEM PUBLIC ${MPI_CXX_INCLUDE_PATH})
@@ -105,9 +107,11 @@ target_link_libraries(libpurify
   Boost::filesystem
   Boost::system
 )
+
 if(PURIFY_CASACORE)
   target_link_libraries(libpurify ${CasaCore_LIBRARIES})
 endif()
+
 if(TARGET openmp::openmp)
   target_link_libraries(libpurify openmp::openmp)
 endif()
@@ -115,6 +119,7 @@ endif()
 if(PURIFY_CUBATURE_LOOKUP)
   add_dependencies(libpurify Lookup-Cubature)
 endif()
+
 if(PURIFY_CASACORE_LOOKUP)
   add_dependencies(libpurify Lookup-CasaCore)
 endif()

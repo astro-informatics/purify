@@ -12,7 +12,6 @@ using namespace purify::notinstalled;
 int main(int nargs, char const **args) {
   auto const session = sopt::mpi::init(nargs, args);
   auto const world = sopt::mpi::Communicator::World();
-  purify::logging::initialize();
   purify::logging::set_level("debug");
   t_int const conj = (nargs > 1) ? std::stod(static_cast<std::string>(args[1])) : 0;
   const t_int iters = (nargs > 2) ? std::stod(static_cast<std::string>(args[2])) : 1;

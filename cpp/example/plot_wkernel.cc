@@ -33,7 +33,6 @@ int main(int nargs, char const **args) {
   ARGS_MACRO(radial, 6, false, bool)
 
 #undef ARGS_MACRO
-  purify::logging::initialize();
   purify::logging::set_level("debug");
   t_uint const J = 4;
   t_int const Jw = 30;
