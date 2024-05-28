@@ -8,6 +8,7 @@
 #include <sstream>
 #include <string>
 #include <tuple>
+#include <cstring>
 
 namespace purify::logging {
 
