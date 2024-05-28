@@ -134,6 +134,11 @@ jobs:
     - name: Build sopt
       run: |
         conan profile detect
+        if [[ ${{matrix.cc}} == "clang" ]]; then
+          conan profile update settings.compiler="apple-clang"
+        else
+          conan profile update settings.compiler="gcc"
+        fi
         conan create ${{github.workspace}}/sopt --build missing -s compiler.cppstd=17 -o dompi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
 
     - name: Dependencies
