@@ -2,13 +2,13 @@
 #define PURIFY_LOGGING_H
 
 #include "purify/config.h"
+#include <cstring
 #include <exception>
 #include <map>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <tuple>
-#include <cstring>
 
 namespace purify::logging {
 
