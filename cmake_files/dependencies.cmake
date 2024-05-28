@@ -63,7 +63,6 @@ if (openmp)
     set(PURIFY_OPENMP TRUE)
   else()
     # Set to FALSE when OpenMP is not found or not requested
-    set(PURIFY_OPENMP_FFTW FALSE)
     message(STATUS "Could not find OpenMP. Compiling without.")
   endif()
 endif()
