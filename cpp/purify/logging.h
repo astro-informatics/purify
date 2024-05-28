@@ -2,7 +2,7 @@
 #define PURIFY_LOGGING_H
 
 #include "purify/config.h"
-#include <cstring
+#include <cstring>
 #include <exception>
 #include <map>
 #include <memory>
