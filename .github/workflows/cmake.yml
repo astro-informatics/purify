@@ -41,9 +41,11 @@ jobs:
             - ubuntu-20.04
             - macos-14
           cc:
+            - gcc-10
             - gcc-11
             - clang
           cxx:
+            - g++-10
             - g++-11
             - clang++
           mpi:
@@ -57,9 +59,17 @@ jobs:
               cxx: clang++
             - cc: clang
               cxx: g++-11
+            - cc: gcc-10
+              cxx: clang++
+            - cc: clang
+              cxx: g++-10
             - os: ubuntu-20.04
               cc: clang
               cxx: clang++
+            - os: macos-14
+              cc: gcc-10
+            - os: ubuntu-20.04
+              cc: gcc-11
             - os: macos-14
               mpi: "on"
             - cxx: clang++
