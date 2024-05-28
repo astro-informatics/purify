@@ -67,9 +67,9 @@ jobs:
               cc: clang
               cxx: clang++
             - os: macos-14
-              cc: gcc-10
+              cxx: g++-10
             - os: ubuntu-20.04
-              cc: gcc-11
+              cxx: g++-11
             - os: macos-14
               mpi: "on"
             - cxx: clang++
