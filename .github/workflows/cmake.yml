@@ -138,9 +138,11 @@ jobs:
           if [[ ${{matrix.cc}} == "clang" ]]; then
             echo "compiler=apple-clang" >> ~/.conan2/profiles/default
             echo "compiler.version=15" >> ~/.conan2/profiles/default
+            echo "compiler.libcxx=libstdc++11" >> ~/.conan2/profiles/default
           else
             echo "compiler=gcc" >> ~/.conan2/profiles/default
             echo "compiler.version=10" >> ~/.conan2/profiles/default
+            echo "compiler.libcxx=libstdc++11" >> ~/.conan2/profiles/default
           fi
         fi
         conan create ${{github.workspace}}/sopt --build missing -s compiler.cppstd=17 -o dompi=${{matrix.mpi}} -o openmp=${{matrix.omp}}
