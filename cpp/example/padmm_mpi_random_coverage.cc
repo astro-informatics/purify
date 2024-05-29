@@ -153,8 +153,6 @@ std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm_factory(
 }
 
 int main(int nargs, char const **args) {
-  sopt::logging::initialize();
-  purify::logging::initialize();
   sopt::logging::set_level("debug");
   purify::logging::set_level("debug");
   auto const session = sopt::mpi::init(nargs, args);
