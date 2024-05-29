@@ -1768,13 +1768,6 @@
     </member>
     <member kind="define">
       <type>#define</type>
-      <name>PURIFY_DO_LOGGING</name>
-      <anchorfile>config_8in_8h.html</anchorfile>
-      <anchor>acb4684f4c7657d334277f117d385a319</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
       <name>PURIFY_OPENMP</name>
       <anchorfile>config_8in_8h.html</anchorfile>
       <anchor>a031729dd3cdcae0065df1f53cec60859</anchor>
@@ -1841,20 +1834,6 @@
       <name>default_logging_level</name>
       <anchorfile>namespacepurify.html</anchorfile>
       <anchor>a0108c76ec3e4a548088e9f5d5f6b4217</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>default_logger_name</name>
-      <anchorfile>namespacepurify.html</anchorfile>
-      <anchor>a4d58563620e972c279f841f66a8f68ef</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>constexpr bool</type>
-      <name>color_logger</name>
-      <anchorfile>namespacepurify.html</anchorfile>
-      <anchor>a1719d0241f5cef19842ac9eb91272777</anchor>
       <arglist>()</arglist>
     </member>
   </compound>
@@ -2538,143 +2517,48 @@
     </member>
   </compound>
   <compound kind="file">
-    <name>logging.disabled.h</name>
+    <name>logging.cc</name>
     <path>/home/runner/work/purify/purify/cpp/purify/</path>
-    <filename>logging_8disabled_8h.html</filename>
+    <filename>logging_8cc.html</filename>
+    <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <namespace>purify</namespace>
     <namespace>purify::logging</namespace>
-    <member kind="define">
-      <type>#define</type>
-      <name>PURIFY_LOG_</name>
-      <anchorfile>logging_8disabled_8h.html</anchorfile>
-      <anchor>a926705337510447c4e4c8ef1ca347613</anchor>
-      <arglist>(...)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::shared_ptr&lt; int &gt;</type>
-      <name>initialize</name>
-      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>a9cb706fbf61a8982965095e1265f3172</anchor>
-      <arglist>(std::string const &amp;name=&quot;&quot;)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::shared_ptr&lt; int &gt;</type>
-      <name>initialize</name>
-      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>a5a761be31c4fb31b3a9e636c17133904</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>std::shared_ptr&lt; int &gt;</type>
-      <name>get</name>
-      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>acbbd33fd8ea1cc02eb2e9db9bfa835d9</anchor>
-      <arglist>(std::string const &amp;name=&quot;&quot;)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::shared_ptr&lt; int &gt;</type>
-      <name>get</name>
-      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>a02a987cbc0c3d7d4c26190b547053998</anchor>
-      <arglist>()</arglist>
-    </member>
     <member kind="function">
       <type>void</type>
-      <name>set_level</name>
+      <name>_updateLevels</name>
       <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>a46c69647ca4c2d4fe100e50884d6b442</anchor>
-      <arglist>(std::string const &amp;level, std::string const &amp;name)</arglist>
+      <anchor>a50424d6bd19db5ab8e1c5d3bbe732111</anchor>
+      <arglist>(const Log::LevelMap &amp;defaultLevels, Log::LogMap &amp;existingLogs)</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
-      <name>set_level</name>
+      <type>ostream &amp;</type>
+      <name>operator&lt;&lt;</name>
       <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>a9bada47c3aae602e8e246a164d79bada</anchor>
-      <arglist>(std::string const &amp;)</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>has_level</name>
-      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>a793bccd5a5042f11480fedfcbdcb56b8</anchor>
-      <arglist>(std::string const &amp;, std::string const &amp;)</arglist>
-    </member>
-    <member kind="variable">
-      <type>const std::string</type>
-      <name>name_prefix</name>
-      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>ade846bfa55625b2ef77802f37adc2c86</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="file">
-    <name>logging.enabled.h</name>
-    <path>/home/runner/work/purify/purify/cpp/purify/</path>
-    <filename>logging_8enabled_8h.html</filename>
-    <namespace>purify</namespace>
-    <namespace>purify::logging</namespace>
-    <member kind="define">
-      <type>#define</type>
-      <name>PURIFY_MACRO</name>
-      <anchorfile>logging_8enabled_8h.html</anchorfile>
-      <anchor>ab91dfc81d34a40e86f5a27aca928d5fb</anchor>
-      <arglist>(LEVEL)</arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>PURIFY_MACRO</name>
-      <anchorfile>logging_8enabled_8h.html</anchorfile>
-      <anchor>ab91dfc81d34a40e86f5a27aca928d5fb</anchor>
-      <arglist>(LEVEL)</arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>PURIFY_LOG_</name>
-      <anchorfile>logging_8enabled_8h.html</anchorfile>
-      <anchor>ac8a4b465c53961c6c4a7980fee9f96c6</anchor>
-      <arglist>(NAME, TYPE,...)</arglist>
-    </member>
-    <member kind="typedef">
-      <type>std::shared_ptr&lt; spdlog::logger &gt;</type>
-      <name>spdlogPtr</name>
-      <anchorfile>logging_8enabled_8h.html</anchorfile>
-      <anchor>aa9892412af755840eb432b2132a55122</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>set_level</name>
-      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>a46c69647ca4c2d4fe100e50884d6b442</anchor>
-      <arglist>(std::string const &amp;level, std::string const &amp;name)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::shared_ptr&lt; int &gt;</type>
-      <name>initialize</name>
-      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>a9cb706fbf61a8982965095e1265f3172</anchor>
-      <arglist>(std::string const &amp;name=&quot;&quot;)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::shared_ptr&lt; int &gt;</type>
-      <name>get</name>
-      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>acbbd33fd8ea1cc02eb2e9db9bfa835d9</anchor>
-      <arglist>(std::string const &amp;name=&quot;&quot;)</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>has_level</name>
-      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>a793bccd5a5042f11480fedfcbdcb56b8</anchor>
-      <arglist>(std::string const &amp;, std::string const &amp;)</arglist>
+      <anchor>adb803afb05f82ec41568931075a9ae9f</anchor>
+      <arglist>(Log &amp;log, int level)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>logging.h</name>
     <path>/home/runner/work/purify/purify/cpp/purify/</path>
     <filename>logging_8h.html</filename>
-    <includes id="logging_8disabled_8h" name="logging.disabled.h" local="yes" imported="no">purify/logging.disabled.h</includes>
+    <class kind="class">purify::logging::Log</class>
+    <namespace>purify</namespace>
+    <namespace>purify::logging</namespace>
+    <member kind="define">
+      <type>#define</type>
+      <name>PURIFY_MSG_LVL</name>
+      <anchorfile>group__logmacros.html</anchorfile>
+      <anchor>ga46d122f99c5a938a43f14ae7e1dff01e</anchor>
+      <arglist>(lvl,...)</arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>PURIFY_LOG_</name>
+      <anchorfile>group__logmacros.html</anchorfile>
+      <anchor>ga389fd70d93568e0041ca858b44fc086a</anchor>
+      <arglist>(TYPE,...)</arglist>
+    </member>
     <member kind="define">
       <type>#define</type>
       <name>PURIFY_CRITICAL</name>
@@ -2737,6 +2621,48 @@
       <anchorfile>logging_8h.html</anchorfile>
       <anchor>a0c01897a385e812973d29bead7548584</anchor>
       <arglist>(...)</arglist>
+    </member>
+    <member kind="function">
+      <type>ostream &amp;</type>
+      <name>operator&lt;&lt;</name>
+      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
+      <anchor>adb803afb05f82ec41568931075a9ae9f</anchor>
+      <arglist>(Log &amp;log, int level)</arglist>
+    </member>
+    <member kind="function">
+      <type>Log &amp;</type>
+      <name>getLog</name>
+      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
+      <anchor>a576bc20c59ffbc22d1c90a21a5712cef</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_level</name>
+      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
+      <anchor>ad63e2000541a28446b87e82485638415</anchor>
+      <arglist>(const std::string &amp;level)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>applyFormat</name>
+      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
+      <anchor>a961e57120323841c9ca64d50dc076e4f</anchor>
+      <arglist>(std::stringstream &amp;ss, char *&amp;pos, Arg &amp;&amp;arg)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>mkFormattedString</name>
+      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
+      <anchor>af58b80d7a581bd92834787f23bc741c0</anchor>
+      <arglist>(const char *txt, Args &amp;&amp;... args)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>mkFormattedString</name>
+      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
+      <anchor>a198ffa26c0be3ac561edfdcd7a8843a0</anchor>
+      <arglist>(const std::string &amp;txt)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -6764,6 +6690,218 @@
     </member>
   </compound>
   <compound kind="class">
+    <name>purify::logging::Log</name>
+    <filename>classpurify_1_1logging_1_1Log.html</filename>
+    <member kind="enumeration">
+      <type></type>
+      <name>Level</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>trace</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05a0da71efb8d039a16064a612813325908</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>debug</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05a72154b8f06c85bb66801d147eb0b835f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>info</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05a077569fb1356121c424ee36886ab197d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>warn</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05a46abec04839ef95711541d2a0d814e7d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>warning</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05ae5b859d88cc6815d90a3c3e040ce0575</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>error</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05abf047c1e8cfb0bdabd4c6a3f0484fe12</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>critical</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05a3085fe93d97f23ab0c75dd112cfe9c0a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>always</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05ac6afec902c0177b7b883a06f49e3fda1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>std::map&lt; std::string, Log &gt;</type>
+      <name>LogMap</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a22fe1ec0a90939dff3bbbcc0810242d1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>std::map&lt; std::string, int &gt;</type>
+      <name>LevelMap</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a89a7fff30095efef77bdb6d6c8a3c83a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="typedef">
+      <type>std::map&lt; int, std::string &gt;</type>
+      <name>ColorCodes</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>abd7bcd56c6599139fd587747004c1b32</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>trace</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05a0da71efb8d039a16064a612813325908</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>debug</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05a72154b8f06c85bb66801d147eb0b835f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>info</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05a077569fb1356121c424ee36886ab197d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>warn</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05a46abec04839ef95711541d2a0d814e7d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>warning</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05ae5b859d88cc6815d90a3c3e040ce0575</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>error</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05abf047c1e8cfb0bdabd4c6a3f0484fe12</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>critical</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05a3085fe93d97f23ab0c75dd112cfe9c0a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>always</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a266bfa79b34e40111d8ef4acce11cc05ac6afec902c0177b7b883a06f49e3fda1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>getLevel</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a5e8a1fc9223bace16164adb6700b9ebc</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>Log &amp;</type>
+      <name>setLevel</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a356715ca19b36dd7036b797c0a0cb230</anchor>
+      <arglist>(int level)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>getName</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>aa8f815faa3cdeaff2a7e0829628229db</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>Log &amp;</type>
+      <name>setName</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a2c361113e788d8868a21e09c6adfcc65</anchor>
+      <arglist>(const std::string &amp;name)</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>isActive</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a565dfb1cc3a83ad27cd6d1178cbff56b</anchor>
+      <arglist>(int level) const</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>setLevel</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>af18b8eb658d8495a60a284df63387abd</anchor>
+      <arglist>(const std::string &amp;name, int level)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>setLevels</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a5fc8a092de0ccc1c0d2c34a9c310108a</anchor>
+      <arglist>(const LevelMap &amp;logLevels)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static Log &amp;</type>
+      <name>getLog</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a3ba0627e0d7b2771c9d5f243dbb9a5d5</anchor>
+      <arglist>(const std::string &amp;name)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static Level</type>
+      <name>getLevelFromName</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a3b37bc02ff7b387f805df112a566bc22</anchor>
+      <arglist>(const std::string &amp;level)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static std::string</type>
+      <name>getLevelName</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a012e4da8e886e600947ba2b8cf90f6db</anchor>
+      <arglist>(int level)</arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static const int</type>
+      <name>end_color</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a30d516201f26a889c5719a39b31b228e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="friend">
+      <type>friend std::ostream &amp;</type>
+      <name>operator&lt;&lt;</name>
+      <anchorfile>classpurify_1_1logging_1_1Log.html</anchorfile>
+      <anchor>a249e58e04cd0cac940c864288681fcfc</anchor>
+      <arglist>(Log &amp;log, int level)</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
     <name>purify::casa::MeasurementSet</name>
     <filename>classpurify_1_1casa_1_1MeasurementSet.html</filename>
     <class kind="class">purify::casa::MeasurementSet::ChannelWrapper</class>
@@ -7733,20 +7871,6 @@
       <arglist>()</arglist>
     </member>
     <member kind="function">
-      <type>std::string</type>
-      <name>default_logger_name</name>
-      <anchorfile>namespacepurify.html</anchorfile>
-      <anchor>a4d58563620e972c279f841f66a8f68ef</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>constexpr bool</type>
-      <name>color_logger</name>
-      <anchorfile>namespacepurify.html</anchorfile>
-      <anchor>a1719d0241f5cef19842ac9eb91272777</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
       <type>std::set&lt; STORAGE_INDEX_TYPE &gt;</type>
       <name>non_empty_outers</name>
       <anchorfile>namespacepurify.html</anchorfile>
@@ -8465,61 +8589,55 @@
   <compound kind="namespace">
     <name>purify::logging</name>
     <filename>namespacepurify_1_1logging.html</filename>
+    <class kind="class">purify::logging::Log</class>
     <member kind="function">
-      <type>std::shared_ptr&lt; int &gt;</type>
-      <name>initialize</name>
+      <type>void</type>
+      <name>_updateLevels</name>
       <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>a9cb706fbf61a8982965095e1265f3172</anchor>
-      <arglist>(std::string const &amp;name=&quot;&quot;)</arglist>
+      <anchor>a50424d6bd19db5ab8e1c5d3bbe732111</anchor>
+      <arglist>(const Log::LevelMap &amp;defaultLevels, Log::LogMap &amp;existingLogs)</arglist>
     </member>
     <member kind="function">
-      <type>std::shared_ptr&lt; int &gt;</type>
-      <name>initialize</name>
+      <type>ostream &amp;</type>
+      <name>operator&lt;&lt;</name>
       <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>a5a761be31c4fb31b3a9e636c17133904</anchor>
-      <arglist>()</arglist>
+      <anchor>adb803afb05f82ec41568931075a9ae9f</anchor>
+      <arglist>(Log &amp;log, int level)</arglist>
     </member>
     <member kind="function">
-      <type>std::shared_ptr&lt; int &gt;</type>
-      <name>get</name>
+      <type>Log &amp;</type>
+      <name>getLog</name>
       <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>acbbd33fd8ea1cc02eb2e9db9bfa835d9</anchor>
-      <arglist>(std::string const &amp;name=&quot;&quot;)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::shared_ptr&lt; int &gt;</type>
-      <name>get</name>
-      <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>a02a987cbc0c3d7d4c26190b547053998</anchor>
+      <anchor>a576bc20c59ffbc22d1c90a21a5712cef</anchor>
       <arglist>()</arglist>
     </member>
     <member kind="function">
       <type>void</type>
       <name>set_level</name>
       <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>a46c69647ca4c2d4fe100e50884d6b442</anchor>
-      <arglist>(std::string const &amp;level, std::string const &amp;name)</arglist>
+      <anchor>ad63e2000541a28446b87e82485638415</anchor>
+      <arglist>(const std::string &amp;level)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
-      <name>set_level</name>
+      <name>applyFormat</name>
       <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>a9bada47c3aae602e8e246a164d79bada</anchor>
-      <arglist>(std::string const &amp;)</arglist>
+      <anchor>a961e57120323841c9ca64d50dc076e4f</anchor>
+      <arglist>(std::stringstream &amp;ss, char *&amp;pos, Arg &amp;&amp;arg)</arglist>
     </member>
     <member kind="function">
-      <type>bool</type>
-      <name>has_level</name>
+      <type>std::string</type>
+      <name>mkFormattedString</name>
       <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>a793bccd5a5042f11480fedfcbdcb56b8</anchor>
-      <arglist>(std::string const &amp;, std::string const &amp;)</arglist>
+      <anchor>af58b80d7a581bd92834787f23bc741c0</anchor>
+      <arglist>(const char *txt, Args &amp;&amp;... args)</arglist>
     </member>
-    <member kind="variable">
-      <type>const std::string</type>
-      <name>name_prefix</name>
+    <member kind="function">
+      <type>std::string</type>
+      <name>mkFormattedString</name>
       <anchorfile>namespacepurify_1_1logging.html</anchorfile>
-      <anchor>ade846bfa55625b2ef77802f37adc2c86</anchor>
-      <arglist></arglist>
+      <anchor>a198ffa26c0be3ac561edfdcd7a8843a0</anchor>
+      <arglist>(const std::string &amp;txt)</arglist>
     </member>
   </compound>
   <compound kind="namespace">
@@ -9770,6 +9888,25 @@
       <enumvalue file="namespacepurify_1_1wproj__utilities_1_1expansions.html" anchor="a92334b90f8de8f723450b3aca72d9e74a334c4a4c42fdb79d7ebc3e73b517e6f8">none</enumvalue>
       <enumvalue file="namespacepurify_1_1wproj__utilities_1_1expansions.html" anchor="a92334b90f8de8f723450b3aca72d9e74a7d8bc5f1a8d3787d06ef11c97d4655df">taylor</enumvalue>
       <enumvalue file="namespacepurify_1_1wproj__utilities_1_1expansions.html" anchor="a92334b90f8de8f723450b3aca72d9e74a172e4ecb02a864e1e4aa51dcce9d8a47">chebyshev</enumvalue>
+    </member>
+  </compound>
+  <compound kind="group">
+    <name>logmacros</name>
+    <title>Logging macros</title>
+    <filename>group__logmacros.html</filename>
+    <member kind="define">
+      <type>#define</type>
+      <name>PURIFY_MSG_LVL</name>
+      <anchorfile>group__logmacros.html</anchorfile>
+      <anchor>ga46d122f99c5a938a43f14ae7e1dff01e</anchor>
+      <arglist>(lvl,...)</arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>PURIFY_LOG_</name>
+      <anchorfile>group__logmacros.html</anchorfile>
+      <anchor>ga389fd70d93568e0041ca858b44fc086a</anchor>
+      <arglist>(TYPE,...)</arglist>
     </member>
   </compound>
   <compound kind="page">

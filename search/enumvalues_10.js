@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['taylor_1183',['taylor',['../namespacepurify_1_1wproj__utilities_1_1expansions.html#a92334b90f8de8f723450b3aca72d9e74a7d8bc5f1a8d3787d06ef11c97d4655df',1,'purify::wproj_utilities::expansions']]],
-  ['tfgproximal_1184',['TFGProximal',['../namespacepurify_1_1factory.html#a3e81ddc8925844c225faea9371315d1facd065a2ab39996b5bd447b890dec2fa9',1,'purify::factory']]]
+  ['radial_1212',['radial',['../namespacepurify_1_1distribute.html#a0bf24e0d0fb613140687838e4546ab2aa869836a44b607137a7e094cf8a308938',1,'purify::distribute']]],
+  ['radians_1213',['radians',['../namespacepurify_1_1utilities.html#aa2af2ee7e4f1bb93a42235b9d973983da017969ba49117264eb077e9f66daacfd',1,'purify::utilities']]],
+  ['rl_1214',['RL',['../namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a7f49bbe2f0af1edb6c6cee353d3e204b',1,'purify']]],
+  ['rr_1215',['RR',['../namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8acb95449a94688af33f6e9bb090cf2936',1,'purify']]]
 ];

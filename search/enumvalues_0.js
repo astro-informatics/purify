@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['box_1130',['box',['../namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a34be958a921e43d813a2075297d8e862',1,'purify::kernels']]]
+  ['always_1162',['always',['../classpurify_1_1logging_1_1Log.html#a266bfa79b34e40111d8ef4acce11cc05ac6afec902c0177b7b883a06f49e3fda1',1,'purify::logging::Log']]]
 ];

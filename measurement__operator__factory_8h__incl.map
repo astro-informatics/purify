@@ -1,38 +1,40 @@
 <map id="/home/runner/work/purify/purify/cpp/purify/measurement_operator_factory.h" name="/home/runner/work/purify/purify/cpp/purify/measurement_operator_factory.h">
-<area shape="rect" id="node1" title=" " alt="" coords="2178,5,2405,61"/>
-<area shape="rect" id="node2" title=" " alt="" coords="1712,661,1826,688"/>
-<area shape="rect" id="node3" href="$types_8h.html" title=" " alt="" coords="1330,512,1440,539"/>
-<area shape="rect" id="node9" href="$logging_8h.html" title=" " alt="" coords="1993,512,2116,539"/>
-<area shape="rect" id="node13" href="$operators_8h.html" title=" " alt="" coords="1190,273,1327,300"/>
-<area shape="rect" id="node34" href="$operators__gpu_8h.html" title=" " alt="" coords="2121,199,2289,225"/>
-<area shape="rect" id="node35" href="$wproj__operators_8h.html" title=" " alt="" coords="1916,199,2096,225"/>
-<area shape="rect" id="node36" href="$wproj__operators__gpu_8h.html" title=" " alt="" coords="2086,109,2254,151"/>
-<area shape="rect" id="node4" title=" " alt="" coords="1460,587,1539,613"/>
-<area shape="rect" id="node5" title=" " alt="" coords="1563,587,1655,613"/>
-<area shape="rect" id="node6" title=" " alt="" coords="1046,587,1148,613"/>
-<area shape="rect" id="node7" title=" " alt="" coords="1173,587,1309,613"/>
-<area shape="rect" id="node8" title=" " alt="" coords="1334,587,1436,613"/>
-<area shape="rect" id="node10" href="$logging_8disabled_8h.html" title=" " alt="" coords="1883,587,2066,613"/>
-<area shape="rect" id="node11" title=" " alt="" coords="1936,661,2013,688"/>
-<area shape="rect" id="node12" title=" " alt="" coords="341,661,400,688"/>
-<area shape="rect" id="node14" title=" " alt="" coords="1826,348,1906,375"/>
-<area shape="rect" id="node15" title=" " alt="" coords="1087,430,1142,457"/>
-<area shape="rect" id="node16" title=" " alt="" coords="40,512,132,539"/>
-<area shape="rect" id="node17" href="$kernels_8h.html" title=" " alt="" coords="736,348,858,375"/>
-<area shape="rect" id="node22" href="$purify_2utilities_8h.html" title=" " alt="" coords="91,430,215,457"/>
-<area shape="rect" id="node24" href="$uvw__utilities_8h.html" title=" " alt="" coords="239,430,398,457"/>
-<area shape="rect" id="node25" href="$wide__field__utilities_8h.html" title=" " alt="" coords="1818,430,2016,457"/>
-<area shape="rect" id="node26" href="$wkernel__integration_8h.html" title=" " alt="" coords="1296,348,1500,375"/>
-<area shape="rect" id="node29" title=" " alt="" coords="1930,348,2117,375"/>
-<area shape="rect" id="node30" title=" " alt="" coords="1627,348,1802,375"/>
-<area shape="rect" id="node31" href="$fly__operators_8h.html" title=" " alt="" coords="1061,348,1221,375"/>
-<area shape="rect" id="node33" title=" " alt="" coords="970,348,1037,375"/>
-<area shape="rect" id="node18" title=" " alt="" coords="524,430,580,457"/>
-<area shape="rect" id="node19" title=" " alt="" coords="604,430,654,457"/>
-<area shape="rect" id="node20" title=" " alt="" coords="678,423,841,464"/>
-<area shape="rect" id="node21" title=" " alt="" coords="865,423,1012,464"/>
-<area shape="rect" id="node23" title=" " alt="" coords="259,512,332,539"/>
-<area shape="rect" id="node27" href="$integration_8h.html" title=" " alt="" coords="1648,430,1794,457"/>
-<area shape="rect" id="node28" title=" " alt="" coords="1666,512,1757,539"/>
-<area shape="rect" id="node32" title=" " alt="" coords="1166,430,1209,457"/>
+<area shape="rect" id="node1" title=" " alt="" coords="1008,5,1235,61"/>
+<area shape="rect" id="node2" title=" " alt="" coords="1461,587,1576,613"/>
+<area shape="rect" id="node3" href="$types_8h.html" title=" " alt="" coords="787,505,898,531"/>
+<area shape="rect" id="node9" href="$logging_8h.html" title=" " alt="" coords="589,505,712,531"/>
+<area shape="rect" id="node17" href="$operators_8h.html" title=" " alt="" coords="1114,273,1251,300"/>
+<area shape="rect" id="node36" href="$operators__gpu_8h.html" title=" " alt="" coords="1297,199,1465,225"/>
+<area shape="rect" id="node37" href="$wproj__operators_8h.html" title=" " alt="" coords="1093,199,1273,225"/>
+<area shape="rect" id="node38" href="$wproj__operators__gpu_8h.html" title=" " alt="" coords="1159,109,1327,151"/>
+<area shape="rect" id="node4" title=" " alt="" coords="1259,587,1338,613"/>
+<area shape="rect" id="node5" title=" " alt="" coords="729,587,821,613"/>
+<area shape="rect" id="node6" title=" " alt="" coords="845,587,947,613"/>
+<area shape="rect" id="node7" title=" " alt="" coords="972,587,1108,613"/>
+<area shape="rect" id="node8" title=" " alt="" coords="1133,587,1235,613"/>
+<area shape="rect" id="node10" title=" " alt="" coords="325,587,392,613"/>
+<area shape="rect" id="node11" title=" " alt="" coords="417,587,503,613"/>
+<area shape="rect" id="node12" title=" " alt="" coords="251,587,301,613"/>
+<area shape="rect" id="node13" title=" " alt="" coords="528,587,605,613"/>
+<area shape="rect" id="node14" title=" " alt="" coords="629,587,704,613"/>
+<area shape="rect" id="node15" title=" " alt="" coords="1363,587,1421,613"/>
+<area shape="rect" id="node16" title=" " alt="" coords="11,587,66,613"/>
+<area shape="rect" id="node18" title=" " alt="" coords="1540,348,1620,375"/>
+<area shape="rect" id="node19" title=" " alt="" coords="1338,505,1430,531"/>
+<area shape="rect" id="node20" href="$kernels_8h.html" title=" " alt="" coords="60,423,183,449"/>
+<area shape="rect" id="node24" href="$purify_2utilities_8h.html" title=" " alt="" coords="1407,423,1531,449"/>
+<area shape="rect" id="node26" href="$uvw__utilities_8h.html" title=" " alt="" coords="1106,423,1265,449"/>
+<area shape="rect" id="node27" href="$wide__field__utilities_8h.html" title=" " alt="" coords="561,423,759,449"/>
+<area shape="rect" id="node28" href="$wkernel__integration_8h.html" title=" " alt="" coords="834,348,1038,375"/>
+<area shape="rect" id="node31" title=" " alt="" coords="1644,348,1831,375"/>
+<area shape="rect" id="node32" title=" " alt="" coords="1906,348,2081,375"/>
+<area shape="rect" id="node33" href="$fly__operators_8h.html" title=" " alt="" coords="1255,348,1415,375"/>
+<area shape="rect" id="node35" title=" " alt="" coords="1113,348,1180,375"/>
+<area shape="rect" id="node21" title=" " alt="" coords="101,505,157,531"/>
+<area shape="rect" id="node22" title=" " alt="" coords="181,497,344,539"/>
+<area shape="rect" id="node23" title=" " alt="" coords="368,497,515,539"/>
+<area shape="rect" id="node25" title=" " alt="" coords="1241,505,1314,531"/>
+<area shape="rect" id="node29" href="$integration_8h.html" title=" " alt="" coords="935,423,1081,449"/>
+<area shape="rect" id="node30" title=" " alt="" coords="973,505,1064,531"/>
+<area shape="rect" id="node34" title=" " alt="" coords="1340,423,1383,449"/>
 </map>

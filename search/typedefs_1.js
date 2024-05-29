@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['pointer_1104',['pointer',['../classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html#aa14fc508f069b9dd36a4530d4a92735a',1,'purify::casa::MeasurementSet::const_iterator']]]
+  ['difference_5ftype_1132',['difference_type',['../classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html#a9a5174b3d3ee12335f2a7d6293aeaf70',1,'purify::casa::MeasurementSet::const_iterator']]],
+  ['direction_1133',['Direction',['../classpurify_1_1casa_1_1MeasurementSet.html#ab42446436227d207bfe3dc9990913188',1,'purify::casa::MeasurementSet']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['h_1141',['h',['../namespacepurify_1_1integration.html#a29ad3e35748f2774b6fe751c8f9a4cc9a2510c39011c5be704182423e3a695e91',1,'purify::integration']]]
+  ['forward_5fbackward_1170',['forward_backward',['../namespacepurify_1_1factory.html#a61804e4c4f79fa94c6b864535459d5f8a9fd3baacb5ca6344ddb0ab9f5b71cb02',1,'purify::factory']]]
 ];

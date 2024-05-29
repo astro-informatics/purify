@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['yamlparser_629',['YamlParser',['../classpurify_1_1YamlParser.html',1,'purify']]]
+  ['waveletoperatoradjointfixture_648',['WaveletOperatorAdjointFixture',['../classWaveletOperatorAdjointFixture.html',1,'']]],
+  ['waveletoperatorfixture_649',['WaveletOperatorFixture',['../classWaveletOperatorFixture.html',1,'']]],
+  ['waveletoperatormpifixture_650',['WaveletOperatorMPIFixture',['../classWaveletOperatorMPIFixture.html',1,'']]]
 ];

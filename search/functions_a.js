@@ -1,5 +1,9 @@
 var searchData=
 [
-  ['linear_5fconvol_5f1d_884',['linear_convol_1d',['../namespacepurify_1_1convol.html#adf71b9fa393f32b36d0cbc545d831360',1,'purify::convol']]],
-  ['linear_5fconvol_5f2d_885',['linear_convol_2d',['../namespacepurify_1_1convol.html#a8243104c62ca603ba048c521ca99be92',1,'purify::convol::linear_convol_2d(const Vector&lt; T &gt; &amp;kernelfu, const Vector&lt; T &gt; &amp;kernelfv, const Matrix&lt; T &gt; &amp;kernelg)'],['../namespacepurify_1_1convol.html#a8d09d81178acd9e2b707396697b39c1a',1,'purify::convol::linear_convol_2d(const std::function&lt; T(t_int)&gt; &amp;kernelu, const std::function&lt; T(t_int)&gt; &amp;kernelv, const std::function&lt; T(t_int, t_int)&gt; &amp;kernelw, const t_uint &amp;Jfu, const t_uint &amp;Jfv, const t_uint &amp;Jgu, const t_uint &amp;Jgv)']]]
+  ['kaiser_5fbessel_902',['kaiser_bessel',['../namespacepurify_1_1kernels.html#a5ebd5a33dc46d12eca370fb011c6d20a',1,'purify::kernels']]],
+  ['kaiser_5fbessel_5fgeneral_903',['kaiser_bessel_general',['../namespacepurify_1_1kernels.html#a95321ed82db7eb7e34a706bf0de8135a',1,'purify::kernels']]],
+  ['kernel_5flinear_5finterp_904',['kernel_linear_interp',['../namespacepurify_1_1kernels.html#add23bd0781527fd3fb7adfbdcd540c90',1,'purify::kernels']]],
+  ['kernel_5fsamples_905',['kernel_samples',['../namespacepurify_1_1kernels.html#a57f3f5095a015db5353a7fd7a3002bf8',1,'purify::kernels']]],
+  ['kernel_5fzero_5finterp_906',['kernel_zero_interp',['../namespacepurify_1_1kernels.html#a62e978dd425d45ba985630786104d89c',1,'purify::kernels']]],
+  ['kmeans_5falgo_907',['kmeans_algo',['../namespacepurify_1_1distribute.html#a63f1d94d4471ff67adec654d547dff4a',1,'purify::distribute']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['norm_5ftype_1123',['norm_type',['../namespacepurify_1_1integration.html#a5d8cd1673befa0bfd8cc7618ff5a9816',1,'purify::integration']]]
+  ['method_1154',['method',['../namespacepurify_1_1integration.html#a29ad3e35748f2774b6fe751c8f9a4cc9',1,'purify::integration']]]
 ];

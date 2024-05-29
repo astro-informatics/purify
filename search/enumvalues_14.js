@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['xx_1192',['XX',['../namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8ac51b57a703ba1c5869228690c93e1701',1,'purify']]],
-  ['xy_1193',['XY',['../namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a74c53bcd3dcb2bb79993b2fec37d362a',1,'purify']]]
+  ['v_1225',['V',['../namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a5206560a306a2e085a437fd258eb57ce',1,'purify']]],
+  ['vis_1226',['vis',['../namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a',1,'purify::read_measurements']]]
 ];

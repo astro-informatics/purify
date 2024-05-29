@@ -96,29 +96,33 @@ $(function() {
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="wavelet__decomposition_8cc__incl.png" border="0" usemap="#_2home_2runner_2work_2purify_2purify_2cpp_2example_2wavelet__decomposition_8cc" alt=""/></div>
 <map name="_2home_2runner_2work_2purify_2purify_2cpp_2example_2wavelet__decomposition_8cc" id="_2home_2runner_2work_2purify_2purify_2cpp_2example_2wavelet__decomposition_8cc">
-<area shape="rect" title=" " alt="" coords="775,5,982,61"/>
-<area shape="rect" title=" " alt="" coords="867,348,981,375"/>
-<area shape="rect" href="types_8h.html" title=" " alt="" coords="277,273,387,300"/>
-<area shape="rect" title=" " alt="" coords="697,117,841,143"/>
-<area shape="rect" href="logging_8h.html" title=" " alt="" coords="1012,199,1135,225"/>
-<area shape="rect" href="pfitsio_8h.html" title=" " alt="" coords="544,117,659,143"/>
-<area shape="rect" href="purify_2utilities_8h.html" title=" " alt="" coords="718,199,842,225"/>
-<area shape="rect" href="wavelet__operator__factory_8h.html" title=" " alt="" coords="1165,109,1342,151"/>
-<area shape="rect" title=" " alt="" coords="293,348,371,375"/>
-<area shape="rect" title=" " alt="" coords="395,348,487,375"/>
-<area shape="rect" title=" " alt="" coords="511,348,614,375"/>
-<area shape="rect" title=" " alt="" coords="5,348,141,375"/>
-<area shape="rect" title=" " alt="" coords="166,348,269,375"/>
-<area shape="rect" href="logging_8disabled_8h.html" title=" " alt="" coords="982,273,1165,300"/>
-<area shape="rect" title=" " alt="" coords="1035,348,1112,375"/>
-<area shape="rect" title=" " alt="" coords="701,348,760,375"/>
-<area shape="rect" href="uvw__utilities_8h.html" title=" " alt="" coords="522,199,681,225"/>
-<area shape="rect" title=" " alt="" coords="329,199,396,225"/>
-<area shape="rect" title=" " alt="" coords="565,273,638,300"/>
-<area shape="rect" title=" " alt="" coords="662,273,754,300"/>
-<area shape="rect" title=" " alt="" coords="1291,199,1354,225"/>
-<area shape="rect" title=" " alt="" coords="1379,199,1504,225"/>
-<area shape="rect" title=" " alt="" coords="1528,199,1685,225"/>
+<area shape="rect" title=" " alt="" coords="719,5,925,61"/>
+<area shape="rect" title=" " alt="" coords="715,348,830,375"/>
+<area shape="rect" href="types_8h.html" title=" " alt="" coords="225,273,336,300"/>
+<area shape="rect" title=" " alt="" coords="1519,117,1663,143"/>
+<area shape="rect" href="logging_8h.html" title=" " alt="" coords="874,199,997,225"/>
+<area shape="rect" href="pfitsio_8h.html" title=" " alt="" coords="665,117,779,143"/>
+<area shape="rect" href="purify_2utilities_8h.html" title=" " alt="" coords="377,199,501,225"/>
+<area shape="rect" href="wavelet__operator__factory_8h.html" title=" " alt="" coords="860,109,1037,151"/>
+<area shape="rect" title=" " alt="" coords="132,348,211,375"/>
+<area shape="rect" title=" " alt="" coords="235,348,327,375"/>
+<area shape="rect" title=" " alt="" coords="351,348,453,375"/>
+<area shape="rect" title=" " alt="" coords="478,348,614,375"/>
+<area shape="rect" title=" " alt="" coords="5,348,108,375"/>
+<area shape="rect" title=" " alt="" coords="1378,273,1445,300"/>
+<area shape="rect" title=" " alt="" coords="912,273,999,300"/>
+<area shape="rect" title=" " alt="" coords="1023,273,1074,300"/>
+<area shape="rect" title=" " alt="" coords="1098,273,1175,300"/>
+<area shape="rect" title=" " alt="" coords="1199,273,1274,300"/>
+<area shape="rect" title=" " alt="" coords="677,273,735,300"/>
+<area shape="rect" title=" " alt="" coords="1299,273,1353,300"/>
+<area shape="rect" href="uvw__utilities_8h.html" title=" " alt="" coords="525,199,684,225"/>
+<area shape="rect" title=" " alt="" coords="235,199,302,225"/>
+<area shape="rect" title=" " alt="" coords="528,273,601,300"/>
+<area shape="rect" title=" " alt="" coords="412,273,504,300"/>
+<area shape="rect" title=" " alt="" coords="1203,199,1265,225"/>
+<area shape="rect" title=" " alt="" coords="1290,199,1415,225"/>
+<area shape="rect" title=" " alt="" coords="1021,199,1178,225"/>
 </map>
 </div>
 </div>
@@ -206,47 +210,45 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="wavelet__decomposition_8cc_source.html#l00012">12</a> of file <a class="el" href="wavelet__decomposition_8cc_source.html">wavelet_decomposition.cc</a>.</p>
 <div class="fragment"><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;                                       {</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  <a class="code" href="namespacepurify_1_1logging.html#a9cb706fbf61a8982965095e1265f3172">purify::logging::initialize</a>();</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <a class="code" href="namespacepurify_1_1logging.html#a46c69647ca4c2d4fe100e50884d6b442">purify::logging::set_level</a>(<span class="stringliteral">&quot;debug&quot;</span>);</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> input_name =</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;      (nargs &gt; 1) ? <span class="keyword">static_cast&lt;</span>std::string<span class="keyword">&gt;</span>(args[1]) : <a class="code" href="namespacepurify_1_1notinstalled.html#adcd4a748b6eaf349d7a41cfc85428883">image_filename</a>(<span class="stringliteral">&quot;M31.fits&quot;</span>);</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> output_name =</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;      (nargs &gt; 2) ? <span class="keyword">static_cast&lt;</span>std::string<span class="keyword">&gt;</span>(args[2]) : <span class="stringliteral">&quot;wavelet_decomposition.fits&quot;</span>;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#define ARGS_MACRO(NAME, ARGN, VALUE, TYPE) \</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">  auto const NAME =                         \</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">      static_cast&lt;TYPE&gt;((nargs &gt; ARGN) ? std::stod(static_cast&lt;std::string&gt;(args[ARGN])) : VALUE);</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <a class="code" href="wavelet__decomposition_8cc.html#a5ef35d83033741b88fd4635a3ffe60de">ARGS_MACRO</a>(levels, 4, 3, t_uint)</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  Image&lt;t_complex&gt; <span class="keyword">const</span> ground_truth_image = <a class="code" href="namespacepurify_1_1pfitsio.html#a2ae1f0721ea099a29b30eaed0c47c771">pfitsio::read2d</a>(input_name).cast&lt;t_complex&gt;();</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keyword">const</span> std::vector&lt;std::tuple&lt;std::string, t_uint&gt;&gt; wavelets{</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      std::make_tuple(<span class="stringliteral">&quot;Dirac&quot;</span>, levels), std::make_tuple(<span class="stringliteral">&quot;DB1&quot;</span>, levels),</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      std::make_tuple(<span class="stringliteral">&quot;DB2&quot;</span>, levels),   std::make_tuple(<span class="stringliteral">&quot;DB3&quot;</span>, levels),</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      std::make_tuple(<span class="stringliteral">&quot;DB4&quot;</span>, levels),   std::make_tuple(<span class="stringliteral">&quot;DB5&quot;</span>, levels),</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      std::make_tuple(<span class="stringliteral">&quot;DB6&quot;</span>, levels),   std::make_tuple(<span class="stringliteral">&quot;DB7&quot;</span>, levels),</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      std::make_tuple(<span class="stringliteral">&quot;DB8&quot;</span>, levels)};</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> phi = factory::wavelet_operator_factory&lt;Vector&lt;t_complex&gt;&gt;(</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      factory::distributed_wavelet_operator::serial, wavelets, ground_truth_image.rows(),</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      ground_truth_image.cols());</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keyword">const</span> Image&lt;t_complex&gt; decompostion =</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      Image&lt;t_complex&gt;::Map((phi-&gt;adjoint() * Vector&lt;t_complex&gt;::Map(ground_truth_image.data(),</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;                                                                     ground_truth_image.size()))</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;                                .eval()</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;                                .data(),</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;                            ground_truth_image.rows(), ground_truth_image.cols() * wavelets.size());</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(decompostion.real(), output_name);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;}</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  <a class="code" href="namespacepurify_1_1logging.html#ad63e2000541a28446b87e82485638415">purify::logging::set_level</a>(<span class="stringliteral">&quot;debug&quot;</span>);</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> input_name =</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;      (nargs &gt; 1) ? <span class="keyword">static_cast&lt;</span>std::string<span class="keyword">&gt;</span>(args[1]) : <a class="code" href="namespacepurify_1_1notinstalled.html#adcd4a748b6eaf349d7a41cfc85428883">image_filename</a>(<span class="stringliteral">&quot;M31.fits&quot;</span>);</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> output_name =</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;      (nargs &gt; 2) ? <span class="keyword">static_cast&lt;</span>std::string<span class="keyword">&gt;</span>(args[2]) : <span class="stringliteral">&quot;wavelet_decomposition.fits&quot;</span>;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#define ARGS_MACRO(NAME, ARGN, VALUE, TYPE) \</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">  auto const NAME =                         \</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">      static_cast&lt;TYPE&gt;((nargs &gt; ARGN) ? std::stod(static_cast&lt;std::string&gt;(args[ARGN])) : VALUE);</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <a class="code" href="wavelet__decomposition_8cc.html#a5ef35d83033741b88fd4635a3ffe60de">ARGS_MACRO</a>(levels, 4, 3, t_uint)</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  Image&lt;t_complex&gt; <span class="keyword">const</span> ground_truth_image = <a class="code" href="namespacepurify_1_1pfitsio.html#a2ae1f0721ea099a29b30eaed0c47c771">pfitsio::read2d</a>(input_name).cast&lt;t_complex&gt;();</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keyword">const</span> std::vector&lt;std::tuple&lt;std::string, t_uint&gt;&gt; wavelets{</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      std::make_tuple(<span class="stringliteral">&quot;Dirac&quot;</span>, levels), std::make_tuple(<span class="stringliteral">&quot;DB1&quot;</span>, levels),</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      std::make_tuple(<span class="stringliteral">&quot;DB2&quot;</span>, levels),   std::make_tuple(<span class="stringliteral">&quot;DB3&quot;</span>, levels),</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      std::make_tuple(<span class="stringliteral">&quot;DB4&quot;</span>, levels),   std::make_tuple(<span class="stringliteral">&quot;DB5&quot;</span>, levels),</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      std::make_tuple(<span class="stringliteral">&quot;DB6&quot;</span>, levels),   std::make_tuple(<span class="stringliteral">&quot;DB7&quot;</span>, levels),</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      std::make_tuple(<span class="stringliteral">&quot;DB8&quot;</span>, levels)};</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> phi = factory::wavelet_operator_factory&lt;Vector&lt;t_complex&gt;&gt;(</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      factory::distributed_wavelet_operator::serial, wavelets, ground_truth_image.rows(),</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      ground_truth_image.cols());</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keyword">const</span> Image&lt;t_complex&gt; decompostion =</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      Image&lt;t_complex&gt;::Map((phi-&gt;adjoint() * Vector&lt;t_complex&gt;::Map(ground_truth_image.data(),</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;                                                                     ground_truth_image.size()))</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;                                .eval()</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;                                .data(),</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;                            ground_truth_image.rows(), ground_truth_image.cols() * wavelets.size());</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(decompostion.real(), output_name);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;}</div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="wavelet__decomposition_8cc.html#a5ef35d83033741b88fd4635a3ffe60de">ARGS_MACRO</a>, <a class="el" href="directories_8in_8h_source.html#l00032">purify::notinstalled::image_filename()</a>, <a class="el" href="logging_8disabled_8h_source.html#l00012">purify::logging::initialize()</a>, <a class="el" href="pfitsio_8h_source.html#l00339">purify::pfitsio::read2d()</a>, <a class="el" href="namespacepurify_1_1factory.html#a5bbc6a01d0a2cdd30b656a6bb957221fa74136b24217cb75599440e6e1d807cf7">purify::factory::serial</a>, <a class="el" href="logging_8disabled_8h_source.html#l00016">purify::logging::set_level()</a>, and <a class="el" href="pfitsio_8cc_source.html#l00030">purify::pfitsio::write2d()</a>.</p>
+<p class="reference">References <a class="el" href="wavelet__decomposition_8cc.html#a5ef35d83033741b88fd4635a3ffe60de">ARGS_MACRO</a>, <a class="el" href="directories_8in_8h_source.html#l00032">purify::notinstalled::image_filename()</a>, <a class="el" href="pfitsio_8h_source.html#l00339">purify::pfitsio::read2d()</a>, <a class="el" href="namespacepurify_1_1factory.html#a5bbc6a01d0a2cdd30b656a6bb957221fa74136b24217cb75599440e6e1d807cf7">purify::factory::serial</a>, <a class="el" href="logging_8h_source.html#l00137">purify::logging::set_level()</a>, and <a class="el" href="pfitsio_8cc_source.html#l00030">purify::pfitsio::write2d()</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <div class="ttc" id="anamespacepurify_1_1pfitsio_html_a2ae1f0721ea099a29b30eaed0c47c771"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#a2ae1f0721ea099a29b30eaed0c47c771">purify::pfitsio::read2d</a></div><div class="ttdeci">Image&lt; t_complex &gt; read2d(const std::string &amp;fits_name)</div><div class="ttdoc">Read image from fits file.</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8h_source.html#l00339">pfitsio.h:339</a></div></div>
-<div class="ttc" id="anamespacepurify_1_1logging_html_a46c69647ca4c2d4fe100e50884d6b442"><div class="ttname"><a href="namespacepurify_1_1logging.html#a46c69647ca4c2d4fe100e50884d6b442">purify::logging::set_level</a></div><div class="ttdeci">void set_level(std::string const &amp;, std::string const &amp;)</div><div class="ttdoc">Sets logging level.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8disabled_8h_source.html#l00016">logging.disabled.h:16</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1notinstalled_html_adcd4a748b6eaf349d7a41cfc85428883"><div class="ttname"><a href="namespacepurify_1_1notinstalled.html#adcd4a748b6eaf349d7a41cfc85428883">purify::notinstalled::image_filename</a></div><div class="ttdeci">std::string image_filename(std::string const &amp;filename)</div><div class="ttdoc">Image filename.</div><div class="ttdef"><b>Definition:</b> <a href="directories_8in_8h_source.html#l00032">directories.in.h:32</a></div></div>
-<div class="ttc" id="anamespacepurify_1_1logging_html_a9cb706fbf61a8982965095e1265f3172"><div class="ttname"><a href="namespacepurify_1_1logging.html#a9cb706fbf61a8982965095e1265f3172">purify::logging::initialize</a></div><div class="ttdeci">std::shared_ptr&lt; int &gt; initialize(std::string const &amp;)</div><div class="ttdoc">Initializes a logger.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8disabled_8h_source.html#l00012">logging.disabled.h:12</a></div></div>
+<div class="ttc" id="anamespacepurify_1_1logging_html_ad63e2000541a28446b87e82485638415"><div class="ttname"><a href="namespacepurify_1_1logging.html#ad63e2000541a28446b87e82485638415">purify::logging::set_level</a></div><div class="ttdeci">void set_level(const std::string &amp;level)</div><div class="ttdoc">Method to set the logging level of the default Log object.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8h_source.html#l00137">logging.h:137</a></div></div>
 <div class="ttc" id="awavelet__decomposition_8cc_html_a5ef35d83033741b88fd4635a3ffe60de"><div class="ttname"><a href="wavelet__decomposition_8cc.html#a5ef35d83033741b88fd4635a3ffe60de">ARGS_MACRO</a></div><div class="ttdeci">#define ARGS_MACRO(NAME, ARGN, VALUE, TYPE)</div></div>
 <div class="ttc" id="anamespacepurify_1_1pfitsio_html_a05de3285d7ec5d5a6e43d2e5761e8b12"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">purify::pfitsio::write2d</a></div><div class="ttdeci">void write2d(const Image&lt; t_real &gt; &amp;eigen_image, const pfitsio::header_params &amp;header, const bool &amp;overwrite)</div><div class="ttdoc">Write image to fits file.</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8cc_source.html#l00030">pfitsio.cc:30</a></div></div>
 <!-- start footer part -->

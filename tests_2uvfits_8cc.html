@@ -95,26 +95,30 @@ $(function() {
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="tests_2uvfits_8cc__incl.png" border="0" usemap="#_2home_2runner_2work_2purify_2purify_2cpp_2tests_2uvfits_8cc" alt=""/></div>
 <map name="_2home_2runner_2work_2purify_2purify_2cpp_2tests_2uvfits_8cc" id="_2home_2runner_2work_2purify_2purify_2cpp_2tests_2uvfits_8cc">
-<area shape="rect" title=" " alt="" coords="601,5,787,47"/>
-<area shape="rect" title=" " alt="" coords="501,319,615,345"/>
-<area shape="rect" href="types_8h.html" title=" " alt="" coords="796,244,907,271"/>
-<area shape="rect" title=" " alt="" coords="502,95,657,121"/>
-<area shape="rect" href="logging_8h.html" title=" " alt="" coords="117,169,239,196"/>
-<area shape="rect" title=" " alt="" coords="731,95,811,121"/>
-<area shape="rect" title=" " alt="" coords="835,95,979,121"/>
-<area shape="rect" href="uvfits_8h.html" title=" " alt="" coords="367,95,477,121"/>
-<area shape="rect" title=" " alt="" coords="927,319,1005,345"/>
-<area shape="rect" title=" " alt="" coords="1029,319,1121,345"/>
-<area shape="rect" title=" " alt="" coords="1145,319,1248,345"/>
-<area shape="rect" title=" " alt="" coords="639,319,775,345"/>
-<area shape="rect" title=" " alt="" coords="800,319,903,345"/>
-<area shape="rect" href="logging_8disabled_8h.html" title=" " alt="" coords="5,244,188,271"/>
-<area shape="rect" title=" " alt="" coords="58,319,135,345"/>
-<area shape="rect" title=" " alt="" coords="247,319,306,345"/>
-<area shape="rect" title=" " alt="" coords="338,169,405,196"/>
-<area shape="rect" href="uvw__utilities_8h.html" title=" " alt="" coords="429,169,588,196"/>
-<area shape="rect" title=" " alt="" coords="365,244,439,271"/>
-<area shape="rect" title=" " alt="" coords="463,244,555,271"/>
+<area shape="rect" title=" " alt="" coords="978,5,1164,47"/>
+<area shape="rect" title=" " alt="" coords="587,319,702,345"/>
+<area shape="rect" href="types_8h.html" title=" " alt="" coords="1029,244,1140,271"/>
+<area shape="rect" title=" " alt="" coords="1108,95,1263,121"/>
+<area shape="rect" href="logging_8h.html" title=" " alt="" coords="423,169,546,196"/>
+<area shape="rect" title=" " alt="" coords="1287,95,1367,121"/>
+<area shape="rect" title=" " alt="" coords="1391,95,1535,121"/>
+<area shape="rect" href="uvfits_8h.html" title=" " alt="" coords="710,95,821,121"/>
+<area shape="rect" title=" " alt="" coords="1304,319,1382,345"/>
+<area shape="rect" title=" " alt="" coords="773,319,865,345"/>
+<area shape="rect" title=" " alt="" coords="889,319,992,345"/>
+<area shape="rect" title=" " alt="" coords="1016,319,1152,345"/>
+<area shape="rect" title=" " alt="" coords="1177,319,1280,345"/>
+<area shape="rect" title=" " alt="" coords="303,244,370,271"/>
+<area shape="rect" title=" " alt="" coords="394,244,481,271"/>
+<area shape="rect" title=" " alt="" coords="506,244,556,271"/>
+<area shape="rect" title=" " alt="" coords="23,244,100,271"/>
+<area shape="rect" title=" " alt="" coords="124,244,199,271"/>
+<area shape="rect" title=" " alt="" coords="682,244,740,271"/>
+<area shape="rect" title=" " alt="" coords="224,244,278,271"/>
+<area shape="rect" title=" " alt="" coords="732,169,799,196"/>
+<area shape="rect" href="uvw__utilities_8h.html" title=" " alt="" coords="824,169,982,196"/>
+<area shape="rect" title=" " alt="" coords="932,244,1005,271"/>
+<area shape="rect" title=" " alt="" coords="816,244,908,271"/>
 </map>
 </div>
 </div>
@@ -144,7 +148,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="tests_2uvfits_8cc_source.html#l00013">13</a> of file <a class="el" href="tests_2uvfits_8cc_source.html">uvfits.cc</a>.</p>
 <div class="fragment"><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;                      {</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <a class="code" href="namespacepurify_1_1logging.html#a46c69647ca4c2d4fe100e50884d6b442">purify::logging::set_level</a>(<span class="stringliteral">&quot;debug&quot;</span>);</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <a class="code" href="namespacepurify_1_1logging.html#ad63e2000541a28446b87e82485638415">purify::logging::set_level</a>(<span class="stringliteral">&quot;debug&quot;</span>);</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <span class="keyword">const</span> std::string filename = <a class="code" href="namespacepurify_1_1notinstalled.html#adf7cca24a1b2c8df495b8c2aadbc61f8">atca_filename</a>(<span class="stringliteral">&quot;0332-391&quot;</span>);</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  SECTION(<span class="stringliteral">&quot;filter&quot;</span>) {</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</a> = <a class="code" href="namespacepurify_1_1pfitsio.html#a4c0c4a69590d4d6e31eb99261dab097f">pfitsio::read_uvfits</a>(filename + <span class="stringliteral">&quot;.uvfits&quot;</span>, <span class="keyword">true</span>, stokes::I);</div>
@@ -205,18 +209,18 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  }</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;}</div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00044">purify::notinstalled::atca_filename()</a>, <a class="el" href="types_8h_source.html#l00060">purify::constant::c</a>, <a class="el" href="casa_8cc_source.html#l00006">CHECK</a>, <a class="el" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8add7536794b63bf90eccfd37f9b147d7f">purify::I</a>, <a class="el" href="purify_2uvfits_8cc_source.html#l00012">purify::pfitsio::read_uvfits()</a>, <a class="el" href="uvw__utilities_8cc_source.html#l00136">purify::utilities::read_visibility()</a>, and <a class="el" href="logging_8disabled_8h_source.html#l00016">purify::logging::set_level()</a>.</p>
+<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00044">purify::notinstalled::atca_filename()</a>, <a class="el" href="types_8h_source.html#l00060">purify::constant::c</a>, <a class="el" href="casa_8cc_source.html#l00006">CHECK</a>, <a class="el" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8add7536794b63bf90eccfd37f9b147d7f">purify::I</a>, <a class="el" href="purify_2uvfits_8cc_source.html#l00012">purify::pfitsio::read_uvfits()</a>, <a class="el" href="uvw__utilities_8cc_source.html#l00136">purify::utilities::read_visibility()</a>, and <a class="el" href="logging_8h_source.html#l00137">purify::logging::set_level()</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <div class="ttc" id="anamespacepurify_1_1pfitsio_html_a4c0c4a69590d4d6e31eb99261dab097f"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#a4c0c4a69590d4d6e31eb99261dab097f">purify::pfitsio::read_uvfits</a></div><div class="ttdeci">utilities::vis_params read_uvfits(const std::string &amp;filename, const bool flag, const stokes pol)</div><div class="ttdoc">Read uvfits file.</div><div class="ttdef"><b>Definition:</b> <a href="purify_2uvfits_8cc_source.html#l00049">uvfits.cc:49</a></div></div>
 <div class="ttc" id="acasa_8cc_html_a2f04a5b42b147fe2ac9c62e73fa66364"><div class="ttname"><a href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a></div><div class="ttdeci">#define CHECK(CONDITION, ERROR)</div><div class="ttdef"><b>Definition:</b> <a href="casa_8cc_source.html#l00006">casa.cc:6</a></div></div>
-<div class="ttc" id="anamespacepurify_1_1logging_html_a46c69647ca4c2d4fe100e50884d6b442"><div class="ttname"><a href="namespacepurify_1_1logging.html#a46c69647ca4c2d4fe100e50884d6b442">purify::logging::set_level</a></div><div class="ttdeci">void set_level(std::string const &amp;, std::string const &amp;)</div><div class="ttdoc">Sets logging level.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8disabled_8h_source.html#l00016">logging.disabled.h:16</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1notinstalled_html_adf7cca24a1b2c8df495b8c2aadbc61f8"><div class="ttname"><a href="namespacepurify_1_1notinstalled.html#adf7cca24a1b2c8df495b8c2aadbc61f8">purify::notinstalled::atca_filename</a></div><div class="ttdeci">std::string atca_filename(std::string const &amp;filename)</div><div class="ttdoc">Specific atca data.</div><div class="ttdef"><b>Definition:</b> <a href="directories_8in_8h_source.html#l00044">directories.in.h:44</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1constant_html_a289e794ad6812bcd3de2fdcc68dfb01b"><div class="ttname"><a href="namespacepurify_1_1constant.html#a289e794ad6812bcd3de2fdcc68dfb01b">purify::constant::c</a></div><div class="ttdeci">const t_real c</div><div class="ttdoc">speed of light in vacuum</div><div class="ttdef"><b>Definition:</b> <a href="types_8h_source.html#l00060">types.h:60</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1utilities_html_ad4492cfc4a58430ffa09a7c002db7988"><div class="ttname"><a href="namespacepurify_1_1utilities.html#ad4492cfc4a58430ffa09a7c002db7988">purify::utilities::read_visibility</a></div><div class="ttdeci">utilities::vis_params read_visibility(const std::vector&lt; std::string &gt; &amp;names, const bool w_term)</div><div class="ttdoc">Read visibility files from name of vector.</div><div class="ttdef"><b>Definition:</b> <a href="uvw__utilities_8cc_source.html#l00136">uvw_utilities.cc:136</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1read__measurements_html_acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a"><div class="ttname"><a href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">purify::read_measurements::format::vis</a></div><div class="ttdeci">@ vis</div></div>
+<div class="ttc" id="anamespacepurify_1_1logging_html_ad63e2000541a28446b87e82485638415"><div class="ttname"><a href="namespacepurify_1_1logging.html#ad63e2000541a28446b87e82485638415">purify::logging::set_level</a></div><div class="ttdeci">void set_level(const std::string &amp;level)</div><div class="ttdoc">Method to set the logging level of the default Log object.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8h_source.html#l00137">logging.h:137</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1read__measurements_html_acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf"><div class="ttname"><a href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">purify::read_measurements::format::uvfits</a></div><div class="ttdeci">@ uvfits</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

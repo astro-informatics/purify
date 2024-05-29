@@ -1,20 +1,11 @@
 var searchData=
 [
-  ['fb_5ffactory_828',['fb_factory',['../namespacepurify_1_1factory.html#af720ee0908263812ee6f16b8cc3cb35f',1,'purify::factory']]],
-  ['field_5fids_829',['field_ids',['../classpurify_1_1casa_1_1MeasurementSet_1_1ChannelWrapper.html#a1fa7d891f0d3ae941e541405078a055e',1,'purify::casa::MeasurementSet::ChannelWrapper']]],
-  ['file_5fexists_830',['file_exists',['../namespacepurify_1_1read__measurements.html#a58ca8b3a5ff4855f72be8729145d3f54',1,'purify::read_measurements::file_exists()'],['../namespacepurify_1_1utilities.html#aa251252a271965c9568d3f3bd8e37259',1,'purify::utilities::file_exists()']]],
-  ['filename_831',['filename',['../classpurify_1_1casa_1_1MeasurementSet.html#a0fb9da315482c39ed3490bf2bfa244d4',1,'purify::casa::MeasurementSet::filename() const'],['../classpurify_1_1casa_1_1MeasurementSet.html#a18d5649b6f6ee6a6a0f6f2464e09a35b',1,'purify::casa::MeasurementSet::filename(std::string const &amp;filename)']]],
-  ['filter_5fand_5fcombine_832',['filter_and_combine',['../namespacepurify_1_1pfitsio.html#a1b1e9a6eadf27865a78d93bba2f6e657',1,'purify::pfitsio']]],
-  ['finalize_833',['Finalize',['../classNullReporter.html#a39c2e27e5376f904fd6a0b63ed5c3291',1,'NullReporter']]],
-  ['fit_5ffwhm_834',['fit_fwhm',['../namespacepurify_1_1utilities.html#a2cfb96bc5695fb0394bab0d55ee1389d',1,'purify::utilities']]],
-  ['fourier_5fwproj_5fkernel_835',['fourier_wproj_kernel',['../namespacepurify_1_1projection__kernels.html#abf118d404395c7699556217d0474950e',1,'purify::projection_kernels']]],
-  ['fov_5fcosine_836',['fov_cosine',['../namespacepurify_1_1widefield.html#a1ea24a256a7408ced82c19ac8afb2de9',1,'purify::widefield']]],
-  ['fov_5fcosines_837',['fov_cosines',['../namespacepurify_1_1wproj__utilities.html#a55409e6c696934e139f47f0930285538',1,'purify::wproj_utilities']]],
-  ['frequencies_838',['frequencies',['../classpurify_1_1casa_1_1MeasurementSet_1_1ChannelWrapper.html#aff1613d2e38707692e277f8e5b1f3352',1,'purify::casa::MeasurementSet::ChannelWrapper']]],
-  ['ft_5fgaussian_839',['ft_gaussian',['../namespacepurify_1_1kernels.html#afd78fa880a5c40cc7d98d741efedea1d',1,'purify::kernels']]],
-  ['ft_5fgaussian_5fgeneral_840',['ft_gaussian_general',['../namespacepurify_1_1kernels.html#a539e03adfcf4e7bc963e8282a722940e',1,'purify::kernels']]],
-  ['ft_5fkaiser_5fbessel_841',['ft_kaiser_bessel',['../namespacepurify_1_1kernels.html#a2703c3d44226204c45f3219cc890edef',1,'purify::kernels']]],
-  ['ft_5fkaiser_5fbessel_5fgeneral_842',['ft_kaiser_bessel_general',['../namespacepurify_1_1kernels.html#afdc7151c592c299ad32241b9af5465e9',1,'purify::kernels']]],
-  ['ft_5fpill_5fbox_843',['ft_pill_box',['../namespacepurify_1_1kernels.html#abe1d622ce6528a7ca83d509943503d22',1,'purify::kernels']]],
-  ['ft_5fpswf_844',['ft_pswf',['../namespacepurify_1_1kernels.html#a8c6fa490c8163e98471c720580b71c49',1,'purify::kernels']]]
+  ['effective_5fnoise_5fbandwidth_841',['effective_noise_bandwidth',['../classpurify_1_1casa_1_1MeasurementSet_1_1ChannelWrapper.html#ab29808c0d2b0fdaa5668e74692a768db',1,'purify::casa::MeasurementSet::ChannelWrapper']]],
+  ['end_842',['end',['../classpurify_1_1casa_1_1MeasurementSet.html#a3208a43dc081294ece6d817dd37d252b',1,'purify::casa::MeasurementSet']]],
+  ['equal_5fdistribution_843',['equal_distribution',['../namespacepurify_1_1distribute.html#a7c0aef9bb156212fd92deaaa148510fc',1,'purify::distribute']]],
+  ['equivalent_5fmiriad_5fcell_5fsize_844',['equivalent_miriad_cell_size',['../namespacepurify_1_1widefield.html#a82b596930b7b3276261dd85917942388',1,'purify::widefield']]],
+  ['estimate_5fcell_5fsize_845',['estimate_cell_size',['../namespacepurify_1_1widefield.html#afa5d4920d752c25aa211d50635a87b8d',1,'purify::widefield']]],
+  ['estimate_5fsample_5fdensity_846',['estimate_sample_density',['../namespacepurify_1_1widefield.html#acf25154b6d23077e6aee75f8c4dc16c9',1,'purify::widefield']]],
+  ['exact_5fw_5fprojection_5fintegration_847',['exact_w_projection_integration',['../namespacepurify_1_1projection__kernels.html#a3363eb7199ce493e3b828292c7ece53a',1,'purify::projection_kernels']]],
+  ['exact_5fw_5fprojection_5fintegration_5f1d_848',['exact_w_projection_integration_1d',['../namespacepurify_1_1projection__kernels.html#a1268ba056206a35e13d2faad51da6990',1,'purify::projection_kernels']]]
 ];

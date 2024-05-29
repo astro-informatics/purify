@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['measurementset_619',['MeasurementSet',['../classpurify_1_1casa_1_1MeasurementSet.html',1,'purify::casa']]]
+  ['log_640',['Log',['../classpurify_1_1logging_1_1Log.html',1,'purify::logging']]]
 ];

@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['sparse_1106',['Sparse',['../namespacepurify.html#ae523b7b9a1588d740b890c191ed57fd4',1,'purify']]],
-  ['sparsevector_1107',['SparseVector',['../namespacepurify.html#a44aec0b43fdac82a0b6cc20b6280e355',1,'purify']]],
-  ['spdlogptr_1108',['spdlogPtr',['../logging_8enabled_8h.html#aa9892412af755840eb432b2132a55122',1,'logging.enabled.h']]]
+  ['pointer_1136',['pointer',['../classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html#aa14fc508f069b9dd36a4530d4a92735a',1,'purify::casa::MeasurementSet::const_iterator']]]
 ];

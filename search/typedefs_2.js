@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['reference_1105',['reference',['../classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html#a33cf13daf3828016b23bcab1a1bd791a',1,'purify::casa::MeasurementSet::const_iterator']]]
+  ['levelmap_1134',['LevelMap',['../classpurify_1_1logging_1_1Log.html#a89a7fff30095efef77bdb6d6c8a3c83a',1,'purify::logging::Log']]],
+  ['logmap_1135',['LogMap',['../classpurify_1_1logging_1_1Log.html#a22fe1ec0a90939dff3bbbcc0810242d1',1,'purify::logging::Log']]]
 ];

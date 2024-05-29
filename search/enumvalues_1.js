@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['chebyshev_1131',['chebyshev',['../namespacepurify_1_1wproj__utilities_1_1expansions.html#a92334b90f8de8f723450b3aca72d9e74a172e4ecb02a864e1e4aa51dcce9d8a47',1,'purify::wproj_utilities::expansions']]]
+  ['box_1163',['box',['../namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a34be958a921e43d813a2075297d8e862',1,'purify::kernels']]]
 ];
