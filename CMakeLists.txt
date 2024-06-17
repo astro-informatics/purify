@@ -57,15 +57,19 @@ if(tests)  # Adds ctest
   include(AddCatchTest)
 endif()
 
+if(tests OR examples)
+  file(COPY data DESTINATION .)
+endif()
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-command-line-argument")
 
 if(tests AND coverage)
   # Enable code coverage.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-	# Build with debugging information to make the output meaningful.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-	# Disable optimizations to get the most accurate results.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+  # Build with debugging information to make the output meaningful.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+  # Disable optimizations to get the most accurate results.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 endif()
 
 if(benchmarks)
