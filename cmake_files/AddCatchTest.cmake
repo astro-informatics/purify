@@ -97,7 +97,7 @@ function(add_catch_test testname)
   endif()
   if(NOT catch_NOTEST)
     add_catch_test_with_seed(
-      test_${testname} "test_${testname}" "${catch_SEED}" ${catch_UNPARSED_ARGUMENTS}
+      test_${testname} "./test_${testname}" "${catch_SEED}" ${catch_UNPARSED_ARGUMENTS}
       ${catch_NOCATCHLABEL} WORKING_DIRECTORY ${catch_WORKING_DIRECTORY}
       LABELS ${catch_LABELS} ARGUMENTS ${catch_ARGUMENTS}
     )
