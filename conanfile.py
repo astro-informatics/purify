@@ -5,14 +5,14 @@ import os
 
 class PurifyConan(ConanFile):
     name = "purify"
-    version = "3.0.1"
+    version = "4.1.0"
     url = "https://github.com/astro-informatics/purify"
     license = "GPL-2.0"
     description = "PURIFY is an open-source collection of routines written in C++ available under the license below. It implements different tools and high-level to perform radio interferometric imaging, i.e. to recover images from the Fourier measurements taken by radio interferometric telescopes."
 
 
     settings = "os", "compiler", "build_type", "arch"
-    requires = ["fftw/3.3.9", "eigen/3.4.0","catch2/3.4.0","benchmark/1.8.2","yaml-cpp/0.7.0", "boost/1.82.0", "cfitsio/4.2.0", "sopt/4.0.0"]
+    requires = ["fftw/3.3.9", "eigen/3.4.0","catch2/3.4.0","benchmark/1.8.2","yaml-cpp/0.7.0", "boost/1.82.0", "cfitsio/4.2.0", "sopt/4.1.0"]
     #generators = "CMakeDeps"
     exports_sources = "cpp/*", "cmake_files/*", "CMakeLists.txt"
     options = {"docs":['on','off'],
