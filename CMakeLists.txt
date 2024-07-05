@@ -51,16 +51,6 @@ if(NOT PURIFY_OPENMP)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 endif()
 
-if(tests)  # Adds ctest
-  enable_testing()
-  find_package(Catch2)
-  include(AddCatchTest)
-endif()
-
-if(tests OR examples)
-  file(COPY data DESTINATION .)
-endif()
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-command-line-argument")
 
 if(tests AND coverage)

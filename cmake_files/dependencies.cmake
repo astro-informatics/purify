@@ -17,7 +17,7 @@ else()
   message(FATAL_ERROR "Eigen is required")
 endif()
 
-find_package(CFitsIO MODULE REQUIRED)
+find_package(CFitsIO REQUIRED)
 
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
@@ -45,15 +45,24 @@ if(docs)
   find_package(Doxygen REQUIRED dot)
 endif()
 
+if(tests)  # Adds ctest
+  enable_testing()
+  find_package(Catch2)
+  include(AddCatchTest)
+endif()
+
 if(examples)
   find_package(TIFF REQUIRED)
+endif()
+
+if(tests OR examples)
+  file(COPY data DESTINATION .)
 endif()
 
 if(benchmarks)
   find_package(benchmark REQUIRED)
   include(AddBenchmark)
 endif()
-
 
 if(cppflow)
   find_package(cppflow)
