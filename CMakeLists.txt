@@ -72,11 +72,6 @@ if(tests AND coverage)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 endif()
 
-if(benchmarks)
-  set(GBenchmark_GIT_TAG "v1.3.0")
-  include(AddBenchmark)
-endif()
-
 add_subdirectory(cpp)
 
 

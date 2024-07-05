@@ -49,6 +49,11 @@ if(examples)
   find_package(TIFF REQUIRED)
 endif()
 
+if(benchmarks)
+  find_package(benchmark REQUIRED)
+  include(AddBenchmark)
+endif()
+
 
 if(cppflow)
   find_package(cppflow)
