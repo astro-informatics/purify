@@ -61,7 +61,7 @@ endif()
 
 if(benchmarks)
   find_package(benchmark REQUIRED)
-  include(AddBenchmark)
+  #include(AddBenchmark)
 endif()
 
 if(cppflow)
