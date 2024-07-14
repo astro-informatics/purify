@@ -88,7 +88,7 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
       auto algo = algo_weak.lock();
       if (algo->gamma() > 0) {
         PURIFY_MEDIUM_LOG("Step size γ {}", algo->gamma());
-        Vector<T> const alpha = algo->g_proximal()->Psi().adjoint() * x;
+        Vector<T> const alpha = algo->Psi().adjoint() * x;
         const t_real new_gamma = alpha.real().cwiseAbs().maxCoeff() * step_size_scale;
         PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
         // updating parameter
