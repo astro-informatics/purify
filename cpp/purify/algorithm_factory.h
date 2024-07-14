@@ -19,11 +19,14 @@
 #include <sopt/imaging_padmm.h>
 #include <sopt/imaging_primal_dual.h>
 #include <sopt/joint_map.h>
-#include <sopt/l1_g_proximal.h>
+#include <sopt/l1_non_diff_function.h>
 #include <sopt/relative_variation.h>
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
+#include <sopt/non_differentiable_func.h>
+#include <sopt/real_indicator.h>
+#include <sopt/differentiable_func.h>
 #ifdef PURIFY_CPPFLOW
 #include <sopt/tf_g_proximal.h>
 #endif
@@ -32,7 +35,7 @@ namespace purify {
 namespace factory {
 enum class algorithm { padmm, primal_dual, sdmm, forward_backward };
 enum class algo_distribution { serial, mpi_serial, mpi_distributed, mpi_random_updates };
-enum class g_proximal_type { L1GProximal, TFGProximal };
+enum class g_proximal_type { L1GProximal, TFGProximal, Indicator };
 const std::map<std::string, algo_distribution> algo_distribution_string = {
     {"none", algo_distribution::serial},
     {"serial-equivalent", algo_distribution::mpi_serial},
@@ -161,7 +164,8 @@ fb_factory(const algo_distribution dist,
            const bool tight_frame = false, const t_real relative_variation = 1e-3,
            const t_real l1_proximal_tolerance = 1e-2, const t_uint maximum_proximal_iterations = 50,
            const t_real op_norm = 1, const std::string model_path = "",
-           const g_proximal_type g_proximal = g_proximal_type::L1GProximal) {
+           const g_proximal_type g_proximal = g_proximal_type::L1GProximal,
+           std::shared_ptr<DifferentiableFunc<typename Algorithm::Scalar>> f_function = nullptr) {
   typedef typename Algorithm::Scalar t_scalar;
   if (sara_size > 1 and tight_frame)
     throw std::runtime_error(
@@ -177,7 +181,8 @@ fb_factory(const algo_distribution dist,
       .nu(op_norm * op_norm)
       .Phi(*measurements);
 
-  std::shared_ptr<GProximal<t_scalar>> gp;
+  if(f_function) fb->f_function(f_function);  // only override f_function default if non-null
+  std::shared_ptr<NonDifferentiableFunc<t_scalar>> g;
 
   switch (g_proximal) {
   case (g_proximal_type::L1GProximal): {
@@ -197,25 +202,30 @@ fb_factory(const algo_distribution dist,
       l1_gp->l1_proximal_direct_space_comm(comm);
     }
 #endif
-    gp = l1_gp;
+    g = l1_gp;
     break;
   }
   case (g_proximal_type::TFGProximal): {
 #ifdef PURIFY_CPPFLOW
     // Create a shared pointer to an instance of the TFGProximal class
-    gp = std::make_shared<sopt::algorithm::TFGProximal<t_scalar>>(model_path);
+    g = std::make_shared<sopt::algorithm::TFGProximal<t_scalar>>(model_path);
     break;
 #else
     throw std::runtime_error(
         "Type TFGProximal not recognized because purify was built with cppflow=off");
 #endif
   }
+  case (g_proximal_type::Indicator):
+  {
+    g = std::make_shared<RealIndicator<t_scalar>>();
+    break;
+  }
   default: {
     throw std::runtime_error("Type of g_proximal operator not recognised.");
   }
   }
 
-  fb->g_proximal(gp);
+  fb->g_function(g);
 
   switch (dist) {
   case (algo_distribution::serial): {
