@@ -35,27 +35,6 @@ jobs:
             sed -i -e 's/^.*FFTW3LibraryDepends.cmake.*$//1' ${{github.workspace}}/build/lib*/cmake/*/FFTW3Config.cmake
             cd -
 
-      - name: Install Tensorflow API on Ubuntu
-        uses: UCL/install-tensorflow-action@main
-        with:
-          version: 2.11.0
-          os: linux
-
-      - name: Checkout cppflow repo
-        uses: actions/checkout@v3
-        with:
-          repository: UCL/cppflow.git
-          path: cppflow
-          ref: master
-
-      - name: Create cppflow package
-        run: |
-          mkdir cppflow/build
-          cd cppflow/build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${PWD}
-          #cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build
-          make -j$(nproc --ignore 1) install
-
       - name: Checkout SOPT
         uses: actions/checkout@v3
         with:
@@ -65,31 +44,23 @@ jobs:
 
       - name: Create SOPT package
         run : |
-          export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
           #export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
           export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
           #export CMAKE_PREFIX_PATH=${{github.workspace}}/build/lib/cmake:$CMAKE_PREFIX_PATH
           mkdir sopt/build
           cd sopt/build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddocasa=OFF -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dcppflow=ON
-          #cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dcppflow=ON
+          cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddocasa=OFF -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF
           make -j$(nproc --ignore 1) install
 
       - name: Configure
         run: |
-          export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
           export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
           mkdir -p ${{github.workspace}}/build
           cd ${{github.workspace}}/build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON -Dcppflow=ON
+          cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON
 
       - name: Build
         run: |
-          export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
-          ##export CMAKE_PREFIX_PATH=${{github.workspace}}/fftw-3.3.10/build/lib/cmake:$CMAKE_PREFIX_PATH
-          #export CMAKE_PREFIX_PATH=${{github.workspace}}/fftw-3.3.10/build:$CMAKE_PREFIX_PATH
-          #export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
-          ##export CMAKE_PREFIX_PATH=${{github.workspace}}/sopt/build:$CMAKE_PREFIX_PATH
           export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
           cd ${{github.workspace}}/build
           make -j$(nproc --ignore 1) install
