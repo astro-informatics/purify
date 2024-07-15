@@ -24,7 +24,7 @@
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#ifdef PURIFY_CPPFLOW
+#ifdef PURIFY_ONNXRT
 #include <sopt/tf_g_proximal.h>
 #endif
 
