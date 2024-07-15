@@ -25,7 +25,7 @@ class PurifyConan(ConanFile):
                "af": ['on', 'off'],
                "cimg": ['on','off'],
                "docasa": ['on','off'],
-               "cppflow": ['on', 'off']}
+               "onnxrt": ['on', 'off']}
     default_options = {"docs": 'off',
                        "examples":'off',
                        "tests": 'on',
@@ -36,11 +36,11 @@ class PurifyConan(ConanFile):
                        "af": 'off',
                        "cimg": 'off',
                        "docasa": 'on',
-                       "cppflow": 'off'}
+                       "onnxrt": 'off'}
 
     def configure(self):
 
-        self.options["sopt"].cppflow = self.options.cppflow
+        self.options["sopt"].onnxrt = self.options.onnxrt
         self.options["sopt"].dompi = self.options.dompi
         self.options["sopt"].openmp = self.options.openmp
         # When building the sopt package, switch off sopt tests and examples,
@@ -67,8 +67,9 @@ class PurifyConan(ConanFile):
         if self.options.cimg == 'on':
             self.requires("cimg/3.0.2")
 
-        if self.options.cppflow == 'on':
-            self.requires("cppflow/2.0.0")
+        if self.options.onnxrt == 'on':
+            self.requires("onnxruntime/1.16.3")
+
 
     def generate(self):
         tc = CMakeToolchain(self)
@@ -83,7 +84,7 @@ class PurifyConan(ConanFile):
         tc.cache_variables['doaf'] = self.options.af
         tc.cache_variables['docimg'] = self.options.cimg
         tc.cache_variables['docasa'] = self.options.docasa
-        tc.cache_variables['cppflow'] = self.options.cppflow
+        tc.cache_variables['onnxrt'] = self.options.onnxrt
 
         # List cases where we don't use ccache
         if ('GITHUB_ACTIONS' in os.environ.keys() and self.options.docs == 'off'):

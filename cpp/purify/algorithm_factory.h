@@ -201,13 +201,13 @@ fb_factory(const algo_distribution dist,
     break;
   }
   case (g_proximal_type::TFGProximal): {
-#ifdef PURIFY_CPPFLOW
+#ifdef PURIFY_ONNXRT
     // Create a shared pointer to an instance of the TFGProximal class
     gp = std::make_shared<sopt::algorithm::TFGProximal<t_scalar>>(model_path);
     break;
 #else
     throw std::runtime_error(
-        "Type TFGProximal not recognized because purify was built with cppflow=off");
+        "Type TFGProximal not recognized because purify was built with onnxrt=off");
 #endif
   }
   default: {

@@ -49,12 +49,6 @@ if(examples)
   find_package(TIFF REQUIRED)
 endif()
 
-
-if(cppflow)
-  find_package(cppflow)
-  find_library(TENSORFLOW_LIB tensorflow REQUIRED)
-endif()
-
 # Always find open-mp, since it may be used by sopt
 if (openmp)
   find_package(OpenMP)
@@ -100,11 +94,10 @@ if(docasa)
   set(PURIFY_CASACORE TRUE)
 endif()
 
-set(PURIFY_CPPFLOW FALSE)
-if(cppflow)
-  find_package(cppflow)
-  find_library(TENSORFLOW_LIB tensorflow REQUIRED)
-  set(PURIFY_CPPFLOW TRUE)
+set(PURIFY_ONNXRT FALSE)
+if(onnxrt)
+  include(LookUpONNXRT)
+  set(PURIFY_ONNXRT TRUE)
 endif()
 
 # Add script to execute to make sure libraries in the build tree can be found
