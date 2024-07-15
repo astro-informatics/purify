@@ -6,7 +6,7 @@
 
 ## Description
 
-**PURIFY** is an open-source collection of routines written in `C++` available under the [license](#license) below. It implements different tools and high-level to perform radio interferometric imaging, _i.e._ to recover images from the Fourier measurements taken by radio interferometric telescopes. 
+**PURIFY** is an open-source collection of routines written in `C++` available under the [license](#license) below. It implements different tools and high-level to perform radio interferometric imaging, _i.e._ to recover images from the Fourier measurements taken by radio interferometric telescopes.
 
 **PURIFY** leverages recent developments in the field of compressive sensing and convex optimization. Low-level functionality to solve the resulting convex optimisation is factored into the open-source companion code, [**SOPT**](https://github.com/astro-informatics/sopt), also written by the authors of **PURIFY**. For further background please see the [reference](#references-and-citation) section.
 
@@ -86,7 +86,7 @@ C++ dependencies as well as the **PURIFY** installation:
 You can turn the various options on and off by adding flags to the `conan install` command, e.g.
 
   ```bash
-  conan install .. -of . --build missing -o cppflow=on -o openmp=on -o mpi=off
+  conan install .. -of . --build missing -o onnxrt=on -o openmp=on -o mpi=off
   conan build .. -of .
   ```
 
@@ -118,25 +118,17 @@ On MacOS, you can also install most of the dependencies with Homebrew e.g.
  ```
 
 
-### TensorFlow support
+### Machine-learning models support
 
-The **SOPT** library includes an interface to TensorFlow for using trained models
+The **SOPT** library includes an interface to ONNXrt for using trained models
 as priors in the Forward-Backward optimization algorithm. To build **PURIFY** with
-TensorFlow capability, some extra steps are currently required.
-We aim to simplify the build process in a future release.
+ONNXrt capability, you need to enable `ONNXrt` support also in **SOPT**:
 
-1. Install the [TensorFlow C API](https://www.tensorflow.org/install/lang_c)
-1. Clone the UCL fork of `cppflow` and create a `conan` package using
-
-  ``` bash
-  git clone git@github.com:UCL/cppflow.git
-  conan create /path/to/cppflow/
-  ```
-1. Follow the nominal build instructions, making sure you enable the `cppflow`
+1. Follow the nominal build instructions, making sure you enable the `onnxrt`
   option when building **SOPT** ...
 
     ```bash
-    conan create /path/to/purify/sopt/ --build missing -o cppflow=on
+    conan create /path/to/purify/sopt/ --build missing -o onnxrt=on
     ```
 
 1. ... and **PURIFY**:
@@ -145,7 +137,7 @@ We aim to simplify the build process in a future release.
     cd /path/to/purify
     mkdir build
     cd build
-    conan install .. --build missing -o cppflow=on
+    conan install .. --build missing -o onnrt=on
     conan build ..
     ```
 
