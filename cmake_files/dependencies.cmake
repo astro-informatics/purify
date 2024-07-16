@@ -24,6 +24,14 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
 find_package(sopt REQUIRED)
+set(PURIFY_ONNXRT FALSE)
+if (onnxrt)
+  if (${sopt_HAS_ORT})
+    set(PURIFY_ONNXRT TRUE)
+  else()
+    message(FATAL_ERROR "SOPT built without ONNXrt support")
+  endif()
+endif()
 
 find_package(Cubature QUIET)
 if(NOT Cubature_FOUND)
@@ -92,12 +100,6 @@ if(docasa)
     set(PURIFY_CASACORE_LOOKUP TRUE)
   endif()
   set(PURIFY_CASACORE TRUE)
-endif()
-
-set(PURIFY_ONNXRT FALSE)
-if(onnxrt)
-  include(LookUpONNXRT)
-  set(PURIFY_ONNXRT TRUE)
 endif()
 
 # Add script to execute to make sure libraries in the build tree can be found

@@ -26,7 +26,6 @@ add_include_dir(
 )
 
 
-message(STATUS "Cubature_LIBRARY_DIR=${Cubature_LIBRARY_DIR}")
 link_directories(${FFTW3_LIBRARY_DIRS} ${YAML_CPP_LIBRARY_DIR} ${Cubature_LIBRARY_DIR})
 add_subdirectory(purify)
 if(tests OR examples OR benchmarks)
