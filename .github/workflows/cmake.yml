@@ -94,35 +94,35 @@ jobs:
         git clone https://github.com/catchorg/Catch2.git -b v3.4.0
         mkdir Catch2/build
         cd Catch2/build
-        cmake .. -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${PWD}
+        cmake .. -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local
         make -j$(nproc --ignore 1) install
         cd -
         wget --no-check-certificate --no-verbose http://www.fftw.org/fftw-3.3.10.tar.gz -O- | tar --no-same-owner -xz;
         cd fftw-3.3.10
-        ./configure --prefix=${{github.workspace}}/build --enable-shared
+        ./configure --prefix=${{github.workspace}}/local --enable-shared
         make -j$(nproc --ignore 1) install CFLAGS=-fPIC
         # Fix bug in FFT3 (cf. https://github.com/FFTW/fftw3/issues/332)
-        sed -i -e 's/^.*FFTW3LibraryDepends.cmake.*$//1' ${{github.workspace}}/build/lib*/cmake/*/FFTW3Config.cmake
+        sed -i -e 's/^.*FFTW3LibraryDepends.cmake.*$//1' ${{github.workspace}}/local/lib*/cmake/*/FFTW3Config.cmake
         cd -
 
     - name: Install Dependencies on MacOS
       if: ${{ contains(matrix.os, 'macos') }}
       run: |
-        brew install gcc libtiff open-mpi libomp eigen libyaml ccache cfitsio
+        brew install gcc libtiff open-mpi libomp eigen libyaml ccache cfitsio boost
         echo "CMAKE_PREFIX_PATH=/opt/homebrew/opt/libomp" >> $GITHUB_ENV
         echo "/opt/homebrew/opt/ccache/libexec" >> $GITHUB_PATH
         git clone https://github.com/catchorg/Catch2.git -b v3.4.0
         mkdir Catch2/build
         cd Catch2/build
-        cmake .. -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${PWD}
+        cmake .. -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local
         make -j$(nproc --ignore 1) install
         cd -
         wget --no-check-certificate --no-verbose http://www.fftw.org/fftw-3.3.10.tar.gz -O- | tar --no-same-owner -xz;
         cd fftw-3.3.10
-        ./configure --prefix=${{github.workspace}}/build --enable-shared
+        ./configure --prefix=${{github.workspace}}/local --enable-shared
         make -j$(nproc --ignore 1) install CFLAGS=-fPIC
         # Fix bug in FFT3 (cf. https://github.com/FFTW/fftw3/issues/332)
-        sed -i -e 's/^.*FFTW3LibraryDepends.cmake.*$//1' ${{github.workspace}}/build/lib*/cmake/*/FFTW3Config.cmake
+        sed -i -e 's/^.*FFTW3LibraryDepends.cmake.*$//1' ${{github.workspace}}/local/lib*/cmake/*/FFTW3Config.cmake
         cd -
 
     - name: Select Python 3.10
@@ -159,29 +159,29 @@ jobs:
 
     - name: Build sopt
       run: |
-        export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
-        export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
+        export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
+        #export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
         mkdir -p ${{github.workspace}}/sopt/build
         cd ${{github.workspace}}/sopt/build
-        cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}}
+        cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}}
         make -j$(nproc --ignore 1) install
 
 
     - name: Install
       # Build your program with the given configuration
       run: |
-        export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
-        export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
-        export CMAKE_PREFIX_PATH=${{github.workspace}}/sopt/build:$CMAKE_PREFIX_PATH
+        export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
+        #export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
+        #export CMAKE_PREFIX_PATH=${{github.workspace}}/sopt/build:$CMAKE_PREFIX_PATH
         mkdir -p ${{github.workspace}}/build
         cd ${{github.workspace}}/build
-        cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${PWD} -Ddocasa=OFF -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}}
+        cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Ddocasa=OFF -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}}
         make -j$(nproc --ignore 1) install
 
     - name: Test
-      working-directory: ${{github.workspace}}/build
+      working-directory: ${{github.workspace}}/local
       # Execute tests defined by the CMake configuration.
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: |
-        export LD_LIBRARY_PATH=${{github.workspace}}/build/external/lib:${LD_LIBRARY_PATH}
+        export LD_LIBRARY_PATH=${{github.workspace}}/local:${LD_LIBRARY_PATH}
         ctest -C ${{env.BUILD_TYPE}} --output-on-failure
