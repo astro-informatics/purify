@@ -161,7 +161,7 @@ jobs:
       run: |
         export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
         export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
-        mkdir ${{github.workspace}}/sopt/build
+        mkdir -p ${{github.workspace}}/sopt/build
         cd ${{github.workspace}}/sopt/build
         cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}}
         make -j$(nproc --ignore 1) install
@@ -173,7 +173,7 @@ jobs:
         export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
         export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
         export CMAKE_PREFIX_PATH=${{github.workspace}}/sopt/build:$CMAKE_PREFIX_PATH
-        mkdir ${{github.workspace}}/build
+        mkdir -p ${{github.workspace}}/build
         cd ${{github.workspace}}/build
         cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${PWD} -Ddocasa=OFF -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}}
         make -j$(nproc --ignore 1) install
