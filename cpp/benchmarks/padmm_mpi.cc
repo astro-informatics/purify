@@ -83,7 +83,6 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
                            saraDistr.size()) *
       1e-3;
   gamma = m_world.all_reduce(gamma, MPI_MAX);
-
   std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm =
       std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(m_uv_data.vis);
   padmm->itermax(state.range(3) + 1)
@@ -95,7 +94,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
       .tight_frame(false)
       .l1_proximal_tolerance(1e-2)
       .l1_proximal_nu(1)
-      .l1_proximal_itermax(2)
+      .l1_proximal_itermax(3)
       .l1_proximal_positivity_constraint(true)
       .l1_proximal_real_constraint(true)
       .residual_tolerance(m_epsilon)
@@ -142,7 +141,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
       .tight_frame(false)
       .l1_proximal_tolerance(1e-2)
       .l1_proximal_nu(1)
-      .l1_proximal_itermax(2)
+      .l1_proximal_itermax(3)
       .l1_proximal_positivity_constraint(true)
       .l1_proximal_real_constraint(true)
       .residual_tolerance(m_epsilon)
@@ -156,6 +155,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
       factory::l2_convergence_factory<t_complex>(factory::ConvergenceType::mpi_local, padmm_weak));
   padmm->objective_convergence(
       factory::l1_convergence_factory<t_complex>(factory::ConvergenceType::mpi_local, padmm_weak));
+
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
@@ -168,6 +168,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo1)
     //->Apply(b_utilities::Arguments)
+    ->Args({256, static_cast<t_int>(1e5), 4, 10, 1})
     ->Args({1024, static_cast<t_int>(1e6), 4, 10, 1})
     ->Args({1024, static_cast<t_int>(5e6), 4, 10, 1})
     ->Args({1024, static_cast<t_int>(1e7), 4, 10, 1})
@@ -176,11 +177,13 @@ BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo1)
     ->Args({1024, static_cast<t_int>(5e8), 4, 10, 1})
     //->Args({128, 1000, 4})
     ->UseManualTime()
-    ->Repetitions(3)  //->ReportAggregatesOnly(true)
+    ->Repetitions(3)
+    ->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo3)
     //->Apply(b_utilities::Arguments)
+    ->Args({256, static_cast<t_int>(1e5), 4, 10, 3})
     ->Args({1024, static_cast<t_int>(1e6), 4, 10, 3})
     ->Args({1024, static_cast<t_int>(5e6), 4, 10, 3})
     ->Args({1024, static_cast<t_int>(1e7), 4, 10, 3})
@@ -189,5 +192,6 @@ BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo3)
     ->Args({1024, static_cast<t_int>(5e8), 4, 10, 3})
     //->Args({128, 1000, 4})
     ->UseManualTime()
-    ->Repetitions(3)  //->ReportAggregatesOnly(true)
+    ->Repetitions(3)
+    ->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
