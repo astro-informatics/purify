@@ -30,6 +30,7 @@
 
 #include <string>
 #include <tuple>
+#include <cstdint>
 
 namespace purify {
 //! Returns library version
