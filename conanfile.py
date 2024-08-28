@@ -12,7 +12,7 @@ class PurifyConan(ConanFile):
 
 
     settings = "os", "compiler", "build_type", "arch"
-    requires = ["fftw/3.3.9", "eigen/3.4.0","catch2/3.4.0","benchmark/1.8.2","yaml-cpp/0.7.0", "boost/1.82.0", "cfitsio/4.2.0", "sopt/4.1.0"]
+    requires = ["fftw/3.3.9", "eigen/3.4.0","catch2/3.4.0","benchmark/1.8.2","yaml-cpp/0.7.0", "boost/1.82.0", "cfitsio/4.2.0", "sopt/4.0.0"]
     #generators = "CMakeDeps"
     exports_sources = "cpp/*", "cmake_files/*", "CMakeLists.txt"
     options = {"docs":['on','off'],
