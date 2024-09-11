@@ -7,9 +7,6 @@ on:
     branches: [ development ]
     if: github.event.pull_request.draft == false
 
-env:
-  USE_CONAN: 0
-
 jobs:
   make-documentation:
     runs-on: ubuntu-20.04
@@ -23,52 +20,20 @@ jobs:
       - name: Install dependencies
         run: |
             sudo apt update
-            sudo apt install openmpi-bin libopenmpi-dev ccache casacore-dev doxygen graphviz
-            if [[ "$USE_CONAN" = 1 ]]; then
-              pip install conan
-            else
-              sudo apt install libeigen3-dev libspdlog-dev libtiff-dev libcfitsio-dev
-              sudo apt install libbenchmark-dev libboost-all-dev libyaml-cpp-dev
-              git clone https://github.com/catchorg/Catch2.git -b v3.4.0
-              mkdir Catch2/build
-              cd Catch2/build
-              cmake .. -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build
-              make -j$(nproc --ignore 1) install
-              cd -
-              wget --no-check-certificate --no-verbose http://www.fftw.org/fftw-3.3.10.tar.gz -O- | tar --no-same-owner -xz;
-              cd fftw-3.3.10
-              ./configure --prefix=${{github.workspace}}/build --enable-shared
-              make -j$(nproc --ignore 1) install CFLAGS=-fPIC
-              # Fix bug in FFT3 (cf. https://github.com/FFTW/fftw3/issues/332)
-              sed -i -e 's/^.*FFTW3LibraryDepends.cmake.*$//1' ${{github.workspace}}/build/lib*/cmake/*/FFTW3Config.cmake
-              cd -
-            fi
-
-      - name: Install Tensorflow API on Ubuntu
-        uses: UCL/install-tensorflow-action@main
-        with:
-          version: 2.11.0
-          os: linux
-
-      - name: Checkout cppflow repo
-        uses: actions/checkout@v3
-        with:
-          repository: UCL/cppflow.git
-          path: cppflow
-          ref: master
-
-      - name: Create cppflow package
-        run: |
-          if [[ "USE_CONAN" = 1 ]]; then
-            conan detect profile
-            conan create ./cppflow -s compiler.cppstd=17
-          else
-            mkdir cppflow/build
-            cd cppflow/build
-            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD}
-            #cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build
+            sudo apt install openmpi-bin libopenmpi-dev ccache casacore-dev doxygen graphviz libeigen3-dev libspdlog-dev libtiff-dev libcfitsio-dev libbenchmark-dev libboost-all-dev libyaml-cpp-dev
+            git clone https://github.com/catchorg/Catch2.git -b v3.4.0
+            mkdir Catch2/build
+            cd Catch2/build
+            cmake .. -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build
             make -j$(nproc --ignore 1) install
-          fi
+            cd -
+            wget --no-check-certificate --no-verbose http://www.fftw.org/fftw-3.3.10.tar.gz -O- | tar --no-same-owner -xz;
+            cd fftw-3.3.10
+            ./configure --prefix=${{github.workspace}}/build --enable-shared
+            make -j$(nproc --ignore 1) install CFLAGS=-fPIC
+            # Fix bug in FFT3 (cf. https://github.com/FFTW/fftw3/issues/332)
+            sed -i -e 's/^.*FFTW3LibraryDepends.cmake.*$//1' ${{github.workspace}}/build/lib*/cmake/*/FFTW3Config.cmake
+            cd -
 
       - name: Checkout SOPT
         uses: actions/checkout@v3
@@ -79,48 +44,26 @@ jobs:
 
       - name: Create SOPT package
         run : |
-          if [[ "USE_CONAN" = 1 ]]; then
-            conan create ./sopt -s compiler.cppstd=17 --build missing -o dompi=off -o docasa=off -o openmp=off -o docs=off -o cppflow=on
-          else
-            export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
-            #export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
-            export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
-            #export CMAKE_PREFIX_PATH=${{github.workspace}}/build/lib/cmake:$CMAKE_PREFIX_PATH
-            mkdir sopt/build
-            cd sopt/build
-            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddocasa=OFF -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dcppflow=ON
-            #cmake .. -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dcppflow=ON
-            make -j$(nproc --ignore 1) install
-          fi
+          #export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
+          export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
+          #export CMAKE_PREFIX_PATH=${{github.workspace}}/build/lib/cmake:$CMAKE_PREFIX_PATH
+          mkdir sopt/build
+          cd sopt/build
+          cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddocasa=OFF -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF
+          make -j$(nproc --ignore 1) install
 
       - name: Configure
         run: |
-          if [[ "USE_CONAN" = 1 ]]; then
-            # Doxygen currently broken in Conan v1 and v2
-            #conan install doxygen/1.9.4@#2af713e135f12722e3536808017ba086 --update
-            conan install ${{github.workspace}} -if ${{github.workspace}}/build -s compiler.cppstd=17 --build missing -o docasa=off -o dompi=off -o openmp=off -o docs=on -o cppflow=on
-          else
-            export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
-            export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
-            mkdir -p ${{github.workspace}}/build
-            cd ${{github.workspace}}/build
-            cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON -Dcppflow=ON
-          fi
+          export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
+          mkdir -p ${{github.workspace}}/build
+          cd ${{github.workspace}}/build
+          cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON
 
       - name: Build
         run: |
-          if [[ "USE_CONAN" = 1 ]]; then
-            conan build ${{github.workspace}} -of ${{github.workspace}}/build -s compiler.cppstd=17 -o docasa=off -o dompi=off -o openmp=off -o docs=on -o cppflow=on
-          else
-            export CMAKE_PREFIX_PATH=${{github.workspace}}/cppflow/build:$CMAKE_PREFIX_PATH
-            ##export CMAKE_PREFIX_PATH=${{github.workspace}}/fftw-3.3.10/build/lib/cmake:$CMAKE_PREFIX_PATH
-            #export CMAKE_PREFIX_PATH=${{github.workspace}}/fftw-3.3.10/build:$CMAKE_PREFIX_PATH
-            #export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
-            ##export CMAKE_PREFIX_PATH=${{github.workspace}}/sopt/build:$CMAKE_PREFIX_PATH
-            export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
-            cd ${{github.workspace}}/build
-            make -j$(nproc --ignore 1) install
-          fi
+          export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
+          cd ${{github.workspace}}/build
+          make -j$(nproc --ignore 1) install
 
       - name: Deploy to GH pages
         if: ${{github.event_name == 'push'}}
