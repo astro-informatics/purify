@@ -55,7 +55,7 @@ jobs:
 
       - name: Create SOPT package
         run : |
-          export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
+          export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
           mkdir sopt/build
           cd sopt/build
           cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddocasa=OFF -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dtests=OFF -Dexamples=OFF
@@ -63,14 +63,14 @@ jobs:
 
       - name: Configure
         run: |
-          export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
+          export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
           mkdir -p ${{github.workspace}}/build
           cd ${{github.workspace}}/build
           cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON
 
       - name: Build
         run: |
-          export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
+          export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
           cd ${{github.workspace}}/build
           make -j$(nproc --ignore 1) install
 
