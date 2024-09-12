@@ -28,7 +28,7 @@
 #include <sopt/real_indicator.h>
 #include <sopt/differentiable_func.h>
 #ifdef PURIFY_CPPFLOW
-#include <sopt/tf_g_proximal.h>
+#include <sopt/tf_non_diff_function.h>
 #endif
 
 namespace purify {
@@ -206,13 +206,13 @@ fb_factory(const algo_distribution dist,
     break;
   }
   case (g_proximal_type::TFGProximal): {
-#ifdef PURIFY_CPPFLOW
+#ifdef PURIFY_ONNXRT
     // Create a shared pointer to an instance of the TFGProximal class
     g = std::make_shared<sopt::algorithm::TFGProximal<t_scalar>>(model_path);
     break;
 #else
     throw std::runtime_error(
-        "Type TFGProximal not recognized because purify was built with cppflow=off");
+        "Type TFGProximal not recognized because purify was built with onnxrt=off");
 #endif
   }
   case (g_proximal_type::Indicator):
