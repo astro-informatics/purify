@@ -22,12 +22,29 @@ jobs:
             sudo apt update
             sudo apt install openmpi-bin libopenmpi-dev ccache casacore-dev doxygen graphviz libeigen3-dev libspdlog-dev libtiff-dev libcfitsio-dev libbenchmark-dev libboost-all-dev libyaml-cpp-dev
             wget --no-check-certificate --no-verbose http://www.fftw.org/fftw-3.3.10.tar.gz -O- | tar --no-same-owner -xz;
-            cd fftw-3.3.10
-            ./configure --prefix=${{github.workspace}}/build --enable-shared
-            make -j$(nproc --ignore 1) install CFLAGS=-fPIC
-            # Fix bug in FFT3 (cf. https://github.com/FFTW/fftw3/issues/332)
-            sed -i -e 's/^.*FFTW3LibraryDepends.cmake.*$//1' ${{github.workspace}}/build/lib*/cmake/*/FFTW3Config.cmake
-            cd -
+
+      - name: Checkout Catch2
+        uses: actions/checkout@v4
+        with:
+          repository: catchorg/Catch2.git
+          path: Catch2
+          ref: v3.4.0
+
+      - name: Build Catch2
+        run: |
+          mkdir Catch2/build
+          cd Catch2/build
+          cmake .. -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local
+          make -j$(nproc --ignore 1) install
+
+      - name: Install FFTW
+        run: |
+          wget --no-check-certificate --no-verbose http://www.fftw.org/fftw-3.3.10.tar.gz -O- | tar --no-same-owner -xz;
+          cd fftw-3.3.10
+          ./configure --prefix=${{github.workspace}}/local --enable-shared
+          make -j$(nproc --ignore 1) install CFLAGS=-fPIC
+          # Fix bug in FFT3 (cf. https://github.com/FFTW/fftw3/issues/332)
+          sed -i -e 's/^.*FFTW3LibraryDepends.cmake.*$//1' ${{github.workspace}}/local/lib*/cmake/*/FFTW3Config.cmake
 
       - name: Checkout SOPT
         uses: actions/checkout@v3
@@ -41,7 +58,7 @@ jobs:
           export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
           mkdir sopt/build
           cd sopt/build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddocasa=OFF -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dtests=OFF
+          cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddocasa=OFF -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dtests=OFF -Dexamples=OFF
           make -j$(nproc --ignore 1) install
 
       - name: Configure
@@ -49,7 +66,7 @@ jobs:
           export CMAKE_PREFIX_PATH=${{github.workspace}}/build:$CMAKE_PREFIX_PATH
           mkdir -p ${{github.workspace}}/build
           cd ${{github.workspace}}/build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON -Dtests=OFF
+          cmake .. -DCMAKE_INSTALL_PREFIX=${PWD} -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON
 
       - name: Build
         run: |
