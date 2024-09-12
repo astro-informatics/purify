@@ -162,7 +162,6 @@ jobs:
     - name: Build sopt
       run: |
         export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
-        #export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
         mkdir -p ${{github.workspace}}/sopt/build
         cd ${{github.workspace}}/sopt/build
         cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}}
@@ -173,8 +172,6 @@ jobs:
       # Build your program with the given configuration
       run: |
         export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
-        #export CMAKE_PREFIX_PATH=${{github.workspace}}/Catch2/build/lib/cmake:$CMAKE_PREFIX_PATH
-        #export CMAKE_PREFIX_PATH=${{github.workspace}}/sopt/build:$CMAKE_PREFIX_PATH
         mkdir -p ${{github.workspace}}/build
         cd ${{github.workspace}}/build
         cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Ddocasa=OFF -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}}
