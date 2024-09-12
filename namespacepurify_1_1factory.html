@@ -857,13 +857,13 @@ template&lt;class Algorithm &gt; </div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  }</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  <span class="keywordflow">case</span> (g_proximal_type::TFGProximal): {</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;<span class="preprocessor">#ifdef PURIFY_CPPFLOW</span></div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;<span class="preprocessor">#ifdef PURIFY_ONNXRT</span></div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="comment">// Create a shared pointer to an instance of the TFGProximal class</span></div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    gp = std::make_shared&lt;sopt::algorithm::TFGProximal&lt;t_scalar&gt;&gt;(model_path);</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;<span class="preprocessor">#else</span></div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        <span class="stringliteral">&quot;Type TFGProximal not recognized because purify was built with cppflow=off&quot;</span>);</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        <span class="stringliteral">&quot;Type TFGProximal not recognized because purify was built with onnxrt=off&quot;</span>);</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  }</div>
 <div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  <span class="keywordflow">default</span>: {</div>
