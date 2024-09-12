@@ -39,6 +39,8 @@ This documentation outlines the necessary and optional [dependencies](#dependenc
 - [google/benchmark](https://github.com/google/benchmark) v1.6.0: Optional - A `C++`
   micro-benchmarking framework only needed for benchmarks.
 
+For examples on how to install dependencies on Ubuntu and MacOS, see the
+[cmake.yml](https://github.com/astro-informatics/purify/blob/development/.github/workflows/cmake.yml).
 
 ## Installing and building PURIFY
 

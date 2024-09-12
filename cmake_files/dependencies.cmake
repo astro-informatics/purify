@@ -19,6 +19,7 @@ endif()
 
 find_package(CFitsIO REQUIRED)
 
+cmake_policy(SET CMP0167 OLD)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 find_package(yaml-cpp REQUIRED)
@@ -74,6 +75,7 @@ endif()
 
 # Always find open-mp, since it may be used by sopt
 if (openmp)
+  cmake_policy(SET CMP0074 NEW)
   find_package(OpenMP)
   if (OPENMP_FOUND)
     # Set PURIFY_OPENMP to TRUE when OpenMP is both found and requested
