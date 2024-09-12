@@ -58,7 +58,7 @@ jobs:
           export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
           mkdir sopt/build
           cd sopt/build
-          cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${github.workspace}/local -Ddocasa=OFF -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dtests=OFF -Dexamples=OFF
+          cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Ddocasa=OFF -Ddompi=OFF -Dopenmp=OFF -Ddocs=OFF -Dtests=OFF -Dexamples=OFF
           make -j$(nproc --ignore 1) install
 
       - name: Configure
@@ -66,7 +66,7 @@ jobs:
           export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
           mkdir -p ${{github.workspace}}/build
           cd ${{github.workspace}}/build
-          cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${github.workspace}/local -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON
+          cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON
           make -j$(nproc --ignore 1) install
 
       - name: Deploy to GH pages
