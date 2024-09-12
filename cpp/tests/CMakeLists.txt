@@ -85,3 +85,6 @@ if(PURIFY_MPI)
   add_mpi_test(mpi_wide_field_utilities LIBRARIES libpurify)
   add_mpi_test(parallel_mpi_utilities LIBRARIES libpurify)
 endif()
+
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/data DESTINATION .)
+
