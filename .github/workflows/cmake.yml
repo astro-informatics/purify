@@ -154,7 +154,7 @@ jobs:
         export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
         mkdir -p ${{github.workspace}}/sopt/build
         cd ${{github.workspace}}/sopt/build
-        cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}}
+        cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}} -Dtests=OFF -Dexamples=OFF
         make -j$(nproc --ignore 1) install
 
     - name: Install
