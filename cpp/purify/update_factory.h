@@ -45,7 +45,7 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
       auto algo = algo_weak.lock();
       if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ {}", algo->gamma());
       if (algo->gamma() > 0) {
-        Vector<t_complex> const alpha = algo->g_proximal()->Psi().adjoint() * x;
+        Vector<t_complex> const alpha = algo->Psi().adjoint() * x;
         const t_real new_gamma =
             comm.all_reduce((sara_size > 0) ? alpha.real().cwiseAbs().maxCoeff() : 0., MPI_MAX) *
             step_size_scale;
