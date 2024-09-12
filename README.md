@@ -91,6 +91,13 @@ When `purify` runs a directory will be created, and the output images will be
 saved and time-stamped. Additionally, a config file with the settings used will
 be saved and time-stamped, helping for reproducibility and book-keeping.
 
+## Debugging the CI workflow with tmate
+
+The CI workflow has a manual dispatch trigger which allows you to log into the job while it's running. You can trigger it in 
+[actions](https://github.com/astro-informatics/purify/actions/workflows/cmake.yml).
+Run the workflow and set `debug_enabled=true` to enable the `tmate` step in the CI workflow. Once the workflow is running, open the job in actions. 
+You should see it printing out a line with a `ssh` command. Run it in terminal to log into the GitHub Actions runner.
+
 ## Docker
 
 A Dockerfile is available on DockerHub. We are currently not maintaining it, and cannot
