@@ -67,11 +67,6 @@ jobs:
           mkdir -p ${{github.workspace}}/build
           cd ${{github.workspace}}/build
           cmake .. -DCMAKE_INSTALL_PREFIX=${PWD}/local -Ddompi=OFF -Dopenmp=OFF -Ddocs=ON
-
-      - name: Build
-        run: |
-          export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
-          cd ${{github.workspace}}/build
           make -j$(nproc --ignore 1) install
 
       - name: Deploy to GH pages
