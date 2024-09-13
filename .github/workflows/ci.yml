@@ -219,7 +219,7 @@ jobs:
       if: ${{ contains(matrix.os, 'ubuntu') }}
       run: |
         sudo apt update
-        sudo apt install openmpi-bin libopenmpi-dev ccache graphviz libeigen3-dev libspdlog-dev libtiff-dev libcfitsio-dev libbenchmark-dev libboost-all-dev libyaml-cpp-dev
+        sudo apt install openmpi-bin libopenmpi-dev ccache doxygen graphviz libeigen3-dev libspdlog-dev libtiff-dev libcfitsio-dev libbenchmark-dev libboost-all-dev libyaml-cpp-dev
 
     - name: Install Dependencies on MacOS
       if: ${{ contains(matrix.os, 'macos') }}
