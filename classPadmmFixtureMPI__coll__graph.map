@@ -1,11 +1,11 @@
 <map id="PadmmFixtureMPI" name="PadmmFixtureMPI">
-<area shape="rect" id="node1" title=" " alt="" coords="229,287,369,313"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,161,72,187"/>
-<area shape="rect" id="node3" title=" " alt="" coords="112,5,171,32"/>
-<area shape="rect" id="node6" href="$structpurify_1_1utilities_1_1vis__params.html" title=" " alt="" coords="237,153,360,195"/>
-<area shape="rect" id="node4" title=" " alt="" coords="385,161,546,187"/>
-<area shape="rect" id="node5" title=" " alt="" coords="571,161,629,187"/>
-<area shape="rect" id="node7" title=" " alt="" coords="217,5,378,32"/>
-<area shape="rect" id="node8" title=" " alt="" coords="403,5,533,32"/>
-<area shape="rect" id="node9" title=" " alt="" coords="557,5,688,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="312,287,452,313"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,161,153,187"/>
+<area shape="rect" id="node3" title=" " alt="" coords="194,5,253,32"/>
+<area shape="rect" id="node6" href="$structpurify_1_1utilities_1_1vis__params.html" title=" " alt="" coords="321,153,443,195"/>
+<area shape="rect" id="node4" title=" " alt="" coords="468,161,629,187"/>
+<area shape="rect" id="node5" title=" " alt="" coords="654,161,713,187"/>
+<area shape="rect" id="node7" title=" " alt="" coords="301,5,463,32"/>
+<area shape="rect" id="node8" title=" " alt="" coords="487,5,618,32"/>
+<area shape="rect" id="node9" title=" " alt="" coords="642,5,773,32"/>
 </map>

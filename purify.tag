@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-<tagfile>
+<tagfile doxygen_version="1.9.1">
   <compound kind="file">
     <name>degridding.cc</name>
     <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
@@ -135,15 +135,8 @@
       <type></type>
       <name>Args</name>
       <anchorfile>benchmarks_2measurement__operator_8cc.html</anchorfile>
-      <anchor>aa781ac5aa22a08500b9cd6f434cc3640</anchor>
-      <arglist>({1024, 1000000, 4}) -&gt; Args(</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>UseManualTime</name>
-      <anchorfile>benchmarks_2measurement__operator_8cc.html</anchorfile>
-      <anchor>a481329d3f01b443e2827b5af221eb315</anchor>
-      <arglist>() -&gt; Repetitions(10) -&gt;Unit(benchmark::kMillisecond)</arglist>
+      <anchor>ad3424cc0ea95a5d52390ed25175d9b28</anchor>
+      <arglist>({1024, 1000000, 4}) -&gt; Args({1024, 10000000, 4}) -&gt;UseManualTime() -&gt;Repetitions(10) -&gt;Unit(benchmark::kMillisecond)</arglist>
     </member>
     <member kind="function">
       <type></type>
@@ -218,22 +211,8 @@
       <type></type>
       <name>Args</name>
       <anchorfile>measurement__operator__af_8cc.html</anchorfile>
-      <anchor>a046865ad202201af44baad38d0b8bcfb</anchor>
-      <arglist>({256, 500000, 4}) -&gt; Args(</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>Args</name>
-      <anchorfile>measurement__operator__af_8cc.html</anchorfile>
-      <anchor>a7eda3ab7775b3ce6151a2bda36464fd6</anchor>
-      <arglist>({1024, 500000, 4}) -&gt; Args(</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>UseManualTime</name>
-      <anchorfile>measurement__operator__af_8cc.html</anchorfile>
-      <anchor>a4d7266d864504b8c40b9064db789f8d1</anchor>
-      <arglist>() -&gt; Repetitions(10) -&gt;ReportAggregatesOnly(true) -&gt;Unit(benchmark::kMillisecond)</arglist>
+      <anchor>a45b32ceff91e4346c6bb89ad5aff3b80</anchor>
+      <arglist>({256, 500000, 4}) -&gt; Args({512, 500000, 4}) -&gt;Args({1024, 500000, 4}) -&gt;Args({2048, 500000, 4}) -&gt;UseManualTime() -&gt;Repetitions(10) -&gt;ReportAggregatesOnly(true) -&gt;Unit(benchmark::kMillisecond)</arglist>
     </member>
     <member kind="function">
       <type></type>
@@ -304,29 +283,8 @@
       <type></type>
       <name>Args</name>
       <anchorfile>measurement__operator__mpi_8cc.html</anchorfile>
-      <anchor>aeff84898f1a6eb904e7c69183af73539</anchor>
-      <arglist>({1024, static_cast&lt; t_int &gt;(1e6), 4}) -&gt; Args(</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>Args</name>
-      <anchorfile>measurement__operator__mpi_8cc.html</anchorfile>
-      <anchor>a54a3caf7df0d96031b919b2f06976783</anchor>
-      <arglist>({1024, static_cast&lt; t_int &gt;(1e7), 4}) -&gt; Args(</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>Args</name>
-      <anchorfile>measurement__operator__mpi_8cc.html</anchorfile>
-      <anchor>a3aaec13205de9f6000e45cc1171d2ad5</anchor>
-      <arglist>({1024, static_cast&lt; t_int &gt;(1e8), 4}) -&gt; Args(</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>UseManualTime</name>
-      <anchorfile>measurement__operator__mpi_8cc.html</anchorfile>
-      <anchor>a481329d3f01b443e2827b5af221eb315</anchor>
-      <arglist>() -&gt; Repetitions(10) -&gt;Unit(benchmark::kMillisecond)</arglist>
+      <anchor>a2e452b7631c7568e5b6200a007a90bf9</anchor>
+      <arglist>({1024, static_cast&lt; t_int &gt;(1e6), 4}) -&gt; Args({1024, static_cast&lt; t_int &gt;(5e6), 4}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e7), 4}) -&gt;Args({1024, static_cast&lt; t_int &gt;(5e7), 4}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e8), 4}) -&gt;Args({1024, static_cast&lt; t_int &gt;(5e8), 4}) -&gt;UseManualTime() -&gt;Repetitions(10) -&gt;Unit(benchmark::kMillisecond)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -423,50 +381,15 @@
       <type></type>
       <name>Args</name>
       <anchorfile>padmm__mpi_8cc.html</anchorfile>
-      <anchor>a4650b9a6c49d8aef43875c8733cf816e</anchor>
-      <arglist>({1024, static_cast&lt; t_int &gt;(1e6), 4, 10, 1}) -&gt; Args(</arglist>
+      <anchor>a4bf72f7fc468de0b11444eedbaea9486</anchor>
+      <arglist>({1024, static_cast&lt; t_int &gt;(1e6), 4, 10, 1}) -&gt; Args({1024, static_cast&lt; t_int &gt;(5e6), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e7), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(5e7), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e8), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(5e8), 4, 10, 1}) -&gt;UseManualTime() -&gt;Repetitions(3) -&gt;Unit(benchmark::kMillisecond)</arglist>
     </member>
     <member kind="function">
       <type></type>
       <name>Args</name>
       <anchorfile>padmm__mpi_8cc.html</anchorfile>
-      <anchor>acdfee39744669deaf4bf01b59e6a948d</anchor>
-      <arglist>({1024, static_cast&lt; t_int &gt;(1e7), 4, 10, 1}) -&gt; Args(</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>Args</name>
-      <anchorfile>padmm__mpi_8cc.html</anchorfile>
-      <anchor>adae37741dd14113ff54cf97b80270055</anchor>
-      <arglist>({1024, static_cast&lt; t_int &gt;(1e8), 4, 10, 1}) -&gt; Args(</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>UseManualTime</name>
-      <anchorfile>padmm__mpi_8cc.html</anchorfile>
-      <anchor>a3de9400ead8a7b964a06b2172d387357</anchor>
-      <arglist>() -&gt; Repetitions(3) -&gt;Unit(benchmark::kMillisecond)</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>Args</name>
-      <anchorfile>padmm__mpi_8cc.html</anchorfile>
-      <anchor>a7e9122ce7afa99618d29af0286502f87</anchor>
-      <arglist>({1024, static_cast&lt; t_int &gt;(1e6), 4, 10, 3}) -&gt; Args(</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>Args</name>
-      <anchorfile>padmm__mpi_8cc.html</anchorfile>
-      <anchor>afa5ff1d491d09386e6cd3e0e4b2de0ce</anchor>
-      <arglist>({1024, static_cast&lt; t_int &gt;(1e7), 4, 10, 3}) -&gt; Args(</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>Args</name>
-      <anchorfile>padmm__mpi_8cc.html</anchorfile>
-      <anchor>a9fb1e4fe17808f7b6afd3f7e4523e182</anchor>
-      <arglist>({1024, static_cast&lt; t_int &gt;(1e8), 4, 10, 3}) -&gt; Args(</arglist>
+      <anchor>a95cf9e6430c4a045ad6ddbc9dcc05cd5</anchor>
+      <arglist>({1024, static_cast&lt; t_int &gt;(1e6), 4, 10, 3}) -&gt; Args({1024, static_cast&lt; t_int &gt;(5e6), 4, 10, 3}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e7), 4, 10, 3}) -&gt;Args({1024, static_cast&lt; t_int &gt;(5e7), 4, 10, 3}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e8), 4, 10, 3}) -&gt;Args({1024, static_cast&lt; t_int &gt;(5e8), 4, 10, 3}) -&gt;UseManualTime() -&gt;Repetitions(3) -&gt;Unit(benchmark::kMillisecond)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -5871,10 +5794,10 @@
       <arglist></arglist>
     </member>
     <member kind="typedef">
-      <type>const value_type &amp;</type>
+      <type>value_type const  &amp;</type>
       <name>reference</name>
       <anchorfile>classpurify_1_1casa_1_1MeasurementSet_1_1const__iterator.html</anchorfile>
-      <anchor>a33cf13daf3828016b23bcab1a1bd791a</anchor>
+      <anchor>a297d8194c6e9116a5cdcfea2ba67db49</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
@@ -6000,6 +5923,7 @@
   <compound kind="class">
     <name>DegridOperatorAdjointFixture</name>
     <filename>classDegridOperatorAdjointFixture.html</filename>
+    <base>DegridOperatorFixture</base>
     <base>DegridOperatorFixture</base>
     <member kind="function" virtualness="virtual">
       <type>virtual bool</type>
@@ -6171,6 +6095,7 @@
   <compound kind="class">
     <name>DegridOperatorDirectFixture</name>
     <filename>classDegridOperatorDirectFixture.html</filename>
+    <base>DegridOperatorFixture</base>
     <base>DegridOperatorFixture</base>
     <member kind="function" virtualness="virtual">
       <type>virtual bool</type>
@@ -6928,10 +6853,10 @@
       <arglist>(MeasurementSet const &amp;c)</arglist>
     </member>
     <member kind="function">
-      <type>const std::string &amp;</type>
+      <type>std::string const  &amp;</type>
       <name>filename</name>
       <anchorfile>classpurify_1_1casa_1_1MeasurementSet.html</anchorfile>
-      <anchor>a0fb9da315482c39ed3490bf2bfa244d4</anchor>
+      <anchor>a30e4791dfd5fc60bc33273642fda93c9</anchor>
       <arglist>() const</arglist>
     </member>
     <member kind="function">
@@ -6942,10 +6867,10 @@
       <arglist>(std::string const &amp;filename)</arglist>
     </member>
     <member kind="function">
-      <type>const ::casacore::Table &amp;</type>
+      <type>::casacore::Table const  &amp;</type>
       <name>table</name>
       <anchorfile>classpurify_1_1casa_1_1MeasurementSet.html</anchorfile>
-      <anchor>a2fea6e32228fe1a61294efc657ab15ea</anchor>
+      <anchor>a62ee30f2803db3061fa4467c1f709391</anchor>
       <arglist>(std::string const &amp;name=&quot;&quot;) const</arglist>
     </member>
     <member kind="function">
@@ -7033,10 +6958,10 @@
       <arglist>(t_real tolerance=1e-8, std::string const &amp;filter=&quot;&quot;) const</arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static const std::string</type>
+      <type>static std::string const</type>
       <name>default_filter</name>
       <anchorfile>classpurify_1_1casa_1_1MeasurementSet.html</anchorfile>
-      <anchor>a2bb01d59c4a3350198e7869ef9ed99f3</anchor>
+      <anchor>a894d32452f89fd9c5bd634cbd3f61d30</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -7267,10 +7192,10 @@
       <arglist>()</arglist>
     </member>
     <member kind="function">
-      <type>const casa::MeasurementSet &amp;</type>
+      <type>casa::MeasurementSet const  &amp;</type>
       <name>operator*</name>
       <anchorfile>classTmpMS.html</anchorfile>
-      <anchor>a066b8260f05110ff866052dd5dc25072</anchor>
+      <anchor>ac320ac074bc08683e0eb6f8e29a6e514</anchor>
       <arglist>() const</arglist>
     </member>
     <member kind="function">
@@ -7281,10 +7206,10 @@
       <arglist>()</arglist>
     </member>
     <member kind="function">
-      <type>const casa::MeasurementSet *</type>
+      <type>casa::MeasurementSet const  *</type>
       <name>operator-&gt;</name>
       <anchorfile>classTmpMS.html</anchorfile>
-      <anchor>a58b1e199b524f55a4ec27e83de1cdbc2</anchor>
+      <anchor>ae522e888f2a0fd4c7828e69c6c02c04a</anchor>
       <arglist>() const</arglist>
     </member>
     <member kind="function">
@@ -7313,10 +7238,10 @@
       <arglist>()</arglist>
     </member>
     <member kind="function">
-      <type>const boost::filesystem::path &amp;</type>
+      <type>boost::filesystem::path const  &amp;</type>
       <name>path</name>
       <anchorfile>classTmpPath.html</anchorfile>
-      <anchor>a094ac77b24c66ba28f9aec10d160c68f</anchor>
+      <anchor>ad14673d5ef0f1e258bd8027bddb570a3</anchor>
       <arglist>() const</arglist>
     </member>
   </compound>
@@ -9912,11 +9837,13 @@
   <compound kind="page">
     <name>purify_contributors</name>
     <title>Contributors</title>
-    <filename>purify_contributors</filename>
+    <filename>purify_contributors.html</filename>
+    <docanchor file="purify_contributors.html">md__home_runner_work_purify_purify_cpp_docs_PURIFY_CONTRIBUTORS</docanchor>
   </compound>
   <compound kind="page">
     <name>index</name>
     <title>PURIFY</title>
-    <filename>index</filename>
+    <filename>index.html</filename>
+    <docanchor file="index.html">md__home_runner_work_purify_purify_cpp_docs_README</docanchor>
   </compound>
 </tagfile>
