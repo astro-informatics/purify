@@ -22,7 +22,7 @@ jobs:
   build:
     # Skip CI if PR is a draft
     if: github.event.pull_request.draft == false
-    name: build-${{matrix.os}}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}}
+    name: build (${{matrix.os}}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}})
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Windows or Mac.  You can convert this to a matrix build if you need
     # cross-platform coverage.
@@ -36,16 +36,29 @@ jobs:
       matrix:
           os:
             - ubuntu-22.04
+            - macos-14
           cc:
             - gcc-12
+            - clang
           cxx:
             - g++-12
+            - clang
           mpi:
             - "ON"
             - "OFF"
           omp:
             - "ON"
             - "OFF"
+          exclude:
+            - cc: gcc-12
+              cxx: clang
+            - cc: clang
+              cxx: g++-12
+            - os: macos-14
+              cc: gcc-12
+              cxx: g++-12
+            - os: macos-14
+              omp: "ON"
 
     steps:
     - uses: actions/checkout@v4
@@ -135,7 +148,7 @@ jobs:
   test:
     needs:
       build
-    name: test-${{matrix.os}}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}}
+    name: test (${{matrix.os}}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}})
     runs-on: ${{matrix.os}}
     env:
       CC: ${{ matrix.cc }}
@@ -145,22 +158,34 @@ jobs:
       matrix:
           os:
             - ubuntu-22.04
+            - macos-14
           cc:
             - gcc-12
+            - clang
           cxx:
             - g++-12
+            - clang
           mpi:
             - "ON"
             - "OFF"
           omp:
             - "ON"
             - "OFF"
+          exclude:
+            - cc: gcc-12
+              cxx: clang
+            - cc: clang
+              cxx: g++-12
+            - os: macos-14
+              cc: gcc-12
+              cxx: g++-12
+            - os: macos-14
+              omp: "ON"
     steps:
     - uses: actions/checkout@v4
 
     - uses: actions/download-artifact@v4
       with:
-        name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
         path: ${{github.workspace}}/local
 
     - name: Install Dependencies on Ubunutu
@@ -196,6 +221,7 @@ jobs:
   doc:
     needs:
       build
+    name: doc (${{matrix.os}}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}})
     runs-on: ${{matrix.os}}
     env:
       CC: ${{ matrix.cc }}
