@@ -41,8 +41,10 @@ jobs:
             - g++-12
           mpi:
             - "ON"
+            - "OFF"
           omp:
             - "ON"
+            - "OFF"
 
     steps:
     - uses: actions/checkout@v4
@@ -147,8 +149,10 @@ jobs:
             - g++-12
           mpi:
             - "ON"
+            - "OFF"
           omp:
             - "ON"
+            - "OFF"
     steps:
     - uses: actions/checkout@v4
 
@@ -204,9 +208,9 @@ jobs:
           cxx:
             - g++-12
           mpi:
-            - "ON"
+            - "OFF"
           omp:
-            - "ON"
+            - "OFF"
     steps:
     - uses: actions/checkout@v4
 
