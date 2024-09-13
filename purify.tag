@@ -228,7 +228,6 @@
     <filename>measurement__operator__mpi_8cc.html</filename>
     <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
-    <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
     <class kind="class">DegridOperatorCtorFixturePar</class>
     <class kind="class">DegridOperatorFixturePar</class>
     <class kind="class">DegridOperatorDirectFixturePar</class>
@@ -293,7 +292,6 @@
     <filename>measurement__operator__wproj_8cc.html</filename>
     <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
-    <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
     <includes id="wide__field__utilities_8h" name="wide_field_utilities.h" local="yes" imported="no">purify/wide_field_utilities.h</includes>
     <includes id="wproj__operators_8h" name="wproj_operators.h" local="yes" imported="no">purify/wproj_operators.h</includes>
     <class kind="class">DegridOperatorCtorFixturePar</class>
@@ -360,7 +358,6 @@
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
     <includes id="mpi__utilities_8h" name="mpi_utilities.h" local="yes" imported="no">purify/mpi_utilities.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
-    <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
     <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
     <class kind="class">PadmmFixtureMPI</class>
     <member kind="function">

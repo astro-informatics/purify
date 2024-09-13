@@ -144,7 +144,7 @@ Public Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00018">18</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00017">17</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a459dd3ab089e71fd83f9ed503f76a3c9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a459dd3ab089e71fd83f9ed503f76a3c9">&#9670;&nbsp;</a></span>SetUp() <span class="overload">[1/2]</span></h2>
@@ -170,32 +170,32 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00020">20</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;                                          {</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="comment">// Keep count of the benchmark repetitions</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#ae88863b3e8a8f20e5360655b933f6a3f">m_counter</a>++;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#adc067fa9305724d7a4ae5689f583d0cf">m_imsizex</a> = state.range(0);</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#a43a0ba9f5f940baab6ecc4ac1fdb95ae">m_imsizey</a> = state.range(0);</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="comment">// Generating random uv(w) coverage</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordtype">bool</span> newMeasurements = <a class="code" href="classDegridOperatorCtorFixturePar.html#a5373ce2f02de6bb2d7080b653dac84c1">m_uv_data</a>.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a71a2094900171da4aa7f0ee62deebd53">size</a>() != state.range(1);</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordflow">if</span> (newMeasurements) {</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      t_real <span class="keyword">const</span> sigma_m = <a class="code" href="namespacepurify_1_1constant.html#aa35bce2e736d0453c6005cbc06f1dbe7">constant::pi</a> / 3;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      <a class="code" href="classDegridOperatorCtorFixturePar.html#a5373ce2f02de6bb2d7080b653dac84c1">m_uv_data</a> = <a class="code" href="namespacepurify_1_1utilities.html#ae8446d8749e342037d66da0ad3ca63ad">utilities::random_sample_density</a>(state.range(1), 0, sigma_m);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    }</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="comment">// Data needed for the creation of the measurement operator</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">const</span> t_real FoV = 1;  <span class="comment">// deg</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#a5e34a9555e3ed67992611cfdb290dcdd">m_cellsize</a> = FoV / <a class="code" href="classDegridOperatorCtorFixturePar.html#adc067fa9305724d7a4ae5689f583d0cf">m_imsizex</a> * 60. * 60.;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#a32ed96a79ff87a33ae546d8231ce76ff">m_w_term</a> = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  }</div>
-<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_a32ed96a79ff87a33ae546d8231ce76ff"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#a32ed96a79ff87a33ae546d8231ce76ff">DegridOperatorCtorFixturePar::m_w_term</a></div><div class="ttdeci">bool m_w_term</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__mpi_8cc_source.html#l00048">measurement_operator_mpi.cc:48</a></div></div>
-<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_a43a0ba9f5f940baab6ecc4ac1fdb95ae"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#a43a0ba9f5f940baab6ecc4ac1fdb95ae">DegridOperatorCtorFixturePar::m_imsizey</a></div><div class="ttdeci">t_uint m_imsizey</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__mpi_8cc_source.html#l00045">measurement_operator_mpi.cc:45</a></div></div>
-<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_a5373ce2f02de6bb2d7080b653dac84c1"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#a5373ce2f02de6bb2d7080b653dac84c1">DegridOperatorCtorFixturePar::m_uv_data</a></div><div class="ttdeci">utilities::vis_params m_uv_data</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__mpi_8cc_source.html#l00046">measurement_operator_mpi.cc:46</a></div></div>
-<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_a5e34a9555e3ed67992611cfdb290dcdd"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#a5e34a9555e3ed67992611cfdb290dcdd">DegridOperatorCtorFixturePar::m_cellsize</a></div><div class="ttdeci">t_real m_cellsize</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__mpi_8cc_source.html#l00047">measurement_operator_mpi.cc:47</a></div></div>
-<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_adc067fa9305724d7a4ae5689f583d0cf"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#adc067fa9305724d7a4ae5689f583d0cf">DegridOperatorCtorFixturePar::m_imsizex</a></div><div class="ttdeci">t_uint m_imsizex</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__mpi_8cc_source.html#l00044">measurement_operator_mpi.cc:44</a></div></div>
-<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_ae88863b3e8a8f20e5360655b933f6a3f"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#ae88863b3e8a8f20e5360655b933f6a3f">DegridOperatorCtorFixturePar::m_counter</a></div><div class="ttdeci">t_uint m_counter</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__mpi_8cc_source.html#l00042">measurement_operator_mpi.cc:42</a></div></div>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00019">19</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;                                          {</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="comment">// Keep count of the benchmark repetitions</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#ae88863b3e8a8f20e5360655b933f6a3f">m_counter</a>++;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#adc067fa9305724d7a4ae5689f583d0cf">m_imsizex</a> = state.range(0);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#a43a0ba9f5f940baab6ecc4ac1fdb95ae">m_imsizey</a> = state.range(0);</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="comment">// Generating random uv(w) coverage</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keywordtype">bool</span> newMeasurements = <a class="code" href="classDegridOperatorCtorFixturePar.html#a5373ce2f02de6bb2d7080b653dac84c1">m_uv_data</a>.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a71a2094900171da4aa7f0ee62deebd53">size</a>() != state.range(1);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordflow">if</span> (newMeasurements) {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      t_real <span class="keyword">const</span> sigma_m = <a class="code" href="namespacepurify_1_1constant.html#aa35bce2e736d0453c6005cbc06f1dbe7">constant::pi</a> / 3;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      <a class="code" href="classDegridOperatorCtorFixturePar.html#a5373ce2f02de6bb2d7080b653dac84c1">m_uv_data</a> = <a class="code" href="namespacepurify_1_1utilities.html#ae8446d8749e342037d66da0ad3ca63ad">utilities::random_sample_density</a>(state.range(1), 0, sigma_m);</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    }</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="comment">// Data needed for the creation of the measurement operator</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">const</span> t_real FoV = 1;  <span class="comment">// deg</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#a5e34a9555e3ed67992611cfdb290dcdd">m_cellsize</a> = FoV / <a class="code" href="classDegridOperatorCtorFixturePar.html#adc067fa9305724d7a4ae5689f583d0cf">m_imsizex</a> * 60. * 60.;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#a32ed96a79ff87a33ae546d8231ce76ff">m_w_term</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  }</div>
+<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_a32ed96a79ff87a33ae546d8231ce76ff"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#a32ed96a79ff87a33ae546d8231ce76ff">DegridOperatorCtorFixturePar::m_w_term</a></div><div class="ttdeci">bool m_w_term</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__mpi_8cc_source.html#l00047">measurement_operator_mpi.cc:47</a></div></div>
+<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_a43a0ba9f5f940baab6ecc4ac1fdb95ae"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#a43a0ba9f5f940baab6ecc4ac1fdb95ae">DegridOperatorCtorFixturePar::m_imsizey</a></div><div class="ttdeci">t_uint m_imsizey</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__mpi_8cc_source.html#l00044">measurement_operator_mpi.cc:44</a></div></div>
+<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_a5373ce2f02de6bb2d7080b653dac84c1"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#a5373ce2f02de6bb2d7080b653dac84c1">DegridOperatorCtorFixturePar::m_uv_data</a></div><div class="ttdeci">utilities::vis_params m_uv_data</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__mpi_8cc_source.html#l00045">measurement_operator_mpi.cc:45</a></div></div>
+<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_a5e34a9555e3ed67992611cfdb290dcdd"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#a5e34a9555e3ed67992611cfdb290dcdd">DegridOperatorCtorFixturePar::m_cellsize</a></div><div class="ttdeci">t_real m_cellsize</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__mpi_8cc_source.html#l00046">measurement_operator_mpi.cc:46</a></div></div>
+<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_adc067fa9305724d7a4ae5689f583d0cf"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#adc067fa9305724d7a4ae5689f583d0cf">DegridOperatorCtorFixturePar::m_imsizex</a></div><div class="ttdeci">t_uint m_imsizex</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__mpi_8cc_source.html#l00043">measurement_operator_mpi.cc:43</a></div></div>
+<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_ae88863b3e8a8f20e5360655b933f6a3f"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#ae88863b3e8a8f20e5360655b933f6a3f">DegridOperatorCtorFixturePar::m_counter</a></div><div class="ttdeci">t_uint m_counter</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__mpi_8cc_source.html#l00041">measurement_operator_mpi.cc:41</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1constant_html_aa35bce2e736d0453c6005cbc06f1dbe7"><div class="ttname"><a href="namespacepurify_1_1constant.html#aa35bce2e736d0453c6005cbc06f1dbe7">purify::constant::pi</a></div><div class="ttdeci">const t_real pi</div><div class="ttdoc">mathematical constant</div><div class="ttdef"><b>Definition:</b> <a href="types_8h_source.html#l00058">types.h:58</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1utilities_html_ae8446d8749e342037d66da0ad3ca63ad"><div class="ttname"><a href="namespacepurify_1_1utilities.html#ae8446d8749e342037d66da0ad3ca63ad">purify::utilities::random_sample_density</a></div><div class="ttdeci">utilities::vis_params random_sample_density(const t_int vis_num, const t_real mean, const t_real standard_deviation, const t_real rms_w)</div><div class="ttdoc">Generates a random visibility coverage.</div><div class="ttdef"><b>Definition:</b> <a href="uvw__utilities_8cc_source.html#l00096">uvw_utilities.cc:96</a></div></div>
 <div class="ttc" id="astructpurify_1_1utilities_1_1vis__params_html_a71a2094900171da4aa7f0ee62deebd53"><div class="ttname"><a href="structpurify_1_1utilities_1_1vis__params.html#a71a2094900171da4aa7f0ee62deebd53">purify::utilities::vis_params::size</a></div><div class="ttdeci">t_uint size() const</div><div class="ttdoc">return number of measurements</div><div class="ttdef"><b>Definition:</b> <a href="uvw__utilities_8h_source.html#l00054">uvw_utilities.h:54</a></div></div>
@@ -228,33 +228,33 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__wproj_8cc_source.html#l00022">22</a> of file <a class="el" href="measurement__operator__wproj_8cc_source.html">measurement_operator_wproj.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;                                          {</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="comment">// Keep count of the benchmark repetitions</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#ae88863b3e8a8f20e5360655b933f6a3f">m_counter</a>++;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="comment">// Data needed for the creation of the measurement operator</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keyword">const</span> t_real FoV = 25;  <span class="comment">// deg</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#a5e34a9555e3ed67992611cfdb290dcdd">m_cellsize</a> = FoV / <a class="code" href="classDegridOperatorCtorFixturePar.html#adc067fa9305724d7a4ae5689f583d0cf">m_imsizex</a> * 60. * 60.;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#a32ed96a79ff87a33ae546d8231ce76ff">m_w_term</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#adc067fa9305724d7a4ae5689f583d0cf">m_imsizex</a> = state.range(0);</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#a43a0ba9f5f940baab6ecc4ac1fdb95ae">m_imsizey</a> = state.range(0);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="comment">// Generating random uv(w) coverage</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    b_utilities::update_comm(<a class="code" href="classDegridOperatorCtorFixturePar.html#a53266a28b6e43e41a82c80dc8b0dc973">m_world</a>);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    t_real <span class="keyword">const</span> sigma_m = <a class="code" href="namespacepurify_1_1constant.html#aa35bce2e736d0453c6005cbc06f1dbe7">constant::pi</a> / 3;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keyword">const</span> t_real du = <a class="code" href="namespacepurify_1_1widefield.html#ab62e83c2e2504a0e5b0e0d333d311b52">widefield::pixel_to_lambda</a>(<a class="code" href="classDegridOperatorCtorFixturePar.html#a5e34a9555e3ed67992611cfdb290dcdd">m_cellsize</a>, <a class="code" href="classDegridOperatorCtorFixturePar.html#adc067fa9305724d7a4ae5689f583d0cf">m_imsizex</a>, 2);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keyword">const</span> t_real max_w = 300.;  <span class="comment">// lambda</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keyword">auto</span> <span class="keyword">const</span> uv_data = <a class="code" href="namespaceb__utilities.html#a224195343f875ecd21158fe98df7daf8">b_utilities::random_measurements</a>(state.range(1), max_w, <a class="code" href="classDegridOperatorCtorFixturePar.html#a53266a28b6e43e41a82c80dc8b0dc973">m_world</a>.rank());</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> cost = [](t_real x) -&gt; t_real { <span class="keywordflow">return</span> std::abs(x * x); };</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#a5373ce2f02de6bb2d7080b653dac84c1">m_uv_data</a> = <a class="code" href="namespacepurify_1_1utilities.html#a37001a359a524976a06439a804a51cb4">utilities::w_stacking</a>(uv_data, <a class="code" href="classDegridOperatorCtorFixturePar.html#a53266a28b6e43e41a82c80dc8b0dc973">m_world</a>, 100, cost);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    std::tie(<a class="code" href="classDegridOperatorCtorFixturePar.html#a6c826c98333762fefbb7eb3bca901fb2">m_uv_data_all_to_all</a>, <a class="code" href="classDegridOperatorCtorFixturePar.html#afa0904a6a4ad064d41abff5ace0ec19b">m_image_index</a>, <a class="code" href="classDegridOperatorCtorFixturePar.html#a77c6c6f3bc326525ec8687b6c690ad15">m_w_stacks</a>) =</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <a class="code" href="namespacepurify_1_1utilities.html#ab6364c945c8df98349ca192860d1c769">utilities::w_stacking_with_all_to_all</a>(uv_data, du, 4, 100, <a class="code" href="classDegridOperatorCtorFixturePar.html#a53266a28b6e43e41a82c80dc8b0dc973">m_world</a>, 100, 1.01, cost);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  }</div>
-<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_a53266a28b6e43e41a82c80dc8b0dc973"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#a53266a28b6e43e41a82c80dc8b0dc973">DegridOperatorCtorFixturePar::m_world</a></div><div class="ttdeci">sopt::mpi::Communicator m_world</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__mpi_8cc_source.html#l00043">measurement_operator_mpi.cc:43</a></div></div>
-<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_a6c826c98333762fefbb7eb3bca901fb2"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#a6c826c98333762fefbb7eb3bca901fb2">DegridOperatorCtorFixturePar::m_uv_data_all_to_all</a></div><div class="ttdeci">utilities::vis_params m_uv_data_all_to_all</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__wproj_8cc_source.html#l00052">measurement_operator_wproj.cc:52</a></div></div>
-<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_a77c6c6f3bc326525ec8687b6c690ad15"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#a77c6c6f3bc326525ec8687b6c690ad15">DegridOperatorCtorFixturePar::m_w_stacks</a></div><div class="ttdeci">std::vector&lt; t_real &gt; m_w_stacks</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__wproj_8cc_source.html#l00053">measurement_operator_wproj.cc:53</a></div></div>
-<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_afa0904a6a4ad064d41abff5ace0ec19b"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#afa0904a6a4ad064d41abff5ace0ec19b">DegridOperatorCtorFixturePar::m_image_index</a></div><div class="ttdeci">std::vector&lt; t_int &gt; m_image_index</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__wproj_8cc_source.html#l00054">measurement_operator_wproj.cc:54</a></div></div>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__wproj_8cc_source.html#l00021">21</a> of file <a class="el" href="measurement__operator__wproj_8cc_source.html">measurement_operator_wproj.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;                                          {</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="comment">// Keep count of the benchmark repetitions</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#ae88863b3e8a8f20e5360655b933f6a3f">m_counter</a>++;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="comment">// Data needed for the creation of the measurement operator</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keyword">const</span> t_real FoV = 25;  <span class="comment">// deg</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#a5e34a9555e3ed67992611cfdb290dcdd">m_cellsize</a> = FoV / <a class="code" href="classDegridOperatorCtorFixturePar.html#adc067fa9305724d7a4ae5689f583d0cf">m_imsizex</a> * 60. * 60.;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#a32ed96a79ff87a33ae546d8231ce76ff">m_w_term</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#adc067fa9305724d7a4ae5689f583d0cf">m_imsizex</a> = state.range(0);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#a43a0ba9f5f940baab6ecc4ac1fdb95ae">m_imsizey</a> = state.range(0);</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="comment">// Generating random uv(w) coverage</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    b_utilities::update_comm(<a class="code" href="classDegridOperatorCtorFixturePar.html#a53266a28b6e43e41a82c80dc8b0dc973">m_world</a>);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    t_real <span class="keyword">const</span> sigma_m = <a class="code" href="namespacepurify_1_1constant.html#aa35bce2e736d0453c6005cbc06f1dbe7">constant::pi</a> / 3;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">const</span> t_real du = <a class="code" href="namespacepurify_1_1widefield.html#ab62e83c2e2504a0e5b0e0d333d311b52">widefield::pixel_to_lambda</a>(<a class="code" href="classDegridOperatorCtorFixturePar.html#a5e34a9555e3ed67992611cfdb290dcdd">m_cellsize</a>, <a class="code" href="classDegridOperatorCtorFixturePar.html#adc067fa9305724d7a4ae5689f583d0cf">m_imsizex</a>, 2);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keyword">const</span> t_real max_w = 300.;  <span class="comment">// lambda</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keyword">auto</span> <span class="keyword">const</span> uv_data = <a class="code" href="namespaceb__utilities.html#a224195343f875ecd21158fe98df7daf8">b_utilities::random_measurements</a>(state.range(1), max_w, <a class="code" href="classDegridOperatorCtorFixturePar.html#a53266a28b6e43e41a82c80dc8b0dc973">m_world</a>.rank());</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> cost = [](t_real x) -&gt; t_real { <span class="keywordflow">return</span> std::abs(x * x); };</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="code" href="classDegridOperatorCtorFixturePar.html#a5373ce2f02de6bb2d7080b653dac84c1">m_uv_data</a> = <a class="code" href="namespacepurify_1_1utilities.html#a37001a359a524976a06439a804a51cb4">utilities::w_stacking</a>(uv_data, <a class="code" href="classDegridOperatorCtorFixturePar.html#a53266a28b6e43e41a82c80dc8b0dc973">m_world</a>, 100, cost);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    std::tie(<a class="code" href="classDegridOperatorCtorFixturePar.html#a6c826c98333762fefbb7eb3bca901fb2">m_uv_data_all_to_all</a>, <a class="code" href="classDegridOperatorCtorFixturePar.html#afa0904a6a4ad064d41abff5ace0ec19b">m_image_index</a>, <a class="code" href="classDegridOperatorCtorFixturePar.html#a77c6c6f3bc326525ec8687b6c690ad15">m_w_stacks</a>) =</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <a class="code" href="namespacepurify_1_1utilities.html#ab6364c945c8df98349ca192860d1c769">utilities::w_stacking_with_all_to_all</a>(uv_data, du, 4, 100, <a class="code" href="classDegridOperatorCtorFixturePar.html#a53266a28b6e43e41a82c80dc8b0dc973">m_world</a>, 100, 1.01, cost);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  }</div>
+<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_a53266a28b6e43e41a82c80dc8b0dc973"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#a53266a28b6e43e41a82c80dc8b0dc973">DegridOperatorCtorFixturePar::m_world</a></div><div class="ttdeci">sopt::mpi::Communicator m_world</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__mpi_8cc_source.html#l00042">measurement_operator_mpi.cc:42</a></div></div>
+<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_a6c826c98333762fefbb7eb3bca901fb2"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#a6c826c98333762fefbb7eb3bca901fb2">DegridOperatorCtorFixturePar::m_uv_data_all_to_all</a></div><div class="ttdeci">utilities::vis_params m_uv_data_all_to_all</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__wproj_8cc_source.html#l00051">measurement_operator_wproj.cc:51</a></div></div>
+<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_a77c6c6f3bc326525ec8687b6c690ad15"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#a77c6c6f3bc326525ec8687b6c690ad15">DegridOperatorCtorFixturePar::m_w_stacks</a></div><div class="ttdeci">std::vector&lt; t_real &gt; m_w_stacks</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__wproj_8cc_source.html#l00052">measurement_operator_wproj.cc:52</a></div></div>
+<div class="ttc" id="aclassDegridOperatorCtorFixturePar_html_afa0904a6a4ad064d41abff5ace0ec19b"><div class="ttname"><a href="classDegridOperatorCtorFixturePar.html#afa0904a6a4ad064d41abff5ace0ec19b">DegridOperatorCtorFixturePar::m_image_index</a></div><div class="ttdeci">std::vector&lt; t_int &gt; m_image_index</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__wproj_8cc_source.html#l00053">measurement_operator_wproj.cc:53</a></div></div>
 <div class="ttc" id="anamespaceb__utilities_html_a224195343f875ecd21158fe98df7daf8"><div class="ttname"><a href="namespaceb__utilities.html#a224195343f875ecd21158fe98df7daf8">b_utilities::random_measurements</a></div><div class="ttdeci">utilities::vis_params random_measurements(t_int size, const t_real max_w, const t_int id)</div><div class="ttdef"><b>Definition:</b> <a href="benchmarks_2utilities_8cc_source.html#l00096">utilities.cc:96</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1utilities_html_a37001a359a524976a06439a804a51cb4"><div class="ttname"><a href="namespacepurify_1_1utilities.html#a37001a359a524976a06439a804a51cb4">purify::utilities::w_stacking</a></div><div class="ttdeci">utilities::vis_params w_stacking(utilities::vis_params const &amp;params, sopt::mpi::Communicator const &amp;comm, const t_int iters, const std::function&lt; t_real(t_real)&gt; &amp;cost, const t_real k_means_rel_diff)</div><div class="ttdef"><b>Definition:</b> <a href="purify_2mpi__utilities_8cc_source.html#l00195">mpi_utilities.cc:195</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1utilities_html_ab6364c945c8df98349ca192860d1c769"><div class="ttname"><a href="namespacepurify_1_1utilities.html#ab6364c945c8df98349ca192860d1c769">purify::utilities::w_stacking_with_all_to_all</a></div><div class="ttdeci">std::tuple&lt; utilities::vis_params, std::vector&lt; t_int &gt;, std::vector&lt; t_real &gt; &gt; w_stacking_with_all_to_all(utilities::vis_params const &amp;params, const t_real du, const t_int min_support, const t_int max_support, sopt::mpi::Communicator const &amp;comm, const t_int iters, const t_real fill_relaxation, const std::function&lt; t_real(t_real)&gt; &amp;cost, const t_real k_means_rel_diff)</div><div class="ttdef"><b>Definition:</b> <a href="purify_2mpi__utilities_8cc_source.html#l00204">mpi_utilities.cc:204</a></div></div>
@@ -288,8 +288,8 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00040">40</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;{}</div>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00039">39</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;{}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -317,8 +317,8 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__wproj_8cc_source.html#l00045">45</a> of file <a class="el" href="measurement__operator__wproj_8cc_source.html">measurement_operator_wproj.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;{}</div>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__wproj_8cc_source.html#l00044">44</a> of file <a class="el" href="measurement__operator__wproj_8cc_source.html">measurement_operator_wproj.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;{}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -335,7 +335,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00047">47</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00046">46</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
 
 </div>
 </div>
@@ -351,7 +351,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00042">42</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00041">41</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
 
 </div>
 </div>
@@ -367,7 +367,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__wproj_8cc_source.html#l00054">54</a> of file <a class="el" href="measurement__operator__wproj_8cc_source.html">measurement_operator_wproj.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__wproj_8cc_source.html#l00053">53</a> of file <a class="el" href="measurement__operator__wproj_8cc_source.html">measurement_operator_wproj.cc</a>.</p>
 
 </div>
 </div>
@@ -383,7 +383,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00044">44</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00043">43</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
 
 </div>
 </div>
@@ -399,7 +399,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00045">45</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00044">44</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
 
 </div>
 </div>
@@ -415,7 +415,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00046">46</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00045">45</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
 
 </div>
 </div>
@@ -431,7 +431,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__wproj_8cc_source.html#l00052">52</a> of file <a class="el" href="measurement__operator__wproj_8cc_source.html">measurement_operator_wproj.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__wproj_8cc_source.html#l00051">51</a> of file <a class="el" href="measurement__operator__wproj_8cc_source.html">measurement_operator_wproj.cc</a>.</p>
 
 </div>
 </div>
@@ -447,7 +447,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__wproj_8cc_source.html#l00053">53</a> of file <a class="el" href="measurement__operator__wproj_8cc_source.html">measurement_operator_wproj.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__wproj_8cc_source.html#l00052">52</a> of file <a class="el" href="measurement__operator__wproj_8cc_source.html">measurement_operator_wproj.cc</a>.</p>
 
 </div>
 </div>
@@ -463,7 +463,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00048">48</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00047">47</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
 
 </div>
 </div>
@@ -479,7 +479,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00043">43</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__mpi_8cc_source.html#l00042">42</a> of file <a class="el" href="measurement__operator__mpi_8cc_source.html">measurement_operator_mpi.cc</a>.</p>
 
 </div>
 </div>
