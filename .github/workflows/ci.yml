@@ -191,6 +191,7 @@ jobs:
 
     - uses: actions/download-artifact@v4
       with:
+        name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
         path: ${{github.workspace}}/local
 
     - name: Install Dependencies on Ubunutu
