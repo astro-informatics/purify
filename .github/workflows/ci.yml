@@ -22,6 +22,7 @@ jobs:
   build:
     # Skip CI if PR is a draft
     if: github.event.pull_request.draft == false
+    name: build-${{matrix.os}}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}}
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Windows or Mac.  You can convert this to a matrix build if you need
     # cross-platform coverage.
@@ -127,13 +128,14 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: dependencies
+        name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
         path: ${{github.workspace}}/local
 
 
   test:
     needs:
       build
+    name: test-${{matrix.os}}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}}
     runs-on: ${{matrix.os}}
     env:
       CC: ${{ matrix.cc }}
@@ -158,7 +160,7 @@ jobs:
 
     - uses: actions/download-artifact@v4
       with:
-        name: dependencies
+        name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
         path: ${{github.workspace}}/local
 
     - name: Install Dependencies on Ubunutu
@@ -216,7 +218,7 @@ jobs:
 
     - uses: actions/download-artifact@v4
       with:
-        name: dependencies
+        name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
         path: ${{github.workspace}}/local
 
     - name: Install Dependencies on Ubunutu
