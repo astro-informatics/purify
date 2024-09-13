@@ -50,26 +50,15 @@ if(NOT PURIFY_OPENMP)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 endif()
 
-if(tests)  # Adds ctest
-  enable_testing()
-  find_package(Catch2)
-  include(AddCatchTest)
-endif()
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-command-line-argument")
 
 if(tests AND coverage)
   # Enable code coverage.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-	# Build with debugging information to make the output meaningful.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-	# Disable optimizations to get the most accurate results.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
-endif()
-
-if(benchmarks)
-  set(GBenchmark_GIT_TAG "v1.3.0")
-  include(AddBenchmark)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+  # Build with debugging information to make the output meaningful.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+  # Disable optimizations to get the most accurate results.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 endif()
 
 add_subdirectory(cpp)

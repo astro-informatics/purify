@@ -7,7 +7,7 @@ namespace purify {
 namespace notinstalled {
 
 //! Holds data and such
-inline std::string data_directory() { return "@PROJECT_SOURCE_DIR@/data"; }
+inline std::string data_directory() { return "@CMAKE_INSTALL_PREFIX@/data"; }
 //! Holds data and such
 inline std::string data_filename(std::string const &filename) {
   return data_directory() + "/" + filename;
