@@ -53,7 +53,7 @@ jobs:
             - os: ubuntu-22.04
               cc: clang
             - os: ubuntu-22.04
-              cxx: clang
+              cxx: clang++
             - os: macos-14
               cc: gcc-12
             - os: macos-14
@@ -166,7 +166,7 @@ jobs:
             - clang
           cxx:
             - g++-12
-            - clang
+            - clang++
           mpi:
             - "ON"
             - "OFF"
@@ -177,7 +177,7 @@ jobs:
             - os: ubuntu-22.04
               cc: clang
             - os: ubuntu-22.04
-              cxx: clang
+              cxx: clang++
             - os: macos-14
               cc: gcc-12
             - os: macos-14
