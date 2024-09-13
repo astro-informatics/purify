@@ -42,7 +42,7 @@ jobs:
             - clang
           cxx:
             - g++-12
-            - clang
+            - clang++
           mpi:
             - "ON"
             - "OFF"
