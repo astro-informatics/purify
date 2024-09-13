@@ -172,15 +172,15 @@ jobs:
             - "ON"
             - "OFF"
           exclude:
-            - cc: gcc-12
+            - os: ubuntu-22.04
               cxx: clang
-            - cc: clang
-              cxx: g++-12
             - os: macos-14
               cc: gcc-12
               cxx: g++-12
             - os: macos-14
               omp: "ON"
+            - os: macos-14
+              mpi: "ON"
     steps:
     - uses: actions/checkout@v4
 
