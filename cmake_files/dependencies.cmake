@@ -19,11 +19,20 @@ endif()
 
 find_package(CFitsIO REQUIRED)
 
+cmake_policy(SET CMP0167 OLD)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 find_package(yaml-cpp REQUIRED)
 
 find_package(sopt REQUIRED)
+set(PURIFY_ONNXRT FALSE)
+if (onnxrt)
+  if (${sopt_HAS_ORT})
+    set(PURIFY_ONNXRT TRUE)
+  else()
+    message(FATAL_ERROR "SOPT built without ONNXrt support")
+  endif()
+endif()
 
 find_package(Cubature QUIET)
 if(NOT Cubature_FOUND)
@@ -64,13 +73,9 @@ if(benchmarks)
   #include(AddBenchmark)
 endif()
 
-if(cppflow)
-  find_package(cppflow)
-  find_library(TENSORFLOW_LIB tensorflow REQUIRED)
-endif()
-
 # Always find open-mp, since it may be used by sopt
 if (openmp)
+  cmake_policy(SET CMP0074 NEW)
   find_package(OpenMP)
   if (OPENMP_FOUND)
     # Set PURIFY_OPENMP to TRUE when OpenMP is both found and requested
@@ -112,13 +117,6 @@ if(docasa)
     set(PURIFY_CASACORE_LOOKUP TRUE)
   endif()
   set(PURIFY_CASACORE TRUE)
-endif()
-
-set(PURIFY_CPPFLOW FALSE)
-if(cppflow)
-  find_package(cppflow)
-  find_library(TENSORFLOW_LIB tensorflow REQUIRED)
-  set(PURIFY_CPPFLOW TRUE)
 endif()
 
 # Add script to execute to make sure libraries in the build tree can be found

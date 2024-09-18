@@ -1,9 +1,6 @@
 
 include_directories("${PROJECT_SOURCE_DIR}/cpp" "${PROJECT_BINARY_DIR}/include")
 add_library(common_catch_main_object OBJECT "common_catch_main.cc")
-if(spdlog_FOUND)
-  target_link_libraries(common_catch_main_object spdlog::spdlog)
-endif()
 if(Catch2_FOUND)
   target_link_libraries(common_catch_main_object Catch2::Catch2)
 endif()
@@ -51,9 +48,6 @@ if(PURIFY_MPI)
   add_library(common_mpi_catch_main_object OBJECT "common_mpi_catch_main.cc")
   target_include_directories(common_mpi_catch_main_object
     PUBLIC ${PROJECT_BINARY_DIR}/include ${MPI_CXX_INCLUDE_PATH})
-  if(spdlog_FOUND)
-    target_link_libraries(common_mpi_catch_main_object spdlog::spdlog)
-  endif()
   if(Catch2_FOUND)
     target_link_libraries(common_mpi_catch_main_object Catch2::Catch2)
   endif()
@@ -91,3 +85,6 @@ if(PURIFY_MPI)
   add_mpi_test(mpi_wide_field_utilities LIBRARIES libpurify)
   add_mpi_test(parallel_mpi_utilities LIBRARIES libpurify)
 endif()
+
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/data DESTINATION .)
+
