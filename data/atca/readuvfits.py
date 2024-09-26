@@ -76,8 +76,7 @@ def readData(filename, vis_name, pol1, pol2, filter):
         f.create_dataset('sigma', data=sigma)
         f.close()
         print(f"saved {h5_name}")
-    else:
-        np.savetxt(vis_name, table, delimiter = " ")
+    np.savetxt(vis_name, table, delimiter = " ")
 
 names = ["0332-391"]
 for name in names:
