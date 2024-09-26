@@ -19,7 +19,7 @@ endif()
 
 find_package(CFitsIO REQUIRED)
 
-if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.29.0")
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.30.0")
   cmake_policy(SET CMP0167 NEW)
 endif()
 find_package(Boost COMPONENTS system filesystem REQUIRED)
