@@ -19,7 +19,9 @@ endif()
 
 find_package(CFitsIO REQUIRED)
 
-cmake_policy(SET CMP0167 OLD)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.30.0")
+  cmake_policy(SET CMP0167 NEW)
+endif()
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 find_package(yaml-cpp REQUIRED)
@@ -50,7 +52,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 if(docs)
-  cmake_policy(SET CMP0057 NEW)
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.3.0")
+    cmake_policy(SET CMP0057 NEW)
+  endif()
   find_package(Doxygen REQUIRED dot)
 endif()
 
@@ -75,7 +79,9 @@ endif()
 
 # Always find open-mp, since it may be used by sopt
 if (openmp)
-  cmake_policy(SET CMP0074 NEW)
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.12.0")
+    cmake_policy(SET CMP0074 NEW)
+  endif()
   find_package(OpenMP)
   if (OPENMP_FOUND)
     # Set PURIFY_OPENMP to TRUE when OpenMP is both found and requested
