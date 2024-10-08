@@ -218,7 +218,10 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: |
         export LD_LIBRARY_PATH=${{github.workspace}}/local/lib:${{github.workspace}}/local/external/lib:${LD_LIBRARY_PATH}
-        ls ${{github.workspace}}/local/
+        OLDSOPT=`ls ${{github.workspace}}/local/lib/libsopt*`
+        SOPTBASE=${OLDSOPT%.*}
+        NEWSOPT=${SOPTBASE%.*}.${OLDSOPT##*.}
+        ln -s  $OLDSOPT $NEWSOPT
         ls ${{github.workspace}}/local/lib/
         ctest -C ${{env.BUILD_TYPE}} --output-on-failure
 
