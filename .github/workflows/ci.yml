@@ -219,8 +219,10 @@ jobs:
       run: |
         export LD_LIBRARY_PATH=${{github.workspace}}/local/lib:${{github.workspace}}/local/external/lib:${LD_LIBRARY_PATH}
         OLDSOPT=`ls ${{github.workspace}}/local/lib/libsopt*`
-        SOPTBASE=${OLDSOPT%.*}
-        NEWSOPT=${SOPTBASE%.*}.${OLDSOPT##*.}
+        NEWSOPT=${OLDSOPT%.*}
+        if [[ $OLDSOPT == *"dylib"* ]]; then
+          NEWSOPT=${NEWSOPT%.*}.${OLDSOPT##*.}
+        fi
         ln -s  $OLDSOPT $NEWSOPT
         ls ${{github.workspace}}/local/lib/
         ctest -C ${{env.BUILD_TYPE}} --output-on-failure
