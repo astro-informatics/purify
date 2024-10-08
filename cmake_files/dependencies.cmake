@@ -26,6 +26,10 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 find_package(yaml-cpp REQUIRED)
 
+if (onnxrt)
+  find_package(onnxruntime REQUIRED)
+endif()
+
 find_package(sopt REQUIRED)
 set(PURIFY_ONNXRT FALSE)
 if (onnxrt)
