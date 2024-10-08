@@ -58,7 +58,7 @@ int main(int nargs, char const **args) {
   std::vector<t_int> image_index;
   std::tie(uv_data, image_index, w_stacks) = utilities::w_stacking_with_all_to_all(
       uv_data, du, Ju, Jw, world, 100, 0., cost, k_means_rel_diff);
-  for (t_real k = 0; k < uv_data.size(); k++) {
+  for (t_int k = 0; k < uv_data.size(); k++) {
     const t_int Ju_max = widefield::w_support(uv_data.w(k) - w_stacks.at(image_index.at(k)), du,
                                               static_cast<t_int>(Ju), static_cast<t_int>(Jw));
     const t_real mem = (Ju_max * Ju_max) * 16.;
