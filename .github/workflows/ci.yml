@@ -223,8 +223,7 @@ jobs:
         if [[ $OLDSOPT == *"dylib"* ]]; then
           NEWSOPT=${NEWSOPT%.*}.${OLDSOPT##*.}
         fi
-        ln -s  $OLDSOPT $NEWSOPT
-        ls ${{github.workspace}}/local/lib/
+        ln -s $OLDSOPT $NEWSOPT
         ctest -C ${{env.BUILD_TYPE}} --output-on-failure
 
   doc:
