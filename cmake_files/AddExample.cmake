@@ -33,7 +33,7 @@ function(add_example targetname)
     if(example_WORKING_DIRECTORY)
       set(EXTRA_ARGS WORKING_DIRECTORY ${example_WORKING_DIRECTORY})
     endif()
-    add_test(NAME test_example_${targetname} COMMAND example_${targetname} ${EXTRA_ARGS})
+    add_test(NAME test_example_${targetname} COMMAND "./example_${targetname}" ${EXTRA_ARGS})
 
     list(APPEND example_LABELS examples)
     set_tests_properties(test_example_${targetname} PROPERTIES LABELS "${example_LABELS}")

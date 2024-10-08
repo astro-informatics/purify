@@ -1,6 +1,13 @@
 import astropy.io.fits as fits
 import numpy as np
 
+do_h5 = False
+try:
+  import h5py
+  do_h5 = True
+except ImportError:
+  do_h5 = False
+
 speed_of_light = 299792458. #m/s
 
 def readData(filename, vis_name, pol1, pol2, filter):
@@ -58,6 +65,17 @@ def readData(filename, vis_name, pol1, pol2, filter):
     print(table[0,:], u[0], v[0], w[0], re[0], im[0], sigma[0])
     print("Total visibilities... ", u.shape, v.shape, w.shape, re.shape, im.shape, sigma.shape)
 
+    if do_h5:
+        h5_name = vis_name[:vis_name.rfind('.')] + '.h5'
+        f = h5py.File(h5_name, 'w')
+        f.create_dataset('u', data=u)
+        f.create_dataset('v', data=v)
+        f.create_dataset('w', data=w)
+        f.create_dataset('re', data=re)
+        f.create_dataset('im', data=im)
+        f.create_dataset('sigma', data=sigma)
+        f.close()
+        print(f"saved {h5_name}")
     np.savetxt(vis_name, table, delimiter = " ")
 
 names = ["0332-391"]

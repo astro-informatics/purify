@@ -70,7 +70,7 @@ if(PURIFY_MPI)
     add_test(NAME ${testname}
       COMMAND
       ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS}
-      $<TARGET_FILE:test_${testname}> ${arguments})
+      "./test_${testname}" ${arguments})
     set_tests_properties(${testname} PROPERTIES LABELS "catch;mpi")
   endfunction()
 
@@ -85,3 +85,6 @@ if(PURIFY_MPI)
   add_mpi_test(mpi_wide_field_utilities LIBRARIES libpurify)
   add_mpi_test(parallel_mpi_utilities LIBRARIES libpurify)
 endif()
+
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/data DESTINATION .)
+

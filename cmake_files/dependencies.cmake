@@ -17,12 +17,18 @@ else()
   message(FATAL_ERROR "Eigen is required")
 endif()
 
-find_package(CFitsIO MODULE REQUIRED)
+find_package(CFitsIO REQUIRED)
 
-cmake_policy(SET CMP0167 OLD)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.30.0")
+  cmake_policy(SET CMP0167 NEW)
+endif()
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 find_package(yaml-cpp REQUIRED)
+
+if (onnxrt)
+  find_package(onnxruntime REQUIRED)
+endif()
 
 find_package(sopt REQUIRED)
 set(PURIFY_ONNXRT FALSE)
@@ -50,17 +56,36 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 if(docs)
-  cmake_policy(SET CMP0057 NEW)
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.3.0")
+    cmake_policy(SET CMP0057 NEW)
+  endif()
   find_package(Doxygen REQUIRED dot)
+endif()
+
+if(tests)  # Adds ctest
+  enable_testing()
+  find_package(Catch2)
+  include(AddCatchTest)
 endif()
 
 if(examples)
   find_package(TIFF REQUIRED)
 endif()
 
+if(tests OR examples)
+  file(COPY data DESTINATION .)
+endif()
+
+if(benchmarks)
+  find_package(benchmark REQUIRED)
+  #include(AddBenchmark)
+endif()
+
 # Always find open-mp, since it may be used by sopt
 if (openmp)
-  cmake_policy(SET CMP0074 NEW)
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.12.0")
+    cmake_policy(SET CMP0074 NEW)
+  endif()
   find_package(OpenMP)
   if (OPENMP_FOUND)
     # Set PURIFY_OPENMP to TRUE when OpenMP is both found and requested
