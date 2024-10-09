@@ -140,7 +140,9 @@ jobs:
         make -j$(nproc --ignore 1) install
 
     - name: Pack dependencies
-      run: tar cfv ${{github.workspace}}/dependencies.tar ${{github.workspace}}/local
+      run: |
+        cd ${{github.workspace}}
+        tar cfv dependencies.tar local
         
     - uses: actions/upload-artifact@v4
       with:
