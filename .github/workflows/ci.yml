@@ -139,10 +139,13 @@ jobs:
         cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}} -Dtests=OFF -Dexamples=OFF
         make -j$(nproc --ignore 1) install
 
+    - name: Pack dependencies
+      run: tar cf ${{github.workspace}}/dependencies.tar ${{github.workspace}}/local
+        
     - uses: actions/upload-artifact@v4
       with:
         name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
-        path: ${{github.workspace}}/local
+        path: ${{github.workspace}}/dependencies.tar
         retention-days: 5
 
   test:
@@ -188,7 +191,9 @@ jobs:
     - uses: actions/download-artifact@v4
       with:
         name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
-        path: ${{github.workspace}}/local
+
+    -name: Unpack dependencies
+        run: tar xf dependencies.tar
 
     - name: Install Dependencies on Ubunutu
       if: ${{ contains(matrix.os, 'ubuntu') }}
@@ -247,7 +252,9 @@ jobs:
     - uses: actions/download-artifact@v4
       with:
         name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
-        path: ${{github.workspace}}/local
+
+    -name: Unpack dependencies
+        run: tar xf dependencies.tar
 
     - name: Install Dependencies on Ubunutu
       if: ${{ contains(matrix.os, 'ubuntu') }}
