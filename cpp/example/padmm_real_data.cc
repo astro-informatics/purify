@@ -46,7 +46,7 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
   auto const Psi = sopt::linear_transform<t_complex>(sara, imsizey, imsizex);
   const Vector<> dimage = (measurements_transform->adjoint() * uv_data.vis).real();
   Matrix<t_complex> point = Matrix<t_complex>::Zero(imsizey, imsizex);
-  point(std::floor(imsizey / 2), std::floor(imsizex / 2)) = 1.;
+  point(int(imsizey / 2), int(imsizex / 2)) = 1.;
   const Vector<> psf =
       (measurements_transform->adjoint() *
        (*measurements_transform * Vector<t_complex>::Map(point.data(), point.size())).eval())

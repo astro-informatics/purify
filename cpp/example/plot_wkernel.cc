@@ -2,7 +2,6 @@
 #include "purify/config.h"
 
 #include <iostream>
-#include "catch.hpp"
 #include "purify/directories.h"
 
 #include "purify/types.h"

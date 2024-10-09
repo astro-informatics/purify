@@ -1,5 +1,5 @@
 
-set(${PROJECT_NAME}_VERSION 3.1.0)
+set(${PROJECT_NAME}_VERSION 4.2.0)
 
 # Tries and get git hash first
 find_package(Git)
