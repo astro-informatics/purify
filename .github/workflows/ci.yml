@@ -193,7 +193,7 @@ jobs:
         name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
 
     -name: Unpack dependencies
-        run: tar xf dependencies.tar
+     run: tar xf dependencies.tar
 
     - name: Install Dependencies on Ubunutu
       if: ${{ contains(matrix.os, 'ubuntu') }}
@@ -254,7 +254,7 @@ jobs:
         name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
 
     -name: Unpack dependencies
-        run: tar xf dependencies.tar
+     run: tar xf dependencies.tar
 
     - name: Install Dependencies on Ubunutu
       if: ${{ contains(matrix.os, 'ubuntu') }}
