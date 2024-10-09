@@ -223,7 +223,7 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  std::vector&lt;t_int&gt; image_index;</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  std::tie(uv_data, image_index, w_stacks) = <a class="code" href="namespacepurify_1_1utilities.html#ab6364c945c8df98349ca192860d1c769">utilities::w_stacking_with_all_to_all</a>(</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      uv_data, du, Ju, Jw, world, 100, 0., cost, k_means_rel_diff);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keywordflow">for</span> (t_real k = 0; k &lt; uv_data.size(); k++) {</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keywordflow">for</span> (t_int k = 0; k &lt; uv_data.size(); k++) {</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keyword">const</span> t_int Ju_max = <a class="code" href="namespacepurify_1_1widefield.html#a72665d41e585afb454323ad5b3e2a5cc">widefield::w_support</a>(uv_data.w(k) - w_stacks.at(image_index.at(k)), du,</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                                              <span class="keyword">static_cast&lt;</span>t_int<span class="keyword">&gt;</span>(Ju), <span class="keyword">static_cast&lt;</span>t_int<span class="keyword">&gt;</span>(Jw));</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keyword">const</span> t_real mem = (Ju_max * Ju_max) * 16.;</div>
