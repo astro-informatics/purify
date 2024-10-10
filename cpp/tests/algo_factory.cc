@@ -14,12 +14,13 @@
 #include "purify/wavelet_operator_factory.h"
 #include <sopt/power_method.h>
 #include <sopt/onnx_differentiable_func.h>
+#include <sopt/directories.h>
 
 #include "purify/test_data.h"
 
 using namespace purify;
 using namespace purify::notinstalled;
-/*
+
 TEST_CASE("padmm_factory") {
   const std::string &test_dir = "expected/padmm/";
   const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
@@ -129,7 +130,7 @@ TEST_CASE("primal_dual_factory", "[!shouldfail]") {
   CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
   CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
 }
-*/
+
 TEST_CASE("fb_factory") {
   const std::string &test_dir = "expected/fb/";
   const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
@@ -223,9 +224,12 @@ TEST_CASE("tf_fb_factory") {
   t_real const sigma = 0.016820222945913496 * std::sqrt(2);  // see test_parameters file
   t_real const beta = sigma * sigma;
   t_real const gamma = 0.0001;
+
+  std::string tf_model_path = sopt::tools::data_directory() + "/snr_15_model_dynamic_v2.onnx";
+
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma, beta,
-      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm, "/home/mmcleod/lexci/sopt/cpp/tests/test_data/snr_15_model_dynamic_v2.onnx", factory::g_proximal_type::TFGProximal);
+      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm, tf_model_path, factory::g_proximal_type::TFGProximal);
 
   auto const diagnostic = (*fb)();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
@@ -243,7 +247,7 @@ TEST_CASE("tf_fb_factory") {
   CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
   CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
 }
-/*
+
 TEST_CASE("onnx_fb_factory") {
   const std::string &test_dir = "expected/fb/";
   const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
@@ -279,10 +283,9 @@ TEST_CASE("onnx_fb_factory") {
   t_real const sigma = 0.016820222945913496 * std::sqrt(2);  // see test_parameters file
   t_real const beta = sigma * sigma;
   t_real const gamma = 0.0001;
-        //TODO: Fix paths? Add directories.h to sopt interface somehow
-  std::string model_dir = "/home/mmcleod/lexci/sopt/cpp/tests/test_data";
-  std::string const prior_path = model_dir + "/example_cost_dynamic_CRR_sigma_5_t_5.onnx";
-  std::string const prior_gradient_path = model_dir + "/example_grad_dynamic_CRR_sigma_5_t_5.onnx";   
+
+  std::string const prior_path = sopt::tools::data_directory() + "/example_cost_dynamic_CRR_sigma_5_t_5.onnx";
+  std::string const prior_gradient_path = sopt::tools::data_directory() + "/example_grad_dynamic_CRR_sigma_5_t_5.onnx";   
   std::shared_ptr<sopt::ONNXDifferentiableFunc<t_complex>> diff_function = std::make_shared<sopt::ONNXDifferentiableFunc<t_complex>>(prior_path, prior_gradient_path, sigma, 20, 5e4, *measurements_transform);
 
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
@@ -306,8 +309,7 @@ TEST_CASE("onnx_fb_factory") {
   CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
   CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
 }
-*/
-/*
+
 TEST_CASE("joint_map_factory") {
   const std::string &test_dir = "expected/joint_map/";
   const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
@@ -372,4 +374,3 @@ TEST_CASE("joint_map_factory") {
   //  CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
   // CHECK(residual_image.real().isApprox(residual.real(), 1e-6));
 }
-*/
