@@ -27,7 +27,7 @@
 #include <sopt/non_differentiable_func.h>
 #include <sopt/real_indicator.h>
 #include <sopt/differentiable_func.h>
-#ifdef PURIFY_CPPFLOW
+#ifdef PURIFY_ONNXRT
 #include <sopt/tf_non_diff_function.h>
 #endif
 
