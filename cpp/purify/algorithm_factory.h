@@ -15,18 +15,18 @@
 #include <sopt/mpi/communicator.h>
 #endif
 
+#include <sopt/differentiable_func.h>
 #include <sopt/imaging_forward_backward.h>
 #include <sopt/imaging_padmm.h>
 #include <sopt/imaging_primal_dual.h>
 #include <sopt/joint_map.h>
 #include <sopt/l1_non_diff_function.h>
+#include <sopt/non_differentiable_func.h>
+#include <sopt/real_indicator.h>
 #include <sopt/relative_variation.h>
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include <sopt/non_differentiable_func.h>
-#include <sopt/real_indicator.h>
-#include <sopt/differentiable_func.h>
 #ifdef PURIFY_ONNXRT
 #include <sopt/tf_non_diff_function.h>
 #endif
@@ -181,7 +181,7 @@ fb_factory(const algo_distribution dist,
       .nu(op_norm * op_norm)
       .Phi(*measurements);
 
-  if(f_function) fb->f_function(f_function);  // only override f_function default if non-null
+  if (f_function) fb->f_function(f_function);  // only override f_function default if non-null
   std::shared_ptr<NonDifferentiableFunc<t_scalar>> g;
 
   switch (g_proximal) {
@@ -215,8 +215,7 @@ fb_factory(const algo_distribution dist,
         "Type TFGProximal not recognized because purify was built with onnxrt=off");
 #endif
   }
-  case (g_proximal_type::Indicator):
-  {
+  case (g_proximal_type::Indicator): {
     g = std::make_shared<RealIndicator<t_scalar>>();
     break;
   }

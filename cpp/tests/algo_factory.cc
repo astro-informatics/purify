@@ -12,9 +12,9 @@
 #include "purify/algorithm_factory.h"
 #include "purify/measurement_operator_factory.h"
 #include "purify/wavelet_operator_factory.h"
-#include <sopt/power_method.h>
-#include <sopt/onnx_differentiable_func.h>
 #include <sopt/directories.h>
+#include <sopt/onnx_differentiable_func.h>
+#include <sopt/power_method.h>
 
 #include "purify/test_data.h"
 
@@ -229,7 +229,8 @@ TEST_CASE("tf_fb_factory") {
 
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma, beta,
-      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm, tf_model_path, factory::g_proximal_type::TFGProximal);
+      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm,
+      tf_model_path, factory::g_proximal_type::TFGProximal);
 
   auto const diagnostic = (*fb)();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
@@ -284,14 +285,18 @@ TEST_CASE("onnx_fb_factory") {
   t_real const beta = sigma * sigma;
   t_real const gamma = 0.0001;
 
-  std::string const prior_path = sopt::tools::data_directory() + "/example_cost_dynamic_CRR_sigma_5_t_5.onnx";
-  std::string const prior_gradient_path = sopt::tools::data_directory() + "/example_grad_dynamic_CRR_sigma_5_t_5.onnx";   
-  std::shared_ptr<sopt::ONNXDifferentiableFunc<t_complex>> diff_function = std::make_shared<sopt::ONNXDifferentiableFunc<t_complex>>(prior_path, prior_gradient_path, sigma, 20, 5e4, *measurements_transform);
+  std::string const prior_path =
+      sopt::tools::data_directory() + "/example_cost_dynamic_CRR_sigma_5_t_5.onnx";
+  std::string const prior_gradient_path =
+      sopt::tools::data_directory() + "/example_grad_dynamic_CRR_sigma_5_t_5.onnx";
+  std::shared_ptr<sopt::ONNXDifferentiableFunc<t_complex>> diff_function =
+      std::make_shared<sopt::ONNXDifferentiableFunc<t_complex>>(
+          prior_path, prior_gradient_path, sigma, 20, 5e4, *measurements_transform);
 
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma, beta,
-      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm, "", factory::g_proximal_type::Indicator, diff_function);
-
+      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm, "",
+      factory::g_proximal_type::Indicator, diff_function);
 
   auto const diagnostic = (*fb)();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
