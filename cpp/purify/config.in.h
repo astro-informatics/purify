@@ -16,6 +16,9 @@
 //! Whether PURIFY is running with mpi
 #cmakedefine PURIFY_MPI
 
+//! Whether PURIFY is running with onnxrt (onnxruntime)
+#cmakedefine PURIFY_ONNXRT
+
 //! Whether PURIFY is running with arrayfire
 #cmakedefine PURIFY_ARRAYFIRE
 
