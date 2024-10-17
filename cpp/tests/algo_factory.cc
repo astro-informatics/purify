@@ -12,7 +12,6 @@
 #include "purify/algorithm_factory.h"
 #include "purify/measurement_operator_factory.h"
 #include "purify/wavelet_operator_factory.h"
-#include <sopt/directories.h>
 #include <sopt/onnx_differentiable_func.h>
 #include <sopt/power_method.h>
 
