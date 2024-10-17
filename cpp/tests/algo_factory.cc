@@ -12,7 +12,11 @@
 #include "purify/algorithm_factory.h"
 #include "purify/measurement_operator_factory.h"
 #include "purify/wavelet_operator_factory.h"
+
+#ifdef PURIFY_ONNXRT
 #include <sopt/onnx_differentiable_func.h>
+#endif
+
 #include <sopt/power_method.h>
 
 #include "purify/test_data.h"
@@ -187,6 +191,7 @@ TEST_CASE("fb_factory") {
   CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
 }
 
+#ifdef PURIFY_ONNXRT
 TEST_CASE("tf_fb_factory") {
   const std::string &test_dir = "expected/fb/";
   const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
@@ -314,6 +319,7 @@ TEST_CASE("onnx_fb_factory") {
   CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
   CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
 }
+#endif
 
 TEST_CASE("joint_map_factory") {
   const std::string &test_dir = "expected/joint_map/";
