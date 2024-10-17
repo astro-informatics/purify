@@ -225,7 +225,8 @@ TEST_CASE("tf_fb_factory") {
   t_real const beta = sigma * sigma;
   t_real const gamma = 0.0001;
 
-  std::string tf_model_path = purify::notinstalled::data_directory() + "/models/snr_15_model_dynamic.onnx";
+  std::string tf_model_path =
+      purify::notinstalled::data_directory() + "/models/snr_15_model_dynamic.onnx";
 
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma, beta,
