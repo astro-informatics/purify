@@ -225,7 +225,7 @@ TEST_CASE("tf_fb_factory") {
   t_real const beta = sigma * sigma;
   t_real const gamma = 0.0001;
 
-  std::string tf_model_path = sopt::tools::data_directory() + "/snr_15_model_dynamic.onnx";
+  std::string tf_model_path = purify::notinstalled::data_directory() + "/models/snr_15_model_dynamic.onnx";
 
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma, beta,
@@ -286,9 +286,9 @@ TEST_CASE("onnx_fb_factory") {
   t_real const gamma = 0.0001;
 
   std::string const prior_path =
-      sopt::tools::data_directory() + "/example_cost_dynamic_CRR_sigma_5_t_5.onnx";
+      purify::notinstalled::data_directory() + "/models/example_cost_dynamic_CRR_sigma_5_t_5.onnx";
   std::string const prior_gradient_path =
-      sopt::tools::data_directory() + "/example_grad_dynamic_CRR_sigma_5_t_5.onnx";
+      purify::notinstalled::data_directory() + "/models/example_grad_dynamic_CRR_sigma_5_t_5.onnx";
   std::shared_ptr<sopt::ONNXDifferentiableFunc<t_complex>> diff_function =
       std::make_shared<sopt::ONNXDifferentiableFunc<t_complex>>(
           prior_path, prior_gradient_path, sigma, 20, 5e4, *measurements_transform);
