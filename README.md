@@ -58,7 +58,7 @@ If the dependencies are already available on your system, you can also install *
 On MacOS, you can also install most of the dependencies with Homebrew e.g.
 
  ``` bash
- brew install boost fftw  eigen yaml-cpp spdlog catch2
+ brew install boost fftw  eigen yaml-cpp catch2 [onnxruntime]
  ```
 
 
