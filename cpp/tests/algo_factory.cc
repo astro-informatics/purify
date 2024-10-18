@@ -181,7 +181,10 @@ TEST_CASE("fb_factory") {
 
   double average_intensity = diagnostic.x.real().sum() / diagnostic.x.size();
   SOPT_HIGH_LOG("Average intensity = {}", average_intensity);
-  double mse = (Vector<t_complex>::Map(solution.data(), solution.size()) - diagnostic.x).real().squaredNorm() / solution.size();
+  double mse = (Vector<t_complex>::Map(solution.data(), solution.size()) - diagnostic.x)
+                   .real()
+                   .squaredNorm() /
+               solution.size();
   SOPT_HIGH_LOG("MSE = {}", mse);
   CHECK(mse <= average_intensity * 1e-3);
 }
@@ -239,7 +242,10 @@ TEST_CASE("tf_fb_factory") {
 
   double average_intensity = diagnostic.x.real().sum() / diagnostic.x.size();
   SOPT_HIGH_LOG("Average intensity = {}", average_intensity);
-  double mse = (Vector<t_complex>::Map(solution.data(), solution.size()) - diagnostic.x).real().squaredNorm() / solution.size();
+  double mse = (Vector<t_complex>::Map(solution.data(), solution.size()) - diagnostic.x)
+                   .real()
+                   .squaredNorm() /
+               solution.size();
   SOPT_HIGH_LOG("MSE = {}", mse);
   CHECK(mse <= average_intensity * 1e-3);
 }
@@ -300,7 +306,10 @@ TEST_CASE("onnx_fb_factory") {
 
   double average_intensity = diagnostic.x.real().sum() / diagnostic.x.size();
   SOPT_HIGH_LOG("Average intensity = {}", average_intensity);
-  double mse = (Vector<t_complex>::Map(solution.data(), solution.size()) - diagnostic.x).real().squaredNorm() / solution.size();
+  double mse = (Vector<t_complex>::Map(solution.data(), solution.size()) - diagnostic.x)
+                   .real()
+                   .squaredNorm() /
+               solution.size();
   SOPT_HIGH_LOG("MSE = {}", mse);
   CHECK(mse <= average_intensity * 1e-3);
 }
