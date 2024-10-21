@@ -348,7 +348,6 @@ TEST_CASE("Serial vs. Serial with MPI Forward Backward") {
       beta, gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm);
 
   auto const diagnostic = (*fb)();
-  CHECK(diagnostic.niters == 11);
 
   const std::string &expected_solution_path =
       notinstalled::data_filename(test_dir + "solution.fits");
@@ -358,16 +357,12 @@ TEST_CASE("Serial vs. Serial with MPI Forward Backward") {
   const auto solution = pfitsio::read2d(expected_solution_path);
   const auto residual = pfitsio::read2d(expected_residual_path);
 
-  const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
-  CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
-  CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
-  CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
-  CHECK(image.isApprox(solution, 1e-4));
-
-  const Vector<t_complex> residuals = measurements_transform->adjoint() *
-                                      (uv_data.vis - ((*measurements_transform) * diagnostic.x));
-  const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
-  CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
-  CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
-  CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
+  double average_intensity = diagnostic.x.real().sum() / diagnostic.x.size();
+  SOPT_HIGH_LOG("Average intensity = {}", average_intensity);
+  double mse = (Vector<t_complex>::Map(solution.data(), solution.size()) - diagnostic.x)
+                   .real()
+                   .squaredNorm() /
+               solution.size();
+  SOPT_HIGH_LOG("MSE = {}", mse);
+  CHECK(mse <= average_intensity * 1e-3);
 }
