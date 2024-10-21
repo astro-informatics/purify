@@ -1348,6 +1348,7 @@
       <arglist></arglist>
       <enumvalue file="namespacepurify_1_1factory.html" anchor="a3e81ddc8925844c225faea9371315d1fadada0c23c1236ccc934a3556a1725e94">L1GProximal</enumvalue>
       <enumvalue file="namespacepurify_1_1factory.html" anchor="a3e81ddc8925844c225faea9371315d1facd065a2ab39996b5bd447b890dec2fa9">TFGProximal</enumvalue>
+      <enumvalue file="namespacepurify_1_1factory.html" anchor="a3e81ddc8925844c225faea9371315d1fa330d9b3991e7785c21cd29a452b56219">Indicator</enumvalue>
     </member>
     <member kind="function">
       <type>std::shared_ptr&lt; Algorithm &gt;</type>
@@ -1367,8 +1368,8 @@
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingForwardBackward&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>fb_factory</name>
       <anchorfile>namespacepurify_1_1factory.html</anchorfile>
-      <anchor>af720ee0908263812ee6f16b8cc3cb35f</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real op_norm=1, const std::string model_path=&quot;&quot;, const g_proximal_type g_proximal=g_proximal_type::L1GProximal)</arglist>
+      <anchor>a30c386e496b397ba9023bdabda2334b5</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real op_norm=1, const std::string model_path=&quot;&quot;, const g_proximal_type g_proximal=g_proximal_type::L1GProximal, std::shared_ptr&lt; DifferentiableFunc&lt; typename Algorithm::Scalar &gt;&gt; f_function=nullptr)</arglist>
     </member>
     <member kind="function">
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingPrimalDual&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
@@ -1726,6 +1727,13 @@
       <name>PURIFY_CASACORE</name>
       <anchorfile>config_8in_8h.html</anchorfile>
       <anchor>a949747b2ae793d86aecd0f88cc927f5b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>PURIFY_ONNXRT</name>
+      <anchorfile>config_8in_8h.html</anchorfile>
+      <anchor>a466ac59f13e070aa1cdd20b7e8289e58</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -8178,6 +8186,7 @@
       <arglist></arglist>
       <enumvalue file="namespacepurify_1_1factory.html" anchor="a3e81ddc8925844c225faea9371315d1fadada0c23c1236ccc934a3556a1725e94">L1GProximal</enumvalue>
       <enumvalue file="namespacepurify_1_1factory.html" anchor="a3e81ddc8925844c225faea9371315d1facd065a2ab39996b5bd447b890dec2fa9">TFGProximal</enumvalue>
+      <enumvalue file="namespacepurify_1_1factory.html" anchor="a3e81ddc8925844c225faea9371315d1fa330d9b3991e7785c21cd29a452b56219">Indicator</enumvalue>
     </member>
     <member kind="enumeration">
       <type></type>
@@ -8230,8 +8239,8 @@
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingForwardBackward&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>fb_factory</name>
       <anchorfile>namespacepurify_1_1factory.html</anchorfile>
-      <anchor>af720ee0908263812ee6f16b8cc3cb35f</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real op_norm=1, const std::string model_path=&quot;&quot;, const g_proximal_type g_proximal=g_proximal_type::L1GProximal)</arglist>
+      <anchor>a30c386e496b397ba9023bdabda2334b5</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real op_norm=1, const std::string model_path=&quot;&quot;, const g_proximal_type g_proximal=g_proximal_type::L1GProximal, std::shared_ptr&lt; DifferentiableFunc&lt; typename Algorithm::Scalar &gt;&gt; f_function=nullptr)</arglist>
     </member>
     <member kind="function">
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingPrimalDual&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
