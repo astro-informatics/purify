@@ -25,6 +25,9 @@
 //! Whether PURIFY is running with casacore
 #cmakedefine PURIFY_CASACORE
 
+//! Whether PURIFY is using (and SOPT was built with) onnxrt support
+#cmakedefine PURIFY_ONNXRT
+
 #include <string>
 #include <tuple>
 #include <cstdint>
