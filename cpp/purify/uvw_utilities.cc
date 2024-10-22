@@ -5,9 +5,16 @@
 #include <sys/stat.h>
 #include "purify/logging.h"
 #include "purify/operators.h"
+#include "purify/h5reader.h"
 
 namespace purify {
 namespace utilities {
+
+bool has_suffix(const std::string &str, const std::string &suff) {
+  return str.size() >= suff.size() &&
+         str.compare(str.size() - suff.size(), suff.size(), suff) == 0;
+}
+
 Matrix<t_real> generate_antennas(const t_uint N, const t_real scale) {
   Matrix<t_real> B = Matrix<t_real>::Zero(N, 3);
   const t_real mean = 0;
@@ -170,7 +177,7 @@ t_real streamtoreal(std::ifstream &stream) {
   return std::stod(input);
 }
 
-utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term) {
+utilities::vis_params read_visibility_csv(const std::string &vis_name, const bool w_term) {
   /*
     Reads an csv file with u, v, visibilities and returns the vectors.
 
@@ -218,6 +225,56 @@ utilities::vis_params read_visibility(const std::string &vis_name, const bool w_
   uv_vis.average_frequency = 0;
 
   return uv_vis;
+}
+
+utilities::vis_params read_visibility_h5(const std::string &vis_name, const bool w_term) {
+  /*
+    Reads an HDF5 file with u, v, visibilities and returns the vectors.
+
+    vis_name:: name of input HDF5 file containing [u, v, real(V), imag(V)].
+  */
+  H5Handler vis_file(vis_name);
+  utilities::vis_params uv_vis;
+
+  std::vector<t_real> utemp = vis_file.read<t_real>("u");
+  uv_vis.u = Eigen::Map<Vector<t_real>>(utemp.data(), utemp.size(), 1);
+
+  // found that a reflection is needed for the orientation
+  // of the gridded image to be correct
+  std::vector<t_real> vtemp = vis_file.read<t_real>("v");
+  uv_vis.v = -Eigen::Map<Vector<t_real>>(vtemp.data(), vtemp.size(), 1);
+
+  if (w_term) {
+    std::vector<t_real> wtemp = vis_file.read<t_real>("w");
+    uv_vis.w = Eigen::Map<Vector<t_real>>(wtemp.data(), wtemp.size(), 1);
+  }
+
+  std::vector<t_real> retemp = vis_file.read<t_real>("re");
+  std::vector<t_real> imtemp = vis_file.read<t_real>("im");
+  std::vector<t_real> sigma = vis_file.read<t_real>("sigma");
+  assert(retemp.size() == imtemp.size());
+
+  uv_vis.vis = Vector<t_complex>::Zero(retemp.size());
+  uv_vis.weights = Vector<t_complex>::Zero(retemp.size());
+  for (size_t i=0; i<retemp.size(); ++i) {
+    uv_vis.vis(i) = t_complex(retemp[i], imtemp[i]);
+    uv_vis.weights(i) = 1 / sigma[i];
+  }
+
+  uv_vis.ra = 0;
+  uv_vis.dec = 0;
+  uv_vis.average_frequency = 0;
+
+  return uv_vis;
+}
+
+utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term) {
+
+  if (      has_suffix(vis_name, ".csv") )  return read_visibility_csv(vis_name, w_term);
+  else if ( has_suffix(vis_name,  ".h5") )  return read_visibility_h5(vis_name,  w_term);
+
+  throw std::runtime_error("File type not supported!");
+
 }
 
 void write_visibility(const utilities::vis_params &uv_vis, const std::string &file_name,
