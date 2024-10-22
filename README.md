@@ -33,7 +33,7 @@ This documentation outlines the necessary and optional [dependencies](#dependenc
 - [yaml-cpp](https://github.com/jbeder/yaml-cpp) v0.6.3: YAML parser and emitter in `C++`.
 - [casacore](http://casacore.github.io/casacore/) - Optional - Needed to interface with measurement
 - [ONNXruntime](https://onnxruntime.ai/) v1.17.1 - Optional - a cross-platform runtime engine based on the Open Neural Network eXchange format.
-  sets. The main **PURIFY** program requires this library (and its dependencies)
+  sets.
 - [Catch2](https://github.com/catchorg/Catch2) v2.13.9: Optional -  A `C++`
   unit-testing framework only needed for testing.
 - [google/benchmark](https://github.com/google/benchmark) v1.6.0: Optional - A `C++`
