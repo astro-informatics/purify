@@ -148,11 +148,6 @@ TEST_CASE("read_mutiple_vis") {
     const auto uv_multi = utilities::read_visibility(names);
     CAPTURE(names.size());
     CAPTURE(uv_data.size());
-    CAPTURE(uv_data.u.size());
-    CAPTURE(uv_data.v.size());
-    CAPTURE(uv_data.w.size());
-    CAPTURE(uv_data.vis.size());
-    CAPTURE(uv_data.weights.size());
     CHECK(uv_data.size() * names.size() == uv_multi.size());
     for (int i = 0; i < names.size(); i++) {
       CHECK(uv_data.u.isApprox(uv_multi.u.segment(i * uv_data.size(), uv_data.size())));
