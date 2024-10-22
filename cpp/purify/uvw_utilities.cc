@@ -3,16 +3,15 @@
 #include <fstream>
 #include <random>
 #include <sys/stat.h>
+#include "purify/h5reader.h"
 #include "purify/logging.h"
 #include "purify/operators.h"
-#include "purify/h5reader.h"
 
 namespace purify {
 namespace utilities {
 
 bool has_suffix(const std::string &str, const std::string &suff) {
-  return str.size() >= suff.size() &&
-         str.compare(str.size() - suff.size(), suff.size(), suff) == 0;
+  return str.size() >= suff.size() && str.compare(str.size() - suff.size(), suff.size(), suff) == 0;
 }
 
 Matrix<t_real> generate_antennas(const t_uint N, const t_real scale) {
@@ -247,8 +246,7 @@ utilities::vis_params read_visibility_h5(const std::string &vis_name, const bool
   if (w_term) {
     std::vector<t_real> wtemp = vis_file.read<t_real>("w");
     uv_vis.w = Eigen::Map<Vector<t_real>>(wtemp.data(), wtemp.size(), 1);
-  }
-  else {
+  } else {
     uv_vis.w = Vector<t_real>::Zero(utemp.size());
   }
 
@@ -259,7 +257,7 @@ utilities::vis_params read_visibility_h5(const std::string &vis_name, const bool
 
   uv_vis.vis = Vector<t_complex>::Zero(retemp.size());
   uv_vis.weights = Vector<t_complex>::Zero(retemp.size());
-  for (size_t i=0; i<retemp.size(); ++i) {
+  for (size_t i = 0; i < retemp.size(); ++i) {
     uv_vis.vis(i) = t_complex(retemp[i], imtemp[i]);
     uv_vis.weights(i) = 1 / sigma[i];
   }
@@ -272,9 +270,8 @@ utilities::vis_params read_visibility_h5(const std::string &vis_name, const bool
 }
 
 utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term) {
-
-  if ( has_suffix(vis_name,  ".h5") )  return read_visibility_h5(vis_name, w_term);
-  return  read_visibility_csv(vis_name, w_term);
+  if (has_suffix(vis_name, ".h5")) return read_visibility_h5(vis_name, w_term);
+  return read_visibility_csv(vis_name, w_term);
 }
 
 void write_visibility(const utilities::vis_params &uv_vis, const std::string &file_name,

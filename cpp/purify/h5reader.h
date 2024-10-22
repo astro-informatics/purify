@@ -13,12 +13,10 @@ namespace purify {
 
 /// @brief Purify interface class to handle HDF5 input files
 class H5Handler {
-  public:
-
+ public:
   H5Handler() = delete;
 
-  H5Handler(const std::string& filename)
-       : _file(filename) { }
+  H5Handler(const std::string& filename) : _file(filename) {}
 
   template <typename T = double>
   std::vector<T> read(const std::string& label) {
@@ -26,11 +24,9 @@ class H5Handler {
     return dataset.read<std::vector<T>>();
   }
 
-  private:
-
-    /// HDF5 file
-    const HighFive::File _file;
-
+ private:
+  /// HDF5 file
+  const HighFive::File _file;
 };
 
 }  // namespace purify
