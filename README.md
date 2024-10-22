@@ -23,7 +23,7 @@ This documentation outlines the necessary and optional [dependencies](#dependenc
 - [OpenMP](http://openmp.org/wp/) v4.8.4 - Optional - Speeds up some of the operations.
 - [MPI](https://www.open-mpi.org) v3.1.1 - Optional - Parallelisation paradigm to speed up operations.
 - [astro-informatics/sopt](https://github.com/astro-informatics/sopt) v4.1.0: Sparse Optimization
-  Compressed Sensing library. Included as a submodule.
+  Compressed Sensing library.
 - [Boost](https://www.boost.org/) v1.78.0: A set of free peer-reviewed
   portable C++ libraries.
 - [fftw3](www.fftw.org) v3.3.9: Fastest Fourier Transform in the West.
