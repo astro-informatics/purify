@@ -88,7 +88,7 @@ $(function() {
 <li><a href="https://gcc.gnu.org">GCC</a> v7.3.0 GNU compiler for <code>C++</code></li>
 <li><a href="http://openmp.org/wp/">OpenMP</a> v4.8.4 - Optional - Speeds up some of the operations.</li>
 <li><a href="https://www.open-mpi.org">MPI</a> v3.1.1 - Optional - Parallelisation paradigm to speed up operations.</li>
-<li><a href="https://github.com/astro-informatics/sopt">astro-informatics/sopt</a> v4.1.0: Sparse Optimization Compressed Sensing library. Included as a submodule.</li>
+<li><a href="https://github.com/astro-informatics/sopt">astro-informatics/sopt</a> v4.1.0: Sparse Optimization Compressed Sensing library.</li>
 <li><a href="https://www.boost.org/">Boost</a> v1.78.0: A set of free peer-reviewed portable C++ libraries.</li>
 <li><a href="www.fftw.org">fftw3</a> v3.3.9: Fastest Fourier Transform in the West.</li>
 <li><a href="http://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen3</a> v3.3.7: Modern <code>C++</code> linear algebra.</li>
@@ -96,7 +96,7 @@ $(function() {
 <li><a href="http://heasarc.gsfc.nasa.gov/fitsio/fitsio.html">cfitsio</a>: v4.0.0: Library of <code>C</code> and <code>Fortran</code> subroutines for reading and writing data files in FITS (Flexible Image Transport System) data format.</li>
 <li><a href="https://github.com/jbeder/yaml-cpp">yaml-cpp</a> v0.6.3: YAML parser and emitter in <code>C++</code>.</li>
 <li><a href="http://casacore.github.io/casacore/">casacore</a> - Optional - Needed to interface with measurement</li>
-<li><a href="https://onnxruntime.ai/">ONNXruntime</a> v1.17.1 - Optional - a cross-platform runtime engine based on the Open Neural Network eXchange format. sets. The main <b>PURIFY</b> program requires this library (and its dependencies)</li>
+<li><a href="https://onnxruntime.ai/">ONNXruntime</a> v1.17.1 - Optional - a cross-platform runtime engine based on the Open Neural Network eXchange format. sets.</li>
 <li><a href="https://github.com/catchorg/Catch2">Catch2</a> v2.13.9: Optional - A <code>C++</code> unit-testing framework only needed for testing.</li>
 <li><a href="https://github.com/google/benchmark">google/benchmark</a> v1.6.0: Optional - A <code>C++</code> micro-benchmarking framework only needed for benchmarks.</li>
 </ul>
@@ -110,7 +110,7 @@ $(function() {
 <div class="line">make -j</div>
 <div class="line">make -j install</div>
 </div><!-- fragment --><p>On MacOS, you can also install most of the dependencies with Homebrew e.g.</p>
-<div class="fragment"><div class="line">brew install boost fftw  eigen yaml-cpp spdlog catch2</div>
+<div class="fragment"><div class="line">brew install boost fftw  eigen yaml-cpp catch2 [onnxruntime]</div>
 </div><!-- fragment --><h2>Machine-learning models</h2>
 <p>The <b>SOPT</b> library includes an interface to ONNXrt for using trained models as priors in the Forward-Backward optimization algorithm. To build <b>PURIFY</b> with ONNXrt capability, you need to enable <code>ONNXrt</code> support also in <b>SOPT</b> using the <code>onnxrt</code> option when running the <code>cmake</code> command.</p>
 <h1>Testing</h1>
