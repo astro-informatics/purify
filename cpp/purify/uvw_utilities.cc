@@ -3,7 +3,9 @@
 #include <fstream>
 #include <random>
 #include <sys/stat.h>
+#ifdef PURIFY_H5
 #include "purify/h5reader.h"
+#endif
 #include "purify/logging.h"
 #include "purify/operators.h"
 
@@ -226,6 +228,7 @@ utilities::vis_params read_visibility_csv(const std::string &vis_name, const boo
   return uv_vis;
 }
 
+#ifdef PURIFY_H5
 utilities::vis_params read_visibility_h5(const std::string &vis_name, const bool w_term) {
   /*
     Reads an HDF5 file with u, v, visibilities and returns the vectors.
@@ -268,9 +271,12 @@ utilities::vis_params read_visibility_h5(const std::string &vis_name, const bool
 
   return uv_vis;
 }
+#endif
 
 utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term) {
+#ifdef PURIFY_H5
   if (has_suffix(vis_name, ".h5")) return read_visibility_h5(vis_name, w_term);
+#endif
   return read_visibility_csv(vis_name, w_term);
 }
 
