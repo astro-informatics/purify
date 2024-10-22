@@ -28,6 +28,9 @@
 //! Whether PURIFY is using (and SOPT was built with) onnxrt support
 #cmakedefine PURIFY_ONNXRT
 
+//! Whether PURIFY is using HDF5 support
+#cmakedefine PURIFY_H5
+
 #include <string>
 #include <tuple>
 #include <cstdint>

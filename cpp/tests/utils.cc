@@ -110,10 +110,11 @@ TEST_CASE("utilities [read_write_vis]", "[read_write_vis]") {
   CHECK(new_random_uv_data.weights.isApprox(random_uv_data.weights, 1e-8));
 }
 TEST_CASE("read_mutiple_vis") {
-  std::string vis_file = vla_filename("at166B.3C129.c0.vis");
-  SECTION("one file") {
-    const std::vector<std::string> names = {vis_file};
-    const auto uv_data = utilities::read_visibility(vis_file);
+  std::string csv_file = vla_filename("at166B.3C129.c0.vis");
+  std::string h5_file = atca_filename("0332-391.h5");
+  SECTION("one csv file") {
+    const std::vector<std::string> names = {csv_file};
+    const auto uv_data = utilities::read_visibility(csv_file);
     const auto uv_multi = utilities::read_visibility(names);
     CAPTURE(names.size());
     CAPTURE(uv_data.size());
@@ -126,9 +127,9 @@ TEST_CASE("read_mutiple_vis") {
       CHECK(uv_data.weights.isApprox(uv_multi.weights.segment(i * uv_data.size(), uv_data.size())));
     }
   }
-  SECTION("many files") {
-    const std::vector<std::string> names = {vis_file, vis_file, vis_file};
-    const auto uv_data = utilities::read_visibility(vis_file);
+  SECTION("many csv files") {
+    const std::vector<std::string> names = {csv_file, csv_file, csv_file};
+    const auto uv_data = utilities::read_visibility(csv_file);
     const auto uv_multi = utilities::read_visibility(names);
     CAPTURE(names.size());
     CAPTURE(uv_data.size());
@@ -141,6 +142,23 @@ TEST_CASE("read_mutiple_vis") {
       CHECK(uv_data.weights.isApprox(uv_multi.weights.segment(i * uv_data.size(), uv_data.size())));
     }
   }
+#ifdef PURIFY_H5
+  SECTION("one HDF5 file") {
+    const std::vector<std::string> names = {h5_file};
+    const auto uv_data = utilities::read_visibility(h5_file);
+    const auto uv_multi = utilities::read_visibility(names);
+    CAPTURE(names.size());
+    CAPTURE(uv_data.size());
+    CHECK(uv_data.size() * names.size() == uv_multi.size());
+    for (int i = 0; i < names.size(); i++) {
+      CHECK(uv_data.u.isApprox(uv_multi.u.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.v.isApprox(uv_multi.v.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.w.isApprox(uv_multi.w.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.vis.isApprox(uv_multi.vis.segment(i * uv_data.size(), uv_data.size())));
+      CHECK(uv_data.weights.isApprox(uv_multi.weights.segment(i * uv_data.size(), uv_data.size())));
+    }
+  }
+#endif
 }
 TEST_CASE("utilities [file exists]", "[file exists]") {
   std::string vis_file = vla_filename("at166B.3C129.c0.vis");
