@@ -23,7 +23,7 @@ This documentation outlines the necessary and optional [dependencies](#dependenc
 - [OpenMP](http://openmp.org/wp/) v4.8.4 - Optional - Speeds up some of the operations.
 - [MPI](https://www.open-mpi.org) v3.1.1 - Optional - Parallelisation paradigm to speed up operations.
 - [astro-informatics/sopt](https://github.com/astro-informatics/sopt) v4.1.0: Sparse Optimization
-  Compressed Sensing library. Included as a submodule.
+  Compressed Sensing library.
 - [Boost](https://www.boost.org/) v1.78.0: A set of free peer-reviewed
   portable C++ libraries.
 - [fftw3](www.fftw.org) v3.3.9: Fastest Fourier Transform in the West.
@@ -33,7 +33,7 @@ This documentation outlines the necessary and optional [dependencies](#dependenc
 - [yaml-cpp](https://github.com/jbeder/yaml-cpp) v0.6.3: YAML parser and emitter in `C++`.
 - [casacore](http://casacore.github.io/casacore/) - Optional - Needed to interface with measurement
 - [ONNXruntime](https://onnxruntime.ai/) v1.17.1 - Optional - a cross-platform runtime engine based on the Open Neural Network eXchange format.
-  sets. The main **PURIFY** program requires this library (and its dependencies)
+  sets.
 - [Catch2](https://github.com/catchorg/Catch2) v2.13.9: Optional -  A `C++`
   unit-testing framework only needed for testing.
 - [google/benchmark](https://github.com/google/benchmark) v1.6.0: Optional - A `C++`
@@ -58,7 +58,7 @@ If the dependencies are already available on your system, you can also install *
 On MacOS, you can also install most of the dependencies with Homebrew e.g.
 
  ``` bash
- brew install boost fftw  eigen yaml-cpp spdlog catch2
+ brew install boost fftw  eigen yaml-cpp catch2 [onnxruntime]
  ```
 
 
