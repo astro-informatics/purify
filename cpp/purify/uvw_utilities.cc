@@ -248,6 +248,9 @@ utilities::vis_params read_visibility_h5(const std::string &vis_name, const bool
     std::vector<t_real> wtemp = vis_file.read<t_real>("w");
     uv_vis.w = Eigen::Map<Vector<t_real>>(wtemp.data(), wtemp.size(), 1);
   }
+  else {
+    uv_vis.w = Vector<t_real>::Zero(utemp.size());
+  }
 
   std::vector<t_real> retemp = vis_file.read<t_real>("re");
   std::vector<t_real> imtemp = vis_file.read<t_real>("im");
@@ -270,11 +273,8 @@ utilities::vis_params read_visibility_h5(const std::string &vis_name, const bool
 
 utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term) {
 
-  if (      has_suffix(vis_name, ".csv") )  return read_visibility_csv(vis_name, w_term);
-  else if ( has_suffix(vis_name,  ".h5") )  return read_visibility_h5(vis_name,  w_term);
-
-  throw std::runtime_error("File type not supported!");
-
+  if ( has_suffix(vis_name,  ".h5") )  return read_visibility_h5(vis_name, w_term);
+  return  read_visibility_csv(vis_name, w_term);
 }
 
 void write_visibility(const utilities::vis_params &uv_vis, const std::string &file_name,

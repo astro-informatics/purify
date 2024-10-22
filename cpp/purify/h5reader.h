@@ -3,7 +3,6 @@
 #include "purify/config.h"
 #include "purify/types.h"
 #include "purify/logging.h"
-//#include "purify/uvw_utilities.h"
 
 #include "highfive/H5File.hpp"
 

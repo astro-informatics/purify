@@ -15,7 +15,7 @@ using namespace purify::notinstalled;
 
 TEST_CASE("Purify H5", "[HDF5]") {
 
-  H5Handler f(atca_filename("0332-391") + ".h5");
+  H5Handler f(atca_filename("0332-391.h5"));
 
   const std::vector<double> u = f.read("u");
   const std::vector<double> v = f.read("v");
