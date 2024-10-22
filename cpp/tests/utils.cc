@@ -142,6 +142,7 @@ TEST_CASE("read_mutiple_vis") {
       CHECK(uv_data.weights.isApprox(uv_multi.weights.segment(i * uv_data.size(), uv_data.size())));
     }
   }
+  #ifdef PURIFY_H5
   SECTION("one HDF5 file") {
     const std::vector<std::string> names = {h5_file};
     const auto uv_data = utilities::read_visibility(h5_file);
@@ -157,6 +158,7 @@ TEST_CASE("read_mutiple_vis") {
       CHECK(uv_data.weights.isApprox(uv_multi.weights.segment(i * uv_data.size(), uv_data.size())));
     }
   }
+  #endif
 }
 TEST_CASE("utilities [file exists]", "[file exists]") {
   std::string vis_file = vla_filename("at166B.3C129.c0.vis");
