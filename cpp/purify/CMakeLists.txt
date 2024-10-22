@@ -16,8 +16,8 @@ endfunction()
 configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(HEADERS
-  logging.h kernels.h pfitsio.h  types.h
-  IndexMapping.h utilities.h operators.h  wproj_utilities.h
+  logging.h kernels.h pfitsio.h types.h
+  IndexMapping.h utilities.h operators.h wproj_utilities.h
   cimg.h uvfits.h convolution.h measurement_operator_factory.h wavelet_operator_factory.h distribute.h
   update_factory.h
   convergence_factory.h
@@ -40,6 +40,10 @@ set(SOURCES utilities.cc pfitsio.cc logging.cc
 if(PURIFY_CASACORE)
   list(APPEND SOURCES casacore.cc)
   list(APPEND HEADERS casacore.h)
+endif()
+
+if(PURIFY_H5)
+  list(APPEND HEADERS h5reader.h)
 endif()
 
 if(PURIFY_MPI)
@@ -68,6 +72,11 @@ endif()
 if(PURIFY_ARRAYFIRE)
   list(APPEND HEADERS operators_gpu.h wproj_operators_gpu.h)
   target_link_libraries(libpurify ${ArrayFire_LIBRARIES})
+endif()
+
+if(PURIFY_H5)
+  target_link_libraries(libpurify ${HDF5_CXX_LIBRARIES})
+  target_include_directories(libpurify SYSTEM PUBLIC ${HDF5_INCLUDE_DIR} ${HighFive_INCLUDE_DIR})
 endif()
 
 target_include_directories(libpurify PUBLIC
@@ -109,6 +118,10 @@ endif()
 
 if(PURIFY_CASACORE_LOOKUP)
   add_dependencies(libpurify Lookup-CasaCore)
+endif()
+
+if(PURIFY_HIGHFIVE_LOOKUP)
+  add_dependencies(libpurify Lookup-HighFive)
 endif()
 
 install(FILES ${HEADERS} DESTINATION include/purify)

@@ -44,6 +44,10 @@ if(PURIFY_ARRAYFIRE)
   add_catch_test(operators_gpu LIBRARIES libpurify ${ArrayFire_LIBRARIES})
 endif()
 
+if(PURIFY_H5)
+  add_catch_test(purify_h5 LIBRARIES libpurify DEPENDS lookup_dependencies)
+endif()
+
 if(PURIFY_MPI)
   add_library(common_mpi_catch_main_object OBJECT "common_mpi_catch_main.cc")
   target_include_directories(common_mpi_catch_main_object

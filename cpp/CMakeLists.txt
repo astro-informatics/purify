@@ -23,6 +23,8 @@ add_include_dir(
   ${yaml-cpp_INCLUDE_DIR}
   ${Cubature_INCLUDE_DIR}
   ${CImg_INCLUDE_DIR}
+  ${HDF5_INCLUDE_DIR}
+  ${HighFive_INCLUDE_DIR}
 )
 
 
