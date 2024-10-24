@@ -18,17 +18,14 @@ class DegridOperatorCtorFixturePar : public ::benchmark::Fixture {
  public:
   void SetUp(const ::benchmark::State &state) {
     // Keep count of the benchmark repetitions
+
     m_counter++;
 
     m_imsizex = state.range(0);
     m_imsizey = state.range(0);
 
     // Generating random uv(w) coverage
-    bool newMeasurements = m_uv_data.size() != state.range(1);
-    if (newMeasurements) {
-      t_real const sigma_m = constant::pi / 3;
-      m_uv_data = utilities::random_sample_density(state.range(1), 0, sigma_m);
-    }
+    bool newMeasurements = b_utilities::updateMeasurements(state.range(1), m_uv_data, m_world);
 
     // Data needed for the creation of the measurement operator
     const t_real FoV = 1;  // deg
@@ -101,11 +98,8 @@ class DegridOperatorFixturePar : public ::benchmark::Fixture {
     bool newImage = updateImage(state.range(0));
 
     // Generating random uv(w) coverage
-    bool newMeasurements = m_uv_data.size() != state.range(1);
-    if (newMeasurements) {
-      t_real const sigma_m = constant::pi / 3;
-      m_uv_data = utilities::random_sample_density(state.range(1), 0, sigma_m);
-    }
+    // bool newMeasurements = m_uv_data.size() != state.range(1);
+    bool newMeasurements = b_utilities::updateMeasurements(state.range(1), m_uv_data, m_world);
 
     // Create measurement operators
     bool newKernel = m_kernel != state.range(2);
