@@ -1,7 +1,9 @@
 #include "purify/config.h"
+#include "purify/logging.h"
 #include <benchmark/benchmark.h>
 #include <sopt/mpi/communicator.h>
 #include <sopt/mpi/session.h>
+#include <sopt/logging.h>
 
 // This reporter does nothing.
 // We can use it to disable output from all but the root process
@@ -16,9 +18,14 @@ class NullReporter : public ::benchmark::BenchmarkReporter {
 // The main is rewritten to allow for MPI initializing and for selecting a
 // reporter according to the process rank
 int main(int argc, char const **argv) {
+
+    sopt::logging::set_level("debug");
+    purify::logging::set_level("debug");
+  
 #ifdef PURIFY_MPI
   auto const session = sopt::mpi::init(argc, argv);
   auto const world = sopt::mpi::Communicator::World();
+  PURIFY_LOW_LOG("MPI initialized");
 #endif
   ::benchmark::Initialize(&argc, const_cast<char **>(argv));
 
