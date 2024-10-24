@@ -91,9 +91,6 @@ BENCHMARK_DEFINE_F(DegridOperatorCtorFixturePar, MPI)(benchmark::State &state) {
 class DegridOperatorFixturePar : public ::benchmark::Fixture {
  public:
   void SetUp(const ::benchmark::State &state) {
-    // Keep count of the benchmark repetitions
-    m_counter++;
-
     // Reading image from file and create temporary image
     bool newImage = updateImage(state.range(0));
 
@@ -118,7 +115,6 @@ class DegridOperatorFixturePar : public ::benchmark::Fixture {
   virtual std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> measurementOperator(
       t_real cellsize, bool w_term) = 0;
 
-  t_uint m_counter;
   sopt::mpi::Communicator m_world;
   t_uint m_kernel;
 
@@ -192,9 +188,6 @@ class DegridOperatorAdjointFixtureMPI : public DegridOperatorAdjointFixturePar {
 
 BENCHMARK_DEFINE_F(DegridOperatorDirectFixtureDistr, Apply)(benchmark::State &state) {
   // Benchmark the application of the distributed operator
-  if ((m_counter % 10) == 1) {
-    m_uv_data.vis = (*m_degridOperator) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
-  }
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     m_uv_data.vis = (*m_degridOperator) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
@@ -208,9 +201,6 @@ BENCHMARK_DEFINE_F(DegridOperatorDirectFixtureDistr, Apply)(benchmark::State &st
 
 BENCHMARK_DEFINE_F(DegridOperatorAdjointFixtureDistr, Apply)(benchmark::State &state) {
   // Benchmark the application of the adjoint distributed operator
-  if ((m_counter % 10) == 1) {
-    m_image = m_degridOperator->adjoint() * m_uv_data.vis;
-  }
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     m_image = m_degridOperator->adjoint() * m_uv_data.vis;
@@ -224,9 +214,6 @@ BENCHMARK_DEFINE_F(DegridOperatorAdjointFixtureDistr, Apply)(benchmark::State &s
 
 BENCHMARK_DEFINE_F(DegridOperatorDirectFixtureMPI, Apply)(benchmark::State &state) {
   // Benchmark the application of the distributed MPI operator
-  if ((m_counter % 10) == 1) {
-    m_uv_data.vis = (*m_degridOperator) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
-  }
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     m_uv_data.vis = (*m_degridOperator) * Image<t_complex>::Map(m_image.data(), m_image.size(), 1);
@@ -240,9 +227,6 @@ BENCHMARK_DEFINE_F(DegridOperatorDirectFixtureMPI, Apply)(benchmark::State &stat
 
 BENCHMARK_DEFINE_F(DegridOperatorAdjointFixtureMPI, Apply)(benchmark::State &state) {
   // Benchmark the application of the adjoint distributed MPI operator
-  if ((m_counter % 10) == 1) {
-    m_image = m_degridOperator->adjoint() * m_uv_data.vis;
-  }
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
     m_image = m_degridOperator->adjoint() * m_uv_data.vis;
@@ -277,51 +261,43 @@ BENCHMARK_REGISTER_F(DegridOperatorCtorFixturePar, MPI)
 BENCHMARK_REGISTER_F(DegridOperatorDirectFixtureDistr, Apply)
     //->Apply(b_utilities::Arguments)
     ->Args({1024, static_cast<t_int>(1e6), 4})
-    ->Args({1024, static_cast<t_int>(5e6), 4})
     ->Args({1024, static_cast<t_int>(1e7), 4})
-    ->Args({1024, static_cast<t_int>(5e7), 4})
-    ->Args({1024, static_cast<t_int>(1e8), 4})
-    ->Args({1024, static_cast<t_int>(5e8), 4})
     ->UseManualTime()
-    ->Repetitions(10)
+    ->MinTime(10.0)
+    ->MinWarmUpTime(5.0)
+    ->Repetitions(3)
     //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorAdjointFixtureDistr, Apply)
     //->Apply(b_utilities::Arguments)
     ->Args({1024, static_cast<t_int>(1e6), 4})
-    ->Args({1024, static_cast<t_int>(5e6), 4})
     ->Args({1024, static_cast<t_int>(1e7), 4})
-    ->Args({1024, static_cast<t_int>(5e7), 4})
-    ->Args({1024, static_cast<t_int>(1e8), 4})
-    ->Args({1024, static_cast<t_int>(5e8), 4})
     ->UseManualTime()
-    ->Repetitions(10)
+    ->MinTime(10.0)
+    ->MinWarmUpTime(5.0)
+    ->Repetitions(3)
     //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorDirectFixtureMPI, Apply)
     //->Apply(b_utilities::Arguments)
     ->Args({1024, static_cast<t_int>(1e6), 4})
-    ->Args({1024, static_cast<t_int>(5e6), 4})
     ->Args({1024, static_cast<t_int>(1e7), 4})
-    ->Args({1024, static_cast<t_int>(5e7), 4})
-    ->Args({1024, static_cast<t_int>(1e8), 4})
-    ->Args({1024, static_cast<t_int>(5e8), 4})
     ->UseManualTime()
-    ->Repetitions(10)
+    ->MinTime(10.0)
+    ->MinWarmUpTime(5.0)
+    ->Repetitions(3)
     //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(DegridOperatorAdjointFixtureMPI, Apply)
     //->Apply(b_utilities::Arguments)
     ->Args({1024, static_cast<t_int>(1e6), 4})
-    ->Args({1024, static_cast<t_int>(5e6), 4})
     ->Args({1024, static_cast<t_int>(1e7), 4})
-    ->Args({1024, static_cast<t_int>(5e7), 4})
-    ->Args({1024, static_cast<t_int>(1e8), 4})
-    ->Args({1024, static_cast<t_int>(5e8), 4})
     ->UseManualTime()
-    ->Repetitions(10)
+    ->MinTime(10.0)
+    ->MinWarmUpTime(5.0)
+    ->Repetitions(3)
     //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
