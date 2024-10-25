@@ -84,8 +84,7 @@ TEST_CASE("primal_dual_factory") {
       notinstalled::data_filename(test_dir + "solution.fits");
   const std::string &expected_residual_path =
       notinstalled::data_filename(test_dir + "residual.fits");
-  const std::string &result_path =
-      notinstalled::data_filename(test_dir + "pd_result.fits");
+  const std::string &result_path = notinstalled::data_filename(test_dir + "pd_result.fits");
 
   const auto solution = pfitsio::read2d(expected_solution_path);
   const auto residual = pfitsio::read2d(expected_residual_path);
@@ -117,7 +116,7 @@ TEST_CASE("primal_dual_factory") {
           imsizey, imsizex, sara.size(), 1000, true, true, 1e-3);
 
   auto const diagnostic = (*primaldual)();
-  
+
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
   // pfitsio::write2d(image.real(), result_path);
 
