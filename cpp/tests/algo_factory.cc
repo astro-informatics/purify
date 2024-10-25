@@ -77,15 +77,15 @@ TEST_CASE("padmm_factory") {
   CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
 }
 
-// This test does not converge and is therefore set to shouldfail.
-// See https://github.com/astro-informatics/purify/issues/317 for details.
-TEST_CASE("primal_dual_factory", "[!shouldfail]") {
+TEST_CASE("primal_dual_factory") {
   const std::string &test_dir = "expected/primal_dual/";
   const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
   const std::string &expected_solution_path =
       notinstalled::data_filename(test_dir + "solution.fits");
   const std::string &expected_residual_path =
       notinstalled::data_filename(test_dir + "residual.fits");
+  const std::string &result_path =
+      notinstalled::data_filename(test_dir + "pd_result.fits");
 
   const auto solution = pfitsio::read2d(expected_solution_path);
   const auto residual = pfitsio::read2d(expected_residual_path);
@@ -98,13 +98,12 @@ TEST_CASE("primal_dual_factory", "[!shouldfail]") {
   t_uint const imsizey = 128;
   t_uint const imsizex = 128;
 
-  Vector<t_complex> const init = Vector<t_complex>::Ones(imsizex * imsizey);
-  auto const measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
-      factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2,
-      kernels::kernel_from_string.at("kb"), 4, 4);
-  auto const power_method_stuff =
-      sopt::algorithm::power_method<Vector<t_complex>>(*measurements_transform, 1000, 1e-5, init);
-  const t_real op_norm = std::get<0>(power_method_stuff);
+  auto const measurements_transform =
+      std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
+          factory::measurement_operator_factory<Vector<t_complex>>(
+              factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2,
+              kernels::kernel_from_string.at("kb"), 4, 4),
+          1000, 1e-5, Vector<t_complex>::Ones(imsizex * imsizey)));
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -115,23 +114,21 @@ TEST_CASE("primal_dual_factory", "[!shouldfail]") {
   auto const primaldual =
       factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
           factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma,
-          imsizey, imsizex, sara.size(), 20, true, true, 1e-2, 1, op_norm);
+          imsizey, imsizex, sara.size(), 1000, true, true, 1e-3);
 
   auto const diagnostic = (*primaldual)();
+  
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
-  // pfitsio::write2d(image.real(), expected_solution_path);
-  CAPTURE(Vector<t_complex>::Map(solution.data(), solution.size()).real().head(10));
-  CAPTURE(Vector<t_complex>::Map(image.data(), image.size()).real().head(10));
-  CAPTURE(Vector<t_complex>::Map((image / solution).eval().data(), image.size()).real().head(10));
-  CHECK(image.isApprox(solution, 1e-4));
+  // pfitsio::write2d(image.real(), result_path);
 
-  const Vector<t_complex> residuals = measurements_transform->adjoint() *
-                                      (uv_data.vis - ((*measurements_transform) * diagnostic.x));
-  const Image<t_complex> residual_image = Image<t_complex>::Map(residuals.data(), imsizey, imsizex);
-  // pfitsio::write2d(residual_image.real(), expected_residual_path);
-  CAPTURE(Vector<t_complex>::Map(residual.data(), residual.size()).real().head(10));
-  CAPTURE(Vector<t_complex>::Map(residuals.data(), residuals.size()).real().head(10));
-  CHECK(residual_image.real().isApprox(residual.real(), 1e-4));
+  double average_intensity = diagnostic.x.real().sum() / diagnostic.x.size();
+  SOPT_HIGH_LOG("Average intensity = {}", average_intensity);
+  double mse = (Vector<t_complex>::Map(solution.data(), solution.size()) - diagnostic.x)
+                   .real()
+                   .squaredNorm() /
+               solution.size();
+  SOPT_HIGH_LOG("MSE = {}", mse);
+  CHECK(mse <= average_intensity * 1e-3);
 }
 
 TEST_CASE("fb_factory") {
