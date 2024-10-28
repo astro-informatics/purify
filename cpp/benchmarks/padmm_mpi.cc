@@ -25,7 +25,8 @@ class PadmmFixtureMPI : public ::benchmark::Fixture {
     bool newImage = b_utilities::updateImage(state.range(0), m_image, m_imsizex, m_imsizey);
 
     // Generating random uv(w) coverage
-    bool newMeasurements = m_uv_data.size() != state.range(1);
+    bool newMeasurements = b_utilities::updateMeasurements(state.range(1), m_uv_data, m_world);
+
     if (newMeasurements) {
       t_real const sigma_m = constant::pi / 3;
       m_uv_data = utilities::random_sample_density(state.range(1), 0, sigma_m);
@@ -80,10 +81,10 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
   t_real gamma =
       utilities::step_size(m_uv_data.vis, m_measurements1,
                            std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(Psi),
-                           saraDistr.size()) *
-      1e-3;
+                           saraDistr.size()) * 1e-3;
   gamma = m_world.all_reduce(gamma, MPI_MAX);
-
+  auto sigma = 1.0;
+  m_epsilon = std::sqrt(2 * m_uv_data.size() + 2 * std::sqrt(4 * m_uv_data.size())) * sigma;
   std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm =
       std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(m_uv_data.vis);
   padmm->itermax(state.range(3) + 1)
@@ -95,7 +96,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
       .tight_frame(false)
       .l1_proximal_tolerance(1e-2)
       .l1_proximal_nu(1)
-      .l1_proximal_itermax(2)
+      .l1_proximal_itermax(20)
       .l1_proximal_positivity_constraint(true)
       .l1_proximal_real_constraint(true)
       .residual_tolerance(m_epsilon)
@@ -114,7 +115,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
     auto start = std::chrono::high_resolution_clock::now();
     auto result = (*padmm)();
     auto end = std::chrono::high_resolution_clock::now();
-    // std::cout << "Converged? " << result.good << " , niters = " << result.niters << std::endl;
+    std::cout << "Converged? " << result.good << " , niters = " << result.niters << std::endl;
     state.SetIterationTime(b_utilities::duration(start, end, m_world));
   }
 }
@@ -130,7 +131,8 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
                            saraDistr.size()) *
       1e-3;
   gamma = m_world.all_reduce(gamma, MPI_MAX);
-
+  auto sigma = 1.0;
+  m_epsilon = std::sqrt(2 * m_uv_data.size() + 2 * std::sqrt(4 * m_uv_data.size())) * sigma;
   std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm =
       std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(m_uv_data.vis);
   padmm->itermax(state.range(3) + 1)
@@ -142,7 +144,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
       .tight_frame(false)
       .l1_proximal_tolerance(1e-2)
       .l1_proximal_nu(1)
-      .l1_proximal_itermax(2)
+      .l1_proximal_itermax(10)
       .l1_proximal_positivity_constraint(true)
       .l1_proximal_real_constraint(true)
       .residual_tolerance(m_epsilon)
@@ -168,26 +170,20 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo1)
     //->Apply(b_utilities::Arguments)
-    ->Args({1024, static_cast<t_int>(1e6), 4, 10, 1})
-    ->Args({1024, static_cast<t_int>(5e6), 4, 10, 1})
-    ->Args({1024, static_cast<t_int>(1e7), 4, 10, 1})
-    ->Args({1024, static_cast<t_int>(5e7), 4, 10, 1})
-    ->Args({1024, static_cast<t_int>(1e8), 4, 10, 1})
-    ->Args({1024, static_cast<t_int>(5e8), 4, 10, 1})
-    //->Args({128, 1000, 4})
+    ->Args({1024, static_cast<t_int>(1e6), 4, 100, 1})
+    ->Args({1024, static_cast<t_int>(1e7), 4, 100, 1})
     ->UseManualTime()
+    ->MinTime(10.0)
+    ->MinWarmUpTime(5.0)
     ->Repetitions(3)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo3)
     //->Apply(b_utilities::Arguments)
     ->Args({1024, static_cast<t_int>(1e6), 4, 10, 3})
-    ->Args({1024, static_cast<t_int>(5e6), 4, 10, 3})
     ->Args({1024, static_cast<t_int>(1e7), 4, 10, 3})
-    ->Args({1024, static_cast<t_int>(5e7), 4, 10, 3})
-    ->Args({1024, static_cast<t_int>(1e8), 4, 10, 3})
-    ->Args({1024, static_cast<t_int>(5e8), 4, 10, 3})
-    //->Args({128, 1000, 4})
     ->UseManualTime()
+    ->MinTime(10.0)
+    ->MinWarmUpTime(5.0)
     ->Repetitions(3)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
