@@ -33,7 +33,7 @@ class H5Handler {
 /// @brief Reads an HDF5 file with u, v, visibilities and returns the vectors.
 ///
 /// @note vis_name: name of input HDF5 file containing [u, v, real(V), imag(V)].
-utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term) {
+utilities::vis_params read_visibility(const std::string& vis_name, const bool w_term) {
   H5Handler vis_file(vis_name);
   utilities::vis_params uv_vis;
 
