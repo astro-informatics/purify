@@ -64,7 +64,7 @@ utilities::vis_params read_measurements(const std::vector<std::string> &names, c
   switch (format_type) {
   case (format::vis): {
     if (pol != stokes::I)
-      throw std::runtime_error("Stokes I assumed for ASCII \"vis\" files, but a different type is chosen.");
+      throw std::runtime_error("Stokes I assumed for vis files, but a different type is chosen.");
     auto measurements = utilities::read_visibility(found_files, w_term);
     measurements.units = units;
     return measurements;

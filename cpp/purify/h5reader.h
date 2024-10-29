@@ -1,8 +1,8 @@
 #ifndef PURIFY_H5READER_H
 #define PURIFY_H5READER_H
 #include "purify/config.h"
-#include "purify/logging.h"
 #include "purify/types.h"
+#include "purify/logging.h"
 #include "purify/uvw_utilities.h"
 
 #include "highfive/H5File.hpp"
@@ -34,7 +34,6 @@ class H5Handler {
 ///
 /// @note vis_name: name of input HDF5 file containing [u, v, real(V), imag(V)].
 utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term) {
-
   H5Handler vis_file(vis_name);
   utilities::vis_params uv_vis;
 
