@@ -6,6 +6,9 @@
 #include <iostream>
 #include "purify/directories.h"
 #include "purify/read_measurements.h"
+#ifdef PURIFY_H5
+#include "purify/h5reader.h"
+#endif
 
 using namespace purify;
 using namespace purify::notinstalled;
@@ -57,6 +60,23 @@ TEST_CASE("uvfits") {
           std::vector<std::string>{filename + ".ms", filename + ".ms"}, comm);
       CAPTURE(comm.rank());
       CHECK(comm.all_sum_all(ms.size()) == 245994 * 2);
+#endif
+    }
+  }
+  SECTION("H5") {
+    SECTION("one") {
+#ifdef PURIFY_H5
+      H5::H5Handler f(filename + ".h5");
+      const std::vector<double> u = f.read("u");
+      CAPTURE(u.size());
+      CHECK(comm.all_sum_all(u.size()) == 245886 * comm.size());
+#endif
+    }
+    SECTION("two") {
+#ifdef PURIFY_H5
+      const auto uvfits = read_measurements::read_measurements(filename + ".h5", comm);
+      CAPTURE(uvfits.size());
+      CHECK(comm.all_sum_all(uvfits.size()) == 245886);
 #endif
     }
   }
