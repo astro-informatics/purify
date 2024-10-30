@@ -5,6 +5,7 @@
 #include "purify/convergence_factory.h"
 #include "purify/directories.h"
 #include "purify/distribute.h"
+#include "purify/logging.h"
 #include "purify/mpi_utilities.h"
 #include "purify/operators.h"
 #include "purify/utilities.h"
@@ -39,16 +40,58 @@ class PadmmFixtureMPI : public ::benchmark::Fixture {
       const t_real FoV = 1;  // deg
       const t_real cellsize = FoV / m_imsizex * 60. * 60.;
       const bool w_term = false;
+
+      auto sigma = 0.033;  // roughly the value used in algo_factory test
+      m_epsilon = std::sqrt(2 * m_uv_data.size() + 2 * std::sqrt(4 * m_uv_data.size())) * sigma;
+
+      sopt::wavelets::SARA saraDistr = sopt::wavelets::distribute_sara(m_sara, m_world);
+      auto const Psi =
+          sopt::linear_transform<t_complex>(saraDistr, m_image.rows(), m_image.cols(), m_world);
+
       // algorithm 1
-      if (state.range(4) == 1)
-        m_measurements1 = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
+      if (state.range(4) == 1) {
+        m_measurements = measurementoperator::init_degrid_operator_2d_mpi<Vector<t_complex>>(
             m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2,
             kernels::kernel::kb, m_kernel, m_kernel, w_term);
-      // algorithm 3
-      if (state.range(4) == 3)
-        m_measurements3 = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
+      } else if (state.range(4) == 3) {
+        m_measurements = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
             m_world, m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2,
             kernels::kernel::kb, m_kernel, m_kernel, w_term);
+      } else {
+        PURIFY_ERROR("Unknown MPI algorithm", state.range(4));
+      }
+
+      // Create the algorithm
+      t_real gamma = utilities::step_size(
+                         m_uv_data.vis, m_measurements,
+                         std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(Psi),
+                         saraDistr.size()) *
+                     1e-3;
+      gamma = m_world.all_reduce(gamma, MPI_MAX);
+      m_padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(m_uv_data.vis);
+      m_padmm->itermax(state.range(3) + 1)
+          .gamma(gamma)
+          .relative_variation(1e-3)
+          .l2ball_proximal_epsilon(m_epsilon)
+          // communicator ensuring l1 norm in l1 proximal is global
+          .l1_proximal_adjoint_space_comm(m_world)
+          .tight_frame(false)
+          .l1_proximal_tolerance(1e-2)
+          .l1_proximal_nu(1)
+          .l1_proximal_itermax(20)
+          .l1_proximal_positivity_constraint(true)
+          .l1_proximal_real_constraint(true)
+          .residual_tolerance(m_epsilon)
+          .lagrange_update_scale(0.9)
+          .nu(1e0)
+          .Psi(Psi)
+          .Phi(*m_measurements);
+
+      std::weak_ptr<decltype(m_padmm)::element_type> const padmm_weak(m_padmm);
+      m_padmm->residual_convergence(factory::l2_convergence_factory<t_complex>(
+          factory::ConvergenceType::mpi_local, padmm_weak));
+      m_padmm->objective_convergence(factory::l1_convergence_factory<t_complex>(
+          factory::ConvergenceType::mpi_local, padmm_weak));
     }
   }
 
@@ -67,53 +110,17 @@ class PadmmFixtureMPI : public ::benchmark::Fixture {
 
   utilities::vis_params m_uv_data;
   t_real m_epsilon;
-
   t_uint m_kernel;
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_measurements1;
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_measurements3;
+
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_measurements;
+  std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> m_padmm;
 };
 
 BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
-  // Create the algorithm - somehow doesn't work if done in the fixture...
-  sopt::wavelets::SARA saraDistr = sopt::wavelets::distribute_sara(m_sara, m_world);
-  auto const Psi =
-      sopt::linear_transform<t_complex>(saraDistr, m_image.rows(), m_image.cols(), m_world);
-  t_real gamma =
-      utilities::step_size(m_uv_data.vis, m_measurements1,
-                           std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(Psi),
-                           saraDistr.size()) * 1e-3;
-  gamma = m_world.all_reduce(gamma, MPI_MAX);
-  auto sigma = 1.0;
-  m_epsilon = std::sqrt(2 * m_uv_data.size() + 2 * std::sqrt(4 * m_uv_data.size())) * sigma;
-  std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm =
-      std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(m_uv_data.vis);
-  padmm->itermax(state.range(3) + 1)
-      .gamma(gamma)
-      .relative_variation(1e-3)
-      .l2ball_proximal_epsilon(m_epsilon)
-      // communicator ensuring l1 norm in l1 proximal is global
-      .l1_proximal_adjoint_space_comm(m_world)
-      .tight_frame(false)
-      .l1_proximal_tolerance(1e-2)
-      .l1_proximal_nu(1)
-      .l1_proximal_itermax(20)
-      .l1_proximal_positivity_constraint(true)
-      .l1_proximal_real_constraint(true)
-      .residual_tolerance(m_epsilon)
-      .lagrange_update_scale(0.9)
-      .nu(1e0)
-      .Psi(Psi)
-      .Phi(*m_measurements1);
-
-  std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
-  padmm->residual_convergence(
-      factory::l2_convergence_factory<t_complex>(factory::ConvergenceType::mpi_local, padmm_weak));
-  padmm->objective_convergence(
-      factory::l1_convergence_factory<t_complex>(factory::ConvergenceType::mpi_local, padmm_weak));
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
-    auto result = (*padmm)();
+    auto result = (*m_padmm)();
     auto end = std::chrono::high_resolution_clock::now();
     std::cout << "Converged? " << result.good << " , niters = " << result.niters << std::endl;
     state.SetIterationTime(b_utilities::duration(start, end, m_world));
@@ -121,57 +128,20 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
 }
 
 BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
-  // Create the algorithm - somehow doesn't work if done in the fixture...
-  sopt::wavelets::SARA saraDistr = sopt::wavelets::distribute_sara(m_sara, m_world);
-  auto const Psi =
-      sopt::linear_transform<t_complex>(saraDistr, m_image.rows(), m_image.cols(), m_world);
-  t_real gamma =
-      utilities::step_size(m_uv_data.vis, m_measurements3,
-                           std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(Psi),
-                           saraDistr.size()) *
-      1e-3;
-  gamma = m_world.all_reduce(gamma, MPI_MAX);
-  auto sigma = 1.0;
-  m_epsilon = std::sqrt(2 * m_uv_data.size() + 2 * std::sqrt(4 * m_uv_data.size())) * sigma;
-  std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm =
-      std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(m_uv_data.vis);
-  padmm->itermax(state.range(3) + 1)
-      .gamma(gamma)
-      .relative_variation(1e-3)
-      .l2ball_proximal_epsilon(m_epsilon)
-      // communicator ensuring l1 norm in l1 proximal is global
-      .l1_proximal_adjoint_space_comm(m_world)
-      .tight_frame(false)
-      .l1_proximal_tolerance(1e-2)
-      .l1_proximal_nu(1)
-      .l1_proximal_itermax(10)
-      .l1_proximal_positivity_constraint(true)
-      .l1_proximal_real_constraint(true)
-      .residual_tolerance(m_epsilon)
-      .lagrange_update_scale(0.9)
-      .nu(1e0)
-      .Psi(Psi)
-      .Phi(*m_measurements3);
-
-  std::weak_ptr<decltype(padmm)::element_type> const padmm_weak(padmm);
-  padmm->residual_convergence(
-      factory::l2_convergence_factory<t_complex>(factory::ConvergenceType::mpi_local, padmm_weak));
-  padmm->objective_convergence(
-      factory::l1_convergence_factory<t_complex>(factory::ConvergenceType::mpi_local, padmm_weak));
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
-    auto result = (*padmm)();
+    auto result = (*m_padmm)();
     auto end = std::chrono::high_resolution_clock::now();
-    // std::cout << "Converged? " << result.good << " , niters = " << result.niters << std::endl;
+    std::cout << "Converged? " << result.good << " , niters = " << result.niters << std::endl;
     state.SetIterationTime(b_utilities::duration(start, end, m_world));
   }
 }
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, ApplyAlgo1)
     //->Apply(b_utilities::Arguments)
-    ->Args({1024, static_cast<t_int>(1e6), 4, 100, 1})
-    ->Args({1024, static_cast<t_int>(1e7), 4, 100, 1})
+    ->Args({1024, static_cast<t_int>(1e6), 4, 10, 1})
+    ->Args({1024, static_cast<t_int>(1e7), 4, 10, 1})
     ->UseManualTime()
     ->MinTime(10.0)
     ->MinWarmUpTime(5.0)

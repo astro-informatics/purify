@@ -37,6 +37,8 @@ class PadmmFixture : public ::benchmark::Fixture {
           m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, kernels::kernel::kb, m_kernel,
           m_kernel, w_term);
       m_gamma = (m_measurements_transform->adjoint() * m_uv_data.vis).real().maxCoeff() * 1e-3;
+      auto sigma = 0.033; // roughly the value used in algo_factory test
+      m_epsilon = std::sqrt(2 * m_uv_data.size() + 2 * std::sqrt(4 * m_uv_data.size())) * sigma;
 
       // create the padmm algorithm
       sopt::LinearTransform<Vector<t_complex>> Psi =
@@ -49,7 +51,7 @@ class PadmmFixture : public ::benchmark::Fixture {
           .tight_frame(false)
           .l1_proximal_tolerance(1e-2)
           .l1_proximal_nu(1)
-          .l1_proximal_itermax(2)
+          .l1_proximal_itermax(20)
           .l1_proximal_positivity_constraint(true)
           .l1_proximal_real_constraint(true)
           .residual_convergence(m_epsilon * 1.001)
@@ -98,7 +100,9 @@ BENCHMARK_REGISTER_F(PadmmFixture, Apply)
     //->Apply(b_utilities::Arguments)
     ->Args({128, 10000, 4, 100})
     ->UseManualTime()
-    ->Repetitions(1)  //->ReportAggregatesOnly(true)
+    ->MinTime(10.0)
+    ->MinWarmUpTime(5.0)
+    ->Repetitions(3)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();
