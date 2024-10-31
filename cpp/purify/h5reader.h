@@ -11,8 +11,10 @@
 
 #include "highfive/H5File.hpp"
 
+#include <algorithm>
 #include <map>
 #include <memory>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -61,12 +63,29 @@ class H5Handler {
     return data;
   }
 
+  /// Method to stochastically draw a subset
+  /// of the distributed dataset slice
+  template<typename T = double>
+  std::vector<T> stochread(const std::string& label, size_t N,
+                           const sopt::mpi::Communicator& comm) {
+    std::vector<T> data = distread(label, comm);
+    if (N > data.size())
+      throw std::runtime_error("Not enough data for requested dataset size!");
+    // stochastic shuffle
+    std::mt19937 rng(rnd_device());
+    std::shuffle(std::begin(data), std::end(data), rng);
+    data.resize(N); // clip dataset to first N elements
+    return data;
+  }
+
   private:
 
   /// HDF5 file
   const HighFive::File _file;
 
   DatsetMap _ds;
+
+  std::random_device rnd_device;
 };
 
 /// @brief Reads an HDF5 file with u, v, visibilities and returns the vectors.
