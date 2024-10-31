@@ -81,7 +81,7 @@ class H5Handler {
   std::mt19937 _rng;
 };
 
-/// @brief Reads an HDF5 file with u, v, visibilities, constructs a vis_params objects and reutrns it.
+/// @brief Reads an HDF5 file with u,v visibilities, constructs a vis_params objects and returns it.
 ///
 /// @note vis_name: name of input HDF5 file containing [u, v, real(V), imag(V)].
 utilities::vis_params read_visibility(const std::string& vis_name, const bool w_term) {
@@ -125,8 +125,7 @@ utilities::vis_params read_visibility(const std::string& vis_name, const bool w_
 /// @brief Stochastically reads dataset slices from the supplied HDF5-file handler,
 /// constructs a vis_params object from them and returns it.
 utilities::vis_params stochread_visibility(H5Handler& file, size_t N,
-                                           const sopt::mpi::Communicator& comm,
-                                           const bool w_term) {
+                                           const sopt::mpi::Communicator& comm, const bool w_term) {
   utilities::vis_params uv_vis;
 
   std::vector<t_real> utemp = file.stochread<t_real>("u", N, comm);
