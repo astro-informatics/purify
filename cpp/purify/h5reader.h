@@ -5,8 +5,14 @@
 #include "purify/logging.h"
 #include "purify/uvw_utilities.h"
 
+#ifdef PURIFY_MPI
+#include <sopt/mpi/communicator.h>
+#endif
+
 #include "highfive/H5File.hpp"
 
+#include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -14,20 +20,53 @@ namespace purify::H5 {
 
 /// @brief Purify interface class to handle HDF5 input files
 class H5Handler {
- public:
+
+  using DatsetMap = std::map<std::string,HighFive::DataSet>;
+
+  public:
+
   H5Handler() = delete;
 
   H5Handler(const std::string& filename) : _file(filename) {}
 
+  /// Method to read the entire dataset
   template <typename T = double>
   std::vector<T> read(const std::string& label) {
     auto dataset = _file.getDataSet(label);
     return dataset.read<std::vector<T>>();
   }
 
- private:
+  /// Method to read a dataset slice with
+  /// slices evenly split across MPI ranks
+  template<typename T = double>
+  std::vector<T> distread(const std::string& label,
+                          const sopt::mpi::Communicator& comm) {
+    if (_ds.find(label) == _ds.end()) { // load the dataset
+      _ds[label] = std::move(_file.getDataSet(label));
+    }
+    const auto& dims = _ds[label].getDimensions();
+    size_t datalen = dims.at(0);
+    if (datalen < comm.size())
+      throw std::runtime_error("Not enough data for each MPI rank!");
+
+    // Read the relevant slice of the dataset
+    // @todo Cache the calculation of starting point/slice length?
+    size_t len = datalen / comm.size();
+    if (comm.rank() == comm.size() - 1) {
+      len += datalen % comm.size();
+    }
+    size_t pos = comm.rank() * len;
+    std::vector<T> data; data.reserve(len);
+    _ds[label].select({pos}, {len}).read(data);
+    return data;
+  }
+
+  private:
+
   /// HDF5 file
   const HighFive::File _file;
+
+  DatsetMap _ds;
 };
 
 /// @brief Reads an HDF5 file with u, v, visibilities and returns the vectors.
