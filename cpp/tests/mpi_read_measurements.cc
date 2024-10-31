@@ -66,17 +66,52 @@ TEST_CASE("uvfits") {
   SECTION("H5") {
     SECTION("one") {
 #ifdef PURIFY_H5
+      // each rank reads the full file
       H5::H5Handler f(filename + ".h5");
       const std::vector<double> u = f.read("u");
       CAPTURE(u.size());
+      // total size is Nranks * data length
       CHECK(comm.all_sum_all(u.size()) == 245886 * comm.size());
 #endif
     }
     SECTION("two") {
 #ifdef PURIFY_H5
+      // each rank reads an evenly distributed slice of the data set
+      H5::H5Handler f(filename + ".h5", comm);
+      const std::vector<double> u = f.distread("u");
+      CAPTURE(u.size());
+      // total size is the data length
+      CHECK(comm.all_sum_all(u.size()) == 245886);
+#endif
+    }
+    SECTION("three") {
+#ifdef PURIFY_H5
+      // each rank reads a stochastically sampled set of 10k dataset members
+      const size_t N = 10000;
+      H5::H5Handler f(filename + ".h5", comm);
+      const std::vector<double> u = f.stochread("u", N);
+      CAPTURE(u.size());
+      // total size is the data length
+      CHECK(comm.all_sum_all(u.size()) == N * comm.size());
+#endif
+    }
+    SECTION("four") {
+#ifdef PURIFY_H5
+      // Root rank reads the data and scatters evenly split slices
       const auto uvfits = read_measurements::read_measurements(filename + ".h5", comm);
       CAPTURE(uvfits.size());
       CHECK(comm.all_sum_all(uvfits.size()) == 245886);
+#endif
+    }
+    SECTION("five") {
+#ifdef PURIFY_H5
+      // each rank reads a stochastically sampled set of 10k dataset members
+      // and constructs a uv_params object from it
+      const size_t N = 10000;
+      H5::H5Handler f(filename + ".h5", comm);
+      const auto uvfits = H5::stochread_visibility(f, N, true);
+      CAPTURE(uvfits.size());
+      CHECK(comm.all_sum_all(uvfits.size()) == N * comm.size());
 #endif
     }
   }

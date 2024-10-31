@@ -7,6 +7,7 @@
 
 #ifdef PURIFY_MPI
 #include <sopt/mpi/communicator.h>
+#include <mpi.h>
 #endif
 
 #include "highfive/H5File.hpp"
@@ -20,6 +21,23 @@
 
 namespace purify::H5 {
 
+#ifdef PURIFY_MPI
+
+HighFive::FileAccessProps MPIFileAccess() {
+  HighFive::FileAccessProps fap;
+  fap.add(HighFive::MPIOFileAccess{MPI_COMM_WORLD, MPI_INFO_NULL});
+  fap.add(HighFive::MPIOCollectiveMetadata{});
+  return fap;
+}
+
+HighFive::DataTransferProps MPIDataTransfer() {
+  HighFive::DataTransferProps dtp;
+  dtp.add(HighFive::UseCollectiveIO{});
+  return dtp;
+}
+
+#endif
+
 /// @brief Purify interface class to handle HDF5 input files
 class H5Handler {
   using DatsetMap = std::map<std::string, HighFive::DataSet>;
@@ -27,7 +45,18 @@ class H5Handler {
  public:
   H5Handler() = delete;
 
-  H5Handler(const std::string& filename) : _file(filename) {}
+  /// @brief Default constructor (serial behaviour)
+  H5Handler(const std::string& filename)
+          : _comm(nullptr), _fap(HighFive::FileAccessProps{}),
+            _dtp(HighFive::DataTransferProps{}),
+            _file(filename, HighFive::File::ReadOnly) {}
+
+#ifdef PURIFY_MPI
+  /// @brief Alternative constructor enabling MPI-collective behaviour
+  H5Handler(const std::string& filename,  const sopt::mpi::Communicator& comm)
+          : _comm(&comm), _fap(MPIFileAccess()), _dtp(MPIDataTransfer()),
+            _file(filename, HighFive::File::ReadOnly, _fap) {}
+#endif
 
   /// Method to read the entire dataset
   template <typename T = double>
@@ -39,33 +68,36 @@ class H5Handler {
   /// Method to read a dataset slice with
   /// slices evenly split across MPI ranks
   template <typename T = double>
-  std::vector<T> distread(const std::string& label, const sopt::mpi::Communicator& comm) {
+  std::vector<T> distread(const std::string& label) {
+    if (!_comm)  throw std::runtime_error("No MPI-collective reading enabled!");
+
     if (_ds.find(label) == _ds.end()) {  // load the dataset
       _ds[label] = std::move(_file.getDataSet(label));
     }
     const auto& dims = _ds[label].getDimensions();
     size_t datalen = dims.at(0);
-    if (datalen < comm.size()) throw std::runtime_error("Not enough data for each MPI rank!");
+    if (datalen < _comm->size()) throw std::runtime_error("Not enough data for each MPI rank!");
 
     // Read the relevant slice of the dataset
     // @todo Cache the calculation of starting point/slice length?
-    size_t len = datalen / comm.size();
-    if (comm.rank() == comm.size() - 1) {
-      len += datalen % comm.size();
+    size_t len = datalen / _comm->size();
+    size_t pos = _comm->rank() * len;
+    if (_comm->rank() == _comm->size() - 1) {
+      len += datalen % _comm->size();
     }
-    size_t pos = comm.rank() * len;
     std::vector<T> data;
     data.reserve(len);
-    _ds[label].select({pos}, {len}).read(data);
+    _ds[label].select({pos}, {len}).read(data, _dtp);
     return data;
   }
 
   /// Method to stochastically draw a subset
   /// of the distributed dataset slice
   template <typename T = double>
-  std::vector<T> stochread(const std::string& label, size_t len,
-                           const sopt::mpi::Communicator& comm) {
-    std::vector<T> data = distread<T>(label, comm);
+  std::vector<T> stochread(const std::string& label, size_t len) {
+    if (!_comm)  throw std::runtime_error("No MPI-collective reading enabled!");
+
+    std::vector<T> data = distread<T>(label);
     if (len > data.size()) throw std::runtime_error("Not enough data for requested dataset size!");
     // stochastic shuffle
     std::shuffle(std::begin(data), std::end(data), _rng);
@@ -74,6 +106,12 @@ class H5Handler {
   }
 
  private:
+  const sopt::mpi::Communicator* _comm;
+
+  const HighFive::FileAccessProps _fap;
+
+  const HighFive::DataTransferProps _dtp;
+
   const HighFive::File _file;
 
   DatsetMap _ds;
@@ -124,28 +162,27 @@ utilities::vis_params read_visibility(const std::string& vis_name, const bool w_
 
 /// @brief Stochastically reads dataset slices from the supplied HDF5-file handler,
 /// constructs a vis_params object from them and returns it.
-utilities::vis_params stochread_visibility(H5Handler& file, size_t N,
-                                           const sopt::mpi::Communicator& comm, const bool w_term) {
+utilities::vis_params stochread_visibility(H5Handler& file, size_t N, const bool w_term) {
   utilities::vis_params uv_vis;
 
-  std::vector<t_real> utemp = file.stochread<t_real>("u", N, comm);
+  std::vector<t_real> utemp = file.stochread<t_real>("u", N);
   uv_vis.u = Eigen::Map<Vector<t_real>>(utemp.data(), utemp.size(), 1);
 
   // found that a reflection is needed for the orientation
   // of the gridded image to be correct
-  std::vector<t_real> vtemp = file.stochread<t_real>("v", N, comm);
+  std::vector<t_real> vtemp = file.stochread<t_real>("v", N);
   uv_vis.v = -Eigen::Map<Vector<t_real>>(vtemp.data(), vtemp.size(), 1);
 
   if (w_term) {
-    std::vector<t_real> wtemp = file.stochread<t_real>("w", N, comm);
+    std::vector<t_real> wtemp = file.stochread<t_real>("w", N);
     uv_vis.w = Eigen::Map<Vector<t_real>>(wtemp.data(), wtemp.size(), 1);
   } else {
     uv_vis.w = Vector<t_real>::Zero(utemp.size());
   }
 
-  std::vector<t_real> retemp = file.stochread<t_real>("re", N, comm);
-  std::vector<t_real> imtemp = file.stochread<t_real>("im", N, comm);
-  std::vector<t_real> sigma = file.stochread<t_real>("sigma", N, comm);
+  std::vector<t_real> retemp = file.stochread<t_real>("re", N);
+  std::vector<t_real> imtemp = file.stochread<t_real>("im", N);
+  std::vector<t_real> sigma = file.stochread<t_real>("sigma", N);
 
   uv_vis.vis = Vector<t_complex>::Zero(retemp.size());
   uv_vis.weights = Vector<t_complex>::Zero(retemp.size());
