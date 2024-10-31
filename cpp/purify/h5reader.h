@@ -54,7 +54,7 @@ class H5Handler {
 
 #ifdef PURIFY_MPI
   /// @brief Alternative constructor enabling MPI-collective behaviour
-  H5Handler(const std::string& filename,  const sopt::mpi::Communicator& comm)
+  H5Handler(const std::string& filename, const sopt::mpi::Communicator& comm)
       : _comm(&comm),
         _fap(MPIFileAccess()),
         _dtp(MPIDataTransfer()),
