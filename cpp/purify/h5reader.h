@@ -6,8 +6,8 @@
 #include "purify/uvw_utilities.h"
 
 #ifdef PURIFY_MPI
-#include <sopt/mpi/communicator.h>
 #include <mpi.h>
+#include <sopt/mpi/communicator.h>
 #endif
 
 #include "highfive/H5File.hpp"
@@ -47,14 +47,17 @@ class H5Handler {
 
   /// @brief Default constructor (serial behaviour)
   H5Handler(const std::string& filename)
-          : _comm(nullptr), _fap(HighFive::FileAccessProps{}),
+          : _comm(nullptr),
+            _fap(HighFive::FileAccessProps{}),
             _dtp(HighFive::DataTransferProps{}),
             _file(filename, HighFive::File::ReadOnly) {}
 
 #ifdef PURIFY_MPI
   /// @brief Alternative constructor enabling MPI-collective behaviour
   H5Handler(const std::string& filename,  const sopt::mpi::Communicator& comm)
-          : _comm(&comm), _fap(MPIFileAccess()), _dtp(MPIDataTransfer()),
+          : _comm(&comm),
+            _fap(MPIFileAccess()),
+            _dtp(MPIDataTransfer()),
             _file(filename, HighFive::File::ReadOnly, _fap) {}
 #endif
 
@@ -69,7 +72,7 @@ class H5Handler {
   /// slices evenly split across MPI ranks
   template <typename T = double>
   std::vector<T> distread(const std::string& label) {
-    if (!_comm)  throw std::runtime_error("No MPI-collective reading enabled!");
+    if (!_comm) throw std::runtime_error("No MPI-collective reading enabled!");
 
     if (_ds.find(label) == _ds.end()) {  // load the dataset
       _ds[label] = std::move(_file.getDataSet(label));
@@ -95,7 +98,7 @@ class H5Handler {
   /// of the distributed dataset slice
   template <typename T = double>
   std::vector<T> stochread(const std::string& label, size_t len) {
-    if (!_comm)  throw std::runtime_error("No MPI-collective reading enabled!");
+    if (!_comm) throw std::runtime_error("No MPI-collective reading enabled!");
 
     std::vector<T> data = distread<T>(label);
     if (len > data.size()) throw std::runtime_error("Not enough data for requested dataset size!");
