@@ -47,18 +47,18 @@ class H5Handler {
 
   /// @brief Default constructor (serial behaviour)
   H5Handler(const std::string& filename)
-          : _comm(nullptr),
-            _fap(HighFive::FileAccessProps{}),
-            _dtp(HighFive::DataTransferProps{}),
-            _file(filename, HighFive::File::ReadOnly) {}
+      : _comm(nullptr),
+        _fap(HighFive::FileAccessProps{}),
+        _dtp(HighFive::DataTransferProps{}),
+        _file(filename, HighFive::File::ReadOnly) {}
 
 #ifdef PURIFY_MPI
   /// @brief Alternative constructor enabling MPI-collective behaviour
   H5Handler(const std::string& filename,  const sopt::mpi::Communicator& comm)
-          : _comm(&comm),
-            _fap(MPIFileAccess()),
-            _dtp(MPIDataTransfer()),
-            _file(filename, HighFive::File::ReadOnly, _fap) {}
+      : _comm(&comm),
+        _fap(MPIFileAccess()),
+        _dtp(MPIDataTransfer()),
+        _file(filename, HighFive::File::ReadOnly, _fap) {}
 #endif
 
   /// Method to read the entire dataset
