@@ -3,8 +3,10 @@
 #include <array>
 #include <benchmark/benchmark.h>
 #include "benchmarks/utilities.h"
+#include "purify/algorithm_factory.h"
 #include "purify/operators.h"
 #include "purify/utilities.h"
+#include "purify/wavelet_operator_factory.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/relative_variation.h>
 #include <sopt/utilities.h>
@@ -36,34 +38,26 @@ class PadmmFixture : public ::benchmark::Fixture {
       m_measurements_transform = measurementoperator::init_degrid_operator_2d<Vector<t_complex>>(
           m_uv_data, m_imsizey, m_imsizex, cellsize, cellsize, 2, kernels::kernel::kb, m_kernel,
           m_kernel, w_term);
-      m_gamma = (m_measurements_transform->adjoint() * m_uv_data.vis).real().maxCoeff() * 1e-3;
 
-      // create the padmm algorithm
-      sopt::LinearTransform<Vector<t_complex>> Psi =
-          sopt::linear_transform<t_complex>(m_sara, m_imsizey, m_imsizex);
-      m_padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(m_uv_data.vis);
-      m_padmm->itermax(state.range(3) + 1)
-          .gamma(m_gamma)
-          .relative_variation(1e-3)
-          .l2ball_proximal_epsilon(m_epsilon)
-          .tight_frame(false)
-          .l1_proximal_tolerance(1e-2)
-          .l1_proximal_nu(1)
-          .l1_proximal_itermax(2)
-          .l1_proximal_positivity_constraint(true)
-          .l1_proximal_real_constraint(true)
-          .residual_convergence(m_epsilon * 1.001)
-          .lagrange_update_scale(0.9)
-          .nu(1e0)
-          .Psi(Psi)
-          .Phi(*m_measurements_transform);
+      const t_uint imsizex = m_imsizex;
+      const t_uint imsizey = m_imsizey;
+
+      auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
+          factory::distributed_wavelet_operator::serial, m_sara, m_imsizey, m_imsizex);
+
+      t_real const sigma = 0.016820222945913496 * std::sqrt(2);  // see test_parameters file
+
+      m_padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
+          factory::algo_distribution::serial, m_measurements_transform, wavelets, m_uv_data, sigma,
+          m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true, false, 1e-3, 1e-2,
+          50, 1.0, 1.0);
     }
   }
 
   void TearDown(const ::benchmark::State &state) {}
 
   t_uint m_counter;
-  const sopt::wavelets::SARA m_sara{
+  std::vector<std::tuple<std::string, t_uint>> const m_sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
