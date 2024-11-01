@@ -6,6 +6,7 @@
 #include "purify/convergence_factory.h"
 #include "purify/directories.h"
 #include "purify/distribute.h"
+#include "purify/logging.h"
 #include "purify/mpi_utilities.h"
 #include "purify/operators.h"
 #include "purify/utilities.h"
@@ -69,10 +70,10 @@ class PadmmFixtureMPI : public ::benchmark::Fixture {
 
   utilities::vis_params m_uv_data;
   t_real m_epsilon;
-
   t_uint m_kernel;
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_measurements1;
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_measurements3;
+
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_measurements;
+  std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> m_padmm;
 };
 
 BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
@@ -127,7 +128,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo1)(benchmark::State &state) {
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
-    auto result = (*padmm)();
+    auto result = (*m_padmm)();
     auto end = std::chrono::high_resolution_clock::now();
     std::cout << "Converged? " << result.good << " , niters = " << result.niters << std::endl;
     state.SetIterationTime(b_utilities::duration(start, end, m_world));
@@ -186,9 +187,9 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, ApplyAlgo3)(benchmark::State &state) {
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
-    auto result = (*padmm)();
+    auto result = (*m_padmm)();
     auto end = std::chrono::high_resolution_clock::now();
-    // std::cout << "Converged? " << result.good << " , niters = " << result.niters << std::endl;
+    std::cout << "Converged? " << result.good << " , niters = " << result.niters << std::endl;
     state.SetIterationTime(b_utilities::duration(start, end, m_world));
   }
 }

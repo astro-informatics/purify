@@ -92,7 +92,9 @@ BENCHMARK_REGISTER_F(PadmmFixture, Apply)
     //->Apply(b_utilities::Arguments)
     ->Args({128, 10000, 4, 100})
     ->UseManualTime()
-    ->Repetitions(1)  //->ReportAggregatesOnly(true)
+    ->MinTime(10.0)
+    ->MinWarmUpTime(5.0)
+    ->Repetitions(3)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();
