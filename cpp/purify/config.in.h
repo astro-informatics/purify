@@ -7,9 +7,6 @@
 #define PURIFY_HAS_NOT_USING
 #endif
 
-//! Whether to do logging or not
-#cmakedefine PURIFY_DO_LOGGING
-
 //! Whether to do openmp
 #cmakedefine PURIFY_OPENMP
 
@@ -28,8 +25,12 @@
 //! Whether PURIFY is running with casacore
 #cmakedefine PURIFY_CASACORE
 
+//! Whether PURIFY is using (and SOPT was built with) onnxrt support
+#cmakedefine PURIFY_ONNXRT
+
 #include <string>
 #include <tuple>
+#include <cstdint>
 
 namespace purify {
 //! Returns library version
@@ -45,14 +46,6 @@ inline std::tuple<uint8_t, uint8_t, uint8_t> version_tuple() {
 inline std::string gitref() { return "@Purify_GITREF@"; }
 //! Default logging level
 inline std::string default_logging_level() { return "@PURIFY_TEST_LOG_LEVEL@"; }
-//! Default logger name
-inline std::string default_logger_name() { return "@PURIFY_LOGGER_NAME@"; }
-//! Wether to add color to the logger
-inline constexpr bool color_logger() {
-  // clang-format off
-  return @PURIFY_COLOR_LOGGING@;
-  // clang-format on
-}
 } // namespace purify
 
 #endif

@@ -1,5 +1,5 @@
 ### Config file for Purify
-Version: 3.1.0
+Version: 4.2.0
 GeneralConfiguration:
   InputOutput:
     input:

@@ -16,8 +16,8 @@ endfunction()
 configure_file(config.in.h "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
 set(HEADERS
-  logging.h kernels.h pfitsio.h  logging.disabled.h types.h
-  IndexMapping.h logging.enabled.h utilities.h operators.h  wproj_utilities.h
+  logging.h kernels.h pfitsio.h  types.h
+  IndexMapping.h utilities.h operators.h  wproj_utilities.h
   cimg.h uvfits.h convolution.h measurement_operator_factory.h wavelet_operator_factory.h distribute.h
   update_factory.h
   convergence_factory.h
@@ -32,12 +32,12 @@ set(HEADERS
   fly_operators.h
   "${PROJECT_BINARY_DIR}/include/purify/config.h")
 
-set(SOURCES utilities.cc pfitsio.cc
+set(SOURCES utilities.cc pfitsio.cc logging.cc
   kernels.cc wproj_utilities.cc operators.cc uvfits.cc yaml-parser.cc
   read_measurements.cc distribute.cc integration.cc wide_field_utilities.cc wkernel_integration.cc
   wproj_operators.cc uvw_utilities.cc setup_utils.cc)
 
-if(TARGET casacore::ms)
+if(PURIFY_CASACORE)
   list(APPEND SOURCES casacore.cc)
   list(APPEND HEADERS casacore.h)
 endif()
@@ -55,6 +55,11 @@ set(version "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}.${Purify_VERSION_PA
 set(soversion "${Purify_VERSION_MAJOR}.${Purify_VERSION_MINOR}")
 set_target_properties(libpurify PROPERTIES VERSION ${version} SOVERSION ${soversion})
 set_target_properties(libpurify PROPERTIES OUTPUT_NAME purify)
+
+if(PURIFY_OPENMP)
+  target_link_libraries(libpurify OpenMP::OpenMP_CXX)
+endif()
+
 if(PURIFY_MPI)
   target_link_libraries(libpurify ${MPI_LIBRARIES})
   target_include_directories(libpurify SYSTEM PUBLIC ${MPI_CXX_INCLUDE_PATH})
@@ -66,56 +71,44 @@ if(PURIFY_ARRAYFIRE)
 endif()
 
 target_include_directories(libpurify PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/cpp>
   $<INSTALL_INTERFACE:include/>)
 
-if (cppflow)
-  target_link_libraries(libpurify "${TENSORFLOW_LIB}")
-  # Make cppflow include directory public. Install interface can't point to source directory,
-  # so it needs to be separately defined, explained in
-  # https://stackoverflow.com/questions/25676277/cmake-target-include-directories-prints-an-error-when-i-try-to-add-the-source
-  # Add /usr/local/include for default location of TensorFlow headers
-  target_include_directories(libpurify PUBLIC
-    $<BUILD_INTERFACE:${cppflow_INCLUDE_DIR}>
-    $<BUILD_INTERFACE:/usr/local/include>
-    $<INSTALL_INTERFACE:cppflow/include/>
-    )
-endif()
-
-
 add_include_dir(
-  ${Eigen3_INCLUDE_DIR}
-  ${eigen_INCLUDE_DIR}
+  ${EIGEN3_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
   ${cfitsio_INCLUDE_DIR}
-  ${yaml-cpp_INCLUDE_DIR}
+  ${FFTW3_INCLUDE_DIRS}
+  ${YAML_CPP_INCLUDE_DIR}
   ${Cubature_INCLUDE_DIR}
   ${CImg_INCLUDE_DIR}
-  ${sopt_INCLUDE_DIR}
-  )
+)
+
 target_link_libraries(libpurify
   ${Cubature_LIBRARIES}
-  FFTW3::fftw3
-  cfitsio::cfitsio
-  sopt::sopt
+  ${FFTW3_LIBRARIES}
+  cfitsio
+  ${sopt_LIBRARIES}
   yaml-cpp
   Boost::filesystem
   Boost::system
-  )
-if(TARGET casacore::casa)
-  target_link_libraries(libpurify casacore::ms)
+)
+
+if(PURIFY_CASACORE)
+  target_link_libraries(libpurify ${CasaCore_LIBRARIES})
 endif()
+
 if(TARGET openmp::openmp)
   target_link_libraries(libpurify openmp::openmp)
 endif()
 
-add_dependencies(libpurify lookup_dependencies)
+if(PURIFY_CUBATURE_LOOKUP)
+  add_dependencies(libpurify Lookup-Cubature)
+endif()
 
-# Add spdlog as direct dependency
-if(spdlog_FOUND)
-  target_link_libraries(libpurify spdlog::spdlog)
-  target_include_directories(libpurify SYSTEM PUBLIC ${spdlog_INCLUDE_DIR})
+if(PURIFY_CASACORE_LOOKUP)
+  add_dependencies(libpurify Lookup-CasaCore)
 endif()
 
 install(FILES ${HEADERS} DESTINATION include/purify)
@@ -126,4 +119,4 @@ install(TARGETS libpurify
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
   INCLUDES DESTINATION include
-  )
+)

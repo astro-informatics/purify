@@ -1,12 +1,12 @@
 #define CATCH_CONFIG_RUNNER
 
 #include <purify/config.h>
-#include <catch.hpp>
 #include <memory>
 #include <mpi.h>
 #include <random>
 #include <regex>
 #include <vector>
+#include <catch2/catch_all.hpp>
 #include <purify/logging.h>
 #include <sopt/logging.h>
 #include <sopt/mpi/session.h>
@@ -46,9 +46,6 @@ int main(int argc, const char **argv) {
   if (returnCode != 0)  // Indicates a command line error
     return returnCode;
   mersenne.reset(new std::mt19937_64(session.configData().rngSeed));
-
-  sopt::logging::initialize();
-  purify::logging::initialize();
 
   auto const result = session.run();
 

@@ -1,5 +1,5 @@
 #include "purify/config.h"
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "purify/logging.h"
 
 #include "purify/types.h"
@@ -11,6 +11,8 @@
 
 using namespace purify;
 using namespace purify::notinstalled;
+using Catch::Approx;
+
 TEST_CASE("test transform kernels") {
   SECTION("horizon bound check for 2d transform") {
     REQUIRE(projection_kernels::fourier_wproj_kernel(0, 0, 0, 0, 0, 1, 1).real() == Approx(1));

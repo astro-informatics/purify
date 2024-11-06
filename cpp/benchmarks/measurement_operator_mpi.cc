@@ -4,7 +4,6 @@
 #include "benchmarks/utilities.h"
 #include "purify/directories.h"
 #include "purify/operators.h"
-#include "purify/pfitsio.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/mpi/communicator.h>
 #include <sopt/mpi/session.h>

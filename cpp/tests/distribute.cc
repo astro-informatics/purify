@@ -1,6 +1,6 @@
 #include "purify/distribute.h"
 #include "purify/types.h"
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "purify/directories.h"
 #include "purify/utilities.h"
 

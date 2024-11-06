@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 #include <yaml-cpp/yaml.h>
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "purify/directories.h"
 #include "purify/yaml-parser.h"
 

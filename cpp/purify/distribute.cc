@@ -88,13 +88,13 @@ Vector<t_int> equal_distribution(Vector<t_real> const &u, Vector<t_real> const &
   Vector<t_int> index = Vector<t_int>::LinSpaced(u.size(), 0, u.size());
   // creating histogram grid
   for (t_int i = 0; i < index.size(); i++) {
-    histogram(std::floor(scaled_u(i)), std::floor(scaled_v(i))) += 1;
+    histogram((t_int)std::floor(scaled_u(i)), (t_int)std::floor(scaled_v(i))) += 1;
   }
   // sorting indicies
   std::sort(index.data(), index.data() + index.size(),
             [&histogram, &scaled_u, &scaled_v](int a, int b) {
-              return (histogram(std::floor(scaled_u(a)), std::floor(scaled_v(a))) <
-                      histogram(std::floor(scaled_u(b)), std::floor(scaled_v(b))));
+              return (histogram((t_int)std::floor(scaled_u(a)), (t_int)std::floor(scaled_v(a))) <
+                      histogram((t_int)std::floor(scaled_u(b)), (t_int)std::floor(scaled_v(b))));
             });
   return index;
 }

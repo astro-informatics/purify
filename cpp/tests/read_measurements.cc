@@ -1,6 +1,6 @@
 #include "purify/config.h"
 #include "purify/types.h"
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "purify/logging.h"
 
 #include <iostream>

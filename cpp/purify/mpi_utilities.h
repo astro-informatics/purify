@@ -9,6 +9,9 @@
 #ifdef PURIFY_MPI
 #include <sopt/mpi/communicator.h>
 #endif
+#ifdef PURIFY_OPENMP
+#include <omp.h>
+#endif
 namespace purify {
 namespace utilities {
 #ifdef PURIFY_MPI

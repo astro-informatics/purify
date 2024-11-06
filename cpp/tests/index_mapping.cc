@@ -2,7 +2,7 @@
 #include "purify/types.h"
 #include <numeric>
 #include <random>
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "purify/IndexMapping.h"
 #include "purify/utilities.h"
 

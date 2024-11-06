@@ -1,6 +1,6 @@
 #include "purify/config.h"
 #include <iostream>
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "purify/logging.h"
 
 #include "purify/types.h"
@@ -13,6 +13,7 @@
 
 using namespace purify;
 using namespace purify::notinstalled;
+using Catch::Approx;
 
 TEST_CASE("uvw units") {
   const t_uint imsizex = 128;

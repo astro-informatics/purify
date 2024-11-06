@@ -4,7 +4,6 @@
 #include "benchmarks/utilities.h"
 #include "purify/directories.h"
 #include "purify/operators.h"
-#include "purify/pfitsio.h"
 #include "purify/wide_field_utilities.h"
 #include "purify/wproj_operators.h"
 #include <sopt/imaging_padmm.h>

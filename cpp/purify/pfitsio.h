@@ -3,14 +3,13 @@
 #include "purify/config.h"
 #include "purify/types.h"
 #include "purify/logging.h"
+#include "purify/uvw_utilities.h"
 
 #include <fitsio.h>
 #include <string>
-#include "purify/uvw_utilities.h"
 
-namespace purify {
+namespace purify::pfitsio {
 
-namespace pfitsio {
 struct header_params {
   // structure containing parameters for fits header
   std::string fits_name = "output_image.fits";
@@ -74,11 +73,14 @@ struct header_params {
 #undef PURIFY_MACRO
   bool operator!=(const header_params &h2) const { return not(*this == h2); }
 };
+
 //! write key to fits file header
 void write_key(fitsfile *fptr, const std::string &key, const std::string &value,
                const std::string &comment, int *status);
+
 void write_key(fitsfile *fptr, const std::string &key, const char *value,
                const std::string &comment, int *status);
+
 //! write history to fits file
 void write_history(fitsfile *fptr, const std::string &context, const std::string &history,
                    int *status);
@@ -88,6 +90,7 @@ typename std::enable_if<std::is_scalar<T>::value, void>::type write_history(
   T value = history;
   write_history(fptr, context, std::to_string(value), status);
 }
+
 template <class T>
 typename std::enable_if<std::is_scalar<T>::value, void>::type write_key(fitsfile *fptr,
                                                                         const std::string &key,
@@ -115,59 +118,65 @@ typename std::enable_if<std::is_scalar<T>::value, void>::type write_key(fitsfile
 }
 
 //! read fits key and return as tuple
-template <class T>
-typename std::enable_if<std::is_scalar<T>::value, T>::type read_key(fitsfile *fptr,
-                                                                    const std::string &key,
-                                                                    int *status) {
-  int datatype = 0;
-  if (std::is_same<T, double>::value)
-    datatype = TDOUBLE;
-  else if (std::is_same<T, float>::value)
-    datatype = TFLOAT;
-  else if (std::is_same<T, int>::value)
-    datatype = TINT;
-  else if (std::is_same<T, t_int>::value)
-    datatype = TINT;
-  else if (std::is_same<T, bool>::value)
-    datatype = TLOGICAL;
-  else
-    throw std::runtime_error("Key type of value not supported by PURIFY template for " + key);
+template <typename T>
+T read_key(fitsfile *fptr, const std::string &key, int *status) {
   T value;
-  std::string comment = "";
-  if (fits_read_key(fptr, datatype, const_cast<char *>(key.c_str()), &value,
-                    const_cast<char *>(comment.c_str()), status))
-    throw std::runtime_error("Error reading value from key " + key);
+  char comment[FLEN_COMMENT];
+  if constexpr (std::is_same_v<T, std::string>) {
+    if (fits_read_key(fptr, TSTRING, key.data(), value.data(), comment, status)) {
+      throw std::runtime_error("Error reading value from key " + key);
+    }
+  } else {
+    int datatype = 0;
+    if (std::is_same<T, double>::value)
+      datatype = TDOUBLE;
+    else if (std::is_same_v<T, float>)
+      datatype = TFLOAT;
+    else if (std::is_same_v<T, int>)
+      datatype = TINT;
+    else if (std::is_same_v<T, bool>)
+      datatype = TLOGICAL;
+    else {
+      throw std::runtime_error("Key type of value not supported by PURIFY template for " + key);
+    }
+
+    if (fits_read_key(fptr, datatype, key.data(), &value, comment, status)) {
+      throw std::runtime_error("Error reading value from key " + key);
+    }
+  }
   return value;
 }
-std::string read_key(fitsfile *fptr, const std::string &key, int *status);
+
 //! Write image to fits file using header information
 void write2d(const Image<t_real> &image, const pfitsio::header_params &header,
              const bool &overwrite = true);
+
 //! Write image to fits file
 void write2d(const Image<t_real> &image, const std::string &fits_name,
              const std::string &pix_units = "Jy/Beam", const bool &overwrite = true);
 
-template <class DERIVED>
+template <typename DERIVED>
 void write2d(const Eigen::EigenBase<DERIVED> &input, int nx, int ny, const std::string &fits_name,
              const std::string &pix_units = "Jy/Beam", const bool &overwrite = true) {
   Image<t_real> const data = input.derived().real().template cast<t_real>();
   write2d(Image<t_real>::Map(data.data(), nx, ny), fits_name, pix_units, overwrite);
 }
-template <class DERIVED>
+template <typename DERIVED>
 void write2d(const Eigen::EigenBase<DERIVED> &input, int nx, int ny,
              const pfitsio::header_params &header, const bool overwrite = true) {
   Image<t_real> const data = input.derived().real().template cast<t_real>();
   write2d(Image<t_real>::Map(data.data(), nx, ny), header, overwrite);
 }
-//! Read image from fits file
-Image<t_complex> read2d(const std::string &fits_name);
+
 //! Write cube to fits file using header information
 void write3d(const std::vector<Image<t_real>> &image, const pfitsio::header_params &header,
              const bool &overwrite = true);
+
 //! Write cube to fits file
 void write3d(const std::vector<Image<t_real>> &image, const std::string &fits_name,
              const std::string &pix_units = "Jy/Beam", const bool &overwrite = true);
-template <class DERIVED>
+
+template <typename DERIVED>
 void write3d(const std::vector<Eigen::EigenBase<DERIVED>> &input, int nx, int ny,
              const std::string &fits_name, const std::string &pix_units = "Jy/Beam",
              const bool &overwrite = true) {
@@ -178,7 +187,7 @@ void write3d(const std::vector<Eigen::EigenBase<DERIVED>> &input, int nx, int ny
   }
   write3d(images, fits_name, pix_units, overwrite);
 }
-template <class DERIVED>
+template <typename DERIVED>
 void write3d(const std::vector<Eigen::EigenBase<DERIVED>> &input, int nx, int ny,
              const pfitsio::header_params &header, const bool &overwrite = true) {
   std::vector<Image<t_real>> images;
@@ -188,7 +197,8 @@ void write3d(const std::vector<Eigen::EigenBase<DERIVED>> &input, int nx, int ny
   }
   write3d(images, header, overwrite);
 }
-template <class T>
+
+template <typename T>
 typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::type write3d(
     const Eigen::EigenBase<T> &image, const t_int rows, const t_int cols, const t_int chans,
     const std::string &fits_name, const std::string &pix_units = "Jy/Beam",
@@ -198,8 +208,9 @@ typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::
   header.pix_units = pix_units;
   write3d<T>(image, rows, cols, chans, header, overwrite);
 }
+
 //! write 3d fits cube with header
-template <class T>
+template <typename T>
 typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::type write3d(
     const Eigen::EigenBase<T> &image, const t_int rows, const t_int cols, const t_int chans,
     const pfitsio::header_params &header, const bool &overwrite) {
@@ -208,7 +219,7 @@ typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::
      image:: image data, a 2d Image.
      header:: structure containing header information
      overwrite:: if true, overwrites old fits file with same name
-*/
+  */
   if (image.size() != rows * cols * chans)
     throw std::runtime_error("image or cube size does not match dimensions.");
 
@@ -276,28 +287,25 @@ typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::
     throw std::runtime_error("Problem closing fits file:" + header.fits_name);
 }
 
-//! Read cube from fits file
-std::vector<Image<t_complex>> read3d(const std::string &fits_name);
-template <class T>
-typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::type read3d(
-    const std::string &fits_name, Eigen::EigenBase<T> &output, t_int &rows, t_int &cols,
-    t_int &channels, t_int &pols) {
+template <typename T, typename = std::enable_if_t<std::is_same_v<double, typename T::Scalar>>>
+void read3d(const std::string &fits_name, Eigen::EigenBase<T> &output, int &rows, int &cols,
+            int &channels, int &pols) {
   /*
      Reads in a cube from a fits file and returns the vector of images.
      fits_name:: name of fits file
-     */
+   */
 
   fitsfile *fptr;
   int status = 0;
   PURIFY_LOW_LOG("Reading fits file {}", fits_name);
   if (fits_open_image(&fptr, fits_name.c_str(), READONLY, &status))
     throw std::runtime_error("Error opening image " + fits_name);
-  const t_int naxis = read_key<int>(fptr, "NAXIS", &status);
+  const int naxis = pfitsio::read_key<int>(fptr, "NAXIS", &status);
   if (naxis < 1) throw std::runtime_error("Image contains zero axes.");
-  rows = read_key<int>(fptr, "NAXIS1", &status);
-  cols = (naxis > 1) ? read_key<int>(fptr, "NAXIS2", &status) : 1;
-  channels = (naxis > 2) ? read_key<int>(fptr, "NAXIS3", &status) : 1;
-  pols = (naxis > 3) ? read_key<int>(fptr, "NAXIS4", &status) : 1;
+  rows = pfitsio::read_key<int>(fptr, "NAXIS1", &status);
+  cols = (naxis > 1) ? pfitsio::read_key<int>(fptr, "NAXIS2", &status) : 1;
+  channels = (naxis > 2) ? pfitsio::read_key<int>(fptr, "NAXIS3", &status) : 1;
+  pols = (naxis > 3) ? pfitsio::read_key<int>(fptr, "NAXIS4", &status) : 1;
   PURIFY_LOW_LOG("Axes {}", naxis);
   std::vector<long> fpixel(naxis, 1);
   PURIFY_LOW_LOG("Dimensions {}x{}x{}x{}", rows, cols, channels, pols);
@@ -312,7 +320,33 @@ typename std::enable_if<std::is_same<t_real, typename T::Scalar>::value, void>::
   if (fits_close_file(fptr, &status))
     throw std::runtime_error("Problem closing fits file: " + fits_name);
 }
-}  // namespace pfitsio
-}  // namespace purify
+
+//! Read cube from fits file
+std::vector<Image<t_complex>> read3d(const std::string &fits_name) {
+  std::vector<Image<t_complex>> eigen_images;
+  Vector<double> image;
+  int rows, cols, channels, pols = 1;
+  read3d<Vector<double>>(fits_name, image, rows, cols, channels, pols);
+  for (int i = 0; i < channels; i++) {
+    Vector<t_complex> eigen_image = Vector<t_complex>::Zero(rows * cols);
+    eigen_image.real() = image.segment(i * rows * cols, rows * cols);
+    eigen_images.push_back(Image<t_complex>::Map(eigen_image.data(), rows, cols));
+  }
+  return eigen_images;
+}
+
+//! Read image from fits file
+Image<t_complex> read2d(const std::string &fits_name) {
+  /*
+    Reads in an image from a fits file and returns the image.
+
+    fits_name:: name of fits file
+  */
+
+  const std::vector<Image<t_complex>> images = read3d(fits_name);
+  return images.at(0);
+}
+
+}  // namespace purify::pfitsio
 
 #endif

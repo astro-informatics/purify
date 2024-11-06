@@ -2,8 +2,9 @@
 #include "purify/logging.h"
 
 #include "purify/pfitsio.h"
-namespace purify {
-namespace pfitsio {
+
+namespace purify::pfitsio {
+
 void write_key(fitsfile *fptr, const std::string &key, const std::string &value,
                const std::string &comment, int *status) {
   std::string entry = value;
@@ -12,24 +13,19 @@ void write_key(fitsfile *fptr, const std::string &key, const std::string &value,
                      const_cast<char *>(comment.c_str()), status))
     throw std::runtime_error("Problem writing key in fits file: " + key);
 }
+
 void write_key(fitsfile *fptr, const std::string &key, const char *value,
                const std::string &comment, int *status) {
   write_key(fptr, key, std::string(value), comment, status);
 }
+
 void write_history(fitsfile *fptr, const std::string &context, const std::string &history,
                    int *status) {
   const std::string entry = context + ": " + history;
   if (fits_write_history(fptr, const_cast<char *>(entry.c_str()), status))
     throw std::runtime_error("Problem writing comments in fits file");
 }
-std::string read_key(fitsfile *fptr, const std::string &key, int *status) {
-  std::string value = "";
-  std::string comment = "";
-  if (fits_read_key(fptr, TSTRING, const_cast<char *>(key.c_str()),
-                    const_cast<char *>(value.c_str()), const_cast<char *>(comment.c_str()), status))
-    throw std::runtime_error("Error reading value from key " + key);
-  return value;
-}
+
 //! Write image to fits file
 void write2d(const Image<t_real> &eigen_image, const pfitsio::header_params &header,
              const bool &overwrite) {
@@ -64,17 +60,6 @@ void write2d(const Image<t_real> &eigen_image, const std::string &fits_name,
   write2d(eigen_image, header, overwrite);
 }
 
-Image<t_complex> read2d(const std::string &fits_name) {
-  /*
-    Reads in an image from a fits file and returns the image.
-
-    fits_name:: name of fits file
-  */
-
-  std::vector<Image<t_complex>> images = read3d(fits_name);
-  return images.at(0);
-}
-
 void write3d(const std::vector<Image<t_real>> &eigen_images, const pfitsio::header_params &header,
              const bool &overwrite) {
   std::vector<long> naxes = {static_cast<long>(eigen_images.at(0).rows()),
@@ -106,17 +91,4 @@ void write3d(const std::vector<Image<t_real>> &eigen_images, const std::string &
   write3d(eigen_images, header, overwrite);
 }
 
-std::vector<Image<t_complex>> read3d(const std::string &fits_name) {
-  std::vector<Image<t_complex>> eigen_images;
-  Vector<t_real> image;
-  t_int rows, cols, channels, pols = 1;
-  read3d<Vector<t_real>>(fits_name, image, rows, cols, channels, pols);
-  for (int i = 0; i < channels; i++) {
-    Vector<t_complex> eigen_image = Vector<t_complex>::Zero(rows * cols);
-    eigen_image.real() = image.segment(i * rows * cols, rows * cols);
-    eigen_images.push_back(Image<t_complex>::Map(eigen_image.data(), rows, cols));
-  }
-  return eigen_images;
-}
-}  // namespace pfitsio
-}  // namespace purify
+}  // namespace purify::pfitsio

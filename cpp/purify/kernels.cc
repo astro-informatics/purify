@@ -177,8 +177,8 @@ t_real kernel_linear_interp(const Vector<t_real> &samples, const t_real x, const
 
   t_real i_effective = (x + J / 2) * total_samples / J;
 
-  t_real i_0 = floor(i_effective);
-  t_real i_1 = ceil(i_effective);
+  t_int i_0 = floor(i_effective);
+  t_int i_1 = ceil(i_effective);
   // case where i_effective is a sample point
   if (std::abs(i_0 - i_1) == 0) {
     return samples(i_0);

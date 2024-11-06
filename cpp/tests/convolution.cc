@@ -1,7 +1,7 @@
 #include "purify/config.h"
 #include "purify/types.h"
 #include <iostream>
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "purify/directories.h"
 #include "purify/logging.h"
 

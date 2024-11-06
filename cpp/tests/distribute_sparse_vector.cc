@@ -2,7 +2,7 @@
 #include <set>
 #include <purify/AllToAllSparseVector.h>
 #include <purify/DistributeSparseVector.h>
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include <sopt/mpi/communicator.h>
 using namespace purify;
 

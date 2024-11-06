@@ -1,21 +1,19 @@
-if(logging)
-  add_library(common_catch_main_object OBJECT "common_catch_main.cc")
-  if(spdlog_INCLUDE_DIR)
-    target_link_libraries(common_catch_main_object spdlog::spdlog)
-    target_include_directories(common_catch_main_object SYSTEM PUBLIC ${spdlog_INCLUDE_DIR})
-  endif()
-  if(CATCH_INCLUDE_DIR)
-    target_include_directories(common_catch_main_object SYSTEM PUBLIC ${CATCH_INCLUDE_DIR})
-  endif()
-  if(sopt_INCLUDE_DIRS)
-    target_include_directories(common_catch_main_object SYSTEM PUBLIC ${sopt_INCLUDE_DIRS})
-  endif()
-  target_include_directories(common_catch_main_object PUBLIC
-    "${PROJECT_BINARY_DIR}/include/"
-    "${CMAKE_CURRENT_SOURCE_DIR}/.."
-    )
+
+include_directories("${PROJECT_SOURCE_DIR}/cpp" "${PROJECT_BINARY_DIR}/include")
+add_library(common_catch_main_object OBJECT "common_catch_main.cc")
+if(Catch2_FOUND)
+  target_link_libraries(common_catch_main_object Catch2::Catch2)
 endif()
-include_directories("${PROJECT_SOURCE_DIR}/cpp" "${CMAKE_CURRENT_BINARY_DIR}/include")
+if(EIGEN3_INCLUDE_DIR)
+target_include_directories(common_catch_main_object SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})
+endif()
+if(sopt_FOUND)
+  target_include_directories(common_catch_main_object SYSTEM PUBLIC ${sopt_INCLUDE_DIR})
+endif()
+target_include_directories(common_catch_main_object PUBLIC
+  "${EXTERNAL_ROOT}/include/"
+  "${PROJECT_BINARY_DIR}/include/"
+)
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/outputs")
 
 
@@ -37,7 +35,7 @@ add_catch_test(wavelet_factory LIBRARIES libpurify)
 add_catch_test(wide_field_utilities LIBRARIES libpurify)
 add_catch_test(wkernel LIBRARIES libpurify)
 
-if(docasa)
+if(PURIFY_CASACORE)
   add_catch_test(casacore LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} DEPENDS lookup_dependencies)
 endif()
 
@@ -47,21 +45,18 @@ if(PURIFY_ARRAYFIRE)
 endif()
 
 if(PURIFY_MPI)
-  add_library(common_mpi_catch_main_object OBJECT common_mpi_catch_main.cc)
+  add_library(common_mpi_catch_main_object OBJECT "common_mpi_catch_main.cc")
   target_include_directories(common_mpi_catch_main_object
-    PUBLIC ${Sopt_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/cpp
-    ${PROJECT_BINARY_DIR}/include ${MPI_CXX_INCLUDE_PATH})
-  if(spdlog_INCLUDE_DIR)
-    target_link_libraries(common_mpi_catch_main_object spdlog::spdlog)
-    target_include_directories(common_mpi_catch_main_object SYSTEM PUBLIC ${spdlog_INCLUDE_DIR})
-  endif()
-  if(CATCH_INCLUDE_DIR)
-    target_include_directories(common_mpi_catch_main_object SYSTEM PUBLIC ${CATCH_INCLUDE_DIR})
+    PUBLIC ${PROJECT_BINARY_DIR}/include ${MPI_CXX_INCLUDE_PATH})
+  if(Catch2_FOUND)
+    target_link_libraries(common_mpi_catch_main_object Catch2::Catch2)
   endif()
   if(sopt_FOUND)
     target_include_directories(common_mpi_catch_main_object SYSTEM PUBLIC ${sopt_INCLUDE_DIR})
   endif()
-
+  if(EIGEN3_INCLUDE_DIR)
+    target_include_directories(common_mpi_catch_main_object SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})
+  endif()
 
   function(add_mpi_test testname)
     add_catch_test(${testname} COMMON_MAIN common_mpi_catch_main_object NOTEST ${ARGN})
@@ -75,7 +70,7 @@ if(PURIFY_MPI)
     add_test(NAME ${testname}
       COMMAND
       ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS}
-      $<TARGET_FILE:test_${testname}> ${arguments})
+      "./test_${testname}" ${arguments})
     set_tests_properties(${testname} PROPERTIES LABELS "catch;mpi")
   endfunction()
 
@@ -90,3 +85,6 @@ if(PURIFY_MPI)
   add_mpi_test(mpi_wide_field_utilities LIBRARIES libpurify)
   add_mpi_test(parallel_mpi_utilities LIBRARIES libpurify)
 endif()
+
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/data DESTINATION .)
+

@@ -10,7 +10,6 @@ using namespace purify;
 using namespace purify::notinstalled;
 
 int main(int nargs, char const **args) {
-  purify::logging::initialize();
   purify::logging::set_level("debug");
   auto const input_name =
       (nargs > 1) ? static_cast<std::string>(args[1]) : image_filename("M31.fits");

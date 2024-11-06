@@ -7,7 +7,6 @@
 #include "purify/distribute.h"
 #include "purify/mpi_utilities.h"
 #include "purify/operators.h"
-#include "purify/pfitsio.h"
 #include "purify/utilities.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/mpi/communicator.h>

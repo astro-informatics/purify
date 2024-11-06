@@ -20,8 +20,6 @@
 int main(int nargs, char const **args) {
   using namespace purify;
   using namespace purify::notinstalled;
-  sopt::logging::initialize();
-  purify::logging::initialize();
 
   if (nargs != 6) {
     PURIFY_CRITICAL(" Wrong number of arguments!");

@@ -1,7 +1,8 @@
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "purify/mpi_utilities.h"
 
 using namespace purify;
+using Catch::Approx;
 
 TEST_CASE("Distribution of visibility data") {
   auto const world = sopt::mpi::Communicator::World();

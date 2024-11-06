@@ -1,6 +1,6 @@
 #include <iomanip>
 #include <random>
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "purify/distribute.h"
 #include "purify/logging.h"
 #include "purify/mpi_utilities.h"

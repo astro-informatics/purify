@@ -23,7 +23,6 @@ int main(int nargs, char const **args) {
   ARGS_MACRO(Jw_max, 4, 0, t_uint)
   ARGS_MACRO(radial, 5, true, bool)
 #undef ARGS_MACRO
-  purify::logging::initialize();
   purify::logging::set_level("debug");
   // Gridding example
   auto const oversample_ratio = 2;

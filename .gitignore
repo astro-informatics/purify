@@ -15,3 +15,5 @@ ipython-*.log
 *.png
 *.pdf
 *~
+local
+CMakeUserPresets.json

@@ -1,128 +1,75 @@
-PURIFY
-=======
+# PURIFY
 
-[![Build Status](https://travis-ci.com/astro-informatics/purify.svg?branch=development)](https://travis-ci.com/astro-informatics/purify)
+[![build](https://github.com/astro-informatics/purify/actions/workflows/ci.yml/badge.svg?branch=development)](https://github.com/astro-informatics/purify/actions/workflows/ci.yml?query=branch%3Adevelopment+)
 [![codecov](https://codecov.io/gh/astro-informatics/purify/branch/development/graph/badge.svg)](https://codecov.io/gh/astro-informatics/purify)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2555252.svg)](https://doi.org/10.5281/zenodo.2555252)
 
-Description
--------------
+## Description
 
-**PURIFY** is an open-source collection of routines written in `C++` available under the [license](#license) below. It implements different tools and high-level to perform radio interferometric imaging, _i.e._ to recover images from the Fourier measurements taken by radio interferometric telescopes. 
+**PURIFY** is an open-source collection of routines written in `C++` available under the [license](#license) below. It implements different tools and high-level to perform radio interferometric imaging, _i.e._ to recover images from the Fourier measurements taken by radio interferometric telescopes.
 
 **PURIFY** leverages recent developments in the field of compressive sensing and convex optimization. Low-level functionality to solve the resulting convex optimisation is factored into the open-source companion code, [**SOPT**](https://github.com/astro-informatics/sopt), also written by the authors of **PURIFY**. For further background please see the [reference](#references-and-citation) section.
 
 This documentation outlines the necessary and optional [dependencies](#dependencies-installation) upon which **PURIFY** should be built, before describing [installation](#installing-and-building-PURIFY), [testing](#testing) and [usage](#usage) details. [Contributors](#contributors), [references](#references-and-citation) and [license](#license) information then follows.
 
-Dependencies installation
--------------------------
+## Dependencies installation
 
-**PURIFY** is written in `C++11`. Required software and libraries, and their minimum supported versions, are listed below. The build system will attempt to automatically download and build the automatically included libraries. (an internet connection is required for this). Most dependencies are handled by the `conan` package manager.
+**PURIFY** is written in `C++11`. Required software and libraries, and their minimum supported versions, are listed below. The build system will attempt to automatically download and build the automatically included libraries. (an internet connection is required for this).
 
 `C++` dependencies:
 
-## User-provided libraries
-
-In order to build **PURIFY**, you should have the following installed on your system.
-
 - [CMake](http://www.cmake.org/) v3.5.1 A free software that allows cross-platform compilation
-- [conan](https://conan.io/) v1.60.1 `C/C++` package manager. **NOTE** Conan 2.0 and later are not supported.
 - [GCC](https://gcc.gnu.org) v7.3.0 GNU compiler for `C++`
 - [OpenMP](http://openmp.org/wp/) v4.8.4 - Optional - Speeds up some of the operations.
 - [MPI](https://www.open-mpi.org) v3.1.1 - Optional - Parallelisation paradigm to speed up operations.
-
-## Automatically included libraries
-
-The build system of **PURIFY** will attempt to download and build these additional dependencies, depending on the build options passed to `conan`. Most of them are automatically handled by `conan`.
-
-- [astro-informatics/sopt](https://github.com/astro-informatics/sopt) v4.0.0: Sparse Optimization
-  Compressed Sensing library. Included as a submodule.
-- [UCL/GreatCMakeCookOff](https://github.com/UCL/GreatCMakeCookOff) Collection of `CMake` recipes.
-  Downloaded automatically if absent.
+- [astro-informatics/sopt](https://github.com/astro-informatics/sopt) v4.1.0: Sparse Optimization
+  Compressed Sensing library.
 - [Boost](https://www.boost.org/) v1.78.0: A set of free peer-reviewed
-  portable C++ libraries. Downloaded automatically by conan.
-- [fftw3](www.fftw.org) v3.3.9: Fastest Fourier Transform in the West. Downloaded automatically by conan.
-- [Eigen3](http://eigen.tuxfamily.org/index.php?title=Main_Page) v3.3.7: Modern `C++` linear algebra. Downloaded automatically by conan.
-- [tiff](http://www.libtiff.org/) v4.0.9: Tag Image File Format library. Downloaded automatically by conan.
-- [cfitsio](http://heasarc.gsfc.nasa.gov/fitsio/fitsio.html): v4.0.0: Library of `C` and `Fortran` subroutines for reading and writing data files in FITS (Flexible Image Transport System) data format. Downloaded automatically by conan.
-- [yaml-cpp](https://github.com/jbeder/yaml-cpp) v0.6.3: YAML parser and emitter in `C++`. Downloaded automatically by conan.
+  portable C++ libraries.
+- [fftw3](www.fftw.org) v3.3.9: Fastest Fourier Transform in the West.
+- [Eigen3](http://eigen.tuxfamily.org/index.php?title=Main_Page) v3.3.7: Modern `C++` linear algebra.
+- [tiff](http://www.libtiff.org/) v4.0.9: Tag Image File Format library.
+- [cfitsio](http://heasarc.gsfc.nasa.gov/fitsio/fitsio.html): v4.0.0: Library of `C` and `Fortran` subroutines for reading and writing data files in FITS (Flexible Image Transport System) data format.
+- [yaml-cpp](https://github.com/jbeder/yaml-cpp) v0.6.3: YAML parser and emitter in `C++`.
 - [casacore](http://casacore.github.io/casacore/) - Optional - Needed to interface with measurement
-  sets. The main **PURIFY** program requires this library (and its dependencies)
-- [spdlog](https://github.com/gabime/spdlog) v1.9.2: Optional - Logging library. Downloaded automatically by conan.
+- [ONNXruntime](https://onnxruntime.ai/) v1.17.1 - Optional - a cross-platform runtime engine based on the Open Neural Network eXchange format.
+  sets.
 - [Catch2](https://github.com/catchorg/Catch2) v2.13.9: Optional -  A `C++`
-  unit-testing framework only needed for testing. Downloaded automatically by conan.
+  unit-testing framework only needed for testing.
 - [google/benchmark](https://github.com/google/benchmark) v1.6.0: Optional - A `C++`
-  micro-benchmarking framework only needed for benchmarks. Downloaded automatically by conan.
+  micro-benchmarking framework only needed for benchmarks.
 
-Installing and building PURIFY
--------------------------------------
+For examples on how to install dependencies on Ubuntu and MacOS, see the
+[cmake.yml](https://github.com/astro-informatics/purify/blob/development/.github/workflows/cmake.yml).
 
-To build **PURIFY**:
+## Installing and building PURIFY
 
-1. Once the mandatory user-provided dependencies are present, `git clone` from the [GitHub repository](https://github.com/astro-informatics/purify):
+If the dependencies are already available on your system, you can also install **PURIFY** manually like so
 
-    ``` bash
-    git clone --recurse-submodules https://github.com/astro-informatics/purify.git
-    ```
+  ``` bash
+  cd /path/to/code
+  mkdir build
+  cd build
+  cmake .. -DCMAKE_INSTALL_PREFIX=${PWD}/../local
+  make -j
+  make -j install
+  ```
 
-1. Create a `conan` package for `sopt`
+On MacOS, you can also install most of the dependencies with Homebrew e.g.
 
-    ```bash
-    conan create /path/to/purify/sopt/ --build missing -s compiler.libcxx=libstdc++11 -pr:h=default -pr:b=default
-    ```
-If you get an error about broken symlinks you can set `skip_broken_symlinks_check = True` in your `~/.conan/conan.conf` file or [set an environment variable](https://docs.conan.io/en/1.46/reference/env_vars.html#conan-skip-broken-symlinks-check)
-1. Then, the program can be built using `conan`:
+ ``` bash
+ brew install boost fftw  eigen yaml-cpp catch2 [onnxruntime]
+ ```
 
-    ``` bash
-    cd /path/to/purify
-    mkdir build
-	cd build
-    conan install .. --build missing -pr:h=default -pr:b=default
-    conan build ..
-    ```
 
-    You can turn the various options on and off by adding flags to the `conan install` command, e.g.
-	The full list of build options can be found in the [conanfile](./conanfile.py).
+### Machine-learning models
 
-    ```bash
-    conan install .. --build missing -o cppflow=on -o openmp=on -o mpi=off -pr:h=default -pr:b=default
-    ```
+The **SOPT** library includes an interface to ONNXrt for using trained models
+as priors in the Forward-Backward optimization algorithm. To build **PURIFY** with
+ONNXrt capability, you need to enable `ONNXrt` support also in **SOPT** using
+the `onnxrt` option when running the `cmake` command.
 
-Installing and building PURIFY with TensorFlow
--------
-
-The `sopt` library includes an interface to TensorFlow for using trained models as priors in the Forward-Backward optimization algorithm. To build **PURIFY** with TensorFlow capability, some extra steps are currently required. We aim to simplify the build process in a future release.
-
-1. Install the [TensorFlow C API](https://www.tensorflow.org/install/lang_c)
-1. Clone the UCL fork of `cppflow` and create a `conan` package using
-
-    ``` bash
-    git clone git@github.com:UCL/cppflow.git
-    conan create /path/to/cppflow/ -pr:h=default -pr:b=default
-    ```
-1. Once the mandatory user-provided dependencies are present, `git clone` from the [GitHub repository](https://github.com/astro-informatics/purify):
-
-    ``` bash
-    git clone --recurse-submodules https://github.com/astro-informatics/purify.git
-    ```
-1. Create a `conan` package for `sopt` with the `cppflow` option set to "on"
-
-    ```bash
-    conan create /path/to/purify/sopt/ --build missing -s compiler.libcxx=libstdc++11 -o cppflow=on  -pr:h=default -pr:b=default
-    ```
-
-1. Then, the program can be built using `conan` with the `cppflow` option set to "on":
-
-    ``` bash
-    cd /path/to/purify
-    mkdir build
-    cd build
-    conan install .. --build missing -o cppflow=on -pr:h=default -pr:b=default
-    conan build ..
-    ```
-
-Testing
--------
+## Testing
 
 To check everything went all right, run the test suite:
 
@@ -131,8 +78,7 @@ cd /path/to/purify/build
 ctest .
 ```
 
-Usage
-------
+## Usage
 
 The main `purify` executable lives either in the build directory or in the in the `bin` subdirectory
 of the installation directory. `purify` has one required argument, it a string for the file path of the config file containing the settings.
@@ -173,6 +119,14 @@ Presently this is designed to work for the unconstrained problem where:
 
 Docker
 -------
+## Debugging the CI workflow with tmate
+
+The CI workflow has a manual dispatch trigger which allows you to log into the job while it's running. You can trigger it in 
+[actions](https://github.com/astro-informatics/purify/actions/workflows/cmake.yml).
+Run the workflow and set `debug_enabled=true` to enable the `tmate` step in the CI workflow. Once the workflow is running, open the job in actions. 
+You should see it printing out a line with a `ssh` command. Run it in terminal to log into the GitHub Actions runner.
+
+## Docker
 
 A Dockerfile is available on DockerHub. We are currently not maintaining it, and cannot
 guarantee it is up to date. Use the below documentation at your own risk.
@@ -204,13 +158,11 @@ you can see all the files from your `/full/path/to/data`. There you can run
 `purify` as shown above.`
 
 
-Contributors
-------------
+## Contributors
 
 Check the [contributors](@ref purify_contributors) page ([github](cpp/docs/PURIFY_CONTRIBUTORS.md)).
 
-References and citation
------------------------
+## References and citation
 
 If you use **PURIFY** for work that results in publication, please reference the [webpage](#webpage) and our related academic papers:
 
@@ -229,8 +181,7 @@ If you use **PURIFY** for work that results in publication, please reference the
 5. R. E. Carrillo, J. D. McEwen and Y. Wiaux.  "PURIFY: a new approach to radio-interferometric
    imaging". _Mon. Not. Roy. Astron. Soc._ **439(4):3591-3604** (2014) [arXiv:1307.4370](http://arxiv.org/abs/1307.4370)
 
-License
---------
+## License
 
 >    PURIFY Copyright (C) 2013-2019
 >
@@ -248,20 +199,17 @@ License
 >    with this program; if not, write to the Free Software Foundation, Inc.,
 >    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-Webpage
--------
+## Webpage
 
 - [Documentation](http://astro-informatics.github.io/purify)
 - [Repository](https://github.com/astro-informatics/purify)
 
-Support
--------
+## Support
 
 For any questions or comments, feel free to contact [Jason McEwen](http://www.jasonmcewen.org), or add
 an issue to the [issue tracker](https://github.com/astro-informatics/purify/issues).
 
-Notes
------
+## Notes
 
 The code is given for educational purpose. The code is in beta and still under development.
 

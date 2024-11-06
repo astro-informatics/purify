@@ -2,9 +2,9 @@
 
 #include "purify/config.h"
 #include <sopt/config.h>
-#include <catch.hpp>
 #include <memory>
 #include <random>
+#include <catch2/catch_all.hpp>
 #include "purify/logging.h"
 #include <sopt/logging.h>
 
@@ -17,9 +17,6 @@ int main(int argc, char **argv) {
   if (returnCode != 0)  // Indicates a command line error
     return returnCode;
   mersenne.reset(new std::mt19937_64(session.configData().rngSeed));
-
-  sopt::logging::initialize();
-  purify::logging::initialize();
 
   return session.run();
 }
