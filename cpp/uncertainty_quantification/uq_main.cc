@@ -2,7 +2,10 @@
 #include "purify/pfitsio.h"
 #include "purify/utilities.h"
 #include "purify/measurement_operator_factory.h"
+#include "purify/setup_utils.h"
 #include "sopt/objective_functions.h"
+#include "sopt/differentiable_func.h"
+#include "sopt/non_differentiable_func.h"
 #include <stdlib.h>
 #include "yaml-cpp/yaml.h"
 #include "purify/yaml-parser.h"
@@ -15,10 +18,13 @@ using VectorC = sopt::Vector<std::complex<double>>;
 
 int main(int argc, char **argv)
 {
-    if(argc != 2)
+    if(argc != 4)
     {
-        std::cout << "purify_UQ should be run using a single additional argument, which is the path to the config (yaml) file." << std::endl;
-        std::cout << "purify_UQ <config_path>" << std::endl;
+        std::cout << "purify_UQ should be run using three additional arguments." << std::endl;
+        std::cout << "purify_UQ <config_path> <reference_image_path> <surrogate_image_path>" << std::endl;
+        std::cout << "<config_path>: path to a .yaml config file specifying details of measurement operator, wavelet operator, observations, and cost functions." << std::endl;
+        std::cout << "<reference_image_path>: path to image file (.fits) which was output from running purify on observed data." << std::endl;
+        std::cout << "<surrogate_image_path>: path to modified image file (.fits) for feature analysis." << std::endl;
         std::cout << std::endl;
         std::cout << "For more information about the contents of the config file please consult the README." << std::endl;
         return 1;
@@ -29,8 +35,8 @@ int main(int argc, char **argv)
     const YAML::Node UQ_config = YAML::LoadFile(config_path);
 
     // Load the Reference and Surrogate images
-    const std::string ref_image_path = UQ_config["reference_image_path"].as<std::string>();
-    const std::string surrogate_image_path = UQ_config["surrogate_image_path"].as<std::string>();
+    const std::string ref_image_path = argv[2];
+    const std::string surrogate_image_path = argv[3];
     const auto reference_image = purify::pfitsio::read2d(ref_image_path);
     const VectorC reference_vector = VectorC::Map(reference_image.data(), reference_image.size());
     const auto surrogate_image = purify::pfitsio::read2d(surrogate_image_path);
@@ -85,7 +91,7 @@ int main(int argc, char **argv)
 
         // This is the measurement operator used in the test but this should probably be selectable
         measurement_operator = 
-        purify::factory::measurement_operator_factory<sopt::Vector<std::complex<double>>>(
+        purify::factory::measurement_operator_factory<sopt::Vector<t_complex>>(
             purify::factory::distributed_measurement_operator::serial,
             measurement_data,
             imsize_y,
@@ -141,19 +147,20 @@ int main(int argc, char **argv)
         return 3;
     }
 
-
+    std::unique_ptr<DifferentiableFunc<t_complex>> f;
+    std::unique_ptr<NonDifferentiableFunc<t_complex>> g;
+    // set up f and g from config
 
     // Calculate the posterior function for the reference image
     // posterior = likelihood + prior
     // Likelihood = |y - Phi(x)|^2 / sigma^2  (L2 norm)
     // Prior = Sum(Psi^t * |x_i|) * gamma  (L1 norm)
-    auto Posterior = [&measurement_data, measurement_operator, wavelet_operator, sigma, gamma](const VectorC &image) {
+    auto Posterior = [&measurement_data, measurement_operator, wavelet_operator, sigma, gamma, &f, &g](const VectorC &image) {
       {
         const auto residuals = (*measurement_operator * image) - measurement_data.vis;
-        auto likelihood =  residuals.squaredNorm() / (2 * sigma * sigma);
-        const VectorC wavelet_rep = wavelet_operator->adjoint() * image;
-        auto prior = wavelet_rep.cwiseAbs().sum() * gamma;
-        return likelihood + prior;
+        auto A = f->function(image, measurement_data.vis, (*measurement_operator));
+        auto B = g->function(image);
+        return A + gamma * B;
       }
     };
 
