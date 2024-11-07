@@ -34,7 +34,7 @@ inline std::string image_filename(std::string const &filename) {
 }
 //! Visibility filename
 inline std::string visibility_filename(std::string const &filename) {
-  return scratch_filename("vis_" + filename);
+  return data_filename("vis_" + filename);
 }
 //! Specific vla data
 inline std::string vla_filename(std::string const &filename) {
