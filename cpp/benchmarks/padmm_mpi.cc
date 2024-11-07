@@ -72,7 +72,8 @@ class PadmmFixtureMPI : public ::benchmark::Fixture {
   t_real m_epsilon;
   t_uint m_kernel;
 
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_measurements;
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_measurements1;
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_measurements3;
   std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> m_padmm;
 };
 
