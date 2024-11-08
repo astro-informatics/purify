@@ -22,7 +22,7 @@
 
 using namespace purify;
 
-class PadmmFixtureMPI : public ::benchmark::Fixture {
+class AlgoFixtureMPI : public ::benchmark::Fixture {
  public:
   void SetUp(const ::benchmark::State &state) {
     // Reading image from file and update related quantities
@@ -78,9 +78,10 @@ class PadmmFixtureMPI : public ::benchmark::Fixture {
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_measurements_distribute_image;
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_measurements_distribute_grid;
   std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> m_padmm;
+  std::shared_ptr<sopt::algorithm::ImagingForwardBackward<t_complex>> m_fb;
 };
 
-BENCHMARK_DEFINE_F(PadmmFixtureMPI, DistributeImage)(benchmark::State &state) {
+BENCHMARK_DEFINE_F(AlgoFixtureMPI, PadmmDistributeImage)(benchmark::State &state) {
   // Create the algorithm - has to be done there to reset the internal state.
   // If done in the fixture repeats would start at the solution and converge immediately.
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
@@ -101,7 +102,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, DistributeImage)(benchmark::State &state) {
   }
 }
 
-BENCHMARK_DEFINE_F(PadmmFixtureMPI, DistributeGrid)(benchmark::State &state) {
+BENCHMARK_DEFINE_F(AlgoFixtureMPI, PadmmDistributeGrid)(benchmark::State &state) {
   // Create the algorithm - has to be done there to reset the internal state.
   // If done in the fixture repeats would start at the solution and converge immediately.
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
@@ -122,7 +123,73 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, DistributeGrid)(benchmark::State &state) {
   }
 }
 
-BENCHMARK_REGISTER_F(PadmmFixtureMPI, DistributeImage)
+BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbDistributeImage)(benchmark::State &state) {
+  // Create the algorithm - has to be done there to reset the internal state.
+  // If done in the fixture repeats would start at the solution and converge immediately.
+  auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
+      factory::distributed_wavelet_operator::mpi_sara, m_sara, m_imsizey, m_imsizex);
+
+  t_real const beta = m_sigma * m_sigma;
+  t_real const gamma = 0.0001;
+
+  m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
+      factory::algo_distribution::mpi_serial, m_measurements_distribute_image, wavelets,
+      m_uv_data, m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1,
+      true, true, false, 1e-3, 1e-2, 50, 1.0);
+
+  // Benchmark the application of the algorithm
+  while (state.KeepRunning()) {
+    auto start = std::chrono::high_resolution_clock::now();
+    auto result = (*m_fb)();
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "Converged? " << result.good << " , niters = " << result.niters << std::endl;
+    state.SetIterationTime(b_utilities::duration(start, end, m_world));
+  }
+}
+
+BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbDistributeGrid)(benchmark::State &state) {
+  // Create the algorithm - has to be done there to reset the internal state.
+  // If done in the fixture repeats would start at the solution and converge immediately.
+  auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
+      factory::distributed_wavelet_operator::mpi_sara, m_sara, m_imsizey, m_imsizex);
+
+  t_real const beta = m_sigma * m_sigma;
+  t_real const gamma = 0.0001;
+
+  m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
+      factory::algo_distribution::mpi_serial, m_measurements_distribute_grid, wavelets,
+      m_uv_data, m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1,
+      true, true, false, 1e-3, 1e-2, 50, 1.0);
+
+  // Benchmark the application of the algorithm
+  while (state.KeepRunning()) {
+    auto start = std::chrono::high_resolution_clock::now();
+    auto result = (*m_fb)();
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "Converged? " << result.good << " , niters = " << result.niters << std::endl;
+    state.SetIterationTime(b_utilities::duration(start, end, m_world));
+  }
+}
+
+BENCHMARK_REGISTER_F(AlgoFixtureMPI, FbDistributeImage)
+    //->Apply(b_utilities::Arguments)
+    ->Args({128, 10000, 4, 10, 1})
+    ->UseManualTime()
+    ->MinTime(10.0)
+    ->MinWarmUpTime(5.0)
+    ->Repetitions(3)  //->ReportAggregatesOnly(true)
+    ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_REGISTER_F(AlgoFixtureMPI, FbDistributeGrid)
+    //->Apply(b_utilities::Arguments)
+    ->Args({128, 10000, 4, 10, 2})
+    ->UseManualTime()
+    ->MinTime(10.0)
+    ->MinWarmUpTime(5.0)
+    ->Repetitions(3)  //->ReportAggregatesOnly(true)
+    ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_REGISTER_F(AlgoFixtureMPI, PadmmDistributeImage)
     //->Apply(b_utilities::Arguments)
     ->Args({128, 10000, 4, 10, 1})
     ->Args({1024, static_cast<t_int>(1e6), 4, 10, 1})
@@ -133,7 +200,7 @@ BENCHMARK_REGISTER_F(PadmmFixtureMPI, DistributeImage)
     ->Repetitions(3)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
-BENCHMARK_REGISTER_F(PadmmFixtureMPI, DistributeGrid)
+BENCHMARK_REGISTER_F(AlgoFixtureMPI, PadmmDistributeGrid)
     //->Apply(b_utilities::Arguments)
     ->Args({128, 10000, 4, 10, 2})
     ->Args({1024, static_cast<t_int>(1e6), 4, 10, 2})
