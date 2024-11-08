@@ -19,7 +19,7 @@ class NullReporter : public ::benchmark::BenchmarkReporter {
 // reporter according to the process rank
 int main(int argc, char const **argv) {
 
-    sopt::logging::set_level("debug");
+    sopt::logging::set_level("info");
     purify::logging::set_level("debug");
   
 #ifdef PURIFY_MPI
