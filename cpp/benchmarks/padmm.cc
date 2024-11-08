@@ -22,11 +22,8 @@ class PadmmFixture : public ::benchmark::Fixture {
     bool newImage = b_utilities::updateImage(state.range(0), m_image, m_imsizex, m_imsizey);
 
     // Generating random uv(w) coverage
-    bool newMeasurements = m_uv_data.size() != state.range(1);
-    if (newMeasurements) {
-      t_real const sigma_m = constant::pi / 3;
-      m_uv_data = utilities::random_sample_density(state.range(1), 0, sigma_m);
-    }
+    bool newMeasurements = b_utilities::updateMeasurements(state.range(1), m_uv_data, m_epsilon,
+                                                           newImage, m_image);
 
     bool newKernel = m_kernel != state.range(2);
     if (newImage || newMeasurements || newKernel) {
@@ -56,6 +53,7 @@ class PadmmFixture : public ::benchmark::Fixture {
 
   void TearDown(const ::benchmark::State &state) {}
 
+  t_real m_epsilon;
   t_uint m_counter;
   std::vector<std::tuple<std::string, t_uint>> const m_sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
@@ -67,11 +65,9 @@ class PadmmFixture : public ::benchmark::Fixture {
   t_uint m_imsizey;
 
   utilities::vis_params m_uv_data;
-  t_real m_epsilon;
 
   t_uint m_kernel;
   std::shared_ptr<sopt::LinearTransform<Vector<t_complex>> const> m_measurements_transform;
-  t_real m_gamma;
   std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> m_padmm;
 };
 
@@ -90,7 +86,7 @@ BENCHMARK_DEFINE_F(PadmmFixture, Apply)(benchmark::State &state) {
 
 BENCHMARK_REGISTER_F(PadmmFixture, Apply)
     //->Apply(b_utilities::Arguments)
-    ->Args({128, 10000, 4, 100})
+    ->Args({128, 10000, 4, 10})
     ->UseManualTime()
     ->MinTime(10.0)
     ->MinWarmUpTime(5.0)
