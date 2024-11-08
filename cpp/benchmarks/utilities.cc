@@ -7,6 +7,7 @@
 #include "purify/operators.h"
 #include "purify/pfitsio.h"
 #include <sopt/linear_transform.h>
+#include "purify/logging.h"
 
 using namespace purify;
 using namespace purify::notinstalled;
@@ -102,9 +103,11 @@ utilities::vis_params random_measurements(t_int size, const t_real max_w, const 
 
   utilities::vis_params uv_data;
   if (vis_file_str.good()) {
+    PURIFY_INFO("Reading random visibilities from file", vis_file);
     uv_data = utilities::read_visibility(vis_file, true);
     uv_data.units = utilities::vis_units::radians;
   } else {
+    PURIFY_INFO("Generating random visibilities and writing to", vis_file);
     t_real const sigma_m = constant::pi / 3;
     uv_data = utilities::random_sample_density(size, 0, sigma_m, max_w);
     uv_data.units = utilities::vis_units::radians;
