@@ -97,12 +97,14 @@ TEST_CASE("primal_dual_factory") {
   t_uint const imsizey = 128;
   t_uint const imsizex = 128;
 
-  auto const measurements_transform =
-      std::get<2>(sopt::algorithm::normalise_operator<Vector<t_complex>>(
-          factory::measurement_operator_factory<Vector<t_complex>>(
-              factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2,
-              kernels::kernel_from_string.at("kb"), 4, 4),
-          1000, 1e-5, Vector<t_complex>::Ones(imsizex * imsizey)));
+  Vector<t_complex> const init = Vector<t_complex>::Ones(imsizex * imsizey);
+  auto const measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
+      factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2,
+      kernels::kernel_from_string.at("kb"), 4, 4);
+  auto const power_method_stuff =
+      sopt::algorithm::power_method<Vector<t_complex>>(*measurements_transform, 1000, 1e-5, init);
+  const t_real op_norm = std::get<0>(power_method_stuff);
+  SOPT_HIGH_LOG("op norm = {}", op_norm);
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -113,21 +115,20 @@ TEST_CASE("primal_dual_factory") {
   auto const primaldual =
       factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
           factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma,
-          imsizey, imsizex, sara.size(), 1000, true, true, 1e-3);
+          imsizey, imsizex, sara.size(), 1000, true, true, 1e-3, 1, op_norm);
 
   auto const diagnostic = (*primaldual)();
 
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
   // pfitsio::write2d(image.real(), result_path);
 
-  double average_intensity = diagnostic.x.real().sum() / diagnostic.x.size();
-  SOPT_HIGH_LOG("Average intensity = {}", average_intensity);
+  double average_solution = solution.real().cwiseAbs().sum() / solution.size();
   double mse = (Vector<t_complex>::Map(solution.data(), solution.size()) - diagnostic.x)
                    .real()
                    .squaredNorm() /
                solution.size();
-  SOPT_HIGH_LOG("MSE = {}", mse);
-  CHECK(mse <= average_intensity * 1e-3);
+  double rms = sqrt(mse);
+  CHECK(rms <= average_solution * 1e-3);
 }
 
 TEST_CASE("fb_factory") {
@@ -157,6 +158,7 @@ TEST_CASE("fb_factory") {
   auto const power_method_stuff =
       sopt::algorithm::power_method<Vector<t_complex>>(*measurements_transform, 1000, 1e-5, init);
   const t_real op_norm = std::get<0>(power_method_stuff);
+  SOPT_HIGH_LOG("Op norm = {}", op_norm);
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -175,14 +177,13 @@ TEST_CASE("fb_factory") {
   // pfitsio::write2d(image.real(), result_path);
   // pfitsio::write2d(residual_image.real(), expected_residual_path);
 
-  double average_intensity = diagnostic.x.real().sum() / diagnostic.x.size();
-  SOPT_HIGH_LOG("Average intensity = {}", average_intensity);
+  double average_solution = solution.real().cwiseAbs().sum() / solution.size();
   double mse = (Vector<t_complex>::Map(solution.data(), solution.size()) - diagnostic.x)
                    .real()
                    .squaredNorm() /
                solution.size();
-  SOPT_HIGH_LOG("MSE = {}", mse);
-  CHECK(mse <= average_intensity * 1e-3);
+  double rms = sqrt(mse);
+  CHECK(rms <= average_solution * 1e-3);
 }
 
 #ifdef PURIFY_ONNXRT
@@ -236,14 +237,13 @@ TEST_CASE("tf_fb_factory") {
   // pfitsio::write2d(image.real(), result_path);
   // pfitsio::write2d(residual_image.real(), expected_residual_path);
 
-  double average_intensity = diagnostic.x.real().sum() / diagnostic.x.size();
-  SOPT_HIGH_LOG("Average intensity = {}", average_intensity);
+  double average_solution = solution.real().cwiseAbs().sum() / solution.size();
   double mse = (Vector<t_complex>::Map(solution.data(), solution.size()) - diagnostic.x)
                    .real()
                    .squaredNorm() /
                solution.size();
-  SOPT_HIGH_LOG("MSE = {}", mse);
-  CHECK(mse <= average_intensity * 1e-3);
+  double rms = sqrt(mse);
+  CHECK(rms <= average_solution * 1e-3);
 }
 
 TEST_CASE("onnx_fb_factory") {
@@ -300,14 +300,13 @@ TEST_CASE("onnx_fb_factory") {
   // pfitsio::write2d(image.real(), result_path);
   // pfitsio::write2d(residual_image.real(), expected_residual_path);
 
-  double average_intensity = diagnostic.x.real().sum() / diagnostic.x.size();
-  SOPT_HIGH_LOG("Average intensity = {}", average_intensity);
+  double average_solution = solution.real().cwiseAbs().sum() / solution.size();
   double mse = (Vector<t_complex>::Map(solution.data(), solution.size()) - diagnostic.x)
                    .real()
                    .squaredNorm() /
                solution.size();
-  SOPT_HIGH_LOG("MSE = {}", mse);
-  CHECK(mse <= average_intensity * 1e-3);
+  double rms = sqrt(mse);
+  CHECK(rms <= average_solution * 1e-3);
 }
 #endif
 
