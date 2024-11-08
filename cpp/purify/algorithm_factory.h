@@ -274,6 +274,7 @@ primaldual_factory(
       .Phi(*measurements)
       .tau(0.5 / (op_norm * op_norm + 1))
       .xi(1.)
+      .nu(op_norm * op_norm)
       .sigma(1.);
 #ifdef PURIFY_MPI
   ConvergenceType obj_conv = ConvergenceType::mpi_global;
