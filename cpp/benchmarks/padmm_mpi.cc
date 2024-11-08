@@ -7,11 +7,11 @@
 #include "purify/directories.h"
 #include "purify/distribute.h"
 #include "purify/logging.h"
+#include "purify/measurement_operator_factory.h"
 #include "purify/mpi_utilities.h"
 #include "purify/operators.h"
 #include "purify/utilities.h"
 #include "purify/wavelet_operator_factory.h"
-#include "purify/measurement_operator_factory.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/mpi/communicator.h>
 #include <sopt/mpi/session.h>
@@ -42,21 +42,19 @@ class PadmmFixtureMPI : public ::benchmark::Fixture {
     if (state.range(4) == 1) {
       PURIFY_INFO("Using distributed image MPI algorithm");
       m_measurements_distribute_image = factory::measurement_operator_factory<Vector<t_complex>>(
-	 factory::distributed_measurement_operator::mpi_distribute_image,
-	 m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2,
-	 kernels::kernel::kb, m_kernel, m_kernel, w_term);
+          factory::distributed_measurement_operator::mpi_distribute_image, m_uv_data,
+          m_image.rows(), m_image.cols(), cellsize, cellsize, 2, kernels::kernel::kb, m_kernel,
+          m_kernel, w_term);
     }
 
     if (state.range(4) == 2) {
       PURIFY_INFO("Using distributed grid MPI algorithm");
       m_measurements_distribute_grid = factory::measurement_operator_factory<Vector<t_complex>>(
-          factory::distributed_measurement_operator::mpi_distribute_grid,
-	  m_uv_data, m_image.rows(), m_image.cols(), cellsize, cellsize, 2,
-          kernels::kernel::kb, m_kernel, m_kernel, w_term);
+          factory::distributed_measurement_operator::mpi_distribute_grid, m_uv_data, m_image.rows(),
+          m_image.cols(), cellsize, cellsize, 2, kernels::kernel::kb, m_kernel, m_kernel, w_term);
     }
 
     m_sigma = 0.016820222945913496 * std::sqrt(2);  // see test_parameters file
-
   }
 
   void TearDown(const ::benchmark::State &state) {}
@@ -89,9 +87,9 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, DistributeImage)(benchmark::State &state) {
       factory::distributed_wavelet_operator::mpi_sara, m_sara, m_imsizey, m_imsizex);
 
   m_padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
-      factory::algo_distribution::mpi_distributed, m_measurements_distribute_image, wavelets, m_uv_data, m_sigma,
-      m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true, false, 1e-3, 1e-2, 50,
-      1.0, 1.0);
+      factory::algo_distribution::mpi_distributed, m_measurements_distribute_image, wavelets,
+      m_uv_data, m_sigma, m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true,
+      false, 1e-3, 1e-2, 50, 1.0, 1.0);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
@@ -106,13 +104,13 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, DistributeImage)(benchmark::State &state) {
 BENCHMARK_DEFINE_F(PadmmFixtureMPI, DistributeGrid)(benchmark::State &state) {
   // Create the algorithm - has to be done there to reset the internal state.
   // If done in the fixture repeats would start at the solution and converge immediately.
-
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
       factory::distributed_wavelet_operator::mpi_sara, m_sara, m_imsizey, m_imsizex);
-  auto const padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
-											     factory::algo_distribution::mpi_distributed, m_measurements_distribute_grid, wavelets, m_uv_data, m_sigma,
-      m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true, false, 1e-3, 1e-2, 50,
-      1.0, 1.0);
+
+  m_padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
+      factory::algo_distribution::mpi_distributed, m_measurements_distribute_grid, wavelets,
+      m_uv_data, m_sigma, m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true,
+      false, 1e-3, 1e-2, 50, 1.0, 1.0);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
@@ -126,6 +124,7 @@ BENCHMARK_DEFINE_F(PadmmFixtureMPI, DistributeGrid)(benchmark::State &state) {
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, DistributeImage)
     //->Apply(b_utilities::Arguments)
+    ->Args({128, 10000, 4, 10, 1})
     ->Args({1024, static_cast<t_int>(1e6), 4, 10, 1})
     ->Args({1024, static_cast<t_int>(1e7), 4, 10, 1})
     ->UseManualTime()
@@ -136,6 +135,7 @@ BENCHMARK_REGISTER_F(PadmmFixtureMPI, DistributeImage)
 
 BENCHMARK_REGISTER_F(PadmmFixtureMPI, DistributeGrid)
     //->Apply(b_utilities::Arguments)
+    ->Args({128, 10000, 4, 10, 2})
     ->Args({1024, static_cast<t_int>(1e6), 4, 10, 2})
     ->Args({1024, static_cast<t_int>(1e7), 4, 10, 2})
     ->UseManualTime()
