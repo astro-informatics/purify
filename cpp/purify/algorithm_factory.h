@@ -174,8 +174,8 @@ fb_factory(const algo_distribution dist,
   auto fb = std::make_shared<Algorithm>(uv_data.vis);
   fb->itermax(max_iterations)
       .gamma(reg_parameter)
-      .sigma(sigma * std::sqrt(2))
-      .beta(step_size * std::sqrt(2))
+      .sigma(sigma)
+      .beta(step_size)
       .relative_variation(relative_variation)
       .tight_frame(tight_frame)
       .nu(op_norm * op_norm)
