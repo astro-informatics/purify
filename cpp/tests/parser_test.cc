@@ -9,10 +9,9 @@
 using namespace purify;
 
 TEST_CASE("Yaml parser and setting variables test") {
-  std::string file_path = purify::notinstalled::data_filename("config/config.yaml");
+  std::string file_path = purify::data_filename("config/config.yaml");
   YamlParser yaml_parser = YamlParser(file_path);
-  std::string file_path_m =
-      purify::notinstalled::data_filename("config/test_measurements_config.yaml");
+  std::string file_path_m = purify::data_filename("config/test_measurements_config.yaml");
   YamlParser yaml_parser_m = YamlParser(file_path_m);
   SECTION("Check the GeneralConfiguration measurement input variables") {
     REQUIRE(yaml_parser_m.source() == purify::utilities::vis_source::measurements);
@@ -28,8 +27,7 @@ TEST_CASE("Yaml parser and setting variables test") {
     REQUIRE(yaml_parser_m.warm_start() == "/path/to/warm/start/image");
   }
   SECTION("Check the GeneralConfiguration simulation input variables") {
-    std::string file_path_s =
-        purify::notinstalled::data_filename("config/test_simulation_config.yaml");
+    std::string file_path_s = purify::data_filename("config/test_simulation_config.yaml");
     YamlParser yaml_parser_s = YamlParser(file_path_s);
     REQUIRE(yaml_parser_s.source() == purify::utilities::vis_source::simulation);
     REQUIRE(yaml_parser_s.measurements() ==

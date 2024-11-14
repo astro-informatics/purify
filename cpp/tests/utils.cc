@@ -5,7 +5,6 @@
 #include "purify/uvw_utilities.h"
 
 using namespace purify;
-using namespace purify::notinstalled;
 using Catch::Approx;
 
 TEST_CASE("utilities [mod]", "[mod]") {

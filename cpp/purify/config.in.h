@@ -31,9 +31,9 @@
 //! Whether PURIFY is using HDF5 support
 #cmakedefine PURIFY_H5
 
+#include <cstdint>
 #include <string>
 #include <tuple>
-#include <cstdint>
 
 namespace purify {
 //! Returns library version
@@ -49,6 +49,6 @@ inline std::tuple<uint8_t, uint8_t, uint8_t> version_tuple() {
 inline std::string gitref() { return "@Purify_GITREF@"; }
 //! Default logging level
 inline std::string default_logging_level() { return "@PURIFY_TEST_LOG_LEVEL@"; }
-} // namespace purify
+}  // namespace purify
 
 #endif

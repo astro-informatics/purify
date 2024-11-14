@@ -21,7 +21,6 @@
 #include "purify/pfitsio.h"
 #include "purify/utilities.h"
 using namespace purify;
-using namespace purify::notinstalled;
 
 void padmm(const std::string &name, const Image<t_complex> &M31, const std::string &kernel,
            const t_int J, const utilities::vis_params &uv_data, const t_real sigma,
@@ -182,13 +181,5 @@ int main(int, char **) {
   // adding noise to visibilities
   uv_data.vis = utilities::add_noise(y0, 0., sigma);
   padmm(name + "30", M31, kernel, 4, uv_data, sigma, std::make_tuple(w_term, cellsize));
-  /*
-    const std::string &test_dir = "expected/padmm_serial/";
-    const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
-    auto uv_data = utilities::read_visibility(input_data_path, false);
-    uv_data.units = utilities::vis_units::radians;
-    t_real const sigma = 0.02378738741225;
-    padmm(name + "10", M31, kernel, 4, uv_data, sigma, std::make_tuple(w_term, cellsize));
-    */
   return 0;
 }

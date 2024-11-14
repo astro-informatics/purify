@@ -10,7 +10,6 @@
 #include <vector>
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 TEST_CASE("Purify H5", "[HDF5]") {
   H5::H5Handler f(atca_filename("0332-391.h5"));
