@@ -1,111 +1,90 @@
 
-include_directories(
-    "${PROJECT_SOURCE_DIR}/cpp"
-    "${PROJECT_BINARY_DIR}/include") add_library(common_catch_main_object OBJECT
-                                                 "common_catch_main.cc") if (Catch2_FOUND)
-    target_link_libraries(common_catch_main_object Catch2::Catch2) endif() if (
-        EIGEN3_INCLUDE_DIR) target_include_directories(common_catch_main_object SYSTEM PUBLIC ${
-        EIGEN3_INCLUDE_DIR}) endif() if (sopt_FOUND) target_include_directories(common_catch_main_object SYSTEM PUBLIC ${
-        sopt_INCLUDE_DIR}) endif() target_include_directories(common_catch_main_object PUBLIC
-                                                              "${EXTERNAL_ROOT}/include/"
-                                                              "${PROJECT_BINARY_DIR}/"
-                                                              "include/") file(MAKE_DIRECTORY
-                                                                               "${PROJECT_"
-                                                                               "BINARY_DIR}"
-                                                                               "/outputs")
+include_directories("${PROJECT_SOURCE_DIR}/cpp" "${PROJECT_BINARY_DIR}/include")
+add_library(common_catch_main_object OBJECT "common_catch_main.cc")
+if(Catch2_FOUND)
+  target_link_libraries(common_catch_main_object Catch2::Catch2)
+endif()
+if(EIGEN3_INCLUDE_DIR)
+target_include_directories(common_catch_main_object SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})
+endif()
+if(sopt_FOUND)
+  target_include_directories(common_catch_main_object SYSTEM PUBLIC ${sopt_INCLUDE_DIR})
+endif()
+target_include_directories(common_catch_main_object PUBLIC
+  "${EXTERNAL_ROOT}/include/"
+  "${PROJECT_BINARY_DIR}/include/"
+)
+file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/outputs")
 
-        add_catch_test(algo_factory LIBRARIES libpurify) add_catch_test(
-            convolution
-                LIBRARIES libpurify) add_catch_test(distribute LIBRARIES libpurify)
-            add_catch_test(index_mapping LIBRARIES libpurify) add_catch_test(integration LIBRARIES libpurify) add_catch_test(
-                measurement_factory
-                    LIBRARIES libpurify) add_catch_test(measurement_operator LIBRARIES libpurify)
-                add_catch_test(operators LIBRARIES libpurify) add_catch_test(
-                    parser_test
-                        LIBRARIES libpurify) add_catch_test(purify_fitsio LIBRARIES libpurify)
-                    add_catch_test(read_measurements LIBRARIES libpurify) add_catch_test(
-                        sparse LIBRARIES libpurify) add_catch_test(utils LIBRARIES libpurify)
-                        add_catch_test(uvfits LIBRARIES libpurify) add_catch_test(wavelet_factory LIBRARIES libpurify) add_catch_test(
-                            wide_field_utilities LIBRARIES
-                                libpurify) add_catch_test(wkernel LIBRARIES libpurify)
 
-                            if (PURIFY_CASACORE) add_catch_test(casacore LIBRARIES libpurify ${
-                                Boost_FILESYSTEM_LIBRARY} ${
-                                Boost_SYSTEM_LIBRARY} DEPENDS lookup_dependencies) endif()
+add_catch_test(algo_factory LIBRARIES libpurify)
+add_catch_test(convolution LIBRARIES libpurify)
+add_catch_test(distribute LIBRARIES libpurify)
+add_catch_test(index_mapping LIBRARIES libpurify)
+add_catch_test(integration LIBRARIES libpurify)
+add_catch_test(measurement_factory LIBRARIES libpurify)
+add_catch_test(measurement_operator LIBRARIES libpurify)
+add_catch_test(operators LIBRARIES libpurify)
+add_catch_test(parser_test LIBRARIES libpurify)
+add_catch_test(purify_fitsio LIBRARIES libpurify)
+add_catch_test(read_measurements LIBRARIES libpurify)
+add_catch_test(sparse LIBRARIES libpurify)
+add_catch_test(utils LIBRARIES libpurify)
+add_catch_test(uvfits LIBRARIES libpurify)
+add_catch_test(wavelet_factory LIBRARIES libpurify)
+add_catch_test(wide_field_utilities LIBRARIES libpurify)
+add_catch_test(wkernel LIBRARIES libpurify)
 
-                                if (PURIFY_ARRAYFIRE) include_directories(${ArrayFire_INCLUDE_DIRS}) add_catch_test(
-                                    operators_gpu LIBRARIES
-                                        libpurify ${ArrayFire_LIBRARIES}) endif()
+if(PURIFY_CASACORE)
+  add_catch_test(casacore LIBRARIES libpurify ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} DEPENDS lookup_dependencies)
+endif()
 
-                                    if (PURIFY_MPI)
-                                        add_library(
-                                            common_mpi_catch_main_object OBJECT
-                                            "common_mpi_catch_main.cc")
-                                            target_include_directories(
-                                                common_mpi_catch_main_object PUBLIC
-                                                    ${PROJECT_BINARY_DIR} /
-                                                include
-                                                    ${MPI_CXX_INCLUDE_PATH}) if (Catch2_FOUND)
-                                                target_link_libraries(common_mpi_catch_main_object Catch2::Catch2) endif() if (
-                                                    sopt_FOUND) target_include_directories(common_mpi_catch_main_object SYSTEM PUBLIC ${
-                                                    sopt_INCLUDE_DIR}) endif() if (EIGEN3_INCLUDE_DIR)
-                                                    target_include_directories(
-                                                        common_mpi_catch_main_object SYSTEM
-                                                            PUBLIC ${EIGEN3_INCLUDE_DIR}) endif()
+if(PURIFY_ARRAYFIRE)
+  include_directories(${ArrayFire_INCLUDE_DIRS})
+  add_catch_test(operators_gpu LIBRARIES libpurify ${ArrayFire_LIBRARIES})
+endif()
 
-                                                        function(add_mpi_test
-                                                                     testname) add_catch_test(${
-                                                            testname} COMMON_MAIN common_mpi_catch_main_object NOTEST ${
-                                                            ARGN}) unset(arguments) if (CATCH_JUNIT)
-                                                            set(arguments - r junit -
-                                                                o ${PROJECT_BINARY_DIR} / Testing /
-                                                                    ${testname}.xml)
-                                                                endif() if (NOT MPIEXEC_MAX_NUMPROCS) set(
-                                                                    MPIEXEC_MAX_NUMPROCS 4) endif() add_test(NAME ${
-                                                                    testname} COMMAND ${
-                                                                    MPIEXEC} ${
-                                                                    MPIEXEC_NUMPROC_FLAG} ${
-                                                                    MPIEXEC_MAX_NUMPROCS} $ {
-                                                                  MPIEXEC_PREFLAGS
-                                                                } "./test_${testname}" ${
-                                                                    arguments}) set_tests_properties(${
-                                                                    testname} PROPERTIES LABELS "ca"
-                                                                                                "tc"
-                                                                                                "h;"
-                                                                                                "mp"
-                                                                                                "i") endfunction()
+if(PURIFY_MPI)
+  add_library(common_mpi_catch_main_object OBJECT "common_mpi_catch_main.cc")
+  target_include_directories(common_mpi_catch_main_object
+    PUBLIC ${PROJECT_BINARY_DIR}/include ${MPI_CXX_INCLUDE_PATH})
+  if(Catch2_FOUND)
+    target_link_libraries(common_mpi_catch_main_object Catch2::Catch2)
+  endif()
+  if(sopt_FOUND)
+    target_include_directories(common_mpi_catch_main_object SYSTEM PUBLIC ${sopt_INCLUDE_DIR})
+  endif()
+  if(EIGEN3_INCLUDE_DIR)
+    target_include_directories(common_mpi_catch_main_object SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})
+  endif()
 
-                                                                    add_mpi_test(
-                                                                        distribute_sparse_vector
-                                                                            LIBRARIES
-                                                                                libpurify) add_mpi_test(kmeans LIBRARIES libpurify)
-                                                                        add_mpi_test(mpi_algo_factory LIBRARIES libpurify) add_mpi_test(
-                                                                            mpi_measurement_factory
-                                                                                LIBRARIES libpurify)
-                                                                            add_mpi_test(
-                                                                                mpi_measurement_operator
-                                                                                    LIBRARIES
-                                                                                        libpurify)
-                                                                                add_mpi_test(
-                                                                                    mpi_read_measurements LIBRARIES
-                                                                                        libpurify)
-                                                                                    add_catch_test(
-                                                                                        mpi_utilities LIBRARIES
-                                                                                            libpurify)
-                                                                                        add_mpi_test(
-                                                                                            mpi_wavelet_factory
-                                                                                                LIBRARIES
-                                                                                                    libpurify)
-                                                                                            add_mpi_test(
-                                                                                                mpi_wide_field_utilities
-                                                                                                    LIBRARIES
-                                                                                                        libpurify)
-                                                                                                add_mpi_test(
-                                                                                                    parallel_mpi_utilities LIBRARIES
-                                                                                                        libpurify) endif()
+  function(add_mpi_test testname)
+    add_catch_test(${testname} COMMON_MAIN common_mpi_catch_main_object NOTEST ${ARGN})
+    unset(arguments)
+    if(CATCH_JUNIT)
+      set(arguments -r junit -o ${PROJECT_BINARY_DIR}/Testing/${testname}.xml)
+    endif()
+    if(NOT MPIEXEC_MAX_NUMPROCS)
+      set(MPIEXEC_MAX_NUMPROCS 4)
+    endif()
+    add_test(NAME ${testname}
+      COMMAND
+      ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS}
+      "./test_${testname}" ${arguments})
+    set_tests_properties(${testname} PROPERTIES LABELS "catch;mpi")
+  endfunction()
 
-                                                                                                    install(
-                                                                                                        DIRECTORY
-                                                                                                            ${CMAKE_SOURCE_DIR} /
-                                                                                                        data DESTINATION
-                                                                                                            .)
+  add_mpi_test(distribute_sparse_vector LIBRARIES libpurify)
+  add_mpi_test(kmeans LIBRARIES libpurify)
+  add_mpi_test(mpi_algo_factory LIBRARIES libpurify)
+  add_mpi_test(mpi_measurement_factory LIBRARIES libpurify)
+  add_mpi_test(mpi_measurement_operator LIBRARIES libpurify)
+  add_mpi_test(mpi_read_measurements LIBRARIES libpurify)
+  add_catch_test(mpi_utilities LIBRARIES libpurify)
+  add_mpi_test(mpi_wavelet_factory LIBRARIES libpurify)
+  add_mpi_test(mpi_wide_field_utilities LIBRARIES libpurify)
+  add_mpi_test(parallel_mpi_utilities LIBRARIES libpurify)
+endif()
+
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/data DESTINATION .)
+
