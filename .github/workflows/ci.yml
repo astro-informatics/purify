@@ -136,14 +136,14 @@ jobs:
         export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
         mkdir -p ${{github.workspace}}/sopt/build
         cd ${{github.workspace}}/sopt/build
-        cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}} -Dtests=OFF -Dexamples=OFF
+        cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Donnxrt=ON -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}} -Dtests=OFF -Dexamples=OFF
         make -j$(nproc --ignore 1) install
 
     - name: Pack dependencies
       run: |
         cd ${{github.workspace}}
         tar cfv dependencies.tar local
-        
+
     - uses: actions/upload-artifact@v4
       with:
         name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
@@ -216,7 +216,7 @@ jobs:
         export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
         mkdir -p ${{github.workspace}}/build
         cd ${{github.workspace}}/build
-        cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Ddocasa=OFF -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}} -Dtests=ON
+        cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Donnxrt=ON -Ddocasa=OFF -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}} -Dtests=ON
         make -j$(nproc --ignore 1) install
 
     - name: Test
