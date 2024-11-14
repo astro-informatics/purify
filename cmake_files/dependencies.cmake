@@ -28,6 +28,7 @@ find_package(yaml-cpp REQUIRED)
 
 if (onnxrt)
   find_package(onnxruntime REQUIRED)
+  install(DIRECTORY ${CMAKE_SOURCE_DIR}/models DESTINATION .)
 endif()
 
 find_package(sopt REQUIRED)
