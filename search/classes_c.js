@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['waveletoperatoradjointfixture_655',['WaveletOperatorAdjointFixture',['../classWaveletOperatorAdjointFixture.html',1,'']]],
-  ['waveletoperatorfixture_656',['WaveletOperatorFixture',['../classWaveletOperatorFixture.html',1,'']]],
-  ['waveletoperatormpifixture_657',['WaveletOperatorMPIFixture',['../classWaveletOperatorMPIFixture.html',1,'']]]
+  ['waveletoperatoradjointfixture_656',['WaveletOperatorAdjointFixture',['../classWaveletOperatorAdjointFixture.html',1,'']]],
+  ['waveletoperatorfixture_657',['WaveletOperatorFixture',['../classWaveletOperatorFixture.html',1,'']]],
+  ['waveletoperatormpifixture_658',['WaveletOperatorMPIFixture',['../classWaveletOperatorMPIFixture.html',1,'']]]
 ];

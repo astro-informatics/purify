@@ -4945,6 +4945,13 @@
     </member>
     <member kind="function">
       <type>std::string</type>
+      <name>models_directory</name>
+      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
+      <anchor>af1a8d19422f01ad794bcfaa45c31e761</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
       <name>data_filename</name>
       <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
       <anchor>a31500447173c424a79ff41f27ce64804</anchor>
@@ -8632,6 +8639,13 @@
       <name>data_directory</name>
       <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
       <anchor>a2a9204ef1ce008b33ce31abbe59045bf</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>models_directory</name>
+      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
+      <anchor>af1a8d19422f01ad794bcfaa45c31e761</anchor>
       <arglist>()</arglist>
     </member>
     <member kind="function">
