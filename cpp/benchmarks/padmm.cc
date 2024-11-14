@@ -22,8 +22,8 @@ class PadmmFixture : public ::benchmark::Fixture {
     bool newImage = b_utilities::updateImage(state.range(0), m_image, m_imsizex, m_imsizey);
 
     // Generating random uv(w) coverage
-    bool newMeasurements = b_utilities::updateMeasurements(state.range(1), m_uv_data, m_epsilon,
-                                                           newImage, m_image);
+    bool newMeasurements =
+        b_utilities::updateMeasurements(state.range(1), m_uv_data, m_epsilon, newImage, m_image);
 
     bool newKernel = m_kernel != state.range(2);
     if (newImage || newMeasurements || newKernel) {
