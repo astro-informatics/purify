@@ -12,7 +12,6 @@
 #include "purify/wide_field_utilities.h"
 
 using namespace purify;
-using namespace purify::notinstalled;
 using Catch::Approx;
 
 TEST_CASE("uvw units") {

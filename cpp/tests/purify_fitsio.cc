@@ -8,7 +8,6 @@
 #include "purify/pfitsio.h"
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 /*TEST_CASE("Purify fitsio", "[readwrite]") {
   Image<t_complex> input = pfitsio::read2d(image_filename("M31.fits"));

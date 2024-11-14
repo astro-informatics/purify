@@ -21,7 +21,6 @@
 #include "purify/uvfits.h"
 #include "purify/wproj_utilities.h"
 using namespace purify;
-using namespace purify::notinstalled;
 
 void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey,
            const std::string &kernel, const t_int J, const utilities::vis_params &uv_data,

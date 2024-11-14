@@ -7,7 +7,6 @@
 #include "purify/directories.h"
 #include "purify/uvfits.h"
 using namespace purify;
-using namespace purify::notinstalled;
 using Catch::Approx;
 
 TEST_CASE("readfile") {
