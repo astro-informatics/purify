@@ -9,7 +9,6 @@
 #include "purify/types.h"
 #include "purify/directories.h"
 namespace purify {
-namespace notinstalled {
   //! read real values from data file
   template <class T>
 typename std::enable_if<std::is_scalar<T>::value, std::vector<T>>::type
@@ -55,5 +54,4 @@ typename std::enable_if<std::is_scalar<T>::value, std::vector<T>>::type
   }
   
 }
-} /* sopt::notinstalled */
 #endif

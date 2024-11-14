@@ -19,7 +19,7 @@
 int main(int, char **) {
   purify::logging::set_level(purify::default_logging_level());
   // Loads a measurement set
-  auto const ngc3256_filename = purify::notinstalled::ngc3256_ms();
+  auto const ngc3256_filename = purify::ngc3256_ms();
   auto const ngc3256 = purify::casa::MeasurementSet(ngc3256_filename);
 
   try {

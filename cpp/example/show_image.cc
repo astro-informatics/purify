@@ -4,7 +4,6 @@
 #include "purify/directories.h"
 #include "purify/pfitsio.h"
 using namespace purify;
-using namespace purify::notinstalled;
 
 int main(int nargs, char const **args) {
   // up samples M31 example

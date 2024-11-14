@@ -11,31 +11,30 @@
 #include <sopt/power_method.h>
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 namespace operators_test {
 const std::string test_dir = "expected/operators/";
 //! data for u coordinate
-const std::vector<t_real> u = notinstalled::read_data<t_real>(
-    notinstalled::data_filename(test_dir + "u_data"));  //! data for v coordinate
+const std::vector<t_real> u = read_data<t_real>(
+    data_filename(test_dir + "u_data"));  //! data for v coordinate
 const std::vector<t_real> v =
-    notinstalled::read_data<t_real>(notinstalled::data_filename(test_dir + "v_data"));
+    read_data<t_real>(data_filename(test_dir + "v_data"));
 //! data for degridding input
 const std::vector<t_complex> direct_input =
-    notinstalled::read_data<t_complex>(notinstalled::data_filename(test_dir + "direct_input_data"));
+    read_data<t_complex>(data_filename(test_dir + "direct_input_data"));
 //! data for degridding output
-const std::vector<t_complex> expected_direct = notinstalled::read_data<t_complex>(
-    notinstalled::data_filename(test_dir + "expected_direct_data"));
+const std::vector<t_complex> expected_direct = read_data<t_complex>(
+    data_filename(test_dir + "expected_direct_data"));
 //! data for gridding input
-const std::vector<t_complex> indirect_input = notinstalled::read_data<t_complex>(
-    notinstalled::data_filename(test_dir + "indirect_input_data"));
+const std::vector<t_complex> indirect_input = read_data<t_complex>(
+    data_filename(test_dir + "indirect_input_data"));
 //! data for gridding output
-const std::vector<t_complex> expected_indirect = notinstalled::read_data<t_complex>(
-    notinstalled::data_filename(test_dir + "expected_indirect_data"));
+const std::vector<t_complex> expected_indirect = read_data<t_complex>(
+    data_filename(test_dir + "expected_indirect_data"));
 
 //! data for gridding correction
-const std::vector<t_complex> expected_S = notinstalled::read_data(
-    notinstalled::read_data<t_real>(notinstalled::data_filename(test_dir + "expected_S_data")));
+const std::vector<t_complex> expected_S = read_data(
+    read_data<t_real>(data_filename(test_dir + "expected_S_data")));
 }  // namespace operators_test
 
 TEST_CASE("Operators") {

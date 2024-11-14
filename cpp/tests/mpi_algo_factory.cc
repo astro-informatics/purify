@@ -41,7 +41,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
   auto const world = sopt::mpi::Communicator::World();
 
   const std::string &test_dir = "expected/padmm/";
-  const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
+  const std::string &input_data_path = data_filename(test_dir + "input_data.vis");
 
   auto uv_data = dirty_visibilities({input_data_path}, world);
   uv_data.units = utilities::vis_units::radians;
@@ -77,9 +77,9 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
     CHECK(diagnostic.niters == 10);
 
     const std::string &expected_solution_path =
-        notinstalled::data_filename(test_dir + "solution.fits");
+        data_filename(test_dir + "solution.fits");
     const std::string &expected_residual_path =
-        notinstalled::data_filename(test_dir + "residual.fits");
+        data_filename(test_dir + "residual.fits");
 
     const auto solution = pfitsio::read2d(expected_solution_path);
     const auto residual = pfitsio::read2d(expected_residual_path);
@@ -113,11 +113,11 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
     if (world.size() > 2 or world.size() == 0) return;
     // testing the case where there are two nodes exactly.
     const std::string &expected_solution_path =
-        (world.size() == 2) ? notinstalled::data_filename(test_dir + "mpi_solution.fits")
-                            : notinstalled::data_filename(test_dir + "solution.fits");
+        (world.size() == 2) ? data_filename(test_dir + "mpi_solution.fits")
+                            : data_filename(test_dir + "solution.fits");
     const std::string &expected_residual_path =
-        (world.size() == 2) ? notinstalled::data_filename(test_dir + "mpi_residual.fits")
-                            : notinstalled::data_filename(test_dir + "residual.fits");
+        (world.size() == 2) ? data_filename(test_dir + "mpi_residual.fits")
+                            : data_filename(test_dir + "residual.fits");
     if (world.size() == 1) CHECK(diagnostic.niters == 10);
     if (world.size() == 2) CHECK(diagnostic.niters == 11);
 
@@ -145,7 +145,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual", "[!shouldfail]") {
   auto const world = sopt::mpi::Communicator::World();
 
   const std::string &test_dir = "expected/primal_dual/";
-  const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
+  const std::string &input_data_path = data_filename(test_dir + "input_data.vis");
 
   auto uv_data = dirty_visibilities({input_data_path}, world);
   uv_data.units = utilities::vis_units::radians;
@@ -182,9 +182,9 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual", "[!shouldfail]") {
     CHECK(diagnostic.niters == 16);
 
     const std::string &expected_solution_path =
-        notinstalled::data_filename(test_dir + "solution.fits");
+        data_filename(test_dir + "solution.fits");
     const std::string &expected_residual_path =
-        notinstalled::data_filename(test_dir + "residual.fits");
+        data_filename(test_dir + "residual.fits");
 
     const auto solution = pfitsio::read2d(expected_solution_path);
     const auto residual = pfitsio::read2d(expected_residual_path);
@@ -219,11 +219,11 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual", "[!shouldfail]") {
     if (world.size() > 2 or world.size() == 0) return;
     // testing the case where there are two nodes exactly.
     const std::string &expected_solution_path =
-        (world.size() == 2) ? notinstalled::data_filename(test_dir + "mpi_solution.fits")
-                            : notinstalled::data_filename(test_dir + "solution.fits");
+        (world.size() == 2) ? data_filename(test_dir + "mpi_solution.fits")
+                            : data_filename(test_dir + "solution.fits");
     const std::string &expected_residual_path =
-        (world.size() == 2) ? notinstalled::data_filename(test_dir + "mpi_residual.fits")
-                            : notinstalled::data_filename(test_dir + "residual.fits");
+        (world.size() == 2) ? data_filename(test_dir + "mpi_residual.fits")
+                            : data_filename(test_dir + "residual.fits");
     if (world.size() == 1) CHECK(diagnostic.niters == 16);
     if (world.size() == 2) CHECK(diagnostic.niters == 18);
     const auto solution = pfitsio::read2d(expected_solution_path);
@@ -277,11 +277,11 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual", "[!shouldfail]") {
     else if (world.size() == 2 or world.size() == 1) {
       // testing the case where there are two nodes exactly.
       const std::string &expected_solution_path =
-          (world.size() == 2) ? notinstalled::data_filename(test_dir + "mpi_random_solution.fits")
-                              : notinstalled::data_filename(test_dir + "solution.fits");
+          (world.size() == 2) ? data_filename(test_dir + "mpi_random_solution.fits")
+                              : data_filename(test_dir + "solution.fits");
       const std::string &expected_residual_path =
-          (world.size() == 2) ? notinstalled::data_filename(test_dir + "mpi_random_residual.fits")
-                              : notinstalled::data_filename(test_dir + "residual.fits");
+          (world.size() == 2) ? data_filename(test_dir + "mpi_random_residual.fits")
+                              : data_filename(test_dir + "residual.fits");
       if (world.size() == 1) CHECK(diagnostic.niters == 16);
       if (world.size() == 2) CHECK(diagnostic.niters < 100);
 
@@ -314,7 +314,7 @@ TEST_CASE("Serial vs. Serial with MPI Forward Backward") {
   auto const world = sopt::mpi::Communicator::World();
 
   const std::string &test_dir = "expected/fb/";
-  const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
+  const std::string &input_data_path = data_filename(test_dir + "input_data.vis");
 
   auto uv_data = dirty_visibilities({input_data_path}, world);
   uv_data.units = utilities::vis_units::radians;
@@ -350,9 +350,9 @@ TEST_CASE("Serial vs. Serial with MPI Forward Backward") {
   auto const diagnostic = (*fb)();
 
   const std::string &expected_solution_path =
-      notinstalled::data_filename(test_dir + "solution.fits");
+      data_filename(test_dir + "solution.fits");
   const std::string &expected_residual_path =
-      notinstalled::data_filename(test_dir + "residual.fits");
+      data_filename(test_dir + "residual.fits");
 
   const auto solution = pfitsio::read2d(expected_solution_path);
   const auto residual = pfitsio::read2d(expected_residual_path);

@@ -10,7 +10,6 @@
 #include <sopt/power_method.h>
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 int main(int nargs, char const **args) {
 #define ARGS_MACRO(NAME, ARGN, VALUE, TYPE) \

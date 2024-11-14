@@ -30,7 +30,6 @@
 #endif
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 std::tuple<utilities::vis_params, t_real> dirty_visibilities(
     Image<t_complex> const &ground_truth_image, t_uint number_of_vis, t_real snr,

@@ -22,15 +22,14 @@
 #include "purify/test_data.h"
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 TEST_CASE("padmm_factory") {
   const std::string &test_dir = "expected/padmm/";
-  const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
+  const std::string &input_data_path = data_filename(test_dir + "input_data.vis");
   const std::string &expected_solution_path =
-      notinstalled::data_filename(test_dir + "solution.fits");
+      data_filename(test_dir + "solution.fits");
   const std::string &expected_residual_path =
-      notinstalled::data_filename(test_dir + "residual.fits");
+      data_filename(test_dir + "residual.fits");
 
   const auto solution = pfitsio::read2d(expected_solution_path);
   const auto residual = pfitsio::read2d(expected_residual_path);
@@ -81,11 +80,11 @@ TEST_CASE("padmm_factory") {
 // See https://github.com/astro-informatics/purify/issues/317 for details.
 TEST_CASE("primal_dual_factory", "[!shouldfail]") {
   const std::string &test_dir = "expected/primal_dual/";
-  const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
+  const std::string &input_data_path = data_filename(test_dir + "input_data.vis");
   const std::string &expected_solution_path =
-      notinstalled::data_filename(test_dir + "solution.fits");
+      data_filename(test_dir + "solution.fits");
   const std::string &expected_residual_path =
-      notinstalled::data_filename(test_dir + "residual.fits");
+      data_filename(test_dir + "residual.fits");
 
   const auto solution = pfitsio::read2d(expected_solution_path);
   const auto residual = pfitsio::read2d(expected_residual_path);
@@ -136,12 +135,12 @@ TEST_CASE("primal_dual_factory", "[!shouldfail]") {
 
 TEST_CASE("fb_factory") {
   const std::string &test_dir = "expected/fb/";
-  const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
+  const std::string &input_data_path = data_filename(test_dir + "input_data.vis");
   const std::string &expected_solution_path =
-      notinstalled::data_filename(test_dir + "solution.fits");
+      data_filename(test_dir + "solution.fits");
   const std::string &expected_residual_path =
-      notinstalled::data_filename(test_dir + "residual.fits");
-  const std::string &result_path = notinstalled::data_filename(test_dir + "fb_result.fits");
+      data_filename(test_dir + "residual.fits");
+  const std::string &result_path = data_filename(test_dir + "fb_result.fits");
 
   const auto solution = pfitsio::read2d(expected_solution_path);
   const auto residual = pfitsio::read2d(expected_residual_path);
@@ -192,12 +191,12 @@ TEST_CASE("fb_factory") {
 #ifdef PURIFY_ONNXRT
 TEST_CASE("tf_fb_factory") {
   const std::string &test_dir = "expected/fb/";
-  const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
+  const std::string &input_data_path = data_filename(test_dir + "input_data.vis");
   const std::string &expected_solution_path =
-      notinstalled::data_filename(test_dir + "solution.fits");
+      data_filename(test_dir + "solution.fits");
   const std::string &expected_residual_path =
-      notinstalled::data_filename(test_dir + "residual.fits");
-  const std::string &result_path = notinstalled::data_filename(test_dir + "tf_result.fits");
+      data_filename(test_dir + "residual.fits");
+  const std::string &result_path = data_filename(test_dir + "tf_result.fits");
 
   const auto solution = pfitsio::read2d(expected_solution_path);
   const auto residual = pfitsio::read2d(expected_residual_path);
@@ -228,7 +227,7 @@ TEST_CASE("tf_fb_factory") {
   t_real const gamma = 0.0001;
 
   std::string tf_model_path =
-      purify::notinstalled::data_directory() + "/models/snr_15_model_dynamic.onnx";
+      purify::models_directory() + "/snr_15_model_dynamic.onnx";
 
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma, beta,
@@ -252,12 +251,12 @@ TEST_CASE("tf_fb_factory") {
 
 TEST_CASE("onnx_fb_factory") {
   const std::string &test_dir = "expected/fb/";
-  const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
+  const std::string &input_data_path = data_filename(test_dir + "input_data.vis");
   const std::string &expected_solution_path =
-      notinstalled::data_filename(test_dir + "solution.fits");
+      data_filename(test_dir + "solution.fits");
   const std::string &expected_residual_path =
-      notinstalled::data_filename(test_dir + "residual.fits");
-  const std::string &result_path = notinstalled::data_filename(test_dir + "onnx_result.fits");
+      data_filename(test_dir + "residual.fits");
+  const std::string &result_path = data_filename(test_dir + "onnx_result.fits");
   const auto solution = pfitsio::read2d(expected_solution_path);
   const auto residual = pfitsio::read2d(expected_residual_path);
 
@@ -287,9 +286,9 @@ TEST_CASE("onnx_fb_factory") {
   t_real const gamma = 0.0001;
 
   std::string const prior_path =
-      purify::notinstalled::data_directory() + "/models/example_cost_dynamic_CRR_sigma_5_t_5.onnx";
+      purify::models_directory() + "/example_cost_dynamic_CRR_sigma_5_t_5.onnx";
   std::string const prior_gradient_path =
-      purify::notinstalled::data_directory() + "/models/example_grad_dynamic_CRR_sigma_5_t_5.onnx";
+      purify::models_directory() + "/example_grad_dynamic_CRR_sigma_5_t_5.onnx";
   std::shared_ptr<sopt::ONNXDifferentiableFunc<t_complex>> diff_function =
       std::make_shared<sopt::ONNXDifferentiableFunc<t_complex>>(
           prior_path, prior_gradient_path, sigma, 20, 5e4, *measurements_transform);
@@ -317,11 +316,11 @@ TEST_CASE("onnx_fb_factory") {
 
 TEST_CASE("joint_map_factory") {
   const std::string &test_dir = "expected/joint_map/";
-  const std::string &input_data_path = notinstalled::data_filename(test_dir + "input_data.vis");
+  const std::string &input_data_path = data_filename(test_dir + "input_data.vis");
   const std::string &expected_solution_path =
-      notinstalled::data_filename(test_dir + "solution.fits");
+      data_filename(test_dir + "solution.fits");
   const std::string &expected_residual_path =
-      notinstalled::data_filename(test_dir + "residual.fits");
+      data_filename(test_dir + "residual.fits");
 
   const auto solution = pfitsio::read2d(expected_solution_path);
   const auto residual = pfitsio::read2d(expected_residual_path);
