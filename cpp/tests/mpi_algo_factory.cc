@@ -76,10 +76,8 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
     auto const diagnostic = (*padmm)();
     CHECK(diagnostic.niters == 10);
 
-    const std::string &expected_solution_path =
-        data_filename(test_dir + "solution.fits");
-    const std::string &expected_residual_path =
-        data_filename(test_dir + "residual.fits");
+    const std::string &expected_solution_path = data_filename(test_dir + "solution.fits");
+    const std::string &expected_residual_path = data_filename(test_dir + "residual.fits");
 
     const auto solution = pfitsio::read2d(expected_solution_path);
     const auto residual = pfitsio::read2d(expected_residual_path);
@@ -112,12 +110,12 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
     // it is hard to know exact precision (might depend on probability theory...)
     if (world.size() > 2 or world.size() == 0) return;
     // testing the case where there are two nodes exactly.
-    const std::string &expected_solution_path =
-        (world.size() == 2) ? data_filename(test_dir + "mpi_solution.fits")
-                            : data_filename(test_dir + "solution.fits");
-    const std::string &expected_residual_path =
-        (world.size() == 2) ? data_filename(test_dir + "mpi_residual.fits")
-                            : data_filename(test_dir + "residual.fits");
+    const std::string &expected_solution_path = (world.size() == 2)
+                                                    ? data_filename(test_dir + "mpi_solution.fits")
+                                                    : data_filename(test_dir + "solution.fits");
+    const std::string &expected_residual_path = (world.size() == 2)
+                                                    ? data_filename(test_dir + "mpi_residual.fits")
+                                                    : data_filename(test_dir + "residual.fits");
     if (world.size() == 1) CHECK(diagnostic.niters == 10);
     if (world.size() == 2) CHECK(diagnostic.niters == 11);
 
@@ -181,10 +179,8 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual", "[!shouldfail]") {
     auto const diagnostic = (*primaldual)();
     CHECK(diagnostic.niters == 16);
 
-    const std::string &expected_solution_path =
-        data_filename(test_dir + "solution.fits");
-    const std::string &expected_residual_path =
-        data_filename(test_dir + "residual.fits");
+    const std::string &expected_solution_path = data_filename(test_dir + "solution.fits");
+    const std::string &expected_residual_path = data_filename(test_dir + "residual.fits");
 
     const auto solution = pfitsio::read2d(expected_solution_path);
     const auto residual = pfitsio::read2d(expected_residual_path);
@@ -218,12 +214,12 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual", "[!shouldfail]") {
     // it is hard to know exact precision (might depend on probability theory...)
     if (world.size() > 2 or world.size() == 0) return;
     // testing the case where there are two nodes exactly.
-    const std::string &expected_solution_path =
-        (world.size() == 2) ? data_filename(test_dir + "mpi_solution.fits")
-                            : data_filename(test_dir + "solution.fits");
-    const std::string &expected_residual_path =
-        (world.size() == 2) ? data_filename(test_dir + "mpi_residual.fits")
-                            : data_filename(test_dir + "residual.fits");
+    const std::string &expected_solution_path = (world.size() == 2)
+                                                    ? data_filename(test_dir + "mpi_solution.fits")
+                                                    : data_filename(test_dir + "solution.fits");
+    const std::string &expected_residual_path = (world.size() == 2)
+                                                    ? data_filename(test_dir + "mpi_residual.fits")
+                                                    : data_filename(test_dir + "residual.fits");
     if (world.size() == 1) CHECK(diagnostic.niters == 16);
     if (world.size() == 2) CHECK(diagnostic.niters == 18);
     const auto solution = pfitsio::read2d(expected_solution_path);
@@ -349,10 +345,8 @@ TEST_CASE("Serial vs. Serial with MPI Forward Backward") {
 
   auto const diagnostic = (*fb)();
 
-  const std::string &expected_solution_path =
-      data_filename(test_dir + "solution.fits");
-  const std::string &expected_residual_path =
-      data_filename(test_dir + "residual.fits");
+  const std::string &expected_solution_path = data_filename(test_dir + "solution.fits");
+  const std::string &expected_residual_path = data_filename(test_dir + "residual.fits");
 
   const auto solution = pfitsio::read2d(expected_solution_path);
   const auto residual = pfitsio::read2d(expected_residual_path);

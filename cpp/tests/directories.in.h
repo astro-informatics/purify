@@ -51,5 +51,5 @@ inline std::string output_filename(std::string const &filename) {
 }
 
 inline std::string ngc3256_ms() { return "@NGC3256_MS@"; }
-}
+}  // namespace purify
 #endif
