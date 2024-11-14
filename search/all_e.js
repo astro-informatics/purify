@@ -22,7 +22,7 @@ var searchData=
   ['operators_5fgpu_2ecc_344',['operators_gpu.cc',['../operators__gpu_8cc.html',1,'']]],
   ['operators_5fgpu_2eh_345',['operators_gpu.h',['../operators__gpu_8h.html',1,'']]],
   ['operators_5ftest_346',['operators_test',['../namespaceoperators__test.html',1,'']]],
-  ['output_5fdirectory_347',['output_directory',['../namespacepurify_1_1notinstalled.html#a6e559eebbb8daf09c4a6a297982e9533',1,'purify::notinstalled']]],
-  ['output_5ffilename_348',['output_filename',['../namespacepurify_1_1notinstalled.html#a711465428b3f8363776594d7d2db98be',1,'purify::notinstalled']]],
+  ['output_5fdirectory_347',['output_directory',['../namespacepurify.html#a56056c743c4ca1c88b72f530925e8cc2',1,'purify']]],
+  ['output_5ffilename_348',['output_filename',['../namespacepurify.html#a63523804178d9db24b8cb3ab3ba620a4',1,'purify']]],
   ['overall_349',['OVERALL',['../classpurify_1_1casa_1_1MeasurementSet_1_1ChannelWrapper.html#a8a3486e632c38521b251686813425338a7905c9b3eda793da18fade6e791b2183',1,'purify::casa::MeasurementSet::ChannelWrapper']]]
 ];

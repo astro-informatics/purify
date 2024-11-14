@@ -123,7 +123,7 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="tests_2casacore_8cc_source.html#l00065">65</a> of file <a class="el" href="tests_2casacore_8cc_source.html">casacore.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tests_2casacore_8cc_source.html#l00064">64</a> of file <a class="el" href="tests_2casacore_8cc_source.html">casacore.cc</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a09c4c1453b7806d75ea9265be2de7077"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a09c4c1453b7806d75ea9265be2de7077">&#9670;&nbsp;</a></span>TmpMS()</h2>
@@ -148,16 +148,18 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="tests_2casacore_8cc_source.html#l00067">67</a> of file <a class="el" href="tests_2casacore_8cc_source.html">casacore.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;          : <a class="code" href="classTmpPath.html#a4209998a9e22c73294d8e6a2cdcb26e2">TmpPath</a>() {</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    casa::TableDesc simpleDesc = casa::MS::requiredTableDesc();</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    casa::SetupNewTable newTab(<a class="code" href="classTmpPath.html#ad14673d5ef0f1e258bd8027bddb570a3">path</a>().<span class="keywordtype">string</span>(), simpleDesc, casa::Table::New);</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    ms_.reset(<span class="keyword">new</span> casa::MeasurementSet(newTab));</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    ms_-&gt;createDefaultSubtables(casa::Table::New);</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  }</div>
-<div class="ttc" id="aclassTmpPath_html_a4209998a9e22c73294d8e6a2cdcb26e2"><div class="ttname"><a href="classTmpPath.html#a4209998a9e22c73294d8e6a2cdcb26e2">TmpPath::TmpPath</a></div><div class="ttdeci">TmpPath()</div><div class="ttdef"><b>Definition:</b> <a href="tests_2casacore_8cc_source.html#l00053">casacore.cc:53</a></div></div>
-<div class="ttc" id="aclassTmpPath_html_ad14673d5ef0f1e258bd8027bddb570a3"><div class="ttname"><a href="classTmpPath.html#ad14673d5ef0f1e258bd8027bddb570a3">TmpPath::path</a></div><div class="ttdeci">boost::filesystem::path const  &amp; path() const</div><div class="ttdef"><b>Definition:</b> <a href="tests_2casacore_8cc_source.html#l00059">casacore.cc:59</a></div></div>
+<p class="definition">Definition at line <a class="el" href="tests_2casacore_8cc_source.html#l00066">66</a> of file <a class="el" href="tests_2casacore_8cc_source.html">casacore.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;          : <a class="code" href="classTmpPath.html#a4209998a9e22c73294d8e6a2cdcb26e2">TmpPath</a>() {</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    casa::TableDesc simpleDesc = casa::MS::requiredTableDesc();</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    casa::SetupNewTable newTab(<a class="code" href="classTmpPath.html#ad14673d5ef0f1e258bd8027bddb570a3">path</a>().<span class="keywordtype">string</span>(), simpleDesc, casa::Table::New);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    ms_.reset(<span class="keyword">new</span> casa::MeasurementSet(newTab));</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    ms_-&gt;createDefaultSubtables(casa::Table::New);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  }</div>
+<div class="ttc" id="aclassTmpPath_html_a4209998a9e22c73294d8e6a2cdcb26e2"><div class="ttname"><a href="classTmpPath.html#a4209998a9e22c73294d8e6a2cdcb26e2">TmpPath::TmpPath</a></div><div class="ttdeci">TmpPath()</div><div class="ttdef"><b>Definition:</b> <a href="tests_2casacore_8cc_source.html#l00052">casacore.cc:52</a></div></div>
+<div class="ttc" id="aclassTmpPath_html_ad14673d5ef0f1e258bd8027bddb570a3"><div class="ttname"><a href="classTmpPath.html#ad14673d5ef0f1e258bd8027bddb570a3">TmpPath::path</a></div><div class="ttdeci">boost::filesystem::path const  &amp; path() const</div><div class="ttdef"><b>Definition:</b> <a href="tests_2casacore_8cc_source.html#l00058">casacore.cc:58</a></div></div>
 </div><!-- fragment -->
+<p class="reference">References <a class="el" href="tests_2casacore_8cc_source.html#l00058">TmpPath::path()</a>.</p>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -184,8 +186,8 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="tests_2casacore_8cc_source.html#l00074">74</a> of file <a class="el" href="tests_2casacore_8cc_source.html">casacore.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;{ <span class="keywordflow">return</span> *ms_; }</div>
+<p class="definition">Definition at line <a class="el" href="tests_2casacore_8cc_source.html#l00073">73</a> of file <a class="el" href="tests_2casacore_8cc_source.html">casacore.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;{ <span class="keywordflow">return</span> *ms_; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -212,8 +214,8 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="tests_2casacore_8cc_source.html#l00073">73</a> of file <a class="el" href="tests_2casacore_8cc_source.html">casacore.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;{ <span class="keywordflow">return</span> *ms_; }</div>
+<p class="definition">Definition at line <a class="el" href="tests_2casacore_8cc_source.html#l00072">72</a> of file <a class="el" href="tests_2casacore_8cc_source.html">casacore.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;{ <span class="keywordflow">return</span> *ms_; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -240,8 +242,8 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="tests_2casacore_8cc_source.html#l00077">77</a> of file <a class="el" href="tests_2casacore_8cc_source.html">casacore.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;{ <span class="keywordflow">return</span> ms_.get(); }</div>
+<p class="definition">Definition at line <a class="el" href="tests_2casacore_8cc_source.html#l00076">76</a> of file <a class="el" href="tests_2casacore_8cc_source.html">casacore.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;{ <span class="keywordflow">return</span> ms_.get(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -268,8 +270,8 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="tests_2casacore_8cc_source.html#l00076">76</a> of file <a class="el" href="tests_2casacore_8cc_source.html">casacore.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;{ <span class="keywordflow">return</span> ms_.get(); }</div>
+<p class="definition">Definition at line <a class="el" href="tests_2casacore_8cc_source.html#l00075">75</a> of file <a class="el" href="tests_2casacore_8cc_source.html">casacore.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;{ <span class="keywordflow">return</span> ms_.get(); }</div>
 </div><!-- fragment -->
 </div>
 </div>

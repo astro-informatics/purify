@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['indexmapping_647',['IndexMapping',['../classpurify_1_1IndexMapping.html',1,'purify']]]
+  ['indexmapping_644',['IndexMapping',['../classpurify_1_1IndexMapping.html',1,'purify']]]
 ];

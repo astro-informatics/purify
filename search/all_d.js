@@ -1,7 +1,7 @@
 var searchData=
 [
   ['n_5fwave_5fcoeff_317',['n_wave_coeff',['../classWaveletOperatorMPIFixture.html#a2323fc20fa322981cb18ce38cb8132bb',1,'WaveletOperatorMPIFixture']]],
-  ['ngc3256_5fms_318',['ngc3256_ms',['../namespacepurify_1_1notinstalled.html#adec66730b5b17d093151b170b6f954fc',1,'purify::notinstalled']]],
+  ['ngc3256_5fms_318',['ngc3256_ms',['../namespacepurify.html#a4338db042ed8c1d9963b4faaef4aedc0',1,'purify']]],
   ['niters_319',['niters',['../structpurify_1_1pfitsio_1_1header__params.html#aa67b53c09939f617f9ac564e17f95d3b',1,'purify::pfitsio::header_params']]],
   ['non_5fempty_5fouters_320',['non_empty_outers',['../namespacepurify.html#ae1142fb0bf079e99cbceb3e29027418c',1,'purify']]],
   ['none_321',['none',['../namespacepurify_1_1distribute.html#a0bf24e0d0fb613140687838e4546ab2aa334c4a4c42fdb79d7ebc3e73b517e6f8',1,'purify::distribute::none()'],['../namespacepurify_1_1wproj__utilities_1_1expansions.html#a92334b90f8de8f723450b3aca72d9e74a334c4a4c42fdb79d7ebc3e73b517e6f8',1,'purify::wproj_utilities::expansions::none()']]],

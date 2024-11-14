@@ -1,7 +1,7 @@
 var searchData=
 [
   ['i_195',['I',['../namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8add7536794b63bf90eccfd37f9b147d7f',1,'purify']]],
-  ['image_5ffilename_196',['image_filename',['../namespacepurify_1_1notinstalled.html#adcd4a748b6eaf349d7a41cfc85428883',1,'purify::notinstalled']]],
+  ['image_5ffilename_196',['image_filename',['../namespacepurify.html#a86c35920819938ed196856155b6d2ba1',1,'purify']]],
   ['image_5fwproj_5fchirp_2ecc_197',['image_wproj_chirp.cc',['../image__wproj__chirp_8cc.html',1,'']]],
   ['ind2sub_198',['ind2sub',['../namespacepurify_1_1utilities.html#afb213bdf3ecdb4d9557e810349443234',1,'purify::utilities']]],
   ['index_5fmapping_2ecc_199',['index_mapping.cc',['../index__mapping_8cc.html',1,'']]],

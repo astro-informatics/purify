@@ -4907,26 +4907,25 @@
     <filename>data_8in_8h.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <namespace>purify</namespace>
-    <namespace>purify::notinstalled</namespace>
     <member kind="function">
       <type>std::enable_if&lt; std::is_scalar&lt; T &gt;::value, std::vector&lt; T &gt; &gt;::type</type>
       <name>read_data</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>af7cc59cd1e20fb709a98750d5acfc541</anchor>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>af068851a3144a36d98e1f64044d1818d</anchor>
       <arglist>(const std::string &amp;filename)</arglist>
     </member>
     <member kind="function">
       <type>std::enable_if&lt; std::is_same&lt; t_complex, T &gt;::value, std::vector&lt; T &gt; &gt;::type</type>
       <name>read_data</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a6de72df1755781a71f9b5d0b26585f73</anchor>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a91b176035cf7cdededf78ddcabb96584</anchor>
       <arglist>(const std::string &amp;filename)</arglist>
     </member>
     <member kind="function">
       <type>std::vector&lt; t_complex &gt;</type>
       <name>read_data</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a9fecf19b08db444e65ca342e7e599e53</anchor>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a0a10b9093bc494c51ecb46bcbca04a57</anchor>
       <arglist>(const std::vector&lt; t_real &gt; &amp;input)</arglist>
     </member>
   </compound>
@@ -4935,110 +4934,95 @@
     <path>/home/runner/work/purify/purify/cpp/tests/</path>
     <filename>directories_8in_8h.html</filename>
     <namespace>purify</namespace>
-    <namespace>purify::notinstalled</namespace>
     <member kind="function">
       <type>std::string</type>
       <name>data_directory</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a2a9204ef1ce008b33ce31abbe59045bf</anchor>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>ab15ea9d438072e9ddbe461022faf26cf</anchor>
       <arglist>()</arglist>
     </member>
     <member kind="function">
       <type>std::string</type>
       <name>models_directory</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>af1a8d19422f01ad794bcfaa45c31e761</anchor>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a2b051df94025a181dc2d979e5d206a96</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>output_directory</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a56056c743c4ca1c88b72f530925e8cc2</anchor>
       <arglist>()</arglist>
     </member>
     <member kind="function">
       <type>std::string</type>
       <name>data_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a31500447173c424a79ff41f27ce64804</anchor>
-      <arglist>(std::string const &amp;filename)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>scratch_directory</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a39f480c23d66c09cc02801c33ea7dc28</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>scratch_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>ad1628b70a7db77d2fee2aa5b1c79fbc8</anchor>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a62440e00433f0a283e3cfb53e0a117dd</anchor>
       <arglist>(std::string const &amp;filename)</arglist>
     </member>
     <member kind="function">
       <type>std::string</type>
       <name>image_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>adcd4a748b6eaf349d7a41cfc85428883</anchor>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a86c35920819938ed196856155b6d2ba1</anchor>
       <arglist>(std::string const &amp;filename)</arglist>
     </member>
     <member kind="function">
       <type>std::string</type>
       <name>visibility_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a0f5b36543cab9c5f594e8c3c8191f272</anchor>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a6584f539e48ba1f6740ddd4a6b1789dd</anchor>
       <arglist>(std::string const &amp;filename)</arglist>
     </member>
     <member kind="function">
       <type>std::string</type>
       <name>vla_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>ac34b6abbc10ba7a195b39343a407b941</anchor>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>af813d3d046b33d25e7cb97a4db5f72d7</anchor>
       <arglist>(std::string const &amp;filename)</arglist>
     </member>
     <member kind="function">
       <type>std::string</type>
       <name>atca_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>adf7cca24a1b2c8df495b8c2aadbc61f8</anchor>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a8c91f3c6ff988b668786fed31fb17282</anchor>
       <arglist>(std::string const &amp;filename)</arglist>
     </member>
     <member kind="function">
       <type>std::string</type>
       <name>mwa_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a7972435bb2c6dd0a30556ec1f7cd1283</anchor>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>aa23eda8f53b24e21d0f09bec0332b6a2</anchor>
       <arglist>(std::string const &amp;filename)</arglist>
     </member>
     <member kind="function">
       <type>std::string</type>
       <name>gridding_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>ac90b295d30fb2cee7bc89403dedc1615</anchor>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a5e73c29cf358d72bd3aa516278edaf18</anchor>
       <arglist>(std::string const &amp;filename)</arglist>
     </member>
     <member kind="function">
       <type>std::string</type>
       <name>degridding_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a27f867ebed051d1c131c979ea8d5d4cc</anchor>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>ad28499443824c24680902878af632629</anchor>
       <arglist>(std::string const &amp;filename)</arglist>
     </member>
     <member kind="function">
       <type>std::string</type>
-      <name>output_directory</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a6e559eebbb8daf09c4a6a297982e9533</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
       <name>output_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a711465428b3f8363776594d7d2db98be</anchor>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a63523804178d9db24b8cb3ab3ba620a4</anchor>
       <arglist>(std::string const &amp;filename)</arglist>
     </member>
     <member kind="function">
       <type>std::string</type>
       <name>ngc3256_ms</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>adec66730b5b17d093151b170b6f954fc</anchor>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a4338db042ed8c1d9963b4faaef4aedc0</anchor>
       <arglist>()</arglist>
     </member>
   </compound>
@@ -7704,7 +7688,6 @@
     <namespace>purify::kernels</namespace>
     <namespace>purify::logging</namespace>
     <namespace>purify::measurementoperator</namespace>
-    <namespace>purify::notinstalled</namespace>
     <namespace>purify::operators</namespace>
     <namespace>purify::pfitsio</namespace>
     <namespace>purify::projection_kernels</namespace>
@@ -7869,6 +7852,118 @@
       <anchorfile>namespacepurify.html</anchorfile>
       <anchor>a981e10b7581eca93431393b74c4c50b5</anchor>
       <arglist>(const YAML::Node &amp;node_map, const std::initializer_list&lt; const char * &gt; indicies)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::enable_if&lt; std::is_scalar&lt; T &gt;::value, std::vector&lt; T &gt; &gt;::type</type>
+      <name>read_data</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>af068851a3144a36d98e1f64044d1818d</anchor>
+      <arglist>(const std::string &amp;filename)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::enable_if&lt; std::is_same&lt; t_complex, T &gt;::value, std::vector&lt; T &gt; &gt;::type</type>
+      <name>read_data</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a91b176035cf7cdededf78ddcabb96584</anchor>
+      <arglist>(const std::string &amp;filename)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::vector&lt; t_complex &gt;</type>
+      <name>read_data</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a0a10b9093bc494c51ecb46bcbca04a57</anchor>
+      <arglist>(const std::vector&lt; t_real &gt; &amp;input)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>data_directory</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>ab15ea9d438072e9ddbe461022faf26cf</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>models_directory</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a2b051df94025a181dc2d979e5d206a96</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>output_directory</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a56056c743c4ca1c88b72f530925e8cc2</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>data_filename</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a62440e00433f0a283e3cfb53e0a117dd</anchor>
+      <arglist>(std::string const &amp;filename)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>image_filename</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a86c35920819938ed196856155b6d2ba1</anchor>
+      <arglist>(std::string const &amp;filename)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>visibility_filename</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a6584f539e48ba1f6740ddd4a6b1789dd</anchor>
+      <arglist>(std::string const &amp;filename)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>vla_filename</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>af813d3d046b33d25e7cb97a4db5f72d7</anchor>
+      <arglist>(std::string const &amp;filename)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>atca_filename</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a8c91f3c6ff988b668786fed31fb17282</anchor>
+      <arglist>(std::string const &amp;filename)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>mwa_filename</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>aa23eda8f53b24e21d0f09bec0332b6a2</anchor>
+      <arglist>(std::string const &amp;filename)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>gridding_filename</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a5e73c29cf358d72bd3aa516278edaf18</anchor>
+      <arglist>(std::string const &amp;filename)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>degridding_filename</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>ad28499443824c24680902878af632629</anchor>
+      <arglist>(std::string const &amp;filename)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>output_filename</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a63523804178d9db24b8cb3ab3ba620a4</anchor>
+      <arglist>(std::string const &amp;filename)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>ngc3256_ms</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a4338db042ed8c1d9963b4faaef4aedc0</anchor>
+      <arglist>()</arglist>
     </member>
     <member kind="variable">
       <type>const std::map&lt; stokes, t_int &gt;</type>
@@ -8608,136 +8703,6 @@
       <anchorfile>namespacepurify_1_1measurementoperator.html</anchorfile>
       <anchor>af14d4bff532ed08e5f31dc24d0e1bde2</anchor>
       <arglist>(const utilities::vis_params &amp;uv_vis_input, const t_uint imsizey, const t_uint imsizex, const t_real cell_x, const t_real cell_y, const t_real oversample_ratio, const kernels::kernel kernel, const t_uint Ju, const t_uint Jw, const bool w_stacking, const t_real absolute_error, const t_real relative_error, const dde_type dde)</arglist>
-    </member>
-  </compound>
-  <compound kind="namespace">
-    <name>purify::notinstalled</name>
-    <filename>namespacepurify_1_1notinstalled.html</filename>
-    <member kind="function">
-      <type>std::enable_if&lt; std::is_scalar&lt; T &gt;::value, std::vector&lt; T &gt; &gt;::type</type>
-      <name>read_data</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>af7cc59cd1e20fb709a98750d5acfc541</anchor>
-      <arglist>(const std::string &amp;filename)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::enable_if&lt; std::is_same&lt; t_complex, T &gt;::value, std::vector&lt; T &gt; &gt;::type</type>
-      <name>read_data</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a6de72df1755781a71f9b5d0b26585f73</anchor>
-      <arglist>(const std::string &amp;filename)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::vector&lt; t_complex &gt;</type>
-      <name>read_data</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a9fecf19b08db444e65ca342e7e599e53</anchor>
-      <arglist>(const std::vector&lt; t_real &gt; &amp;input)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>data_directory</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a2a9204ef1ce008b33ce31abbe59045bf</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>models_directory</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>af1a8d19422f01ad794bcfaa45c31e761</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>data_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a31500447173c424a79ff41f27ce64804</anchor>
-      <arglist>(std::string const &amp;filename)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>scratch_directory</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a39f480c23d66c09cc02801c33ea7dc28</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>scratch_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>ad1628b70a7db77d2fee2aa5b1c79fbc8</anchor>
-      <arglist>(std::string const &amp;filename)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>image_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>adcd4a748b6eaf349d7a41cfc85428883</anchor>
-      <arglist>(std::string const &amp;filename)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>visibility_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a0f5b36543cab9c5f594e8c3c8191f272</anchor>
-      <arglist>(std::string const &amp;filename)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>vla_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>ac34b6abbc10ba7a195b39343a407b941</anchor>
-      <arglist>(std::string const &amp;filename)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>atca_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>adf7cca24a1b2c8df495b8c2aadbc61f8</anchor>
-      <arglist>(std::string const &amp;filename)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>mwa_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a7972435bb2c6dd0a30556ec1f7cd1283</anchor>
-      <arglist>(std::string const &amp;filename)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>gridding_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>ac90b295d30fb2cee7bc89403dedc1615</anchor>
-      <arglist>(std::string const &amp;filename)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>degridding_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a27f867ebed051d1c131c979ea8d5d4cc</anchor>
-      <arglist>(std::string const &amp;filename)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>output_directory</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a6e559eebbb8daf09c4a6a297982e9533</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>output_filename</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>a711465428b3f8363776594d7d2db98be</anchor>
-      <arglist>(std::string const &amp;filename)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::string</type>
-      <name>ngc3256_ms</name>
-      <anchorfile>namespacepurify_1_1notinstalled.html</anchorfile>
-      <anchor>adec66730b5b17d093151b170b6f954fc</anchor>
-      <arglist>()</arglist>
     </member>
   </compound>
   <compound kind="namespace">

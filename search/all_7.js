@@ -27,6 +27,6 @@ var searchData=
   ['gpu_5fmpi_5fdistribute_5fimage_185',['gpu_mpi_distribute_image',['../namespacepurify_1_1factory.html#a6b8de5116c3d7d0d679cd6dd47a80248a3c5924386fd8ce3e082a2e4e2f73a3a2',1,'purify::factory']]],
   ['gpu_5fserial_186',['gpu_serial',['../namespacepurify_1_1factory.html#a6b8de5116c3d7d0d679cd6dd47a80248aeb435348cd1dd3b23bc83af306c8af4e',1,'purify::factory']]],
   ['gridding_2ecc_187',['gridding.cc',['../gridding_8cc.html',1,'']]],
-  ['gridding_5ffilename_188',['gridding_filename',['../namespacepurify_1_1notinstalled.html#ac90b295d30fb2cee7bc89403dedc1615',1,'purify::notinstalled']]],
+  ['gridding_5ffilename_188',['gridding_filename',['../namespacepurify.html#a5e73c29cf358d72bd3aa516278edaf18',1,'purify']]],
   ['gridoperatorfixture_189',['GridOperatorFixture',['../classGridOperatorFixture.html',1,'']]]
 ];

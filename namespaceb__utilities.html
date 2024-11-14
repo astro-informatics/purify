@@ -114,16 +114,16 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00016">16</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;                                              {</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keywordtype">int</span> im_size_max = 4096;      <span class="comment">// 4096</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keywordtype">int</span> uv_size_max = 10000000;  <span class="comment">// 1M, 10M, 100M</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keywordtype">int</span> kernel_max = 16;         <span class="comment">// 16</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 128; i &lt;= im_size_max; i *= 2)</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 1000000; j &lt;= uv_size_max; j *= 10)</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 2; k &lt;= kernel_max; k *= 2)</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        <span class="keywordflow">if</span> (k * k &lt; i) b-&gt;Args({i, j, k});</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00015">15</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;                                              {</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <span class="keywordtype">int</span> im_size_max = 4096;      <span class="comment">// 4096</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keywordtype">int</span> uv_size_max = 10000000;  <span class="comment">// 1M, 10M, 100M</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keywordtype">int</span> kernel_max = 16;         <span class="comment">// 16</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 128; i &lt;= im_size_max; i *= 2)</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 1000000; j &lt;= uv_size_max; j *= 10)</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 2; k &lt;= kernel_max; k *= 2)</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        <span class="keywordflow">if</span> (k * k &lt; i) b-&gt;Args({i, j, k});</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -165,30 +165,30 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00077">77</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;                            {</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="keyword">auto</span> uv_data = <a class="code" href="namespaceb__utilities.html#a224195343f875ecd21158fe98df7daf8">random_measurements</a>(number_of_vis);</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="comment">// creating operator to generate measurements</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keyword">auto</span> measurement_op = measurementoperator::init_degrid_operator_2d&lt;Vector&lt;t_complex&gt;&gt;(</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      uv_data, ground_truth_image.rows(), ground_truth_image.cols(), cellsize, cellsize, 2,</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      kernels::kernel::kb, 8, 8, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <span class="comment">// Generates measurements from image</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  uv_data.vis = (*measurement_op) *</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;                Image&lt;t_complex&gt;::Map(ground_truth_image.data(), ground_truth_image.size(), 1);</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  <span class="comment">// working out value of signal given SNR</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> sigma = <a class="code" href="namespacepurify_1_1utilities.html#a4b530b0918705248f2d2dd4de0bb29f6">utilities::SNR_to_standard_deviation</a>(uv_data.vis, snr);</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="comment">// adding noise to visibilities</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  uv_data.vis = <a class="code" href="namespacepurify_1_1utilities.html#a7788412bbecc48c81b8e5777943b5666">utilities::add_noise</a>(uv_data.vis, 0., sigma);</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <span class="keywordflow">return</span> std::make_tuple(uv_data, sigma);</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;}</div>
-<div class="ttc" id="anamespaceb__utilities_html_a224195343f875ecd21158fe98df7daf8"><div class="ttname"><a href="namespaceb__utilities.html#a224195343f875ecd21158fe98df7daf8">b_utilities::random_measurements</a></div><div class="ttdeci">utilities::vis_params random_measurements(t_int size, const t_real max_w, const t_int id)</div><div class="ttdef"><b>Definition:</b> <a href="benchmarks_2utilities_8cc_source.html#l00096">utilities.cc:96</a></div></div>
+<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00076">76</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;                            {</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  <span class="keyword">auto</span> uv_data = <a class="code" href="namespaceb__utilities.html#a224195343f875ecd21158fe98df7daf8">random_measurements</a>(number_of_vis);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="comment">// creating operator to generate measurements</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="keyword">auto</span> measurement_op = measurementoperator::init_degrid_operator_2d&lt;Vector&lt;t_complex&gt;&gt;(</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      uv_data, ground_truth_image.rows(), ground_truth_image.cols(), cellsize, cellsize, 2,</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      kernels::kernel::kb, 8, 8, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="comment">// Generates measurements from image</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  uv_data.vis = (*measurement_op) *</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;                Image&lt;t_complex&gt;::Map(ground_truth_image.data(), ground_truth_image.size(), 1);</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  <span class="comment">// working out value of signal given SNR</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> sigma = <a class="code" href="namespacepurify_1_1utilities.html#a4b530b0918705248f2d2dd4de0bb29f6">utilities::SNR_to_standard_deviation</a>(uv_data.vis, snr);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  <span class="comment">// adding noise to visibilities</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  uv_data.vis = <a class="code" href="namespacepurify_1_1utilities.html#a7788412bbecc48c81b8e5777943b5666">utilities::add_noise</a>(uv_data.vis, 0., sigma);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="keywordflow">return</span> std::make_tuple(uv_data, sigma);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;}</div>
+<div class="ttc" id="anamespaceb__utilities_html_a224195343f875ecd21158fe98df7daf8"><div class="ttname"><a href="namespaceb__utilities.html#a224195343f875ecd21158fe98df7daf8">b_utilities::random_measurements</a></div><div class="ttdeci">utilities::vis_params random_measurements(t_int size, const t_real max_w, const t_int id)</div><div class="ttdef"><b>Definition:</b> <a href="benchmarks_2utilities_8cc_source.html#l00095">utilities.cc:95</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1utilities_html_a4b530b0918705248f2d2dd4de0bb29f6"><div class="ttname"><a href="namespacepurify_1_1utilities.html#a4b530b0918705248f2d2dd4de0bb29f6">purify::utilities::SNR_to_standard_deviation</a></div><div class="ttdeci">t_real SNR_to_standard_deviation(const Vector&lt; t_complex &gt; &amp;y0, const t_real &amp;SNR)</div><div class="ttdoc">Converts SNR to RMS noise.</div><div class="ttdef"><b>Definition:</b> <a href="purify_2utilities_8cc_source.html#l00101">utilities.cc:101</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1utilities_html_a7788412bbecc48c81b8e5777943b5666"><div class="ttname"><a href="namespacepurify_1_1utilities.html#a7788412bbecc48c81b8e5777943b5666">purify::utilities::add_noise</a></div><div class="ttdeci">Vector&lt; t_complex &gt; add_noise(const Vector&lt; t_complex &gt; &amp;y0, const t_complex &amp;mean, const t_real &amp;standard_deviation)</div><div class="ttdoc">Add guassian noise to vector.</div><div class="ttdef"><b>Definition:</b> <a href="purify_2utilities_8cc_source.html#l00113">utilities.cc:113</a></div></div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="purify_2utilities_8cc_source.html#l00113">purify::utilities::add_noise()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668aba34ea40525a4379add785228e37fe86">purify::kernels::kb</a>, <a class="el" href="benchmarks_2utilities_8cc_source.html#l00096">random_measurements()</a>, and <a class="el" href="purify_2utilities_8cc_source.html#l00101">purify::utilities::SNR_to_standard_deviation()</a>.</p>
+<p class="reference">References <a class="el" href="purify_2utilities_8cc_source.html#l00113">purify::utilities::add_noise()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668aba34ea40525a4379add785228e37fe86">purify::kernels::kb</a>, <a class="el" href="benchmarks_2utilities_8cc_source.html#l00095">random_measurements()</a>, and <a class="el" href="purify_2utilities_8cc_source.html#l00101">purify::utilities::SNR_to_standard_deviation()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="benchmarks_2utilities_8cc_source.html#l00062">updateMeasurements()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="benchmarks_2utilities_8cc_source.html#l00061">updateMeasurements()</a>.</p>
 
 </div>
 </div>
@@ -218,11 +218,11 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00026">26</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;                                                              {</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keyword">auto</span> elapsed_seconds = std::chrono::duration_cast&lt;std::chrono::duration&lt;double&gt;&gt;(end - start);</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keywordflow">return</span> elapsed_seconds.count();</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00025">25</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;                                                              {</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keyword">auto</span> elapsed_seconds = std::chrono::duration_cast&lt;std::chrono::duration&lt;double&gt;&gt;(end - start);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keywordflow">return</span> elapsed_seconds.count();</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;}</div>
 </div><!-- fragment -->
 <p class="reference">Referenced by <a class="el" href="degridding_8cc_source.html#l00041">BENCHMARK_DEFINE_F()</a>, <a class="el" href="benchmarks_2measurement__operator_8cc_source.html#l00010">degrid_operator_ctor()</a>, and <a class="el" href="wavelet__operator_8cc_source.html#l00010">wavelet_operator_constructor()</a>.</p>
 
@@ -260,37 +260,37 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00096">96</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;                                                                                        {</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  std::stringstream filename;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  filename &lt;&lt; <span class="stringliteral">&quot;random_&quot;</span> &lt;&lt; size &lt;&lt; <span class="stringliteral">&quot;_&quot;</span>;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  filename &lt;&lt; std::to_string(<span class="keywordtype">id</span>) &lt;&lt; <span class="stringliteral">&quot;.vis&quot;</span>;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  std::string <span class="keyword">const</span> vis_file = <a class="code" href="namespacepurify_1_1notinstalled.html#a0f5b36543cab9c5f594e8c3c8191f272">visibility_filename</a>(filename.str());</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  std::ifstream vis_file_str(vis_file);</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <a class="code" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> uv_data;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  <span class="keywordflow">if</span> (vis_file_str.good()) {</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    uv_data = <a class="code" href="namespacepurify_1_1utilities.html#ad4492cfc4a58430ffa09a7c002db7988">utilities::read_visibility</a>(vis_file, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#aadff757058a3bc040f9ddfc78ad47b1c">units</a> = utilities::vis_units::radians;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    t_real <span class="keyword">const</span> sigma_m = <a class="code" href="namespacepurify_1_1constant.html#aa35bce2e736d0453c6005cbc06f1dbe7">constant::pi</a> / 3;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    uv_data = <a class="code" href="namespacepurify_1_1utilities.html#ae8446d8749e342037d66da0ad3ca63ad">utilities::random_sample_density</a>(size, 0, sigma_m, max_w);</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#aadff757058a3bc040f9ddfc78ad47b1c">units</a> = utilities::vis_units::radians;</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <a class="code" href="namespacepurify_1_1utilities.html#a083e82d5b1fdc9cae30da55252492c0f">utilities::write_visibility</a>(uv_data, vis_file, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  }</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <span class="keywordflow">return</span> uv_data;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00095">95</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                                                                                        {</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  std::stringstream filename;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  filename &lt;&lt; <span class="stringliteral">&quot;random_&quot;</span> &lt;&lt; size &lt;&lt; <span class="stringliteral">&quot;_&quot;</span>;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  filename &lt;&lt; std::to_string(<span class="keywordtype">id</span>) &lt;&lt; <span class="stringliteral">&quot;.vis&quot;</span>;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  std::string <span class="keyword">const</span> vis_file = <a class="code" href="namespacepurify.html#a6584f539e48ba1f6740ddd4a6b1789dd">visibility_filename</a>(filename.str());</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  std::ifstream vis_file_str(vis_file);</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  <a class="code" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> uv_data;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <span class="keywordflow">if</span> (vis_file_str.good()) {</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    uv_data = <a class="code" href="namespacepurify_1_1utilities.html#ad4492cfc4a58430ffa09a7c002db7988">utilities::read_visibility</a>(vis_file, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#aadff757058a3bc040f9ddfc78ad47b1c">units</a> = utilities::vis_units::radians;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    t_real <span class="keyword">const</span> sigma_m = <a class="code" href="namespacepurify_1_1constant.html#aa35bce2e736d0453c6005cbc06f1dbe7">constant::pi</a> / 3;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    uv_data = <a class="code" href="namespacepurify_1_1utilities.html#ae8446d8749e342037d66da0ad3ca63ad">utilities::random_sample_density</a>(size, 0, sigma_m, max_w);</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#aadff757058a3bc040f9ddfc78ad47b1c">units</a> = utilities::vis_units::radians;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <a class="code" href="namespacepurify_1_1utilities.html#a083e82d5b1fdc9cae30da55252492c0f">utilities::write_visibility</a>(uv_data, vis_file, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  }</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <span class="keywordflow">return</span> uv_data;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;}</div>
 <div class="ttc" id="anamespacepurify_1_1constant_html_aa35bce2e736d0453c6005cbc06f1dbe7"><div class="ttname"><a href="namespacepurify_1_1constant.html#aa35bce2e736d0453c6005cbc06f1dbe7">purify::constant::pi</a></div><div class="ttdeci">const t_real pi</div><div class="ttdoc">mathematical constant</div><div class="ttdef"><b>Definition:</b> <a href="types_8h_source.html#l00058">types.h:58</a></div></div>
-<div class="ttc" id="anamespacepurify_1_1notinstalled_html_a0f5b36543cab9c5f594e8c3c8191f272"><div class="ttname"><a href="namespacepurify_1_1notinstalled.html#a0f5b36543cab9c5f594e8c3c8191f272">purify::notinstalled::visibility_filename</a></div><div class="ttdeci">std::string visibility_filename(std::string const &amp;filename)</div><div class="ttdoc">Visibility filename.</div><div class="ttdef"><b>Definition:</b> <a href="directories_8in_8h_source.html#l00039">directories.in.h:39</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1utilities_html_a083e82d5b1fdc9cae30da55252492c0f"><div class="ttname"><a href="namespacepurify_1_1utilities.html#a083e82d5b1fdc9cae30da55252492c0f">purify::utilities::write_visibility</a></div><div class="ttdeci">void write_visibility(const utilities::vis_params &amp;uv_vis, const std::string &amp;file_name, const bool w_term)</div><div class="ttdoc">Writes visibilities to txt.</div><div class="ttdef"><b>Definition:</b> <a href="uvw__utilities_8cc_source.html#l00223">uvw_utilities.cc:223</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1utilities_html_ad4492cfc4a58430ffa09a7c002db7988"><div class="ttname"><a href="namespacepurify_1_1utilities.html#ad4492cfc4a58430ffa09a7c002db7988">purify::utilities::read_visibility</a></div><div class="ttdeci">utilities::vis_params read_visibility(const std::vector&lt; std::string &gt; &amp;names, const bool w_term)</div><div class="ttdoc">Read visibility files from name of vector.</div><div class="ttdef"><b>Definition:</b> <a href="uvw__utilities_8cc_source.html#l00136">uvw_utilities.cc:136</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1utilities_html_ae8446d8749e342037d66da0ad3ca63ad"><div class="ttname"><a href="namespacepurify_1_1utilities.html#ae8446d8749e342037d66da0ad3ca63ad">purify::utilities::random_sample_density</a></div><div class="ttdeci">utilities::vis_params random_sample_density(const t_int vis_num, const t_real mean, const t_real standard_deviation, const t_real rms_w)</div><div class="ttdoc">Generates a random visibility coverage.</div><div class="ttdef"><b>Definition:</b> <a href="uvw__utilities_8cc_source.html#l00096">uvw_utilities.cc:96</a></div></div>
+<div class="ttc" id="anamespacepurify_html_a6584f539e48ba1f6740ddd4a6b1789dd"><div class="ttname"><a href="namespacepurify.html#a6584f539e48ba1f6740ddd4a6b1789dd">purify::visibility_filename</a></div><div class="ttdeci">std::string visibility_filename(std::string const &amp;filename)</div><div class="ttdoc">Visibility filename.</div><div class="ttdef"><b>Definition:</b> <a href="directories_8in_8h_source.html#l00024">directories.in.h:24</a></div></div>
 <div class="ttc" id="astructpurify_1_1utilities_1_1vis__params_html"><div class="ttname"><a href="structpurify_1_1utilities_1_1vis__params.html">purify::utilities::vis_params</a></div><div class="ttdef"><b>Definition:</b> <a href="uvw__utilities_8h_source.html#l00015">uvw_utilities.h:15</a></div></div>
 <div class="ttc" id="astructpurify_1_1utilities_1_1vis__params_html_aadff757058a3bc040f9ddfc78ad47b1c"><div class="ttname"><a href="structpurify_1_1utilities_1_1vis__params.html#aadff757058a3bc040f9ddfc78ad47b1c">purify::utilities::vis_params::units</a></div><div class="ttdeci">vis_units units</div><div class="ttdef"><b>Definition:</b> <a href="uvw__utilities_8h_source.html#l00024">uvw_utilities.h:24</a></div></div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="types_8h_source.html#l00058">purify::constant::pi</a>, <a class="el" href="namespacepurify_1_1utilities.html#aa2af2ee7e4f1bb93a42235b9d973983da017969ba49117264eb077e9f66daacfd">purify::utilities::radians</a>, <a class="el" href="uvw__utilities_8cc_source.html#l00096">purify::utilities::random_sample_density()</a>, <a class="el" href="uvw__utilities_8cc_source.html#l00136">purify::utilities::read_visibility()</a>, <a class="el" href="uvw__utilities_8h_source.html#l00024">purify::utilities::vis_params::units</a>, <a class="el" href="directories_8in_8h_source.html#l00039">purify::notinstalled::visibility_filename()</a>, and <a class="el" href="uvw__utilities_8cc_source.html#l00223">purify::utilities::write_visibility()</a>.</p>
+<p class="reference">References <a class="el" href="types_8h_source.html#l00058">purify::constant::pi</a>, <a class="el" href="namespacepurify_1_1utilities.html#aa2af2ee7e4f1bb93a42235b9d973983da017969ba49117264eb077e9f66daacfd">purify::utilities::radians</a>, <a class="el" href="uvw__utilities_8cc_source.html#l00096">purify::utilities::random_sample_density()</a>, <a class="el" href="uvw__utilities_8cc_source.html#l00136">purify::utilities::read_visibility()</a>, <a class="el" href="uvw__utilities_8h_source.html#l00024">purify::utilities::vis_params::units</a>, <a class="el" href="directories_8in_8h_source.html#l00024">purify::visibility_filename()</a>, and <a class="el" href="uvw__utilities_8cc_source.html#l00223">purify::utilities::write_visibility()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="benchmarks_2measurement__operator_8cc_source.html#l00010">degrid_operator_ctor()</a>, <a class="el" href="benchmarks_2utilities_8cc_source.html#l00077">dirty_measurements()</a>, <a class="el" href="measurement__operator__wproj_8cc_source.html#l00021">DegridOperatorCtorFixturePar::SetUp()</a>, and <a class="el" href="benchmarks_2utilities_8cc_source.html#l00054">updateMeasurements()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="benchmarks_2measurement__operator_8cc_source.html#l00010">degrid_operator_ctor()</a>, <a class="el" href="benchmarks_2utilities_8cc_source.html#l00076">dirty_measurements()</a>, <a class="el" href="measurement__operator__wproj_8cc_source.html#l00020">DegridOperatorCtorFixturePar::SetUp()</a>, and <a class="el" href="benchmarks_2utilities_8cc_source.html#l00053">updateMeasurements()</a>.</p>
 
 </div>
 </div>
@@ -332,18 +332,18 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00044">44</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                                                                                              {</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordflow">if</span> (sizex == newSize) {</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  }</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  image.resize(newSize * newSize);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  sizex = newSize;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  sizey = newSize;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00043">43</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;                                                                                              {</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordflow">if</span> (sizex == newSize) {</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  }</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  image.resize(newSize * newSize);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  sizex = newSize;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  sizey = newSize;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;}</div>
 </div><!-- fragment -->
-<p class="reference">Referenced by <a class="el" href="benchmarks_2measurement__operator_8cc_source.html#l00100">DegridOperatorAdjointFixture::updateImage()</a>, and <a class="el" href="measurement__operator__mpi_8cc_source.html#l00150">DegridOperatorAdjointFixturePar::updateImage()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="benchmarks_2measurement__operator_8cc_source.html#l00100">DegridOperatorAdjointFixture::updateImage()</a>, and <a class="el" href="measurement__operator__mpi_8cc_source.html#l00149">DegridOperatorAdjointFixturePar::updateImage()</a>.</p>
 
 </div>
 </div>
@@ -385,20 +385,20 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00032">32</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;                                                                                        {</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keywordflow">if</span> (sizex == newSize) {</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  }</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  image = Image&lt;t_complex&gt;::Random(newSize, newSize);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  sizex = image.cols();</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  sizey = image.rows();</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  t_real <span class="keyword">const</span> max = image.array().abs().maxCoeff();</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  image = image * 1. / max;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00031">31</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                                                                                        {</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keywordflow">if</span> (sizex == newSize) {</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  }</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  image = Image&lt;t_complex&gt;::Random(newSize, newSize);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  sizex = image.cols();</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  sizey = image.rows();</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  t_real <span class="keyword">const</span> max = image.array().abs().maxCoeff();</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  image = image * 1. / max;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;}</div>
 </div><!-- fragment -->
-<p class="reference">Referenced by <a class="el" href="benchmarks_2measurement__operator_8cc_source.html#l00047">DegridOperatorFixture::SetUp()</a>, <a class="el" href="measurement__operator__mpi_8cc_source.html#l00096">DegridOperatorFixturePar::SetUp()</a>, <a class="el" href="padmm_8cc_source.html#l00018">PadmmFixture::SetUp()</a>, <a class="el" href="padmm__mpi_8cc_source.html#l00023">PadmmFixtureMPI::SetUp()</a>, <a class="el" href="benchmarks_2measurement__operator_8cc_source.html#l00091">DegridOperatorDirectFixture::updateImage()</a>, and <a class="el" href="measurement__operator__mpi_8cc_source.html#l00141">DegridOperatorDirectFixturePar::updateImage()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="benchmarks_2measurement__operator_8cc_source.html#l00047">DegridOperatorFixture::SetUp()</a>, <a class="el" href="measurement__operator__mpi_8cc_source.html#l00095">DegridOperatorFixturePar::SetUp()</a>, <a class="el" href="padmm_8cc_source.html#l00018">PadmmFixture::SetUp()</a>, <a class="el" href="padmm__mpi_8cc_source.html#l00023">PadmmFixtureMPI::SetUp()</a>, <a class="el" href="benchmarks_2measurement__operator_8cc_source.html#l00091">DegridOperatorDirectFixture::updateImage()</a>, and <a class="el" href="measurement__operator__mpi_8cc_source.html#l00140">DegridOperatorDirectFixturePar::updateImage()</a>.</p>
 
 </div>
 </div>
@@ -428,17 +428,17 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00054">54</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;                                                                   {</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keywordflow">if</span> (data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a00fec6b3490e6c98c4d0befb677bfb09">vis</a>.size() == newSize) {</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  }</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  data = <a class="code" href="namespaceb__utilities.html#a224195343f875ecd21158fe98df7daf8">b_utilities::random_measurements</a>(newSize);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00053">53</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;                                                                   {</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keywordflow">if</span> (data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a00fec6b3490e6c98c4d0befb677bfb09">vis</a>.size() == newSize) {</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  }</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  data = <a class="code" href="namespaceb__utilities.html#a224195343f875ecd21158fe98df7daf8">b_utilities::random_measurements</a>(newSize);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;}</div>
 <div class="ttc" id="astructpurify_1_1utilities_1_1vis__params_html_a00fec6b3490e6c98c4d0befb677bfb09"><div class="ttname"><a href="structpurify_1_1utilities_1_1vis__params.html#a00fec6b3490e6c98c4d0befb677bfb09">purify::utilities::vis_params::vis</a></div><div class="ttdeci">Vector&lt; t_complex &gt; vis</div><div class="ttdef"><b>Definition:</b> <a href="uvw__utilities_8h_source.html#l00022">uvw_utilities.h:22</a></div></div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="benchmarks_2utilities_8cc_source.html#l00096">random_measurements()</a>, and <a class="el" href="uvw__utilities_8h_source.html#l00022">purify::utilities::vis_params::vis</a>.</p>
+<p class="reference">References <a class="el" href="benchmarks_2utilities_8cc_source.html#l00095">random_measurements()</a>, and <a class="el" href="uvw__utilities_8h_source.html#l00022">purify::utilities::vis_params::vis</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="measurement__operator__af_8cc_source.html#l00055">DegridOperatorFixture::SetUp()</a>.</p>
 
@@ -488,24 +488,24 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00062">62</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                                                 {</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keywordflow">if</span> (data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a00fec6b3490e6c98c4d0befb677bfb09">vis</a>.size() == newSize &amp;&amp; !newImage) {</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  }</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keyword">const</span> t_real FoV = 1;  <span class="comment">// deg</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <span class="keyword">const</span> t_real cellsize = FoV / image.size() * 60. * 60.;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  std::tuple&lt;utilities::vis_params, t_real&gt; temp =</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      <a class="code" href="namespaceb__utilities.html#a92ba576f33170ef3a76ab53c758a2bed">b_utilities::dirty_measurements</a>(image, newSize, 30., cellsize);</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  data = std::get&lt;0&gt;(temp);</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  epsilon = <a class="code" href="namespacepurify_1_1utilities.html#af90182ef1213164564e72e51f8a83ac7">utilities::calculate_l2_radius</a>(data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a00fec6b3490e6c98c4d0befb677bfb09">vis</a>.size(), std::get&lt;1&gt;(temp));</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;}</div>
-<div class="ttc" id="anamespaceb__utilities_html_a92ba576f33170ef3a76ab53c758a2bed"><div class="ttname"><a href="namespaceb__utilities.html#a92ba576f33170ef3a76ab53c758a2bed">b_utilities::dirty_measurements</a></div><div class="ttdeci">std::tuple&lt; utilities::vis_params, t_real &gt; dirty_measurements(Image&lt; t_complex &gt; const &amp;ground_truth_image, t_uint number_of_vis, t_real snr, const t_real &amp;cellsize)</div><div class="ttdef"><b>Definition:</b> <a href="benchmarks_2utilities_8cc_source.html#l00077">utilities.cc:77</a></div></div>
+<p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00061">61</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                                                 {</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="keywordflow">if</span> (data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a00fec6b3490e6c98c4d0befb677bfb09">vis</a>.size() == newSize &amp;&amp; !newImage) {</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  }</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="keyword">const</span> t_real FoV = 1;  <span class="comment">// deg</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keyword">const</span> t_real cellsize = FoV / image.size() * 60. * 60.;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  std::tuple&lt;utilities::vis_params, t_real&gt; temp =</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;      <a class="code" href="namespaceb__utilities.html#a92ba576f33170ef3a76ab53c758a2bed">b_utilities::dirty_measurements</a>(image, newSize, 30., cellsize);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  data = std::get&lt;0&gt;(temp);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  epsilon = <a class="code" href="namespacepurify_1_1utilities.html#af90182ef1213164564e72e51f8a83ac7">utilities::calculate_l2_radius</a>(data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a00fec6b3490e6c98c4d0befb677bfb09">vis</a>.size(), std::get&lt;1&gt;(temp));</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;}</div>
+<div class="ttc" id="anamespaceb__utilities_html_a92ba576f33170ef3a76ab53c758a2bed"><div class="ttname"><a href="namespaceb__utilities.html#a92ba576f33170ef3a76ab53c758a2bed">b_utilities::dirty_measurements</a></div><div class="ttdeci">std::tuple&lt; utilities::vis_params, t_real &gt; dirty_measurements(Image&lt; t_complex &gt; const &amp;ground_truth_image, t_uint number_of_vis, t_real snr, const t_real &amp;cellsize)</div><div class="ttdef"><b>Definition:</b> <a href="benchmarks_2utilities_8cc_source.html#l00076">utilities.cc:76</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1utilities_html_af90182ef1213164564e72e51f8a83ac7"><div class="ttname"><a href="namespacepurify_1_1utilities.html#af90182ef1213164564e72e51f8a83ac7">purify::utilities::calculate_l2_radius</a></div><div class="ttdeci">t_real calculate_l2_radius(const t_uint y_size, const t_real &amp;sigma, const t_real &amp;n_sigma, const std::string distirbution)</div><div class="ttdoc">A function that calculates the l2 ball radius for sopt.</div><div class="ttdef"><b>Definition:</b> <a href="purify_2utilities_8cc_source.html#l00075">utilities.cc:75</a></div></div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="purify_2utilities_8cc_source.html#l00075">purify::utilities::calculate_l2_radius()</a>, <a class="el" href="benchmarks_2utilities_8cc_source.html#l00077">dirty_measurements()</a>, and <a class="el" href="uvw__utilities_8h_source.html#l00022">purify::utilities::vis_params::vis</a>.</p>
+<p class="reference">References <a class="el" href="purify_2utilities_8cc_source.html#l00075">purify::utilities::calculate_l2_radius()</a>, <a class="el" href="benchmarks_2utilities_8cc_source.html#l00076">dirty_measurements()</a>, and <a class="el" href="uvw__utilities_8h_source.html#l00022">purify::utilities::vis_params::vis</a>.</p>
 
 </div>
 </div>

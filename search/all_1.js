@@ -22,6 +22,6 @@ var searchData=
   ['args_5fmacro_20',['ARGS_MACRO',['../compare__wprojection_8cc.html#a5ef35d83033741b88fd4635a3ffe60de',1,'ARGS_MACRO():&#160;compare_wprojection.cc'],['../image__wproj__chirp_8cc.html#a5ef35d83033741b88fd4635a3ffe60de',1,'ARGS_MACRO():&#160;image_wproj_chirp.cc'],['../plot__wkernel_8cc.html#a5ef35d83033741b88fd4635a3ffe60de',1,'ARGS_MACRO():&#160;plot_wkernel.cc'],['../wavelet__decomposition_8cc.html#a5ef35d83033741b88fd4635a3ffe60de',1,'ARGS_MACRO():&#160;wavelet_decomposition.cc']]],
   ['arguments_21',['Arguments',['../namespaceb__utilities.html#ab66b84f597f29c434e1666cf4c6f2668',1,'b_utilities']]],
   ['array_5fcolumn_22',['array_column',['../classpurify_1_1casa_1_1MeasurementSet.html#a5499d989cba2942af0dd73dc9ff2ba99',1,'purify::casa::MeasurementSet']]],
-  ['atca_5ffilename_23',['atca_filename',['../namespacepurify_1_1notinstalled.html#adf7cca24a1b2c8df495b8c2aadbc61f8',1,'purify::notinstalled']]],
+  ['atca_5ffilename_23',['atca_filename',['../namespacepurify.html#a8c91f3c6ff988b668786fed31fb17282',1,'purify']]],
   ['average_5ffrequency_24',['average_frequency',['../structpurify_1_1utilities_1_1vis__params.html#a5551626c86ef47969b6736a12dc55127',1,'purify::utilities::vis_params::average_frequency()'],['../namespacepurify_1_1casa.html#a401de6500811d6b4d4f6481975f3482d',1,'purify::casa::average_frequency()']]]
 ];

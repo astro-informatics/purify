@@ -105,8 +105,6 @@ Namespaces</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:namespacepurify_1_1measurementoperator"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1measurementoperator.html">measurementoperator</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:namespacepurify_1_1notinstalled"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1notinstalled.html">notinstalled</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:namespacepurify_1_1operators"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1operators.html">operators</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:namespacepurify_1_1pfitsio"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1pfitsio.html">pfitsio</a></td></tr>
@@ -219,6 +217,54 @@ Functions</h2></td></tr>
 <tr class="memitem:a981e10b7581eca93431393b74c4c50b5"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a981e10b7581eca93431393b74c4c50b5"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a981e10b7581eca93431393b74c4c50b5">get_vector</a> (const YAML::Node &amp;node_map, const std::initializer_list&lt; const char * &gt; indicies)</td></tr>
 <tr class="separator:a981e10b7581eca93431393b74c4c50b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af068851a3144a36d98e1f64044d1818d"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:af068851a3144a36d98e1f64044d1818d"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt; std::is_scalar&lt; T &gt;::value, std::vector&lt; T &gt; &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify.html#af068851a3144a36d98e1f64044d1818d">read_data</a> (const std::string &amp;filename)</td></tr>
+<tr class="memdesc:af068851a3144a36d98e1f64044d1818d"><td class="mdescLeft">&#160;</td><td class="mdescRight">read real values from data file  <a href="namespacepurify.html#af068851a3144a36d98e1f64044d1818d">More...</a><br /></td></tr>
+<tr class="separator:af068851a3144a36d98e1f64044d1818d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91b176035cf7cdededf78ddcabb96584"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a91b176035cf7cdededf78ddcabb96584"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt; std::is_same&lt; t_complex, T &gt;::value, std::vector&lt; T &gt; &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a91b176035cf7cdededf78ddcabb96584">read_data</a> (const std::string &amp;filename)</td></tr>
+<tr class="memdesc:a91b176035cf7cdededf78ddcabb96584"><td class="mdescLeft">&#160;</td><td class="mdescRight">read complex values from data file  <a href="namespacepurify.html#a91b176035cf7cdededf78ddcabb96584">More...</a><br /></td></tr>
+<tr class="separator:a91b176035cf7cdededf78ddcabb96584"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a10b9093bc494c51ecb46bcbca04a57"><td class="memItemLeft" align="right" valign="top">std::vector&lt; t_complex &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a0a10b9093bc494c51ecb46bcbca04a57">read_data</a> (const std::vector&lt; t_real &gt; &amp;input)</td></tr>
+<tr class="separator:a0a10b9093bc494c51ecb46bcbca04a57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab15ea9d438072e9ddbe461022faf26cf"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#ab15ea9d438072e9ddbe461022faf26cf">data_directory</a> ()</td></tr>
+<tr class="memdesc:ab15ea9d438072e9ddbe461022faf26cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds data and such.  <a href="namespacepurify.html#ab15ea9d438072e9ddbe461022faf26cf">More...</a><br /></td></tr>
+<tr class="separator:ab15ea9d438072e9ddbe461022faf26cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b051df94025a181dc2d979e5d206a96"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a2b051df94025a181dc2d979e5d206a96">models_directory</a> ()</td></tr>
+<tr class="memdesc:a2b051df94025a181dc2d979e5d206a96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds TF models.  <a href="namespacepurify.html#a2b051df94025a181dc2d979e5d206a96">More...</a><br /></td></tr>
+<tr class="separator:a2b051df94025a181dc2d979e5d206a96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56056c743c4ca1c88b72f530925e8cc2"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a56056c743c4ca1c88b72f530925e8cc2">output_directory</a> ()</td></tr>
+<tr class="memdesc:a56056c743c4ca1c88b72f530925e8cc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Where test outputs go.  <a href="namespacepurify.html#a56056c743c4ca1c88b72f530925e8cc2">More...</a><br /></td></tr>
+<tr class="separator:a56056c743c4ca1c88b72f530925e8cc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62440e00433f0a283e3cfb53e0a117dd"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a62440e00433f0a283e3cfb53e0a117dd">data_filename</a> (std::string const &amp;filename)</td></tr>
+<tr class="memdesc:a62440e00433f0a283e3cfb53e0a117dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds data and such.  <a href="namespacepurify.html#a62440e00433f0a283e3cfb53e0a117dd">More...</a><br /></td></tr>
+<tr class="separator:a62440e00433f0a283e3cfb53e0a117dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86c35920819938ed196856155b6d2ba1"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a86c35920819938ed196856155b6d2ba1">image_filename</a> (std::string const &amp;filename)</td></tr>
+<tr class="memdesc:a86c35920819938ed196856155b6d2ba1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Image filename.  <a href="namespacepurify.html#a86c35920819938ed196856155b6d2ba1">More...</a><br /></td></tr>
+<tr class="separator:a86c35920819938ed196856155b6d2ba1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6584f539e48ba1f6740ddd4a6b1789dd"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a6584f539e48ba1f6740ddd4a6b1789dd">visibility_filename</a> (std::string const &amp;filename)</td></tr>
+<tr class="memdesc:a6584f539e48ba1f6740ddd4a6b1789dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visibility filename.  <a href="namespacepurify.html#a6584f539e48ba1f6740ddd4a6b1789dd">More...</a><br /></td></tr>
+<tr class="separator:a6584f539e48ba1f6740ddd4a6b1789dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af813d3d046b33d25e7cb97a4db5f72d7"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#af813d3d046b33d25e7cb97a4db5f72d7">vla_filename</a> (std::string const &amp;filename)</td></tr>
+<tr class="memdesc:af813d3d046b33d25e7cb97a4db5f72d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specific vla data.  <a href="namespacepurify.html#af813d3d046b33d25e7cb97a4db5f72d7">More...</a><br /></td></tr>
+<tr class="separator:af813d3d046b33d25e7cb97a4db5f72d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c91f3c6ff988b668786fed31fb17282"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a8c91f3c6ff988b668786fed31fb17282">atca_filename</a> (std::string const &amp;filename)</td></tr>
+<tr class="memdesc:a8c91f3c6ff988b668786fed31fb17282"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specific atca data.  <a href="namespacepurify.html#a8c91f3c6ff988b668786fed31fb17282">More...</a><br /></td></tr>
+<tr class="separator:a8c91f3c6ff988b668786fed31fb17282"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa23eda8f53b24e21d0f09bec0332b6a2"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#aa23eda8f53b24e21d0f09bec0332b6a2">mwa_filename</a> (std::string const &amp;filename)</td></tr>
+<tr class="memdesc:aa23eda8f53b24e21d0f09bec0332b6a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specific mwa data.  <a href="namespacepurify.html#aa23eda8f53b24e21d0f09bec0332b6a2">More...</a><br /></td></tr>
+<tr class="separator:aa23eda8f53b24e21d0f09bec0332b6a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e73c29cf358d72bd3aa516278edaf18"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a5e73c29cf358d72bd3aa516278edaf18">gridding_filename</a> (std::string const &amp;filename)</td></tr>
+<tr class="memdesc:a5e73c29cf358d72bd3aa516278edaf18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Some gridding regression data.  <a href="namespacepurify.html#a5e73c29cf358d72bd3aa516278edaf18">More...</a><br /></td></tr>
+<tr class="separator:a5e73c29cf358d72bd3aa516278edaf18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad28499443824c24680902878af632629"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#ad28499443824c24680902878af632629">degridding_filename</a> (std::string const &amp;filename)</td></tr>
+<tr class="memdesc:ad28499443824c24680902878af632629"><td class="mdescLeft">&#160;</td><td class="mdescRight">Some degridding regression data.  <a href="namespacepurify.html#ad28499443824c24680902878af632629">More...</a><br /></td></tr>
+<tr class="separator:ad28499443824c24680902878af632629"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63523804178d9db24b8cb3ab3ba620a4"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a63523804178d9db24b8cb3ab3ba620a4">output_filename</a> (std::string const &amp;filename)</td></tr>
+<tr class="memdesc:a63523804178d9db24b8cb3ab3ba620a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test output file.  <a href="namespacepurify.html#a63523804178d9db24b8cb3ab3ba620a4">More...</a><br /></td></tr>
+<tr class="separator:a63523804178d9db24b8cb3ab3ba620a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4338db042ed8c1d9963b4faaef4aedc0"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a4338db042ed8c1d9963b4faaef4aedc0">ngc3256_ms</a> ()</td></tr>
+<tr class="separator:a4338db042ed8c1d9963b4faaef4aedc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -439,6 +485,44 @@ template&lt;class T  = t_real, class I  = t_int&gt; </div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <span class="keywordflow">return</span> send_sizes;</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;}</div>
 </div><!-- fragment -->
+</div>
+</div>
+<a id="a8c91f3c6ff988b668786fed31fb17282"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c91f3c6ff988b668786fed31fb17282">&#9670;&nbsp;</a></span>atca_filename()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string purify::atca_filename </td>
+          <td>(</td>
+          <td class="paramtype">std::string const &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Specific atca data. </p>
+
+<p class="definition">Definition at line <a class="el" href="directories_8in_8h_source.html#l00032">32</a> of file <a class="el" href="directories_8in_8h_source.html">directories.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;                                                          {</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacepurify.html#a62440e00433f0a283e3cfb53e0a117dd">data_filename</a>(<span class="stringliteral">&quot;atca/&quot;</span> + filename);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;}</div>
+<div class="ttc" id="anamespacepurify_html_a62440e00433f0a283e3cfb53e0a117dd"><div class="ttname"><a href="namespacepurify.html#a62440e00433f0a283e3cfb53e0a117dd">purify::data_filename</a></div><div class="ttdeci">std::string data_filename(std::string const &amp;filename)</div><div class="ttdoc">Holds data and such.</div><div class="ttdef"><b>Definition:</b> <a href="directories_8in_8h_source.html#l00016">directories.in.h:16</a></div></div>
+</div><!-- fragment -->
+<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00016">data_filename()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="tests_2read__measurements_8cc_source.html#l00020">TEST_CASE()</a>.</p>
+
 </div>
 </div>
 <a id="ae5a8e573961b3d00cc5603cf4e5e647f"></a>
@@ -662,7 +746,7 @@ template&lt;class T0 &gt; </div>
 </div><!-- fragment -->
 <p class="reference">References <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a34be958a921e43d813a2075297d8e862">purify::kernels::box</a>, <a class="el" href="kernels_8cc_source.html#l00060">purify::kernels::ft_gaussian()</a>, <a class="el" href="kernels_8cc_source.html#l00233">purify::kernels::ft_gaussian_general()</a>, <a class="el" href="kernels_8cc_source.html#l00040">purify::kernels::ft_kaiser_bessel()</a>, <a class="el" href="kernels_8cc_source.html#l00025">purify::kernels::ft_kaiser_bessel_general()</a>, <a class="el" href="kernels_8cc_source.html#l00211">purify::kernels::ft_pill_box()</a>, <a class="el" href="kernels_8cc_source.html#l00124">purify::kernels::ft_pswf()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a710a4950250286365cf841f765a790f1">purify::kernels::gauss</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a575e9f12266a1af6d0b1cce8da8bc310">purify::kernels::gauss_alt</a>, <a class="el" href="kernels_8cc_source.html#l00049">purify::kernels::gaussian()</a>, <a class="el" href="kernels_8cc_source.html#l00220">purify::kernels::gaussian_general()</a>, <a class="el" href="kernels_8cc_source.html#l00007">purify::kernels::kaiser_bessel()</a>, <a class="el" href="kernels_8cc_source.html#l00015">purify::kernels::kaiser_bessel_general()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668aba34ea40525a4379add785228e37fe86">purify::kernels::kb</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a6aa53115b88dffbf79eb9c4aa0e0ba20">purify::kernels::kb_presample</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668ac8f9b2014e544adacfc19dfeba3718e8">purify::kernels::kbmin</a>, <a class="el" href="kernels_8cc_source.html#l00144">purify::kernels::kernel_samples()</a>, <a class="el" href="kernels_8cc_source.html#l00156">purify::kernels::kernel_zero_interp()</a>, <a class="el" href="types_8h_source.html#l00058">purify::constant::pi</a>, <a class="el" href="kernels_8cc_source.html#l00202">purify::kernels::pill_box()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a214d868f9c3f802c756980667a30cc65">purify::kernels::pswf</a>, <a class="el" href="logging_8h_source.html#l00190">PURIFY_ERROR</a>, and <a class="el" href="logging_8h_source.html#l00205">PURIFY_MEDIUM_LOG</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="operators_8h_source.html#l00490">purify::operators::base_degrid_operator_2d()</a>, <a class="el" href="degridding_8cc_source.html#l00012">GridOperatorFixture::SetUp()</a>, and <a class="el" href="tests_2operators_8cc_source.html#l00041">TEST_CASE()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="operators_8h_source.html#l00490">purify::operators::base_degrid_operator_2d()</a>, <a class="el" href="degridding_8cc_source.html#l00012">GridOperatorFixture::SetUp()</a>, and <a class="el" href="tests_2operators_8cc_source.html#l00039">TEST_CASE()</a>.</p>
 
 </div>
 </div>
@@ -756,6 +840,76 @@ template&lt;class T0 &gt; </div>
 
 </div>
 </div>
+<a id="ab15ea9d438072e9ddbe461022faf26cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab15ea9d438072e9ddbe461022faf26cf">&#9670;&nbsp;</a></span>data_directory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string purify::data_directory </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Holds data and such. </p>
+
+<p class="definition">Definition at line <a class="el" href="directories_8in_8h_source.html#l00009">9</a> of file <a class="el" href="directories_8in_8h_source.html">directories.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;@CMAKE_INSTALL_PREFIX@/data&quot;</span>; }</div>
+</div><!-- fragment -->
+<p class="reference">Referenced by <a class="el" href="directories_8in_8h_source.html#l00016">data_filename()</a>.</p>
+
+</div>
+</div>
+<a id="a62440e00433f0a283e3cfb53e0a117dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62440e00433f0a283e3cfb53e0a117dd">&#9670;&nbsp;</a></span>data_filename()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string purify::data_filename </td>
+          <td>(</td>
+          <td class="paramtype">std::string const &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Holds data and such. </p>
+
+<p class="definition">Definition at line <a class="el" href="directories_8in_8h_source.html#l00016">16</a> of file <a class="el" href="directories_8in_8h_source.html">directories.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;                                                          {</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacepurify.html#ab15ea9d438072e9ddbe461022faf26cf">data_directory</a>() + <span class="stringliteral">&quot;/&quot;</span> + filename;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;}</div>
+<div class="ttc" id="anamespacepurify_html_ab15ea9d438072e9ddbe461022faf26cf"><div class="ttname"><a href="namespacepurify.html#ab15ea9d438072e9ddbe461022faf26cf">purify::data_directory</a></div><div class="ttdeci">std::string data_directory()</div><div class="ttdoc">Holds data and such.</div><div class="ttdef"><b>Definition:</b> <a href="directories_8in_8h_source.html#l00009">directories.in.h:9</a></div></div>
+</div><!-- fragment -->
+<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00009">data_directory()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="directories_8in_8h_source.html#l00032">atca_filename()</a>, <a class="el" href="directories_8in_8h_source.html#l00044">degridding_filename()</a>, <a class="el" href="directories_8in_8h_source.html#l00040">gridding_filename()</a>, <a class="el" href="directories_8in_8h_source.html#l00020">image_filename()</a>, <a class="el" href="directories_8in_8h_source.html#l00036">mwa_filename()</a>, <a class="el" href="algo__factory_8cc_source.html#l00026">TEST_CASE()</a>, <a class="el" href="directories_8in_8h_source.html#l00024">visibility_filename()</a>, and <a class="el" href="directories_8in_8h_source.html#l00028">vla_filename()</a>.</p>
+
+</div>
+</div>
 <a id="a0108c76ec3e4a548088e9f5d5f6b4217"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0108c76ec3e4a548088e9f5d5f6b4217">&#9670;&nbsp;</a></span>default_logging_level()</h2>
 
@@ -785,6 +939,41 @@ template&lt;class T0 &gt; </div>
 <div class="fragment"><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;@PURIFY_TEST_LOG_LEVEL@&quot;</span>; }</div>
 </div><!-- fragment -->
 <p class="reference">Referenced by <a class="el" href="casa_8cc_source.html#l00019">main()</a>.</p>
+
+</div>
+</div>
+<a id="ad28499443824c24680902878af632629"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad28499443824c24680902878af632629">&#9670;&nbsp;</a></span>degridding_filename()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string purify::degridding_filename </td>
+          <td>(</td>
+          <td class="paramtype">std::string const &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Some degridding regression data. </p>
+
+<p class="definition">Definition at line <a class="el" href="directories_8in_8h_source.html#l00044">44</a> of file <a class="el" href="directories_8in_8h_source.html">directories.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                                                                {</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacepurify.html#a62440e00433f0a283e3cfb53e0a117dd">data_filename</a>(<span class="stringliteral">&quot;expected/degridding/&quot;</span> + filename);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;}</div>
+</div><!-- fragment -->
+<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00016">data_filename()</a>.</p>
 
 </div>
 </div>
@@ -868,6 +1057,78 @@ template&lt;typename T &gt; </div>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a5e73c29cf358d72bd3aa516278edaf18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e73c29cf358d72bd3aa516278edaf18">&#9670;&nbsp;</a></span>gridding_filename()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string purify::gridding_filename </td>
+          <td>(</td>
+          <td class="paramtype">std::string const &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Some gridding regression data. </p>
+
+<p class="definition">Definition at line <a class="el" href="directories_8in_8h_source.html#l00040">40</a> of file <a class="el" href="directories_8in_8h_source.html">directories.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;                                                              {</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacepurify.html#a62440e00433f0a283e3cfb53e0a117dd">data_filename</a>(<span class="stringliteral">&quot;expected/gridding/&quot;</span> + filename);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;}</div>
+</div><!-- fragment -->
+<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00016">data_filename()</a>.</p>
+
+</div>
+</div>
+<a id="a86c35920819938ed196856155b6d2ba1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86c35920819938ed196856155b6d2ba1">&#9670;&nbsp;</a></span>image_filename()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string purify::image_filename </td>
+          <td>(</td>
+          <td class="paramtype">std::string const &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Image filename. </p>
+
+<p class="definition">Definition at line <a class="el" href="directories_8in_8h_source.html#l00020">20</a> of file <a class="el" href="directories_8in_8h_source.html">directories.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;                                                           {</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacepurify.html#a62440e00433f0a283e3cfb53e0a117dd">data_filename</a>(<span class="stringliteral">&quot;images/&quot;</span> + filename);</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;}</div>
+</div><!-- fragment -->
+<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00016">data_filename()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="histogram__equalisation_8cc_source.html#l00008">main()</a>.</p>
+
+</div>
+</div>
 <a id="a105e14bc03a66d05ce538e8fce85d78b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a105e14bc03a66d05ce538e8fce85d78b">&#9670;&nbsp;</a></span>mkdir_recursive() <span class="overload">[1/2]</span></h2>
 
@@ -911,7 +1172,7 @@ template&lt;typename T &gt; </div>
 </div><!-- fragment -->
 <p class="reference">References <a class="el" href="purify_2read__measurements_8cc_source.html#l00127">purify::read_measurements::dir_exists()</a>, and <a class="el" href="purify_2read__measurements_8cc_source.html#l00133">split()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="padmm__mpi__random__coverage_8cc_source.html#l00155">main()</a>, <a class="el" href="read__measurements_8h_source.html#l00045">mkdir_recursive()</a>, <a class="el" href="tests_2read__measurements_8cc_source.html#l00013">TEST_CASE()</a>, and <a class="el" href="yaml-parser_8cc_source.html#l00295">purify::YamlParser::writeOutput()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="padmm__mpi__random__coverage_8cc_source.html#l00154">main()</a>, <a class="el" href="read__measurements_8h_source.html#l00045">mkdir_recursive()</a>, <a class="el" href="tests_2read__measurements_8cc_source.html#l00012">TEST_CASE()</a>, and <a class="el" href="yaml-parser_8cc_source.html#l00295">purify::YamlParser::writeOutput()</a>.</p>
 
 </div>
 </div>
@@ -942,6 +1203,103 @@ template&lt;class T &gt; </div>
 <div class="ttc" id="anamespacepurify_html_aa7644e567d476e9f6123218bd3e0088f"><div class="ttname"><a href="namespacepurify.html#aa7644e567d476e9f6123218bd3e0088f">purify::mkdir_recursive</a></div><div class="ttdeci">void mkdir_recursive(const T &amp;path)</div><div class="ttdoc">boost wrapper</div><div class="ttdef"><b>Definition:</b> <a href="read__measurements_8h_source.html#l00045">read_measurements.h:45</a></div></div>
 </div><!-- fragment -->
 <p class="reference">References <a class="el" href="purify_2read__measurements_8cc_source.html#l00138">mkdir_recursive()</a>.</p>
+
+</div>
+</div>
+<a id="a2b051df94025a181dc2d979e5d206a96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b051df94025a181dc2d979e5d206a96">&#9670;&nbsp;</a></span>models_directory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string purify::models_directory </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Holds TF models. </p>
+
+<p class="definition">Definition at line <a class="el" href="directories_8in_8h_source.html#l00011">11</a> of file <a class="el" href="directories_8in_8h_source.html">directories.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;@CMAKE_INSTALL_PREFIX@/models&quot;</span>; }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aa23eda8f53b24e21d0f09bec0332b6a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa23eda8f53b24e21d0f09bec0332b6a2">&#9670;&nbsp;</a></span>mwa_filename()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string purify::mwa_filename </td>
+          <td>(</td>
+          <td class="paramtype">std::string const &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Specific mwa data. </p>
+
+<p class="definition">Definition at line <a class="el" href="directories_8in_8h_source.html#l00036">36</a> of file <a class="el" href="directories_8in_8h_source.html">directories.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;                                                         {</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacepurify.html#a62440e00433f0a283e3cfb53e0a117dd">data_filename</a>(<span class="stringliteral">&quot;mwa/&quot;</span> + filename);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;}</div>
+</div><!-- fragment -->
+<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00016">data_filename()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="generate__vis__data_8cc_source.html#l00013">main()</a>, and <a class="el" href="utils_8cc_source.html#l00302">TEST_CASE()</a>.</p>
+
+</div>
+</div>
+<a id="a4338db042ed8c1d9963b4faaef4aedc0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4338db042ed8c1d9963b4faaef4aedc0">&#9670;&nbsp;</a></span>ngc3256_ms()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string purify::ngc3256_ms </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="directories_8in_8h_source.html#l00053">53</a> of file <a class="el" href="directories_8in_8h_source.html">directories.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;@NGC3256_MS@&quot;</span>; }</div>
+</div><!-- fragment -->
+<p class="reference">Referenced by <a class="el" href="casa_8cc_source.html#l00019">main()</a>.</p>
 
 </div>
 </div>
@@ -976,6 +1334,176 @@ template&lt;class T0 , class STORAGE_INDEX_TYPE  = t_int&gt; </div>
 </div><!-- fragment -->
 <p class="reference">Referenced by <a class="el" href="IndexMapping_8h_source.html#l00071">compress_outer()</a>, and <a class="el" href="index__mapping_8cc_source.html#l00066">TEST_CASE()</a>.</p>
 
+</div>
+</div>
+<a id="a56056c743c4ca1c88b72f530925e8cc2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a56056c743c4ca1c88b72f530925e8cc2">&#9670;&nbsp;</a></span>output_directory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string purify::output_directory </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Where test outputs go. </p>
+
+<p class="definition">Definition at line <a class="el" href="directories_8in_8h_source.html#l00013">13</a> of file <a class="el" href="directories_8in_8h_source.html">directories.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;@CMAKE_INSTALL_PREFIX@/outputs&quot;</span>; }</div>
+</div><!-- fragment -->
+<p class="reference">Referenced by <a class="el" href="directories_8in_8h_source.html#l00049">output_filename()</a>.</p>
+
+</div>
+</div>
+<a id="a63523804178d9db24b8cb3ab3ba620a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63523804178d9db24b8cb3ab3ba620a4">&#9670;&nbsp;</a></span>output_filename()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string purify::output_filename </td>
+          <td>(</td>
+          <td class="paramtype">std::string const &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Test output file. </p>
+
+<p class="definition">Definition at line <a class="el" href="directories_8in_8h_source.html#l00049">49</a> of file <a class="el" href="directories_8in_8h_source.html">directories.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;                                                            {</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacepurify.html#a56056c743c4ca1c88b72f530925e8cc2">output_directory</a>() + <span class="stringliteral">&quot;/&quot;</span> + filename;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;}</div>
+<div class="ttc" id="anamespacepurify_html_a56056c743c4ca1c88b72f530925e8cc2"><div class="ttname"><a href="namespacepurify.html#a56056c743c4ca1c88b72f530925e8cc2">purify::output_directory</a></div><div class="ttdeci">std::string output_directory()</div><div class="ttdoc">Where test outputs go.</div><div class="ttdef"><b>Definition:</b> <a href="directories_8in_8h_source.html#l00013">directories.in.h:13</a></div></div>
+</div><!-- fragment -->
+<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00013">output_directory()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="generate__vis__data_8cc_source.html#l00013">main()</a>, <a class="el" href="padmm__random__coverage_8cc_source.html#l00025">padmm()</a>, and <a class="el" href="tests_2read__measurements_8cc_source.html#l00012">TEST_CASE()</a>.</p>
+
+</div>
+</div>
+<a id="af068851a3144a36d98e1f64044d1818d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af068851a3144a36d98e1f64044d1818d">&#9670;&nbsp;</a></span>read_data() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::enable_if&lt;std::is_scalar&lt;T&gt;::value, std::vector&lt;T&gt; &gt;::type purify::read_data </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>read real values from data file </p>
+
+<p class="definition">Definition at line <a class="el" href="data_8in_8h_source.html#l00014">14</a> of file <a class="el" href="data_8in_8h_source.html">data.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;                               {</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  std::ifstream data_file(filename);</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keywordflow">if</span> (!data_file) <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Test data is missing: &quot;</span> + filename);</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  std::string s;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="comment">// read data</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  std::vector&lt;T&gt; data;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keywordflow">for</span> (std::string s; std::getline(data_file, s, <span class="charliteral">&#39;,&#39;</span>);) {</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    data.push_back(std::stod(s));</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  }</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keywordflow">return</span> data;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a91b176035cf7cdededf78ddcabb96584"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91b176035cf7cdededf78ddcabb96584">&#9670;&nbsp;</a></span>read_data() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::enable_if&lt;std::is_same&lt;t_complex, T&gt;::value, std::vector&lt;T&gt; &gt;::type purify::read_data </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>read complex values from data file </p>
+
+<p class="definition">Definition at line <a class="el" href="data_8in_8h_source.html#l00028">28</a> of file <a class="el" href="data_8in_8h_source.html">data.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;                               {</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  std::ifstream data_file(filename);</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keywordflow">if</span> (!data_file) <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Test data is missing: &quot;</span> + filename);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  std::string real = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  std::string imag = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="comment">// read data</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  std::vector&lt;T&gt; data;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keywordflow">for</span> (std::string real; std::getline(data_file, real, <span class="charliteral">&#39;,&#39;</span>);) {</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    real.erase(0, 1);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordflow">if</span> (!std::getline(data_file, imag, <span class="charliteral">&#39;)&#39;</span>)) <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    data.push_back(T(std::stod(real), std::stod(imag)));</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    real = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    imag = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keywordflow">return</span> data;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a0a10b9093bc494c51ecb46bcbca04a57"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a10b9093bc494c51ecb46bcbca04a57">&#9670;&nbsp;</a></span>read_data() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;t_complex&gt; purify::read_data </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; t_real &gt; &amp;&#160;</td>
+          <td class="paramname"><em>input</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="data_8in_8h_source.html#l00046">46</a> of file <a class="el" href="data_8in_8h_source.html">data.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                                                               {</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  std::vector&lt;t_complex&gt; output;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> a = input.begin(); a != input.end(); a++) output.push_back(t_complex(*a, 0.));</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="keywordflow">return</span> output;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a75b4261fcc6cbc6e4733d6af03e294e0"></a>
@@ -1131,6 +1659,80 @@ template&lt;typename T &gt; </div>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a6584f539e48ba1f6740ddd4a6b1789dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6584f539e48ba1f6740ddd4a6b1789dd">&#9670;&nbsp;</a></span>visibility_filename()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string purify::visibility_filename </td>
+          <td>(</td>
+          <td class="paramtype">std::string const &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Visibility filename. </p>
+
+<p class="definition">Definition at line <a class="el" href="directories_8in_8h_source.html#l00024">24</a> of file <a class="el" href="directories_8in_8h_source.html">directories.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;                                                                {</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacepurify.html#a62440e00433f0a283e3cfb53e0a117dd">data_filename</a>(<span class="stringliteral">&quot;vis_&quot;</span> + filename);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;}</div>
+</div><!-- fragment -->
+<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00016">data_filename()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="benchmarks_2utilities_8cc_source.html#l00095">b_utilities::random_measurements()</a>.</p>
+
+</div>
+</div>
+<a id="af813d3d046b33d25e7cb97a4db5f72d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af813d3d046b33d25e7cb97a4db5f72d7">&#9670;&nbsp;</a></span>vla_filename()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string purify::vla_filename </td>
+          <td>(</td>
+          <td class="paramtype">std::string const &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Specific vla data. </p>
+
+<p class="definition">Definition at line <a class="el" href="directories_8in_8h_source.html#l00028">28</a> of file <a class="el" href="directories_8in_8h_source.html">directories.in.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;                                                         {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacepurify.html#a62440e00433f0a283e3cfb53e0a117dd">data_filename</a>(<span class="stringliteral">&quot;vla/&quot;</span> + filename);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;}</div>
+</div><!-- fragment -->
+<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00016">data_filename()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="padmm__mpi__real__data_8cc_source.html#l00154">main()</a>, and <a class="el" href="tests_2distribute_8cc_source.html#l00008">TEST_CASE()</a>.</p>
+
+</div>
+</div>
 <h2 class="groupheader">Variable Documentation</h2>
 <a id="a28dc6ce59ab78004234888df0d8ba64f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a28dc6ce59ab78004234888df0d8ba64f">&#9670;&nbsp;</a></span>stokes_int</h2>
@@ -1150,7 +1752,7 @@ template&lt;typename T &gt; </div>
 </div><!-- fragment -->
 <p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00033">33</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="pfitsio_8h_source.html#l00033">purify::pfitsio::header_params::header_params()</a>, and <a class="el" href="purify__fitsio_8cc_source.html#l00091">TEST_CASE()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="pfitsio_8h_source.html#l00033">purify::pfitsio::header_params::header_params()</a>, and <a class="el" href="purify__fitsio_8cc_source.html#l00090">TEST_CASE()</a>.</p>
 
 </div>
 </div>
@@ -1176,7 +1778,7 @@ template&lt;typename T &gt; </div>
 </div><!-- fragment -->
 <p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00037">37</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="yaml-parser_8cc_source.html#l00102">purify::YamlParser::parseAndSetGeneralConfiguration()</a>, and <a class="el" href="purify__fitsio_8cc_source.html#l00091">TEST_CASE()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="yaml-parser_8cc_source.html#l00102">purify::YamlParser::parseAndSetGeneralConfiguration()</a>, and <a class="el" href="purify__fitsio_8cc_source.html#l00090">TEST_CASE()</a>.</p>
 
 </div>
 </div>

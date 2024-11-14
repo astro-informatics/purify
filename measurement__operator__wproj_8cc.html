@@ -209,29 +209,29 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__wproj_8cc_source.html#l00060">60</a> of file <a class="el" href="measurement__operator__wproj_8cc_source.html">measurement_operator_wproj.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                                                                               {</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="comment">// benchmark the creation of the distributed measurement operator</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keywordflow">if</span> ((m_counter % 10) == 1) {</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">auto</span> sky_measurements = measurementoperator::init_degrid_operator_2d&lt;Vector&lt;t_complex&gt;&gt;(</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        m_world, m_uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, kernels::kernel::kb,</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        state.range(2), 100, m_w_term, 1e-6, 1e-6, dde_type::wkernel_radial);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  }</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keywordflow">while</span> (state.KeepRunning()) {</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">auto</span> start = std::chrono::high_resolution_clock::now();</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keyword">auto</span> sky_measurements = measurementoperator::init_degrid_operator_2d&lt;Vector&lt;t_complex&gt;&gt;(</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        m_world, m_uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, kernels::kernel::kb,</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        state.range(2), 100, m_w_term, 1e-6, 1e-6, dde_type::wkernel_radial);</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keyword">auto</span> end = std::chrono::high_resolution_clock::now();</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    state.SetIterationTime(<a class="code" href="namespaceb__utilities.html#ac2c5b1baa8b1154965c0acbe63be33e1">b_utilities::duration</a>(start, end, m_world));</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  }</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizex * m_imsizey) *</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;                          <span class="keyword">sizeof</span>(t_complex));</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;}</div>
-<div class="ttc" id="anamespaceb__utilities_html_ac2c5b1baa8b1154965c0acbe63be33e1"><div class="ttname"><a href="namespaceb__utilities.html#ac2c5b1baa8b1154965c0acbe63be33e1">b_utilities::duration</a></div><div class="ttdeci">double duration(std::chrono::high_resolution_clock::time_point start, std::chrono::high_resolution_clock::time_point end)</div><div class="ttdef"><b>Definition:</b> <a href="benchmarks_2utilities_8cc_source.html#l00026">utilities.cc:26</a></div></div>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__wproj_8cc_source.html#l00059">59</a> of file <a class="el" href="measurement__operator__wproj_8cc_source.html">measurement_operator_wproj.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                                                                               {</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="comment">// benchmark the creation of the distributed measurement operator</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keywordflow">if</span> ((m_counter % 10) == 1) {</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keyword">auto</span> sky_measurements = measurementoperator::init_degrid_operator_2d&lt;Vector&lt;t_complex&gt;&gt;(</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        m_world, m_uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, kernels::kernel::kb,</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        state.range(2), 100, m_w_term, 1e-6, 1e-6, dde_type::wkernel_radial);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  }</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="keywordflow">while</span> (state.KeepRunning()) {</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keyword">auto</span> start = std::chrono::high_resolution_clock::now();</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">auto</span> sky_measurements = measurementoperator::init_degrid_operator_2d&lt;Vector&lt;t_complex&gt;&gt;(</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        m_world, m_uv_data, m_imsizey, m_imsizex, m_cellsize, m_cellsize, 2, kernels::kernel::kb,</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        state.range(2), 100, m_w_term, 1e-6, 1e-6, dde_type::wkernel_radial);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keyword">auto</span> end = std::chrono::high_resolution_clock::now();</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    state.SetIterationTime(<a class="code" href="namespaceb__utilities.html#ac2c5b1baa8b1154965c0acbe63be33e1">b_utilities::duration</a>(start, end, m_world));</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  }</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizex * m_imsizey) *</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;                          <span class="keyword">sizeof</span>(t_complex));</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;}</div>
+<div class="ttc" id="anamespaceb__utilities_html_ac2c5b1baa8b1154965c0acbe63be33e1"><div class="ttname"><a href="namespaceb__utilities.html#ac2c5b1baa8b1154965c0acbe63be33e1">b_utilities::duration</a></div><div class="ttdeci">double duration(std::chrono::high_resolution_clock::time_point start, std::chrono::high_resolution_clock::time_point end)</div><div class="ttdef"><b>Definition:</b> <a href="benchmarks_2utilities_8cc_source.html#l00025">utilities.cc:25</a></div></div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="benchmarks_2utilities_8cc_source.html#l00026">b_utilities::duration()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668aba34ea40525a4379add785228e37fe86">purify::kernels::kb</a>, and <a class="el" href="namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5a15a19970dec9bb028b96daf2bb89af90">purify::wkernel_radial</a>.</p>
+<p class="reference">References <a class="el" href="benchmarks_2utilities_8cc_source.html#l00025">b_utilities::duration()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668aba34ea40525a4379add785228e37fe86">purify::kernels::kb</a>, and <a class="el" href="namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5a15a19970dec9bb028b96daf2bb89af90">purify::wkernel_radial</a>.</p>
 
 </div>
 </div>
@@ -261,32 +261,32 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="measurement__operator__wproj_8cc_source.html#l00080">80</a> of file <a class="el" href="measurement__operator__wproj_8cc_source.html">measurement_operator_wproj.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;                                                                             {</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="comment">// benchmark the creation of the distributed MPI measurement operator</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keywordflow">if</span> ((m_counter % 10) == 1) {</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keyword">auto</span> sky_measurements =</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        measurementoperator::init_degrid_operator_2d_all_to_all&lt;Vector&lt;t_complex&gt;&gt;(</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            m_world, m_image_index, m_w_stacks, m_uv_data_all_to_all, m_imsizey, m_imsizex,</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;            m_cellsize, m_cellsize, 2, kernels::kernel::kb, state.range(2), 100, m_w_term, 1e-6,</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;            1e-6, dde_type::wkernel_radial);</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  }</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  <span class="keywordflow">while</span> (state.KeepRunning()) {</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keyword">auto</span> start = std::chrono::high_resolution_clock::now();</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keyword">auto</span> sky_measurements =</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        measurementoperator::init_degrid_operator_2d_all_to_all&lt;Vector&lt;t_complex&gt;&gt;(</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;            m_world, m_image_index, m_w_stacks, m_uv_data_all_to_all, m_imsizey, m_imsizex,</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            m_cellsize, m_cellsize, 2, kernels::kernel::kb, state.range(2), 100, m_w_term, 1e-6,</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;            1e-6, dde_type::wkernel_radial);</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keyword">auto</span> end = std::chrono::high_resolution_clock::now();</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    state.SetIterationTime(<a class="code" href="namespaceb__utilities.html#ac2c5b1baa8b1154965c0acbe63be33e1">b_utilities::duration</a>(start, end, m_world));</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  }</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizex * m_imsizey) *</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                          <span class="keyword">sizeof</span>(t_complex));</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="measurement__operator__wproj_8cc_source.html#l00079">79</a> of file <a class="el" href="measurement__operator__wproj_8cc_source.html">measurement_operator_wproj.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;                                                                             {</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="comment">// benchmark the creation of the distributed MPI measurement operator</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="keywordflow">if</span> ((m_counter % 10) == 1) {</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keyword">auto</span> sky_measurements =</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        measurementoperator::init_degrid_operator_2d_all_to_all&lt;Vector&lt;t_complex&gt;&gt;(</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            m_world, m_image_index, m_w_stacks, m_uv_data_all_to_all, m_imsizey, m_imsizex,</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            m_cellsize, m_cellsize, 2, kernels::kernel::kb, state.range(2), 100, m_w_term, 1e-6,</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;            1e-6, dde_type::wkernel_radial);</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  }</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  <span class="keywordflow">while</span> (state.KeepRunning()) {</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keyword">auto</span> start = std::chrono::high_resolution_clock::now();</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keyword">auto</span> sky_measurements =</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        measurementoperator::init_degrid_operator_2d_all_to_all&lt;Vector&lt;t_complex&gt;&gt;(</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            m_world, m_image_index, m_w_stacks, m_uv_data_all_to_all, m_imsizey, m_imsizex,</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;            m_cellsize, m_cellsize, 2, kernels::kernel::kb, state.range(2), 100, m_w_term, 1e-6,</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            1e-6, dde_type::wkernel_radial);</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keyword">auto</span> end = std::chrono::high_resolution_clock::now();</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    state.SetIterationTime(<a class="code" href="namespaceb__utilities.html#ac2c5b1baa8b1154965c0acbe63be33e1">b_utilities::duration</a>(start, end, m_world));</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  }</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  state.SetBytesProcessed(int64_t(state.iterations()) * (state.range(1) + m_imsizex * m_imsizey) *</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;                          <span class="keyword">sizeof</span>(t_complex));</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;}</div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="benchmarks_2utilities_8cc_source.html#l00026">b_utilities::duration()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668aba34ea40525a4379add785228e37fe86">purify::kernels::kb</a>, and <a class="el" href="namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5a15a19970dec9bb028b96daf2bb89af90">purify::wkernel_radial</a>.</p>
+<p class="reference">References <a class="el" href="benchmarks_2utilities_8cc_source.html#l00025">b_utilities::duration()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668aba34ea40525a4379add785228e37fe86">purify::kernels::kb</a>, and <a class="el" href="namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5a15a19970dec9bb028b96daf2bb89af90">purify::wkernel_radial</a>.</p>
 
 </div>
 </div>

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['convergencetype_1153',['ConvergenceType',['../namespacepurify_1_1factory.html#ae3112c9c2dd6bbf06b1c59b4549f89c6',1,'purify::factory']]]
+  ['convergencetype_1147',['ConvergenceType',['../namespacepurify_1_1factory.html#ae3112c9c2dd6bbf06b1c59b4549f89c6',1,'purify::factory']]]
 ];

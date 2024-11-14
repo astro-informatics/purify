@@ -44,7 +44,7 @@ var searchData=
   ['mkdir_5frecursive_293',['mkdir_recursive',['../namespacepurify.html#a105e14bc03a66d05ce538e8fce85d78b',1,'purify::mkdir_recursive(const std::string &amp;path)'],['../namespacepurify.html#aa7644e567d476e9f6123218bd3e0088f',1,'purify::mkdir_recursive(const T &amp;path)']]],
   ['mkformattedstring_294',['mkFormattedString',['../namespacepurify_1_1logging.html#a198ffa26c0be3ac561edfdcd7a8843a0',1,'purify::logging::mkFormattedString(const std::string &amp;txt)'],['../namespacepurify_1_1logging.html#af58b80d7a581bd92834787f23bc741c0',1,'purify::logging::mkFormattedString(const char *txt, Args &amp;&amp;... args)']]],
   ['mod_295',['mod',['../namespacepurify_1_1utilities.html#ae7983367cb937c38c31b16bd1e4619fa',1,'purify::utilities']]],
-  ['models_5fdirectory_296',['models_directory',['../namespacepurify_1_1notinstalled.html#af1a8d19422f01ad794bcfaa45c31e761',1,'purify::notinstalled']]],
+  ['models_5fdirectory_296',['models_directory',['../namespacepurify.html#a2b051df94025a181dc2d979e5d206a96',1,'purify']]],
   ['mpi_5falgo_5ffactory_2ecc_297',['mpi_algo_factory.cc',['../mpi__algo__factory_8cc.html',1,'']]],
   ['mpi_5fdistribute_5fall_5fto_5fall_298',['mpi_distribute_all_to_all',['../namespacepurify_1_1factory.html#a6b8de5116c3d7d0d679cd6dd47a80248affd4db530301a1cf705ff432f5c077df',1,'purify::factory']]],
   ['mpi_5fdistribute_5fgrid_299',['mpi_distribute_grid',['../namespacepurify_1_1factory.html#a6b8de5116c3d7d0d679cd6dd47a80248ade789d500028594f8485e34f4fd201da',1,'purify::factory']]],
@@ -64,5 +64,5 @@ var searchData=
   ['mpi_5fwide_5ffield_5futilities_2ecc_313',['mpi_wide_field_utilities.cc',['../mpi__wide__field__utilities_8cc.html',1,'']]],
   ['mr_5fmetric_314',['mr_metric',['../namespacepurify_1_1wproj__utilities.html#ac91e4de3e44bf6b1a10b266f2768ca3e',1,'purify::wproj_utilities']]],
   ['ms_315',['ms',['../namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723caee33e909372d935d190f4fcb2a92d542',1,'purify::read_measurements']]],
-  ['mwa_5ffilename_316',['mwa_filename',['../namespacepurify_1_1notinstalled.html#a7972435bb2c6dd0a30556ec1f7cd1283',1,'purify::notinstalled']]]
+  ['mwa_5ffilename_316',['mwa_filename',['../namespacepurify.html#aa23eda8f53b24e21d0f09bec0332b6a2',1,'purify']]]
 ];
