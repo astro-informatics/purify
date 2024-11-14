@@ -8,6 +8,9 @@ namespace notinstalled {
 
 //! Holds data and such
 inline std::string data_directory() { return "@CMAKE_INSTALL_PREFIX@/data"; }
+//! Holds TF models
+inline std::string models_directory() { return "@CMAKE_INSTALL_PREFIX@/models"; }
+
 //! Holds data and such
 inline std::string data_filename(std::string const &filename) {
   return data_directory() + "/" + filename;
