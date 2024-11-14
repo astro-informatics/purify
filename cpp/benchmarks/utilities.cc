@@ -3,11 +3,11 @@
 #include <benchmarks/utilities.h>
 #include "purify/directories.h"
 #include "purify/distribute.h"
+#include "purify/logging.h"
 #include "purify/mpi_utilities.h"
 #include "purify/operators.h"
 #include "purify/pfitsio.h"
 #include <sopt/linear_transform.h>
-#include "purify/logging.h"
 
 using namespace purify;
 using namespace purify::notinstalled;
