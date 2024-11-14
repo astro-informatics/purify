@@ -137,6 +137,8 @@ jobs:
         mkdir -p ${{github.workspace}}/sopt/build
         cd ${{github.workspace}}/sopt/build
         sed -i -e 's/target_link_libraries(sopt/target_link_libraries(sopt PUBLIC/g' ../cpp/sopt/CMakeLists.txt
+        sed -i -e 's/_DIRS@")/_DIRS@")\ninclude(CMakeFindDependencyMacro)\nfind_dependency(onnxruntime REQUIRED)/1' ../cmake_files/soptConfig.in.cmake
+
         cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Donnxrt=ON -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}} -Dtests=OFF -Dexamples=OFF
         make -j$(nproc --ignore 1) install
 
