@@ -1,3 +1,6 @@
+#ifndef SETUP_UTILS_H
+#define SETUP_UTILS_H
+
 #include "purify/types.h"
 #include "purify/measurement_operator_factory.h"
 #include "purify/wavelet_operator_factory.h"
@@ -81,3 +84,5 @@ void saveDirtyImage(const YamlParser &params,
                     const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> &measurements_transform,
                     const utilities::vis_params &uv_data,
                     const t_real beam_units);
+
+#endif
