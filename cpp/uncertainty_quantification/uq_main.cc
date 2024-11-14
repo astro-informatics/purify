@@ -42,7 +42,6 @@ int main(int argc, char **argv)
     const auto surrogate_image = purify::pfitsio::read2d(surrogate_image_path);
     const VectorC surrogate_vector = VectorC::Map(surrogate_image.data(), surrogate_image.size());
 
-
     const uint imsize_x = reference_image.cols();
     const uint imsize_y = reference_image.rows();
 
