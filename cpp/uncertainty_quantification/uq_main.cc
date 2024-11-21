@@ -116,6 +116,10 @@ int main(int argc, char **argv)
 
         wavelet_operator = purify::factory::wavelet_operator_factory<Vector<t_complex>>(
             factory::distributed_wavelet_operator::serial, sara, imsize_y, imsize_x);
+
+        // default cost function
+        f = std::make_unique<sopt::L2DifferentiableFunc<t_complex>>(1, *measurement_operator);  // what would a default sigma look like??
+        g = std::make_unique<sopt::algorithm::L1GProximal<t_complex>>();
     }
 
     // Set up confidence and objective function params
