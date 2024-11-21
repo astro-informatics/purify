@@ -8,6 +8,8 @@
 #include "purify/read_measurements.h"
 #include "purify/yaml-parser.h"
 #include "purify/logging.h"
+#include <sopt/differentiable_func.h>
+#include <sopt/non_differentiable_func.h>
 
 using namespace purify;
 

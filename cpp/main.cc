@@ -21,6 +21,11 @@
 #include <sopt/relative_variation.h>
 #include <sopt/reweighted.h>
 #include "purify/setup_utils.h"
+#include <memory>
+
+#ifdef PURIFY_ONNXRT
+#include <sopt/onnx_differentiable_func.h>
+#endif
 
 using namespace purify;
 
@@ -118,6 +123,22 @@ int main(int argc, const char **argv) {
         params.relVarianceConvergence(), params.dualFBVarianceConvergence(), 50,
         params.epsilonConvergenceScaling(), operator_norm);
   if (params.algorithm() == "fb")
+  {
+    std::shared_ptr<DifferentiableFunc<t_complex>> f;
+    if(params.diffFuncType() == diff_func_type::L2Norm_with_CRR)
+    {
+      #ifdef PURIFY_ONNXRT
+        f = std::make_shared<sopt::ONNXDifferentiableFunc<t_complex>>(params.CRR_function_model_path(),
+                                                                      params.CRR_gradient_model_path(),
+                                                                      sigma,
+                                                                      params.CRR_mu(),
+                                                                      params.CRR_lambda(),
+                                                                      *measurements_transform);
+      #else
+        throw std::runtime_error("CRR approach cannot be used with ONNXRT off");
+      #endif
+    }
+
     fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
         params.mpiAlgorithm(), measurements_transform, wavelets.transform, uv_data,
         sigma * params.epsilonScaling() / flux_scale,
@@ -127,7 +148,8 @@ int main(int argc, const char **argv) {
         (params.wavelet_basis().size() < 2) and (not params.realValueConstraint()) and
             (not params.positiveValueConstraint()),
         params.relVarianceConvergence(), params.dualFBVarianceConvergence(), 50, operator_norm,
-        params.model_path(), params.nondiffFuncType());
+        params.model_path(), params.nondiffFuncType(), f);
+  }
   if (params.algorithm() == "primaldual")
     primaldual = factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
         params.mpiAlgorithm(), measurements_transform, wavelets.transform, uv_data,
