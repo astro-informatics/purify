@@ -214,7 +214,7 @@ fb_factory(const algo_distribution dist,
 #endif
   }
   case (nondiff_func_type::RealIndicator): {
-    g = std::make_shared<RealIndicator<t_scalar>>();
+    g = std::make_shared<sopt::algorithm::RealIndicator<t_scalar>>();
     break;
   }
   default: {

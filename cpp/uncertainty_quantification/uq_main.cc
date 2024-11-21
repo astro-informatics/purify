@@ -13,6 +13,12 @@
 #include <vector>
 #include <tuple>
 #include <string>
+#include <sopt/l1_non_diff_function.h>
+#include <sopt/tf_non_diff_function.h>
+#include <sopt/real_indicator.h>
+#include <sopt/l2_differentiable_func.h>
+#include <sopt/onnx_differentiable_func.h>
+
 
 using VectorC = sopt::Vector<std::complex<double>>;
 
@@ -45,7 +51,12 @@ int main(int argc, char **argv)
     const uint imsize_x = reference_image.cols();
     const uint imsize_y = reference_image.rows();
 
-    // Prepare operators and data using either purify config 
+    std::unique_ptr<DifferentiableFunc<t_complex>> f;
+    std::unique_ptr<NonDifferentiableFunc<t_complex>> g;
+
+    double sigma;
+
+    // Prepare operators and data using purify config
     // If no purify config use basic version for now based on algo_factory test images 
     purify::utilities::vis_params measurement_data;
     std::shared_ptr<sopt::LinearTransform<VectorC>> measurement_operator;
@@ -81,6 +92,39 @@ int main(int argc, char **argv)
         measurement_data = uv_data;
         measurement_operator = transform;
         wavelet_operator = wavelets.transform;
+
+        // set up f and g from config
+        switch (purify_config.diffFuncType())
+        {
+            case purify::diff_func_type::L2Norm:
+                f = std::make_unique<sopt::L2DifferentiableFunc<t_complex>>(sigma, *measurement_operator);
+                break;
+            case purify::diff_func_type::L2Norm_with_CRR:
+                f = std::make_unique<sopt::ONNXDifferentiableFunc<t_complex>>(
+                    purify_config.CRR_function_model_path(),
+                    purify_config.CRR_gradient_model_path(),
+                    sigma,
+                    purify_config.CRR_mu(),
+                    purify_config.CRR_lambda(),
+                    *measurement_operator
+                );
+                break;
+        }
+
+        switch (purify_config.nondiffFuncType())
+        {
+            case purify::nondiff_func_type::L1Norm:
+                g = std::make_unique<sopt::algorithm::L1GProximal<t_complex>>();
+                break;
+            case purify::nondiff_func_type::Denoiser:
+                g = std::make_unique<sopt::algorithm::TFGProximal<t_complex>>(
+                    purify_config.model_path()
+                );
+                break;
+            case purify::nondiff_func_type::RealIndicator:
+                g = std::make_unique<sopt::algorithm::RealIndicator<t_complex>>();
+                break;
+        }
     }
     else
     {
@@ -129,8 +173,8 @@ int main(int argc, char **argv)
         std::cout << "Config file must contain either 'confidence_interval' or 'alpha' as a parameter." << std::endl;
         return 1;
     }
-    const double sigma = UQ_config["sigma"].as<double>();
-    const double gamma = UQ_config["gamma"].as<double>();
+
+    const double regulariser_strength = UQ_config["regulariser_strength"].as<double>();
 
 
     if((imsize_x != surrogate_image.cols()) || (imsize_y != surrogate_image.rows()))
@@ -146,20 +190,16 @@ int main(int argc, char **argv)
         return 3;
     }
 
-    std::unique_ptr<DifferentiableFunc<t_complex>> f;
-    std::unique_ptr<NonDifferentiableFunc<t_complex>> g;
-    // set up f and g from config
-
     // Calculate the posterior function for the reference image
     // posterior = likelihood + prior
     // Likelihood = |y - Phi(x)|^2 / sigma^2  (L2 norm)
-    // Prior = Sum(Psi^t * |x_i|) * gamma  (L1 norm)
-    auto Posterior = [&measurement_data, measurement_operator, wavelet_operator, sigma, gamma, &f, &g](const VectorC &image) {
+    // Prior = Sum(Psi^t * |x_i|) * regulariser_strength  (L1 norm)
+    auto Posterior = [&measurement_data, measurement_operator, wavelet_operator, sigma, regulariser_strength, &f, &g](const VectorC &image) {
       {
         const auto residuals = (*measurement_operator * image) - measurement_data.vis;
         auto A = f->function(image, measurement_data.vis, (*measurement_operator));
         auto B = g->function(image);
-        return A + gamma * B;
+        return A + regulariser_strength * B;
       }
     };
 
