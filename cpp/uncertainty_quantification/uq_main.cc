@@ -54,8 +54,6 @@ int main(int argc, char **argv)
     std::unique_ptr<DifferentiableFunc<t_complex>> f;
     std::unique_ptr<NonDifferentiableFunc<t_complex>> g;
 
-    double sigma;
-
     // Prepare operators and data using purify config
     // If no purify config use basic version for now based on algo_factory test images 
     purify::utilities::vis_params measurement_data;
@@ -194,7 +192,7 @@ int main(int argc, char **argv)
     // posterior = likelihood + prior
     // Likelihood = |y - Phi(x)|^2 / sigma^2  (L2 norm)
     // Prior = Sum(Psi^t * |x_i|) * regulariser_strength  (L1 norm)
-    auto Posterior = [&measurement_data, measurement_operator, wavelet_operator, sigma, regulariser_strength, &f, &g](const VectorC &image) {
+    auto Posterior = [&measurement_data, measurement_operator, wavelet_operator, regulariser_strength, &f, &g](const VectorC &image) {
       {
         const auto residuals = (*measurement_operator * image) - measurement_data.vis;
         auto A = f->function(image, measurement_data.vis, (*measurement_operator));
