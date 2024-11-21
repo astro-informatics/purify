@@ -40,8 +40,6 @@ const std::map<std::string, algo_distribution> algo_distribution_string = {
     {"serial-equivalent", algo_distribution::mpi_serial},
     {"random-updates", algo_distribution::mpi_random_updates},
     {"fully-distributed", algo_distribution::mpi_distributed}};
-const std::map<std::string, nondiff_func_type> nondiff_type_string = {
-    {"l1", nondiff_func_type::L1Norm}, {"denoiser", nondiff_func_type::Denoiser}, {"realIndicator", nondiff_func_type::RealIndicator}};
 
 //! return chosen algorithm given parameters
 template <class Algorithm, class... ARGS>

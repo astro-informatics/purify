@@ -27,6 +27,8 @@ enum class diff_func_type {L2Norm, L2Norm_with_CRR};
 
 // Different available types of non-differentiable functions (g)
 enum class nondiff_func_type {L1Norm, Denoiser, RealIndicator};
+const std::map<std::string, nondiff_func_type> nondiff_type_string = {
+    {"l1", nondiff_func_type::L1Norm}, {"denoiser", nondiff_func_type::Denoiser}, {"realIndicator", nondiff_func_type::RealIndicator}};
 
 //! \brief A matrix of a given type
 //! \details Operates as mathematical sparse matrix.
