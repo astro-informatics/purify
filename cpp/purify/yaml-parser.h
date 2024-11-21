@@ -141,7 +141,7 @@ class YamlParser {
   YAML_MACRO(t_real, jmap_beta, 1)
 
   YAML_MACRO(std::string, model_path, "")
-  YAML_MACRO(factory::g_proximal_type, gProximalType, factory::g_proximal_type::L1GProximal)
+  YAML_MACRO(nondiff_func_type, gProximalType, nondiff_func_type::L1Norm)
 
   std::string output_path() const
   {

@@ -223,7 +223,7 @@ TEST_CASE("tf_fb_factory") {
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma, beta,
       gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm,
-      tf_model_path, factory::g_proximal_type::TFGProximal);
+      tf_model_path, nondiff_func_type::Denoiser);
 
   auto const diagnostic = (*fb)();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
@@ -285,7 +285,7 @@ TEST_CASE("onnx_fb_factory") {
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma, beta,
       gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm, "",
-      factory::g_proximal_type::Indicator, diff_function);
+      nondiff_func_type::RealIndicator, diff_function);
 
   auto const diagnostic = (*fb)();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);

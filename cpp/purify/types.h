@@ -22,6 +22,12 @@ typedef std::complex<float> t_complexf;
 //! Root of the type hierarchy for triplet lists
 typedef Eigen::Triplet<t_complex> t_tripletList;
 
+// Different available types of differentiable functions (f)
+enum class diff_func_type {L2Norm, L2Norm_with_CRR};
+
+// Different available types of non-differentiable functions (g)
+enum class nondiff_func_type {L1Norm, Denoiser, RealIndicator};
+
 //! \brief A matrix of a given type
 //! \details Operates as mathematical sparse matrix.
 template <class T = t_real, class I = t_int>
