@@ -91,38 +91,8 @@ int main(int argc, char **argv)
         measurement_operator = transform;
         wavelet_operator = wavelets.transform;
 
-        // set up f and g from config
-        switch (purify_config.diffFuncType())
-        {
-            case purify::diff_func_type::L2Norm:
-                f = std::make_unique<sopt::L2DifferentiableFunc<t_complex>>(sigma, *measurement_operator);
-                break;
-            case purify::diff_func_type::L2Norm_with_CRR:
-                f = std::make_unique<sopt::ONNXDifferentiableFunc<t_complex>>(
-                    purify_config.CRR_function_model_path(),
-                    purify_config.CRR_gradient_model_path(),
-                    sigma,
-                    purify_config.CRR_mu(),
-                    purify_config.CRR_lambda(),
-                    *measurement_operator
-                );
-                break;
-        }
-
-        switch (purify_config.nondiffFuncType())
-        {
-            case purify::nondiff_func_type::L1Norm:
-                g = std::make_unique<sopt::algorithm::L1GProximal<t_complex>>();
-                break;
-            case purify::nondiff_func_type::Denoiser:
-                g = std::make_unique<sopt::algorithm::TFGProximal<t_complex>>(
-                    purify_config.model_path()
-                );
-                break;
-            case purify::nondiff_func_type::RealIndicator:
-                g = std::make_unique<sopt::algorithm::RealIndicator<t_complex>>();
-                break;
-        }
+        // setup f and g based on config file
+        setupCostFunctions(purify_config, f, g, sigma, *measurement_operator);
     }
     else
     {

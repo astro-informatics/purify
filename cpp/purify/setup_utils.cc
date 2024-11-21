@@ -1,5 +1,12 @@
 #include "purify/setup_utils.h"
 #include <sopt/power_method.h>
+#include <sopt/differentiable_func.h>
+#include <sopt/non_differentiable_func.h>
+#include <sopt/l1_non_diff_function.h>
+#include <sopt/tf_non_diff_function.h>
+#include <sopt/real_indicator.h>
+#include <sopt/l2_differentiable_func.h>
+#include <sopt/onnx_differentiable_func.h>
 
 using namespace purify;
 
@@ -297,6 +304,36 @@ measurementOpInfo createMeasurementOperator(const YamlParser &params,
   }
 
   return {measurements_transform, operator_norm};
+}
+
+void setupCostFunctions(const YamlParser &params, 
+                        std::unique_ptr<DifferentiableFunc<t_complex>> &f,
+                        std::unique_ptr<NonDifferentiableFunc<t_complex>> &g,
+                        t_real sigma,
+                        sopt::LinearTransform<Vector<t_complex>> &Phi) 
+{
+  switch (params.diffFuncType()) {
+  case purify::diff_func_type::L2Norm:
+    f = std::make_unique<sopt::L2DifferentiableFunc<t_complex>>(sigma, Phi);
+    break;
+  case purify::diff_func_type::L2Norm_with_CRR:
+    f = std::make_unique<sopt::ONNXDifferentiableFunc<t_complex>>(
+        params.CRR_function_model_path(), params.CRR_gradient_model_path(), sigma, params.CRR_mu(),
+        params.CRR_lambda(), Phi);
+    break;
+  }
+
+  switch (params.nondiffFuncType()) {
+  case purify::nondiff_func_type::L1Norm:
+    g = std::make_unique<sopt::algorithm::L1GProximal<t_complex>>();
+    break;
+  case purify::nondiff_func_type::Denoiser:
+    g = std::make_unique<sopt::algorithm::TFGProximal<t_complex>>(params.model_path());
+    break;
+  case purify::nondiff_func_type::RealIndicator:
+    g = std::make_unique<sopt::algorithm::RealIndicator<t_complex>>();
+    break;
+  }
 }
 
 void initOutDirectoryWithConfig(YamlParser &params)

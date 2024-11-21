@@ -57,6 +57,12 @@ measurementOpInfo createMeasurementOperator(const YamlParser &params,
                                             const utilities::vis_params &uv_data,
                                             Vector<t_complex> &measurement_op_eigen_vector);
 
+void setupCostFunctions(const YamlParser &params, 
+                        std::unique_ptr<DifferentiableFunc<t_complex>> &f,
+                        std::unique_ptr<NonDifferentiableFunc<t_complex>> &g,
+                        t_real sigma,
+                        sopt::LinearTransform<Vector<t_complex>> &Phi);
+
 void initOutDirectoryWithConfig(YamlParser &params);
 
 struct Headers
