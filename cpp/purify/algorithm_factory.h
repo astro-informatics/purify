@@ -80,7 +80,7 @@ padmm_factory(const algo_distribution dist,
       .l1_proximal_positivity_constraint(positive_constraint)
       .l1_proximal_real_constraint(real_constraint)
       .lagrange_update_scale(0.9)
-      .nu(op_norm * op_norm)
+      .sq_op_norm(op_norm * op_norm)
       .Psi(*wavelets)
       .Phi(*measurements);
 #ifdef PURIFY_MPI
@@ -90,7 +90,7 @@ padmm_factory(const algo_distribution dist,
   switch (dist) {
   case (algo_distribution::serial):
     padmm
-        ->gamma((wavelets->adjoint() * (measurements->adjoint() * uv_data.vis).eval())
+        ->regulariser_strength((wavelets->adjoint() * (measurements->adjoint() * uv_data.vis).eval())
                     .cwiseAbs()
                     .maxCoeff() *
                 1e-3)
@@ -132,8 +132,8 @@ padmm_factory(const algo_distribution dist,
   std::weak_ptr<Algorithm> const padmm_weak(padmm);
   // set epsilon
   padmm->residual_tolerance(epsilon * residual_tolerance_scaling).l2ball_proximal_epsilon(epsilon);
-  // set gamma
-  padmm->gamma(comm.all_reduce(
+  // set regulariser_strength
+  padmm->regulariser_strength(comm.all_reduce(
       utilities::step_size<Vector<t_complex>>(uv_data.vis, measurements, wavelets, sara_size) *
           1e-3,
       MPI_MAX));
@@ -173,12 +173,12 @@ fb_factory(const algo_distribution dist,
         "one wavelet basis.");
   auto fb = std::make_shared<Algorithm>(uv_data.vis);
   fb->itermax(max_iterations)
-      .gamma(reg_parameter)
+      .regulariser_strength(reg_parameter)
       .sigma(sigma * std::sqrt(2))
-      .beta(step_size * std::sqrt(2))
+      .step_size(step_size * std::sqrt(2))
       .relative_variation(relative_variation)
       .tight_frame(tight_frame)
-      .nu(op_norm * op_norm)
+      .sq_op_norm(op_norm * op_norm)
       .Phi(*measurements);
 
   if (f_function) fb->f_function(f_function);  // only override f_function default if non-null
@@ -282,7 +282,7 @@ primaldual_factory(
   switch (dist) {
   case (algo_distribution::serial): {
     primaldual
-        ->gamma((wavelets->adjoint() * (measurements->adjoint() * uv_data.vis).eval())
+        ->regulariser_strength((wavelets->adjoint() * (measurements->adjoint() * uv_data.vis).eval())
                     .cwiseAbs()
                     .maxCoeff() *
                 1e-3)
@@ -345,8 +345,8 @@ primaldual_factory(
   // set epsilon
   primaldual->residual_tolerance(epsilon * residual_tolerance_scaling)
       .l2ball_proximal_epsilon(epsilon);
-  // set gamma
-  primaldual->gamma(comm.all_reduce(
+  // set regulariser_strength
+  primaldual->regulariser_strength(comm.all_reduce(
       utilities::step_size<Vector<t_complex>>(uv_data.vis, measurements, wavelets, sara_size) *
           1e-3,
       MPI_MAX));
