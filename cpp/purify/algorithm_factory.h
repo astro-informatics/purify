@@ -90,10 +90,11 @@ padmm_factory(const algo_distribution dist,
   switch (dist) {
   case (algo_distribution::serial):
     padmm
-        ->regulariser_strength((wavelets->adjoint() * (measurements->adjoint() * uv_data.vis).eval())
-                    .cwiseAbs()
-                    .maxCoeff() *
-                1e-3)
+        ->regulariser_strength(
+            (wavelets->adjoint() * (measurements->adjoint() * uv_data.vis).eval())
+                .cwiseAbs()
+                .maxCoeff() *
+            1e-3)
         .l2ball_proximal_epsilon(epsilon)
         .residual_tolerance(epsilon * residual_tolerance_scaling);
     return padmm;
@@ -282,10 +283,11 @@ primaldual_factory(
   switch (dist) {
   case (algo_distribution::serial): {
     primaldual
-        ->regulariser_strength((wavelets->adjoint() * (measurements->adjoint() * uv_data.vis).eval())
-                    .cwiseAbs()
-                    .maxCoeff() *
-                1e-3)
+        ->regulariser_strength(
+            (wavelets->adjoint() * (measurements->adjoint() * uv_data.vis).eval())
+                .cwiseAbs()
+                .maxCoeff() *
+            1e-3)
         .l2ball_proximal_epsilon(epsilon)
         .residual_tolerance(epsilon * residual_tolerance_scaling);
     return primaldual;
