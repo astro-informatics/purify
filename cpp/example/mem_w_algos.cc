@@ -7,7 +7,6 @@
 #include "purify/utilities.h"
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 int main(int nargs, char const **args) {
   auto const session = sopt::mpi::init(nargs, args);

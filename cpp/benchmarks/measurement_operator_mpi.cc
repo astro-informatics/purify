@@ -10,7 +10,6 @@
 #include <sopt/wavelets.h>
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 // ----------------- Degrid operator constructor fixture -----------------------//
 

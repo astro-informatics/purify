@@ -19,7 +19,6 @@
 
 int main(int, char **) {
   using namespace purify;
-  using namespace purify::notinstalled;
   sopt::logging::set_level("info");
 
   std::string const fitsfile = image_filename("M31.fits");

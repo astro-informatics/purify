@@ -10,7 +10,6 @@
 #include "purify/wkernel_integration.h"
 
 using namespace purify;
-using namespace purify::notinstalled;
 using Catch::Approx;
 
 TEST_CASE("test transform kernels") {

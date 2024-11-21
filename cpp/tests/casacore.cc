@@ -17,7 +17,6 @@
 #include "catch2/catch_all.hpp"
 namespace casa = casacore;
 
-using namespace purify::notinstalled;
 TEST_CASE("Casacore") {
   // create the table descriptor
   casa::TableDesc simpleDesc = casa::MS::requiredTableDesc();
