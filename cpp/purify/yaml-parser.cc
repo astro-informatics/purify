@@ -222,11 +222,24 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
         get<t_real>(algorithmOptionsNode, {"fb", "regularisation_parameter"});
     this->dualFBVarianceConvergence_ =
         get<t_real>(algorithmOptionsNode, {"fb", "dualFBVarianceConvergence"});
+
     this->nondiffFuncType_ = nondiff_type_string.at(
         get<std::string>(algorithmOptionsNode, {"fb", "nonDifferentiableFunctionType"}));
+    if(this->nondiffFuncType_ == nondiff_func_type::Denoiser)
+    {
+      this->model_path_ = get<std::string>(algorithmOptionsNode, {"fb", "modelPath"});
+    }
+
     this->diffFuncType_ = diff_type_string.at(
         get<std::string>(algorithmOptionsNode, {"fb", "differentiableFunctionType"}));
-    this->model_path_ = get<std::string>(algorithmOptionsNode, {"fb", "modelPath"});
+    if(this->diffFuncType_ == diff_func_type::L2Norm_with_CRR)
+    {
+      this->CRR_function_model_path_ = get<std::string>(algorithmOptionsNode, {"fb", "CRR_function_model_path"});
+      this->CRR_gradient_model_path_ = get<std::string>(algorithmOptionsNode, {"fb", "CRR_gradient_model_path"});
+      this->CRR_mu = get<std::string>(algorithmOptionsNode, {"fb", "CRR_mu"});
+      this->CRR_lambda = get<std::string>(algorithmOptionsNode, {"fb", "CRR_lambda"});
+    }
+
     if (this->algorithm_ == "fb_joint_map") {
       this->jmap_iters_ =
           get<t_uint>(algorithmOptionsNode, {"fb", "joint_map_estimation", "iters"});

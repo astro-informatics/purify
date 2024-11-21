@@ -143,6 +143,10 @@ class YamlParser {
   YAML_MACRO(std::string, model_path, "")
   YAML_MACRO(nondiff_func_type, nondiffFuncType, nondiff_func_type::L1Norm)
   YAML_MACRO(diff_func_type, diffFuncType, diff_func_type::L2Norm)
+  YAML_MACRO(std::string, CRR_function_model_path, "")
+  YAML_MACRO(std::string, CRR_gradient_model_path, "")
+  YAML_MACRO(t_real, CRR_mu, 20)
+  YAML_MACRO(t_real, CRR_lambda, 5000)
 
   std::string output_path() const
   {
