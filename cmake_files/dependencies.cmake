@@ -26,10 +26,6 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 find_package(yaml-cpp REQUIRED)
 
-if (onnxrt)
-  find_package(onnxruntime REQUIRED)
-endif()
-
 find_package(sopt REQUIRED)
 set(PURIFY_ONNXRT FALSE)
 if (onnxrt)
@@ -38,6 +34,7 @@ if (onnxrt)
   else()
     message(FATAL_ERROR "SOPT built without ONNXrt support")
   endif()
+  install(DIRECTORY ${CMAKE_SOURCE_DIR}/models DESTINATION .)
 endif()
 
 find_package(Cubature QUIET)

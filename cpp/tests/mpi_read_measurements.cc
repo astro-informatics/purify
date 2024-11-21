@@ -8,7 +8,6 @@
 #include "purify/read_measurements.h"
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 TEST_CASE("uvfits") {
   auto const comm = sopt::mpi::Communicator::World();
