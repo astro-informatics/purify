@@ -236,8 +236,8 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
     {
       this->CRR_function_model_path_ = get<std::string>(algorithmOptionsNode, {"fb", "CRR_function_model_path"});
       this->CRR_gradient_model_path_ = get<std::string>(algorithmOptionsNode, {"fb", "CRR_gradient_model_path"});
-      this->CRR_mu = get<std::string>(algorithmOptionsNode, {"fb", "CRR_mu"});
-      this->CRR_lambda = get<std::string>(algorithmOptionsNode, {"fb", "CRR_lambda"});
+      this->CRR_mu_ = get<t_real>(algorithmOptionsNode, {"fb", "CRR_mu"});
+      this->CRR_lambda_ = get<t_real>(algorithmOptionsNode, {"fb", "CRR_lambda"});
     }
 
     if (this->algorithm_ == "fb_joint_map") {
