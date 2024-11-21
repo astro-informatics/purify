@@ -127,7 +127,7 @@ int main(int argc, const char **argv) {
         (params.wavelet_basis().size() < 2) and (not params.realValueConstraint()) and
             (not params.positiveValueConstraint()),
         params.relVarianceConvergence(), params.dualFBVarianceConvergence(), 50, operator_norm,
-        params.model_path(), params.gProximalType());
+        params.model_path(), params.nondiffFuncType());
   if (params.algorithm() == "primaldual")
     primaldual = factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
         params.mpiAlgorithm(), measurements_transform, wavelets.transform, uv_data,
