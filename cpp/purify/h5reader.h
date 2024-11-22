@@ -50,7 +50,9 @@ class H5Handler {
       : _comm(nullptr),
         _fap(HighFive::FileAccessProps{}),
         _dtp(HighFive::DataTransferProps{}),
-        _file(filename, HighFive::File::ReadOnly) {}
+        _file(filename, HighFive::File::ReadOnly) {
+    _datalen = _slicepos = _slicelen = _batchpos = 0;
+  }
 
 #ifdef PURIFY_MPI
   /// @brief Alternative constructor enabling MPI-collective behaviour
@@ -58,7 +60,9 @@ class H5Handler {
       : _comm(&comm),
         _fap(MPIFileAccess()),
         _dtp(MPIDataTransfer()),
-        _file(filename, HighFive::File::ReadOnly, _fap) {}
+        _file(filename, HighFive::File::ReadOnly, _fap) {
+    _datalen = _slicepos = _slicelen = _batchpos = 0;
+  }
 #endif
 
   /// Method to read the entire dataset
@@ -73,42 +77,68 @@ class H5Handler {
   template <typename T = double>
   std::vector<T> distread(const std::string& label) {
     if (!_comm) throw std::runtime_error("No MPI-collective reading enabled!");
-
-    if (_ds.find(label) == _ds.end()) {  // load the dataset
-      _ds[label] = std::move(_file.getDataSet(label));
-    }
-    const auto& dims = _ds[label].getDimensions();
-    size_t datalen = dims.at(0);
-    if (datalen < _comm->size()) throw std::runtime_error("Not enough data for each MPI rank!");
-
-    // Read the relevant slice of the dataset
-    // @todo Cache the calculation of starting point/slice length?
-    size_t len = datalen / _comm->size();
-    size_t pos = _comm->rank() * len;
-    if (_comm->rank() == _comm->size() - 1) {
-      len += datalen % _comm->size();
-    }
+    _loadDataSet(label);
     std::vector<T> data;
-    data.reserve(len);
-    _ds[label].select({pos}, {len}).read(data, _dtp);
+    data.reserve(_slicelen);
+    _ds[label].select({_slicepos}, {_slicelen}).read(data, _dtp);
     return data;
   }
 
   /// Method to stochastically draw a subset
-  /// of the distributed dataset slice
+  /// from the distributed dataset slice
   template <typename T = double>
-  std::vector<T> stochread(const std::string& label, size_t len) {
+  std::vector<T> stochread(const std::string& label, size_t batchsize, bool shuffle = false) {
     if (!_comm) throw std::runtime_error("No MPI-collective reading enabled!");
 
-    std::vector<T> data = distread<T>(label);
-    if (len > data.size()) throw std::runtime_error("Not enough data for requested dataset size!");
-    // stochastic shuffle
-    std::shuffle(std::begin(data), std::end(data), _rng);
-    data.resize(len);  // clip dataset to first N elements
+    _loadDataSet(label);
+    if (shuffle)  _shuffle();
+
+    std::vector<T> data;
+    data.reserve(batchsize);
+    // account for wrap around near
+    // the edges of the slice
+    size_t pos = _batchpos;
+    while (batchsize) {
+      std::vector<T> tmp;
+      size_t len = std::min(batchsize, _slicepos + _slicelen - pos);
+      _ds[label].select({pos}, {len}).read(tmp, _dtp);
+      data.insert(data.end(), std::make_move_iterator(std::begin(tmp)),
+                              std::make_move_iterator(std::end(tmp)));
+      pos = _slicepos;
+      batchsize -= len;
+    }
     return data;
   }
 
  private:
+
+  void _loadDataSet(const std::string& label) {
+    if (_ds.find(label) != _ds.end()) return;
+
+    _ds[label] = std::move(_file.getDataSet(label));
+    const auto& dims = _ds[label].getDimensions();
+    size_t len = dims.at(0);
+    if (len == 0) throw std::runtime_error("Dataset has zero length!");
+    if (len < _comm->size()) throw std::runtime_error("Not enough data for each MPI rank!");
+    if (_datalen == 0) {
+      _datalen = len;
+      // Determine starting position and length of the data slice
+      _slicelen = _datalen / _comm->size();
+      _slicepos = _comm->rank() * _slicelen;
+      if (_comm->rank() == _comm->size() - 1) {
+        _slicelen += _datalen % _comm->size();
+      }
+    }
+    else if (len != _datalen) {
+      throw std::runtime_error("Inconsistent dataset length!");
+    }
+  }
+
+  void _shuffle() {
+    std::uniform_int_distribution<size_t> uni(_slicepos,_slicepos+_slicelen-1);
+    _batchpos = uni(_rng);
+  }
+
   const sopt::mpi::Communicator* _comm;
 
   const HighFive::FileAccessProps _fap;
@@ -120,6 +150,8 @@ class H5Handler {
   DatsetMap _ds;
 
   std::mt19937 _rng;
+
+  size_t _datalen, _slicepos, _slicelen, _batchpos;
 };
 
 /// @brief Reads an HDF5 file with u,v visibilities, constructs a vis_params objects and returns it.
@@ -165,10 +197,10 @@ utilities::vis_params read_visibility(const std::string& vis_name, const bool w_
 
 /// @brief Stochastically reads dataset slices from the supplied HDF5-file handler,
 /// constructs a vis_params object from them and returns it.
-utilities::vis_params stochread_visibility(H5Handler& file, size_t N, const bool w_term) {
+utilities::vis_params stochread_visibility(H5Handler& file, const size_t N, const bool w_term) {
   utilities::vis_params uv_vis;
 
-  std::vector<t_real> utemp = file.stochread<t_real>("u", N);
+  std::vector<t_real> utemp = file.stochread<t_real>("u", N, true); //< shuffle batch starting position
   uv_vis.u = Eigen::Map<Vector<t_real>>(utemp.data(), utemp.size(), 1);
 
   // found that a reflection is needed for the orientation
