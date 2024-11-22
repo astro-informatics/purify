@@ -91,7 +91,7 @@ class H5Handler {
     if (!_comm) throw std::runtime_error("No MPI-collective reading enabled!");
 
     _loadDataSet(label);
-    if (shuffle)  _shuffle();
+    if (shuffle) _shuffle();
 
     std::vector<T> data;
     data.reserve(batchsize);
@@ -103,7 +103,7 @@ class H5Handler {
       size_t len = std::min(batchsize, _slicepos + _slicelen - pos);
       _ds[label].select({pos}, {len}).read(tmp, _dtp);
       data.insert(data.end(), std::make_move_iterator(std::begin(tmp)),
-                              std::make_move_iterator(std::end(tmp)));
+                  std::make_move_iterator(std::end(tmp)));
       pos = _slicepos;
       batchsize -= len;
     }
@@ -111,7 +111,6 @@ class H5Handler {
   }
 
  private:
-
   void _loadDataSet(const std::string& label) {
     if (_ds.find(label) != _ds.end()) return;
 
@@ -128,14 +127,13 @@ class H5Handler {
       if (_comm->rank() == _comm->size() - 1) {
         _slicelen += _datalen % _comm->size();
       }
-    }
-    else if (len != _datalen) {
+    } else if (len != _datalen) {
       throw std::runtime_error("Inconsistent dataset length!");
     }
   }
 
   void _shuffle() {
-    std::uniform_int_distribution<size_t> uni(_slicepos,_slicepos+_slicelen-1);
+    std::uniform_int_distribution<size_t> uni(_slicepos,_slicepos + _slicelen - 1);
     _batchpos = uni(_rng);
   }
 
@@ -200,7 +198,8 @@ utilities::vis_params read_visibility(const std::string& vis_name, const bool w_
 utilities::vis_params stochread_visibility(H5Handler& file, const size_t N, const bool w_term) {
   utilities::vis_params uv_vis;
 
-  std::vector<t_real> utemp = file.stochread<t_real>("u", N, true); //< shuffle batch starting position
+  std::vector<t_real> utemp =
+      file.stochread<t_real>("u", N, true); //< shuffle batch starting position
   uv_vis.u = Eigen::Map<Vector<t_real>>(utemp.data(), utemp.size(), 1);
 
   // found that a reflection is needed for the orientation

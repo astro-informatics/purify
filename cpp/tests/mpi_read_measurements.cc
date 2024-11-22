@@ -3,17 +3,16 @@
 #include "catch2/catch_all.hpp"
 #include "purify/logging.h"
 
-#include <sopt/gradient_utils.h>
 #include <iostream>
 #include "purify/directories.h"
 #include "purify/read_measurements.h"
+#include <sopt/gradient_utils.h>
 #ifdef PURIFY_H5
 #include "purify/h5reader.h"
 #include "purify/measurement_operator_factory.h"
 #endif
 
 using namespace purify;
-
 
 TEST_CASE("uvfits") {
   auto const comm = sopt::mpi::Communicator::World();
@@ -103,7 +102,7 @@ TEST_CASE("uvfits") {
       // and constructs a uv_params object from it
       const size_t N = 10000;
       H5::H5Handler f(filename + ".h5", comm);
-      const auto uvfits = H5::stochread_visibility(f, N, true); //< true = include w-term
+      const auto uvfits = H5::stochread_visibility(f, N, true);  //< true = include w-term
       CAPTURE(uvfits.size());
       CHECK(comm.all_sum_all(uvfits.size()) == N * comm.size());
     }
@@ -119,12 +118,10 @@ TEST_CASE("uvfits") {
       auto functor = [&f = h5file, &N]() {
         utilities::vis_params uv_data = H5::stochread_visibility(f, N, true);
         auto phi = factory::measurement_operator_factory<t_complexVec>(
-                   factory::distributed_measurement_operator::mpi_distribute_image,
-                   uv_data, 128, 128, 1, 1, 2,
-                   kernels::kernel_from_string.at("kb"), 4, 4);
+            factory::distributed_measurement_operator::mpi_distribute_image, uv_data, 128, 128, 1,
+            1, 2, kernels::kernel_from_string.at("kb"), 4, 4);
 
         return sopt::IterationState<t_complexVec>(uv_data.vis, phi);
-
       };
 
       // And it would be called in Sopt like this
@@ -132,8 +129,7 @@ TEST_CASE("uvfits") {
 
       // Make sure the return values are sensible
       const bool pass = comm.all_sum_all(item.target().size()) == N * comm.size() &&
-                        item.phi().sizes()[0] == 0 &&
-                        item.phi().sizes()[1] == 1 &&
+                        item.phi().sizes()[0] == 0 && item.phi().sizes()[1] == 1 &&
                         item.phi().sizes()[2] == N;
       CHECK(pass);
     }
