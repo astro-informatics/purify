@@ -19,6 +19,12 @@
 #include <string>
 #include <vector>
 
+#ifndef PURIFY_MPI
+namespace sopt::mpi {
+class Communicator;
+}
+#endif
+
 namespace purify::H5 {
 
 #ifdef PURIFY_MPI
@@ -112,6 +118,7 @@ class H5Handler {
 
  private:
   void _loadDataSet(const std::string& label) {
+#ifdef PURIFY_MPI
     if (_ds.find(label) != _ds.end()) return;
 
     _ds[label] = std::move(_file.getDataSet(label));
@@ -130,6 +137,7 @@ class H5Handler {
     } else if (len != _datalen) {
       throw std::runtime_error("Inconsistent dataset length!");
     }
+#endif
   }
 
   void _shuffle() {
