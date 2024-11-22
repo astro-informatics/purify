@@ -133,7 +133,7 @@ class H5Handler {
   }
 
   void _shuffle() {
-    std::uniform_int_distribution<size_t> uni(_slicepos,_slicepos + _slicelen - 1);
+    std::uniform_int_distribution<size_t> uni(_slicepos, _slicepos + _slicelen - 1);
     _batchpos = uni(_rng);
   }
 
@@ -199,7 +199,7 @@ utilities::vis_params stochread_visibility(H5Handler& file, const size_t N, cons
   utilities::vis_params uv_vis;
 
   std::vector<t_real> utemp =
-      file.stochread<t_real>("u", N, true); //< shuffle batch starting position
+      file.stochread<t_real>("u", N, true);  //< shuffle batch starting position
   uv_vis.u = Eigen::Map<Vector<t_real>>(utemp.data(), utemp.size(), 1);
 
   // found that a reflection is needed for the orientation
