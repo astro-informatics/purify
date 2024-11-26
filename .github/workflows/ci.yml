@@ -128,7 +128,7 @@ jobs:
       run: |
         wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-1.14.3/src/hdf5-1.14.3.tar.gz -O- | tar --no-same-owner -xz;
         cd hdf5-1.14.3/
-        ./configure --prefix=${{github.workspace}}/local --enable-parallel --enable-shared
+        CC=`which mpicc` CXX=`which mpicxx` ./configure --prefix=${{github.workspace}}/local --enable-parallel --enable-shared
         make -j4 install
 
     - name: Checkout SOPT
