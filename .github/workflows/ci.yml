@@ -128,7 +128,9 @@ jobs:
       run: |
         wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-1.14.3/src/hdf5-1.14.3.tar.gz -O- | tar --no-same-owner -xz;
         cd hdf5-1.14.3/
-        CC=`which mpicc` CXX=`which mpicxx` ./configure --prefix=${{github.workspace}}/local --enable-parallel --enable-shared --enable-cxx
+        mkdir build && cd build
+        #CC=`which mpicc` CXX=`which mpicxx` ./configure --prefix=${{github.workspace}}/local --enable-parallel --enable-shared --enable-cxx
+        cmake .. -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -DHDF5_ENABLE_PARALLEL:BOOL=ON -DALLOW_UNSUPPORTED:BOOL=ONi -DHDF5_BUILD_FORTRAN:BOOL=ON -DHDF5_BUILD_CPP_LIB:BOOL=ON -DHDF5_ENABLE_NONSTANDARD_FEATURE_FLOAT16:BOOL=OFF
         make -j$(nproc --ignore 1) install
 
     - name: Checkout SOPT
