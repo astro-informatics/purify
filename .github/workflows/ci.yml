@@ -129,7 +129,7 @@ jobs:
         wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-1.14.3/src/hdf5-1.14.3.tar.gz -O- | tar --no-same-owner -xz;
         cd hdf5-1.14.3/
         CC=`which mpicc` CXX=`which mpicxx` ./configure --prefix=${{github.workspace}}/local --enable-parallel --enable-shared
-        make -j4 install
+        make -j$(nproc --ignore 1) install
 
     - name: Checkout SOPT
       uses: actions/checkout@v4
@@ -221,6 +221,7 @@ jobs:
       # Build your program with the given configuration
       run: |
         export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
+        export PATH=${{github.workspace}}/local:$PATH
         mkdir -p ${{github.workspace}}/build
         cd ${{github.workspace}}/build
         cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Donnxrt=ON -Dhdf5=ON -Ddocasa=OFF -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}} -Dtests=ON
