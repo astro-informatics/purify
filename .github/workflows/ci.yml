@@ -22,33 +22,26 @@ jobs:
   build:
     # Skip CI if PR is a draft
     if: github.event.pull_request.draft == false
-    name: build (${{matrix.os}}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}})
+    name: build (${{matrix.os}}-${{matrix.container}}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}})
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Windows or Mac.  You can convert this to a matrix build if you need
     # cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ${{matrix.os}}
+    container: ${{matrix.container}}
     env:
       CXX: ${{ matrix.cxx }}
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-22.04
-          - macos-14
-        cxx:
-          - g++
-          - clang++
-        mpi:
-          - "ON"
-          - "OFF"
-        omp:
-          - "ON"
-          - "OFF"
-        exclude:
-          - { os: ubuntu-22.04, cxx: clang++ }
-          - { os: macos-14, cxx: g++ }
-          - { os: macos-14, mpi: "ON"}
+        include:
+          - { os: ubuntu-22.04, cxx: g++, mpi: "ON", omp: "ON" }
+          - { os: ubuntu-22.04, cxx: g++, mpi: "ON", omp: "OFF" }
+          - { os: ubuntu-22.04, cxx: g++, mpi: "OFF", omp: "ON" }
+          - { os: ubuntu-22.04, cxx: g++, mpi: "OFF", omp: "OFF"}
+          - { os: ubuntu-22.04, cxx: g++, mpi: "OFF", omp: "ON", distribution: "fedora", container: "fedora:39" }
+          - { os: macos-14, cxx: clang++, mpi: "ON", omp: "ON" }
+          - { os: macos-14, cxx: clang++, mpi: "OFF", omp: "OFF" }
     steps:
     - uses: actions/checkout@v4
 
@@ -67,8 +60,9 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ${{runner.workspace}}/.ccache
-        key: ${{matrix.os}}-${{matrix.cxx}}-${{matrix.mpi}}-${{matrix.omp}}-${{ steps.ccache_cache_timestamp.outputs.date_and_time }}
+        key: ${{matrix.os}}-${{matrix.container}}-${{matrix.cxx}}-${{matrix.mpi}}-${{matrix.omp}}-${{ steps.ccache_cache_timestamp.outputs.date_and_time }}
         restore-keys: |
+          ${{ matrix.os }}-${{matrix.container}}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
           ${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
           ${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}
           ${{ matrix.os }}-${{ matrix.cxx }}
@@ -78,10 +72,17 @@ jobs:
 #      run: ccache --clear
 
     - name: Install Dependencies on Ubunutu
-      if: ${{ contains(matrix.os, 'ubuntu') }}
+      if: contains(matrix.os, 'ubuntu') && !contains(matrix.container, 'fedora')
       run: |
         sudo apt update
         sudo apt install openmpi-bin libopenmpi-dev libyaml-cpp-dev libeigen3-dev libtiff-dev ccache
+
+    - name: Install Dependencies on Fedora
+      if: ${{ contains(matrix.container, 'fedora') }}
+      run: |
+          sudo dnf -y update
+          sudo dnf -y install cmake gcc gcc-c++ wget
+          sudo dnf -y install openmpi openmpi-devel yaml-cpp ccache eigen3-devel libtiff-devel git
 
     - name: Install Dependencies on MacOS
       if: ${{ contains(matrix.os, 'macos') }}
@@ -123,63 +124,63 @@ jobs:
     - name: Build sopt
       run: |
         export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
-        mkdir -p ${{github.workspace}}/sopt/build
-        cd ${{github.workspace}}/sopt/build
+        mkdir -p sopt/build
+        cd sopt/build
         cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Donnxrt=ON -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}} -Dtests=OFF -Dexamples=OFF
         make -j$(nproc --ignore 1) install
 
     - name: Pack dependencies
       run: |
-        cd ${{github.workspace}}
-        tar cfv dependencies.tar local
+        tar cfv dependencies.tar ${{github.workspace}}/local
 
     - uses: actions/upload-artifact@v4
       with:
-        name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
+        name: dependencies-${{ matrix.os }}-${{ matrix.distribution }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
         path: ${{github.workspace}}/dependencies.tar
         retention-days: 5
 
   test:
     needs:
       build
-    name: test (${{matrix.os}}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}})
+    name: test (${{matrix.os}}-${{ matrix.container }}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}})
     runs-on: ${{matrix.os}}
+    container: ${{matrix.container}}
     env:
       CXX: ${{ matrix.cxx }}
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-22.04
-          - macos-14
-        cxx:
-          - g++
-          - clang++
-        mpi:
-          - "ON"
-          - "OFF"
-        omp:
-          - "ON"
-          - "OFF"
-        exclude:
-          - { os: ubuntu-22.04, cxx: clang++ }
-          - { os: macos-14, cxx: g++ }
-          - { os: macos-14, mpi: "ON"}
+        include:
+          - { os: ubuntu-22.04, cxx: g++, mpi: "ON", omp: "ON" }
+          - { os: ubuntu-22.04, cxx: g++, mpi: "ON", omp: "OFF" }
+          - { os: ubuntu-22.04, cxx: g++, mpi: "OFF", omp: "ON" }
+          - { os: ubuntu-22.04, cxx: g++, mpi: "OFF", omp: "OFF" }
+          - { os: ubuntu-22.04, cxx: g++, mpi: "OFF", omp: "ON", distribution: "fedora", container: "fedora:39" }
+          - { os: macos-14, cxx: clang++, mpi: "ON", omp: "ON" }
+          - { os: macos-14, cxx: clang++, mpi: "OFF", omp: "OFF" }
+
     steps:
     - uses: actions/checkout@v4
 
     - uses: actions/download-artifact@v4
       with:
-        name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
+        name: dependencies-${{ matrix.os }}-${{matrix.distribution}}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
 
     - name: Unpack dependencies
       run: tar xfv dependencies.tar
 
     - name: Install Dependencies on Ubunutu
-      if: ${{ contains(matrix.os, 'ubuntu') }}
+      if: contains(matrix.os, 'ubuntu') && !contains(matrix.container, 'fedora')
       run: |
         sudo apt update
-        sudo apt install openmpi-bin libopenmpi-dev ccache graphviz libeigen3-dev libtiff-dev libcfitsio-dev libboost-all-dev libyaml-cpp-dev
+        sudo apt install openmpi-bin libopenmpi-dev ccache libeigen3-dev libtiff-dev libcfitsio-dev libboost-all-dev libyaml-cpp-dev
+
+    - name: Install Dependencies on Fedora
+      if: ${{ contains(matrix.container, 'fedora') }}
+      run: |
+          sudo dnf -y update
+          sudo dnf -y install cmake gcc gcc-c++
+          sudo dnf -y install openmpi openmpi-devel yaml-cpp ccache eigen3-devel libtiff-devel cfitsio-devel boost-devel
 
     - name: Install Dependencies on MacOS
       if: ${{ contains(matrix.os, 'macos') }}
@@ -208,27 +209,21 @@ jobs:
   doc:
     needs:
       build
-    name: doc (${{matrix.os}}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}})
+    name: doc (${{matrix.os}}--${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}})
     runs-on: ${{matrix.os}}
     env:
       CXX: ${{ matrix.cxx }}
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-22.04
-        cxx:
-          - g++
-        mpi:
-          - "OFF"
-        omp:
-          - "OFF"
+        include:
+          - { os: ubuntu-22.04, cxx: g++, mpi: "OFF", omp: "OFF" }
     steps:
     - uses: actions/checkout@v4
 
     - uses: actions/download-artifact@v4
       with:
-        name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
+        name: dependencies-${{ matrix.os }}--${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
 
     - name: Unpack dependencies
       run: tar xfv dependencies.tar
