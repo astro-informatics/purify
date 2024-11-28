@@ -8,7 +8,6 @@
 #include "purify/integration.h"
 #include "purify/kernels.h"
 using namespace purify;
-using namespace purify::notinstalled;
 
 TEST_CASE("integration") {
   const t_uint max_evaluations = 1000;

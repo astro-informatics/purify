@@ -10,7 +10,6 @@
 #include <sopt/linear_transform.h>
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 namespace b_utilities {
 

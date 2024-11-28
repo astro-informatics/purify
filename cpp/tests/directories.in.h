@@ -4,32 +4,17 @@
 #include <string>
 #include <sys/stat.h>
 namespace purify {
-namespace notinstalled {
 
 //! Holds data and such
 inline std::string data_directory() { return "@CMAKE_INSTALL_PREFIX@/data"; }
 //! Holds TF models
 inline std::string models_directory() { return "@CMAKE_INSTALL_PREFIX@/models"; }
+//! Where test outputs go
+inline std::string output_directory() { return "@CMAKE_INSTALL_PREFIX@/outputs"; }
 
 //! Holds data and such
 inline std::string data_filename(std::string const &filename) {
   return data_directory() + "/" + filename;
-}
-//! Holds data and such in Scratch (useful for legion)
-inline std::string scratch_directory() {
-  std::string dirName = "$ENV{HOME}/Scratch/purify/data";
-  struct stat sb;
-  if ( stat("$ENV{HOME}/Scratch",&sb)!=0 || !S_ISDIR(sb.st_mode) )
-    mkdir("$ENV{HOME}/Scratch",S_IRWXU);
-  if ( stat("$ENV{HOME}/Scratch/purify",&sb)!=0 || !S_ISDIR(sb.st_mode) )
-    mkdir("$ENV{HOME}/Scratch/purify",S_IRWXU);
-  if ( stat("$ENV{HOME}/Scratch/purify/data",&sb)!=0 || !S_ISDIR(sb.st_mode) )
-    mkdir("$ENV{HOME}/Scratch/purify/data",S_IRWXU);
-  return dirName;
-}
-//! Holds data and such in Scratch (useful for legion)
-inline std::string scratch_filename(std::string const &filename) {
-  return scratch_directory() + "/" + filename;
 }
 //! Image filename
 inline std::string image_filename(std::string const &filename) {
@@ -60,14 +45,11 @@ inline std::string degridding_filename(std::string const &filename) {
   return data_filename("expected/degridding/" + filename);
 }
 
-//! Where test outputs go
-inline std::string output_directory() { return "@PROJECT_BINARY_DIR@/outputs"; }
 //! Test output file
 inline std::string output_filename(std::string const &filename) {
   return output_directory() + "/" + filename;
 }
 
 inline std::string ngc3256_ms() { return "@NGC3256_MS@"; }
-}
-} /* sopt::notinstalled */
+}  // namespace purify
 #endif

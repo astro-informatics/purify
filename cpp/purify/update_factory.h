@@ -43,17 +43,19 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
                           step_size_scale, update_header_sol, update_header_res, sara_size, comm,
                           beam_units](const Vector<T> &x, const Vector<T> &res) -> bool {
       auto algo = algo_weak.lock();
-      if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ {}", algo->gamma());
-      if (algo->gamma() > 0) {
+      if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ {}", algo->regulariser_strength());
+      if (algo->regulariser_strength() > 0) {
         Vector<t_complex> const alpha = algo->Psi().adjoint() * x;
         const t_real new_gamma =
             comm.all_reduce((sara_size > 0) ? alpha.real().cwiseAbs().maxCoeff() : 0., MPI_MAX) *
             step_size_scale;
         if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
         // updating parameter
-        algo->gamma(((std::abs(algo->gamma() - new_gamma) > update_tol) and *iter < update_iters)
-                        ? new_gamma
-                        : algo->gamma());
+        algo->regulariser_strength(
+            ((std::abs(algo->regulariser_strength() - new_gamma) > update_tol) and
+             *iter < update_iters)
+                ? new_gamma
+                : algo->regulariser_strength());
       }
       Vector<t_complex> const residual = algo->Phi().adjoint() * (res / beam_units).eval();
       PURIFY_MEDIUM_LOG("RMS of residual map in Jy/beam {}",
@@ -86,16 +88,17 @@ void add_updater(std::weak_ptr<Algo> const algo_weak, const t_real step_size_sca
 #endif
     ](const Vector<T> &x, const Vector<T> &res) -> bool {
       auto algo = algo_weak.lock();
-      if (algo->gamma() > 0) {
-        PURIFY_MEDIUM_LOG("Step size γ {}", algo->gamma());
+      if (algo->regulariser_strength() > 0) {
+        PURIFY_MEDIUM_LOG("Step size γ {}", algo->regulariser_strength());
         Vector<T> const alpha = algo->Psi().adjoint() * x;
         const t_real new_gamma = alpha.real().cwiseAbs().maxCoeff() * step_size_scale;
         PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
         // updating parameter
-        algo->gamma(((std::abs((algo->gamma() - new_gamma) / algo->gamma()) > update_tol) and
-                     *iter < update_iters)
-                        ? new_gamma
-                        : algo->gamma());
+        algo->regulariser_strength(((std::abs((algo->regulariser_strength() - new_gamma) /
+                                              algo->regulariser_strength()) > update_tol) and
+                                    *iter < update_iters)
+                                       ? new_gamma
+                                       : algo->regulariser_strength());
       }
       Vector<t_complex> const residual = algo->Phi().adjoint() * (res / beam_units).eval();
       PURIFY_MEDIUM_LOG("RMS of residual map in Jy/beam {}",

@@ -31,7 +31,6 @@
 #endif
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 utilities::vis_params dirty_visibilities(const std::vector<std::string> &names) {
   return utilities::read_visibility(names, true);

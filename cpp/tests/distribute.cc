@@ -5,7 +5,6 @@
 #include "purify/utilities.h"
 
 using namespace purify;
-using namespace purify::notinstalled;
 TEST_CASE("Distribute") {
   // Test splitting up of data for separate nodes
   auto const uv_data = utilities::read_visibility(vla_filename("at166B.3C129.c0.vis"));

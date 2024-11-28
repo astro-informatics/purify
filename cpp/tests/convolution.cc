@@ -8,7 +8,6 @@
 #include "purify/convolution.h"
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 TEST_CASE("1d_zeropad") {
   const Vector<t_int> signal = Vector<t_int>::Random(3);

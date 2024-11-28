@@ -10,7 +10,6 @@
 #include "purify/wproj_operators.h"
 #include <sopt/power_method.h>
 
-using namespace purify::notinstalled;
 using namespace purify;
 using Catch::Approx;
 
