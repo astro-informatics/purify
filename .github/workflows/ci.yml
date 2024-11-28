@@ -29,37 +29,26 @@ jobs:
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ${{matrix.os}}
     env:
-      CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
     strategy:
       fail-fast: false
       matrix:
-          os:
-            - ubuntu-22.04
-            - macos-14
-          cc:
-            - gcc-12
-            - clang
-          cxx:
-            - g++-12
-            - clang++
-          mpi:
-            - "ON"
-            - "OFF"
-          omp:
-            - "ON"
-            - "OFF"
-          exclude:
-            - os: ubuntu-22.04
-              cc: clang
-            - os: ubuntu-22.04
-              cxx: clang++
-            - os: macos-14
-              cc: gcc-12
-            - os: macos-14
-              cxx: g++-12
-            - os: macos-14
-              mpi: "ON"
+        os:
+          - ubuntu-22.04
+          - macos-14
+        cxx:
+          - g++
+          - clang++
+        mpi:
+          - "ON"
+          - "OFF"
+        omp:
+          - "ON"
+          - "OFF"
+        exclude:
+          - { os: ubuntu-22.04, cxx: clang++ }
+          - { os: macos-14, cxx: g++ }
+          - { os: macos-14, mpi: "ON"}
     steps:
     - uses: actions/checkout@v4
 
@@ -156,37 +145,26 @@ jobs:
     name: test (${{matrix.os}}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}})
     runs-on: ${{matrix.os}}
     env:
-      CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
     strategy:
       fail-fast: false
       matrix:
-          os:
-            - ubuntu-22.04
-            - macos-14
-          cc:
-            - gcc-12
-            - clang
-          cxx:
-            - g++-12
-            - clang++
-          mpi:
-            - "ON"
-            - "OFF"
-          omp:
-            - "ON"
-            - "OFF"
-          exclude:
-            - os: ubuntu-22.04
-              cc: clang
-            - os: ubuntu-22.04
-              cxx: clang++
-            - os: macos-14
-              cc: gcc-12
-            - os: macos-14
-              cxx: g++-12
-            - os: macos-14
-              mpi: "ON"
+        os:
+          - ubuntu-22.04
+          - macos-14
+        cxx:
+          - g++
+          - clang++
+        mpi:
+          - "ON"
+          - "OFF"
+        omp:
+          - "ON"
+          - "OFF"
+        exclude:
+          - { os: ubuntu-22.04, cxx: clang++ }
+          - { os: macos-14, cxx: g++ }
+          - { os: macos-14, mpi: "ON"}
     steps:
     - uses: actions/checkout@v4
 
@@ -233,21 +211,18 @@ jobs:
     name: doc (${{matrix.os}}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}})
     runs-on: ${{matrix.os}}
     env:
-      CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
     strategy:
       fail-fast: false
       matrix:
-          os:
-            - ubuntu-22.04
-          cc:
-            - gcc-12
-          cxx:
-            - g++-12
-          mpi:
-            - "OFF"
-          omp:
-            - "OFF"
+        os:
+          - ubuntu-22.04
+        cxx:
+          - g++
+        mpi:
+          - "OFF"
+        omp:
+          - "OFF"
     steps:
     - uses: actions/checkout@v4
 
