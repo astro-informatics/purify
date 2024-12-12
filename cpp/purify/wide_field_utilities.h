@@ -9,7 +9,7 @@
 #endif
 namespace purify {
 namespace widefield {
-//! estaimte support size of w given u resolution du
+//! estimate support size of w given u resolution du
 t_int w_support(const t_real w, const t_real du, const t_int min, const t_int max);
 //! return factors to convert between arcsecond pixel size image space and lambda for uv space
 t_real pixel_to_lambda(const t_real cell, const t_uint imsize, const t_real oversample_ratio);

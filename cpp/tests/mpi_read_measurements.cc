@@ -3,9 +3,9 @@
 #include "catch2/catch_all.hpp"
 #include "purify/logging.h"
 
-#include <iostream>
 #include "purify/directories.h"
 #include "purify/read_measurements.h"
+#include "purify/utilities.h"
 #include <sopt/gradient_utils.h>
 #ifdef PURIFY_H5
 #include "purify/h5reader.h"
@@ -90,6 +90,7 @@ TEST_CASE("uvfits") {
     }
     SECTION("four") {
       // each rank reads a stochastically sampled set of 10k dataset members
+      // @todo account for w-stacking
       const size_t N = 10000;
       H5::H5Handler f(filename + ".h5", comm);
       const std::vector<double> u = f.stochread("u", N);
@@ -100,6 +101,7 @@ TEST_CASE("uvfits") {
     SECTION("five") {
       // each rank reads a stochastically sampled set of 10k dataset members
       // and constructs a uv_params object from it
+      // @todo account for w-stacking
       const size_t N = 10000;
       H5::H5Handler f(filename + ".h5", comm);
       const auto uvfits = H5::stochread_visibility(f, N, true);  //< true = include w-term
@@ -110,6 +112,7 @@ TEST_CASE("uvfits") {
       // a functor is used to read a stochastically sampled set of 10k dataset members
       // on each rank and to constructs a uv_params object from it, along with a measurement
       // operator which are then returned, wrapped in a sopt::IterationState object
+      // @todo account for w-stacking
       const size_t N = 10000;
       H5::H5Handler h5file(filename + ".h5", comm);
       using t_complexVec = Vector<t_complex>;
