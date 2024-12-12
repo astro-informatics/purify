@@ -184,7 +184,7 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbOnnxDistributeImage)(benchmark::State &stat
   t_real const gamma = 0.0001;
 
   std::string tf_model_path =
-      purify::notinstalled::data_directory() + "/models/snr_15_model_dynamic.onnx";
+      purify::data_directory() + "/models/snr_15_model_dynamic.onnx";
 
   m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::mpi_serial, m_measurements_distribute_image, wavelets, m_uv_data,
