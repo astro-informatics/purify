@@ -42,7 +42,7 @@ std::vector<t_int> distribute_measurements(Vector<t_real> const &u, Vector<t_rea
       "Using {} to make {} partitions from {} visibilities, with {} visibilities per a node.",
       plan_name, number_of_nodes, index.size(), partition_size);
   std::vector<t_int> partitions(u.size());
-  if (std::floor(static_cast<t_real>(index.size()-1) / static_cast<t_real>(partition_size)) >
+  if (std::floor(static_cast<t_real>(index.size() - 1) / static_cast<t_real>(partition_size)) >
       number_of_nodes - 1) {
     PURIFY_ERROR("Error: Probably a bug in distribution plan.");
     throw std::runtime_error("Distributing data into too many nodes");
