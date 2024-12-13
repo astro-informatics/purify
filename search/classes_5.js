@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['indexmapping_644',['IndexMapping',['../classpurify_1_1IndexMapping.html',1,'purify']]]
+  ['header_5fparams_647',['header_params',['../structpurify_1_1pfitsio_1_1header__params.html',1,'purify::pfitsio']]]
 ];

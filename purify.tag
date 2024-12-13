@@ -1,6 +1,106 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <tagfile doxygen_version="1.9.1">
   <compound kind="file">
+    <name>algorithms.cc</name>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>algorithms_8cc.html</filename>
+    <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
+    <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
+    <includes id="algorithm__factory_8h" name="algorithm_factory.h" local="yes" imported="no">purify/algorithm_factory.h</includes>
+    <includes id="measurement__operator__factory_8h" name="measurement_operator_factory.h" local="yes" imported="no">purify/measurement_operator_factory.h</includes>
+    <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
+    <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
+    <includes id="wavelet__operator__factory_8h" name="wavelet_operator_factory.h" local="yes" imported="no">purify/wavelet_operator_factory.h</includes>
+    <class kind="class">AlgoFixture</class>
+    <member kind="function">
+      <type></type>
+      <name>BENCHMARK_DEFINE_F</name>
+      <anchorfile>algorithms_8cc.html</anchorfile>
+      <anchor>adf1d4b00fc2a909fbd591dbb92c0fc9c</anchor>
+      <arglist>(AlgoFixture, Padmm)(benchmark</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>BENCHMARK_DEFINE_F</name>
+      <anchorfile>algorithms_8cc.html</anchorfile>
+      <anchor>a48161d89fff3058ccc7e9828bcefe141</anchor>
+      <arglist>(AlgoFixture, ForwardBackward)(benchmark</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>Args</name>
+      <anchorfile>algorithms_8cc.html</anchorfile>
+      <anchor>a154106e1431b627040c809117c7c1b89</anchor>
+      <arglist>({128, 10000, 4, 10}) -&gt; UseManualTime() -&gt;MinTime(10.0) -&gt;MinWarmUpTime(5.0) -&gt;Repetitions(3) -&gt;Unit(benchmark::kMillisecond)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>BENCHMARK_MAIN</name>
+      <anchorfile>algorithms_8cc.html</anchorfile>
+      <anchor>a5851750faa9cfec10f7cad1f3b89697e</anchor>
+      <arglist>()</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>algorithms_mpi.cc</name>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>algorithms__mpi_8cc.html</filename>
+    <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
+    <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
+    <includes id="algorithm__factory_8h" name="algorithm_factory.h" local="yes" imported="no">purify/algorithm_factory.h</includes>
+    <includes id="convergence__factory_8h" name="convergence_factory.h" local="yes" imported="no">purify/convergence_factory.h</includes>
+    <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
+    <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
+    <includes id="measurement__operator__factory_8h" name="measurement_operator_factory.h" local="yes" imported="no">purify/measurement_operator_factory.h</includes>
+    <includes id="mpi__utilities_8h" name="mpi_utilities.h" local="yes" imported="no">purify/mpi_utilities.h</includes>
+    <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
+    <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
+    <includes id="wavelet__operator__factory_8h" name="wavelet_operator_factory.h" local="yes" imported="no">purify/wavelet_operator_factory.h</includes>
+    <class kind="class">AlgoFixtureMPI</class>
+    <member kind="function">
+      <type></type>
+      <name>BENCHMARK_DEFINE_F</name>
+      <anchorfile>algorithms__mpi_8cc.html</anchorfile>
+      <anchor>af53a016e0a52273a7ad0bdf842547684</anchor>
+      <arglist>(AlgoFixtureMPI, PadmmDistributeImage)(benchmark</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>BENCHMARK_DEFINE_F</name>
+      <anchorfile>algorithms__mpi_8cc.html</anchorfile>
+      <anchor>a1a0ea1af8b122b6e792e440f28c38522</anchor>
+      <arglist>(AlgoFixtureMPI, PadmmDistributeGrid)(benchmark</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>BENCHMARK_DEFINE_F</name>
+      <anchorfile>algorithms__mpi_8cc.html</anchorfile>
+      <anchor>a8f1fd65980bba7d3875e6ba8d7e940a9</anchor>
+      <arglist>(AlgoFixtureMPI, FbDistributeImage)(benchmark</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>BENCHMARK_DEFINE_F</name>
+      <anchorfile>algorithms__mpi_8cc.html</anchorfile>
+      <anchor>ab180f96dee85d01625e8759ac9d792ea</anchor>
+      <arglist>(AlgoFixtureMPI, FbDistributeGrid)(benchmark</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>Args</name>
+      <anchorfile>algorithms__mpi_8cc.html</anchorfile>
+      <anchor>a812395b93f595ca8fc969903c6acff3d</anchor>
+      <arglist>({128, 10000, 4, 10, 1}) -&gt; Args({1024, static_cast&lt; t_int &gt;(1e6), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e7), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e8), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e9), 4, 10, 1}) -&gt;UseManualTime() -&gt;MinTime(120.0) -&gt;MinWarmUpTime(10.0) -&gt;Repetitions(3) -&gt;Unit(benchmark::kMillisecond)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>Args</name>
+      <anchorfile>algorithms__mpi_8cc.html</anchorfile>
+      <anchor>ac1dd1acff457ce674e6e8500f0ca6e45</anchor>
+      <arglist>({128, 10000, 4, 10, 2}) -&gt; Args({1024, static_cast&lt; t_int &gt;(1e6), 4, 10, 2}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e7), 4, 10, 2}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e8), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e9), 4, 10, 1}) -&gt;UseManualTime() -&gt;MinTime(120.0) -&gt;MinWarmUpTime(10.0) -&gt;Repetitions(3) -&gt;Unit(benchmark::kMillisecond)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
     <name>degridding.cc</name>
     <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
     <filename>degridding_8cc.html</filename>
@@ -69,6 +169,7 @@
     <name>main.cc</name>
     <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
     <filename>benchmarks_2main_8cc.html</filename>
+    <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <class kind="class">NullReporter</class>
     <member kind="function">
       <type>int</type>
@@ -282,8 +383,8 @@
       <type></type>
       <name>Args</name>
       <anchorfile>measurement__operator__mpi_8cc.html</anchorfile>
-      <anchor>a2e452b7631c7568e5b6200a007a90bf9</anchor>
-      <arglist>({1024, static_cast&lt; t_int &gt;(1e6), 4}) -&gt; Args({1024, static_cast&lt; t_int &gt;(5e6), 4}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e7), 4}) -&gt;Args({1024, static_cast&lt; t_int &gt;(5e7), 4}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e8), 4}) -&gt;Args({1024, static_cast&lt; t_int &gt;(5e8), 4}) -&gt;UseManualTime() -&gt;Repetitions(10) -&gt;Unit(benchmark::kMillisecond)</arglist>
+      <anchor>a57341bab935d9236bf43d572c5f353e0</anchor>
+      <arglist>({1024, static_cast&lt; t_int &gt;(1e6), 4}) -&gt; Args({1024, static_cast&lt; t_int &gt;(1e7), 4}) -&gt;UseManualTime() -&gt;MinTime(10.0) -&gt;MinWarmUpTime(5.0) -&gt;Repetitions(3) -&gt;Unit(benchmark::kMillisecond)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -318,83 +419,12 @@
     </member>
   </compound>
   <compound kind="file">
-    <name>padmm.cc</name>
-    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
-    <filename>padmm_8cc.html</filename>
-    <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
-    <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
-    <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
-    <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
-    <class kind="class">PadmmFixture</class>
-    <member kind="function">
-      <type></type>
-      <name>BENCHMARK_DEFINE_F</name>
-      <anchorfile>padmm_8cc.html</anchorfile>
-      <anchor>acc91c46583b8f8fe41a6de94aecb8751</anchor>
-      <arglist>(PadmmFixture, Apply)(benchmark</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>Args</name>
-      <anchorfile>padmm_8cc.html</anchorfile>
-      <anchor>a18e5d7b8f262144c382572eba2dcc6d0</anchor>
-      <arglist>({128, 10000, 4, 100}) -&gt; UseManualTime() -&gt;Repetitions(1) -&gt;Unit(benchmark::kMillisecond)</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>BENCHMARK_MAIN</name>
-      <anchorfile>padmm_8cc.html</anchorfile>
-      <anchor>a5851750faa9cfec10f7cad1f3b89697e</anchor>
-      <arglist>()</arglist>
-    </member>
-  </compound>
-  <compound kind="file">
-    <name>padmm_mpi.cc</name>
-    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
-    <filename>padmm__mpi_8cc.html</filename>
-    <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
-    <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
-    <includes id="convergence__factory_8h" name="convergence_factory.h" local="yes" imported="no">purify/convergence_factory.h</includes>
-    <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
-    <includes id="mpi__utilities_8h" name="mpi_utilities.h" local="yes" imported="no">purify/mpi_utilities.h</includes>
-    <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
-    <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
-    <class kind="class">PadmmFixtureMPI</class>
-    <member kind="function">
-      <type></type>
-      <name>BENCHMARK_DEFINE_F</name>
-      <anchorfile>padmm__mpi_8cc.html</anchorfile>
-      <anchor>ac4763ec09a987e594fbb79ba85349723</anchor>
-      <arglist>(PadmmFixtureMPI, ApplyAlgo1)(benchmark</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>BENCHMARK_DEFINE_F</name>
-      <anchorfile>padmm__mpi_8cc.html</anchorfile>
-      <anchor>aecc79116c10a1c94917e3e59fea3a99f</anchor>
-      <arglist>(PadmmFixtureMPI, ApplyAlgo3)(benchmark</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>Args</name>
-      <anchorfile>padmm__mpi_8cc.html</anchorfile>
-      <anchor>a4bf72f7fc468de0b11444eedbaea9486</anchor>
-      <arglist>({1024, static_cast&lt; t_int &gt;(1e6), 4, 10, 1}) -&gt; Args({1024, static_cast&lt; t_int &gt;(5e6), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e7), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(5e7), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e8), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(5e8), 4, 10, 1}) -&gt;UseManualTime() -&gt;Repetitions(3) -&gt;Unit(benchmark::kMillisecond)</arglist>
-    </member>
-    <member kind="function">
-      <type></type>
-      <name>Args</name>
-      <anchorfile>padmm__mpi_8cc.html</anchorfile>
-      <anchor>a95cf9e6430c4a045ad6ddbc9dcc05cd5</anchor>
-      <arglist>({1024, static_cast&lt; t_int &gt;(1e6), 4, 10, 3}) -&gt; Args({1024, static_cast&lt; t_int &gt;(5e6), 4, 10, 3}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e7), 4, 10, 3}) -&gt;Args({1024, static_cast&lt; t_int &gt;(5e7), 4, 10, 3}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e8), 4, 10, 3}) -&gt;Args({1024, static_cast&lt; t_int &gt;(5e8), 4, 10, 3}) -&gt;UseManualTime() -&gt;Repetitions(3) -&gt;Unit(benchmark::kMillisecond)</arglist>
-    </member>
-  </compound>
-  <compound kind="file">
     <name>utilities.cc</name>
     <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
     <filename>benchmarks_2utilities_8cc.html</filename>
     <includes id="benchmarks_2utilities_8h" name="utilities.h" local="no" imported="no">benchmarks/utilities.h</includes>
     <includes id="distribute_8h" name="distribute.h" local="yes" imported="no">purify/distribute.h</includes>
+    <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="mpi__utilities_8h" name="mpi_utilities.h" local="yes" imported="no">purify/mpi_utilities.h</includes>
     <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
     <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
@@ -5557,6 +5587,217 @@
     </member>
   </compound>
   <compound kind="class">
+    <name>AlgoFixture</name>
+    <filename>classAlgoFixture.html</filename>
+    <member kind="function">
+      <type>void</type>
+      <name>SetUp</name>
+      <anchorfile>classAlgoFixture.html</anchorfile>
+      <anchor>a2f6c0f07eb32310ff81d591e2bc374c2</anchor>
+      <arglist>(const ::benchmark::State &amp;state)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>TearDown</name>
+      <anchorfile>classAlgoFixture.html</anchorfile>
+      <anchor>abef8d822af9cafc037641a02f6e84842</anchor>
+      <arglist>(const ::benchmark::State &amp;state)</arglist>
+    </member>
+    <member kind="variable">
+      <type>t_real</type>
+      <name>m_epsilon</name>
+      <anchorfile>classAlgoFixture.html</anchorfile>
+      <anchor>a9caf23715a6553d6f5009300237ddb8a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_uint</type>
+      <name>m_counter</name>
+      <anchorfile>classAlgoFixture.html</anchorfile>
+      <anchor>a3aec3180898a54fdb3764e0d36391648</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_real</type>
+      <name>m_sigma</name>
+      <anchorfile>classAlgoFixture.html</anchorfile>
+      <anchor>a78242c03cca0cc4d7d8c15f3e24aa7b0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; std::tuple&lt; std::string, t_uint &gt; &gt; const</type>
+      <name>m_sara</name>
+      <anchorfile>classAlgoFixture.html</anchorfile>
+      <anchor>aa10b9b30bd2b3b0cbdf257febfae1ba5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>Image&lt; t_complex &gt;</type>
+      <name>m_image</name>
+      <anchorfile>classAlgoFixture.html</anchorfile>
+      <anchor>a499ca43c47d54224fa96b48f5633dfe0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_uint</type>
+      <name>m_imsizex</name>
+      <anchorfile>classAlgoFixture.html</anchorfile>
+      <anchor>a16b1a8b4a50c38ed7be34c2ed1d54769</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_uint</type>
+      <name>m_imsizey</name>
+      <anchorfile>classAlgoFixture.html</anchorfile>
+      <anchor>ae3d8d6db9aa02b9c46e2ae7d91e5851e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>utilities::vis_params</type>
+      <name>m_uv_data</name>
+      <anchorfile>classAlgoFixture.html</anchorfile>
+      <anchor>a4775fc6114608fdb5375d47d6f60bd47</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_uint</type>
+      <name>m_kernel</name>
+      <anchorfile>classAlgoFixture.html</anchorfile>
+      <anchor>a00638653d2949a86c654e937d11cb6e1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt; &gt; const  &gt;</type>
+      <name>m_measurements_transform</name>
+      <anchorfile>classAlgoFixture.html</anchorfile>
+      <anchor>a76a46875beaad78527af6b24a924f89e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::shared_ptr&lt; sopt::algorithm::ImagingProximalADMM&lt; t_complex &gt; &gt;</type>
+      <name>m_padmm</name>
+      <anchorfile>classAlgoFixture.html</anchorfile>
+      <anchor>a4de340a7d761d8751f3cd1786e09592d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::shared_ptr&lt; sopt::algorithm::ImagingForwardBackward&lt; t_complex &gt; &gt;</type>
+      <name>m_fb</name>
+      <anchorfile>classAlgoFixture.html</anchorfile>
+      <anchor>ad9ef31c76a6301ed087f8547b060bd09</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>AlgoFixtureMPI</name>
+    <filename>classAlgoFixtureMPI.html</filename>
+    <member kind="function">
+      <type>void</type>
+      <name>SetUp</name>
+      <anchorfile>classAlgoFixtureMPI.html</anchorfile>
+      <anchor>a8cb79f8f4d7d1c4048d2db4fdd82d787</anchor>
+      <arglist>(const ::benchmark::State &amp;state)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>TearDown</name>
+      <anchorfile>classAlgoFixtureMPI.html</anchorfile>
+      <anchor>abbd026d3fed4de3629722bb6487fb632</anchor>
+      <arglist>(const ::benchmark::State &amp;state)</arglist>
+    </member>
+    <member kind="variable">
+      <type>sopt::mpi::Communicator</type>
+      <name>m_world</name>
+      <anchorfile>classAlgoFixtureMPI.html</anchorfile>
+      <anchor>a4a33c55b31cd74b5f79fd86cb9c7ccd5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; std::tuple&lt; std::string, t_uint &gt; &gt; const</type>
+      <name>m_sara</name>
+      <anchorfile>classAlgoFixtureMPI.html</anchorfile>
+      <anchor>ad8527cc61175c506485de7f58c0fa30b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>Image&lt; t_complex &gt;</type>
+      <name>m_image</name>
+      <anchorfile>classAlgoFixtureMPI.html</anchorfile>
+      <anchor>a6159b251613745a9dece5dcbe69b5e67</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_uint</type>
+      <name>m_imsizex</name>
+      <anchorfile>classAlgoFixtureMPI.html</anchorfile>
+      <anchor>a99035cacd0289ac338ca460b534eccf5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_uint</type>
+      <name>m_imsizey</name>
+      <anchorfile>classAlgoFixtureMPI.html</anchorfile>
+      <anchor>a275bcae944f6e4d8ae0010799d78cf45</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>utilities::vis_params</type>
+      <name>m_uv_data</name>
+      <anchorfile>classAlgoFixtureMPI.html</anchorfile>
+      <anchor>aa87ac1483808f22c173e58647886e70b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_real</type>
+      <name>m_epsilon</name>
+      <anchorfile>classAlgoFixtureMPI.html</anchorfile>
+      <anchor>a8388e6ebbf5ea3f3990496d7482f720b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_real</type>
+      <name>m_sigma</name>
+      <anchorfile>classAlgoFixtureMPI.html</anchorfile>
+      <anchor>a6098af8539101ce1e6a17a1309d026fd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_uint</type>
+      <name>m_kernel</name>
+      <anchorfile>classAlgoFixtureMPI.html</anchorfile>
+      <anchor>ae9d63085bdfa874da429466aef7eeb47</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt; &gt; const  &gt;</type>
+      <name>m_measurements_distribute_image</name>
+      <anchorfile>classAlgoFixtureMPI.html</anchorfile>
+      <anchor>a06217f0eacdcd6cdf98a1e482aad61e9</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt; &gt; const  &gt;</type>
+      <name>m_measurements_distribute_grid</name>
+      <anchorfile>classAlgoFixtureMPI.html</anchorfile>
+      <anchor>acd1c2ceb30426461c50fa88e255559f5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::shared_ptr&lt; sopt::algorithm::ImagingProximalADMM&lt; t_complex &gt; &gt;</type>
+      <name>m_padmm</name>
+      <anchorfile>classAlgoFixtureMPI.html</anchorfile>
+      <anchor>a212a1b4a6760d9afecae9c10b49f973e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::shared_ptr&lt; sopt::algorithm::ImagingForwardBackward&lt; t_complex &gt; &gt;</type>
+      <name>m_fb</name>
+      <anchorfile>classAlgoFixtureMPI.html</anchorfile>
+      <anchor>a1a5f252571c5767c5f8ab4b5423a07ac</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
     <name>purify::casa::MeasurementSet::ChannelWrapper</name>
     <filename>classpurify_1_1casa_1_1MeasurementSet_1_1ChannelWrapper.html</filename>
     <member kind="enumeration">
@@ -6278,13 +6519,6 @@
       <arglist>(t_real cellsize, bool w_term)=0</arglist>
     </member>
     <member kind="variable">
-      <type>t_uint</type>
-      <name>m_counter</name>
-      <anchorfile>classDegridOperatorFixturePar.html</anchorfile>
-      <anchor>ad9e9fc264516913f62927b45e4f1b398</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
       <type>sopt::mpi::Communicator</type>
       <name>m_world</name>
       <anchorfile>classDegridOperatorFixturePar.html</anchorfile>
@@ -6991,189 +7225,6 @@
       <anchorfile>classNullReporter.html</anchorfile>
       <anchor>a39c2e27e5376f904fd6a0b63ed5c3291</anchor>
       <arglist>()</arglist>
-    </member>
-  </compound>
-  <compound kind="class">
-    <name>PadmmFixture</name>
-    <filename>classPadmmFixture.html</filename>
-    <member kind="function">
-      <type>void</type>
-      <name>SetUp</name>
-      <anchorfile>classPadmmFixture.html</anchorfile>
-      <anchor>a39a2b63e7620af30f2895a320707745c</anchor>
-      <arglist>(const ::benchmark::State &amp;state)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>TearDown</name>
-      <anchorfile>classPadmmFixture.html</anchorfile>
-      <anchor>ae17a92ac0fd5a72922988f285433cf99</anchor>
-      <arglist>(const ::benchmark::State &amp;state)</arglist>
-    </member>
-    <member kind="variable">
-      <type>t_uint</type>
-      <name>m_counter</name>
-      <anchorfile>classPadmmFixture.html</anchorfile>
-      <anchor>afb10dbdcd1fc5760e68691b835d1f6ba</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>const sopt::wavelets::SARA</type>
-      <name>m_sara</name>
-      <anchorfile>classPadmmFixture.html</anchorfile>
-      <anchor>a47a8ec3f3f87024df032db1475b6d37a</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>Image&lt; t_complex &gt;</type>
-      <name>m_image</name>
-      <anchorfile>classPadmmFixture.html</anchorfile>
-      <anchor>aeab69f13ca3fc32c29b1596fe84af14b</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>t_uint</type>
-      <name>m_imsizex</name>
-      <anchorfile>classPadmmFixture.html</anchorfile>
-      <anchor>a0f52961263dbcd1805c408f6594882cb</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>t_uint</type>
-      <name>m_imsizey</name>
-      <anchorfile>classPadmmFixture.html</anchorfile>
-      <anchor>abe3f1cca04ec7013dfdc7306ddeb9981</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>utilities::vis_params</type>
-      <name>m_uv_data</name>
-      <anchorfile>classPadmmFixture.html</anchorfile>
-      <anchor>adfc4866343b7dd9880ce467e9ec4f1a1</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>t_real</type>
-      <name>m_epsilon</name>
-      <anchorfile>classPadmmFixture.html</anchorfile>
-      <anchor>a39f8f59d0461c400adb0440de5e18bbf</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>t_uint</type>
-      <name>m_kernel</name>
-      <anchorfile>classPadmmFixture.html</anchorfile>
-      <anchor>a88d44c06e14e80625ce0c204449a6912</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt; &gt; const  &gt;</type>
-      <name>m_measurements_transform</name>
-      <anchorfile>classPadmmFixture.html</anchorfile>
-      <anchor>a9a334d5265a7bdee18d189ef05b19291</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>t_real</type>
-      <name>m_gamma</name>
-      <anchorfile>classPadmmFixture.html</anchorfile>
-      <anchor>a9dca78100e20ee41bb91724159f735a7</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>std::shared_ptr&lt; sopt::algorithm::ImagingProximalADMM&lt; t_complex &gt; &gt;</type>
-      <name>m_padmm</name>
-      <anchorfile>classPadmmFixture.html</anchorfile>
-      <anchor>a5726a6434b465c8dce2c2885db7c8ea5</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="class">
-    <name>PadmmFixtureMPI</name>
-    <filename>classPadmmFixtureMPI.html</filename>
-    <member kind="function">
-      <type>void</type>
-      <name>SetUp</name>
-      <anchorfile>classPadmmFixtureMPI.html</anchorfile>
-      <anchor>a055ba5bddb99e276fb0dbc0598655c95</anchor>
-      <arglist>(const ::benchmark::State &amp;state)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>TearDown</name>
-      <anchorfile>classPadmmFixtureMPI.html</anchorfile>
-      <anchor>a8aec27c003802523fce809122aa83244</anchor>
-      <arglist>(const ::benchmark::State &amp;state)</arglist>
-    </member>
-    <member kind="variable">
-      <type>sopt::mpi::Communicator</type>
-      <name>m_world</name>
-      <anchorfile>classPadmmFixtureMPI.html</anchorfile>
-      <anchor>ad0072aa8caca8636e4e17056d3f7f513</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>const sopt::wavelets::SARA</type>
-      <name>m_sara</name>
-      <anchorfile>classPadmmFixtureMPI.html</anchorfile>
-      <anchor>a21d164da9b487d81e91b60ee36bfc732</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>Image&lt; t_complex &gt;</type>
-      <name>m_image</name>
-      <anchorfile>classPadmmFixtureMPI.html</anchorfile>
-      <anchor>a6ce27ab78e0b7dbb779481e3a3c1c472</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>t_uint</type>
-      <name>m_imsizex</name>
-      <anchorfile>classPadmmFixtureMPI.html</anchorfile>
-      <anchor>a1649a03d84108e4e3806b577219c4799</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>t_uint</type>
-      <name>m_imsizey</name>
-      <anchorfile>classPadmmFixtureMPI.html</anchorfile>
-      <anchor>ab6e5f6610cbef8c3117e2531a5b3f644</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>utilities::vis_params</type>
-      <name>m_uv_data</name>
-      <anchorfile>classPadmmFixtureMPI.html</anchorfile>
-      <anchor>a3b2e53d88a4375ed989f68d87797acd7</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>t_real</type>
-      <name>m_epsilon</name>
-      <anchorfile>classPadmmFixtureMPI.html</anchorfile>
-      <anchor>a6c48054251bf4422af9090b2cb4e4f18</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>t_uint</type>
-      <name>m_kernel</name>
-      <anchorfile>classPadmmFixtureMPI.html</anchorfile>
-      <anchor>a48cdb5d494320a659cdeda052a30d83d</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt; &gt; const  &gt;</type>
-      <name>m_measurements1</name>
-      <anchorfile>classPadmmFixtureMPI.html</anchorfile>
-      <anchor>a9905e7b4ba06263db0fbafa65b07eee4</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt; &gt; const  &gt;</type>
-      <name>m_measurements3</name>
-      <anchorfile>classPadmmFixtureMPI.html</anchorfile>
-      <anchor>ab93dfd28cc653e635f5966d8eecf6150</anchor>
-      <arglist></arglist>
     </member>
   </compound>
   <compound kind="class">

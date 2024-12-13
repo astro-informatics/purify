@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['log_645',['Log',['../classpurify_1_1logging_1_1Log.html',1,'purify::logging']]]
+  ['indexmapping_648',['IndexMapping',['../classpurify_1_1IndexMapping.html',1,'purify']]]
 ];

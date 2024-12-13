@@ -84,6 +84,8 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &quot;purify/config.h&quot;</code><br />
 <code>#include &lt;benchmark/benchmark.h&gt;</code><br />
+<code>#include &quot;<a class="el" href="logging_8h_source.html">purify/logging.h</a>&quot;</code><br />
+<code>#include &lt;sopt/logging.h&gt;</code><br />
 <code>#include &lt;sopt/mpi/communicator.h&gt;</code><br />
 <code>#include &lt;sopt/mpi/session.h&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -93,11 +95,20 @@ $(function() {
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="benchmarks_2main_8cc__incl.png" border="0" usemap="#a_2home_2runner_2work_2purify_2purify_2cpp_2benchmarks_2main_8cc" alt=""/></div>
 <map name="a_2home_2runner_2work_2purify_2purify_2cpp_2benchmarks_2main_8cc" id="a_2home_2runner_2work_2purify_2purify_2cpp_2benchmarks_2main_8cc">
-<area shape="rect" title=" " alt="" coords="248,5,435,61"/>
-<area shape="rect" title=" " alt="" coords="5,109,120,136"/>
-<area shape="rect" title=" " alt="" coords="144,109,328,136"/>
-<area shape="rect" title=" " alt="" coords="353,109,541,136"/>
-<area shape="rect" title=" " alt="" coords="565,109,709,136"/>
+<area shape="rect" title=" " alt="" coords="349,5,536,61"/>
+<area shape="rect" title=" " alt="" coords="5,184,120,211"/>
+<area shape="rect" title=" " alt="" coords="103,109,287,136"/>
+<area shape="rect" href="logging_8h.html" title=" " alt="" coords="311,109,433,136"/>
+<area shape="rect" title=" " alt="" coords="457,109,572,136"/>
+<area shape="rect" title=" " alt="" coords="597,109,785,136"/>
+<area shape="rect" title=" " alt="" coords="809,109,953,136"/>
+<area shape="rect" title=" " alt="" coords="144,184,211,211"/>
+<area shape="rect" title=" " alt="" coords="235,184,322,211"/>
+<area shape="rect" title=" " alt="" coords="347,184,397,211"/>
+<area shape="rect" title=" " alt="" coords="421,184,499,211"/>
+<area shape="rect" title=" " alt="" coords="523,184,597,211"/>
+<area shape="rect" title=" " alt="" coords="621,184,680,211"/>
+<area shape="rect" title=" " alt="" coords="705,184,759,211"/>
 </map>
 </div>
 </div>
@@ -140,29 +151,37 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="benchmarks_2main_8cc_source.html#l00018">18</a> of file <a class="el" href="benchmarks_2main_8cc_source.html">main.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;                                      {</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> session = sopt::mpi::init(argc, argv);</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> world = sopt::mpi::Communicator::World();</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  ::benchmark::Initialize(&amp;argc, <span class="keyword">const_cast&lt;</span><span class="keywordtype">char</span> **<span class="keyword">&gt;</span>(argv));</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keywordflow">if</span> (world.is_root())</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="comment">// root process will use a reporter from the usual set provided by</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="comment">// ::benchmark</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    ::benchmark::RunSpecifiedBenchmarks();</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="comment">// reporting from other processes is disabled by passing a custom reporter</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="classNullReporter.html">NullReporter</a> <span class="keyword">null</span>;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    ::benchmark::RunSpecifiedBenchmarks(&amp;<span class="keyword">null</span>);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  }</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;}</div>
-<div class="ttc" id="aclassNullReporter_html"><div class="ttname"><a href="classNullReporter.html">NullReporter</a></div><div class="ttdef"><b>Definition:</b> <a href="benchmarks_2main_8cc_source.html#l00008">main.cc:8</a></div></div>
+<p class="definition">Definition at line <a class="el" href="benchmarks_2main_8cc_source.html#l00020">20</a> of file <a class="el" href="benchmarks_2main_8cc_source.html">main.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;                                      {</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <a class="code" href="namespacepurify_1_1logging.html#ad63e2000541a28446b87e82485638415">sopt::logging::set_level</a>(<span class="stringliteral">&quot;info&quot;</span>);</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <a class="code" href="namespacepurify_1_1logging.html#ad63e2000541a28446b87e82485638415">purify::logging::set_level</a>(<span class="stringliteral">&quot;debug&quot;</span>);</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> session = sopt::mpi::init(argc, argv);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> world = sopt::mpi::Communicator::World();</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <a class="code" href="logging_8h.html#a0c01897a385e812973d29bead7548584">PURIFY_LOW_LOG</a>(<span class="stringliteral">&quot;MPI initialized&quot;</span>);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  ::benchmark::Initialize(&amp;argc, <span class="keyword">const_cast&lt;</span><span class="keywordtype">char</span> **<span class="keyword">&gt;</span>(argv));</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keywordflow">if</span> (world.is_root())</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="comment">// root process will use a reporter from the usual set provided by</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="comment">// ::benchmark</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    ::benchmark::RunSpecifiedBenchmarks();</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="comment">// reporting from other processes is disabled by passing a custom reporter</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <a class="code" href="classNullReporter.html">NullReporter</a> <span class="keyword">null</span>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    ::benchmark::RunSpecifiedBenchmarks(&amp;<span class="keyword">null</span>);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  }</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;}</div>
+<div class="ttc" id="aclassNullReporter_html"><div class="ttname"><a href="classNullReporter.html">NullReporter</a></div><div class="ttdef"><b>Definition:</b> <a href="benchmarks_2main_8cc_source.html#l00010">main.cc:10</a></div></div>
+<div class="ttc" id="alogging_8h_html_a0c01897a385e812973d29bead7548584"><div class="ttname"><a href="logging_8h.html#a0c01897a385e812973d29bead7548584">PURIFY_LOW_LOG</a></div><div class="ttdeci">#define PURIFY_LOW_LOG(...)</div><div class="ttdoc">Low priority message.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8h_source.html#l00207">logging.h:207</a></div></div>
+<div class="ttc" id="anamespacepurify_1_1logging_html_ad63e2000541a28446b87e82485638415"><div class="ttname"><a href="namespacepurify_1_1logging.html#ad63e2000541a28446b87e82485638415">purify::logging::set_level</a></div><div class="ttdeci">void set_level(const std::string &amp;level)</div><div class="ttdoc">Method to set the logging level of the default Log object.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8h_source.html#l00137">logging.h:137</a></div></div>
 </div><!-- fragment -->
+<p class="reference">References <a class="el" href="logging_8h_source.html#l00207">PURIFY_LOW_LOG</a>, and <a class="el" href="logging_8h_source.html#l00137">purify::logging::set_level()</a>.</p>
+
 </div>
 </div>
 </div><!-- contents -->
