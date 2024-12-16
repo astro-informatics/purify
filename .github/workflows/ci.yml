@@ -131,13 +131,17 @@ jobs:
 
     - name: Pack dependencies
       run: |
-        tar cfv dependencies.tar ${{github.workspace}}/local
+        cd ${{github.workspace}}
+        # Work around a bug with paths when running in containers
+        # https://github.com/actions/runner/issues/2058
+        tar cfv $GITHUB_WORKSPACE/dependencies.tar ./local
 
     - uses: actions/upload-artifact@v4
       with:
         name: dependencies-${{ matrix.os }}-${{ matrix.distribution }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
         path: ${{github.workspace}}/dependencies.tar
         retention-days: 5
+        if-no-files-found: error
 
   test:
     needs:
@@ -167,6 +171,7 @@ jobs:
         name: dependencies-${{ matrix.os }}-${{matrix.distribution}}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
 
     - name: Unpack dependencies
+      working-directory: ${{github.workspace}}
       run: tar xfv dependencies.tar
 
     - name: Install Dependencies on Ubunutu
@@ -192,9 +197,10 @@ jobs:
     - name: Build tests
       # Build your program with the given configuration
       run: |
+        export CMAKE_PREFIX_PATH=${{github.workspace}}/local:$CMAKE_PREFIX_PATH
         mkdir -p ${{github.workspace}}/build
         cd ${{github.workspace}}/build
-        cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Donnxrt=ON -Ddocasa=OFF -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}} -Dtests=ON --debug-find -DCMAKE_PREFIX_PATH=../local/share/cmake/sopt
+        cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Donnxrt=ON -Ddocasa=OFF -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}} -Dtests=ON
         make -j$(nproc --ignore 1) install
 
     - name: Test
@@ -225,6 +231,7 @@ jobs:
         name: dependencies-${{ matrix.os }}--${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
 
     - name: Unpack dependencies
+      working-directory: ${{github.workspace}}
       run: tar xfv dependencies.tar
 
     - name: Install Dependencies on Ubunutu
