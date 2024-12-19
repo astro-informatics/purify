@@ -2,8 +2,8 @@ include_directories("${PROJECT_SOURCE_DIR}/cpp" "${CMAKE_CURRENT_BINARY_DIR}/inc
 
 add_executable(measurement_operator utilities.cc measurement_operator.cc)
 target_link_libraries(measurement_operator benchmark libpurify)
-add_executable(padmm utilities.cc padmm.cc)
-target_link_libraries(padmm benchmark libpurify)
+add_executable(algorithms utilities.cc algorithms.cc)
+target_link_libraries(algorithms benchmark libpurify)
 add_executable(wavelet_operator utilities.cc wavelet_operator.cc)
 target_link_libraries(wavelet_operator benchmark libpurify)
 add_executable(fft utilities.cc fft.cc)
