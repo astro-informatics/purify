@@ -90,7 +90,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   auto const padmm =
       sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
           .itermax(500)
-          .gamma((Psi.adjoint() * (measurements_transform->adjoint() * uv_data.vis).eval())
+          .regulariser_strength((Psi.adjoint() * (measurements_transform->adjoint() * uv_data.vis).eval())
                      .cwiseAbs()
                      .maxCoeff() *
                  1e-3)
@@ -107,7 +107,7 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
 #ifdef PURIFY_CImg
           .is_converged(show_image)
 #endif
-          .nu(1e0)
+          .sq_op_norm(1e0)
           .Psi(Psi)
           .Phi(*measurements_transform);
 

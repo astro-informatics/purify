@@ -54,7 +54,7 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), imsizey, imsizex), dirty_image_fits);
   pfitsio::write2d(Image<t_real>::Map(psf.data(), imsizey, imsizex), psf_image_fits);
   auto const epsilon = 3 * std::sqrt(2 * uv_data.size()) * sigma;
-  auto const gamma = (measurements_transform->adjoint() * uv_data.vis).real().maxCoeff() * 1e-3;
+  auto const regulariser_strength = (measurements_transform->adjoint() * uv_data.vis).real().maxCoeff() * 1e-3;
   PURIFY_HIGH_LOG("Using epsilon of {}", epsilon);
 #ifdef PURIFY_CImg
   auto const canvas = std::make_shared<CDisplay>(
@@ -79,7 +79,7 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
 #endif
   auto padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(uv_data.vis);
   padmm->itermax(500)
-      .gamma(gamma)
+      .regulariser_strength(regulariser_strength)
       .relative_variation(1e-3)
       .l2ball_proximal_epsilon(epsilon)
       .tight_frame(false)
@@ -90,7 +90,7 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
       .l1_proximal_real_constraint(true)
       .residual_convergence(epsilon)
       .lagrange_update_scale(0.9)
-      .nu(1e0)
+      .sq_op_norm(1e0)
       .Psi(Psi)
       .Phi(*measurements_transform);
 
@@ -101,14 +101,14 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
   const auto algo_update = [uv_data, imsizex, imsizey, padmm_weak,
                             iter](const Vector<t_complex> &x) -> bool {
     auto padmm = padmm_weak.lock();
-    PURIFY_MEDIUM_LOG("Step size γ {}", padmm->gamma());
+    PURIFY_MEDIUM_LOG("Step size γ {}", padmm->regulariser_strength());
     *iter = *iter + 1;
     Vector<t_complex> const alpha = padmm->Psi().adjoint() * x;
     // updating parameter
-    const t_real new_gamma = alpha.real().cwiseAbs().maxCoeff() * 1e-3;
-    PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
-    padmm->gamma(((std::abs(padmm->gamma() - new_gamma) > 0.2) and *iter < 200) ? new_gamma
-                                                                                : padmm->gamma());
+    const t_real new_regulariser_strength = alpha.real().cwiseAbs().maxCoeff() * 1e-3;
+    PURIFY_MEDIUM_LOG("Step size γ update {}", new_regulariser_strength);
+    padmm->regulariser_strength(((std::abs(padmm->regulariser_strength() - new_regulariser_strength) > 0.2) and *iter < 200) ? new_regulariser_strength
+                                                                                : padmm->regulariser_strength());
 
     Vector<t_complex> const residual = padmm->Phi().adjoint() * (uv_data.vis - padmm->Phi() * x);
 

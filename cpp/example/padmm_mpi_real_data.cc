@@ -60,19 +60,19 @@ std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm_factory(
 #elif PURIFY_PADMM_ALGORITHM == 3 || PURIFY_PADMM_ALGORITHM == 1
   auto const epsilon = 3 * std::sqrt(2 * uv_data.size()) * sigma;
 #endif
-  const t_real gamma =
+  const t_real regulariser_strength =
       utilities::step_size(uv_data.vis, measurements,
                            std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(Psi),
                            sara.size()) *
       1e-3;
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
-  PURIFY_MEDIUM_LOG("Gamma {}", gamma);
+  PURIFY_MEDIUM_LOG("Regulariser_Strength {}", regulariser_strength);
 
   // shared pointer because the convergence function need access to some data that we would rather
   // not reproduce. E.g. padmm definition is self-referential.
   auto padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(uv_data.vis);
   padmm->itermax(50)
-      .gamma(comm.all_reduce<t_real>(gamma, MPI_MAX))
+      .regulariser_strength(comm.all_reduce<t_real>(regulariser_strength, MPI_MAX))
       .relative_variation(1e-3)
       .l2ball_proximal_epsilon(epsilon)
 #if PURIFY_PADMM_ALGORITHM == 2
@@ -89,7 +89,7 @@ std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm_factory(
       .l1_proximal_real_constraint(true)
       .residual_tolerance(epsilon)
       .lagrange_update_scale(0.9)
-      .nu(1e0)
+      .sq_op_norm(1e0)
       .Psi(Psi)
       .Phi(*measurements);
   sopt::ScalarRelativeVariation<t_complex> conv(padmm->relative_variation(),
@@ -127,13 +127,13 @@ std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm_factory(
   const auto algo_update = [uv_data, imsizex, imsizey, padmm_weak, iter,
                             comm](const Vector<t_complex> &x) -> bool {
     auto padmm = padmm_weak.lock();
-    if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ {}", padmm->gamma());
+    if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ {}", padmm->regulariser_strength());
     *iter = *iter + 1;
     Vector<t_complex> const alpha = padmm->Psi().adjoint() * x;
-    const t_real new_gamma = comm.all_reduce(alpha.real().cwiseAbs().maxCoeff(), MPI_MAX) * 1e-3;
-    if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ update {}", new_gamma);
-    padmm->gamma(((std::abs(padmm->gamma() - new_gamma) > 0.2) and *iter < 200) ? new_gamma
-                                                                                : padmm->gamma());
+    const t_real new_regulariser_strength = comm.all_reduce(alpha.real().cwiseAbs().maxCoeff(), MPI_MAX) * 1e-3;
+    if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ update {}", new_regulariser_strength);
+    padmm->regulariser_strength(((std::abs(padmm->regulariser_strength() - new_regulariser_strength) > 0.2) and *iter < 200) ? new_regulariser_strength
+                                                                                : padmm->regulariser_strength());
     // updating parameter
 
     Vector<t_complex> const residual = padmm->Phi().adjoint() * (uv_data.vis - padmm->Phi() * x);
