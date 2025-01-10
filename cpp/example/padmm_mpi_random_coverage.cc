@@ -92,7 +92,8 @@ std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm_factory(
                            sara.size()) *
       1e-3;
   PURIFY_LOW_LOG("Epsilon {}, Rank = {}", epsilon, comm.rank());
-  PURIFY_LOW_LOG("Regulariser_Strength {}, SARA Size = {}, Rank = {}", regulariser_strength, sara.size(), comm.rank());
+  PURIFY_LOW_LOG("Regulariser_Strength {}, SARA Size = {}, Rank = {}", regulariser_strength,
+                 sara.size(), comm.rank());
 
   // shared pointer because the convergence function need access to some data that we would rather
   // not reproduce. E.g. padmm definition is self-referential.

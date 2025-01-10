@@ -54,7 +54,8 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), imsizey, imsizex), dirty_image_fits);
   pfitsio::write2d(Image<t_real>::Map(psf.data(), imsizey, imsizex), psf_image_fits);
   auto const epsilon = 3 * std::sqrt(2 * uv_data.size()) * sigma;
-  auto const regulariser_strength = (measurements_transform->adjoint() * uv_data.vis).real().maxCoeff() * 1e-3;
+  auto const regulariser_strength =
+      (measurements_transform->adjoint() * uv_data.vis).real().maxCoeff() * 1e-3;
   PURIFY_HIGH_LOG("Using epsilon of {}", epsilon);
 #ifdef PURIFY_CImg
   auto const canvas = std::make_shared<CDisplay>(
@@ -107,8 +108,10 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
     // updating parameter
     const t_real new_regulariser_strength = alpha.real().cwiseAbs().maxCoeff() * 1e-3;
     PURIFY_MEDIUM_LOG("Step size γ update {}", new_regulariser_strength);
-    padmm->regulariser_strength(((std::abs(padmm->regulariser_strength() - new_regulariser_strength) > 0.2) and *iter < 200) ? new_regulariser_strength
-                                                                                : padmm->regulariser_strength());
+    padmm->regulariser_strength(
+        ((std::abs(padmm->regulariser_strength() - new_regulariser_strength) > 0.2) and *iter < 200)
+            ? new_regulariser_strength
+            : padmm->regulariser_strength());
 
     Vector<t_complex> const residual = padmm->Phi().adjoint() * (uv_data.vis - padmm->Phi() * x);
 

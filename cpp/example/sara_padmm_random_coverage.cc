@@ -80,8 +80,8 @@ int main(int, char **) {
           .maxCoeff() *
       beta;
 
-  // auto purify_regulariser_strength = 3 * utilities::median((Psi.adjoint() * (measurements_transform.adjoint() *
-  // (uv_data.vis - y0))).real().cwiseAbs())/0.6745;
+  // auto purify_regulariser_strength = 3 * utilities::median((Psi.adjoint() *
+  // (measurements_transform.adjoint() * (uv_data.vis - y0))).real().cwiseAbs())/0.6745;
 
   SOPT_INFO("Using epsilon of {} \n", epsilon);
   auto const padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)

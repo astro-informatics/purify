@@ -90,10 +90,11 @@ void padmm(const std::string &name, const Image<t_complex> &M31, const std::stri
   auto const padmm =
       sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
           .itermax(500)
-          .regulariser_strength((Psi.adjoint() * (measurements_transform->adjoint() * uv_data.vis).eval())
-                     .cwiseAbs()
-                     .maxCoeff() *
-                 1e-3)
+          .regulariser_strength(
+              (Psi.adjoint() * (measurements_transform->adjoint() * uv_data.vis).eval())
+                  .cwiseAbs()
+                  .maxCoeff() *
+              1e-3)
           .relative_variation(1e-3)
           .l2ball_proximal_epsilon(epsilon)
           .tight_frame(false)

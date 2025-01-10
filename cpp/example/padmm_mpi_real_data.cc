@@ -130,10 +130,13 @@ std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm_factory(
     if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ {}", padmm->regulariser_strength());
     *iter = *iter + 1;
     Vector<t_complex> const alpha = padmm->Psi().adjoint() * x;
-    const t_real new_regulariser_strength = comm.all_reduce(alpha.real().cwiseAbs().maxCoeff(), MPI_MAX) * 1e-3;
+    const t_real new_regulariser_strength =
+        comm.all_reduce(alpha.real().cwiseAbs().maxCoeff(), MPI_MAX) * 1e-3;
     if (comm.is_root()) PURIFY_MEDIUM_LOG("Step size γ update {}", new_regulariser_strength);
-    padmm->regulariser_strength(((std::abs(padmm->regulariser_strength() - new_regulariser_strength) > 0.2) and *iter < 200) ? new_regulariser_strength
-                                                                                : padmm->regulariser_strength());
+    padmm->regulariser_strength(
+        ((std::abs(padmm->regulariser_strength() - new_regulariser_strength) > 0.2) and *iter < 200)
+            ? new_regulariser_strength
+            : padmm->regulariser_strength());
     // updating parameter
 
     Vector<t_complex> const residual = padmm->Phi().adjoint() * (uv_data.vis - padmm->Phi() * x);
