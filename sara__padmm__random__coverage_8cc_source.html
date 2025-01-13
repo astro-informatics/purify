@@ -155,19 +155,19 @@ $(function() {
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(Image&lt;t_real&gt;::Map(dimage.data(), M31.rows(), M31.cols()), dirty_image_fits);</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> epsilon = <a class="code" href="namespacepurify_1_1utilities.html#af90182ef1213164564e72e51f8a83ac7">utilities::calculate_l2_radius</a>(uv_data.vis.size(), sigma);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> purify_gamma =</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> purify_regulariser_strength =</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis).eval())</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;          .cwiseAbs()</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;          .maxCoeff() *</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      beta;</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="comment">// auto purify_gamma = 3 * utilities::median((Psi.adjoint() * (measurements_transform.adjoint() *</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="comment">// (uv_data.vis - y0))).real().cwiseAbs())/0.6745;</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="comment">// auto purify_regulariser_strength = 3 * utilities::median((Psi.adjoint() *</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="comment">// (measurements_transform.adjoint() * (uv_data.vis - y0))).real().cwiseAbs())/0.6745;</span></div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  SOPT_INFO(<span class="stringliteral">&quot;Using epsilon of {} \n&quot;</span>, epsilon);</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> <a class="code" href="padmm__random__coverage_8cc.html#a0a5a4b5d505c1171d7dcabe5269fabb1">padmm</a> = sopt::algorithm::ImagingProximalADMM&lt;t_complex&gt;(uv_data.vis)</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;                         .itermax(1000)</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;                         .gamma(purify_gamma)</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;                         .regulariser_strength(purify_regulariser_strength)</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;                         .relative_variation(1e-6)</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;                         .l2ball_proximal_epsilon(epsilon)</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;                         .tight_frame(<span class="keyword">false</span>)</div>
@@ -178,7 +178,7 @@ $(function() {
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;                         .l1_proximal_real_constraint(<span class="keyword">true</span>)</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;                         .residual_convergence(epsilon * 1.001)</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;                         .lagrange_update_scale(0.9)</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;                         .nu(1e0)</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;                         .sq_op_norm(1e0)</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                         .Psi(Psi)</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;                         .Phi(measurements_transform);</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
