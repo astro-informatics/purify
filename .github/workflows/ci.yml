@@ -225,6 +225,8 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: |
         export LD_LIBRARY_PATH=${{github.workspace}}/local/lib:${{github.workspace}}/local/external/lib:${LD_LIBRARY_PATH}
+        export DYLD_LIBRARY_PATH=${{github.workspace}}/local/lib:${{github.workspace}}/local/external/lib:${DYLD_LIBRARY_PATH}
+        export DYLD_LIBRARY_PATH=$(brew --prefix)/lib:${DYLD_LIBRARY_PATH}
         ctest -C ${{env.BUILD_TYPE}} --output-on-failure
 
   doc:

@@ -65,10 +65,6 @@ if(tests)  # Adds ctest
   include(AddCatchTest)
 endif()
 
-if(examples)
-  find_package(TIFF REQUIRED)
-endif()
-
 if(tests OR examples)
   file(COPY data DESTINATION .)
 endif()

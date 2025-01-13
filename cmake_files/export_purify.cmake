@@ -38,3 +38,4 @@ install(FILES
 )
 
 install(EXPORT PurifyTargets DESTINATION share/cmake/purify COMPONENT dev)
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/data" DESTINATION "${CMAKE_INSTALL_PREFIX}")
