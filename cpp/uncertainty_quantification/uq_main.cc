@@ -59,6 +59,7 @@ int main(int argc, char **argv)
     // Prepare operators and data using purify config
     // If no purify config use basic version for now based on algo_factory test images 
     purify::utilities::vis_params measurement_data;
+    double regulariser_strength = 0;
     std::shared_ptr<sopt::LinearTransform<VectorC>> measurement_operator;
     std::shared_ptr<const sopt::LinearTransform<VectorC>> wavelet_operator;
     std::vector<std::tuple<std::string, t_uint>> const sara{
@@ -95,6 +96,8 @@ int main(int argc, char **argv)
 
         // setup f and g based on config file
         setupCostFunctions(purify_config, f, g, sigma, *measurement_operator);
+
+        regulariser_strength = purify_config.regularisation_parameter();
     }
     else
     {
@@ -122,6 +125,16 @@ int main(int argc, char **argv)
         // default cost function
         f = std::make_unique<sopt::L2DifferentiableFunc<t_complex>>(1, *measurement_operator);  // what would a default sigma look like??
         g = std::make_unique<sopt::algorithm::L1GProximal<t_complex>>();
+
+        try
+        {
+            regulariser_strength = UQ_config["regulariser_strength"].as<double>();
+        }
+        catch(...)
+        {
+            std::cout << "Regulariser strength not provided in UQ config, and no purify config was provided.\n";
+            std::cout << "Regulariser strength will be 0 by default." << std::endl;
+        }
     }
 
     // Set up confidence and objective function params
@@ -147,9 +160,6 @@ int main(int argc, char **argv)
         std::cout << "Config file must contain either 'confidence_interval' or 'alpha' as a parameter." << std::endl;
         return 1;
     }
-
-    const double regulariser_strength = UQ_config["regulariser_strength"].as<double>();
-
 
     if((imsize_x != surrogate_image.cols()) || (imsize_y != surrogate_image.rows()))
     {
