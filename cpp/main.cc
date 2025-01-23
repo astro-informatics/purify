@@ -4,6 +4,7 @@
 #include <array>
 #include <cstddef>
 #include <ctime>
+#include <memory>
 #include <random>
 #include "purify/algorithm_factory.h"
 #include "purify/cimg.h"
@@ -11,6 +12,7 @@
 #include "purify/measurement_operator_factory.h"
 #include "purify/pfitsio.h"
 #include "purify/read_measurements.h"
+#include "purify/setup_utils.h"
 #include "purify/update_factory.h"
 #include "purify/wavelet_operator_factory.h"
 #include "purify/wide_field_utilities.h"
@@ -20,15 +22,12 @@
 #include <sopt/power_method.h>
 #include <sopt/relative_variation.h>
 #include <sopt/reweighted.h>
-#include "purify/setup_utils.h"
-#include <memory>
 
 #ifdef PURIFY_ONNXRT
 #include <sopt/onnx_differentiable_func.h>
 #endif
 
 using namespace purify;
-
 
 int main(int argc, const char **argv) {
   std::srand(static_cast<t_uint>(std::time(0)));
@@ -58,20 +57,13 @@ int main(int argc, const char **argv) {
   purify::logging::set_level(params.logging());
 
   // Read or generate input data
-  auto [uv_data, sigma, measurement_op_eigen_vector, image_index, w_stacks] = getInputData(params,
-                                                                                           mop_algo,
-                                                                                           wop_algo,
-                                                                                           using_mpi);
+  auto [uv_data, sigma, measurement_op_eigen_vector, image_index, w_stacks] =
+      getInputData(params, mop_algo, wop_algo, using_mpi);
 
   // create measurement operator
-  auto [measurements_transform, operator_norm] = createMeasurementOperator(params,
-                                                                          mop_algo,
-                                                                          wop_algo,
-                                                                          using_mpi,
-                                                                          image_index,
-                                                                          w_stacks,
-                                                                          uv_data,
-                                                                          measurement_op_eigen_vector);
+  auto [measurements_transform, operator_norm] =
+      createMeasurementOperator(params, mop_algo, wop_algo, using_mpi, image_index, w_stacks,
+                                uv_data, measurement_op_eigen_vector);
 
   // create wavelet operator
   const waveletInfo wavelets = createWaveletOperator(params, wop_algo);
@@ -86,10 +78,10 @@ int main(int argc, const char **argv) {
 
   // Creating header for saving output images during iterations
   const auto [update_header_sol, update_header_res, def_header] = genHeaders(params, uv_data);
-  
+
   // the eigenvector
   saveMeasurementEigenVector(params, measurement_op_eigen_vector);
-  
+
   // the psf
   t_real beam_units = 1.0;
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
@@ -103,11 +95,11 @@ int main(int argc, const char **argv) {
     beam_units = uv_data.size() / flux_scale / flux_scale;
   }
 
-  savePSF(params, def_header, measurements_transform, uv_data, flux_scale, sigma, operator_norm, beam_units);
+  savePSF(params, def_header, measurements_transform, uv_data, flux_scale, sigma, operator_norm,
+          beam_units);
 
   // the dirty image
   saveDirtyImage(params, def_header, measurements_transform, uv_data, beam_units);
-
 
   // Create algorithm
   std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm;
@@ -116,27 +108,23 @@ int main(int argc, const char **argv) {
   if (params.algorithm() == "padmm")
     padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
         params.mpiAlgorithm(), measurements_transform, wavelets.transform, uv_data,
-        sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(), wavelets.sara_size,
-        params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
+        sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(),
+        wavelets.sara_size, params.iterations(), params.realValueConstraint(),
+        params.positiveValueConstraint(),
         (params.wavelet_basis().size() < 2) and (not params.realValueConstraint()) and
             (not params.positiveValueConstraint()),
         params.relVarianceConvergence(), params.dualFBVarianceConvergence(), 50,
         params.epsilonConvergenceScaling(), operator_norm);
-  if (params.algorithm() == "fb")
-  {
+  if (params.algorithm() == "fb") {
     std::shared_ptr<DifferentiableFunc<t_complex>> f;
-    if(params.diffFuncType() == diff_func_type::L2Norm_with_CRR)
-    {
-      #ifdef PURIFY_ONNXRT
-        f = std::make_shared<sopt::ONNXDifferentiableFunc<t_complex>>(params.CRR_function_model_path(),
-                                                                      params.CRR_gradient_model_path(),
-                                                                      sigma,
-                                                                      params.CRR_mu(),
-                                                                      params.CRR_lambda(),
-                                                                      *measurements_transform);
-      #else
-        throw std::runtime_error("CRR approach cannot be used with ONNXRT off");
-      #endif
+    if (params.diffFuncType() == diff_func_type::L2Norm_with_CRR) {
+#ifdef PURIFY_ONNXRT
+      f = std::make_shared<sopt::ONNXDifferentiableFunc<t_complex>>(
+          params.CRR_function_model_path(), params.CRR_gradient_model_path(), sigma,
+          params.CRR_mu(), params.CRR_lambda(), *measurements_transform);
+#else
+      throw std::runtime_error("CRR approach cannot be used with ONNXRT off");
+#endif
     }
 
     fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
@@ -153,9 +141,10 @@ int main(int argc, const char **argv) {
   if (params.algorithm() == "primaldual")
     primaldual = factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
         params.mpiAlgorithm(), measurements_transform, wavelets.transform, uv_data,
-        sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(), wavelets.sara_size,
-        params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
-        params.relVarianceConvergence(), params.epsilonConvergenceScaling(), operator_norm);
+        sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(),
+        wavelets.sara_size, params.iterations(), params.realValueConstraint(),
+        params.positiveValueConstraint(), params.relVarianceConvergence(),
+        params.epsilonConvergenceScaling(), operator_norm);
   // Add primal dual preconditioning
   if (params.algorithm() == "primaldual" and params.precondition_iters() > 0) {
     PURIFY_HIGH_LOG(
@@ -181,14 +170,16 @@ int main(int argc, const char **argv) {
     // Adding step size update to algorithm
     factory::add_updater<t_complex, sopt::algorithm::ImagingProximalADMM<t_complex>>(
         algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
-        update_header_res, params.height(), params.width(), wavelets.sara_size, using_mpi, beam_units);
+        update_header_res, params.height(), params.width(), wavelets.sara_size, using_mpi,
+        beam_units);
   }
   if (params.algorithm() == "primaldual") {
     const std::weak_ptr<sopt::algorithm::ImagingPrimalDual<t_complex>> algo_weak(primaldual);
     // Adding step size update to algorithm
     factory::add_updater<t_complex, sopt::algorithm::ImagingPrimalDual<t_complex>>(
         algo_weak, 1e-3, params.update_tolerance(), params.update_iters(), update_header_sol,
-        update_header_res, params.height(), params.width(), wavelets.sara_size, using_mpi, beam_units);
+        update_header_res, params.height(), params.width(), wavelets.sara_size, using_mpi,
+        beam_units);
   }
   if (params.algorithm() == "fb") {
     const std::weak_ptr<sopt::algorithm::ImagingForwardBackward<t_complex>> algo_weak(fb);
