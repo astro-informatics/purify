@@ -66,6 +66,7 @@ padmm_factory(const algo_distribution dist,
     throw std::runtime_error(
         "l1 proximal not consistent: You say you are using a tight frame, but you have more than "
         "one wavelet basis.");
+  PURIFY_INFO("Constructing PADMM algorithm");
   auto epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size())) * sigma;
   auto padmm = std::make_shared<Algorithm>(uv_data.vis);
   padmm->itermax(max_iterations)
@@ -169,11 +170,12 @@ fb_factory(const algo_distribution dist,
     throw std::runtime_error(
         "l1 proximal not consistent: You say you are using a tight frame, but you have more than "
         "one wavelet basis.");
+  PURIFY_INFO("Constructing Forward Backward algorithm");
   auto fb = std::make_shared<Algorithm>(uv_data.vis);
   fb->itermax(max_iterations)
       .regulariser_strength(reg_parameter)
-      .sigma(sigma)
-      .step_size(step_size)
+      .sigma(sigma * std::sqrt(2))
+      .step_size(step_size * std::sqrt(2))
       .relative_variation(relative_variation)
       .tight_frame(tight_frame)
       .sq_op_norm(op_norm * op_norm)
@@ -213,6 +215,7 @@ fb_factory(const algo_distribution dist,
         "Type TFGProximal not recognized because purify was built with onnxrt=off");
 #endif
   }
+
   case (nondiff_func_type::RealIndicator): {
     g = std::make_shared<sopt::algorithm::RealIndicator<t_scalar>>();
     break;
@@ -262,6 +265,7 @@ primaldual_factory(
     const t_real relative_variation = 1e-3, const t_real residual_tolerance_scaling = 1,
     const t_real op_norm = 1) {
   typedef typename Algorithm::Scalar t_scalar;
+  PURIFY_INFO("Constructing Primal Dual algorithm");
   auto epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size())) * sigma;
   auto primaldual = std::make_shared<Algorithm>(uv_data.vis);
   primaldual->itermax(max_iterations)

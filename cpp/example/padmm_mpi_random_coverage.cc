@@ -86,19 +86,20 @@ std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm_factory(
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
 #endif
   PURIFY_LOW_LOG("SARA Size = {}, Rank = {}", sara.size(), comm.rank());
-  const t_real gamma =
+  const t_real regulariser_strength =
       utilities::step_size(uv_data.vis, measurements,
                            std::make_shared<sopt::LinearTransform<Vector<t_complex>> const>(Psi),
                            sara.size()) *
       1e-3;
   PURIFY_LOW_LOG("Epsilon {}, Rank = {}", epsilon, comm.rank());
-  PURIFY_LOW_LOG("Gamma {}, SARA Size = {}, Rank = {}", gamma, sara.size(), comm.rank());
+  PURIFY_LOW_LOG("Regulariser_Strength {}, SARA Size = {}, Rank = {}", regulariser_strength,
+                 sara.size(), comm.rank());
 
   // shared pointer because the convergence function need access to some data that we would rather
   // not reproduce. E.g. padmm definition is self-referential.
   auto padmm = std::make_shared<sopt::algorithm::ImagingProximalADMM<t_complex>>(uv_data.vis);
   padmm->itermax(50)
-      .gamma(comm.all_reduce(gamma, MPI_MAX))
+      .regulariser_strength(comm.all_reduce(regulariser_strength, MPI_MAX))
       .relative_variation(1e-3)
       .l2ball_proximal_epsilon(epsilon)
 #if PURIFY_PADMM_ALGORITHM == 2
@@ -115,7 +116,7 @@ std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm_factory(
       .l1_proximal_real_constraint(true)
       .residual_tolerance(epsilon)
       .lagrange_update_scale(0.9)
-      .nu(1e0)
+      .sq_op_norm(1e0)
       .Psi(Psi)
       .Phi(*measurements);
   sopt::ScalarRelativeVariation<t_complex> conv(padmm->relative_variation(),
