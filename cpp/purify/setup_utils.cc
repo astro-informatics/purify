@@ -1,18 +1,18 @@
 #include "purify/setup_utils.h"
-#include <sopt/power_method.h>
 #include <sopt/differentiable_func.h>
-#include <sopt/non_differentiable_func.h>
 #include <sopt/l1_non_diff_function.h>
-#include <sopt/tf_non_diff_function.h>
-#include <sopt/real_indicator.h>
 #include <sopt/l2_differentiable_func.h>
+#include <sopt/non_differentiable_func.h>
 #include <sopt/onnx_differentiable_func.h>
+#include <sopt/power_method.h>
+#include <sopt/real_indicator.h>
+#include <sopt/tf_non_diff_function.h>
 
 using namespace purify;
 
-waveletInfo createWaveletOperator(YamlParser &params, const factory::distributed_wavelet_operator &wop_algo)
-{
-    std::vector<std::tuple<std::string, t_uint>> sara;
+waveletInfo createWaveletOperator(YamlParser &params,
+                                  const factory::distributed_wavelet_operator &wop_algo) {
+  std::vector<std::tuple<std::string, t_uint>> sara;
   for (size_t i = 0; i < params.wavelet_basis().size(); i++)
     sara.push_back(std::make_tuple(params.wavelet_basis().at(i), params.wavelet_levels()));
   t_uint sara_size = 0;
@@ -28,8 +28,7 @@ waveletInfo createWaveletOperator(YamlParser &params, const factory::distributed
   return {wavelets_transform, sara_size};
 }
 
-OperatorsInfo selectOperators(YamlParser &params)
-{
+OperatorsInfo selectOperators(YamlParser &params) {
   factory::distributed_measurement_operator mop_algo =
       (not params.gpu()) ? factory::distributed_measurement_operator::serial
                          : factory::distributed_measurement_operator::gpu_serial;
@@ -59,9 +58,7 @@ OperatorsInfo selectOperators(YamlParser &params)
 
 inputData getInputData(const YamlParser &params,
                        const factory::distributed_measurement_operator mop_algo,
-                       const factory::distributed_wavelet_operator wop_algo,
-                       const bool using_mpi)
-{
+                       const factory::distributed_wavelet_operator wop_algo, const bool using_mpi) {
   utilities::vis_params uv_data;
   bool w_term = params.w_term();
   t_real sigma;
@@ -243,16 +240,12 @@ inputData getInputData(const YamlParser &params,
   return {uv_data, sigma, measurement_op_eigen_vector, image_index, w_stacks};
 }
 
-measurementOpInfo createMeasurementOperator(const YamlParser &params,
-                                            const factory::distributed_measurement_operator mop_algo,
-                                            const factory::distributed_wavelet_operator wop_algo,
-                                            const bool using_mpi,
-                                            const std::vector<t_int> &image_index,
-                                            const std::vector<t_real> &w_stacks,
-                                            const utilities::vis_params &uv_data,
-                                            Vector<t_complex> &measurement_op_eigen_vector)
-{
-    std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measurements_transform;
+measurementOpInfo createMeasurementOperator(
+    const YamlParser &params, const factory::distributed_measurement_operator mop_algo,
+    const factory::distributed_wavelet_operator wop_algo, const bool using_mpi,
+    const std::vector<t_int> &image_index, const std::vector<t_real> &w_stacks,
+    const utilities::vis_params &uv_data, Vector<t_complex> &measurement_op_eigen_vector) {
+  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measurements_transform;
   if (mop_algo != factory::distributed_measurement_operator::mpi_distribute_all_to_all and
       mop_algo != factory::distributed_measurement_operator::gpu_mpi_distribute_all_to_all)
     measurements_transform =
@@ -307,12 +300,9 @@ measurementOpInfo createMeasurementOperator(const YamlParser &params,
   return {measurements_transform, operator_norm};
 }
 
-void setupCostFunctions(const YamlParser &params, 
-                        std::unique_ptr<DifferentiableFunc<t_complex>> &f,
-                        std::unique_ptr<NonDifferentiableFunc<t_complex>> &g,
-                        t_real sigma,
-                        sopt::LinearTransform<Vector<t_complex>> &Phi) 
-{
+void setupCostFunctions(const YamlParser &params, std::unique_ptr<DifferentiableFunc<t_complex>> &f,
+                        std::unique_ptr<NonDifferentiableFunc<t_complex>> &g, t_real sigma,
+                        sopt::LinearTransform<Vector<t_complex>> &Phi) {
   switch (params.diffFuncType()) {
   case purify::diff_func_type::L2Norm:
     f = std::make_unique<sopt::L2DifferentiableFunc<t_complex>>(sigma, Phi);
@@ -337,8 +327,7 @@ void setupCostFunctions(const YamlParser &params,
   }
 }
 
-void initOutDirectoryWithConfig(YamlParser &params)
-{
+void initOutDirectoryWithConfig(YamlParser &params) {
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
     auto const world = sopt::mpi::Communicator::World();
@@ -352,15 +341,14 @@ void initOutDirectoryWithConfig(YamlParser &params)
   }
 }
 
-Headers genHeaders(const YamlParser &params, const utilities::vis_params &uv_data)
-{
+Headers genHeaders(const YamlParser &params, const utilities::vis_params &uv_data) {
   const pfitsio::header_params update_header_sol =
-      pfitsio::header_params(params.output_path() + "/sol_update.fits", "Jy/Pixel", 1, uv_data.ra, uv_data.dec,
-                             params.measurements_polarization(), params.cellsizex(),
+      pfitsio::header_params(params.output_path() + "/sol_update.fits", "Jy/Pixel", 1, uv_data.ra,
+                             uv_data.dec, params.measurements_polarization(), params.cellsizex(),
                              params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
   const pfitsio::header_params update_header_res =
-      pfitsio::header_params(params.output_path() + "/res_update.fits", "Jy/Beam", 1, uv_data.ra, uv_data.dec,
-                             params.measurements_polarization(), params.cellsizex(),
+      pfitsio::header_params(params.output_path() + "/res_update.fits", "Jy/Beam", 1, uv_data.ra,
+                             uv_data.dec, params.measurements_polarization(), params.cellsizex(),
                              params.cellsizey(), uv_data.average_frequency, 0, 0, false, 0, 0, 0);
   const pfitsio::header_params def_header = pfitsio::header_params(
       "", "Jy/Pixel", 1, uv_data.ra, uv_data.dec, params.measurements_polarization(),
@@ -369,8 +357,8 @@ Headers genHeaders(const YamlParser &params, const utilities::vis_params &uv_dat
   return {update_header_sol, update_header_res, def_header};
 }
 
-void saveMeasurementEigenVector(const YamlParser &params, const Vector<t_complex> &measurement_op_eigen_vector)
-{
+void saveMeasurementEigenVector(const YamlParser &params,
+                                const Vector<t_complex> &measurement_op_eigen_vector) {
   if (params.mpiAlgorithm() != factory::algo_distribution::serial) {
 #ifdef PURIFY_MPI
     auto const world = sopt::mpi::Communicator::World();
@@ -392,16 +380,12 @@ void saveMeasurementEigenVector(const YamlParser &params, const Vector<t_complex
   }
 }
 
-void savePSF(const YamlParser &params,
-             const pfitsio::header_params &def_header,
-             const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> &measurements_transform,
-             const utilities::vis_params &uv_data,
-             const t_real flux_scale,
-             const t_real sigma,
-             const t_real operator_norm,
-             const t_real beam_units)
-{
-    pfitsio::header_params psf_header = def_header;
+void savePSF(
+    const YamlParser &params, const pfitsio::header_params &def_header,
+    const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> &measurements_transform,
+    const utilities::vis_params &uv_data, const t_real flux_scale, const t_real sigma,
+    const t_real operator_norm, const t_real beam_units) {
+  pfitsio::header_params psf_header = def_header;
   psf_header.fits_name = params.output_path() + "/psf.fits";
   psf_header.pix_units = "Jy/Pixel";
   const Vector<t_complex> psf = measurements_transform->adjoint() * (uv_data.weights / flux_scale);
@@ -434,13 +418,11 @@ void savePSF(const YamlParser &params,
   PURIFY_HIGH_LOG("Effective sigma is {} Jy", sigma * params.epsilonScaling());
 }
 
-void saveDirtyImage(const YamlParser &params,
-                    const pfitsio::header_params &def_header,
-                    const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> &measurements_transform,
-                    const utilities::vis_params &uv_data,
-                    const t_real beam_units)
-{
-    pfitsio::header_params dirty_header = def_header;
+void saveDirtyImage(
+    const YamlParser &params, const pfitsio::header_params &def_header,
+    const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> &measurements_transform,
+    const utilities::vis_params &uv_data, const t_real beam_units) {
+  pfitsio::header_params dirty_header = def_header;
   dirty_header.fits_name = params.output_path() + "/dirty.fits";
   dirty_header.pix_units = "Jy/Beam";
   const Vector<t_complex> dimage = measurements_transform->adjoint() * uv_data.vis;
