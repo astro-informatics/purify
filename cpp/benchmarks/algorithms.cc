@@ -115,7 +115,7 @@ BENCHMARK_DEFINE_F(AlgoFixture, ForwardBackwardOnnx)(benchmark::State &state) {
   m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, m_measurements_transform, wavelets, m_uv_data, m_sigma,
       beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true, false, 1e-3,
-      1e-2, 50, 1.0, tf_model_path, factory::g_proximal_type::TFGProximal);
+      1e-2, 50, 1.0, tf_model_path, factory::nondiff_func_type::Denoiser);
 
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
