@@ -129,6 +129,7 @@ class YamlParser {
   YAML_MACRO(std::string, output_prefix, "")
   YAML_MACRO(std::string, skymodel, "")
   YAML_MACRO(std::vector<std::string>, measurements, {})
+  YAML_MACRO(bool, w_term, true)
   YAML_MACRO(stokes, measurements_polarization, stokes::I)
   YAML_MACRO(utilities::vis_units, measurements_units, utilities::vis_units::radians)
   YAML_MACRO(std::string, kernel, "")

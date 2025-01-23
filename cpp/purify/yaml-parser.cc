@@ -119,6 +119,16 @@ void YamlParser::parseAndSetGeneralConfiguration(const YAML::Node& generalConfig
     this->source_ = purify::utilities::vis_source::measurements;
     this->measurements_ = get_vector<std::vector<std::string>>(
         generalConfigNode, {"InputOutput", "input", "measurements", "measurements_files"});
+    try
+    {
+      this->w_term_ = get<bool>(
+        generalConfigNode, {"InputOutput", "input", "measurements", "w_term"});
+    }
+    catch(...)
+    {
+      PURIFY_LOW_LOG("W-term flag not set for input measurements; defaulting to true.");
+      this->w_term_ = true;
+    }
     // TODO: use the enum instead of string.
     const std::string units_measurement_str = get<std::string>(
         generalConfigNode, {"InputOutput", "input", "measurements", "measurements_units"});
@@ -200,7 +210,8 @@ void YamlParser::parseAndSetSARA(const YAML::Node& SARANode) {
 
 void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsNode) {
   this->algorithm_ = get<std::string>(algorithmOptionsNode, {"algorithm"});
-  if (this->algorithm_ == "padmm") {
+  if (this->algorithm_ == "padmm") 
+  {
     this->epsilonConvergenceScaling_ =
         get<t_real>(algorithmOptionsNode, {"padmm", "epsilonConvergenceScaling"});
     this->mpiAlgorithm_ = factory::algo_distribution_string.at(
@@ -212,7 +223,9 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
         get<t_real>(algorithmOptionsNode, {"padmm", "stepsize", "update_tolerance"});
     this->dualFBVarianceConvergence_ =
         get<t_real>(algorithmOptionsNode, {"padmm", "dualFBVarianceConvergence"});
-  } else if (this->algorithm_ == "fb" or this->algorithm_ == "fb_joint_map") {
+  } 
+  else if (this->algorithm_ == "fb" or this->algorithm_ == "fb_joint_map") 
+  {
     this->mpiAlgorithm_ = factory::algo_distribution_string.at(
         get<std::string>(algorithmOptionsNode, {"fb", "mpiAlgorithm"}));
     this->relVarianceConvergence_ =
@@ -251,7 +264,9 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
           get<t_real>(algorithmOptionsNode, {"fb", "joint_map_estimation", "alpha"});
       this->jmap_beta_ = get<t_real>(algorithmOptionsNode, {"fb", "joint_map_estimation", "beta"});
     }
-  } else if (this->algorithm_ == "primaldual") {
+  } 
+  else if (this->algorithm_ == "primaldual") 
+  {
     this->epsilonConvergenceScaling_ =
         get<t_real>(algorithmOptionsNode, {"primaldual", "epsilonConvergenceScaling"});
     this->mpiAlgorithm_ = factory::algo_distribution_string.at(
@@ -264,7 +279,9 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
         get<t_real>(algorithmOptionsNode, {"primaldual", "stepsize", "update_tolerance"});
     this->precondition_iters_ =
         get<t_int>(algorithmOptionsNode, {"primaldual", "precondition_iters"});
-  } else {
+  } 
+  else
+  {
     throw std::runtime_error(
         "Only padmm algorithm configured for now. Please fill the appropriate block in the "
         "configuration file.");

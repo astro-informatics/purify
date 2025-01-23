@@ -63,6 +63,7 @@ inputData getInputData(const YamlParser &params,
                        const bool using_mpi)
 {
   utilities::vis_params uv_data;
+  bool w_term = params.w_term();
   t_real sigma;
   std::vector<t_int> image_index = std::vector<t_int>();
   std::vector<t_real> w_stacks = std::vector<t_real>();
@@ -95,7 +96,7 @@ inputData getInputData(const YamlParser &params,
     if (using_mpi) {
       auto const world = sopt::mpi::Communicator::World();
       uv_data = read_measurements::read_measurements(params.measurements(), world,
-                                                     distribute::plan::radial, true, stokes::I,
+                                                     distribute::plan::radial, w_term, stokes::I,
                                                      params.measurements_units());
       const t_real norm =
           std::sqrt(world.all_sum_all(
@@ -108,7 +109,7 @@ inputData getInputData(const YamlParser &params,
     } else
 #endif
     {
-      uv_data = read_measurements::read_measurements(params.measurements(), true, stokes::I,
+      uv_data = read_measurements::read_measurements(params.measurements(), w_term, stokes::I,
                                                      params.measurements_units());
       const t_real norm = std::sqrt(
           (uv_data.weights.real().array() * uv_data.weights.real().array()).sum() / uv_data.size());
@@ -156,11 +157,11 @@ inputData getInputData(const YamlParser &params,
       if (using_mpi) {
         auto const world = sopt::mpi::Communicator::World();
         uv_data = read_measurements::read_measurements(params.measurements(), world,
-                                                       distribute::plan::radial, true, stokes::I,
+                                                       distribute::plan::radial, w_term, stokes::I,
                                                        params.measurements_units());
       } else
 #endif
-        uv_data = read_measurements::read_measurements(params.measurements(), true, stokes::I,
+        uv_data = read_measurements::read_measurements(params.measurements(), w_term, stokes::I,
                                                        params.measurements_units());
       uv_data.weights = Vector<t_complex>::Ones(uv_data.weights.size());
     }
