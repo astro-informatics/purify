@@ -149,10 +149,7 @@ class YamlParser {
   YAML_MACRO(t_real, CRR_mu, 20)
   YAML_MACRO(t_real, CRR_lambda, 5000)
 
-  std::string output_path() const
-  {
-    return out_path;
-  }
+  std::string output_path() const { return out_path; }
 
 #undef YAML_MACRO
  private:
