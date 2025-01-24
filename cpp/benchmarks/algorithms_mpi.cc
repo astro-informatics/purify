@@ -200,6 +200,35 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbOnnxDistributeImage)(benchmark::State &stat
   }
 }
 
+BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbOnnxDistributeGrid)(benchmark::State &state) {
+  // Create the algorithm - has to be done there to reset the internal state.
+  // If done in the fixture repeats would start at the solution and converge immediately.
+
+  // TODO: Wavelets are constructed but not used in the factory method
+  auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
+      factory::distributed_wavelet_operator::serial, m_sara, m_imsizey, m_imsizex);
+
+  t_real const beta = m_sigma * m_sigma;
+  t_real const gamma = 0.0001;
+
+  std::string tf_model_path = purify::models_directory() + "/snr_15_model_dynamic.onnx";
+
+  m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
+      factory::algo_distribution::mpi_serial, m_measurements_distribute_grid, wavelets, m_uv_data,
+      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true,
+      false, 1e-3, 1e-2, 50, 1.0, tf_model_path, factory::g_proximal_type::TFGProximal);
+
+  // Benchmark the application of the algorithm
+  while (state.KeepRunning()) {
+    auto start = std::chrono::high_resolution_clock::now();
+    auto result = (*m_fb)();
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "Converged? " << result.good << " , niters = " << result.niters << std::endl;
+    state.SetIterationTime(b_utilities::duration(start, end, m_world));
+  }
+}
+
+
 BENCHMARK_REGISTER_F(AlgoFixtureMPI, FbOnnxDistributeImage)
     //->Apply(b_utilities::Arguments)
     ->Args({128, 10000, 4, 10, 1})
