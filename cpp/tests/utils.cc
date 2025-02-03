@@ -87,7 +87,7 @@ TEST_CASE("utilities [median]", "[median]") {
 }
 TEST_CASE("utilities [read_write_vis]", "[read_write_vis]") {
   // tests the read and write function for a visibility data set
-  std::string vis_file = vla_filename("at166B.3C129.c0I.vis");
+  std::string vis_file = vla_filename("at166B.3C129.c0.vis");
   std::string out_file = output_filename("test_output.vis");
   std::string out_w_file = output_filename("test_w_output.vis");
   auto uv_data = utilities::read_visibility(vis_file);
