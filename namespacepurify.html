@@ -146,6 +146,15 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
+<tr class="memitem:a9288eb8d6da092f4e9d9442046093356"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a9288eb8d6da092f4e9d9442046093356">diff_func_type</a> { <a class="el" href="namespacepurify.html#a9288eb8d6da092f4e9d9442046093356af3b33f9ef56070596a299d6824c440a0">L2Norm</a>
+, <a class="el" href="namespacepurify.html#a9288eb8d6da092f4e9d9442046093356abad1f84f2aa31704a02b89eecbd17f72">L2Norm_with_CRR</a>
+ }</td></tr>
+<tr class="separator:a9288eb8d6da092f4e9d9442046093356"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42082160b5b3bb71406463530ddcdba3"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3">nondiff_func_type</a> { <a class="el" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3af3b25b9828de3ee193fbb78a8c847b0a">L1Norm</a>
+, <a class="el" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3a5ad0cc29f63d0e86542b2935cbde2980">Denoiser</a>
+, <a class="el" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3a63e2f5122a48c43827d069e526b4cfcf">RealIndicator</a>
+ }</td></tr>
+<tr class="separator:a42082160b5b3bb71406463530ddcdba3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a97d23bf901331999e4ef365e403ba8b8"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8">stokes</a> { <br />
 &#160;&#160;<a class="el" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8add7536794b63bf90eccfd37f9b147d7f">I</a>
 , <a class="el" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8af09564c9ca56850d4cd6b3319e541aee">Q</a>
@@ -268,6 +277,10 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a670298eb86fc4bac76e6ca9d621c230e"><td class="memItemLeft" align="right" valign="top">const std::map&lt; std::string, <a class="el" href="namespacepurify.html#a9288eb8d6da092f4e9d9442046093356">diff_func_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a670298eb86fc4bac76e6ca9d621c230e">diff_type_string</a></td></tr>
+<tr class="separator:a670298eb86fc4bac76e6ca9d621c230e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae932bff3414fceab9be7e35641f3bf90"><td class="memItemLeft" align="right" valign="top">const std::map&lt; std::string, <a class="el" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3">nondiff_func_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#ae932bff3414fceab9be7e35641f3bf90">nondiff_type_string</a></td></tr>
+<tr class="separator:ae932bff3414fceab9be7e35641f3bf90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28dc6ce59ab78004234888df0d8ba64f"><td class="memItemLeft" align="right" valign="top">const std::map&lt; <a class="el" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8">stokes</a>, t_int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a28dc6ce59ab78004234888df0d8ba64f">stokes_int</a></td></tr>
 <tr class="separator:a28dc6ce59ab78004234888df0d8ba64f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a563072861363d38f71744c9e817705c3"><td class="memItemLeft" align="right" valign="top">const std::map&lt; std::string, <a class="el" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8">stokes</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify.html#a563072861363d38f71744c9e817705c3">stokes_string</a></td></tr>
@@ -303,7 +316,7 @@ template&lt;class T  = t_real, class I  = t_int&gt; </div>
 <p>A matrix of a given type. </p>
 <p>Operates as mathematical sparse matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00028">28</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00040">40</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
 
 </div>
 </div>
@@ -321,7 +334,7 @@ template&lt;class T  = t_real, class I  = t_int&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00030">30</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00042">42</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
 
 </div>
 </div>
@@ -386,10 +399,74 @@ template&lt;class T  = t_real, class I  = t_int&gt; </div>
 <tr><td class="fieldname"><a id="ad1900deb6bebc3b75891904d6f576df5aa06fc4a5c57b80607e8a5d5a577bc796"></a>wkernel_2d&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00047">47</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;{ <a class="code" href="namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5a15a19970dec9bb028b96daf2bb89af90">wkernel_radial</a>, <a class="code" href="namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5aa06fc4a5c57b80607e8a5d5a577bc796">wkernel_2d</a> };</div>
+<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00059">59</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;{ <a class="code" href="namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5a15a19970dec9bb028b96daf2bb89af90">wkernel_radial</a>, <a class="code" href="namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5aa06fc4a5c57b80607e8a5d5a577bc796">wkernel_2d</a> };</div>
 <div class="ttc" id="anamespacepurify_html_ad1900deb6bebc3b75891904d6f576df5a15a19970dec9bb028b96daf2bb89af90"><div class="ttname"><a href="namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5a15a19970dec9bb028b96daf2bb89af90">purify::dde_type::wkernel_radial</a></div><div class="ttdeci">@ wkernel_radial</div></div>
 <div class="ttc" id="anamespacepurify_html_ad1900deb6bebc3b75891904d6f576df5aa06fc4a5c57b80607e8a5d5a577bc796"><div class="ttname"><a href="namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5aa06fc4a5c57b80607e8a5d5a577bc796">purify::dde_type::wkernel_2d</a></div><div class="ttdeci">@ wkernel_2d</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a9288eb8d6da092f4e9d9442046093356"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9288eb8d6da092f4e9d9442046093356">&#9670;&nbsp;</a></span>diff_func_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespacepurify.html#a9288eb8d6da092f4e9d9442046093356">purify::diff_func_type</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a9288eb8d6da092f4e9d9442046093356af3b33f9ef56070596a299d6824c440a0"></a>L2Norm&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a9288eb8d6da092f4e9d9442046093356abad1f84f2aa31704a02b89eecbd17f72"></a>L2Norm_with_CRR&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00026">26</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;{ <a class="code" href="namespacepurify.html#a9288eb8d6da092f4e9d9442046093356af3b33f9ef56070596a299d6824c440a0">L2Norm</a>, <a class="code" href="namespacepurify.html#a9288eb8d6da092f4e9d9442046093356abad1f84f2aa31704a02b89eecbd17f72">L2Norm_with_CRR</a> };</div>
+<div class="ttc" id="anamespacepurify_html_a9288eb8d6da092f4e9d9442046093356abad1f84f2aa31704a02b89eecbd17f72"><div class="ttname"><a href="namespacepurify.html#a9288eb8d6da092f4e9d9442046093356abad1f84f2aa31704a02b89eecbd17f72">purify::diff_func_type::L2Norm_with_CRR</a></div><div class="ttdeci">@ L2Norm_with_CRR</div></div>
+<div class="ttc" id="anamespacepurify_html_a9288eb8d6da092f4e9d9442046093356af3b33f9ef56070596a299d6824c440a0"><div class="ttname"><a href="namespacepurify.html#a9288eb8d6da092f4e9d9442046093356af3b33f9ef56070596a299d6824c440a0">purify::diff_func_type::L2Norm</a></div><div class="ttdeci">@ L2Norm</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a42082160b5b3bb71406463530ddcdba3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42082160b5b3bb71406463530ddcdba3">&#9670;&nbsp;</a></span>nondiff_func_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3">purify::nondiff_func_type</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a42082160b5b3bb71406463530ddcdba3af3b25b9828de3ee193fbb78a8c847b0a"></a>L1Norm&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a42082160b5b3bb71406463530ddcdba3a5ad0cc29f63d0e86542b2935cbde2980"></a>Denoiser&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a42082160b5b3bb71406463530ddcdba3a63e2f5122a48c43827d069e526b4cfcf"></a>RealIndicator&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00031">31</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;{ <a class="code" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3af3b25b9828de3ee193fbb78a8c847b0a">L1Norm</a>, <a class="code" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3a5ad0cc29f63d0e86542b2935cbde2980">Denoiser</a>, <a class="code" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3a63e2f5122a48c43827d069e526b4cfcf">RealIndicator</a> };</div>
+<div class="ttc" id="anamespacepurify_html_a42082160b5b3bb71406463530ddcdba3a5ad0cc29f63d0e86542b2935cbde2980"><div class="ttname"><a href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3a5ad0cc29f63d0e86542b2935cbde2980">purify::nondiff_func_type::Denoiser</a></div><div class="ttdeci">@ Denoiser</div></div>
+<div class="ttc" id="anamespacepurify_html_a42082160b5b3bb71406463530ddcdba3a63e2f5122a48c43827d069e526b4cfcf"><div class="ttname"><a href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3a63e2f5122a48c43827d069e526b4cfcf">purify::nondiff_func_type::RealIndicator</a></div><div class="ttdeci">@ RealIndicator</div></div>
+<div class="ttc" id="anamespacepurify_html_a42082160b5b3bb71406463530ddcdba3af3b25b9828de3ee193fbb78a8c847b0a"><div class="ttname"><a href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3af3b25b9828de3ee193fbb78a8c847b0a">purify::nondiff_func_type::L1Norm</a></div><div class="ttdeci">@ L1Norm</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -428,8 +505,8 @@ template&lt;class T  = t_real, class I  = t_int&gt; </div>
 <tr><td class="fieldname"><a id="a97d23bf901331999e4ef365e403ba8b8a44c29edb103a2872f519ad0c9a0fdaaa"></a>P&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00032">32</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;{ <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8add7536794b63bf90eccfd37f9b147d7f">I</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8af09564c9ca56850d4cd6b3319e541aee">Q</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a4c614360da93c0a041b22e537de151eb">U</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a5206560a306a2e085a437fd258eb57ce">V</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8ac51b57a703ba1c5869228690c93e1701">XX</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a0867f43e27585e019c13f7f4b7c4ab6b">YY</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a74c53bcd3dcb2bb79993b2fec37d362a">XY</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a923db922542fbe09e7ff87bb31b2f310">YX</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a67824ecf84f5816f07b74fa956bdbcd2">LL</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8acb95449a94688af33f6e9bb090cf2936">RR</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a90a7c45eaffbd575ca6fb361e6d170a4">LR</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a7f49bbe2f0af1edb6c6cee353d3e204b">RL</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a44c29edb103a2872f519ad0c9a0fdaaa">P</a> };</div>
+<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00044">44</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;{ <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8add7536794b63bf90eccfd37f9b147d7f">I</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8af09564c9ca56850d4cd6b3319e541aee">Q</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a4c614360da93c0a041b22e537de151eb">U</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a5206560a306a2e085a437fd258eb57ce">V</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8ac51b57a703ba1c5869228690c93e1701">XX</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a0867f43e27585e019c13f7f4b7c4ab6b">YY</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a74c53bcd3dcb2bb79993b2fec37d362a">XY</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a923db922542fbe09e7ff87bb31b2f310">YX</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a67824ecf84f5816f07b74fa956bdbcd2">LL</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8acb95449a94688af33f6e9bb090cf2936">RR</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a90a7c45eaffbd575ca6fb361e6d170a4">LR</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a7f49bbe2f0af1edb6c6cee353d3e204b">RL</a>, <a class="code" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a44c29edb103a2872f519ad0c9a0fdaaa">P</a> };</div>
 <div class="ttc" id="anamespacepurify_html_a97d23bf901331999e4ef365e403ba8b8a0867f43e27585e019c13f7f4b7c4ab6b"><div class="ttname"><a href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a0867f43e27585e019c13f7f4b7c4ab6b">purify::stokes::YY</a></div><div class="ttdeci">@ YY</div></div>
 <div class="ttc" id="anamespacepurify_html_a97d23bf901331999e4ef365e403ba8b8a44c29edb103a2872f519ad0c9a0fdaaa"><div class="ttname"><a href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a44c29edb103a2872f519ad0c9a0fdaaa">purify::stokes::P</a></div><div class="ttdeci">@ P</div></div>
 <div class="ttc" id="anamespacepurify_html_a97d23bf901331999e4ef365e403ba8b8a4c614360da93c0a041b22e537de151eb"><div class="ttname"><a href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8a4c614360da93c0a041b22e537de151eb">purify::stokes::U</a></div><div class="ttdeci">@ U</div></div>
@@ -728,7 +805,7 @@ template&lt;class T0 &gt; </div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;}</div>
 <div class="ttc" id="alogging_8h_html_a8436006ba02587ee29d4e22975394895"><div class="ttname"><a href="logging_8h.html#a8436006ba02587ee29d4e22975394895">PURIFY_ERROR</a></div><div class="ttdeci">#define PURIFY_ERROR(...)</div><div class="ttdoc">\macro Something is definitely wrong, algorithm exits</div><div class="ttdef"><b>Definition:</b> <a href="logging_8h_source.html#l00190">logging.h:190</a></div></div>
 <div class="ttc" id="alogging_8h_html_ad2207dcfa3c2c44fa0fccbb9d0a3b21c"><div class="ttname"><a href="logging_8h.html#ad2207dcfa3c2c44fa0fccbb9d0a3b21c">PURIFY_MEDIUM_LOG</a></div><div class="ttdeci">#define PURIFY_MEDIUM_LOG(...)</div><div class="ttdoc">Medium priority message.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8h_source.html#l00205">logging.h:205</a></div></div>
-<div class="ttc" id="anamespacepurify_1_1constant_html_aa35bce2e736d0453c6005cbc06f1dbe7"><div class="ttname"><a href="namespacepurify_1_1constant.html#aa35bce2e736d0453c6005cbc06f1dbe7">purify::constant::pi</a></div><div class="ttdeci">const t_real pi</div><div class="ttdoc">mathematical constant</div><div class="ttdef"><b>Definition:</b> <a href="types_8h_source.html#l00058">types.h:58</a></div></div>
+<div class="ttc" id="anamespacepurify_1_1constant_html_aa35bce2e736d0453c6005cbc06f1dbe7"><div class="ttname"><a href="namespacepurify_1_1constant.html#aa35bce2e736d0453c6005cbc06f1dbe7">purify::constant::pi</a></div><div class="ttdeci">const t_real pi</div><div class="ttdoc">mathematical constant</div><div class="ttdef"><b>Definition:</b> <a href="types_8h_source.html#l00070">types.h:70</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1kernels_html_a2703c3d44226204c45f3219cc890edef"><div class="ttname"><a href="namespacepurify_1_1kernels.html#a2703c3d44226204c45f3219cc890edef">purify::kernels::ft_kaiser_bessel</a></div><div class="ttdeci">t_real ft_kaiser_bessel(const t_real x, const t_real J)</div><div class="ttdoc">Fourier transform of kaiser bessel kernel.</div><div class="ttdef"><b>Definition:</b> <a href="kernels_8cc_source.html#l00040">kernels.cc:40</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1kernels_html_a539e03adfcf4e7bc963e8282a722940e"><div class="ttname"><a href="namespacepurify_1_1kernels.html#a539e03adfcf4e7bc963e8282a722940e">purify::kernels::ft_gaussian_general</a></div><div class="ttdeci">t_real ft_gaussian_general(const t_real x, const t_real J, const t_real sigma)</div><div class="ttdoc">Fourier transform of general Gaussian kernel.</div><div class="ttdef"><b>Definition:</b> <a href="kernels_8cc_source.html#l00233">kernels.cc:233</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1kernels_html_a57f3f5095a015db5353a7fd7a3002bf8"><div class="ttname"><a href="namespacepurify_1_1kernels.html#a57f3f5095a015db5353a7fd7a3002bf8">purify::kernels::kernel_samples</a></div><div class="ttdeci">std::vector&lt; t_real &gt; kernel_samples(const t_int total_samples, const std::function&lt; t_real(t_real)&gt; kernelu)</div><div class="ttdoc">Calculates samples of a kernel.</div><div class="ttdef"><b>Definition:</b> <a href="kernels_8cc_source.html#l00144">kernels.cc:144</a></div></div>
@@ -744,7 +821,7 @@ template&lt;class T0 &gt; </div>
 <div class="ttc" id="anamespacepurify_1_1kernels_html_afd78fa880a5c40cc7d98d741efedea1d"><div class="ttname"><a href="namespacepurify_1_1kernels.html#afd78fa880a5c40cc7d98d741efedea1d">purify::kernels::ft_gaussian</a></div><div class="ttdeci">t_real ft_gaussian(const t_real x, const t_real J)</div><div class="ttdoc">Fourier transform of Gaussian kernel.</div><div class="ttdef"><b>Definition:</b> <a href="kernels_8cc_source.html#l00060">kernels.cc:60</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1kernels_html_afdc7151c592c299ad32241b9af5465e9"><div class="ttname"><a href="namespacepurify_1_1kernels.html#afdc7151c592c299ad32241b9af5465e9">purify::kernels::ft_kaiser_bessel_general</a></div><div class="ttdeci">t_real ft_kaiser_bessel_general(const t_real x, const t_real J, const t_real alpha)</div><div class="ttdoc">Fourier transform of more general Kaiser-Bessel kernel.</div><div class="ttdef"><b>Definition:</b> <a href="kernels_8cc_source.html#l00025">kernels.cc:25</a></div></div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a34be958a921e43d813a2075297d8e862">purify::kernels::box</a>, <a class="el" href="kernels_8cc_source.html#l00060">purify::kernels::ft_gaussian()</a>, <a class="el" href="kernels_8cc_source.html#l00233">purify::kernels::ft_gaussian_general()</a>, <a class="el" href="kernels_8cc_source.html#l00040">purify::kernels::ft_kaiser_bessel()</a>, <a class="el" href="kernels_8cc_source.html#l00025">purify::kernels::ft_kaiser_bessel_general()</a>, <a class="el" href="kernels_8cc_source.html#l00211">purify::kernels::ft_pill_box()</a>, <a class="el" href="kernels_8cc_source.html#l00124">purify::kernels::ft_pswf()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a710a4950250286365cf841f765a790f1">purify::kernels::gauss</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a575e9f12266a1af6d0b1cce8da8bc310">purify::kernels::gauss_alt</a>, <a class="el" href="kernels_8cc_source.html#l00049">purify::kernels::gaussian()</a>, <a class="el" href="kernels_8cc_source.html#l00220">purify::kernels::gaussian_general()</a>, <a class="el" href="kernels_8cc_source.html#l00007">purify::kernels::kaiser_bessel()</a>, <a class="el" href="kernels_8cc_source.html#l00015">purify::kernels::kaiser_bessel_general()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668aba34ea40525a4379add785228e37fe86">purify::kernels::kb</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a6aa53115b88dffbf79eb9c4aa0e0ba20">purify::kernels::kb_presample</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668ac8f9b2014e544adacfc19dfeba3718e8">purify::kernels::kbmin</a>, <a class="el" href="kernels_8cc_source.html#l00144">purify::kernels::kernel_samples()</a>, <a class="el" href="kernels_8cc_source.html#l00156">purify::kernels::kernel_zero_interp()</a>, <a class="el" href="types_8h_source.html#l00058">purify::constant::pi</a>, <a class="el" href="kernels_8cc_source.html#l00202">purify::kernels::pill_box()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a214d868f9c3f802c756980667a30cc65">purify::kernels::pswf</a>, <a class="el" href="logging_8h_source.html#l00190">PURIFY_ERROR</a>, and <a class="el" href="logging_8h_source.html#l00205">PURIFY_MEDIUM_LOG</a>.</p>
+<p class="reference">References <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a34be958a921e43d813a2075297d8e862">purify::kernels::box</a>, <a class="el" href="kernels_8cc_source.html#l00060">purify::kernels::ft_gaussian()</a>, <a class="el" href="kernels_8cc_source.html#l00233">purify::kernels::ft_gaussian_general()</a>, <a class="el" href="kernels_8cc_source.html#l00040">purify::kernels::ft_kaiser_bessel()</a>, <a class="el" href="kernels_8cc_source.html#l00025">purify::kernels::ft_kaiser_bessel_general()</a>, <a class="el" href="kernels_8cc_source.html#l00211">purify::kernels::ft_pill_box()</a>, <a class="el" href="kernels_8cc_source.html#l00124">purify::kernels::ft_pswf()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a710a4950250286365cf841f765a790f1">purify::kernels::gauss</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a575e9f12266a1af6d0b1cce8da8bc310">purify::kernels::gauss_alt</a>, <a class="el" href="kernels_8cc_source.html#l00049">purify::kernels::gaussian()</a>, <a class="el" href="kernels_8cc_source.html#l00220">purify::kernels::gaussian_general()</a>, <a class="el" href="kernels_8cc_source.html#l00007">purify::kernels::kaiser_bessel()</a>, <a class="el" href="kernels_8cc_source.html#l00015">purify::kernels::kaiser_bessel_general()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668aba34ea40525a4379add785228e37fe86">purify::kernels::kb</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a6aa53115b88dffbf79eb9c4aa0e0ba20">purify::kernels::kb_presample</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668ac8f9b2014e544adacfc19dfeba3718e8">purify::kernels::kbmin</a>, <a class="el" href="kernels_8cc_source.html#l00144">purify::kernels::kernel_samples()</a>, <a class="el" href="kernels_8cc_source.html#l00156">purify::kernels::kernel_zero_interp()</a>, <a class="el" href="types_8h_source.html#l00070">purify::constant::pi</a>, <a class="el" href="kernels_8cc_source.html#l00202">purify::kernels::pill_box()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a214d868f9c3f802c756980667a30cc65">purify::kernels::pswf</a>, <a class="el" href="logging_8h_source.html#l00190">PURIFY_ERROR</a>, and <a class="el" href="logging_8h_source.html#l00205">PURIFY_MEDIUM_LOG</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="operators_8h_source.html#l00490">purify::operators::base_degrid_operator_2d()</a>, <a class="el" href="degridding_8cc_source.html#l00012">GridOperatorFixture::SetUp()</a>, and <a class="el" href="tests_2operators_8cc_source.html#l00039">TEST_CASE()</a>.</p>
 
@@ -834,7 +911,7 @@ template&lt;class T0 &gt; </div>
 <div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  }</div>
 <div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;}</div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a34be958a921e43d813a2075297d8e862">purify::kernels::box</a>, <a class="el" href="kernels_8cc_source.html#l00060">purify::kernels::ft_gaussian()</a>, <a class="el" href="kernels_8cc_source.html#l00040">purify::kernels::ft_kaiser_bessel()</a>, <a class="el" href="kernels_8cc_source.html#l00025">purify::kernels::ft_kaiser_bessel_general()</a>, <a class="el" href="kernels_8cc_source.html#l00211">purify::kernels::ft_pill_box()</a>, <a class="el" href="kernels_8cc_source.html#l00124">purify::kernels::ft_pswf()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a710a4950250286365cf841f765a790f1">purify::kernels::gauss</a>, <a class="el" href="kernels_8cc_source.html#l00049">purify::kernels::gaussian()</a>, <a class="el" href="kernels_8cc_source.html#l00007">purify::kernels::kaiser_bessel()</a>, <a class="el" href="kernels_8cc_source.html#l00015">purify::kernels::kaiser_bessel_general()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668aba34ea40525a4379add785228e37fe86">purify::kernels::kb</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668ac8f9b2014e544adacfc19dfeba3718e8">purify::kernels::kbmin</a>, <a class="el" href="types_8h_source.html#l00058">purify::constant::pi</a>, <a class="el" href="kernels_8cc_source.html#l00202">purify::kernels::pill_box()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a214d868f9c3f802c756980667a30cc65">purify::kernels::pswf</a>, <a class="el" href="logging_8h_source.html#l00190">PURIFY_ERROR</a>, and <a class="el" href="logging_8h_source.html#l00205">PURIFY_MEDIUM_LOG</a>.</p>
+<p class="reference">References <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a34be958a921e43d813a2075297d8e862">purify::kernels::box</a>, <a class="el" href="kernels_8cc_source.html#l00060">purify::kernels::ft_gaussian()</a>, <a class="el" href="kernels_8cc_source.html#l00040">purify::kernels::ft_kaiser_bessel()</a>, <a class="el" href="kernels_8cc_source.html#l00025">purify::kernels::ft_kaiser_bessel_general()</a>, <a class="el" href="kernels_8cc_source.html#l00211">purify::kernels::ft_pill_box()</a>, <a class="el" href="kernels_8cc_source.html#l00124">purify::kernels::ft_pswf()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a710a4950250286365cf841f765a790f1">purify::kernels::gauss</a>, <a class="el" href="kernels_8cc_source.html#l00049">purify::kernels::gaussian()</a>, <a class="el" href="kernels_8cc_source.html#l00007">purify::kernels::kaiser_bessel()</a>, <a class="el" href="kernels_8cc_source.html#l00015">purify::kernels::kaiser_bessel_general()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668aba34ea40525a4379add785228e37fe86">purify::kernels::kb</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668ac8f9b2014e544adacfc19dfeba3718e8">purify::kernels::kbmin</a>, <a class="el" href="types_8h_source.html#l00070">purify::constant::pi</a>, <a class="el" href="kernels_8cc_source.html#l00202">purify::kernels::pill_box()</a>, <a class="el" href="namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668a214d868f9c3f802c756980667a30cc65">purify::kernels::pswf</a>, <a class="el" href="logging_8h_source.html#l00190">PURIFY_ERROR</a>, and <a class="el" href="logging_8h_source.html#l00205">PURIFY_MEDIUM_LOG</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="wproj__operators_8h_source.html#l00060">purify::operators::base_degrid_operator_2d()</a>.</p>
 
@@ -1172,7 +1249,7 @@ template&lt;typename T &gt; </div>
 </div><!-- fragment -->
 <p class="reference">References <a class="el" href="purify_2read__measurements_8cc_source.html#l00127">purify::read_measurements::dir_exists()</a>, and <a class="el" href="purify_2read__measurements_8cc_source.html#l00133">split()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="padmm__mpi__random__coverage_8cc_source.html#l00155">main()</a>, <a class="el" href="read__measurements_8h_source.html#l00045">mkdir_recursive()</a>, <a class="el" href="tests_2read__measurements_8cc_source.html#l00012">TEST_CASE()</a>, and <a class="el" href="yaml-parser_8cc_source.html#l00295">purify::YamlParser::writeOutput()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="padmm__mpi__random__coverage_8cc_source.html#l00155">main()</a>, <a class="el" href="read__measurements_8h_source.html#l00045">mkdir_recursive()</a>, <a class="el" href="tests_2read__measurements_8cc_source.html#l00012">TEST_CASE()</a>, and <a class="el" href="yaml-parser_8cc_source.html#l00317">purify::YamlParser::writeOutput()</a>.</p>
 
 </div>
 </div>
@@ -1620,7 +1697,7 @@ template&lt;typename T &gt; </div>
 <p class="definition">Definition at line <a class="el" href="config_8in_8h_source.html#l00037">37</a> of file <a class="el" href="config_8in_8h_source.html">config.in.h</a>.</p>
 <div class="fragment"><div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;@Purify_VERSION@&quot;</span>; }</div>
 </div><!-- fragment -->
-<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00025">main()</a>, and <a class="el" href="parser__test_8cc_source.html#l00011">TEST_CASE()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00032">main()</a>, and <a class="el" href="parser__test_8cc_source.html#l00011">TEST_CASE()</a>.</p>
 
 </div>
 </div>
@@ -1734,6 +1811,48 @@ template&lt;typename T &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
+<a id="a670298eb86fc4bac76e6ca9d621c230e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a670298eb86fc4bac76e6ca9d621c230e">&#9670;&nbsp;</a></span>diff_type_string</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::map&lt;std::string, <a class="el" href="namespacepurify.html#a9288eb8d6da092f4e9d9442046093356">diff_func_type</a>&gt; purify::diff_type_string</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">    {<span class="stringliteral">&quot;l2&quot;</span>, diff_func_type::L2Norm}, {<span class="stringliteral">&quot;CRR&quot;</span>, diff_func_type::L2Norm_with_CRR}}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00027">27</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="yaml-parser_8cc_source.html#l00208">purify::YamlParser::parseAndSetAlgorithmOptions()</a>.</p>
+
+</div>
+</div>
+<a id="ae932bff3414fceab9be7e35641f3bf90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae932bff3414fceab9be7e35641f3bf90">&#9670;&nbsp;</a></span>nondiff_type_string</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::map&lt;std::string, <a class="el" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3">nondiff_func_type</a>&gt; purify::nondiff_type_string</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">    {<span class="stringliteral">&quot;l1&quot;</span>, nondiff_func_type::L1Norm},</div>
+<div class="line">    {<span class="stringliteral">&quot;denoiser&quot;</span>, nondiff_func_type::Denoiser},</div>
+<div class="line">    {<span class="stringliteral">&quot;realIndicator&quot;</span>, nondiff_func_type::RealIndicator}}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00032">32</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="yaml-parser_8cc_source.html#l00208">purify::YamlParser::parseAndSetAlgorithmOptions()</a>.</p>
+
+</div>
+</div>
 <a id="a28dc6ce59ab78004234888df0d8ba64f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a28dc6ce59ab78004234888df0d8ba64f">&#9670;&nbsp;</a></span>stokes_int</h2>
 
@@ -1750,7 +1869,7 @@ template&lt;typename T &gt; </div>
 <div class="line">                                            {stokes::RL, -3}, {stokes::LR, -4}, {stokes::XX, -5},</div>
 <div class="line">                                            {stokes::YY, -6}, {stokes::XY, -7}, {stokes::YX, -8}}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00033">33</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00045">45</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="pfitsio_8h_source.html#l00033">purify::pfitsio::header_params::header_params()</a>, and <a class="el" href="purify__fitsio_8cc_source.html#l00090">TEST_CASE()</a>.</p>
 
@@ -1776,7 +1895,7 @@ template&lt;typename T &gt; </div>
 <div class="line">    {<span class="stringliteral">&quot;LR&quot;</span>, stokes::LR}, {<span class="stringliteral">&quot;lr&quot;</span>, stokes::LR}, {<span class="stringliteral">&quot;RL&quot;</span>, stokes::RL}, {<span class="stringliteral">&quot;rl&quot;</span>, stokes::RL},</div>
 <div class="line">    {<span class="stringliteral">&quot;P&quot;</span>, stokes::P},   {<span class="stringliteral">&quot;p&quot;</span>, stokes::P}}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00037">37</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00049">49</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="yaml-parser_8cc_source.html#l00102">purify::YamlParser::parseAndSetGeneralConfiguration()</a>, and <a class="el" href="purify__fitsio_8cc_source.html#l00090">TEST_CASE()</a>.</p>
 

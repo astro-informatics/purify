@@ -190,6 +190,7 @@
     <includes id="measurement__operator__factory_8h" name="measurement_operator_factory.h" local="yes" imported="no">purify/measurement_operator_factory.h</includes>
     <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
     <includes id="read__measurements_8h" name="read_measurements.h" local="yes" imported="no">purify/read_measurements.h</includes>
+    <includes id="setup__utils_8h" name="setup_utils.h" local="yes" imported="no">purify/setup_utils.h</includes>
     <includes id="update__factory_8h" name="update_factory.h" local="yes" imported="no">purify/update_factory.h</includes>
     <includes id="wavelet__operator__factory_8h" name="wavelet_operator_factory.h" local="yes" imported="no">purify/wavelet_operator_factory.h</includes>
     <includes id="wide__field__utilities_8h" name="wide_field_utilities.h" local="yes" imported="no">purify/wide_field_utilities.h</includes>
@@ -1370,16 +1371,6 @@
       <enumvalue file="namespacepurify_1_1factory.html" anchor="a862f0cad917b1ba718f965fd508f31f4afd592d6cd0b4eadd3f6fa268b995ff76">mpi_distributed</enumvalue>
       <enumvalue file="namespacepurify_1_1factory.html" anchor="a862f0cad917b1ba718f965fd508f31f4a67e8f37794e0d9fed73a8b77c703f8e6">mpi_random_updates</enumvalue>
     </member>
-    <member kind="enumeration">
-      <type></type>
-      <name>g_proximal_type</name>
-      <anchorfile>namespacepurify_1_1factory.html</anchorfile>
-      <anchor>a3e81ddc8925844c225faea9371315d1f</anchor>
-      <arglist></arglist>
-      <enumvalue file="namespacepurify_1_1factory.html" anchor="a3e81ddc8925844c225faea9371315d1fadada0c23c1236ccc934a3556a1725e94">L1GProximal</enumvalue>
-      <enumvalue file="namespacepurify_1_1factory.html" anchor="a3e81ddc8925844c225faea9371315d1facd065a2ab39996b5bd447b890dec2fa9">TFGProximal</enumvalue>
-      <enumvalue file="namespacepurify_1_1factory.html" anchor="a3e81ddc8925844c225faea9371315d1fa330d9b3991e7785c21cd29a452b56219">Indicator</enumvalue>
-    </member>
     <member kind="function">
       <type>std::shared_ptr&lt; Algorithm &gt;</type>
       <name>algorithm_factory</name>
@@ -1398,8 +1389,8 @@
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingForwardBackward&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>fb_factory</name>
       <anchorfile>namespacepurify_1_1factory.html</anchorfile>
-      <anchor>a30c386e496b397ba9023bdabda2334b5</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real op_norm=1, const std::string model_path=&quot;&quot;, const g_proximal_type g_proximal=g_proximal_type::L1GProximal, std::shared_ptr&lt; DifferentiableFunc&lt; typename Algorithm::Scalar &gt;&gt; f_function=nullptr)</arglist>
+      <anchor>a13b034d2a3b6b7b7e66543daadcdc5da</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real op_norm=1, const std::string model_path=&quot;&quot;, const nondiff_func_type g_proximal=nondiff_func_type::L1Norm, std::shared_ptr&lt; DifferentiableFunc&lt; typename Algorithm::Scalar &gt;&gt; f_function=nullptr)</arglist>
     </member>
     <member kind="function">
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingPrimalDual&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
@@ -1413,13 +1404,6 @@
       <name>algo_distribution_string</name>
       <anchorfile>namespacepurify_1_1factory.html</anchorfile>
       <anchor>a27d858e0728daf0eff9998983c8c72a5</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>const std::map&lt; std::string, g_proximal_type &gt;</type>
-      <name>g_proximal_type_string</name>
-      <anchorfile>namespacepurify_1_1factory.html</anchorfile>
-      <anchor>a64dc10f53ae3ae03615720090d31684f</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -3101,6 +3085,20 @@
       <anchor>ab2064cf1926a00a2aeeeece32959c465</anchor>
       <arglist>(const std::vector&lt; Image&lt; t_real &gt;&gt; &amp;image, const std::string &amp;fits_name, const std::string &amp;pix_units=&quot;Jy/Beam&quot;, const bool &amp;overwrite=true)</arglist>
     </member>
+    <member kind="function">
+      <type>std::vector&lt; Image&lt; t_complex &gt; &gt;</type>
+      <name>read3d</name>
+      <anchorfile>namespacepurify_1_1pfitsio.html</anchorfile>
+      <anchor>a6899ef51fc550bbb6a8188f2f305b889</anchor>
+      <arglist>(const std::string &amp;fits_name)</arglist>
+    </member>
+    <member kind="function">
+      <type>Image&lt; t_complex &gt;</type>
+      <name>read2d</name>
+      <anchorfile>namespacepurify_1_1pfitsio.html</anchorfile>
+      <anchor>a2d7e29052f62225e3af9b8e8f1420fb4</anchor>
+      <arglist>(const std::string &amp;fits_name)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>pfitsio.h</name>
@@ -3249,14 +3247,14 @@
       <type>std::vector&lt; Image&lt; t_complex &gt; &gt;</type>
       <name>read3d</name>
       <anchorfile>namespacepurify_1_1pfitsio.html</anchorfile>
-      <anchor>ac45a80db8e051f45372c3018fbd027d1</anchor>
+      <anchor>a6899ef51fc550bbb6a8188f2f305b889</anchor>
       <arglist>(const std::string &amp;fits_name)</arglist>
     </member>
     <member kind="function">
       <type>Image&lt; t_complex &gt;</type>
       <name>read2d</name>
       <anchorfile>namespacepurify_1_1pfitsio.html</anchorfile>
-      <anchor>a2ae1f0721ea099a29b30eaed0c47c771</anchor>
+      <anchor>a2d7e29052f62225e3af9b8e8f1420fb4</anchor>
       <arglist>(const std::string &amp;fits_name)</arglist>
     </member>
   </compound>
@@ -3434,6 +3432,169 @@
     </member>
   </compound>
   <compound kind="file">
+    <name>setup_utils.cc</name>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>setup__utils_8cc.html</filename>
+    <includes id="setup__utils_8h" name="setup_utils.h" local="yes" imported="no">purify/setup_utils.h</includes>
+    <member kind="function">
+      <type>waveletInfo</type>
+      <name>createWaveletOperator</name>
+      <anchorfile>setup__utils_8cc.html</anchorfile>
+      <anchor>a6d6621916ecf8c9b46d6e5a7e10fb9db</anchor>
+      <arglist>(YamlParser &amp;params, const factory::distributed_wavelet_operator &amp;wop_algo)</arglist>
+    </member>
+    <member kind="function">
+      <type>OperatorsInfo</type>
+      <name>selectOperators</name>
+      <anchorfile>setup__utils_8cc.html</anchorfile>
+      <anchor>a7636afdc654d9ded72092e8a333c1cbb</anchor>
+      <arglist>(YamlParser &amp;params)</arglist>
+    </member>
+    <member kind="function">
+      <type>inputData</type>
+      <name>getInputData</name>
+      <anchorfile>setup__utils_8cc.html</anchorfile>
+      <anchor>aca83fa516d93df60232c7d3ccb47fe25</anchor>
+      <arglist>(const YamlParser &amp;params, const factory::distributed_measurement_operator mop_algo, const factory::distributed_wavelet_operator wop_algo, const bool using_mpi)</arglist>
+    </member>
+    <member kind="function">
+      <type>measurementOpInfo</type>
+      <name>createMeasurementOperator</name>
+      <anchorfile>setup__utils_8cc.html</anchorfile>
+      <anchor>a635bd4e2d13f646bb4c2e2369f3130fc</anchor>
+      <arglist>(const YamlParser &amp;params, const factory::distributed_measurement_operator mop_algo, const factory::distributed_wavelet_operator wop_algo, const bool using_mpi, const std::vector&lt; t_int &gt; &amp;image_index, const std::vector&lt; t_real &gt; &amp;w_stacks, const utilities::vis_params &amp;uv_data, Vector&lt; t_complex &gt; &amp;measurement_op_eigen_vector)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>setupCostFunctions</name>
+      <anchorfile>setup__utils_8cc.html</anchorfile>
+      <anchor>ae8383f55e6c3f95651d2a0b8a7b0451b</anchor>
+      <arglist>(const YamlParser &amp;params, std::unique_ptr&lt; DifferentiableFunc&lt; t_complex &gt;&gt; &amp;f, std::unique_ptr&lt; NonDifferentiableFunc&lt; t_complex &gt;&gt; &amp;g, t_real sigma, sopt::LinearTransform&lt; Vector&lt; t_complex &gt;&gt; &amp;Phi)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>initOutDirectoryWithConfig</name>
+      <anchorfile>setup__utils_8cc.html</anchorfile>
+      <anchor>aa7e746c5b763d2a66eb9e5bfda2d3c28</anchor>
+      <arglist>(YamlParser &amp;params)</arglist>
+    </member>
+    <member kind="function">
+      <type>Headers</type>
+      <name>genHeaders</name>
+      <anchorfile>setup__utils_8cc.html</anchorfile>
+      <anchor>abf454e788ec7a8c47c4138403b09da6d</anchor>
+      <arglist>(const YamlParser &amp;params, const utilities::vis_params &amp;uv_data)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>saveMeasurementEigenVector</name>
+      <anchorfile>setup__utils_8cc.html</anchorfile>
+      <anchor>a42749b1324a8608a20be0aa3f73e06df</anchor>
+      <arglist>(const YamlParser &amp;params, const Vector&lt; t_complex &gt; &amp;measurement_op_eigen_vector)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>savePSF</name>
+      <anchorfile>setup__utils_8cc.html</anchorfile>
+      <anchor>aa75bc3b6f384d070363b7a3c6cddd148</anchor>
+      <arglist>(const YamlParser &amp;params, const pfitsio::header_params &amp;def_header, const std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt;&gt;&gt; &amp;measurements_transform, const utilities::vis_params &amp;uv_data, const t_real flux_scale, const t_real sigma, const t_real operator_norm, const t_real beam_units)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>saveDirtyImage</name>
+      <anchorfile>setup__utils_8cc.html</anchorfile>
+      <anchor>a443972565bca5edaa85415c69da3414f</anchor>
+      <arglist>(const YamlParser &amp;params, const pfitsio::header_params &amp;def_header, const std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt;&gt;&gt; &amp;measurements_transform, const utilities::vis_params &amp;uv_data, const t_real beam_units)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>setup_utils.h</name>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>setup__utils_8h.html</filename>
+    <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
+    <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
+    <includes id="measurement__operator__factory_8h" name="measurement_operator_factory.h" local="yes" imported="no">purify/measurement_operator_factory.h</includes>
+    <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
+    <includes id="read__measurements_8h" name="read_measurements.h" local="yes" imported="no">purify/read_measurements.h</includes>
+    <includes id="wavelet__operator__factory_8h" name="wavelet_operator_factory.h" local="yes" imported="no">purify/wavelet_operator_factory.h</includes>
+    <includes id="yaml-parser_8h" name="yaml-parser.h" local="yes" imported="no">purify/yaml-parser.h</includes>
+    <class kind="struct">waveletInfo</class>
+    <class kind="struct">OperatorsInfo</class>
+    <class kind="struct">inputData</class>
+    <class kind="struct">measurementOpInfo</class>
+    <class kind="struct">Headers</class>
+    <member kind="function">
+      <type>waveletInfo</type>
+      <name>createWaveletOperator</name>
+      <anchorfile>setup__utils_8h.html</anchorfile>
+      <anchor>a6d6621916ecf8c9b46d6e5a7e10fb9db</anchor>
+      <arglist>(YamlParser &amp;params, const factory::distributed_wavelet_operator &amp;wop_algo)</arglist>
+    </member>
+    <member kind="function">
+      <type>OperatorsInfo</type>
+      <name>selectOperators</name>
+      <anchorfile>setup__utils_8h.html</anchorfile>
+      <anchor>a7636afdc654d9ded72092e8a333c1cbb</anchor>
+      <arglist>(YamlParser &amp;params)</arglist>
+    </member>
+    <member kind="function">
+      <type>inputData</type>
+      <name>getInputData</name>
+      <anchorfile>setup__utils_8h.html</anchorfile>
+      <anchor>aca83fa516d93df60232c7d3ccb47fe25</anchor>
+      <arglist>(const YamlParser &amp;params, const factory::distributed_measurement_operator mop_algo, const factory::distributed_wavelet_operator wop_algo, const bool using_mpi)</arglist>
+    </member>
+    <member kind="function">
+      <type>measurementOpInfo</type>
+      <name>createMeasurementOperator</name>
+      <anchorfile>setup__utils_8h.html</anchorfile>
+      <anchor>a635bd4e2d13f646bb4c2e2369f3130fc</anchor>
+      <arglist>(const YamlParser &amp;params, const factory::distributed_measurement_operator mop_algo, const factory::distributed_wavelet_operator wop_algo, const bool using_mpi, const std::vector&lt; t_int &gt; &amp;image_index, const std::vector&lt; t_real &gt; &amp;w_stacks, const utilities::vis_params &amp;uv_data, Vector&lt; t_complex &gt; &amp;measurement_op_eigen_vector)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>setupCostFunctions</name>
+      <anchorfile>setup__utils_8h.html</anchorfile>
+      <anchor>ae8383f55e6c3f95651d2a0b8a7b0451b</anchor>
+      <arglist>(const YamlParser &amp;params, std::unique_ptr&lt; DifferentiableFunc&lt; t_complex &gt;&gt; &amp;f, std::unique_ptr&lt; NonDifferentiableFunc&lt; t_complex &gt;&gt; &amp;g, t_real sigma, sopt::LinearTransform&lt; Vector&lt; t_complex &gt;&gt; &amp;Phi)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>initOutDirectoryWithConfig</name>
+      <anchorfile>setup__utils_8h.html</anchorfile>
+      <anchor>aa7e746c5b763d2a66eb9e5bfda2d3c28</anchor>
+      <arglist>(YamlParser &amp;params)</arglist>
+    </member>
+    <member kind="function">
+      <type>Headers</type>
+      <name>genHeaders</name>
+      <anchorfile>setup__utils_8h.html</anchorfile>
+      <anchor>abf454e788ec7a8c47c4138403b09da6d</anchor>
+      <arglist>(const YamlParser &amp;params, const utilities::vis_params &amp;uv_data)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>saveMeasurementEigenVector</name>
+      <anchorfile>setup__utils_8h.html</anchorfile>
+      <anchor>a42749b1324a8608a20be0aa3f73e06df</anchor>
+      <arglist>(const YamlParser &amp;params, const Vector&lt; t_complex &gt; &amp;measurement_op_eigen_vector)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>savePSF</name>
+      <anchorfile>setup__utils_8h.html</anchorfile>
+      <anchor>aa75bc3b6f384d070363b7a3c6cddd148</anchor>
+      <arglist>(const YamlParser &amp;params, const pfitsio::header_params &amp;def_header, const std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt;&gt;&gt; &amp;measurements_transform, const utilities::vis_params &amp;uv_data, const t_real flux_scale, const t_real sigma, const t_real operator_norm, const t_real beam_units)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>saveDirtyImage</name>
+      <anchorfile>setup__utils_8h.html</anchorfile>
+      <anchor>a443972565bca5edaa85415c69da3414f</anchor>
+      <arglist>(const YamlParser &amp;params, const pfitsio::header_params &amp;def_header, const std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt;&gt;&gt; &amp;measurements_transform, const utilities::vis_params &amp;uv_data, const t_real beam_units)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
     <name>types.h</name>
     <path>/home/runner/work/purify/purify/cpp/purify/</path>
     <filename>types_8h.html</filename>
@@ -3468,6 +3629,25 @@
       <anchorfile>namespacepurify.html</anchorfile>
       <anchor>a44aec0b43fdac82a0b6cc20b6280e355</anchor>
       <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>diff_func_type</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a9288eb8d6da092f4e9d9442046093356</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacepurify.html" anchor="a9288eb8d6da092f4e9d9442046093356af3b33f9ef56070596a299d6824c440a0">L2Norm</enumvalue>
+      <enumvalue file="namespacepurify.html" anchor="a9288eb8d6da092f4e9d9442046093356abad1f84f2aa31704a02b89eecbd17f72">L2Norm_with_CRR</enumvalue>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>nondiff_func_type</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a42082160b5b3bb71406463530ddcdba3</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacepurify.html" anchor="a42082160b5b3bb71406463530ddcdba3af3b25b9828de3ee193fbb78a8c847b0a">L1Norm</enumvalue>
+      <enumvalue file="namespacepurify.html" anchor="a42082160b5b3bb71406463530ddcdba3a5ad0cc29f63d0e86542b2935cbde2980">Denoiser</enumvalue>
+      <enumvalue file="namespacepurify.html" anchor="a42082160b5b3bb71406463530ddcdba3a63e2f5122a48c43827d069e526b4cfcf">RealIndicator</enumvalue>
     </member>
     <member kind="enumeration">
       <type></type>
@@ -3507,6 +3687,20 @@
       <enumvalue file="namespacepurify_1_1wproj__utilities_1_1expansions.html" anchor="a92334b90f8de8f723450b3aca72d9e74a334c4a4c42fdb79d7ebc3e73b517e6f8">none</enumvalue>
       <enumvalue file="namespacepurify_1_1wproj__utilities_1_1expansions.html" anchor="a92334b90f8de8f723450b3aca72d9e74a7d8bc5f1a8d3787d06ef11c97d4655df">taylor</enumvalue>
       <enumvalue file="namespacepurify_1_1wproj__utilities_1_1expansions.html" anchor="a92334b90f8de8f723450b3aca72d9e74a172e4ecb02a864e1e4aa51dcce9d8a47">chebyshev</enumvalue>
+    </member>
+    <member kind="variable">
+      <type>const std::map&lt; std::string, diff_func_type &gt;</type>
+      <name>diff_type_string</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a670298eb86fc4bac76e6ca9d621c230e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const std::map&lt; std::string, nondiff_func_type &gt;</type>
+      <name>nondiff_type_string</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>ae932bff3414fceab9be7e35641f3bf90</anchor>
+      <arglist></arglist>
     </member>
     <member kind="variable">
       <type>const std::map&lt; stokes, t_int &gt;</type>
@@ -5586,6 +5780,30 @@
       <arglist>(&quot;calculating zero&quot;)</arglist>
     </member>
   </compound>
+  <compound kind="file">
+    <name>uq_main.cc</name>
+    <path>/home/runner/work/purify/purify/cpp/uncertainty_quantification/</path>
+    <filename>uq__main_8cc.html</filename>
+    <includes id="measurement__operator__factory_8h" name="measurement_operator_factory.h" local="yes" imported="no">purify/measurement_operator_factory.h</includes>
+    <includes id="pfitsio_8h" name="pfitsio.h" local="yes" imported="no">purify/pfitsio.h</includes>
+    <includes id="setup__utils_8h" name="setup_utils.h" local="yes" imported="no">purify/setup_utils.h</includes>
+    <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
+    <includes id="yaml-parser_8h" name="yaml-parser.h" local="yes" imported="no">purify/yaml-parser.h</includes>
+    <member kind="typedef">
+      <type>sopt::Vector&lt; std::complex&lt; double &gt; &gt;</type>
+      <name>VectorC</name>
+      <anchorfile>uq__main_8cc.html</anchorfile>
+      <anchor>a97651719441ba00d4188b6ca19282746</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>main</name>
+      <anchorfile>uq__main_8cc.html</anchorfile>
+      <anchor>a3c04138a5bfe5d72780bb7e82a18e627</anchor>
+      <arglist>(int argc, char **argv)</arglist>
+    </member>
+  </compound>
   <compound kind="class">
     <name>AlgoFixture</name>
     <filename>classAlgoFixture.html</filename>
@@ -6790,6 +7008,31 @@
       <arglist></arglist>
     </member>
   </compound>
+  <compound kind="struct">
+    <name>Headers</name>
+    <filename>structHeaders.html</filename>
+    <member kind="variable">
+      <type>pfitsio::header_params</type>
+      <name>solution_header</name>
+      <anchorfile>structHeaders.html</anchorfile>
+      <anchor>af2ca9bb3ce36109f4d45e514acc524b4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>pfitsio::header_params</type>
+      <name>residuals_header</name>
+      <anchorfile>structHeaders.html</anchorfile>
+      <anchor>a09f900719cfb9446bdf9c9cc88caf45c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>pfitsio::header_params</type>
+      <name>def_header</name>
+      <anchorfile>structHeaders.html</anchorfile>
+      <anchor>af5e69aaa792ee526d34888fbf0b93396</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
   <compound kind="class">
     <name>purify::IndexMapping</name>
     <filename>classpurify_1_1IndexMapping.html</filename>
@@ -6842,6 +7085,45 @@
       <anchorfile>classpurify_1_1IndexMapping.html</anchorfile>
       <anchor>af356b62a81d13933eea58d3a9689bc84</anchor>
       <arglist>() const</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>inputData</name>
+    <filename>structinputData.html</filename>
+    <member kind="variable">
+      <type>utilities::vis_params</type>
+      <name>uv_data</name>
+      <anchorfile>structinputData.html</anchorfile>
+      <anchor>a8feb1ea6fc6a408c41fcb6ed8200d217</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_real</type>
+      <name>sigma</name>
+      <anchorfile>structinputData.html</anchorfile>
+      <anchor>a154693b38fdd8ef75eabbcce1acbe8d9</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>Vector&lt; t_complex &gt;</type>
+      <name>measurement_op_eigen_vector</name>
+      <anchorfile>structinputData.html</anchorfile>
+      <anchor>a099597fbcc9036e0c214d2164c272122</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; t_int &gt;</type>
+      <name>image_index</name>
+      <anchorfile>structinputData.html</anchorfile>
+      <anchor>a23bcc4d001786304252dcb15d3cf8114</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; t_real &gt;</type>
+      <name>w_stacks</name>
+      <anchorfile>structinputData.html</anchorfile>
+      <anchor>ae98d25bf10c7b3f983239d11e1f56e3c</anchor>
+      <arglist></arglist>
     </member>
   </compound>
   <compound kind="class">
@@ -7056,6 +7338,24 @@
       <arglist>(Log &amp;log, int level)</arglist>
     </member>
   </compound>
+  <compound kind="struct">
+    <name>measurementOpInfo</name>
+    <filename>structmeasurementOpInfo.html</filename>
+    <member kind="variable">
+      <type>std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt; &gt; &gt;</type>
+      <name>measurement_transform</name>
+      <anchorfile>structmeasurementOpInfo.html</anchorfile>
+      <anchor>a6460d2a2dcdef8d01a16f28a41131ecd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_real</type>
+      <name>operator_norm</name>
+      <anchorfile>structmeasurementOpInfo.html</anchorfile>
+      <anchor>a4b26d4f46e17acf92384affba9e75903</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
   <compound kind="class">
     <name>purify::casa::MeasurementSet</name>
     <filename>classpurify_1_1casa_1_1MeasurementSet.html</filename>
@@ -7225,6 +7525,31 @@
       <anchorfile>classNullReporter.html</anchorfile>
       <anchor>a39c2e27e5376f904fd6a0b63ed5c3291</anchor>
       <arglist>()</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>OperatorsInfo</name>
+    <filename>structOperatorsInfo.html</filename>
+    <member kind="variable">
+      <type>factory::distributed_measurement_operator</type>
+      <name>mop_algo</name>
+      <anchorfile>structOperatorsInfo.html</anchorfile>
+      <anchor>af2fe0bfff9d70a2641924bb01b8dc89d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>factory::distributed_wavelet_operator</type>
+      <name>wop_algo</name>
+      <anchorfile>structOperatorsInfo.html</anchorfile>
+      <anchor>a68e84b657618a1457dfc892b2e093f2d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>using_mpi</name>
+      <anchorfile>structOperatorsInfo.html</anchorfile>
+      <anchor>a8ae15c37e999ce62fad4ef5e365055a2</anchor>
+      <arglist></arglist>
     </member>
   </compound>
   <compound kind="class">
@@ -7422,6 +7747,24 @@
       <arglist></arglist>
     </member>
   </compound>
+  <compound kind="struct">
+    <name>waveletInfo</name>
+    <filename>structwaveletInfo.html</filename>
+    <member kind="variable">
+      <type>std::shared_ptr&lt; const sopt::LinearTransform&lt; Eigen::VectorXcd &gt; &gt;</type>
+      <name>transform</name>
+      <anchorfile>structwaveletInfo.html</anchorfile>
+      <anchor>a6db9532c0f568ffe2df6539745403629</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_uint</type>
+      <name>sara_size</name>
+      <anchorfile>structwaveletInfo.html</anchorfile>
+      <anchor>ab1f6cd3b141b644f01cd263659316062</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
   <compound kind="class">
     <name>WaveletOperatorAdjointFixture</name>
     <filename>classWaveletOperatorAdjointFixture.html</filename>
@@ -7605,6 +7948,13 @@
       <anchor>ae219f45210f4414e86e53ebd0176c0bc</anchor>
       <arglist>()</arglist>
     </member>
+    <member kind="function">
+      <type>std::string</type>
+      <name>output_path</name>
+      <anchorfile>classpurify_1_1YamlParser.html</anchorfile>
+      <anchor>a4a9c27025ce8cfc99a0a9e4d62263efc</anchor>
+      <arglist>() const</arglist>
+    </member>
   </compound>
   <compound kind="namespace">
     <name>b_utilities</name>
@@ -7776,6 +8126,25 @@
       <anchorfile>namespacepurify.html</anchorfile>
       <anchor>a44aec0b43fdac82a0b6cc20b6280e355</anchor>
       <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>diff_func_type</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a9288eb8d6da092f4e9d9442046093356</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacepurify.html" anchor="a9288eb8d6da092f4e9d9442046093356af3b33f9ef56070596a299d6824c440a0">L2Norm</enumvalue>
+      <enumvalue file="namespacepurify.html" anchor="a9288eb8d6da092f4e9d9442046093356abad1f84f2aa31704a02b89eecbd17f72">L2Norm_with_CRR</enumvalue>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>nondiff_func_type</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a42082160b5b3bb71406463530ddcdba3</anchor>
+      <arglist></arglist>
+      <enumvalue file="namespacepurify.html" anchor="a42082160b5b3bb71406463530ddcdba3af3b25b9828de3ee193fbb78a8c847b0a">L1Norm</enumvalue>
+      <enumvalue file="namespacepurify.html" anchor="a42082160b5b3bb71406463530ddcdba3a5ad0cc29f63d0e86542b2935cbde2980">Denoiser</enumvalue>
+      <enumvalue file="namespacepurify.html" anchor="a42082160b5b3bb71406463530ddcdba3a63e2f5122a48c43827d069e526b4cfcf">RealIndicator</enumvalue>
     </member>
     <member kind="enumeration">
       <type></type>
@@ -8015,6 +8384,20 @@
       <anchorfile>namespacepurify.html</anchorfile>
       <anchor>a4338db042ed8c1d9963b4faaef4aedc0</anchor>
       <arglist>()</arglist>
+    </member>
+    <member kind="variable">
+      <type>const std::map&lt; std::string, diff_func_type &gt;</type>
+      <name>diff_type_string</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>a670298eb86fc4bac76e6ca9d621c230e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const std::map&lt; std::string, nondiff_func_type &gt;</type>
+      <name>nondiff_type_string</name>
+      <anchorfile>namespacepurify.html</anchorfile>
+      <anchor>ae932bff3414fceab9be7e35641f3bf90</anchor>
+      <arglist></arglist>
     </member>
     <member kind="variable">
       <type>const std::map&lt; stokes, t_int &gt;</type>
@@ -8333,16 +8716,6 @@
     </member>
     <member kind="enumeration">
       <type></type>
-      <name>g_proximal_type</name>
-      <anchorfile>namespacepurify_1_1factory.html</anchorfile>
-      <anchor>a3e81ddc8925844c225faea9371315d1f</anchor>
-      <arglist></arglist>
-      <enumvalue file="namespacepurify_1_1factory.html" anchor="a3e81ddc8925844c225faea9371315d1fadada0c23c1236ccc934a3556a1725e94">L1GProximal</enumvalue>
-      <enumvalue file="namespacepurify_1_1factory.html" anchor="a3e81ddc8925844c225faea9371315d1facd065a2ab39996b5bd447b890dec2fa9">TFGProximal</enumvalue>
-      <enumvalue file="namespacepurify_1_1factory.html" anchor="a3e81ddc8925844c225faea9371315d1fa330d9b3991e7785c21cd29a452b56219">Indicator</enumvalue>
-    </member>
-    <member kind="enumeration">
-      <type></type>
       <name>ConvergenceType</name>
       <anchorfile>namespacepurify_1_1factory.html</anchorfile>
       <anchor>ae3112c9c2dd6bbf06b1c59b4549f89c6</anchor>
@@ -8392,8 +8765,8 @@
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingForwardBackward&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>fb_factory</name>
       <anchorfile>namespacepurify_1_1factory.html</anchorfile>
-      <anchor>a30c386e496b397ba9023bdabda2334b5</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real op_norm=1, const std::string model_path=&quot;&quot;, const g_proximal_type g_proximal=g_proximal_type::L1GProximal, std::shared_ptr&lt; DifferentiableFunc&lt; typename Algorithm::Scalar &gt;&gt; f_function=nullptr)</arglist>
+      <anchor>a13b034d2a3b6b7b7e66543daadcdc5da</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real op_norm=1, const std::string model_path=&quot;&quot;, const nondiff_func_type g_proximal=nondiff_func_type::L1Norm, std::shared_ptr&lt; DifferentiableFunc&lt; typename Algorithm::Scalar &gt;&gt; f_function=nullptr)</arglist>
     </member>
     <member kind="function">
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingPrimalDual&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
@@ -8442,13 +8815,6 @@
       <name>algo_distribution_string</name>
       <anchorfile>namespacepurify_1_1factory.html</anchorfile>
       <anchor>a27d858e0728daf0eff9998983c8c72a5</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>const std::map&lt; std::string, g_proximal_type &gt;</type>
-      <name>g_proximal_type_string</name>
-      <anchorfile>namespacepurify_1_1factory.html</anchorfile>
-      <anchor>a64dc10f53ae3ae03615720090d31684f</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -8893,6 +9259,20 @@
       <arglist>(const std::vector&lt; Image&lt; t_real &gt;&gt; &amp;image, const std::string &amp;fits_name, const std::string &amp;pix_units=&quot;Jy/Beam&quot;, const bool &amp;overwrite=true)</arglist>
     </member>
     <member kind="function">
+      <type>std::vector&lt; Image&lt; t_complex &gt; &gt;</type>
+      <name>read3d</name>
+      <anchorfile>namespacepurify_1_1pfitsio.html</anchorfile>
+      <anchor>a6899ef51fc550bbb6a8188f2f305b889</anchor>
+      <arglist>(const std::string &amp;fits_name)</arglist>
+    </member>
+    <member kind="function">
+      <type>Image&lt; t_complex &gt;</type>
+      <name>read2d</name>
+      <anchorfile>namespacepurify_1_1pfitsio.html</anchorfile>
+      <anchor>a2d7e29052f62225e3af9b8e8f1420fb4</anchor>
+      <arglist>(const std::string &amp;fits_name)</arglist>
+    </member>
+    <member kind="function">
       <type>std::enable_if&lt; std::is_scalar&lt; T &gt;::value, void &gt;::type</type>
       <name>write_history</name>
       <anchorfile>namespacepurify_1_1pfitsio.html</anchorfile>
@@ -8961,20 +9341,6 @@
       <anchorfile>namespacepurify_1_1pfitsio.html</anchorfile>
       <anchor>a323352a9113f5104bfd6e092f1196b1d</anchor>
       <arglist>(const std::string &amp;fits_name, Eigen::EigenBase&lt; T &gt; &amp;output, int &amp;rows, int &amp;cols, int &amp;channels, int &amp;pols)</arglist>
-    </member>
-    <member kind="function">
-      <type>std::vector&lt; Image&lt; t_complex &gt; &gt;</type>
-      <name>read3d</name>
-      <anchorfile>namespacepurify_1_1pfitsio.html</anchorfile>
-      <anchor>ac45a80db8e051f45372c3018fbd027d1</anchor>
-      <arglist>(const std::string &amp;fits_name)</arglist>
-    </member>
-    <member kind="function">
-      <type>Image&lt; t_complex &gt;</type>
-      <name>read2d</name>
-      <anchorfile>namespacepurify_1_1pfitsio.html</anchorfile>
-      <anchor>a2ae1f0721ea099a29b30eaed0c47c771</anchor>
-      <arglist>(const std::string &amp;fits_name)</arglist>
     </member>
     <member kind="function">
       <type>utilities::vis_params</type>

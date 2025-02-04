@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['level_1158',['Level',['../classpurify_1_1logging_1_1Log.html#a266bfa79b34e40111d8ef4acce11cc05',1,'purify::logging::Log']]]
+  ['method_1232',['method',['../namespacepurify_1_1integration.html#a29ad3e35748f2774b6fe751c8f9a4cc9',1,'purify::integration']]]
 ];

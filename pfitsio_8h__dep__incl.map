@@ -1,5 +1,5 @@
 <map id="/home/runner/work/purify/purify/cpp/purify/pfitsio.h" name="/home/runner/work/purify/purify/cpp/purify/pfitsio.h">
-<area shape="rect" id="node1" title=" " alt="" coords="2533,5,2720,47"/>
+<area shape="rect" id="node1" title=" " alt="" coords="2761,5,2948,47"/>
 <area shape="rect" id="node2" href="$benchmarks_2utilities_8cc.html" title=" " alt="" coords="5,95,192,151"/>
 <area shape="rect" id="node3" href="$compare__wprojection_8cc.html" title=" " alt="" coords="217,95,429,151"/>
 <area shape="rect" id="node4" href="$generate__vis__data_8cc.html" title=" " alt="" coords="453,95,667,151"/>
@@ -16,11 +16,14 @@
 <area shape="rect" id="node15" href="$sdmm__m31__simulation_8cc.html" title=" " alt="" coords="2990,95,3186,151"/>
 <area shape="rect" id="node16" href="$show__image_8cc.html" title=" " alt="" coords="3211,95,3400,151"/>
 <area shape="rect" id="node17" href="$wavelet__decomposition_8cc.html" title=" " alt="" coords="3425,95,3631,151"/>
-<area shape="rect" id="node18" href="$main_8cc.html" title=" " alt="" coords="3751,199,3937,240"/>
+<area shape="rect" id="node18" href="$main_8cc.html" title=" " alt="" coords="3883,206,4069,247"/>
 <area shape="rect" id="node19" href="$pfitsio_8cc.html" title=" " alt="" coords="3707,102,3901,143"/>
-<area shape="rect" id="node20" href="$update__factory_8h.html" title=" " alt="" coords="3925,95,4112,151"/>
-<area shape="rect" id="node21" href="$algo__factory_8cc.html" title=" " alt="" coords="4136,95,4323,151"/>
-<area shape="rect" id="node22" href="$tests_2measurement__operator_8cc.html" title=" " alt="" coords="4347,95,4568,151"/>
-<area shape="rect" id="node23" href="$mpi__algo__factory_8cc.html" title=" " alt="" coords="4593,95,4783,151"/>
-<area shape="rect" id="node24" href="$purify__fitsio_8cc.html" title=" " alt="" coords="4808,95,4995,151"/>
+<area shape="rect" id="node20" href="$setup__utils_8h.html" title=" " alt="" coords="4136,95,4323,151"/>
+<area shape="rect" id="node22" href="$uq__main_8cc.html" title=" " alt="" coords="4305,199,4501,255"/>
+<area shape="rect" id="node23" href="$update__factory_8h.html" title=" " alt="" coords="3925,95,4112,151"/>
+<area shape="rect" id="node24" href="$algo__factory_8cc.html" title=" " alt="" coords="4397,95,4584,151"/>
+<area shape="rect" id="node25" href="$tests_2measurement__operator_8cc.html" title=" " alt="" coords="4608,95,4829,151"/>
+<area shape="rect" id="node26" href="$mpi__algo__factory_8cc.html" title=" " alt="" coords="4854,95,5045,151"/>
+<area shape="rect" id="node27" href="$purify__fitsio_8cc.html" title=" " alt="" coords="5069,95,5256,151"/>
+<area shape="rect" id="node21" href="$setup__utils_8cc.html" title=" " alt="" coords="4093,199,4280,255"/>
 </map>

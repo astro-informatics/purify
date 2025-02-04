@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['contributors_1270',['Contributors',['../purify_contributors.html',1,'']]]
+  ['contributors_1346',['Contributors',['../purify_contributors.html',1,'']]]
 ];

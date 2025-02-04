@@ -156,13 +156,16 @@ $(function() {
 <area shape="rect" title=" " alt="" coords="471,5,670,61"/>
 <area shape="rect" href="algorithms_8cc.html" title=" " alt="" coords="5,109,192,165"/>
 <area shape="rect" href="algorithms__mpi_8cc.html" title=" " alt="" coords="216,109,403,165"/>
-<area shape="rect" href="main_8cc.html" title=" " alt="" coords="477,221,664,262"/>
-<area shape="rect" href="update__factory_8h.html" title=" " alt="" coords="477,109,664,165"/>
-<area shape="rect" href="yaml-parser_8h.html" title=" " alt="" coords="688,109,875,165"/>
-<area shape="rect" href="algo__factory_8cc.html" title=" " alt="" coords="899,109,1085,165"/>
-<area shape="rect" href="mpi__algo__factory_8cc.html" title=" " alt="" coords="1110,109,1301,165"/>
-<area shape="rect" href="yaml-parser_8cc.html" title=" " alt="" coords="688,213,875,269"/>
-<area shape="rect" href="parser__test_8cc.html" title=" " alt="" coords="899,213,1085,269"/>
+<area shape="rect" href="main_8cc.html" title=" " alt="" coords="477,325,664,366"/>
+<area shape="rect" href="update__factory_8h.html" title=" " alt="" coords="477,213,664,269"/>
+<area shape="rect" href="yaml-parser_8h.html" title=" " alt="" coords="673,109,860,165"/>
+<area shape="rect" href="algo__factory_8cc.html" title=" " alt="" coords="884,109,1071,165"/>
+<area shape="rect" href="mpi__algo__factory_8cc.html" title=" " alt="" coords="1095,109,1286,165"/>
+<area shape="rect" href="setup__utils_8h.html" title=" " alt="" coords="739,213,925,269"/>
+<area shape="rect" href="uq__main_8cc.html" title=" " alt="" coords="899,317,1095,373"/>
+<area shape="rect" href="yaml-parser_8cc.html" title=" " alt="" coords="1000,213,1187,269"/>
+<area shape="rect" href="parser__test_8cc.html" title=" " alt="" coords="1211,213,1397,269"/>
+<area shape="rect" href="setup__utils_8cc.html" title=" " alt="" coords="688,317,875,373"/>
 </map>
 </div>
 </div>
@@ -189,11 +192,6 @@ Enumerations</h2></td></tr>
 , <a class="el" href="namespacepurify_1_1factory.html#a862f0cad917b1ba718f965fd508f31f4a67e8f37794e0d9fed73a8b77c703f8e6">purify::factory::mpi_random_updates</a>
  }</td></tr>
 <tr class="separator:a862f0cad917b1ba718f965fd508f31f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e81ddc8925844c225faea9371315d1f"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1factory.html#a3e81ddc8925844c225faea9371315d1f">purify::factory::g_proximal_type</a> { <a class="el" href="namespacepurify_1_1factory.html#a3e81ddc8925844c225faea9371315d1fadada0c23c1236ccc934a3556a1725e94">purify::factory::L1GProximal</a>
-, <a class="el" href="namespacepurify_1_1factory.html#a3e81ddc8925844c225faea9371315d1facd065a2ab39996b5bd447b890dec2fa9">purify::factory::TFGProximal</a>
-, <a class="el" href="namespacepurify_1_1factory.html#a3e81ddc8925844c225faea9371315d1fa330d9b3991e7785c21cd29a452b56219">purify::factory::Indicator</a>
- }</td></tr>
-<tr class="separator:a3e81ddc8925844c225faea9371315d1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -205,10 +203,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a69db909e3bb6edef074b5eb0e15cdb5b"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingProximalADMM&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1factory.html#a69db909e3bb6edef074b5eb0e15cdb5b">purify::factory::padmm_factory</a> (const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real residual_tolerance_scaling=1, const t_real op_norm=1)</td></tr>
 <tr class="memdesc:a69db909e3bb6edef074b5eb0e15cdb5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">return shared pointer to padmm object  <a href="namespacepurify_1_1factory.html#a69db909e3bb6edef074b5eb0e15cdb5b">More...</a><br /></td></tr>
 <tr class="separator:a69db909e3bb6edef074b5eb0e15cdb5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30c386e496b397ba9023bdabda2334b5"><td class="memTemplParams" colspan="2">template&lt;class Algorithm &gt; </td></tr>
-<tr class="memitem:a30c386e496b397ba9023bdabda2334b5"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingForwardBackward&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1factory.html#a30c386e496b397ba9023bdabda2334b5">purify::factory::fb_factory</a> (const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real op_norm=1, const std::string model_path=&quot;&quot;, const g_proximal_type g_proximal=g_proximal_type::L1GProximal, std::shared_ptr&lt; DifferentiableFunc&lt; typename Algorithm::Scalar &gt;&gt; f_function=nullptr)</td></tr>
-<tr class="memdesc:a30c386e496b397ba9023bdabda2334b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">return shared pointer to forward backward object  <a href="namespacepurify_1_1factory.html#a30c386e496b397ba9023bdabda2334b5">More...</a><br /></td></tr>
-<tr class="separator:a30c386e496b397ba9023bdabda2334b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13b034d2a3b6b7b7e66543daadcdc5da"><td class="memTemplParams" colspan="2">template&lt;class Algorithm &gt; </td></tr>
+<tr class="memitem:a13b034d2a3b6b7b7e66543daadcdc5da"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingForwardBackward&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1factory.html#a13b034d2a3b6b7b7e66543daadcdc5da">purify::factory::fb_factory</a> (const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real op_norm=1, const std::string model_path=&quot;&quot;, const nondiff_func_type g_proximal=nondiff_func_type::L1Norm, std::shared_ptr&lt; DifferentiableFunc&lt; typename Algorithm::Scalar &gt;&gt; f_function=nullptr)</td></tr>
+<tr class="memdesc:a13b034d2a3b6b7b7e66543daadcdc5da"><td class="mdescLeft">&#160;</td><td class="mdescRight">return shared pointer to forward backward object  <a href="namespacepurify_1_1factory.html#a13b034d2a3b6b7b7e66543daadcdc5da">More...</a><br /></td></tr>
+<tr class="separator:a13b034d2a3b6b7b7e66543daadcdc5da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b08dded6011adff0ab4e7cef53911fc"><td class="memTemplParams" colspan="2">template&lt;class Algorithm &gt; </td></tr>
 <tr class="memitem:a0b08dded6011adff0ab4e7cef53911fc"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingPrimalDual&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1factory.html#a0b08dded6011adff0ab4e7cef53911fc">purify::factory::primaldual_factory</a> (const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const t_real relative_variation=1e-3, const t_real residual_tolerance_scaling=1, const t_real op_norm=1)</td></tr>
 <tr class="memdesc:a0b08dded6011adff0ab4e7cef53911fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">return shared pointer to primal dual object  <a href="namespacepurify_1_1factory.html#a0b08dded6011adff0ab4e7cef53911fc">More...</a><br /></td></tr>
@@ -218,8 +216,6 @@ Functions</h2></td></tr>
 Variables</h2></td></tr>
 <tr class="memitem:a27d858e0728daf0eff9998983c8c72a5"><td class="memItemLeft" align="right" valign="top">const std::map&lt; std::string, algo_distribution &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1factory.html#a27d858e0728daf0eff9998983c8c72a5">purify::factory::algo_distribution_string</a></td></tr>
 <tr class="separator:a27d858e0728daf0eff9998983c8c72a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64dc10f53ae3ae03615720090d31684f"><td class="memItemLeft" align="right" valign="top">const std::map&lt; std::string, g_proximal_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1factory.html#a64dc10f53ae3ae03615720090d31684f">purify::factory::g_proximal_type_string</a></td></tr>
-<tr class="separator:a64dc10f53ae3ae03615720090d31684f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['waveletoperatoradjointfixture_655',['WaveletOperatorAdjointFixture',['../classWaveletOperatorAdjointFixture.html',1,'']]],
-  ['waveletoperatorfixture_656',['WaveletOperatorFixture',['../classWaveletOperatorFixture.html',1,'']]],
-  ['waveletoperatormpifixture_657',['WaveletOperatorMPIFixture',['../classWaveletOperatorMPIFixture.html',1,'']]]
+  ['vis_5fparams_695',['vis_params',['../structpurify_1_1utilities_1_1vis__params.html',1,'purify::utilities']]]
 ];

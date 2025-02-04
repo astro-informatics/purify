@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['kernel_1157',['kernel',['../namespacepurify_1_1kernels.html#a5d1a602d4c5e183ca2ea9bf831d61668',1,'purify::kernels']]]
+  ['level_1231',['Level',['../classpurify_1_1logging_1_1Log.html#a266bfa79b34e40111d8ef4acce11cc05',1,'purify::logging::Log']]]
 ];

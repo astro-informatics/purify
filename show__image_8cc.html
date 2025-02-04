@@ -158,8 +158,8 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;  <span class="comment">// up samples M31 example</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  std::string <span class="keyword">const</span> fitsfile = <a class="code" href="namespacepurify.html#a86c35920819938ed196856155b6d2ba1">image_filename</a>(<span class="stringliteral">&quot;M31.fits&quot;</span>);</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  std::string <span class="keyword">const</span> fitsfile2 = <a class="code" href="namespacepurify.html#a86c35920819938ed196856155b6d2ba1">image_filename</a>(<span class="stringliteral">&quot;M31_512.fits&quot;</span>);</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  Image&lt;t_real&gt; <span class="keyword">const</span> M31 = <a class="code" href="namespacepurify_1_1pfitsio.html#a2ae1f0721ea099a29b30eaed0c47c771">pfitsio::read2d</a>(fitsfile).real();</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  Image&lt;t_real&gt; <span class="keyword">const</span> M31_large = <a class="code" href="namespacepurify_1_1pfitsio.html#a2ae1f0721ea099a29b30eaed0c47c771">pfitsio::read2d</a>(fitsfile2).real();</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  Image&lt;t_real&gt; <span class="keyword">const</span> M31 = <a class="code" href="namespacepurify_1_1pfitsio.html#a2d7e29052f62225e3af9b8e8f1420fb4">pfitsio::read2d</a>(fitsfile).real();</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  Image&lt;t_real&gt; <span class="keyword">const</span> M31_large = <a class="code" href="namespacepurify_1_1pfitsio.html#a2d7e29052f62225e3af9b8e8f1420fb4">pfitsio::read2d</a>(fitsfile2).real();</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#ifdef PURIFY_CImg</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  CDisplay display = cimg::make_display&lt;Image&lt;t_real&gt;&gt;(M31, <span class="stringliteral">&quot;M31 small&quot;</span>);</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <span class="keywordflow">while</span> (!display.is_closed()) {</div>
@@ -168,10 +168,10 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  }</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;}</div>
-<div class="ttc" id="anamespacepurify_1_1pfitsio_html_a2ae1f0721ea099a29b30eaed0c47c771"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#a2ae1f0721ea099a29b30eaed0c47c771">purify::pfitsio::read2d</a></div><div class="ttdeci">Image&lt; t_complex &gt; read2d(const std::string &amp;fits_name)</div><div class="ttdoc">Read image from fits file.</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8h_source.html#l00339">pfitsio.h:339</a></div></div>
+<div class="ttc" id="anamespacepurify_1_1pfitsio_html_a2d7e29052f62225e3af9b8e8f1420fb4"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#a2d7e29052f62225e3af9b8e8f1420fb4">purify::pfitsio::read2d</a></div><div class="ttdeci">Image&lt; t_complex &gt; read2d(const std::string &amp;fits_name)</div><div class="ttdoc">Read image from fits file.</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8cc_source.html#l00109">pfitsio.cc:109</a></div></div>
 <div class="ttc" id="anamespacepurify_html_a86c35920819938ed196856155b6d2ba1"><div class="ttname"><a href="namespacepurify.html#a86c35920819938ed196856155b6d2ba1">purify::image_filename</a></div><div class="ttdeci">std::string image_filename(std::string const &amp;filename)</div><div class="ttdoc">Image filename.</div><div class="ttdef"><b>Definition:</b> <a href="directories_8in_8h_source.html#l00020">directories.in.h:20</a></div></div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00020">purify::image_filename()</a>, and <a class="el" href="pfitsio_8h_source.html#l00339">purify::pfitsio::read2d()</a>.</p>
+<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00020">purify::image_filename()</a>, and <a class="el" href="pfitsio_8cc_source.html#l00109">purify::pfitsio::read2d()</a>.</p>
 
 </div>
 </div>

@@ -110,6 +110,12 @@ Functions</h2></td></tr>
 <tr class="memitem:ab2064cf1926a00a2aeeeece32959c465"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1pfitsio.html#ab2064cf1926a00a2aeeeece32959c465">write3d</a> (const std::vector&lt; Image&lt; t_real &gt;&gt; &amp;image, const std::string &amp;fits_name, const std::string &amp;pix_units=&quot;Jy/Beam&quot;, const bool &amp;overwrite=true)</td></tr>
 <tr class="memdesc:ab2064cf1926a00a2aeeeece32959c465"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write cube to fits file.  <a href="namespacepurify_1_1pfitsio.html#ab2064cf1926a00a2aeeeece32959c465">More...</a><br /></td></tr>
 <tr class="separator:ab2064cf1926a00a2aeeeece32959c465"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6899ef51fc550bbb6a8188f2f305b889"><td class="memItemLeft" align="right" valign="top">std::vector&lt; Image&lt; t_complex &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1pfitsio.html#a6899ef51fc550bbb6a8188f2f305b889">read3d</a> (const std::string &amp;fits_name)</td></tr>
+<tr class="memdesc:a6899ef51fc550bbb6a8188f2f305b889"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read cube from fits file.  <a href="namespacepurify_1_1pfitsio.html#a6899ef51fc550bbb6a8188f2f305b889">More...</a><br /></td></tr>
+<tr class="separator:a6899ef51fc550bbb6a8188f2f305b889"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d7e29052f62225e3af9b8e8f1420fb4"><td class="memItemLeft" align="right" valign="top">Image&lt; t_complex &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1pfitsio.html#a2d7e29052f62225e3af9b8e8f1420fb4">read2d</a> (const std::string &amp;fits_name)</td></tr>
+<tr class="memdesc:a2d7e29052f62225e3af9b8e8f1420fb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read image from fits file.  <a href="namespacepurify_1_1pfitsio.html#a2d7e29052f62225e3af9b8e8f1420fb4">More...</a><br /></td></tr>
+<tr class="separator:a2d7e29052f62225e3af9b8e8f1420fb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a585686ddb75d2e64e0c86c4efec3fdab"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a585686ddb75d2e64e0c86c4efec3fdab"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt; std::is_scalar&lt; T &gt;::value, void &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1pfitsio.html#a585686ddb75d2e64e0c86c4efec3fdab">write_history</a> (fitsfile *fptr, const std::string &amp;context, const T &amp;history, int *status)</td></tr>
 <tr class="separator:a585686ddb75d2e64e0c86c4efec3fdab"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -142,12 +148,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a323352a9113f5104bfd6e092f1196b1d"><td class="memTemplParams" colspan="2">template&lt;typename T , typename  = std::enable_if_t&lt;std::is_same_v&lt;double, typename T::Scalar&gt;&gt;&gt; </td></tr>
 <tr class="memitem:a323352a9113f5104bfd6e092f1196b1d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1pfitsio.html#a323352a9113f5104bfd6e092f1196b1d">read3d</a> (const std::string &amp;fits_name, Eigen::EigenBase&lt; T &gt; &amp;output, int &amp;rows, int &amp;cols, int &amp;channels, int &amp;pols)</td></tr>
 <tr class="separator:a323352a9113f5104bfd6e092f1196b1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac45a80db8e051f45372c3018fbd027d1"><td class="memItemLeft" align="right" valign="top">std::vector&lt; Image&lt; t_complex &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1pfitsio.html#ac45a80db8e051f45372c3018fbd027d1">read3d</a> (const std::string &amp;fits_name)</td></tr>
-<tr class="memdesc:ac45a80db8e051f45372c3018fbd027d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read cube from fits file.  <a href="namespacepurify_1_1pfitsio.html#ac45a80db8e051f45372c3018fbd027d1">More...</a><br /></td></tr>
-<tr class="separator:ac45a80db8e051f45372c3018fbd027d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ae1f0721ea099a29b30eaed0c47c771"><td class="memItemLeft" align="right" valign="top">Image&lt; t_complex &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1pfitsio.html#a2ae1f0721ea099a29b30eaed0c47c771">read2d</a> (const std::string &amp;fits_name)</td></tr>
-<tr class="memdesc:a2ae1f0721ea099a29b30eaed0c47c771"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read image from fits file.  <a href="namespacepurify_1_1pfitsio.html#a2ae1f0721ea099a29b30eaed0c47c771">More...</a><br /></td></tr>
-<tr class="separator:a2ae1f0721ea099a29b30eaed0c47c771"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab302818131b95815c67a68477508881d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1pfitsio.html#ab302818131b95815c67a68477508881d">read_uvfits</a> (const std::vector&lt; std::string &gt; &amp;names, const bool flag=true, const <a class="el" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8">stokes</a> pol=<a class="el" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8add7536794b63bf90eccfd37f9b147d7f">stokes::I</a>)</td></tr>
 <tr class="memdesc:ab302818131b95815c67a68477508881d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read uvfits files from name of vector.  <a href="namespacepurify_1_1pfitsio.html#ab302818131b95815c67a68477508881d">More...</a><br /></td></tr>
 <tr class="separator:ab302818131b95815c67a68477508881d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -287,14 +287,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a2ae1f0721ea099a29b30eaed0c47c771"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2ae1f0721ea099a29b30eaed0c47c771">&#9670;&nbsp;</a></span>read2d()</h2>
+<a id="a2d7e29052f62225e3af9b8e8f1420fb4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d7e29052f62225e3af9b8e8f1420fb4">&#9670;&nbsp;</a></span>read2d()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Image&lt;t_complex&gt; purify::pfitsio::read2d </td>
+          <td class="memname">Image&lt; t_complex &gt; purify::pfitsio::read2d </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>fits_name</em></td><td>)</td>
@@ -305,33 +305,33 @@ Functions</h2></td></tr>
 
 <p>Read image from fits file. </p>
 
-<p class="definition">Definition at line <a class="el" href="pfitsio_8h_source.html#l00339">339</a> of file <a class="el" href="pfitsio_8h_source.html">pfitsio.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;                                                    {</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  <span class="comment">/*</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;<span class="comment">    Reads in an image from a fits file and returns the image.</span></div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;<span class="comment">    fits_name:: name of fits file</span></div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;<span class="comment">  */</span></div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160; </div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;  <span class="keyword">const</span> std::vector&lt;Image&lt;t_complex&gt;&gt; images = <a class="code" href="namespacepurify_1_1pfitsio.html#ac45a80db8e051f45372c3018fbd027d1">read3d</a>(fits_name);</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  <span class="keywordflow">return</span> images.at(0);</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;}</div>
-<div class="ttc" id="anamespacepurify_1_1pfitsio_html_ac45a80db8e051f45372c3018fbd027d1"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#ac45a80db8e051f45372c3018fbd027d1">purify::pfitsio::read3d</a></div><div class="ttdeci">std::vector&lt; Image&lt; t_complex &gt; &gt; read3d(const std::string &amp;fits_name)</div><div class="ttdoc">Read cube from fits file.</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8h_source.html#l00325">pfitsio.h:325</a></div></div>
+<p class="definition">Definition at line <a class="el" href="pfitsio_8cc_source.html#l00109">109</a> of file <a class="el" href="pfitsio_8cc_source.html">pfitsio.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;                                                    {</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="comment">/*</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="comment">    Reads in an image from a fits file and returns the image.</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment">    fits_name:: name of fits file</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment">  */</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  <span class="keyword">const</span> std::vector&lt;Image&lt;t_complex&gt;&gt; images = <a class="code" href="namespacepurify_1_1pfitsio.html#a6899ef51fc550bbb6a8188f2f305b889">read3d</a>(fits_name);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  <span class="keywordflow">return</span> images.at(0);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;}</div>
+<div class="ttc" id="anamespacepurify_1_1pfitsio_html_a6899ef51fc550bbb6a8188f2f305b889"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#a6899ef51fc550bbb6a8188f2f305b889">purify::pfitsio::read3d</a></div><div class="ttdeci">std::vector&lt; Image&lt; t_complex &gt; &gt; read3d(const std::string &amp;fits_name)</div><div class="ttdoc">Read cube from fits file.</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8cc_source.html#l00095">pfitsio.cc:95</a></div></div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="pfitsio_8h_source.html#l00291">read3d()</a>.</p>
+<p class="reference">References <a class="el" href="pfitsio_8cc_source.html#l00095">read3d()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00025">main()</a>, and <a class="el" href="algo__factory_8cc_source.html#l00026">TEST_CASE()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="setup__utils_8cc_source.html#l00059">getInputData()</a>, <a class="el" href="main_8cc_source.html#l00032">main()</a>, and <a class="el" href="algo__factory_8cc_source.html#l00026">TEST_CASE()</a>.</p>
 
 </div>
 </div>
-<a id="ac45a80db8e051f45372c3018fbd027d1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac45a80db8e051f45372c3018fbd027d1">&#9670;&nbsp;</a></span>read3d() <span class="overload">[1/2]</span></h2>
+<a id="a6899ef51fc550bbb6a8188f2f305b889"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6899ef51fc550bbb6a8188f2f305b889">&#9670;&nbsp;</a></span>read3d() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;Image&lt;t_complex&gt; &gt; purify::pfitsio::read3d </td>
+          <td class="memname">std::vector&lt; Image&lt; t_complex &gt; &gt; purify::pfitsio::read3d </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>fits_name</em></td><td>)</td>
@@ -342,20 +342,22 @@ Functions</h2></td></tr>
 
 <p>Read cube from fits file. </p>
 
-<p class="definition">Definition at line <a class="el" href="pfitsio_8h_source.html#l00325">325</a> of file <a class="el" href="pfitsio_8h_source.html">pfitsio.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;                                                               {</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;  std::vector&lt;Image&lt;t_complex&gt;&gt; eigen_images;</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  Vector&lt;double&gt; image;</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;  <span class="keywordtype">int</span> rows, cols, channels, pols = 1;</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  read3d&lt;Vector&lt;double&gt;&gt;(fits_name, image, rows, cols, channels, pols);</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; channels; i++) {</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    Vector&lt;t_complex&gt; eigen_image = Vector&lt;t_complex&gt;::Zero(rows * cols);</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    eigen_image.real() = image.segment(i * rows * cols, rows * cols);</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    eigen_images.push_back(Image&lt;t_complex&gt;::Map(eigen_image.data(), rows, cols));</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;  }</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;  <span class="keywordflow">return</span> eigen_images;</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="pfitsio_8cc_source.html#l00095">95</a> of file <a class="el" href="pfitsio_8cc_source.html">pfitsio.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                                                               {</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  std::vector&lt;Image&lt;t_complex&gt;&gt; eigen_images;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  Vector&lt;double&gt; image;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="keywordtype">int</span> rows, cols, channels, pols = 1;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  read3d&lt;Vector&lt;double&gt;&gt;(fits_name, image, rows, cols, channels, pols);</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; channels; i++) {</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    Vector&lt;t_complex&gt; eigen_image = Vector&lt;t_complex&gt;::Zero(rows * cols);</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    eigen_image.real() = image.segment(i * rows * cols, rows * cols);</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    eigen_images.push_back(Image&lt;t_complex&gt;::Map(eigen_image.data(), rows, cols));</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  }</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <span class="keywordflow">return</span> eigen_images;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;}</div>
 </div><!-- fragment -->
+<p class="reference">Referenced by <a class="el" href="setup__utils_8cc_source.html#l00059">getInputData()</a>, and <a class="el" href="pfitsio_8cc_source.html#l00109">read2d()</a>.</p>
+
 </div>
 </div>
 <a id="a323352a9113f5104bfd6e092f1196b1d"></a>
@@ -444,8 +446,6 @@ template&lt;typename T , typename  = std::enable_if_t&lt;std::is_same_v&lt;doubl
 <div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;}</div>
 </div><!-- fragment -->
 <p class="reference">References <a class="el" href="logging_8h_source.html#l00207">PURIFY_LOW_LOG</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00025">main()</a>, and <a class="el" href="pfitsio_8h_source.html#l00339">read2d()</a>.</p>
 
 </div>
 </div>
@@ -651,11 +651,11 @@ template&lt;typename T &gt; </div>
 <div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;  uv_data.units = utilities::vis_units::lambda;</div>
 <div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;  <span class="keywordflow">return</span> uv_data;</div>
 <div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;}</div>
-<div class="ttc" id="anamespacepurify_1_1constant_html_a289e794ad6812bcd3de2fdcc68dfb01b"><div class="ttname"><a href="namespacepurify_1_1constant.html#a289e794ad6812bcd3de2fdcc68dfb01b">purify::constant::c</a></div><div class="ttdeci">const t_real c</div><div class="ttdoc">speed of light in vacuum</div><div class="ttdef"><b>Definition:</b> <a href="types_8h_source.html#l00060">types.h:60</a></div></div>
+<div class="ttc" id="anamespacepurify_1_1constant_html_a289e794ad6812bcd3de2fdcc68dfb01b"><div class="ttname"><a href="namespacepurify_1_1constant.html#a289e794ad6812bcd3de2fdcc68dfb01b">purify::constant::c</a></div><div class="ttdeci">const t_real c</div><div class="ttdoc">speed of light in vacuum</div><div class="ttdef"><b>Definition:</b> <a href="types_8h_source.html#l00072">types.h:72</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1pfitsio_html_a5e34256158689b24229b60876e06d174"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#a5e34256158689b24229b60876e06d174">purify::pfitsio::read_weight_from_data</a></div><div class="ttdeci">t_complex read_weight_from_data(const Vector&lt; t_real &gt; &amp;data, const t_uint pol, const t_uint pols, const t_uint chan, const t_uint chans, const t_uint baseline, const t_uint baselines)</div><div class="ttdoc">return weight for given baseline</div><div class="ttdef"><b>Definition:</b> <a href="purify_2uvfits_8cc_source.html#l00388">uvfits.cc:388</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1pfitsio_html_af7c72608a0a44fc31e640b6e77be7748"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#af7c72608a0a44fc31e640b6e77be7748">purify::pfitsio::read_vis_from_data</a></div><div class="ttdeci">t_complex read_vis_from_data(const Vector&lt; t_real &gt; &amp;data, const t_uint pol, const t_uint pols, const t_uint chan, const t_uint chans, const t_uint baseline, const t_uint baselines)</div><div class="ttdoc">return visibility for given baseline</div><div class="ttdef"><b>Definition:</b> <a href="purify_2uvfits_8cc_source.html#l00381">uvfits.cc:381</a></div></div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="uvw__utilities_8h_source.html#l00027">purify::utilities::vis_params::average_frequency</a>, <a class="el" href="uvw__utilities_8h_source.html#l00020">purify::utilities::vis_params::baseline</a>, <a class="el" href="types_8h_source.html#l00060">purify::constant::c</a>, <a class="el" href="uvw__utilities_8h_source.html#l00021">purify::utilities::vis_params::frequencies</a>, <a class="el" href="namespacepurify_1_1utilities.html#aa2af2ee7e4f1bb93a42235b9d973983da945f3fc449518a73b9f5f32868db466c">purify::utilities::lambda</a>, <a class="el" href="purify_2uvfits_8cc_source.html#l00381">read_vis_from_data()</a>, <a class="el" href="purify_2uvfits_8cc_source.html#l00388">read_weight_from_data()</a>, <a class="el" href="uvw__utilities_8h_source.html#l00019">purify::utilities::vis_params::time</a>, <a class="el" href="uvw__utilities_8h_source.html#l00016">purify::utilities::vis_params::u</a>, <a class="el" href="uvw__utilities_8h_source.html#l00024">purify::utilities::vis_params::units</a>, <a class="el" href="uvw__utilities_8h_source.html#l00017">purify::utilities::vis_params::v</a>, <a class="el" href="uvw__utilities_8h_source.html#l00022">purify::utilities::vis_params::vis</a>, <a class="el" href="uvw__utilities_8h_source.html#l00018">purify::utilities::vis_params::w</a>, and <a class="el" href="uvw__utilities_8h_source.html#l00023">purify::utilities::vis_params::weights</a>.</p>
+<p class="reference">References <a class="el" href="uvw__utilities_8h_source.html#l00027">purify::utilities::vis_params::average_frequency</a>, <a class="el" href="uvw__utilities_8h_source.html#l00020">purify::utilities::vis_params::baseline</a>, <a class="el" href="types_8h_source.html#l00072">purify::constant::c</a>, <a class="el" href="uvw__utilities_8h_source.html#l00021">purify::utilities::vis_params::frequencies</a>, <a class="el" href="namespacepurify_1_1utilities.html#aa2af2ee7e4f1bb93a42235b9d973983da945f3fc449518a73b9f5f32868db466c">purify::utilities::lambda</a>, <a class="el" href="purify_2uvfits_8cc_source.html#l00381">read_vis_from_data()</a>, <a class="el" href="purify_2uvfits_8cc_source.html#l00388">read_weight_from_data()</a>, <a class="el" href="uvw__utilities_8h_source.html#l00019">purify::utilities::vis_params::time</a>, <a class="el" href="uvw__utilities_8h_source.html#l00016">purify::utilities::vis_params::u</a>, <a class="el" href="uvw__utilities_8h_source.html#l00024">purify::utilities::vis_params::units</a>, <a class="el" href="uvw__utilities_8h_source.html#l00017">purify::utilities::vis_params::v</a>, <a class="el" href="uvw__utilities_8h_source.html#l00022">purify::utilities::vis_params::vis</a>, <a class="el" href="uvw__utilities_8h_source.html#l00018">purify::utilities::vis_params::w</a>, and <a class="el" href="uvw__utilities_8h_source.html#l00023">purify::utilities::vis_params::weights</a>.</p>
 
 </div>
 </div>
@@ -793,7 +793,7 @@ template&lt;typename T &gt; </div>
 <div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;}</div>
 <div class="ttc" id="alogging_8h_html_ad2207dcfa3c2c44fa0fccbb9d0a3b21c"><div class="ttname"><a href="logging_8h.html#ad2207dcfa3c2c44fa0fccbb9d0a3b21c">PURIFY_MEDIUM_LOG</a></div><div class="ttdeci">#define PURIFY_MEDIUM_LOG(...)</div><div class="ttdoc">Medium priority message.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8h_source.html#l00205">logging.h:205</a></div></div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="uvw__utilities_8h_source.html#l00027">purify::utilities::vis_params::average_frequency</a>, <a class="el" href="uvw__utilities_8h_source.html#l00020">purify::utilities::vis_params::baseline</a>, <a class="el" href="types_8h_source.html#l00060">purify::constant::c</a>, <a class="el" href="uvw__utilities_8h_source.html#l00021">purify::utilities::vis_params::frequencies</a>, <a class="el" href="namespacepurify_1_1utilities.html#aa2af2ee7e4f1bb93a42235b9d973983da945f3fc449518a73b9f5f32868db466c">purify::utilities::lambda</a>, <a class="el" href="logging_8h_source.html#l00207">PURIFY_LOW_LOG</a>, <a class="el" href="logging_8h_source.html#l00205">PURIFY_MEDIUM_LOG</a>, <a class="el" href="purify_2uvfits_8cc_source.html#l00381">read_vis_from_data()</a>, <a class="el" href="purify_2uvfits_8cc_source.html#l00388">read_weight_from_data()</a>, <a class="el" href="uvw__utilities_8h_source.html#l00019">purify::utilities::vis_params::time</a>, <a class="el" href="uvw__utilities_8h_source.html#l00016">purify::utilities::vis_params::u</a>, <a class="el" href="uvw__utilities_8h_source.html#l00024">purify::utilities::vis_params::units</a>, <a class="el" href="uvw__utilities_8h_source.html#l00017">purify::utilities::vis_params::v</a>, <a class="el" href="uvw__utilities_8h_source.html#l00022">purify::utilities::vis_params::vis</a>, <a class="el" href="uvw__utilities_8h_source.html#l00018">purify::utilities::vis_params::w</a>, and <a class="el" href="uvw__utilities_8h_source.html#l00023">purify::utilities::vis_params::weights</a>.</p>
+<p class="reference">References <a class="el" href="uvw__utilities_8h_source.html#l00027">purify::utilities::vis_params::average_frequency</a>, <a class="el" href="uvw__utilities_8h_source.html#l00020">purify::utilities::vis_params::baseline</a>, <a class="el" href="types_8h_source.html#l00072">purify::constant::c</a>, <a class="el" href="uvw__utilities_8h_source.html#l00021">purify::utilities::vis_params::frequencies</a>, <a class="el" href="namespacepurify_1_1utilities.html#aa2af2ee7e4f1bb93a42235b9d973983da945f3fc449518a73b9f5f32868db466c">purify::utilities::lambda</a>, <a class="el" href="logging_8h_source.html#l00207">PURIFY_LOW_LOG</a>, <a class="el" href="logging_8h_source.html#l00205">PURIFY_MEDIUM_LOG</a>, <a class="el" href="purify_2uvfits_8cc_source.html#l00381">read_vis_from_data()</a>, <a class="el" href="purify_2uvfits_8cc_source.html#l00388">read_weight_from_data()</a>, <a class="el" href="uvw__utilities_8h_source.html#l00019">purify::utilities::vis_params::time</a>, <a class="el" href="uvw__utilities_8h_source.html#l00016">purify::utilities::vis_params::u</a>, <a class="el" href="uvw__utilities_8h_source.html#l00024">purify::utilities::vis_params::units</a>, <a class="el" href="uvw__utilities_8h_source.html#l00017">purify::utilities::vis_params::v</a>, <a class="el" href="uvw__utilities_8h_source.html#l00022">purify::utilities::vis_params::vis</a>, <a class="el" href="uvw__utilities_8h_source.html#l00018">purify::utilities::vis_params::w</a>, and <a class="el" href="uvw__utilities_8h_source.html#l00023">purify::utilities::vis_params::weights</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="purify_2uvfits_8cc_source.html#l00049">read_uvfits()</a>.</p>
 
@@ -1800,7 +1800,7 @@ template&lt;typename DERIVED &gt; </div>
 </div><!-- fragment -->
 <p class="reference">References <a class="el" href="pfitsio_8cc_source.html#l00063">write3d()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="update__factory_8h_source.html#l00020">purify::factory::add_updater()</a>, <a class="el" href="main_8cc_source.html#l00025">main()</a>, <a class="el" href="padmm__random__coverage_8cc_source.html#l00025">padmm()</a>, <a class="el" href="padmm__mpi__real__data_8cc_source.html#l00051">padmm_factory()</a>, and <a class="el" href="pfitsio_8cc_source.html#l00044">write2d()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="update__factory_8h_source.html#l00020">purify::factory::add_updater()</a>, <a class="el" href="main_8cc_source.html#l00032">main()</a>, <a class="el" href="padmm__random__coverage_8cc_source.html#l00025">padmm()</a>, <a class="el" href="padmm__mpi__real__data_8cc_source.html#l00051">padmm_factory()</a>, <a class="el" href="setup__utils_8cc_source.html#l00421">saveDirtyImage()</a>, <a class="el" href="setup__utils_8cc_source.html#l00360">saveMeasurementEigenVector()</a>, <a class="el" href="setup__utils_8cc_source.html#l00383">savePSF()</a>, and <a class="el" href="pfitsio_8cc_source.html#l00044">write2d()</a>.</p>
 
 </div>
 </div>
@@ -1996,11 +1996,11 @@ template&lt;typename T &gt; </div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  <span class="keywordflow">if</span> (fits_close_file(fptr, &amp;status))</div>
 <div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Problem closing fits file:&quot;</span> + header.fits_name);</div>
 <div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;}</div>
-<div class="ttc" id="anamespacepurify_1_1constant_html_aa35bce2e736d0453c6005cbc06f1dbe7"><div class="ttname"><a href="namespacepurify_1_1constant.html#aa35bce2e736d0453c6005cbc06f1dbe7">purify::constant::pi</a></div><div class="ttdeci">const t_real pi</div><div class="ttdoc">mathematical constant</div><div class="ttdef"><b>Definition:</b> <a href="types_8h_source.html#l00058">types.h:58</a></div></div>
+<div class="ttc" id="anamespacepurify_1_1constant_html_aa35bce2e736d0453c6005cbc06f1dbe7"><div class="ttname"><a href="namespacepurify_1_1constant.html#aa35bce2e736d0453c6005cbc06f1dbe7">purify::constant::pi</a></div><div class="ttdeci">const t_real pi</div><div class="ttdoc">mathematical constant</div><div class="ttdef"><b>Definition:</b> <a href="types_8h_source.html#l00070">types.h:70</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1pfitsio_html_a585686ddb75d2e64e0c86c4efec3fdab"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#a585686ddb75d2e64e0c86c4efec3fdab">purify::pfitsio::write_history</a></div><div class="ttdeci">std::enable_if&lt; std::is_scalar&lt; T &gt;::value, void &gt;::type write_history(fitsfile *fptr, const std::string &amp;context, const T &amp;history, int *status)</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8h_source.html#l00088">pfitsio.h:88</a></div></div>
 <div class="ttc" id="apfitsio_8h_html_ae5e7423e6f677807cacaaf36ad9141b3"><div class="ttname"><a href="pfitsio_8h.html#ae5e7423e6f677807cacaaf36ad9141b3">PURIFY_MACRO</a></div><div class="ttdeci">#define PURIFY_MACRO(VAR, H2)</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8h_source.html#l00062">pfitsio.h:62</a></div></div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="pfitsio_8h_source.html#l00017">purify::pfitsio::header_params::cell_x</a>, <a class="el" href="pfitsio_8h_source.html#l00018">purify::pfitsio::header_params::cell_y</a>, <a class="el" href="pfitsio_8h_source.html#l00025">purify::pfitsio::header_params::channel_width</a>, <a class="el" href="pfitsio_8h_source.html#l00020">purify::pfitsio::header_params::dec</a>, <a class="el" href="pfitsio_8h_source.html#l00031">purify::pfitsio::header_params::epsilon</a>, <a class="el" href="pfitsio_8h_source.html#l00015">purify::pfitsio::header_params::fits_name</a>, <a class="el" href="pfitsio_8h_source.html#l00028">purify::pfitsio::header_params::hasconverged</a>, <a class="el" href="pfitsio_8h_source.html#l00016">purify::pfitsio::header_params::mean_frequency</a>, <a class="el" href="pfitsio_8h_source.html#l00027">purify::pfitsio::header_params::niters</a>, <a class="el" href="types_8h_source.html#l00058">purify::constant::pi</a>, <a class="el" href="pfitsio_8h_source.html#l00023">purify::pfitsio::header_params::pix_units</a>, <a class="el" href="logging_8h_source.html#l00207">PURIFY_LOW_LOG</a>, <a class="el" href="pfitsio_8h_source.html#l00062">PURIFY_MACRO</a>, <a class="el" href="pfitsio_8h_source.html#l00019">purify::pfitsio::header_params::ra</a>, <a class="el" href="pfitsio_8h_source.html#l00029">purify::pfitsio::header_params::relative_variation</a>, <a class="el" href="pfitsio_8h_source.html#l00030">purify::pfitsio::header_params::residual_convergence</a>, and <a class="el" href="pfitsio_8cc_source.html#l00022">write_history()</a>.</p>
+<p class="reference">References <a class="el" href="pfitsio_8h_source.html#l00017">purify::pfitsio::header_params::cell_x</a>, <a class="el" href="pfitsio_8h_source.html#l00018">purify::pfitsio::header_params::cell_y</a>, <a class="el" href="pfitsio_8h_source.html#l00025">purify::pfitsio::header_params::channel_width</a>, <a class="el" href="pfitsio_8h_source.html#l00020">purify::pfitsio::header_params::dec</a>, <a class="el" href="pfitsio_8h_source.html#l00031">purify::pfitsio::header_params::epsilon</a>, <a class="el" href="pfitsio_8h_source.html#l00015">purify::pfitsio::header_params::fits_name</a>, <a class="el" href="pfitsio_8h_source.html#l00028">purify::pfitsio::header_params::hasconverged</a>, <a class="el" href="pfitsio_8h_source.html#l00016">purify::pfitsio::header_params::mean_frequency</a>, <a class="el" href="pfitsio_8h_source.html#l00027">purify::pfitsio::header_params::niters</a>, <a class="el" href="types_8h_source.html#l00070">purify::constant::pi</a>, <a class="el" href="pfitsio_8h_source.html#l00023">purify::pfitsio::header_params::pix_units</a>, <a class="el" href="logging_8h_source.html#l00207">PURIFY_LOW_LOG</a>, <a class="el" href="pfitsio_8h_source.html#l00062">PURIFY_MACRO</a>, <a class="el" href="pfitsio_8h_source.html#l00019">purify::pfitsio::header_params::ra</a>, <a class="el" href="pfitsio_8h_source.html#l00029">purify::pfitsio::header_params::relative_variation</a>, <a class="el" href="pfitsio_8h_source.html#l00030">purify::pfitsio::header_params::residual_convergence</a>, and <a class="el" href="pfitsio_8cc_source.html#l00022">write_history()</a>.</p>
 
 </div>
 </div>
