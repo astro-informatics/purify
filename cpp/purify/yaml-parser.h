@@ -81,7 +81,7 @@ class YamlParser {
   TYPE NAME##_ = VALUE;               \
                                       \
  public:                              \
-  TYPE NAME() { return NAME##_; };
+  TYPE NAME() const { return NAME##_; };
 
   YAML_MACRO(std::string, filepath, "")
   YAML_MACRO(std::string, version, "")
@@ -129,6 +129,7 @@ class YamlParser {
   YAML_MACRO(std::string, output_prefix, "")
   YAML_MACRO(std::string, skymodel, "")
   YAML_MACRO(std::vector<std::string>, measurements, {})
+  YAML_MACRO(bool, w_term, true)
   YAML_MACRO(stokes, measurements_polarization, stokes::I)
   YAML_MACRO(utilities::vis_units, measurements_units, utilities::vis_units::radians)
   YAML_MACRO(std::string, kernel, "")
@@ -141,11 +142,19 @@ class YamlParser {
   YAML_MACRO(t_real, jmap_beta, 1)
 
   YAML_MACRO(std::string, model_path, "")
-  YAML_MACRO(factory::g_proximal_type, gProximalType, factory::g_proximal_type::L1GProximal)
+  YAML_MACRO(nondiff_func_type, nondiffFuncType, nondiff_func_type::L1Norm)
+  YAML_MACRO(diff_func_type, diffFuncType, diff_func_type::L2Norm)
+  YAML_MACRO(std::string, CRR_function_model_path, "")
+  YAML_MACRO(std::string, CRR_gradient_model_path, "")
+  YAML_MACRO(t_real, CRR_mu, 20)
+  YAML_MACRO(t_real, CRR_lambda, 5000)
+
+  std::string output_path() const { return out_path; }
 
 #undef YAML_MACRO
  private:
   YAML::Node config_file;
+  std::string out_path;
 
   template <typename T>
   T get(const YAML::Node& node_map, const std::initializer_list<const char*> indicies);

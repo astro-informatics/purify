@@ -45,6 +45,8 @@ if (docs)
   add_subdirectory(docs)
 endif()
 
+add_subdirectory(uncertainty_quantification)
+
 add_executable(purify main.cc)
 set_target_properties(purify PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 target_link_libraries(purify libpurify ${sopt_LIBRARIES})
