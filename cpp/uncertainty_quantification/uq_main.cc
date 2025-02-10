@@ -15,11 +15,6 @@
 #include <sopt/l1_non_diff_function.h>
 #include <sopt/l2_differentiable_func.h>
 #include <sopt/real_indicator.h>
-#include <sopt/tf_non_diff_function.h>
-
-#ifdef PURIFY_ONNXRT
-#include <sopt/onnx_differentiable_func.h>
-#endif
 
 using VectorC = sopt::Vector<std::complex<double>>;
 
