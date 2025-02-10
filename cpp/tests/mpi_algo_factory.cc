@@ -372,13 +372,14 @@ TEST_CASE("Serial vs. Serial with MPI Forward Backward") {
   CHECK(mse <= average_intensity * 1e-3);
 }
 
+#ifdef PURIFY_H5
 TEST_CASE("MPI_fb_factory_hdf5") {
   auto const world = sopt::mpi::Communicator::World();
   const size_t N = 13107;
   
   const std::string &test_dir = "expected/fb/";
   const std::string &input_data_path = data_filename(test_dir + "input_data.h5");
-  const std::string &result_path = data_filename(test_dir + "mpi_fb_result.fits");
+  const std::string &result_path = data_filename(test_dir + "mpi_fb_result_hdf5.fits");
   H5::H5Handler h5file(input_data_path, world);
 
   auto uv_data = H5::stochread_visibility(h5file, 6000, false);
@@ -414,11 +415,10 @@ TEST_CASE("MPI_fb_factory_hdf5") {
 
   auto const diagnostic = (*fb)();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
-  if (world.is_root())
-  {
-    pfitsio::write2d(image.real(), result_path);
-  //pfitsio::write2d(residual_image.real(), expected_residual_path);
-  }
+  //if (world.is_root())
+  //{
+  //  pfitsio::write2d(image.real(), result_path);
+  //}
 
   const std::string &expected_solution_path = data_filename(test_dir + "solution.fits");
   const std::string &expected_residual_path = data_filename(test_dir + "residual.fits");
@@ -436,7 +436,6 @@ TEST_CASE("MPI_fb_factory_hdf5") {
   CHECK(mse <= average_intensity * 1e-3);
 }
 
-#ifdef PURIFY_H5
 TEST_CASE("fb_factory_stochastic") {
   const std::string &test_dir = "expected/fb/";
   const std::string &input_data_path = data_filename(test_dir + "input_data.h5");
@@ -494,17 +493,10 @@ TEST_CASE("fb_factory_stochastic") {
 
   auto const diagnostic = fb();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
-  SOPT_HIGH_LOG("God help me.");
-  if (comm.is_root())
-  {
-    SOPT_HIGH_LOG("Root write file");
-    pfitsio::write2d(image.real(), result_path);
-  //pfitsio::write2d(residual_image.real(), expected_residual_path);
-  }
-  else
-  {
-    SOPT_HIGH_LOG("Worker has nowt to do.");
-  }
+  //if (comm.is_root())
+  //{
+  //  //pfitsio::write2d(image.real(), result_path);
+  //}
 
   auto soln_flat = Vector<t_complex>::Map(solution.data(), solution.size());
   double average_intensity = soln_flat.real().sum() / soln_flat.size();

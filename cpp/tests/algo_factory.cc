@@ -186,6 +186,7 @@ TEST_CASE("fb_factory") {
   CHECK(mse <= average_intensity * 1e-3);
 }
 
+#ifdef PURIFY_HD5
 TEST_CASE("fb_factory_stochastic") {
   const std::string &test_dir = "expected/fb/";
   const std::string &input_data_path = data_filename(test_dir + "input_data.vis");
@@ -278,7 +279,7 @@ TEST_CASE("fb_factory_stochastic") {
 
   auto const diagnostic = fb();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
-  pfitsio::write2d(image.real(), result_path);
+  //pfitsio::write2d(image.real(), result_path);
   //pfitsio::write2d(residual_image.real(), expected_residual_path);
 
   auto soln_flat = Vector<t_complex>::Map(solution.data(), solution.size());
@@ -291,6 +292,7 @@ TEST_CASE("fb_factory_stochastic") {
   SOPT_HIGH_LOG("MSE = {}", mse);
   CHECK(mse <= average_intensity * 1e-3);
 }
+#endif
 
 #ifdef PURIFY_ONNXRT
 TEST_CASE("tf_fb_factory") {
