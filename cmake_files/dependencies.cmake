@@ -19,7 +19,6 @@ endif()
 
 find_package(CFitsIO REQUIRED)
 find_package(yaml-cpp REQUIRED)
-find_package(benchmark REQUIRED)
 
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.30.0")
   cmake_policy(SET CMP0167 NEW)
@@ -69,10 +68,9 @@ if(tests OR examples)
   file(COPY data DESTINATION .)
 endif()
 
-#if(benchmarks)
-#find_package(benchmark REQUIRED CONFIG)
-  #include(AddBenchmark)
-#endif()
+if(benchmarks)
+  find_package(benchmark REQUIRED CONFIG)
+endif()
 
 # Always find open-mp, since it may be used by sopt
 if (openmp)
