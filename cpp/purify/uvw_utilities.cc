@@ -1,5 +1,8 @@
 #include "purify/uvw_utilities.h"
 #include "purify/config.h"
+#ifdef PURIFY_H5
+#include "purify/h5reader.h"
+#endif
 #include <fstream>
 #include <random>
 #include <sys/stat.h>
@@ -8,6 +11,11 @@
 
 namespace purify {
 namespace utilities {
+
+bool has_suffix(const std::string &str, const std::string &suff) {
+  return str.size() >= suff.size() && str.compare(str.size() - suff.size(), suff.size(), suff) == 0;
+}
+
 Matrix<t_real> generate_antennas(const t_uint N, const t_real scale) {
   Matrix<t_real> B = Matrix<t_real>::Zero(N, 3);
   const t_real mean = 0;
@@ -170,7 +178,7 @@ t_real streamtoreal(std::ifstream &stream) {
   return std::stod(input);
 }
 
-utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term) {
+utilities::vis_params read_visibility_csv(const std::string &vis_name, const bool w_term) {
   /*
     Reads an csv file with u, v, visibilities and returns the vectors.
 
@@ -223,6 +231,13 @@ utilities::vis_params read_visibility(const std::string &vis_name, const bool w_
   uv_vis.average_frequency = 0;
 
   return uv_vis;
+}
+
+utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term) {
+#ifdef PURIFY_H5
+  if (has_suffix(vis_name, ".h5")) return H5::read_visibility(vis_name, w_term);
+#endif
+  return read_visibility_csv(vis_name, w_term);
 }
 
 void write_visibility(const utilities::vis_params &uv_vis, const std::string &file_name,

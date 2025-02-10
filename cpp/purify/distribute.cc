@@ -1,8 +1,7 @@
 #include "purify/distribute.h"
 #include "purify/wide_field_utilities.h"
 
-namespace purify {
-namespace distribute {
+namespace purify::distribute {
 
 std::vector<t_int> distribute_measurements(Vector<t_real> const &u, Vector<t_real> const &v,
                                            Vector<t_real> const &w, t_int const number_of_nodes,
@@ -10,7 +9,7 @@ std::vector<t_int> distribute_measurements(Vector<t_real> const &u, Vector<t_rea
                                            t_int const &grid_size) {
   // distrubte visibilities from a measurement
   Vector<t_int> index = Vector<t_int>::LinSpaced(u.size(), 0, u.size());
-  t_int const patition_size =
+  t_int const partition_size =
       std::ceil(static_cast<t_real>(u.size()) / static_cast<t_real>(number_of_nodes));
   // return a vector of vectors of indicies for each node
   std::string plan_name = "";
@@ -41,23 +40,25 @@ std::vector<t_int> distribute_measurements(Vector<t_real> const &u, Vector<t_rea
   }
   PURIFY_DEBUG(
       "Using {} to make {} partitions from {} visibilities, with {} visibilities per a node.",
-      plan_name, number_of_nodes, index.size(), patition_size);
-  std::vector<t_int> patitions(u.size());
-  // creating patitions
-  for (t_int i = 0; i < index.size(); i++) {
-    if (std::floor(static_cast<t_real>(i) / static_cast<t_real>(patition_size)) >
-        number_of_nodes - 1) {
-      PURIFY_ERROR("Error: Probably a bug in distribution plan.");
-      throw std::runtime_error("Distributing data into too many nodes");
-    }
-    patitions[index(i)] = std::floor(static_cast<t_real>(i) / static_cast<t_real>(patition_size));
+      plan_name, number_of_nodes, index.size(), partition_size);
+  std::vector<t_int> partitions(u.size());
+  if (std::floor(static_cast<t_real>(index.size() - 1) / static_cast<t_real>(partition_size)) >
+      number_of_nodes - 1) {
+    PURIFY_ERROR("Error: Probably a bug in distribution plan.");
+    throw std::runtime_error("Distributing data into too many nodes");
   }
-  return patitions;
+  // creating partitions
+  for (t_int i = 0; i < index.size(); ++i) {
+    partitions[index(i)] = std::floor(static_cast<t_real>(i) / static_cast<t_real>(partition_size));
+  }
+  return partitions;
 }
+
 Vector<t_int> w_distribution(const Vector<t_real> &u, const Vector<t_real> &v,
                              Vector<t_real> const &w) {
   return w_distribution(w);
 }
+
 Vector<t_int> w_distribution(Vector<t_real> const &w) {
   // sort visibilities by w from  w_max to w_min
   Vector<t_int> index = Vector<t_int>::LinSpaced(w.size(), 0, w.size());
@@ -98,6 +99,7 @@ Vector<t_int> equal_distribution(Vector<t_real> const &u, Vector<t_real> const &
             });
   return index;
 }
+
 std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters,
     const std::function<t_real(t_real)> &cost, const t_real rel_diff) {
@@ -147,6 +149,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
 
   return std::make_tuple(w_node, w_centre);
 }
+
 #ifdef PURIFY_MPI
 std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
     const Vector<t_real> &w, const t_int number_of_nodes, const t_int iters,
@@ -164,7 +167,7 @@ std::tuple<std::vector<t_int>, std::vector<t_real>> kmeans_algo(
   for (int i = 0; i < w_centre.size(); i++)
     w_centre[i] =
         (static_cast<t_real>(i) * (wmax - wmin) / static_cast<t_real>(number_of_nodes) + wmin);
-  // lopp through even nodes to reduces w-term
+  // loop through even nodes to reduce w-term
   for (int n = 0; n < iters; n++) {
     if (comm.is_root()) PURIFY_DEBUG("clustering iteration {}", n);
     for (int i = 0; i < w.size(); i++) {
@@ -216,8 +219,9 @@ std::vector<t_int> w_support(Vector<t_real> const &w, const std::vector<t_int> &
                                         min_support, max_support);
   const t_real coeff_average =
       comm.all_sum_all<t_real>(coeff_total) / static_cast<t_real>(comm.size());
-  if (comm.is_root())
+  if (comm.is_root()) {
     PURIFY_DEBUG("Each node should have on average {} coefficients.", coeff_average);
+  }
   t_real coeff_sum = 0;
   t_int group = 0;
   std::vector<t_int> groups(w.size(), comm.rank());
@@ -242,22 +246,23 @@ std::vector<t_int> w_support(Vector<t_real> const &w, const std::vector<t_int> &
         groups[i] = group;
       }
     }
-    if (group > comm.size() - 1)
+    if (group > comm.size() - 1) {
       throw std::runtime_error(
           "Error distributing visibilites to even computational load for wide field imaging. Group "
           "number out of bounds.");
+    }
     coeff_sum = comm.broadcast(coeff_sum, rank);
     group = comm.broadcast(group, rank);
 
-    if (total != coeff_total and comm.rank() == rank)
+    if (total != coeff_total and comm.rank() == rank) {
       throw std::runtime_error(
           "Total number of coefficients calculated is not the same, loop might be broken. " +
           std::to_string(total) + " != " + std::to_string(coeff_total));
+    }
   }
   if (comm.is_root()) PURIFY_DEBUG("{} node should have {} coefficients.", group, coeff_sum);
   return groups;
 }
 #endif
 
-}  // namespace distribute
-}  // namespace purify
+}  // namespace purify::distribute
