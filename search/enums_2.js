@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['dde_5ftype_1224',['dde_type',['../namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5',1,'purify']]],
-  ['diff_5ffunc_5ftype_1225',['diff_func_type',['../namespacepurify.html#a9288eb8d6da092f4e9d9442046093356',1,'purify']]],
-  ['distributed_5fmeasurement_5foperator_1226',['distributed_measurement_operator',['../namespacepurify_1_1factory.html#a6b8de5116c3d7d0d679cd6dd47a80248',1,'purify::factory']]],
-  ['distributed_5fwavelet_5foperator_1227',['distributed_wavelet_operator',['../namespacepurify_1_1factory.html#a5bbc6a01d0a2cdd30b656a6bb957221f',1,'purify::factory']]]
+  ['dde_5ftype_1252',['dde_type',['../namespacepurify.html#ad1900deb6bebc3b75891904d6f576df5',1,'purify']]],
+  ['diff_5ffunc_5ftype_1253',['diff_func_type',['../namespacepurify.html#a9288eb8d6da092f4e9d9442046093356',1,'purify']]],
+  ['distributed_5fmeasurement_5foperator_1254',['distributed_measurement_operator',['../namespacepurify_1_1factory.html#a6b8de5116c3d7d0d679cd6dd47a80248',1,'purify::factory']]],
+  ['distributed_5fwavelet_5foperator_1255',['distributed_wavelet_operator',['../namespacepurify_1_1factory.html#a5bbc6a01d0a2cdd30b656a6bb957221f',1,'purify::factory']]]
 ];

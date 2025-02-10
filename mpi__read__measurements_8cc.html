@@ -85,9 +85,10 @@ $(function() {
 <code>#include &quot;<a class="el" href="types_8h_source.html">purify/types.h</a>&quot;</code><br />
 <code>#include &quot;catch2/catch_all.hpp&quot;</code><br />
 <code>#include &quot;<a class="el" href="logging_8h_source.html">purify/logging.h</a>&quot;</code><br />
-<code>#include &lt;iostream&gt;</code><br />
 <code>#include &quot;purify/directories.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="read__measurements_8h_source.html">purify/read_measurements.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="purify_2utilities_8h_source.html">purify/utilities.h</a>&quot;</code><br />
+<code>#include &lt;sopt/gradient_utils.h&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for mpi_read_measurements.cc:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
@@ -95,31 +96,33 @@ $(function() {
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="mpi__read__measurements_8cc__incl.png" border="0" usemap="#a_2home_2runner_2work_2purify_2purify_2cpp_2tests_2mpi__read__measurements_8cc" alt=""/></div>
 <map name="a_2home_2runner_2work_2purify_2purify_2cpp_2tests_2mpi__read__measurements_8cc" id="a_2home_2runner_2work_2purify_2purify_2cpp_2tests_2mpi__read__measurements_8cc">
-<area shape="rect" title=" " alt="" coords="523,5,714,61"/>
-<area shape="rect" title=" " alt="" coords="649,408,764,435"/>
-<area shape="rect" href="types_8h.html" title=" " alt="" coords="1101,333,1211,360"/>
-<area shape="rect" title=" " alt="" coords="427,109,581,136"/>
-<area shape="rect" href="logging_8h.html" title=" " alt="" coords="341,259,464,285"/>
-<area shape="rect" title=" " alt="" coords="552,259,632,285"/>
-<area shape="rect" title=" " alt="" coords="899,109,1043,136"/>
-<area shape="rect" href="read__measurements_8h.html" title=" " alt="" coords="665,109,874,136"/>
-<area shape="rect" title=" " alt="" coords="1117,408,1195,435"/>
-<area shape="rect" title=" " alt="" coords="1219,408,1311,435"/>
-<area shape="rect" title=" " alt="" coords="1335,408,1438,435"/>
-<area shape="rect" title=" " alt="" coords="829,408,965,435"/>
-<area shape="rect" title=" " alt="" coords="990,408,1093,435"/>
-<area shape="rect" title=" " alt="" coords="449,333,516,360"/>
-<area shape="rect" title=" " alt="" coords="541,333,627,360"/>
-<area shape="rect" title=" " alt="" coords="44,333,95,360"/>
-<area shape="rect" title=" " alt="" coords="119,333,196,360"/>
-<area shape="rect" title=" " alt="" coords="220,333,295,360"/>
-<area shape="rect" title=" " alt="" coords="703,333,761,360"/>
-<area shape="rect" title=" " alt="" coords="319,333,374,360"/>
-<area shape="rect" href="distribute_8h.html" title=" " alt="" coords="707,184,845,211"/>
-<area shape="rect" href="uvw__utilities_8h.html" title=" " alt="" coords="905,259,1063,285"/>
-<area shape="rect" title=" " alt="" coords="813,259,880,285"/>
-<area shape="rect" title=" " alt="" coords="887,333,961,360"/>
-<area shape="rect" title=" " alt="" coords="985,333,1077,360"/>
+<area shape="rect" title=" " alt="" coords="1110,5,1301,61"/>
+<area shape="rect" title=" " alt="" coords="100,408,215,435"/>
+<area shape="rect" href="types_8h.html" title=" " alt="" coords="1151,333,1262,360"/>
+<area shape="rect" title=" " alt="" coords="1268,109,1423,136"/>
+<area shape="rect" href="logging_8h.html" title=" " alt="" coords="392,259,515,285"/>
+<area shape="rect" title=" " alt="" coords="1447,109,1591,136"/>
+<area shape="rect" href="read__measurements_8h.html" title=" " alt="" coords="759,109,969,136"/>
+<area shape="rect" href="purify_2utilities_8h.html" title=" " alt="" coords="967,259,1091,285"/>
+<area shape="rect" title=" " alt="" coords="1615,109,1769,136"/>
+<area shape="rect" title=" " alt="" coords="1426,408,1505,435"/>
+<area shape="rect" title=" " alt="" coords="895,408,987,435"/>
+<area shape="rect" title=" " alt="" coords="1011,408,1114,435"/>
+<area shape="rect" title=" " alt="" coords="1139,408,1275,435"/>
+<area shape="rect" title=" " alt="" coords="1299,408,1402,435"/>
+<area shape="rect" title=" " alt="" coords="195,333,261,360"/>
+<area shape="rect" title=" " alt="" coords="286,333,373,360"/>
+<area shape="rect" title=" " alt="" coords="397,333,448,360"/>
+<area shape="rect" title=" " alt="" coords="472,333,549,360"/>
+<area shape="rect" title=" " alt="" coords="573,333,648,360"/>
+<area shape="rect" title=" " alt="" coords="752,333,811,360"/>
+<area shape="rect" title=" " alt="" coords="673,333,727,360"/>
+<area shape="rect" href="distribute_8h.html" title=" " alt="" coords="642,184,779,211"/>
+<area shape="rect" href="uvw__utilities_8h.html" title=" " alt="" coords="785,259,943,285"/>
+<area shape="rect" title=" " alt="" coords="539,259,619,285"/>
+<area shape="rect" title=" " alt="" coords="643,259,709,285"/>
+<area shape="rect" title=" " alt="" coords="886,333,959,360"/>
+<area shape="rect" title=" " alt="" coords="983,333,1075,360"/>
 </map>
 </div>
 </div>
@@ -147,66 +150,146 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mpi__read__measurements_8cc_source.html#l00012">12</a> of file <a class="el" href="mpi__read__measurements_8cc_source.html">mpi_read_measurements.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;                    {</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> comm = sopt::mpi::Communicator::World();</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <span class="keyword">const</span> std::string filename = <a class="code" href="namespacepurify.html#a8c91f3c6ff988b668786fed31fb17282">atca_filename</a>(<span class="stringliteral">&quot;0332-391&quot;</span>);</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  SECTION(<span class="stringliteral">&quot;one&quot;</span>) {</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    SECTION(<span class="stringliteral">&quot;uvfits&quot;</span>) {</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</a> = <a class="code" href="namespacepurify_1_1read__measurements.html#a84cbb7fbe2a5562c37ed918ab4f57f92">read_measurements::read_measurements</a>(filename + <span class="stringliteral">&quot;.uvfits&quot;</span>, comm);</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;      CAPTURE(comm.rank());</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</a>.size()) == 245886);</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    }</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    SECTION(<span class="stringliteral">&quot;vis&quot;</span>) {</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">vis</a> =</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;          <a class="code" href="namespacepurify_1_1read__measurements.html#a84cbb7fbe2a5562c37ed918ab4f57f92">read_measurements::read_measurements</a>(filename + <span class="stringliteral">&quot;.vis&quot;</span>, comm, distribute::plan::w_term,</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;                                               <span class="keyword">false</span>, stokes::I, utilities::vis_units::radians);</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;      CAPTURE(comm.rank());</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">vis</a>.size()) == 245886);</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">vis</a>.units == utilities::vis_units::radians);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    }</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  }</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  SECTION(<span class="stringliteral">&quot;two&quot;</span>) {</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    SECTION(<span class="stringliteral">&quot;uvfits&quot;</span>) {</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</a> = <a class="code" href="namespacepurify_1_1read__measurements.html#a84cbb7fbe2a5562c37ed918ab4f57f92">read_measurements::read_measurements</a>(</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;          std::vector&lt;std::string&gt;{filename + <span class="stringliteral">&quot;.uvfits&quot;</span>, filename + <span class="stringliteral">&quot;.uvfits&quot;</span>}, comm);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      CAPTURE(comm.rank());</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</a>.size()) == 245886 * 2);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    }</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    SECTION(<span class="stringliteral">&quot;vis&quot;</span>) {</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">vis</a> = <a class="code" href="namespacepurify_1_1read__measurements.html#a84cbb7fbe2a5562c37ed918ab4f57f92">read_measurements::read_measurements</a>(</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;          std::vector&lt;std::string&gt;{filename + <span class="stringliteral">&quot;.vis&quot;</span>, filename + <span class="stringliteral">&quot;.vis&quot;</span>}, comm);</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      CAPTURE(comm.rank());</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">vis</a>.size()) == 245886 * 2);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">vis</a>.units == utilities::vis_units::lambda);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    }</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  }</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  SECTION(<span class="stringliteral">&quot;ms&quot;</span>) {</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    SECTION(<span class="stringliteral">&quot;one&quot;</span>) {</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#ifdef PURIFY_CASACORE</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723caee33e909372d935d190f4fcb2a92d542">ms</a> = <a class="code" href="namespacepurify_1_1read__measurements.html#a84cbb7fbe2a5562c37ed918ab4f57f92">read_measurements::read_measurements</a>(filename + <span class="stringliteral">&quot;.ms&quot;</span>, comm);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      CAPTURE(comm.rank());</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723caee33e909372d935d190f4fcb2a92d542">ms</a>.size()) == 245994);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    }</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    SECTION(<span class="stringliteral">&quot;two&quot;</span>) {</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#ifdef PURIFY_CASACORE</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723caee33e909372d935d190f4fcb2a92d542">ms</a> = <a class="code" href="namespacepurify_1_1read__measurements.html#a84cbb7fbe2a5562c37ed918ab4f57f92">read_measurements::read_measurements</a>(</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;          std::vector&lt;std::string&gt;{filename + <span class="stringliteral">&quot;.ms&quot;</span>, filename + <span class="stringliteral">&quot;.ms&quot;</span>}, comm);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      CAPTURE(comm.rank());</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723caee33e909372d935d190f4fcb2a92d542">ms</a>.size()) == 245994 * 2);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    }</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  }</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="mpi__read__measurements_8cc_source.html#l00017">17</a> of file <a class="el" href="mpi__read__measurements_8cc_source.html">mpi_read_measurements.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;                    {</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> comm = sopt::mpi::Communicator::World();</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">const</span> std::string filename = <a class="code" href="namespacepurify.html#a8c91f3c6ff988b668786fed31fb17282">atca_filename</a>(<span class="stringliteral">&quot;0332-391&quot;</span>);</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  SECTION(<span class="stringliteral">&quot;one&quot;</span>) {</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    SECTION(<span class="stringliteral">&quot;uvfits&quot;</span>) {</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</a> = <a class="code" href="namespacepurify_1_1read__measurements.html#a84cbb7fbe2a5562c37ed918ab4f57f92">read_measurements::read_measurements</a>(filename + <span class="stringliteral">&quot;.uvfits&quot;</span>, comm);</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;      CAPTURE(comm.rank());</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</a>.size()) == 245886);</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    }</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    SECTION(<span class="stringliteral">&quot;vis&quot;</span>) {</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">vis</a> =</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;          <a class="code" href="namespacepurify_1_1read__measurements.html#a84cbb7fbe2a5562c37ed918ab4f57f92">read_measurements::read_measurements</a>(filename + <span class="stringliteral">&quot;.vis&quot;</span>, comm, distribute::plan::w_term,</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;                                               <span class="keyword">false</span>, stokes::I, utilities::vis_units::radians);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      CAPTURE(comm.rank());</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">vis</a>.size()) == 245886);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">vis</a>.units == utilities::vis_units::radians);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    }</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  }</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  SECTION(<span class="stringliteral">&quot;two&quot;</span>) {</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    SECTION(<span class="stringliteral">&quot;uvfits&quot;</span>) {</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</a> = <a class="code" href="namespacepurify_1_1read__measurements.html#a84cbb7fbe2a5562c37ed918ab4f57f92">read_measurements::read_measurements</a>(</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;          std::vector&lt;std::string&gt;{filename + <span class="stringliteral">&quot;.uvfits&quot;</span>, filename + <span class="stringliteral">&quot;.uvfits&quot;</span>}, comm);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      CAPTURE(comm.rank());</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</a>.size()) == 245886 * 2);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    }</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    SECTION(<span class="stringliteral">&quot;vis&quot;</span>) {</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">vis</a> = <a class="code" href="namespacepurify_1_1read__measurements.html#a84cbb7fbe2a5562c37ed918ab4f57f92">read_measurements::read_measurements</a>(</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;          std::vector&lt;std::string&gt;{filename + <span class="stringliteral">&quot;.vis&quot;</span>, filename + <span class="stringliteral">&quot;.vis&quot;</span>}, comm);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      CAPTURE(comm.rank());</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">vis</a>.size()) == 245886 * 2);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">vis</a>.units == utilities::vis_units::lambda);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    }</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  }</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  SECTION(<span class="stringliteral">&quot;ms&quot;</span>) {</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    SECTION(<span class="stringliteral">&quot;one&quot;</span>) {</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#ifdef PURIFY_CASACORE</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723caee33e909372d935d190f4fcb2a92d542">ms</a> = <a class="code" href="namespacepurify_1_1read__measurements.html#a84cbb7fbe2a5562c37ed918ab4f57f92">read_measurements::read_measurements</a>(filename + <span class="stringliteral">&quot;.ms&quot;</span>, comm);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      CAPTURE(comm.rank());</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723caee33e909372d935d190f4fcb2a92d542">ms</a>.size()) == 245994);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    }</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    SECTION(<span class="stringliteral">&quot;two&quot;</span>) {</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#ifdef PURIFY_CASACORE</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723caee33e909372d935d190f4fcb2a92d542">ms</a> = <a class="code" href="namespacepurify_1_1read__measurements.html#a84cbb7fbe2a5562c37ed918ab4f57f92">read_measurements::read_measurements</a>(</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;          std::vector&lt;std::string&gt;{filename + <span class="stringliteral">&quot;.ms&quot;</span>, filename + <span class="stringliteral">&quot;.ms&quot;</span>}, comm);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      CAPTURE(comm.rank());</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723caee33e909372d935d190f4fcb2a92d542">ms</a>.size()) == 245994 * 2);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    }</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  }</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#ifdef PURIFY_H5</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  SECTION(<span class="stringliteral">&quot;H5&quot;</span>) {</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    SECTION(<span class="stringliteral">&quot;one&quot;</span>) {</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      <span class="comment">// each rank reads the full file</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      <a class="code" href="classpurify_1_1H5_1_1H5Handler.html">H5::H5Handler</a> f(filename + <span class="stringliteral">&quot;.h5&quot;</span>);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      <span class="keyword">const</span> std::vector&lt;double&gt; <a class="code" href="namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5">u</a> = f.read(<span class="stringliteral">&quot;u&quot;</span>);</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;      CAPTURE(<a class="code" href="namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5">u</a>.size());</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;      <span class="comment">// total size is Nranks * data length</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5">u</a>.size()) == 245886 * comm.size());</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    }</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    SECTION(<span class="stringliteral">&quot;two&quot;</span>) {</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      <span class="comment">// each rank reads an evenly distributed slice of the data set</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      <a class="code" href="classpurify_1_1H5_1_1H5Handler.html">H5::H5Handler</a> f(filename + <span class="stringliteral">&quot;.h5&quot;</span>, comm);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      <span class="keyword">const</span> std::vector&lt;double&gt; <a class="code" href="namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5">u</a> = f.distread(<span class="stringliteral">&quot;u&quot;</span>);</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      CAPTURE(<a class="code" href="namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5">u</a>.size());</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      <span class="comment">// total size is the data length</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5">u</a>.size()) == 245886);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    }</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    SECTION(<span class="stringliteral">&quot;three&quot;</span>) {</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      <span class="comment">// Root rank reads the data and scatters evenly split slices</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</a> = <a class="code" href="namespacepurify_1_1read__measurements.html#a84cbb7fbe2a5562c37ed918ab4f57f92">read_measurements::read_measurements</a>(filename + <span class="stringliteral">&quot;.h5&quot;</span>, comm);</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;      CAPTURE(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</a>.size());</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</a>.size()) == 245886);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    }</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    SECTION(<span class="stringliteral">&quot;four&quot;</span>) {</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      <span class="comment">// each rank reads a stochastically sampled set of 10k dataset members</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      <span class="comment">// @todo account for w-stacking</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">size_t</span> N = 10000;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      <a class="code" href="classpurify_1_1H5_1_1H5Handler.html">H5::H5Handler</a> f(filename + <span class="stringliteral">&quot;.h5&quot;</span>, comm);</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      <span class="keyword">const</span> std::vector&lt;double&gt; <a class="code" href="namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5">u</a> = f.stochread(<span class="stringliteral">&quot;u&quot;</span>, N);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      CAPTURE(<a class="code" href="namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5">u</a>.size());</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      <span class="comment">// total size is the data length</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5">u</a>.size()) == N * comm.size());</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    }</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    SECTION(<span class="stringliteral">&quot;five&quot;</span>) {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      <span class="comment">// each rank reads a stochastically sampled set of 10k dataset members</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      <span class="comment">// and constructs a uv_params object from it</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      <span class="comment">// @todo account for w-stacking</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">size_t</span> N = 10000;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      <a class="code" href="classpurify_1_1H5_1_1H5Handler.html">H5::H5Handler</a> f(filename + <span class="stringliteral">&quot;.h5&quot;</span>, comm);</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</a> = <a class="code" href="namespacepurify_1_1H5.html#ac525627cf52c534dfa9203cb82c35184">H5::stochread_visibility</a>(f, N, <span class="keyword">true</span>);  <span class="comment">//&lt; true = include w-term</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      CAPTURE(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</a>.size());</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(comm.all_sum_all(<a class="code" href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</a>.size()) == N * comm.size());</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    }</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    SECTION(<span class="stringliteral">&quot;six&quot;</span>) {</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      <span class="comment">// a functor is used to read a stochastically sampled set of 10k dataset members</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      <span class="comment">// on each rank and to constructs a uv_params object from it, along with a measurement</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      <span class="comment">// operator which are then returned, wrapped in a sopt::IterationState object</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      <span class="comment">// @todo account for w-stacking</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">size_t</span> N = 10000;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;      <a class="code" href="classpurify_1_1H5_1_1H5Handler.html">H5::H5Handler</a> h5file(filename + <span class="stringliteral">&quot;.h5&quot;</span>, comm);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      <span class="keyword">using</span> t_complexVec = Vector&lt;t_complex&gt;;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      <span class="comment">// This functor would be defined in Purify</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      <span class="keyword">auto</span> functor = [&amp;f = h5file, &amp;N]() {</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        <a class="code" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> uv_data = <a class="code" href="namespacepurify_1_1H5.html#ac525627cf52c534dfa9203cb82c35184">H5::stochread_visibility</a>(f, N, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        <span class="keyword">auto</span> phi = factory::measurement_operator_factory&lt;t_complexVec&gt;(</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;            factory::distributed_measurement_operator::mpi_distribute_image, uv_data, 128, 128, 1,</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;            1, 2, <a class="code" href="namespacepurify_1_1kernels.html#a1e2f3c37e5c0c6e2f2a3282110891f31">kernels::kernel_from_string</a>.at(<span class="stringliteral">&quot;kb&quot;</span>), 4, 4);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        <span class="keywordflow">return</span> sopt::IterationState&lt;t_complexVec&gt;(uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a00fec6b3490e6c98c4d0befb677bfb09">vis</a>, phi);</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      };</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      <span class="comment">// And it would be called in Sopt like this</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;      sopt::IterationState&lt;t_complexVec&gt; item = functor();</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      <span class="comment">// Make sure the return values are sensible</span></div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">bool</span> pass = comm.all_sum_all(item.target().size()) == N * comm.size() &amp;&amp;</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;                        item.Phi().sizes()[0] == 0 &amp;&amp; item.Phi().sizes()[1] == 1 &amp;&amp;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;                        item.Phi().sizes()[2] == N;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      <a class="code" href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a>(pass);</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    }</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  }</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;}</div>
 <div class="ttc" id="acasa_8cc_html_a2f04a5b42b147fe2ac9c62e73fa66364"><div class="ttname"><a href="casa_8cc.html#a2f04a5b42b147fe2ac9c62e73fa66364">CHECK</a></div><div class="ttdeci">#define CHECK(CONDITION, ERROR)</div><div class="ttdef"><b>Definition:</b> <a href="casa_8cc_source.html#l00006">casa.cc:6</a></div></div>
-<div class="ttc" id="anamespacepurify_1_1read__measurements_html_a84cbb7fbe2a5562c37ed918ab4f57f92"><div class="ttname"><a href="namespacepurify_1_1read__measurements.html#a84cbb7fbe2a5562c37ed918ab4f57f92">purify::read_measurements::read_measurements</a></div><div class="ttdeci">utilities::vis_params read_measurements(const std::string &amp;name, const bool w_term, const stokes pol, const utilities::vis_units units)</div><div class="ttdoc">read in signle measurement file</div><div class="ttdef"><b>Definition:</b> <a href="purify_2read__measurements_8cc_source.html#l00017">read_measurements.cc:17</a></div></div>
+<div class="ttc" id="aclasspurify_1_1H5_1_1H5Handler_html"><div class="ttname"><a href="classpurify_1_1H5_1_1H5Handler.html">purify::H5::H5Handler</a></div><div class="ttdoc">Purify interface class to handle HDF5 input files.</div><div class="ttdef"><b>Definition:</b> <a href="h5reader_8h_source.html#l00048">h5reader.h:48</a></div></div>
+<div class="ttc" id="anamespaceoperators__test_html_a694d86dbaf57f62a716d96eb8ce87bd5"><div class="ttname"><a href="namespaceoperators__test.html#a694d86dbaf57f62a716d96eb8ce87bd5">operators_test::u</a></div><div class="ttdeci">const std::vector&lt; t_real &gt; u</div><div class="ttdoc">data for u coordinate</div><div class="ttdef"><b>Definition:</b> <a href="tests_2operators_8cc_source.html#l00018">operators.cc:18</a></div></div>
+<div class="ttc" id="anamespacepurify_1_1H5_html_ac525627cf52c534dfa9203cb82c35184"><div class="ttname"><a href="namespacepurify_1_1H5.html#ac525627cf52c534dfa9203cb82c35184">purify::H5::stochread_visibility</a></div><div class="ttdeci">utilities::vis_params stochread_visibility(H5Handler &amp;file, const size_t N, const bool w_term)</div><div class="ttdoc">Stochastically reads dataset slices from the supplied HDF5-file handler, constructs a vis_params obje...</div><div class="ttdef"><b>Definition:</b> <a href="h5reader_8h_source.html#l00206">h5reader.h:206</a></div></div>
+<div class="ttc" id="anamespacepurify_1_1kernels_html_a1e2f3c37e5c0c6e2f2a3282110891f31"><div class="ttname"><a href="namespacepurify_1_1kernels.html#a1e2f3c37e5c0c6e2f2a3282110891f31">purify::kernels::kernel_from_string</a></div><div class="ttdeci">const std::map&lt; std::string, kernel &gt; kernel_from_string</div><div class="ttdef"><b>Definition:</b> <a href="kernels_8h_source.html#l00016">kernels.h:16</a></div></div>
+<div class="ttc" id="anamespacepurify_1_1read__measurements_html_a84cbb7fbe2a5562c37ed918ab4f57f92"><div class="ttname"><a href="namespacepurify_1_1read__measurements.html#a84cbb7fbe2a5562c37ed918ab4f57f92">purify::read_measurements::read_measurements</a></div><div class="ttdeci">utilities::vis_params read_measurements(const std::string &amp;name, const bool w_term, const stokes pol, const utilities::vis_units units)</div><div class="ttdoc">read in single measurement file</div><div class="ttdef"><b>Definition:</b> <a href="purify_2read__measurements_8cc_source.html#l00017">read_measurements.cc:17</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1read__measurements_html_acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf"><div class="ttname"><a href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">purify::read_measurements::format::uvfits</a></div><div class="ttdeci">@ uvfits</div></div>
 <div class="ttc" id="anamespacepurify_1_1read__measurements_html_acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a"><div class="ttname"><a href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">purify::read_measurements::format::vis</a></div><div class="ttdeci">@ vis</div></div>
 <div class="ttc" id="anamespacepurify_1_1read__measurements_html_acd8f0c1e37901dde05b3ca586809723caee33e909372d935d190f4fcb2a92d542"><div class="ttname"><a href="namespacepurify_1_1read__measurements.html#acd8f0c1e37901dde05b3ca586809723caee33e909372d935d190f4fcb2a92d542">purify::read_measurements::format::ms</a></div><div class="ttdeci">@ ms</div></div>
 <div class="ttc" id="anamespacepurify_html_a8c91f3c6ff988b668786fed31fb17282"><div class="ttname"><a href="namespacepurify.html#a8c91f3c6ff988b668786fed31fb17282">purify::atca_filename</a></div><div class="ttdeci">std::string atca_filename(std::string const &amp;filename)</div><div class="ttdoc">Specific atca data.</div><div class="ttdef"><b>Definition:</b> <a href="directories_8in_8h_source.html#l00032">directories.in.h:32</a></div></div>
+<div class="ttc" id="astructpurify_1_1utilities_1_1vis__params_html"><div class="ttname"><a href="structpurify_1_1utilities_1_1vis__params.html">purify::utilities::vis_params</a></div><div class="ttdef"><b>Definition:</b> <a href="uvw__utilities_8h_source.html#l00015">uvw_utilities.h:15</a></div></div>
+<div class="ttc" id="astructpurify_1_1utilities_1_1vis__params_html_a00fec6b3490e6c98c4d0befb677bfb09"><div class="ttname"><a href="structpurify_1_1utilities_1_1vis__params.html#a00fec6b3490e6c98c4d0befb677bfb09">purify::utilities::vis_params::vis</a></div><div class="ttdeci">Vector&lt; t_complex &gt; vis</div><div class="ttdef"><b>Definition:</b> <a href="uvw__utilities_8h_source.html#l00022">uvw_utilities.h:22</a></div></div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00032">purify::atca_filename()</a>, <a class="el" href="casa_8cc_source.html#l00006">CHECK</a>, <a class="el" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8add7536794b63bf90eccfd37f9b147d7f">purify::I</a>, <a class="el" href="namespacepurify_1_1utilities.html#aa2af2ee7e4f1bb93a42235b9d973983da945f3fc449518a73b9f5f32868db466c">purify::utilities::lambda</a>, <a class="el" href="namespacepurify_1_1utilities.html#aa2af2ee7e4f1bb93a42235b9d973983da017969ba49117264eb077e9f66daacfd">purify::utilities::radians</a>, <a class="el" href="purify_2read__measurements_8cc_source.html#l00017">purify::read_measurements::read_measurements()</a>, and <a class="el" href="namespacepurify_1_1distribute.html#a0bf24e0d0fb613140687838e4546ab2aa40b63143a987ddcf3aa69fb2ac32a3bd">purify::distribute::w_term</a>.</p>
+<p class="reference">References <a class="el" href="directories_8in_8h_source.html#l00032">purify::atca_filename()</a>, <a class="el" href="casa_8cc_source.html#l00006">CHECK</a>, <a class="el" href="h5reader_8h_source.html#l00084">purify::H5::H5Handler::distread()</a>, <a class="el" href="namespacepurify.html#a97d23bf901331999e4ef365e403ba8b8add7536794b63bf90eccfd37f9b147d7f">purify::I</a>, <a class="el" href="kernels_8h_source.html#l00016">purify::kernels::kernel_from_string</a>, <a class="el" href="namespacepurify_1_1utilities.html#aa2af2ee7e4f1bb93a42235b9d973983da945f3fc449518a73b9f5f32868db466c">purify::utilities::lambda</a>, <a class="el" href="namespacepurify_1_1factory.html#a6b8de5116c3d7d0d679cd6dd47a80248a3c25e5e5347476170daf56c780247dab">purify::factory::mpi_distribute_image</a>, <a class="el" href="namespacepurify_1_1utilities.html#aa2af2ee7e4f1bb93a42235b9d973983da017969ba49117264eb077e9f66daacfd">purify::utilities::radians</a>, <a class="el" href="h5reader_8h_source.html#l00076">purify::H5::H5Handler::read()</a>, <a class="el" href="purify_2read__measurements_8cc_source.html#l00017">purify::read_measurements::read_measurements()</a>, <a class="el" href="h5reader_8h_source.html#l00096">purify::H5::H5Handler::stochread()</a>, <a class="el" href="h5reader_8h_source.html#l00206">purify::H5::stochread_visibility()</a>, <a class="el" href="tests_2operators_8cc_source.html#l00018">operators_test::u</a>, <a class="el" href="uvw__utilities_8h_source.html#l00022">purify::utilities::vis_params::vis</a>, and <a class="el" href="namespacepurify_1_1distribute.html#a0bf24e0d0fb613140687838e4546ab2aa40b63143a987ddcf3aa69fb2ac32a3bd">purify::distribute::w_term</a>.</p>
 
 </div>
 </div>

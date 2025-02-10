@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['algofixture_667',['AlgoFixture',['../classAlgoFixture.html',1,'']]],
-  ['algofixturempi_668',['AlgoFixtureMPI',['../classAlgoFixtureMPI.html',1,'']]]
+  ['algofixture_682',['AlgoFixture',['../classAlgoFixture.html',1,'']]],
+  ['algofixturempi_683',['AlgoFixtureMPI',['../classAlgoFixtureMPI.html',1,'']]]
 ];

@@ -1750,6 +1750,13 @@
       <anchor>a466ac59f13e070aa1cdd20b7e8289e58</anchor>
       <arglist></arglist>
     </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>PURIFY_H5</name>
+      <anchorfile>config_8in_8h.html</anchorfile>
+      <anchor>ab54a89bd5c3f56a7b48ff665035f3d16</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="function">
       <type>std::string</type>
       <name>version</name>
@@ -1985,6 +1992,33 @@
       <anchorfile>namespacepurify_1_1operators.html</anchorfile>
       <anchor>aa2beb558b7ac32db7be23bfea9cdeda4</anchor>
       <arglist>(const Vector&lt; t_real &gt; &amp;u, const Vector&lt; t_real &gt; &amp;v, const Vector&lt; t_complex &gt; &amp;weights, const t_uint &amp;imsizey_, const t_uint &amp;imsizex_, const t_real &amp;oversample_ratio, const std::function&lt; t_real(t_real)&gt; &amp;kernelu, const t_uint Ju, const t_int total_samples)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>h5reader.h</name>
+    <path>/home/runner/work/purify/purify/cpp/purify/</path>
+    <filename>h5reader_8h.html</filename>
+    <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
+    <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
+    <includes id="uvw__utilities_8h" name="uvw_utilities.h" local="yes" imported="no">purify/uvw_utilities.h</includes>
+    <class kind="class">purify::H5::H5Handler</class>
+    <namespace>sopt</namespace>
+    <namespace>sopt::mpi</namespace>
+    <namespace>purify</namespace>
+    <namespace>purify::H5</namespace>
+    <member kind="function">
+      <type>utilities::vis_params</type>
+      <name>read_visibility</name>
+      <anchorfile>namespacepurify_1_1H5.html</anchorfile>
+      <anchor>a0695c59f20a8f28ab2b81a84ce2a1eca</anchor>
+      <arglist>(const std::string &amp;vis_name, const bool w_term)</arglist>
+    </member>
+    <member kind="function">
+      <type>utilities::vis_params</type>
+      <name>stochread_visibility</name>
+      <anchorfile>namespacepurify_1_1H5.html</anchorfile>
+      <anchor>ac525627cf52c534dfa9203cb82c35184</anchor>
+      <arglist>(H5Handler &amp;file, const size_t N, const bool w_term)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -3371,6 +3405,7 @@
       <anchor>acd8f0c1e37901dde05b3ca586809723c</anchor>
       <arglist></arglist>
       <enumvalue file="namespacepurify_1_1read__measurements.html" anchor="acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">vis</enumvalue>
+      <enumvalue file="namespacepurify_1_1read__measurements.html" anchor="acd8f0c1e37901dde05b3ca586809723ca77230e94b5cd88d51a872031531bfecd">h5</enumvalue>
       <enumvalue file="namespacepurify_1_1read__measurements.html" anchor="acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</enumvalue>
       <enumvalue file="namespacepurify_1_1read__measurements.html" anchor="acd8f0c1e37901dde05b3ca586809723caee33e909372d935d190f4fcb2a92d542">ms</enumvalue>
     </member>
@@ -4024,6 +4059,13 @@
     <namespace>purify</namespace>
     <namespace>purify::utilities</namespace>
     <member kind="function">
+      <type>bool</type>
+      <name>has_suffix</name>
+      <anchorfile>namespacepurify_1_1utilities.html</anchorfile>
+      <anchor>a81a9eeb703e2c77c44f87f2a06725108</anchor>
+      <arglist>(const std::string &amp;str, const std::string &amp;suff)</arglist>
+    </member>
+    <member kind="function">
       <type>Matrix&lt; t_real &gt;</type>
       <name>generate_antennas</name>
       <anchorfile>namespacepurify_1_1utilities.html</anchorfile>
@@ -4092,6 +4134,13 @@
       <anchorfile>namespacepurify_1_1utilities.html</anchorfile>
       <anchor>a796bee1239c7873850c229f57d637189</anchor>
       <arglist>(std::ifstream &amp;stream)</arglist>
+    </member>
+    <member kind="function">
+      <type>utilities::vis_params</type>
+      <name>read_visibility_csv</name>
+      <anchorfile>namespacepurify_1_1utilities.html</anchorfile>
+      <anchor>af50bd7a727a30a127a67b902cf5e04a8</anchor>
+      <arglist>(const std::string &amp;vis_name, const bool w_term=false)</arglist>
     </member>
     <member kind="function">
       <type>utilities::vis_params</type>
@@ -4281,6 +4330,13 @@
       <anchorfile>namespacepurify_1_1utilities.html</anchorfile>
       <anchor>a796bee1239c7873850c229f57d637189</anchor>
       <arglist>(std::ifstream &amp;stream)</arglist>
+    </member>
+    <member kind="function">
+      <type>utilities::vis_params</type>
+      <name>read_visibility_csv</name>
+      <anchorfile>namespacepurify_1_1utilities.html</anchorfile>
+      <anchor>af50bd7a727a30a127a67b902cf5e04a8</anchor>
+      <arglist>(const std::string &amp;vis_name, const bool w_term=false)</arglist>
     </member>
     <member kind="function">
       <type>utilities::vis_params</type>
@@ -5521,6 +5577,7 @@
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
     <includes id="read__measurements_8h" name="read_measurements.h" local="yes" imported="no">purify/read_measurements.h</includes>
+    <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
     <member kind="function">
       <type></type>
       <name>TEST_CASE</name>
@@ -5625,6 +5682,21 @@
       <anchorfile>purify__fitsio_8cc.html</anchorfile>
       <anchor>af7a0b166e7d3259f6b7874a0cca6e677</anchor>
       <arglist>(&quot;header&quot;)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>purify_h5.cc</name>
+    <path>/home/runner/work/purify/purify/cpp/tests/</path>
+    <filename>purify__h5_8cc.html</filename>
+    <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
+    <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
+    <includes id="h5reader_8h" name="h5reader.h" local="yes" imported="no">purify/h5reader.h</includes>
+    <member kind="function">
+      <type></type>
+      <name>TEST_CASE</name>
+      <anchorfile>purify__h5_8cc.html</anchorfile>
+      <anchor>a4e2d2db9455987c252e1bd7937d31724</anchor>
+      <arglist>(&quot;Purify H5&quot;, &quot;[HDF5]&quot;)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -6857,6 +6929,45 @@
       <arglist></arglist>
     </member>
   </compound>
+  <compound kind="class">
+    <name>purify::H5::H5Handler</name>
+    <filename>classpurify_1_1H5_1_1H5Handler.html</filename>
+    <member kind="function">
+      <type></type>
+      <name>H5Handler</name>
+      <anchorfile>classpurify_1_1H5_1_1H5Handler.html</anchorfile>
+      <anchor>a073c86d21165cff2a644251e24491c3c</anchor>
+      <arglist>()=delete</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>H5Handler</name>
+      <anchorfile>classpurify_1_1H5_1_1H5Handler.html</anchorfile>
+      <anchor>afdcda7693d80814dd5d67176caf10053</anchor>
+      <arglist>(const std::string &amp;filename)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::vector&lt; T &gt;</type>
+      <name>read</name>
+      <anchorfile>classpurify_1_1H5_1_1H5Handler.html</anchorfile>
+      <anchor>a3f6221e6ef2ae4d6e6987e57cc0f113f</anchor>
+      <arglist>(const std::string &amp;label) const</arglist>
+    </member>
+    <member kind="function">
+      <type>std::vector&lt; T &gt;</type>
+      <name>distread</name>
+      <anchorfile>classpurify_1_1H5_1_1H5Handler.html</anchorfile>
+      <anchor>a68711c211a81b0b373d79a7dac3b012d</anchor>
+      <arglist>(const std::string &amp;label)</arglist>
+    </member>
+    <member kind="function">
+      <type>std::vector&lt; T &gt;</type>
+      <name>stochread</name>
+      <anchorfile>classpurify_1_1H5_1_1H5Handler.html</anchorfile>
+      <anchor>abc704161cb81930db61a514f11ffba03</anchor>
+      <arglist>(const std::string &amp;label, size_t batchsize, bool shuffle=false)</arglist>
+    </member>
+  </compound>
   <compound kind="struct">
     <name>purify::pfitsio::header_params</name>
     <filename>structpurify_1_1pfitsio_1_1header__params.html</filename>
@@ -8085,6 +8196,7 @@
     <namespace>purify::details</namespace>
     <namespace>purify::distribute</namespace>
     <namespace>purify::factory</namespace>
+    <namespace>purify::H5</namespace>
     <namespace>purify::integration</namespace>
     <namespace>purify::kernels</namespace>
     <namespace>purify::logging</namespace>
@@ -8819,6 +8931,25 @@
     </member>
   </compound>
   <compound kind="namespace">
+    <name>purify::H5</name>
+    <filename>namespacepurify_1_1H5.html</filename>
+    <class kind="class">purify::H5::H5Handler</class>
+    <member kind="function">
+      <type>utilities::vis_params</type>
+      <name>read_visibility</name>
+      <anchorfile>namespacepurify_1_1H5.html</anchorfile>
+      <anchor>a0695c59f20a8f28ab2b81a84ce2a1eca</anchor>
+      <arglist>(const std::string &amp;vis_name, const bool w_term)</arglist>
+    </member>
+    <member kind="function">
+      <type>utilities::vis_params</type>
+      <name>stochread_visibility</name>
+      <anchorfile>namespacepurify_1_1H5.html</anchorfile>
+      <anchor>ac525627cf52c534dfa9203cb82c35184</anchor>
+      <arglist>(H5Handler &amp;file, const size_t N, const bool w_term)</arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
     <name>purify::integration</name>
     <filename>namespacepurify_1_1integration.html</filename>
     <member kind="enumeration">
@@ -9508,6 +9639,7 @@
       <anchor>acd8f0c1e37901dde05b3ca586809723c</anchor>
       <arglist></arglist>
       <enumvalue file="namespacepurify_1_1read__measurements.html" anchor="acd8f0c1e37901dde05b3ca586809723cac3e888ce42796ce1d5780a4ea8197f0a">vis</enumvalue>
+      <enumvalue file="namespacepurify_1_1read__measurements.html" anchor="acd8f0c1e37901dde05b3ca586809723ca77230e94b5cd88d51a872031531bfecd">h5</enumvalue>
       <enumvalue file="namespacepurify_1_1read__measurements.html" anchor="acd8f0c1e37901dde05b3ca586809723cabb130d30d26131335c78557f26dafbcf">uvfits</enumvalue>
       <enumvalue file="namespacepurify_1_1read__measurements.html" anchor="acd8f0c1e37901dde05b3ca586809723caee33e909372d935d190f4fcb2a92d542">ms</enumvalue>
     </member>
@@ -9795,6 +9927,13 @@
       <arglist>(const K &amp;A, const L &amp;B)</arglist>
     </member>
     <member kind="function">
+      <type>bool</type>
+      <name>has_suffix</name>
+      <anchorfile>namespacepurify_1_1utilities.html</anchorfile>
+      <anchor>a81a9eeb703e2c77c44f87f2a06725108</anchor>
+      <arglist>(const std::string &amp;str, const std::string &amp;suff)</arglist>
+    </member>
+    <member kind="function">
       <type>Matrix&lt; t_real &gt;</type>
       <name>generate_antennas</name>
       <anchorfile>namespacepurify_1_1utilities.html</anchorfile>
@@ -9863,6 +10002,13 @@
       <anchorfile>namespacepurify_1_1utilities.html</anchorfile>
       <anchor>a796bee1239c7873850c229f57d637189</anchor>
       <arglist>(std::ifstream &amp;stream)</arglist>
+    </member>
+    <member kind="function">
+      <type>utilities::vis_params</type>
+      <name>read_visibility_csv</name>
+      <anchorfile>namespacepurify_1_1utilities.html</anchorfile>
+      <anchor>af50bd7a727a30a127a67b902cf5e04a8</anchor>
+      <arglist>(const std::string &amp;vis_name, const bool w_term=false)</arglist>
     </member>
     <member kind="function">
       <type>utilities::vis_params</type>
@@ -10216,6 +10362,15 @@
       <enumvalue file="namespacepurify_1_1wproj__utilities_1_1expansions.html" anchor="a92334b90f8de8f723450b3aca72d9e74a7d8bc5f1a8d3787d06ef11c97d4655df">taylor</enumvalue>
       <enumvalue file="namespacepurify_1_1wproj__utilities_1_1expansions.html" anchor="a92334b90f8de8f723450b3aca72d9e74a172e4ecb02a864e1e4aa51dcce9d8a47">chebyshev</enumvalue>
     </member>
+  </compound>
+  <compound kind="namespace">
+    <name>sopt</name>
+    <filename>namespacesopt.html</filename>
+    <namespace>sopt::mpi</namespace>
+  </compound>
+  <compound kind="namespace">
+    <name>sopt::mpi</name>
+    <filename>namespacesopt_1_1mpi.html</filename>
   </compound>
   <compound kind="group">
     <name>logmacros</name>
