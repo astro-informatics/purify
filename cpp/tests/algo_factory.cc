@@ -243,18 +243,11 @@ TEST_CASE("fb_factory_stochastic") {
       };
 
   Vector<t_complex> const init = Vector<t_complex>::Ones(imsizex * imsizey);
-  auto const measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
-      factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2,
-      kernels::kernel_from_string.at("kb"), 4, 4);
-  auto const power_method_stuff =
-      sopt::algorithm::power_method<Vector<t_complex>>(*measurements_transform, 1000, 1e-5, init);
-  const t_real op_norm = std::get<0>(power_method_stuff);
-
   auto IS = random_updater();
   auto Phi = IS->Phi();
-  auto const power_method_stuff2 =
+  auto const power_method_stuff =
       sopt::algorithm::power_method<Vector<t_complex>>(Phi, 1000, 1e-5, init);
-  const t_real op_norm2 = std::get<0>(power_method_stuff2);
+  const t_real op_norm = std::get<0>(power_method_stuff);
 
   const auto solution = pfitsio::read2d(expected_solution_path);
 
