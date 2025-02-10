@@ -186,7 +186,7 @@ TEST_CASE("fb_factory") {
   CHECK(mse <= average_intensity * 1e-3);
 }
 
-#ifdef PURIFY_HD5
+#ifdef PURIFY_H5
 TEST_CASE("fb_factory_stochastic") {
   const std::string &test_dir = "expected/fb/";
   const std::string &input_data_path = data_filename(test_dir + "input_data.vis");
