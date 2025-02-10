@@ -205,41 +205,42 @@ TEST_CASE("fb_factory_stochastic") {
   // This functor would be defined in Purify
   std::mt19937 rng(0);
   const size_t N = 1000;
-  std::function<std::shared_ptr<sopt::IterationState<Vector<t_complex>>>()> random_updater = [&input_data_path, imsizex, imsizey, &rng, &N]() {
-    utilities::vis_params uv_data = utilities::read_visibility(input_data_path, false);
-    uv_data.units = utilities::vis_units::radians;
-    
-    // Get random subset
-    std::vector<size_t> indices(uv_data.size());
-    size_t i = 0;
-    for(auto &x : indices)
-    {
-        x = i++;
-    }
+  std::function<std::shared_ptr<sopt::IterationState<Vector<t_complex>>>()> random_updater =
+      [&input_data_path, imsizex, imsizey, &rng, &N]() {
+        utilities::vis_params uv_data = utilities::read_visibility(input_data_path, false);
+        uv_data.units = utilities::vis_units::radians;
 
-    std::shuffle(indices.begin(), indices.end(), rng);
-    Vector<t_real> u_fragment(N);
-    Vector<t_real> v_fragment(N);
-    Vector<t_real> w_fragment(N);
-    Vector<t_complex> vis_fragment(N);
-    Vector<t_complex> weights_fragment(N);
-    for(i = 0; i < N; i++)
-    {
-        size_t j = indices[i];
-        u_fragment[i] = uv_data.u[j];
-        v_fragment[i] = uv_data.v[j];
-        w_fragment[i] = uv_data.w[j];
-        vis_fragment[i] = uv_data.vis[j];
-        weights_fragment[i] = uv_data.weights[j];
-    }
-    utilities::vis_params uv_data_fragment(u_fragment, v_fragment, w_fragment, vis_fragment, weights_fragment, uv_data.units, uv_data.ra, uv_data.dec, uv_data.average_frequency);
-    
-    auto phi = factory::measurement_operator_factory<Vector<t_complex>>(
-      factory::distributed_measurement_operator::serial, uv_data_fragment, imsizey, imsizex, 1, 1, 2,
-      kernels::kernel_from_string.at("kb"), 4, 4);
+        // Get random subset
+        std::vector<size_t> indices(uv_data.size());
+        size_t i = 0;
+        for (auto &x : indices) {
+          x = i++;
+        }
 
-    return std::make_shared<sopt::IterationState<Vector<t_complex>>>(uv_data_fragment.vis, phi);
-  };
+        std::shuffle(indices.begin(), indices.end(), rng);
+        Vector<t_real> u_fragment(N);
+        Vector<t_real> v_fragment(N);
+        Vector<t_real> w_fragment(N);
+        Vector<t_complex> vis_fragment(N);
+        Vector<t_complex> weights_fragment(N);
+        for (i = 0; i < N; i++) {
+          size_t j = indices[i];
+          u_fragment[i] = uv_data.u[j];
+          v_fragment[i] = uv_data.v[j];
+          w_fragment[i] = uv_data.w[j];
+          vis_fragment[i] = uv_data.vis[j];
+          weights_fragment[i] = uv_data.weights[j];
+        }
+        utilities::vis_params uv_data_fragment(u_fragment, v_fragment, w_fragment, vis_fragment,
+                                               weights_fragment, uv_data.units, uv_data.ra,
+                                               uv_data.dec, uv_data.average_frequency);
+
+        auto phi = factory::measurement_operator_factory<Vector<t_complex>>(
+            factory::distributed_measurement_operator::serial, uv_data_fragment, imsizey, imsizex,
+            1, 1, 2, kernels::kernel_from_string.at("kb"), 4, 4);
+
+        return std::make_shared<sopt::IterationState<Vector<t_complex>>>(uv_data_fragment.vis, phi);
+      };
 
   Vector<t_complex> const init = Vector<t_complex>::Ones(imsizex * imsizey);
   auto const measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
@@ -257,38 +258,47 @@ TEST_CASE("fb_factory_stochastic") {
 
   const auto solution = pfitsio::read2d(expected_solution_path);
 
-  //wavelets
+  // wavelets
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
       std::make_tuple("DB6", 3u),   std::make_tuple("DB7", 3u), std::make_tuple("DB8", 3u)};
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
       factory::distributed_wavelet_operator::serial, sara, imsizey, imsizex);
-  
-  //algorithm
+
+  // algorithm
   t_real const sigma = 0.016820222945913496 * std::sqrt(2);  // see test_parameters file
   t_real const beta = sigma * sigma;
   t_real const gamma = 0.0001;
 
   sopt::algorithm::ImagingForwardBackward<t_complex> fb(random_updater);
-  fb.itermax(1000).step_size(beta*sqrt(2)).sigma(sigma*sqrt(2)).regulariser_strength(gamma).relative_variation(1e-3).residual_tolerance(0).tight_frame(true).sq_op_norm(op_norm*op_norm);
+  fb.itermax(1000)
+      .step_size(beta * sqrt(2))
+      .sigma(sigma * sqrt(2))
+      .regulariser_strength(gamma)
+      .relative_variation(1e-3)
+      .residual_tolerance(0)
+      .tight_frame(true)
+      .sq_op_norm(op_norm * op_norm);
 
   auto gp = std::make_shared<sopt::algorithm::L1GProximal<t_complex>>(false);
-  gp->l1_proximal_tolerance(1e-4).l1_proximal_nu(1).l1_proximal_itermax(50).l1_proximal_positivity_constraint(true).l1_proximal_real_constraint(true).Psi(*wavelets);
+  gp->l1_proximal_tolerance(1e-4)
+      .l1_proximal_nu(1)
+      .l1_proximal_itermax(50)
+      .l1_proximal_positivity_constraint(true)
+      .l1_proximal_real_constraint(true)
+      .Psi(*wavelets);
   fb.g_function(gp);
 
   auto const diagnostic = fb();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
-  //pfitsio::write2d(image.real(), result_path);
-  //pfitsio::write2d(residual_image.real(), expected_residual_path);
+  // pfitsio::write2d(image.real(), result_path);
+  // pfitsio::write2d(residual_image.real(), expected_residual_path);
 
   auto soln_flat = Vector<t_complex>::Map(solution.data(), solution.size());
   double average_intensity = soln_flat.real().sum() / soln_flat.size();
   SOPT_HIGH_LOG("Average intensity = {}", average_intensity);
-  double mse = (soln_flat - diagnostic.x)
-                   .real()
-                   .squaredNorm() /
-               solution.size();
+  double mse = (soln_flat - diagnostic.x).real().squaredNorm() / solution.size();
   SOPT_HIGH_LOG("MSE = {}", mse);
   CHECK(mse <= average_intensity * 1e-3);
 }

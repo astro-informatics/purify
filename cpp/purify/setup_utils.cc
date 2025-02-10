@@ -13,7 +13,7 @@
 
 #ifdef PURIFY_ONNXRT
 #include <sopt/tf_non_diff_function.h>
-#endif 
+#endif
 
 using namespace purify;
 
@@ -315,13 +315,14 @@ void setupCostFunctions(const YamlParser &params, std::unique_ptr<Differentiable
     f = std::make_unique<sopt::L2DifferentiableFunc<t_complex>>(sigma, Phi);
     break;
   case purify::diff_func_type::L2Norm_with_CRR:
-  #ifdef PURIFY_ONNXRT
+#ifdef PURIFY_ONNXRT
     f = std::make_unique<sopt::ONNXDifferentiableFunc<t_complex>>(
         params.CRR_function_model_path(), params.CRR_gradient_model_path(), sigma, params.CRR_mu(),
         params.CRR_lambda(), Phi);
-  #else
-    throw std::runtime_error("To use the CRR you must compile with ONNX runtime turned on. (-Donnxrt=on)");
-  #endif
+#else
+    throw std::runtime_error(
+        "To use the CRR you must compile with ONNX runtime turned on. (-Donnxrt=on)");
+#endif
     break;
   }
 
@@ -330,12 +331,13 @@ void setupCostFunctions(const YamlParser &params, std::unique_ptr<Differentiable
     g = std::make_unique<sopt::algorithm::L1GProximal<t_complex>>();
     break;
   case purify::nondiff_func_type::Denoiser:
-  #ifdef PURIFY_ONNXRT
+#ifdef PURIFY_ONNXRT
     g = std::make_unique<sopt::algorithm::TFGProximal<t_complex>>(params.model_path());
     break;
-  #else
-    throw std::runtime_error("To use the Denoiser you must compile with ONNX runtime turned on. (-Donnxrt=on)");
-  #endif
+#else
+    throw std::runtime_error(
+        "To use the Denoiser you must compile with ONNX runtime turned on. (-Donnxrt=on)");
+#endif
 
   case purify::nondiff_func_type::RealIndicator:
     g = std::make_unique<sopt::algorithm::RealIndicator<t_complex>>();
