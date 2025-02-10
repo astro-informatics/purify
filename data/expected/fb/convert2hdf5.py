@@ -16,10 +16,10 @@ for name in names:
         for line in csvFile:
             u, v, re, im, sigma = line[0].split()
             udata.append(float(u))
-            vdata.append(float(u))
-            rdata.append(float(u))
-            idata.append(float(u))
-            sdata.append(float(u))
+            vdata.append(float(v))
+            rdata.append(float(re))
+            idata.append(float(im))
+            sdata.append(float(sigma))
 
     f = h5py.File(h5_name, 'w')
     f.create_dataset('u', data=udata)
