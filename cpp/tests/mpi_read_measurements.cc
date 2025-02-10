@@ -132,8 +132,8 @@ TEST_CASE("uvfits") {
 
       // Make sure the return values are sensible
       const bool pass = comm.all_sum_all(item.target().size()) == N * comm.size() &&
-                        item.phi().sizes()[0] == 0 && item.phi().sizes()[1] == 1 &&
-                        item.phi().sizes()[2] == N;
+                        item.Phi().sizes()[0] == 0 && item.Phi().sizes()[1] == 1 &&
+                        item.Phi().sizes()[2] == N;
       CHECK(pass);
     }
   }
