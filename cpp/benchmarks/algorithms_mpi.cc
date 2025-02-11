@@ -89,8 +89,8 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, PadmmDistributeImage)(benchmark::State &state
 
   m_padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
       factory::algo_distribution::mpi_distributed, m_measurements_distribute_image, wavelets,
-      m_uv_data, m_sigma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true,
-      false, 1e-3, 1e-2, 50, 1.0, 1.0);
+      m_uv_data, m_sigma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true, false,
+      1e-3, 1e-2, 50, 1.0, 1.0);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
@@ -110,8 +110,8 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, PadmmDistributeGrid)(benchmark::State &state)
 
   m_padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
       factory::algo_distribution::mpi_distributed, m_measurements_distribute_grid, wavelets,
-      m_uv_data, m_sigma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true,
-      false, 1e-3, 1e-2, 50, 1.0, 1.0);
+      m_uv_data, m_sigma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true, false,
+      1e-3, 1e-2, 50, 1.0, 1.0);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
@@ -134,8 +134,8 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbDistributeImage)(benchmark::State &state) {
 
   m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::mpi_serial, m_measurements_distribute_image, wavelets, m_uv_data,
-      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true,
-      false, 1e-3, 1e-2, 50, 1.0);
+      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true, false,
+      1e-3, 1e-2, 50, 1.0);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
@@ -158,8 +158,8 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbDistributeGrid)(benchmark::State &state) {
 
   m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::mpi_serial, m_measurements_distribute_grid, wavelets, m_uv_data,
-      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true,
-      false, 1e-3, 1e-2, 50, 1.0);
+      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true, false,
+      1e-3, 1e-2, 50, 1.0);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
@@ -187,8 +187,8 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbOnnxDistributeImage)(benchmark::State &stat
 
   m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::mpi_serial, m_measurements_distribute_image, wavelets, m_uv_data,
-      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true,
-      false, 1e-3, 1e-2, 50, 1.0, tf_model_path, nondiff_func_type::Denoiser);
+      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true, false,
+      1e-3, 1e-2, 50, 1.0, tf_model_path, nondiff_func_type::Denoiser);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
@@ -215,8 +215,8 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbOnnxDistributeGrid)(benchmark::State &state
 
   m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::mpi_serial, m_measurements_distribute_grid, wavelets, m_uv_data,
-      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true,
-      false, 1e-3, 1e-2, 50, 1.0, tf_model_path, factory::g_proximal_type::TFGProximal);
+      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true, false,
+      1e-3, 1e-2, 50, 1.0, tf_model_path, factory::g_proximal_type::TFGProximal);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
@@ -227,7 +227,6 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbOnnxDistributeGrid)(benchmark::State &state
     state.SetIterationTime(b_utilities::duration(start, end, m_world));
   }
 }
-
 
 BENCHMARK_REGISTER_F(AlgoFixtureMPI, FbOnnxDistributeImage)
     //->Apply(b_utilities::Arguments)
@@ -258,7 +257,6 @@ BENCHMARK_REGISTER_F(AlgoFixtureMPI, FbOnnxDistributeGrid)
     ->MinWarmUpTime(1.0)
     ->Repetitions(3)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
-
 
 #endif
 
