@@ -1,0 +1,2 @@
+purify_config_file: data/config/fb_example.yaml
+confidence_interval: 0.95

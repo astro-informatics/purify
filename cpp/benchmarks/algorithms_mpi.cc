@@ -188,7 +188,7 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbOnnxDistributeImage)(benchmark::State &stat
   m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::mpi_serial, m_measurements_distribute_image, wavelets, m_uv_data,
       m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true,
-      false, 1e-3, 1e-2, 50, 1.0, tf_model_path, factory::g_proximal_type::TFGProximal);
+      false, 1e-3, 1e-2, 50, 1.0, tf_model_path, nondiff_func_type::Denoiser);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {

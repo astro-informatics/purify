@@ -42,31 +42,45 @@ utilities::vis_params read_measurements(const std::vector<std::string> &names, c
         format_check = format::vis;
         if (not file_exists(file_path.native()))
           throw std::runtime_error(names.at(i) + " is not a regular file.");
+      } else if (format_string == ".h5") {
+        format_check = format::h5;
+        if (not file_exists(file_path.native()))
+          throw std::runtime_error(names.at(i) + " is not a regular file.");
       } else if (format_string == ".uvfits") {
         format_check = format::uvfits;
         if (not file_exists(file_path.native()))
           throw std::runtime_error(names.at(i) + " is not a regular file.");
       } else
-        throw std::runtime_error("File extention for " + names.at(i) +
-                                 " not recognised. Must be .vis, .uvfits, or .ms.");
+        throw std::runtime_error("File extension for " + names.at(i) +
+                                 " not recognised. Must be .vis, .h5, .uvfits, or .ms.");
       if (i == 0) format_type = format_check;
       if (i > 0 and (format_check != format_type))
-        throw std::runtime_error("File extention is not the same for " + names.at(i) + " " +
+        throw std::runtime_error("File extension is not the same for " + names.at(i) + " " +
                                  names.at(i - 1));
     }
   }
 
-  if (found_files.size() == 0) throw std::runtime_error("No files found, all files are missing!");
+  if (found_files.size() == 0) throw std::runtime_error("No files found.");
   switch (format_type) {
   case (format::vis): {
     if (pol != stokes::I)
-      throw std::runtime_error(
-          ".vis files are ascii, so it is assumed that it is Stokes I. But, you are trying to "
-          "choose a different type!");
+      throw std::runtime_error("Stokes I assumed for vis files, but a different type is chosen.");
     auto measurements = utilities::read_visibility(found_files, w_term);
     measurements.units = units;
     return measurements;
     break;
+  }
+  case (format::h5): {
+#ifdef PURIFY_H5
+    if (pol != stokes::I)
+      throw std::runtime_error("Stokes I assumed for HDF5 files, but a different type is chosen.");
+    auto measurements = utilities::read_visibility(found_files, w_term);
+    measurements.units = units;
+    return measurements;
+    break;
+#else
+    throw std::runtime_error("HDF5 interface required to read h5 files.");
+#endif
   }
   case (format::uvfits): {
     return pfitsio::read_uvfits(found_files, true, pol);
@@ -77,12 +91,11 @@ utilities::vis_params read_measurements(const std::vector<std::string> &names, c
     return casa::read_measurementset(found_files, pol);
     break;
 #else
-    throw std::runtime_error(
-        "You want to read a measurement set, but you did not compile with casacore.");
+    throw std::runtime_error("Casacore interface required to read a measurement set.");
 #endif
   }
   default:
-    throw std::runtime_error("Format not recongised.");
+    throw std::runtime_error("Format not recognised.");
   }
 }
 

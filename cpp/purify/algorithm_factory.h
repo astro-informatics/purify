@@ -35,14 +35,11 @@ namespace purify {
 namespace factory {
 enum class algorithm { padmm, primal_dual, sdmm, forward_backward };
 enum class algo_distribution { serial, mpi_serial, mpi_distributed, mpi_random_updates };
-enum class g_proximal_type { L1GProximal, TFGProximal, Indicator };
 const std::map<std::string, algo_distribution> algo_distribution_string = {
     {"none", algo_distribution::serial},
     {"serial-equivalent", algo_distribution::mpi_serial},
     {"random-updates", algo_distribution::mpi_random_updates},
     {"fully-distributed", algo_distribution::mpi_distributed}};
-const std::map<std::string, g_proximal_type> g_proximal_type_string = {
-    {"l1", g_proximal_type::L1GProximal}, {"learned", g_proximal_type::TFGProximal}};
 
 //! return chosen algorithm given parameters
 template <class Algorithm, class... ARGS>
@@ -166,7 +163,7 @@ fb_factory(const algo_distribution dist,
            const bool tight_frame = false, const t_real relative_variation = 1e-3,
            const t_real l1_proximal_tolerance = 1e-2, const t_uint maximum_proximal_iterations = 50,
            const t_real op_norm = 1, const std::string model_path = "",
-           const g_proximal_type g_proximal = g_proximal_type::L1GProximal,
+           const nondiff_func_type g_proximal = nondiff_func_type::L1Norm,
            std::shared_ptr<DifferentiableFunc<typename Algorithm::Scalar>> f_function = nullptr) {
   typedef typename Algorithm::Scalar t_scalar;
   if (sara_size > 1 and tight_frame)
@@ -188,7 +185,7 @@ fb_factory(const algo_distribution dist,
   std::shared_ptr<NonDifferentiableFunc<t_scalar>> g;
 
   switch (g_proximal) {
-  case (g_proximal_type::L1GProximal): {
+  case (nondiff_func_type::L1Norm): {
     // Create a shared pointer to an instance of the L1GProximal class
     // and set its properties
     auto l1_gp = std::make_shared<sopt::algorithm::L1GProximal<t_scalar>>(false);
@@ -208,7 +205,7 @@ fb_factory(const algo_distribution dist,
     g = l1_gp;
     break;
   }
-  case (g_proximal_type::TFGProximal): {
+  case (nondiff_func_type::Denoiser): {
 #ifdef PURIFY_ONNXRT
     // Create a shared pointer to an instance of the TFGProximal class
     g = std::make_shared<sopt::algorithm::TFGProximal<t_scalar>>(model_path);
@@ -218,7 +215,8 @@ fb_factory(const algo_distribution dist,
         "Type TFGProximal not recognized because purify was built with onnxrt=off");
 #endif
   }
-  case (g_proximal_type::Indicator): {
+
+  case (nondiff_func_type::RealIndicator): {
     g = std::make_shared<sopt::algorithm::RealIndicator<t_scalar>>();
     break;
   }
