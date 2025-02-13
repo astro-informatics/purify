@@ -8,7 +8,13 @@ Examples:
   %(prog)s [options] -i input -o output
 """
 
-import sys, csv, h5py, argparse
+import sys, csv, argparse
+
+try:
+  import h5py
+except:
+  print("Please install h5py!")
+  sys.exit(1)
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("-i", dest="INPUT_FILE", default="", help="input file")
