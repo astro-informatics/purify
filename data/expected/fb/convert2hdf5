@@ -1,0 +1,63 @@
+#! /usr/bin/env python3
+
+"""\
+Convert csv uvfits-like files to HDF5
+
+Examples:
+
+  %(prog)s [options] -i input -o output
+"""
+
+import sys, csv, h5py, argparse
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("-i", dest="INPUT_FILE", default="", help="input file")
+parser.add_argument("-o", dest="OUTPUT_FILE", default="", help="output file")
+parser.add_argument("-w", "--with-w", dest="HAS_W", action="store_true", default=False, help="assume w coordinate present")
+args = parser.parse_args()
+
+if args.INPUT_FILE == "":
+  print("Specify input file using -i flag!")
+  sys.exit(1)
+
+if args.OUTPUT_FILE == "":
+  print("Specify output file using -o flag!")
+  sys.exit(1)
+
+udata = []
+vdata = []
+wdata = []
+rdata = []
+idata = []
+sdata = []
+with open(args.INPUT_FILE, mode ='r') as file:
+    csvFile = csv.reader(file)
+    for line in csvFile:
+        u  = None
+        v  = None
+        w  = None
+        re = None
+        im = None
+        s  = None
+        if args.HAS_W:
+            u, v, w, re, im, sigma = line[0].split()
+            wdata.append(float(w))
+        else:
+            u, v, re, im, sigma = line[0].split()
+        udata.append(float(u))
+        vdata.append(float(v))
+        rdata.append(float(re))
+        idata.append(float(im))
+        sdata.append(float(sigma))
+
+with h5py.File(args.OUTPUT_FILE, 'w') as f:
+  f.create_dataset('u', data=udata)
+  f.create_dataset('v', data=vdata)
+  if args.HAS_W:
+      f.create_dataset('w', data=wdata)
+  f.create_dataset('re', data=rdata)
+  f.create_dataset('im', data=idata)
+  f.create_dataset('sigma', data=sdata)
+
+print(f"Saved '{args.OUTPUT_FILE}'.")
+
