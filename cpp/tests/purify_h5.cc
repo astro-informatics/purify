@@ -35,7 +35,6 @@ TEST_CASE("Purify H5 reader", "[HDF5]") {
 }
 
 TEST_CASE("Purify H5 writer", "[HDF5]") {
-
   const auto uvfits = read_measurements::read_measurements(atca_filename("0332-391.uvfits"));
 
   H5::write_visibility(uvfits, "test-h5.h5", false);
