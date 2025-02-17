@@ -240,33 +240,34 @@ utilities::vis_params stochread_visibility(H5Handler& file, const size_t N, cons
   return uv_vis;
 }
 
-
 /// @brief Write an HDF5 file with u,v visibilities from a vis_params object.
 void write_visibility(const utilities::vis_params& uv_vis, const std::string& h5name,
-                      const bool w_term, cons int chunksize = -1) {
+                      const bool w_term, const size_t chunksize = 0) {
   // Set up HDF5 file
   HighFive::File h5file(h5name, HighFive::File::OpenOrCreate | HighFive::File::Truncate);
-  // Set up file properies, such as chunking and compression
-  // Note: the I/O is minimised if compression is disabeld (obvs)
+  // Set up file properties, such as chunking and compression
+  // Note: the I/O is minimised if compression is disabled (obvs)
   // If using decompressed data is not an option, then the
-  // I/O performance can be optiomised by chunking the data
-  // in such a way that each MPI rank only has to decompressi
+  // I/O performance can be optimised by chunking the dataset
+  // in such a way that each MPI rank only has to decompress
   // its allocated segment (or a subset thereof)
   HighFive::DataSetCreateProps props;
   if (uv_vis.u.size()) {
     if (chunkize > 0) {
-      props.add(HighFive::Chunking(std::vector<hsize_t>{(size_t)chunksize}));
-    }
-    else {
+      props.add(HighFive::Chunking(std::vector<hsize_t>{chunksize}));
+    } else {
       props.add(HighFive::Chunking(std::vector<hsize_t>{uv_vis.u.size()}));
     }
-    props.add(HighFive::Deflate(9)); // maximal compression
+    props.add(HighFive::Deflate(9));  // maximal compression
   }
   // Create the H5 datasets
-  h5file.createDataSet("u", std::vector<t_real>(uv_vis.u.data(), uv_vis.u.data() + uv_vis.u.size()), props);
-  h5file.createDataSet("v", std::vector<t_real>(uv_vis.v.data(), uv_vis.v.data() + uv_vis.v.size()), props);
+  h5file.createDataSet("u", std::vector<t_real>(uv_vis.u.data(), uv_vis.u.data() + uv_vis.u.size()),
+                       props);
+  h5file.createDataSet("v", std::vector<t_real>(uv_vis.v.data(), uv_vis.v.data() + uv_vis.v.size()),
+                       props);
   if (w_term) {
-    h5file.createDataSet("w", std::vector<t_real>(uv_vis.w.data(), uv_vis.w.data() + uv_vis.w.size()), props);
+    h5file.createDataSet(
+        "w", std::vector<t_real>(uv_vis.w.data(), uv_vis.w.data() + uv_vis.w.size()), props);
   }
 
   vector<t_real> redata, imdata, sigma;
@@ -282,7 +283,6 @@ void write_visibility(const utilities::vis_params& uv_vis, const std::string& h5
   h5file.createDataSet("im", std::move(imdata), props);
   h5file.createDataSet("sigma", std::move(imdata), props);
 }
-
 
 }  // namespace purify::H5
 
