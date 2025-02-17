@@ -253,10 +253,10 @@ void write_visibility(const utilities::vis_params& uv_vis, const std::string& h5
   // its allocated segment (or a subset thereof)
   HighFive::DataSetCreateProps props;
   if (uv_vis.u.size()) {
-    if (chunkize > 0) {
+    if (chunksize > 0) {
       props.add(HighFive::Chunking(std::vector<hsize_t>{chunksize}));
     } else {
-      props.add(HighFive::Chunking(std::vector<hsize_t>{uv_vis.u.size()}));
+      props.add(HighFive::Chunking(std::vector<hsize_t>{static_cast<hsize_t>(uv_vis.u.size())}));
     }
     props.add(HighFive::Deflate(9));  // maximal compression
   }
@@ -270,14 +270,14 @@ void write_visibility(const utilities::vis_params& uv_vis, const std::string& h5
         "w", std::vector<t_real>(uv_vis.w.data(), uv_vis.w.data() + uv_vis.w.size()), props);
   }
 
-  vector<t_real> redata, imdata, sigma;
+  std::vector<t_real> redata, imdata, sigma;
   redata.reserve(uv_vis.vis.size());
   imdata.reserve(uv_vis.vis.size());
   sigma.reserve(uv_vis.weights.size());
   for (size_t i = 0; i < uv_vis.vis.size(); ++i) {
     redata.push_back(uv_vis.vis(i).real());
     imdata.push_back(uv_vis.vis(i).imag());
-    sigma.push_back(1 / uv_vis.weights(i));
+    sigma.push_back(1.0 / uv_vis.weights(i).real());
   }
   h5file.createDataSet("re", std::move(redata), props);
   h5file.createDataSet("im", std::move(imdata), props);
