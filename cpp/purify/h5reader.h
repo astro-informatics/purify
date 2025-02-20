@@ -160,7 +160,7 @@ class H5Handler {
   size_t _datalen, _slicepos, _slicelen, _batchpos;
 };
 
-/// @brief Reads an HDF5 file with u,v visibilities, constructs a vis_params objects and returns it.
+/// @brief Reads an HDF5 file with u,v visibilities, constructs a vis_params object and returns it.
 ///
 /// @note vis_name: name of input HDF5 file containing [u, v, real(V), imag(V)].
 utilities::vis_params read_visibility(const std::string& vis_name, const bool w_term) {
@@ -238,6 +238,50 @@ utilities::vis_params stochread_visibility(H5Handler& file, const size_t N, cons
   uv_vis.average_frequency = 0;
 
   return uv_vis;
+}
+
+/// @brief Write an HDF5 file with u,v visibilities from a vis_params object.
+void write_visibility(const utilities::vis_params& uv_vis, const std::string& h5name,
+                      const bool w_term, const size_t chunksize = 0) {
+  // Set up HDF5 file
+  HighFive::File h5file(h5name, HighFive::File::OpenOrCreate | HighFive::File::Truncate);
+  // Set up file properties, such as chunking and compression
+  // Note: the I/O is minimised if compression is disabled (obvs)
+  // If using decompressed data is not an option, then the
+  // I/O performance can be optimised by chunking the dataset
+  // in such a way that each MPI rank only has to decompress
+  // its allocated segment (or a subset thereof)
+  HighFive::DataSetCreateProps props;
+  if (uv_vis.u.size()) {
+    if (chunksize > 0) {
+      props.add(HighFive::Chunking(std::vector<hsize_t>{chunksize}));
+    } else {
+      props.add(HighFive::Chunking(std::vector<hsize_t>{static_cast<hsize_t>(uv_vis.u.size())}));
+    }
+    props.add(HighFive::Deflate(9));  // maximal compression
+  }
+  // Create the H5 datasets
+  h5file.createDataSet("u", std::vector<t_real>(uv_vis.u.data(), uv_vis.u.data() + uv_vis.u.size()),
+                       props);
+  h5file.createDataSet("v", std::vector<t_real>(uv_vis.v.data(), uv_vis.v.data() + uv_vis.v.size()),
+                       props);
+  if (w_term) {
+    h5file.createDataSet(
+        "w", std::vector<t_real>(uv_vis.w.data(), uv_vis.w.data() + uv_vis.w.size()), props);
+  }
+
+  std::vector<t_real> redata, imdata, sigma;
+  redata.reserve(uv_vis.vis.size());
+  imdata.reserve(uv_vis.vis.size());
+  sigma.reserve(uv_vis.weights.size());
+  for (size_t i = 0; i < uv_vis.vis.size(); ++i) {
+    redata.push_back(uv_vis.vis(i).real());
+    imdata.push_back(uv_vis.vis(i).imag());
+    sigma.push_back(1.0 / uv_vis.weights(i).real());
+  }
+  h5file.createDataSet("re", std::move(redata), props);
+  h5file.createDataSet("im", std::move(imdata), props);
+  h5file.createDataSet("sigma", std::move(imdata), props);
 }
 
 }  // namespace purify::H5
