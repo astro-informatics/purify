@@ -2020,6 +2020,13 @@
       <anchor>ac525627cf52c534dfa9203cb82c35184</anchor>
       <arglist>(H5Handler &amp;file, const size_t N, const bool w_term)</arglist>
     </member>
+    <member kind="function">
+      <type>void</type>
+      <name>write_visibility</name>
+      <anchorfile>namespacepurify_1_1H5.html</anchorfile>
+      <anchor>aeb9d8cd7d6e33bb7731456f5ad3f8cdf</anchor>
+      <arglist>(const utilities::vis_params &amp;uv_vis, const std::string &amp;h5name, const bool w_term, const size_t chunksize=0)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>IndexMapping.h</name>
@@ -5690,13 +5697,21 @@
     <filename>purify__h5_8cc.html</filename>
     <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
     <includes id="logging_8h" name="logging.h" local="yes" imported="no">purify/logging.h</includes>
+    <includes id="read__measurements_8h" name="read_measurements.h" local="yes" imported="no">purify/read_measurements.h</includes>
     <includes id="h5reader_8h" name="h5reader.h" local="yes" imported="no">purify/h5reader.h</includes>
     <member kind="function">
       <type></type>
       <name>TEST_CASE</name>
       <anchorfile>purify__h5_8cc.html</anchorfile>
-      <anchor>a4e2d2db9455987c252e1bd7937d31724</anchor>
-      <arglist>(&quot;Purify H5&quot;, &quot;[HDF5]&quot;)</arglist>
+      <anchor>ab4bff2f2f35d6ac705023104fc0f5269</anchor>
+      <arglist>(&quot;Purify H5 reader&quot;, &quot;[HDF5]&quot;)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>TEST_CASE</name>
+      <anchorfile>purify__h5_8cc.html</anchorfile>
+      <anchor>ad8a6705becdd5ea05a9beac5aff01a17</anchor>
+      <arglist>(&quot;Purify H5 writer&quot;, &quot;[HDF5]&quot;)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -8947,6 +8962,13 @@
       <anchorfile>namespacepurify_1_1H5.html</anchorfile>
       <anchor>ac525627cf52c534dfa9203cb82c35184</anchor>
       <arglist>(H5Handler &amp;file, const size_t N, const bool w_term)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>write_visibility</name>
+      <anchorfile>namespacepurify_1_1H5.html</anchorfile>
+      <anchor>aeb9d8cd7d6e33bb7731456f5ad3f8cdf</anchor>
+      <arglist>(const utilities::vis_params &amp;uv_vis, const std::string &amp;h5name, const bool w_term, const size_t chunksize=0)</arglist>
     </member>
   </compound>
   <compound kind="namespace">

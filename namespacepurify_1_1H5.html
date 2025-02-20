@@ -92,11 +92,14 @@ Classes</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a0695c59f20a8f28ab2b81a84ce2a1eca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1H5.html#a0695c59f20a8f28ab2b81a84ce2a1eca">read_visibility</a> (const std::string &amp;vis_name, const bool w_term)</td></tr>
-<tr class="memdesc:a0695c59f20a8f28ab2b81a84ce2a1eca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads an HDF5 file with u,v visibilities, constructs a vis_params objects and returns it.  <a href="namespacepurify_1_1H5.html#a0695c59f20a8f28ab2b81a84ce2a1eca">More...</a><br /></td></tr>
+<tr class="memdesc:a0695c59f20a8f28ab2b81a84ce2a1eca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads an HDF5 file with u,v visibilities, constructs a vis_params object and returns it.  <a href="namespacepurify_1_1H5.html#a0695c59f20a8f28ab2b81a84ce2a1eca">More...</a><br /></td></tr>
 <tr class="separator:a0695c59f20a8f28ab2b81a84ce2a1eca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac525627cf52c534dfa9203cb82c35184"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1H5.html#ac525627cf52c534dfa9203cb82c35184">stochread_visibility</a> (<a class="el" href="classpurify_1_1H5_1_1H5Handler.html">H5Handler</a> &amp;file, const size_t N, const bool w_term)</td></tr>
 <tr class="memdesc:ac525627cf52c534dfa9203cb82c35184"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stochastically reads dataset slices from the supplied HDF5-file handler, constructs a vis_params object from them and returns it.  <a href="namespacepurify_1_1H5.html#ac525627cf52c534dfa9203cb82c35184">More...</a><br /></td></tr>
 <tr class="separator:ac525627cf52c534dfa9203cb82c35184"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb9d8cd7d6e33bb7731456f5ad3f8cdf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepurify_1_1H5.html#aeb9d8cd7d6e33bb7731456f5ad3f8cdf">write_visibility</a> (const <a class="el" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> &amp;uv_vis, const std::string &amp;h5name, const bool w_term, const size_t chunksize=0)</td></tr>
+<tr class="memdesc:aeb9d8cd7d6e33bb7731456f5ad3f8cdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write an HDF5 file with u,v visibilities from a vis_params object.  <a href="namespacepurify_1_1H5.html#aeb9d8cd7d6e33bb7731456f5ad3f8cdf">More...</a><br /></td></tr>
+<tr class="separator:aeb9d8cd7d6e33bb7731456f5ad3f8cdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a0695c59f20a8f28ab2b81a84ce2a1eca"></a>
@@ -125,7 +128,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Reads an HDF5 file with u,v visibilities, constructs a vis_params objects and returns it. </p>
+<p>Reads an HDF5 file with u,v visibilities, constructs a vis_params object and returns it. </p>
 <dl class="section note"><dt>Note</dt><dd>vis_name: name of input HDF5 file containing [u, v, real(V), imag(V)]. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="h5reader_8h_source.html#l00166">166</a> of file <a class="el" href="h5reader_8h_source.html">h5reader.h</a>.</p>
@@ -248,6 +251,95 @@ Functions</h2></td></tr>
 <p class="reference">References <a class="el" href="uvw__utilities_8h_source.html#l00027">purify::utilities::vis_params::average_frequency</a>, <a class="el" href="uvw__utilities_8h_source.html#l00026">purify::utilities::vis_params::dec</a>, <a class="el" href="uvw__utilities_8h_source.html#l00025">purify::utilities::vis_params::ra</a>, <a class="el" href="h5reader_8h_source.html#l00096">purify::H5::H5Handler::stochread()</a>, <a class="el" href="uvw__utilities_8h_source.html#l00016">purify::utilities::vis_params::u</a>, <a class="el" href="uvw__utilities_8h_source.html#l00017">purify::utilities::vis_params::v</a>, <a class="el" href="uvw__utilities_8h_source.html#l00022">purify::utilities::vis_params::vis</a>, <a class="el" href="uvw__utilities_8h_source.html#l00018">purify::utilities::vis_params::w</a>, and <a class="el" href="uvw__utilities_8h_source.html#l00023">purify::utilities::vis_params::weights</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="mpi__read__measurements_8cc_source.html#l00017">TEST_CASE()</a>.</p>
+
+</div>
+</div>
+<a id="aeb9d8cd7d6e33bb7731456f5ad3f8cdf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb9d8cd7d6e33bb7731456f5ad3f8cdf">&#9670;&nbsp;</a></span>write_visibility()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void purify::H5::write_visibility </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> &amp;&#160;</td>
+          <td class="paramname"><em>uv_vis</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>h5name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>w_term</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramname"><em>chunksize</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write an HDF5 file with u,v visibilities from a vis_params object. </p>
+
+<p class="definition">Definition at line <a class="el" href="h5reader_8h_source.html#l00244">244</a> of file <a class="el" href="h5reader_8h_source.html">h5reader.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;                                                                     {</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  <span class="comment">// Set up HDF5 file</span></div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  HighFive::File h5file(h5name, HighFive::File::OpenOrCreate | HighFive::File::Truncate);</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  <span class="comment">// Set up file properties, such as chunking and compression</span></div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <span class="comment">// Note: the I/O is minimised if compression is disabled (obvs)</span></div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  <span class="comment">// If using decompressed data is not an option, then the</span></div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  <span class="comment">// I/O performance can be optimised by chunking the dataset</span></div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  <span class="comment">// in such a way that each MPI rank only has to decompress</span></div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  <span class="comment">// its allocated segment (or a subset thereof)</span></div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  HighFive::DataSetCreateProps props;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  <span class="keywordflow">if</span> (uv_vis.u.size()) {</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="keywordflow">if</span> (chunksize &gt; 0) {</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      props.add(HighFive::Chunking(std::vector&lt;hsize_t&gt;{chunksize}));</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;      props.add(HighFive::Chunking(std::vector&lt;hsize_t&gt;{<span class="keyword">static_cast&lt;</span>hsize_t<span class="keyword">&gt;</span>(uv_vis.u.size())}));</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    }</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    props.add(HighFive::Deflate(9));  <span class="comment">// maximal compression</span></div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  }</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  <span class="comment">// Create the H5 datasets</span></div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  h5file.createDataSet(<span class="stringliteral">&quot;u&quot;</span>, std::vector&lt;t_real&gt;(uv_vis.u.data(), uv_vis.u.data() + uv_vis.u.size()),</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;                       props);</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;  h5file.createDataSet(<span class="stringliteral">&quot;v&quot;</span>, std::vector&lt;t_real&gt;(uv_vis.v.data(), uv_vis.v.data() + uv_vis.v.size()),</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;                       props);</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;  <span class="keywordflow">if</span> (w_term) {</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    h5file.createDataSet(</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        <span class="stringliteral">&quot;w&quot;</span>, std::vector&lt;t_real&gt;(uv_vis.w.data(), uv_vis.w.data() + uv_vis.w.size()), props);</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  }</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160; </div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  std::vector&lt;t_real&gt; redata, imdata, sigma;</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  redata.reserve(uv_vis.vis.size());</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  imdata.reserve(uv_vis.vis.size());</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  sigma.reserve(uv_vis.weights.size());</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; uv_vis.vis.size(); ++i) {</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    redata.push_back(uv_vis.vis(i).real());</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    imdata.push_back(uv_vis.vis(i).imag());</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    sigma.push_back(1.0 / uv_vis.weights(i).real());</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  }</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;  h5file.createDataSet(<span class="stringliteral">&quot;re&quot;</span>, std::move(redata), props);</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  h5file.createDataSet(<span class="stringliteral">&quot;im&quot;</span>, std::move(imdata), props);</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  h5file.createDataSet(<span class="stringliteral">&quot;sigma&quot;</span>, std::move(imdata), props);</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;}</div>
+</div><!-- fragment -->
+<p class="reference">References <a class="el" href="uvw__utilities_8h_source.html#l00016">purify::utilities::vis_params::u</a>, <a class="el" href="uvw__utilities_8h_source.html#l00017">purify::utilities::vis_params::v</a>, <a class="el" href="uvw__utilities_8h_source.html#l00022">purify::utilities::vis_params::vis</a>, <a class="el" href="uvw__utilities_8h_source.html#l00018">purify::utilities::vis_params::w</a>, and <a class="el" href="uvw__utilities_8h_source.html#l00023">purify::utilities::vis_params::weights</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="purify__h5_8cc_source.html#l00037">TEST_CASE()</a>.</p>
 
 </div>
 </div>
