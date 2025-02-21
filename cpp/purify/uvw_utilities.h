@@ -190,9 +190,9 @@ utilities::vis_params read_ant_positions_to_coverage(const std::string &pos_name
 //! Reading reals from visibility file (including nan's and inf's)
 t_real streamtoreal(std::ifstream &stream);
 //! Reads in visibility csv file
-utilities::vis_params read_visibility_csv(const std::string &vis_name, const bool w_term = false);
+utilities::vis_params read_visibility_csv(const std::string &vis_name, const bool w_term = false, const bool vis_term = true);
 //! Reads in visibility file
-utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term = false);
+utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term = false, const bool vis_term = true);
 //! Read visibility files from name of vector
 utilities::vis_params read_visibility(const std::vector<std::string> &names,
                                       const bool w_term = false);

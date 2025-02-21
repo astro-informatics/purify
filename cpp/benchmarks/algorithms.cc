@@ -8,6 +8,7 @@
 #include "purify/measurement_operator_factory.h"
 #include "purify/operators.h"
 #include "purify/utilities.h"
+#include "purify/uvw_utilities.h"
 #include "purify/wavelet_operator_factory.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/relative_variation.h>
@@ -23,9 +24,15 @@ class AlgoFixture : public ::benchmark::Fixture {
     // Reading image from file and update related quantities
     bool newImage = b_utilities::updateImage(state.range(0), m_image, m_imsizex, m_imsizey);
 
-    // Generating random uv(w) coverage
-    bool newMeasurements =
-        b_utilities::updateMeasurements(state.range(1), m_uv_data, m_epsilon, newImage, m_image);
+    if (state.range(4) == 1) {
+      // Generating random uv(w) coverage
+      bool newMeasurements = b_utilities::updateMeasurements(state.range(1), m_uv_data, m_epsilon,
+							     newImage, m_image);
+    }
+    if (state.range(4) == 2) {
+      auto hdf5_filename_small = data_filename("ska_mid/uvw_ska1mid197_simulation_12h_dt_60.h5");
+      m_uv_data = utilities::read_visibility(hdf5_filename_small, true, true);
+    }
 
     bool newKernel = m_kernel != state.range(2);
 
@@ -70,7 +77,7 @@ BENCHMARK_DEFINE_F(AlgoFixture, Padmm)(benchmark::State &state) {
 
   m_padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
       factory::algo_distribution::serial, m_measurements_transform, wavelets, m_uv_data, m_sigma,
-      m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true, false, 1e-3, 1e-2, 50,
+      m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true, false, 1e-3, 1e-2, 50,
       1.0, 1.0);
 
   while (state.KeepRunning()) {
@@ -91,7 +98,7 @@ BENCHMARK_DEFINE_F(AlgoFixture, ForwardBackward)(benchmark::State &state) {
 
   m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, m_measurements_transform, wavelets, m_uv_data, m_sigma,
-      beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true, false, 1e-3,
+      beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true, false, 1e-3,
       1e-2, 50, 1.0);
 
   while (state.KeepRunning()) {
@@ -114,7 +121,7 @@ BENCHMARK_DEFINE_F(AlgoFixture, ForwardBackwardOnnx)(benchmark::State &state) {
 
   m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, m_measurements_transform, wavelets, m_uv_data, m_sigma,
-      beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true, false, 1e-3,
+      beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true, false, 1e-3,
       1e-2, 50, 1.0, tf_model_path, nondiff_func_type::Denoiser);
 
   while (state.KeepRunning()) {
@@ -137,7 +144,7 @@ BENCHMARK_REGISTER_F(AlgoFixture, ForwardBackwardOnnx)
 
 BENCHMARK_REGISTER_F(AlgoFixture, Padmm)
     //->Apply(b_utilities::Arguments)
-    ->Args({128, 10000, 4, 10})
+    ->Args({128, 10000, 4, 10, 2})
     ->UseManualTime()
     ->MinTime(10.0)
     ->MinWarmUpTime(5.0)
@@ -146,7 +153,7 @@ BENCHMARK_REGISTER_F(AlgoFixture, Padmm)
 
 BENCHMARK_REGISTER_F(AlgoFixture, ForwardBackward)
     //->Apply(b_utilities::Arguments)
-    ->Args({128, 10000, 4, 10})
+    ->Args({128, 10000, 4, 10, 2})
     ->UseManualTime()
     ->MinTime(10.0)
     ->MinWarmUpTime(5.0)

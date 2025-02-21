@@ -28,9 +28,15 @@ class AlgoFixtureMPI : public ::benchmark::Fixture {
     // Reading image from file and update related quantities
     bool newImage = b_utilities::updateImage(state.range(0), m_image, m_imsizex, m_imsizey);
 
-    // Generating random uv(w) coverage
-    bool newMeasurements = b_utilities::updateMeasurements(state.range(1), m_uv_data, m_epsilon,
-                                                           newImage, m_image, m_world);
+    if (state.range(5) == 1) {
+      // Generating random uv(w) coverage
+      bool newMeasurements = b_utilities::updateMeasurements(state.range(1), m_uv_data, m_epsilon,
+							     newImage, m_image, m_world);
+    }
+    if (state.range(5) == 2) {
+      auto hdf5_filename_small = data_filename("ska_mid/uvw_ska1mid197_simulation_12h_dt_60.h5");
+      m_uv_data = utilities::read_visibility(hdf5_filename_small, true, true);
+    }
 
     bool newKernel = m_kernel != state.range(2);
 

@@ -178,7 +178,7 @@ t_real streamtoreal(std::ifstream &stream) {
   return std::stod(input);
 }
 
-utilities::vis_params read_visibility_csv(const std::string &vis_name, const bool w_term) {
+  utilities::vis_params read_visibility_csv(const std::string &vis_name, const bool w_term, const bool vis_term) {
   /*
     Reads an csv file with u, v, visibilities and returns the vectors.
 
@@ -186,7 +186,7 @@ utilities::vis_params read_visibility_csv(const std::string &vis_name, const boo
   */
   std::ifstream vis_file(vis_name);
   if (vis_file) {
-    PURIFY_LOW_LOG("File {} successfully opened", vis_name);
+    PURIFY_INFO("File {} successfully opened", vis_name);
   } else {
     throw std::runtime_error("Could not open file " + vis_name);
   }
@@ -213,11 +213,13 @@ utilities::vis_params read_visibility_csv(const std::string &vis_name, const boo
     if (w_term) {
       wtemp(row) = streamtoreal(vis_file);
     }
-    real = streamtoreal(vis_file);
-    imag = streamtoreal(vis_file);
-    entry = streamtoreal(vis_file);
-    vistemp(row) = t_complex(real, imag);
-    weightstemp(row) = 1 / entry;
+    if (vis_term) {
+      real = streamtoreal(vis_file);
+      imag = streamtoreal(vis_file);
+      entry = streamtoreal(vis_file);
+      vistemp(row) = t_complex(real, imag);
+      weightstemp(row) = 1 / entry;
+    }
   }
   utilities::vis_params uv_vis;
   uv_vis.u = utemp;
@@ -233,11 +235,11 @@ utilities::vis_params read_visibility_csv(const std::string &vis_name, const boo
   return uv_vis;
 }
 
-utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term) {
+utilities::vis_params read_visibility(const std::string &vis_name, const bool w_term, const bool vis_term) {
 #ifdef PURIFY_H5
   if (has_suffix(vis_name, ".h5")) return H5::read_visibility(vis_name, w_term);
 #endif
-  return read_visibility_csv(vis_name, w_term);
+  return read_visibility_csv(vis_name, w_term, vis_term);
 }
 
 void write_visibility(const utilities::vis_params &uv_vis, const std::string &file_name,
