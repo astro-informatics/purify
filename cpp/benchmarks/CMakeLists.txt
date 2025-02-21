@@ -11,6 +11,10 @@ target_link_libraries(fft benchmark libpurify)
 add_executable(degridding utilities.cc degridding.cc)
 target_link_libraries(degridding benchmark libpurify)
 
+add_executable(stochastic_algorithm utilities.cc stochastic_algorithm.cc)
+target_link_libraries(stochastic_algorithm benchmark libpurify)
+
+
 # Skip ArrayFire benchmarks for now, add back later if needed
 # if(doaf)
 #   add_benchmark(measurement_operator_af utilities.cc LIBRARIES libpurify)
