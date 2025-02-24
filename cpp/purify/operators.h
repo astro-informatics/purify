@@ -310,7 +310,7 @@ sopt::OperatorFunction<T> init_all_sum_all(const sopt::mpi::Communicator &comm) 
 //! constructs lambdas that apply degridding matrix with adjoint
 template <class T, class... ARGS>
 std::tuple<sopt::OperatorFunction<T>, sopt::OperatorFunction<T>> init_gridding_matrix_2d(
-    ARGS &&... args) {
+    ARGS &&...args) {
   const std::shared_ptr<const Sparse<t_complex>> interpolation_matrix =
       std::make_shared<const Sparse<t_complex>>(
           details::init_gridding_matrix_2d(std::forward<ARGS>(args)...));
