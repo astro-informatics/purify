@@ -39,7 +39,7 @@ BENCHMARK_DEFINE_F(FFTOperatorFixture, Apply)(benchmark::State& state) {
 BENCHMARK_REGISTER_F(FFTOperatorFixture, Apply)
     //->Apply(b_utilities::Arguments)
     ->RangeMultiplier(2)
-    ->Range(128, 128 << 6)
+    ->Range(128, 128 << 10) // 128, 128<<6=2^13, 128<<10=2^17 
     ->UseManualTime()
     ->Repetitions(10)
     ->ReportAggregatesOnly(true)
