@@ -95,8 +95,7 @@ int main(int argc, const char **argv) {
     beam_units = uv_data.size() / flux_scale / flux_scale;
   }
 
-  savePSF(params, def_header, measurements_transform, uv_data, flux_scale, sigma,
-          beam_units);
+  savePSF(params, def_header, measurements_transform, uv_data, flux_scale, sigma, beam_units);
 
   // the dirty image
   saveDirtyImage(params, def_header, measurements_transform, uv_data, beam_units);

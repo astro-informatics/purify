@@ -43,7 +43,7 @@ const std::map<std::string, algo_distribution> algo_distribution_string = {
 
 //! return chosen algorithm given parameters
 template <class Algorithm, class... ARGS>
-std::shared_ptr<Algorithm> algorithm_factory(const factory::algorithm algo, ARGS &&...args);
+std::shared_ptr<Algorithm> algorithm_factory(const factory::algorithm algo, ARGS &&... args);
 //! return shared pointer to padmm object
 template <class Algorithm>
 typename std::enable_if<
@@ -362,7 +362,7 @@ primaldual_factory(
 }
 
 template <class Algorithm, class... ARGS>
-std::shared_ptr<Algorithm> algorithm_factory(const factory::algorithm algo, ARGS &&...args) {
+std::shared_ptr<Algorithm> algorithm_factory(const factory::algorithm algo, ARGS &&... args) {
   switch (algo) {
   case algorithm::padmm:
     return padmm_factory<Algorithm>(std::forward<ARGS>(args)...);

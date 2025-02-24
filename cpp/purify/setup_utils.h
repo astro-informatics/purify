@@ -67,7 +67,8 @@ void saveMeasurementEigenVector(const YamlParser &params,
 void savePSF(
     const YamlParser &params, const pfitsio::header_params &def_header,
     const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> &measurements_transform,
-    const utilities::vis_params &uv_data, const t_real flux_scale, const t_real sigma, const t_real beam_units);
+    const utilities::vis_params &uv_data, const t_real flux_scale, const t_real sigma,
+    const t_real beam_units);
 
 void saveDirtyImage(
     const YamlParser &params, const pfitsio::header_params &def_header,
