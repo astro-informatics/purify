@@ -61,14 +61,14 @@ int main(int argc, const char **argv) {
       getInputData(params, mop_algo, wop_algo, using_mpi);
 
   // create measurement operator
-  auto [measurements_transform, operator_norm] =
+  auto measurements_transform =
       createMeasurementOperator(params, mop_algo, wop_algo, using_mpi, image_index, w_stacks,
                                 uv_data, measurement_op_eigen_vector);
 
   // create wavelet operator
   const waveletInfo wavelets = createWaveletOperator(params, wop_algo);
 
-  PURIFY_LOW_LOG("Value of operator norm is {}", operator_norm);
+  PURIFY_LOW_LOG("Value of operator norm is {}", measurements_transform->norm());
   t_real const flux_scale = 1.;
   uv_data.vis = uv_data.vis.array() * uv_data.weights.array() / flux_scale;
 
@@ -95,7 +95,7 @@ int main(int argc, const char **argv) {
     beam_units = uv_data.size() / flux_scale / flux_scale;
   }
 
-  savePSF(params, def_header, measurements_transform, uv_data, flux_scale, sigma, operator_norm,
+  savePSF(params, def_header, measurements_transform, uv_data, flux_scale, sigma,
           beam_units);
 
   // the dirty image
@@ -114,7 +114,7 @@ int main(int argc, const char **argv) {
         (params.wavelet_basis().size() < 2) and (not params.realValueConstraint()) and
             (not params.positiveValueConstraint()),
         params.relVarianceConvergence(), params.dualFBVarianceConvergence(), 50,
-        params.epsilonConvergenceScaling(), operator_norm);
+        params.epsilonConvergenceScaling());
   if (params.algorithm() == "fb") {
     std::shared_ptr<DifferentiableFunc<t_complex>> f;
     if (params.diffFuncType() == diff_func_type::L2Norm_with_CRR) {
@@ -135,7 +135,7 @@ int main(int argc, const char **argv) {
         params.iterations(), params.realValueConstraint(), params.positiveValueConstraint(),
         (params.wavelet_basis().size() < 2) and (not params.realValueConstraint()) and
             (not params.positiveValueConstraint()),
-        params.relVarianceConvergence(), params.dualFBVarianceConvergence(), 50, operator_norm,
+        params.relVarianceConvergence(), params.dualFBVarianceConvergence(), 50,
         params.model_path(), params.nondiffFuncType(), f);
   }
   if (params.algorithm() == "primaldual")
@@ -144,7 +144,7 @@ int main(int argc, const char **argv) {
         sigma * params.epsilonScaling() / flux_scale, params.height(), params.width(),
         wavelets.sara_size, params.iterations(), params.realValueConstraint(),
         params.positiveValueConstraint(), params.relVarianceConvergence(),
-        params.epsilonConvergenceScaling(), operator_norm);
+        params.epsilonConvergenceScaling());
   // Add primal dual preconditioning
   if (params.algorithm() == "primaldual" and params.precondition_iters() > 0) {
     PURIFY_HIGH_LOG(

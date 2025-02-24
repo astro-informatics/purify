@@ -247,7 +247,7 @@ inputData getInputData(const YamlParser &params,
   return {uv_data, sigma, measurement_op_eigen_vector, image_index, w_stacks};
 }
 
-measurementOpInfo createMeasurementOperator(
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> createMeasurementOperator(
     const YamlParser &params, const factory::distributed_measurement_operator mop_algo,
     const factory::distributed_wavelet_operator wop_algo, const bool using_mpi,
     const std::vector<t_int> &image_index, const std::vector<t_real> &w_stacks,
@@ -294,6 +294,7 @@ measurementOpInfo createMeasurementOperator(
                   params.powMethod_tolerance(), comm.broadcast(measurement_op_eigen_vector).eval());
     measurement_op_eigen_vector = std::get<1>(power_method_result);
     operator_norm = std::get<0>(power_method_result);
+    measurements_transform->set_norm(operator_norm);
   } else
 #endif
   {
@@ -302,9 +303,10 @@ measurementOpInfo createMeasurementOperator(
         measurement_op_eigen_vector);
     measurement_op_eigen_vector = std::get<1>(power_method_result);
     operator_norm = std::get<0>(power_method_result);
+    measurements_transform->set_norm(operator_norm);
   }
 
-  return {measurements_transform, operator_norm};
+  return measurements_transform;
 }
 
 void setupCostFunctions(const YamlParser &params, std::unique_ptr<DifferentiableFunc<t_complex>> &f,
@@ -401,8 +403,7 @@ void saveMeasurementEigenVector(const YamlParser &params,
 void savePSF(
     const YamlParser &params, const pfitsio::header_params &def_header,
     const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> &measurements_transform,
-    const utilities::vis_params &uv_data, const t_real flux_scale, const t_real sigma,
-    const t_real operator_norm, const t_real beam_units) {
+    const utilities::vis_params &uv_data, const t_real flux_scale, const t_real sigma, const t_real beam_units) {
   pfitsio::header_params psf_header = def_header;
   psf_header.fits_name = params.output_path() + "/psf.fits";
   psf_header.pix_units = "Jy/Pixel";
@@ -417,7 +418,7 @@ void savePSF(
     auto const world = sopt::mpi::Communicator::World();
     PURIFY_LOW_LOG(
         "Expected image domain residual RMS is {} jy/beam",
-        sigma * params.epsilonScaling() * operator_norm /
+        sigma * params.epsilonScaling() * measurements_transform->norm() /
             (std::sqrt(params.width() * params.height()) * world.all_sum_all(uv_data.size())));
     if (world.is_root())
 #else
@@ -426,7 +427,7 @@ void savePSF(
       pfitsio::write2d(psf_image, psf_header, true);
   } else {
     PURIFY_LOW_LOG("Expected image domain residual RMS is {} jy/beam",
-                   sigma * params.epsilonScaling() * operator_norm /
+                   sigma * params.epsilonScaling() * measurements_transform->norm() /
                        (std::sqrt(params.width() * params.height()) * uv_data.size()));
     pfitsio::write2d(psf_image, psf_header, true);
   }

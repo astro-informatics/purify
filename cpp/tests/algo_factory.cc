@@ -21,6 +21,7 @@
 #include "purify/h5reader.h"
 #endif
 
+#include <sopt/gradient_utils.h>
 #include <sopt/power_method.h>
 
 #include "purify/test_data.h"
@@ -44,12 +45,14 @@ TEST_CASE("padmm_factory") {
   t_uint const imsizey = 128;
   t_uint const imsizex = 128;
   Vector<t_complex> const init = Vector<t_complex>::Ones(imsizex * imsizey);
-  auto const measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
+  auto measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
       factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2,
       kernels::kernel_from_string.at("kb"), 4, 4);
   auto const power_method_stuff =
       sopt::algorithm::power_method<Vector<t_complex>>(*measurements_transform, 1000, 1e-5, init);
   const t_real op_norm = std::get<0>(power_method_stuff);
+  measurements_transform->set_norm(op_norm);
+
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -59,7 +62,7 @@ TEST_CASE("padmm_factory") {
   t_real const sigma = 0.016820222945913496 * std::sqrt(2);  // see test_parameters file
   auto const padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
       factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma, imsizey,
-      imsizex, sara.size(), 300, true, true, false, 1e-2, 1e-3, 50, 1, op_norm);
+      imsizex, sara.size(), 300, true, true, false, 1e-2, 1e-3, 50, 1);
 
   auto const diagnostic = (*padmm)();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
@@ -98,12 +101,14 @@ TEST_CASE("primal_dual_factory", "[!shouldfail]") {
   t_uint const imsizex = 128;
 
   Vector<t_complex> const init = Vector<t_complex>::Ones(imsizex * imsizey);
-  auto const measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
+  auto measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
       factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2,
       kernels::kernel_from_string.at("kb"), 4, 4);
   auto const power_method_stuff =
       sopt::algorithm::power_method<Vector<t_complex>>(*measurements_transform, 1000, 1e-5, init);
   const t_real op_norm = std::get<0>(power_method_stuff);
+  measurements_transform->set_norm(op_norm);
+
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -114,7 +119,7 @@ TEST_CASE("primal_dual_factory", "[!shouldfail]") {
   auto const primaldual =
       factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
           factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma,
-          imsizey, imsizex, sara.size(), 20, true, true, 1e-2, 1, op_norm);
+          imsizey, imsizex, sara.size(), 20, true, true, 1e-2, 1);
 
   auto const diagnostic = (*primaldual)();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
@@ -152,12 +157,14 @@ TEST_CASE("fb_factory") {
   t_uint const imsizex = 128;
 
   Vector<t_complex> const init = Vector<t_complex>::Ones(imsizex * imsizey);
-  auto const measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
+  auto measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
       factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2,
       kernels::kernel_from_string.at("kb"), 4, 4);
   auto const power_method_stuff =
       sopt::algorithm::power_method<Vector<t_complex>>(*measurements_transform, 1000, 1e-5, init);
   const t_real op_norm = std::get<0>(power_method_stuff);
+  measurements_transform->set_norm(op_norm);
+
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -169,7 +176,7 @@ TEST_CASE("fb_factory") {
   t_real const gamma = 0.0001;
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma, beta,
-      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm);
+      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50);
 
   auto const diagnostic = (*fb)();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
@@ -239,15 +246,14 @@ TEST_CASE("fb_factory_stochastic") {
             factory::distributed_measurement_operator::serial, uv_data_fragment, imsizey, imsizex,
             1, 1, 2, kernels::kernel_from_string.at("kb"), 4, 4);
 
+        Vector<t_complex> const init = Vector<t_complex>::Ones(imsizex * imsizey);
+        auto const power_method_stuff =
+            sopt::algorithm::power_method<Vector<t_complex>>(Phi, 1000, 1e-5, init);
+        const t_real op_norm = std::get<0>(power_method_stuff);
+        phi->set_norm(op_norm);
+
         return std::make_shared<sopt::IterationState<Vector<t_complex>>>(uv_data_fragment.vis, phi);
       };
-
-  Vector<t_complex> const init = Vector<t_complex>::Ones(imsizex * imsizey);
-  auto IS = random_updater();
-  auto Phi = IS->Phi();
-  auto const power_method_stuff =
-      sopt::algorithm::power_method<Vector<t_complex>>(Phi, 1000, 1e-5, init);
-  const t_real op_norm = std::get<0>(power_method_stuff);
 
   const auto solution = pfitsio::read2d(expected_solution_path);
 
@@ -271,8 +277,7 @@ TEST_CASE("fb_factory_stochastic") {
       .regulariser_strength(gamma)
       .relative_variation(1e-3)
       .residual_tolerance(0)
-      .tight_frame(true)
-      .sq_op_norm(op_norm * op_norm);
+      .tight_frame(true);
 
   auto gp = std::make_shared<sopt::algorithm::L1GProximal<t_complex>>(false);
   gp->l1_proximal_tolerance(1e-4)
@@ -317,12 +322,14 @@ TEST_CASE("tf_fb_factory") {
   t_uint const imsizex = 128;
 
   Vector<t_complex> const init = Vector<t_complex>::Ones(imsizex * imsizey);
-  auto const measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
+  auto measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
       factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2,
       kernels::kernel_from_string.at("kb"), 4, 4);
   auto const power_method_stuff =
       sopt::algorithm::power_method<Vector<t_complex>>(*measurements_transform, 1000, 1e-5, init);
   const t_real op_norm = std::get<0>(power_method_stuff);
+  measurements_transform->set_norm(op_norm);
+
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -337,7 +344,7 @@ TEST_CASE("tf_fb_factory") {
 
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma, beta,
-      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm,
+      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50,
       tf_model_path, nondiff_func_type::Denoiser);
 
   auto const diagnostic = (*fb)();
@@ -373,12 +380,14 @@ TEST_CASE("onnx_fb_factory") {
   t_uint const imsizex = 128;
 
   Vector<t_complex> const init = Vector<t_complex>::Ones(imsizex * imsizey);
-  auto const measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
+  auto measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
       factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2,
       kernels::kernel_from_string.at("kb"), 4, 4);
   auto const power_method_stuff =
       sopt::algorithm::power_method<Vector<t_complex>>(*measurements_transform, 1000, 1e-5, init);
   const t_real op_norm = std::get<0>(power_method_stuff);
+  measurements_transform->set_norm(op_norm);
+
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -399,7 +408,7 @@ TEST_CASE("onnx_fb_factory") {
 
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma, beta,
-      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm, "",
+      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, "",
       nondiff_func_type::RealIndicator, diff_function);
 
   auto const diagnostic = (*fb)();
@@ -436,12 +445,14 @@ TEST_CASE("joint_map_factory") {
   t_uint const imsizex = 128;
 
   Vector<t_complex> const init = Vector<t_complex>::Ones(imsizex * imsizey);
-  auto const measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
+  auto measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
       factory::distributed_measurement_operator::serial, uv_data, imsizey, imsizex, 1, 1, 2,
       kernels::kernel_from_string.at("kb"), 4, 4);
   auto const power_method_stuff =
       sopt::algorithm::power_method<Vector<t_complex>>(*measurements_transform, 1000, 1e-5, init);
   const t_real op_norm = std::get<0>(power_method_stuff);
+  measurements_transform->set_norm(op_norm);
+
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -453,7 +464,7 @@ TEST_CASE("joint_map_factory") {
   t_real const gamma = 1;
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma, beta,
-      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm);
+      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50);
   auto const l1_norm = [wavelets](const Vector<t_complex> &x) {
     auto val = sopt::l1_norm(wavelets->adjoint() * x);
     return val;

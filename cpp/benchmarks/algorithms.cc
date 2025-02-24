@@ -71,7 +71,7 @@ BENCHMARK_DEFINE_F(AlgoFixture, Padmm)(benchmark::State &state) {
   m_padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
       factory::algo_distribution::serial, m_measurements_transform, wavelets, m_uv_data, m_sigma,
       m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true, false, 1e-3, 1e-2, 50,
-      1.0, 1.0);
+      1.0);
 
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
@@ -92,7 +92,7 @@ BENCHMARK_DEFINE_F(AlgoFixture, ForwardBackward)(benchmark::State &state) {
   m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, m_measurements_transform, wavelets, m_uv_data, m_sigma,
       beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true, false, 1e-3,
-      1e-2, 50, 1.0);
+      1e-2, 50);
 
   while (state.KeepRunning()) {
     auto start = std::chrono::high_resolution_clock::now();
