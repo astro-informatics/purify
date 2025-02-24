@@ -30,7 +30,6 @@ using namespace purify;
 class StochasticAlgoFixture : public ::benchmark::Fixture {
  public:
   void SetUp(const ::benchmark::State &state) {
-
     m_imsizex = state.range(0);
     m_imsizey = state.range(0);
 
