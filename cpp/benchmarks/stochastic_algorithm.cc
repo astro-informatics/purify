@@ -7,19 +7,19 @@
 #include "purify/algorithm_factory.h"
 #include "purify/directories.h"
 #include "purify/measurement_operator_factory.h"
+#include "purify/mpi_utilities.h"
 #include "purify/operators.h"
 #include "purify/utilities.h"
-#include "purify/mpi_utilities.h"
 #include "purify/uvw_utilities.h"
 #include "purify/wavelet_operator_factory.h"
 #include <sopt/imaging_padmm.h>
+#include <sopt/mpi/communicator.h>
+#include <sopt/mpi/session.h>
 #include <sopt/power_method.h>
 #include <sopt/relative_variation.h>
 #include <sopt/utilities.h>
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
-#include <sopt/mpi/communicator.h>
-#include <sopt/mpi/session.h>
 
 #ifdef PURIFY_H5
 #include "purify/h5reader.h"
@@ -30,8 +30,6 @@ using namespace purify;
 class StochasticAlgoFixture : public ::benchmark::Fixture {
  public:
   void SetUp(const ::benchmark::State &state) {
-    // m_uv_data = utilities::read_visibility(input_data_path, false);
-    // m_uv_data.units = utilities::vis_units::radians;
 
     m_imsizex = state.range(0);
     m_imsizey = state.range(0);
@@ -40,11 +38,11 @@ class StochasticAlgoFixture : public ::benchmark::Fixture {
     m_beta = m_sigma * m_sigma;
     m_gamma = 0.0001;
 
-    m_N = 1000;
+    m_N = state.range(1);
 
-    // m_input_data_path = data_filename("expected/fb/input_data.vis");
-    m_input_data_path = data_filename("ska_mid/uvw_ska1mid197_simulation_12h_dt_60.h5");
+    m_input_data_path = data_filename("expected/fb/input_data.h5");
 
+    m_world = sopt::mpi::Communicator::World();
   }
 
   void TearDown(const ::benchmark::State &state) {}
@@ -52,8 +50,6 @@ class StochasticAlgoFixture : public ::benchmark::Fixture {
   sopt::mpi::Communicator m_world;
 
   std::string m_input_data_path;
-
-  // utilities::vis_params m_uv_data;
 
   t_uint m_imsizey;
   t_uint m_imsizex;
@@ -74,40 +70,31 @@ BENCHMARK_DEFINE_F(StochasticAlgoFixture, ForwardBackward)(benchmark::State &sta
   // This functor would be defined in Purify
   std::function<std::shared_ptr<sopt::IterationState<Vector<t_complex>>>()> random_updater =
       [this]() {
-	H5::H5Handler h5file(m_input_data_path, m_world);
-        utilities::vis_params uv_data = H5::stochread_visibility(h5file, m_N, true);
+        H5::H5Handler h5file(m_input_data_path, m_world);
+        utilities::vis_params uv_data = H5::stochread_visibility(h5file, m_N, false);
         uv_data.units = utilities::vis_units::radians;
         auto phi = factory::measurement_operator_factory<Vector<t_complex>>(
-            factory::distributed_measurement_operator::mpi_distribute_image, uv_data, 128, 128, 1,
-            1, 2, kernels::kernel_from_string.at("kb"), 4, 4);
+            factory::distributed_measurement_operator::mpi_distribute_image, uv_data, m_imsizex,
+            m_imsizey, 1, 1, 2, kernels::kernel_from_string.at("kb"), 4, 4);
 
         return std::make_shared<sopt::IterationState<Vector<t_complex>>>(uv_data.vis, phi);
       };
 
-  Vector<t_complex> const init = Vector<t_complex>::Ones(m_imsizex * m_imsizey);
-
-  PURIFY_INFO("Call random_updater");
-
   auto IS = random_updater();
   auto Phi = IS->Phi();
 
-  PURIFY_INFO("Call power method");
+  auto const power_method_stuff = sopt::algorithm::power_method<Vector<t_complex>>(
+      Phi, 1000, 1e-5, m_world.broadcast(Vector<t_complex>::Ones(m_imsizex * m_imsizey).eval()));
 
-  auto const power_method_stuff =
-    sopt::algorithm::power_method<Vector<t_complex>>(Phi, 1000, 1e-5, m_world.broadcast(init.eval()));
   const t_real op_norm = std::get<0>(power_method_stuff);
-
-  PURIFY_INFO("Construct wavelets");
 
   // wavelets
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
       factory::distributed_wavelet_operator::serial, m_sara, m_imsizey, m_imsizex);
 
-  PURIFY_INFO("Construct fb algorithm with random updater");
-
   // algorithm
   sopt::algorithm::ImagingForwardBackward<t_complex> fb(random_updater);
-  fb.itermax(state.range(1))
+  fb.itermax(state.range(2))
       .step_size(m_beta * sqrt(2))
       .sigma(m_sigma * sqrt(2))
       .regulariser_strength(m_gamma)
@@ -137,11 +124,9 @@ BENCHMARK_DEFINE_F(StochasticAlgoFixture, ForwardBackward)(benchmark::State &sta
 }
 
 BENCHMARK_REGISTER_F(StochasticAlgoFixture, ForwardBackward)
-    ->Args({128, 10})
+    ->Args({128, 10000, 10})
     ->UseManualTime()
-    ->MinTime(10.0)
+    ->MinTime(60.0)
     ->MinWarmUpTime(5.0)
     ->Repetitions(3)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
-
-BENCHMARK_MAIN();
