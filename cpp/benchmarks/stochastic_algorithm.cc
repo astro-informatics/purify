@@ -11,6 +11,7 @@
 #include "purify/operators.h"
 #include "purify/utilities.h"
 #include "purify/uvw_utilities.h"
+#include "purify/h5reader.h"
 #include "purify/wavelet_operator_factory.h"
 #include <sopt/imaging_padmm.h>
 #include <sopt/mpi/communicator.h>
@@ -21,9 +22,9 @@
 #include <sopt/wavelets.h>
 #include <sopt/wavelets/sara.h>
 
-#ifdef PURIFY_H5
-#include "purify/h5reader.h"
-#endif
+// #ifdef PURIFY_H5
+// #include "purify/h5reader.h"
+// #endif
 
 using namespace purify;
 
