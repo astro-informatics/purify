@@ -459,9 +459,9 @@ TEST_CASE("fb_factory_stochastic") {
 
   // This functor would be defined in Purify
   std::function<std::shared_ptr<sopt::IterationState<Vector<t_complex>>>()> random_updater =
-      [&f = h5file, &N]() {
+      [&h5file, &N, &comm]() {
         utilities::vis_params uv_data =
-            H5::stochread_visibility(f, N, false);  // no w-term in this data-set
+            H5::stochread_visibility(h5file, N, false);  // no w-term in this data-set
         uv_data.units = utilities::vis_units::radians;
         auto phi = factory::measurement_operator_factory<t_complexVec>(
             factory::distributed_measurement_operator::mpi_distribute_image, uv_data, 128, 128, 1,
