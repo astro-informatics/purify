@@ -248,7 +248,7 @@ TEST_CASE("fb_factory_stochastic") {
 
         Vector<t_complex> const init = Vector<t_complex>::Ones(imsizex * imsizey);
         auto const power_method_stuff =
-            sopt::algorithm::power_method<Vector<t_complex>>(Phi, 1000, 1e-5, init);
+            sopt::algorithm::power_method<Vector<t_complex>>(phi, 1000, 1e-5, init);
         const t_real op_norm = std::get<0>(power_method_stuff);
         phi->set_norm(op_norm);
 
