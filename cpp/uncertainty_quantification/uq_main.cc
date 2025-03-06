@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
     auto [uv_data, sigma, measurement_op_eigen_vector, image_index, w_stacks] =
         getInputData(purify_config, mop_algo, wop_algo, using_mpi);
 
-    auto [transform, operator_norm] =
+    auto transform =
         createMeasurementOperator(purify_config, mop_algo, wop_algo, using_mpi, image_index,
                                   w_stacks, uv_data, measurement_op_eigen_vector);
 

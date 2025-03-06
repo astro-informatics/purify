@@ -60,7 +60,7 @@ padmm_factory(const algo_distribution dist,
               const bool tight_frame = false, const t_real relative_variation = 1e-3,
               const t_real l1_proximal_tolerance = 1e-2,
               const t_uint maximum_proximal_iterations = 50,
-              const t_real residual_tolerance_scaling = 1, const t_real op_norm = 1) {
+              const t_real residual_tolerance_scaling = 1) {
   typedef typename Algorithm::Scalar t_scalar;
   if (sara_size > 1 and tight_frame)
     throw std::runtime_error(
@@ -78,7 +78,6 @@ padmm_factory(const algo_distribution dist,
       .l1_proximal_positivity_constraint(positive_constraint)
       .l1_proximal_real_constraint(real_constraint)
       .lagrange_update_scale(0.9)
-      .sq_op_norm(op_norm * op_norm)
       .Psi(*wavelets)
       .Phi(*measurements);
 #ifdef PURIFY_MPI
@@ -162,7 +161,7 @@ fb_factory(const algo_distribution dist,
            const bool real_constraint = true, const bool positive_constraint = true,
            const bool tight_frame = false, const t_real relative_variation = 1e-3,
            const t_real l1_proximal_tolerance = 1e-2, const t_uint maximum_proximal_iterations = 50,
-           const t_real op_norm = 1, const std::string model_path = "",
+           const std::string model_path = "",
            const nondiff_func_type g_proximal = nondiff_func_type::L1Norm,
            std::shared_ptr<DifferentiableFunc<typename Algorithm::Scalar>> f_function = nullptr) {
   typedef typename Algorithm::Scalar t_scalar;
@@ -178,7 +177,6 @@ fb_factory(const algo_distribution dist,
       .step_size(step_size * std::sqrt(2))
       .relative_variation(relative_variation)
       .tight_frame(tight_frame)
-      .sq_op_norm(op_norm * op_norm)
       .Phi(*measurements);
 
   if (f_function) fb->f_function(f_function);  // only override f_function default if non-null
@@ -262,8 +260,7 @@ primaldual_factory(
     const utilities::vis_params &uv_data, const t_real sigma, const t_uint imsizey,
     const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations = 500,
     const bool real_constraint = true, const bool positive_constraint = true,
-    const t_real relative_variation = 1e-3, const t_real residual_tolerance_scaling = 1,
-    const t_real op_norm = 1) {
+    const t_real relative_variation = 1e-3, const t_real residual_tolerance_scaling = 1) {
   typedef typename Algorithm::Scalar t_scalar;
   PURIFY_INFO("Constructing Primal Dual algorithm");
   auto epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size())) * sigma;
@@ -274,7 +271,7 @@ primaldual_factory(
       .positivity_constraint(positive_constraint)
       .Psi(*wavelets)
       .Phi(*measurements)
-      .tau(0.5 / (op_norm * op_norm + 1))
+      .tau(0.5 / (measurements->sq_norm() + 1))
       .xi(1.)
       .sigma(1.);
 #ifdef PURIFY_MPI

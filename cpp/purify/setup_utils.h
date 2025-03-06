@@ -41,12 +41,7 @@ inputData getInputData(const YamlParser &params,
                        const factory::distributed_measurement_operator mop_algo,
                        const factory::distributed_wavelet_operator wop_algo, const bool using_mpi);
 
-struct measurementOpInfo {
-  std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> measurement_transform;
-  t_real operator_norm;
-};
-
-measurementOpInfo createMeasurementOperator(
+std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> createMeasurementOperator(
     const YamlParser &params, const factory::distributed_measurement_operator mop_algo,
     const factory::distributed_wavelet_operator wop_algo, const bool using_mpi,
     const std::vector<t_int> &image_index, const std::vector<t_real> &w_stacks,
@@ -73,7 +68,7 @@ void savePSF(
     const YamlParser &params, const pfitsio::header_params &def_header,
     const std::shared_ptr<sopt::LinearTransform<Vector<t_complex>>> &measurements_transform,
     const utilities::vis_params &uv_data, const t_real flux_scale, const t_real sigma,
-    const t_real operator_norm, const t_real beam_units);
+    const t_real beam_units);
 
 void saveDirtyImage(
     const YamlParser &params, const pfitsio::header_params &def_header,

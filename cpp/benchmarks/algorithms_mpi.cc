@@ -90,7 +90,7 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, PadmmDistributeImage)(benchmark::State &state
   m_padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
       factory::algo_distribution::mpi_distributed, m_measurements_distribute_image, wavelets,
       m_uv_data, m_sigma, m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true,
-      false, 1e-3, 1e-2, 50, 1.0, 1.0);
+      false, 1e-3, 1e-2, 50, 1.0);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
@@ -111,7 +111,7 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, PadmmDistributeGrid)(benchmark::State &state)
   m_padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
       factory::algo_distribution::mpi_distributed, m_measurements_distribute_grid, wavelets,
       m_uv_data, m_sigma, m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true,
-      false, 1e-3, 1e-2, 50, 1.0, 1.0);
+      false, 1e-3, 1e-2, 50, 1.0);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
@@ -135,7 +135,7 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbDistributeImage)(benchmark::State &state) {
   m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::mpi_serial, m_measurements_distribute_image, wavelets, m_uv_data,
       m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true,
-      false, 1e-3, 1e-2, 50, 1.0);
+      false, 1e-3, 1e-2, 50);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
@@ -159,7 +159,7 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbDistributeGrid)(benchmark::State &state) {
   m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::mpi_serial, m_measurements_distribute_grid, wavelets, m_uv_data,
       m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true,
-      false, 1e-3, 1e-2, 50, 1.0);
+      false, 1e-3, 1e-2, 50);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {

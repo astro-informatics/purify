@@ -117,7 +117,6 @@ int main(int nargs, char const **args) {
                          .l1_proximal_real_constraint(true)
                          .residual_convergence(epsilon * 1.001)
                          .lagrange_update_scale(0.9)
-                         .sq_op_norm(1e0)
                          .Psi(Psi)
                          .itermax(100)
                          .is_converged(convergence_function)
