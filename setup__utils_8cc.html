@@ -158,8 +158,8 @@ Functions</h2></td></tr>
 <tr class="separator:a7636afdc654d9ded72092e8a333c1cbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca83fa516d93df60232c7d3ccb47fe25"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structinputData.html">inputData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="setup__utils_8cc.html#aca83fa516d93df60232c7d3ccb47fe25">getInputData</a> (const <a class="el" href="classpurify_1_1YamlParser.html">YamlParser</a> &amp;params, const <a class="el" href="namespacepurify_1_1factory.html#a6b8de5116c3d7d0d679cd6dd47a80248">factory::distributed_measurement_operator</a> mop_algo, const <a class="el" href="namespacepurify_1_1factory.html#a5bbc6a01d0a2cdd30b656a6bb957221f">factory::distributed_wavelet_operator</a> wop_algo, const bool using_mpi)</td></tr>
 <tr class="separator:aca83fa516d93df60232c7d3ccb47fe25"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a635bd4e2d13f646bb4c2e2369f3130fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structmeasurementOpInfo.html">measurementOpInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="setup__utils_8cc.html#a635bd4e2d13f646bb4c2e2369f3130fc">createMeasurementOperator</a> (const <a class="el" href="classpurify_1_1YamlParser.html">YamlParser</a> &amp;params, const <a class="el" href="namespacepurify_1_1factory.html#a6b8de5116c3d7d0d679cd6dd47a80248">factory::distributed_measurement_operator</a> mop_algo, const <a class="el" href="namespacepurify_1_1factory.html#a5bbc6a01d0a2cdd30b656a6bb957221f">factory::distributed_wavelet_operator</a> wop_algo, const bool using_mpi, const std::vector&lt; t_int &gt; &amp;image_index, const std::vector&lt; t_real &gt; &amp;w_stacks, const <a class="el" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> &amp;uv_data, Vector&lt; t_complex &gt; &amp;measurement_op_eigen_vector)</td></tr>
-<tr class="separator:a635bd4e2d13f646bb4c2e2369f3130fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59bc3b2dc8906a5b1cceb691c5b9aba6"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="setup__utils_8cc.html#a59bc3b2dc8906a5b1cceb691c5b9aba6">createMeasurementOperator</a> (const <a class="el" href="classpurify_1_1YamlParser.html">YamlParser</a> &amp;params, const <a class="el" href="namespacepurify_1_1factory.html#a6b8de5116c3d7d0d679cd6dd47a80248">factory::distributed_measurement_operator</a> mop_algo, const <a class="el" href="namespacepurify_1_1factory.html#a5bbc6a01d0a2cdd30b656a6bb957221f">factory::distributed_wavelet_operator</a> wop_algo, const bool using_mpi, const std::vector&lt; t_int &gt; &amp;image_index, const std::vector&lt; t_real &gt; &amp;w_stacks, const <a class="el" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> &amp;uv_data, Vector&lt; t_complex &gt; &amp;measurement_op_eigen_vector)</td></tr>
+<tr class="separator:a59bc3b2dc8906a5b1cceb691c5b9aba6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae8383f55e6c3f95651d2a0b8a7b0451b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="setup__utils_8cc.html#ae8383f55e6c3f95651d2a0b8a7b0451b">setupCostFunctions</a> (const <a class="el" href="classpurify_1_1YamlParser.html">YamlParser</a> &amp;params, std::unique_ptr&lt; DifferentiableFunc&lt; t_complex &gt;&gt; &amp;f, std::unique_ptr&lt; NonDifferentiableFunc&lt; t_complex &gt;&gt; &amp;g, t_real sigma, sopt::LinearTransform&lt; Vector&lt; t_complex &gt;&gt; &amp;Phi)</td></tr>
 <tr class="separator:ae8383f55e6c3f95651d2a0b8a7b0451b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7e746c5b763d2a66eb9e5bfda2d3c28"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="setup__utils_8cc.html#aa7e746c5b763d2a66eb9e5bfda2d3c28">initOutDirectoryWithConfig</a> (<a class="el" href="classpurify_1_1YamlParser.html">YamlParser</a> &amp;params)</td></tr>
@@ -168,20 +168,20 @@ Functions</h2></td></tr>
 <tr class="separator:abf454e788ec7a8c47c4138403b09da6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42749b1324a8608a20be0aa3f73e06df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="setup__utils_8cc.html#a42749b1324a8608a20be0aa3f73e06df">saveMeasurementEigenVector</a> (const <a class="el" href="classpurify_1_1YamlParser.html">YamlParser</a> &amp;params, const Vector&lt; t_complex &gt; &amp;measurement_op_eigen_vector)</td></tr>
 <tr class="separator:a42749b1324a8608a20be0aa3f73e06df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa75bc3b6f384d070363b7a3c6cddd148"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="setup__utils_8cc.html#aa75bc3b6f384d070363b7a3c6cddd148">savePSF</a> (const <a class="el" href="classpurify_1_1YamlParser.html">YamlParser</a> &amp;params, const <a class="el" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a> &amp;def_header, const std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt;&gt;&gt; &amp;measurements_transform, const <a class="el" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> &amp;uv_data, const t_real flux_scale, const t_real sigma, const t_real operator_norm, const t_real beam_units)</td></tr>
-<tr class="separator:aa75bc3b6f384d070363b7a3c6cddd148"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e0f466c64b7aa4337590c4028c08479"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="setup__utils_8cc.html#a4e0f466c64b7aa4337590c4028c08479">savePSF</a> (const <a class="el" href="classpurify_1_1YamlParser.html">YamlParser</a> &amp;params, const <a class="el" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a> &amp;def_header, const std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt;&gt;&gt; &amp;measurements_transform, const <a class="el" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> &amp;uv_data, const t_real flux_scale, const t_real sigma, const t_real beam_units)</td></tr>
+<tr class="separator:a4e0f466c64b7aa4337590c4028c08479"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a443972565bca5edaa85415c69da3414f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="setup__utils_8cc.html#a443972565bca5edaa85415c69da3414f">saveDirtyImage</a> (const <a class="el" href="classpurify_1_1YamlParser.html">YamlParser</a> &amp;params, const <a class="el" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a> &amp;def_header, const std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt;&gt;&gt; &amp;measurements_transform, const <a class="el" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> &amp;uv_data, const t_real beam_units)</td></tr>
 <tr class="separator:a443972565bca5edaa85415c69da3414f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a635bd4e2d13f646bb4c2e2369f3130fc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a635bd4e2d13f646bb4c2e2369f3130fc">&#9670;&nbsp;</a></span>createMeasurementOperator()</h2>
+<a id="a59bc3b2dc8906a5b1cceb691c5b9aba6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59bc3b2dc8906a5b1cceb691c5b9aba6">&#9670;&nbsp;</a></span>createMeasurementOperator()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structmeasurementOpInfo.html">measurementOpInfo</a> createMeasurementOperator </td>
+          <td class="memname">std::shared_ptr&lt;sopt::LinearTransform&lt;Vector&lt;t_complex&gt; &gt; &gt; createMeasurementOperator </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classpurify_1_1YamlParser.html">YamlParser</a> &amp;&#160;</td>
           <td class="paramname"><em>params</em>, </td>
@@ -280,18 +280,20 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;                  params.powMethod_tolerance(), comm.broadcast(measurement_op_eigen_vector).eval());</div>
 <div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    measurement_op_eigen_vector = std::get&lt;1&gt;(power_method_result);</div>
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    operator_norm = std::get&lt;0&gt;(power_method_result);</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  } <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  {</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <span class="keyword">auto</span> power_method_result = sopt::algorithm::power_method&lt;Vector&lt;t_complex&gt;&gt;(</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;        *measurements_transform, params.powMethod_iter(), params.powMethod_tolerance(),</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;        measurement_op_eigen_vector);</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    measurement_op_eigen_vector = std::get&lt;1&gt;(power_method_result);</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    operator_norm = std::get&lt;0&gt;(power_method_result);</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;  }</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160; </div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;  <span class="keywordflow">return</span> {measurements_transform, operator_norm};</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;}</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    measurements_transform-&gt;set_norm(operator_norm);</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  } <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;  {</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    <span class="keyword">auto</span> power_method_result = sopt::algorithm::power_method&lt;Vector&lt;t_complex&gt;&gt;(</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;        *measurements_transform, params.powMethod_iter(), params.powMethod_tolerance(),</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;        measurement_op_eigen_vector);</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    measurement_op_eigen_vector = std::get&lt;1&gt;(power_method_result);</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    operator_norm = std::get&lt;0&gt;(power_method_result);</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    measurements_transform-&gt;set_norm(operator_norm);</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;  }</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160; </div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  <span class="keywordflow">return</span> measurements_transform;</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;}</div>
 <div class="ttc" id="anamespacepurify_1_1factory_html_add61d07deb1ba5f3c41866d940ef2da0"><div class="ttname"><a href="namespacepurify_1_1factory.html#add61d07deb1ba5f3c41866d940ef2da0">purify::factory::measurement_operator_factory</a></div><div class="ttdeci">std::shared_ptr&lt; sopt::LinearTransform&lt; T &gt; &gt; measurement_operator_factory(const distributed_measurement_operator distribute, ARGS &amp;&amp;...args)</div><div class="ttdoc">distributed measurement operator factory</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__factory_8h_source.html#l00063">measurement_operator_factory.h:63</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1factory_html_af5d5583c4430e8a6fa9606e487299ef5"><div class="ttname"><a href="namespacepurify_1_1factory.html#af5d5583c4430e8a6fa9606e487299ef5">purify::factory::all_to_all_measurement_operator_factory</a></div><div class="ttdeci">std::shared_ptr&lt; sopt::LinearTransform&lt; T &gt; &gt; all_to_all_measurement_operator_factory(const distributed_measurement_operator distribute, const std::vector&lt; t_int &gt; &amp;image_stacks, const std::vector&lt; t_real &gt; &amp;w_stacks, ARGS &amp;&amp;...args)</div><div class="ttdoc">distributed measurement operator factory</div><div class="ttdef"><b>Definition:</b> <a href="measurement__operator__factory_8h_source.html#l00043">measurement_operator_factory.h:43</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1kernels_html_a1e2f3c37e5c0c6e2f2a3282110891f31"><div class="ttname"><a href="namespacepurify_1_1kernels.html#a1e2f3c37e5c0c6e2f2a3282110891f31">purify::kernels::kernel_from_string</a></div><div class="ttdeci">const std::map&lt; std::string, kernel &gt; kernel_from_string</div><div class="ttdef"><b>Definition:</b> <a href="kernels_8h_source.html#l00016">kernels.h:16</a></div></div>
@@ -378,22 +380,22 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="setup__utils_8cc_source.html#l00362">362</a> of file <a class="el" href="setup__utils_8cc_source.html">setup_utils.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;                                                                                 {</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;  <span class="keyword">const</span> <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a> update_header_sol =</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;      <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a>(params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/sol_update.fits&quot;</span>, <span class="stringliteral">&quot;Jy/Pixel&quot;</span>, 1, uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a1f99c60f1d0691ecbf12cff5c6b99056">ra</a>,</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;                             uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#ab0bf945f28efc826e081b4b8955aec73">dec</a>, params.measurements_polarization(), params.cellsizex(),</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;                             params.cellsizey(), uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a5551626c86ef47969b6736a12dc55127">average_frequency</a>, 0, 0, <span class="keyword">false</span>, 0, 0, 0);</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;  <span class="keyword">const</span> <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a> update_header_res =</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;      <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a>(params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/res_update.fits&quot;</span>, <span class="stringliteral">&quot;Jy/Beam&quot;</span>, 1, uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a1f99c60f1d0691ecbf12cff5c6b99056">ra</a>,</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;                             uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#ab0bf945f28efc826e081b4b8955aec73">dec</a>, params.measurements_polarization(), params.cellsizex(),</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;                             params.cellsizey(), uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a5551626c86ef47969b6736a12dc55127">average_frequency</a>, 0, 0, <span class="keyword">false</span>, 0, 0, 0);</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;  <span class="keyword">const</span> <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a> def_header = <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a>(</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;      <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;Jy/Pixel&quot;</span>, 1, uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a1f99c60f1d0691ecbf12cff5c6b99056">ra</a>, uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#ab0bf945f28efc826e081b4b8955aec73">dec</a>, params.measurements_polarization(),</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;      params.cellsizex(), params.cellsizey(), uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a5551626c86ef47969b6736a12dc55127">average_frequency</a>, 0, 0, <span class="keyword">false</span>, 0, 0, 0);</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160; </div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;  <span class="keywordflow">return</span> {update_header_sol, update_header_res, def_header};</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="setup__utils_8cc_source.html#l00364">364</a> of file <a class="el" href="setup__utils_8cc_source.html">setup_utils.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;                                                                                 {</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;  <span class="keyword">const</span> <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a> update_header_sol =</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;      <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a>(params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/sol_update.fits&quot;</span>, <span class="stringliteral">&quot;Jy/Pixel&quot;</span>, 1, uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a1f99c60f1d0691ecbf12cff5c6b99056">ra</a>,</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;                             uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#ab0bf945f28efc826e081b4b8955aec73">dec</a>, params.measurements_polarization(), params.cellsizex(),</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;                             params.cellsizey(), uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a5551626c86ef47969b6736a12dc55127">average_frequency</a>, 0, 0, <span class="keyword">false</span>, 0, 0, 0);</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;  <span class="keyword">const</span> <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a> update_header_res =</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;      <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a>(params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/res_update.fits&quot;</span>, <span class="stringliteral">&quot;Jy/Beam&quot;</span>, 1, uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a1f99c60f1d0691ecbf12cff5c6b99056">ra</a>,</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;                             uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#ab0bf945f28efc826e081b4b8955aec73">dec</a>, params.measurements_polarization(), params.cellsizex(),</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;                             params.cellsizey(), uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a5551626c86ef47969b6736a12dc55127">average_frequency</a>, 0, 0, <span class="keyword">false</span>, 0, 0, 0);</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  <span class="keyword">const</span> <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a> def_header = <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a>(</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;      <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;Jy/Pixel&quot;</span>, 1, uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a1f99c60f1d0691ecbf12cff5c6b99056">ra</a>, uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#ab0bf945f28efc826e081b4b8955aec73">dec</a>, params.measurements_polarization(),</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;      params.cellsizex(), params.cellsizey(), uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a5551626c86ef47969b6736a12dc55127">average_frequency</a>, 0, 0, <span class="keyword">false</span>, 0, 0, 0);</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160; </div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;  <span class="keywordflow">return</span> {update_header_sol, update_header_res, def_header};</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;}</div>
 <div class="ttc" id="aclasspurify_1_1YamlParser_html_a4a9c27025ce8cfc99a0a9e4d62263efc"><div class="ttname"><a href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">purify::YamlParser::output_path</a></div><div class="ttdeci">std::string output_path() const</div><div class="ttdef"><b>Definition:</b> <a href="yaml-parser_8h_source.html#l00152">yaml-parser.h:152</a></div></div>
 <div class="ttc" id="astructpurify_1_1pfitsio_1_1header__params_html"><div class="ttname"><a href="structpurify_1_1pfitsio_1_1header__params.html">purify::pfitsio::header_params</a></div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8h_source.html#l00013">pfitsio.h:13</a></div></div>
 <div class="ttc" id="astructpurify_1_1utilities_1_1vis__params_html_a1f99c60f1d0691ecbf12cff5c6b99056"><div class="ttname"><a href="structpurify_1_1utilities_1_1vis__params.html#a1f99c60f1d0691ecbf12cff5c6b99056">purify::utilities::vis_params::ra</a></div><div class="ttdeci">t_real ra</div><div class="ttdef"><b>Definition:</b> <a href="uvw__utilities_8h_source.html#l00025">uvw_utilities.h:25</a></div></div>
@@ -673,20 +675,20 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="setup__utils_8cc_source.html#l00348">348</a> of file <a class="el" href="setup__utils_8cc_source.html">setup_utils.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;                                                    {</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;  <span class="keywordflow">if</span> (params.mpiAlgorithm() != factory::algo_distribution::serial) {</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    <span class="keyword">auto</span> <span class="keyword">const</span> world = sopt::mpi::Communicator::World();</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    <span class="keywordflow">if</span> (world.is_root())</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Compile with MPI if you want to use MPI algorithm&quot;</span>);</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;      params.<a class="code" href="classpurify_1_1YamlParser.html#ae219f45210f4414e86e53ebd0176c0bc">writeOutput</a>();</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;  } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    params.<a class="code" href="classpurify_1_1YamlParser.html#ae219f45210f4414e86e53ebd0176c0bc">writeOutput</a>();</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;  }</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="setup__utils_8cc_source.html#l00350">350</a> of file <a class="el" href="setup__utils_8cc_source.html">setup_utils.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;                                                    {</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;  <span class="keywordflow">if</span> (params.mpiAlgorithm() != factory::algo_distribution::serial) {</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    <span class="keyword">auto</span> <span class="keyword">const</span> world = sopt::mpi::Communicator::World();</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    <span class="keywordflow">if</span> (world.is_root())</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Compile with MPI if you want to use MPI algorithm&quot;</span>);</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;      params.<a class="code" href="classpurify_1_1YamlParser.html#ae219f45210f4414e86e53ebd0176c0bc">writeOutput</a>();</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    params.<a class="code" href="classpurify_1_1YamlParser.html#ae219f45210f4414e86e53ebd0176c0bc">writeOutput</a>();</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;  }</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;}</div>
 <div class="ttc" id="aclasspurify_1_1YamlParser_html_ae219f45210f4414e86e53ebd0176c0bc"><div class="ttname"><a href="classpurify_1_1YamlParser.html#ae219f45210f4414e86e53ebd0176c0bc">purify::YamlParser::writeOutput</a></div><div class="ttdeci">void writeOutput()</div><div class="ttdef"><b>Definition:</b> <a href="yaml-parser_8cc_source.html#l00317">yaml-parser.cc:317</a></div></div>
 </div><!-- fragment -->
 <p class="reference">References <a class="el" href="namespacepurify_1_1factory.html#a862f0cad917b1ba718f965fd508f31f4a74136b24217cb75599440e6e1d807cf7">purify::factory::serial</a>, and <a class="el" href="yaml-parser_8cc_source.html#l00317">purify::YamlParser::writeOutput()</a>.</p>
@@ -739,26 +741,26 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="setup__utils_8cc_source.html#l00439">439</a> of file <a class="el" href="setup__utils_8cc_source.html">setup_utils.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;                                                                 {</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;  <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a> dirty_header = def_header;</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;  dirty_header.<a class="code" href="structpurify_1_1pfitsio_1_1header__params.html#a52ed16fe9c9d5deda4f7a32862fa5f1c">fits_name</a> = params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/dirty.fits&quot;</span>;</div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;  dirty_header.<a class="code" href="structpurify_1_1pfitsio_1_1header__params.html#a9fca5b73fa4d5d69064001d57af4023b">pix_units</a> = <span class="stringliteral">&quot;Jy/Beam&quot;</span>;</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;  <span class="keyword">const</span> Vector&lt;t_complex&gt; dimage = measurements_transform-&gt;adjoint() * uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a00fec6b3490e6c98c4d0befb677bfb09">vis</a>;</div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;  <span class="keyword">const</span> Image&lt;t_real&gt; dirty_image =</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;      Image&lt;t_complex&gt;::Map(dimage.data(), params.height(), params.width()).real();</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;  <span class="keywordflow">if</span> (params.mpiAlgorithm() != factory::algo_distribution::serial) {</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    <span class="keyword">auto</span> <span class="keyword">const</span> world = sopt::mpi::Communicator::World();</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;    <span class="keywordflow">if</span> (world.is_root())</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Compile with MPI if you want to use MPI algorithm&quot;</span>);</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;      <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(dirty_image / beam_units, dirty_header, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;  } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;    <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(dirty_image / beam_units, dirty_header, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;  }</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="setup__utils_8cc_source.html#l00441">441</a> of file <a class="el" href="setup__utils_8cc_source.html">setup_utils.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;                                                                 {</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;  <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a> dirty_header = def_header;</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;  dirty_header.<a class="code" href="structpurify_1_1pfitsio_1_1header__params.html#a52ed16fe9c9d5deda4f7a32862fa5f1c">fits_name</a> = params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/dirty.fits&quot;</span>;</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;  dirty_header.<a class="code" href="structpurify_1_1pfitsio_1_1header__params.html#a9fca5b73fa4d5d69064001d57af4023b">pix_units</a> = <span class="stringliteral">&quot;Jy/Beam&quot;</span>;</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;  <span class="keyword">const</span> Vector&lt;t_complex&gt; dimage = measurements_transform-&gt;adjoint() * uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a00fec6b3490e6c98c4d0befb677bfb09">vis</a>;</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;  <span class="keyword">const</span> Image&lt;t_real&gt; dirty_image =</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;      Image&lt;t_complex&gt;::Map(dimage.data(), params.height(), params.width()).real();</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;  <span class="keywordflow">if</span> (params.mpiAlgorithm() != factory::algo_distribution::serial) {</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;    <span class="keyword">auto</span> <span class="keyword">const</span> world = sopt::mpi::Communicator::World();</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;    <span class="keywordflow">if</span> (world.is_root())</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Compile with MPI if you want to use MPI algorithm&quot;</span>);</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;      <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(dirty_image / beam_units, dirty_header, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(dirty_image / beam_units, dirty_header, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;  }</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;}</div>
 <div class="ttc" id="anamespacepurify_1_1pfitsio_html_a05de3285d7ec5d5a6e43d2e5761e8b12"><div class="ttname"><a href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">purify::pfitsio::write2d</a></div><div class="ttdeci">void write2d(const Image&lt; t_real &gt; &amp;eigen_image, const pfitsio::header_params &amp;header, const bool &amp;overwrite)</div><div class="ttdoc">Write image to fits file.</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8cc_source.html#l00030">pfitsio.cc:30</a></div></div>
 <div class="ttc" id="astructpurify_1_1pfitsio_1_1header__params_html_a52ed16fe9c9d5deda4f7a32862fa5f1c"><div class="ttname"><a href="structpurify_1_1pfitsio_1_1header__params.html#a52ed16fe9c9d5deda4f7a32862fa5f1c">purify::pfitsio::header_params::fits_name</a></div><div class="ttdeci">std::string fits_name</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8h_source.html#l00015">pfitsio.h:15</a></div></div>
 <div class="ttc" id="astructpurify_1_1pfitsio_1_1header__params_html_a9fca5b73fa4d5d69064001d57af4023b"><div class="ttname"><a href="structpurify_1_1pfitsio_1_1header__params.html#a9fca5b73fa4d5d69064001d57af4023b">purify::pfitsio::header_params::pix_units</a></div><div class="ttdeci">std::string pix_units</div><div class="ttdef"><b>Definition:</b> <a href="pfitsio_8h_source.html#l00023">pfitsio.h:23</a></div></div>
@@ -795,28 +797,28 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="setup__utils_8cc_source.html#l00378">378</a> of file <a class="el" href="setup__utils_8cc_source.html">setup_utils.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;                                                                                      {</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;  <span class="keywordflow">if</span> (params.mpiAlgorithm() != factory::algo_distribution::serial) {</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    <span class="keyword">auto</span> <span class="keyword">const</span> world = sopt::mpi::Communicator::World();</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    <span class="keywordflow">if</span> (world.is_root())</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Compile with MPI if you want to use MPI algorithm&quot;</span>);</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    {</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;      <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(measurement_op_eigen_vector.real(), params.height(), params.width(),</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;                       params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/eigenvector_real.fits&quot;</span>, <span class="stringliteral">&quot;pix&quot;</span>, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;      <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(measurement_op_eigen_vector.imag(), params.height(), params.width(),</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;                       params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/eigenvector_imag.fits&quot;</span>, <span class="stringliteral">&quot;pix&quot;</span>, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    }</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(measurement_op_eigen_vector.real(), params.height(), params.width(),</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;                     params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/eigenvector_real.fits&quot;</span>, <span class="stringliteral">&quot;pix&quot;</span>, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;    <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(measurement_op_eigen_vector.imag(), params.height(), params.width(),</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;                     params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/eigenvector_imag.fits&quot;</span>, <span class="stringliteral">&quot;pix&quot;</span>, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  }</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="setup__utils_8cc_source.html#l00380">380</a> of file <a class="el" href="setup__utils_8cc_source.html">setup_utils.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;                                                                                      {</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;  <span class="keywordflow">if</span> (params.mpiAlgorithm() != factory::algo_distribution::serial) {</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    <span class="keyword">auto</span> <span class="keyword">const</span> world = sopt::mpi::Communicator::World();</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    <span class="keywordflow">if</span> (world.is_root())</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Compile with MPI if you want to use MPI algorithm&quot;</span>);</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    {</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;      <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(measurement_op_eigen_vector.real(), params.height(), params.width(),</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;                       params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/eigenvector_real.fits&quot;</span>, <span class="stringliteral">&quot;pix&quot;</span>, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;      <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(measurement_op_eigen_vector.imag(), params.height(), params.width(),</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;                       params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/eigenvector_imag.fits&quot;</span>, <span class="stringliteral">&quot;pix&quot;</span>, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    }</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;    <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(measurement_op_eigen_vector.real(), params.height(), params.width(),</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;                     params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/eigenvector_real.fits&quot;</span>, <span class="stringliteral">&quot;pix&quot;</span>, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(measurement_op_eigen_vector.imag(), params.height(), params.width(),</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;                     params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/eigenvector_imag.fits&quot;</span>, <span class="stringliteral">&quot;pix&quot;</span>, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;  }</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;}</div>
 </div><!-- fragment -->
 <p class="reference">References <a class="el" href="yaml-parser_8h_source.html#l00152">purify::YamlParser::output_path()</a>, <a class="el" href="namespacepurify_1_1factory.html#a862f0cad917b1ba718f965fd508f31f4a74136b24217cb75599440e6e1d807cf7">purify::factory::serial</a>, and <a class="el" href="pfitsio_8cc_source.html#l00030">purify::pfitsio::write2d()</a>.</p>
 
@@ -824,8 +826,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aa75bc3b6f384d070363b7a3c6cddd148"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa75bc3b6f384d070363b7a3c6cddd148">&#9670;&nbsp;</a></span>savePSF()</h2>
+<a id="a4e0f466c64b7aa4337590c4028c08479"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e0f466c64b7aa4337590c4028c08479">&#9670;&nbsp;</a></span>savePSF()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -870,12 +872,6 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const t_real&#160;</td>
-          <td class="paramname"><em>operator_norm</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const t_real&#160;</td>
           <td class="paramname"><em>beam_units</em>&#160;</td>
         </tr>
         <tr>
@@ -886,40 +882,40 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="setup__utils_8cc_source.html#l00401">401</a> of file <a class="el" href="setup__utils_8cc_source.html">setup_utils.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;                                                         {</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;  <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a> psf_header = def_header;</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;  psf_header.<a class="code" href="structpurify_1_1pfitsio_1_1header__params.html#a52ed16fe9c9d5deda4f7a32862fa5f1c">fits_name</a> = params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/psf.fits&quot;</span>;</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;  psf_header.<a class="code" href="structpurify_1_1pfitsio_1_1header__params.html#a9fca5b73fa4d5d69064001d57af4023b">pix_units</a> = <span class="stringliteral">&quot;Jy/Pixel&quot;</span>;</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;  <span class="keyword">const</span> Vector&lt;t_complex&gt; psf = measurements_transform-&gt;adjoint() * (uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a91df0d9033a35225f6ed93bc2e3ab253">weights</a> / flux_scale);</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;  <span class="keyword">const</span> Image&lt;t_real&gt; psf_image =</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;      Image&lt;t_complex&gt;::Map(psf.data(), params.height(), params.width()).real();</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;  <a class="code" href="logging_8h.html#a4c0fef90efd9093d28b6dc8e10cb577d">PURIFY_HIGH_LOG</a>(</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;      <span class="stringliteral">&quot;Peak of PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)&quot;</span>,</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;      psf_image(<span class="keyword">static_cast&lt;</span>t_int<span class="keyword">&gt;</span>(params.width() * 0.5 + params.height() * 0.5 * params.width())));</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;  <span class="keywordflow">if</span> (params.mpiAlgorithm() != factory::algo_distribution::serial) {</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;    <span class="keyword">auto</span> <span class="keyword">const</span> world = sopt::mpi::Communicator::World();</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    <a class="code" href="logging_8h.html#a0c01897a385e812973d29bead7548584">PURIFY_LOW_LOG</a>(</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        <span class="stringliteral">&quot;Expected image domain residual RMS is {} jy/beam&quot;</span>,</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;        sigma * params.epsilonScaling() * operator_norm /</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;            (std::sqrt(params.width() * params.height()) * world.all_sum_all(uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a71a2094900171da4aa7f0ee62deebd53">size</a>())));</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    <span class="keywordflow">if</span> (world.is_root())</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Compile with MPI if you want to use MPI algorithm&quot;</span>);</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;      <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(psf_image, psf_header, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;  } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    <a class="code" href="logging_8h.html#a0c01897a385e812973d29bead7548584">PURIFY_LOW_LOG</a>(<span class="stringliteral">&quot;Expected image domain residual RMS is {} jy/beam&quot;</span>,</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;                   sigma * params.epsilonScaling() * operator_norm /</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;                       (std::sqrt(params.width() * params.height()) * uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a71a2094900171da4aa7f0ee62deebd53">size</a>()));</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(psf_image, psf_header, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;  }</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;  <a class="code" href="logging_8h.html#a4c0fef90efd9093d28b6dc8e10cb577d">PURIFY_HIGH_LOG</a>(</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;      <span class="stringliteral">&quot;Theoretical calculation for peak PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)&quot;</span>,</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;      beam_units);</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;  <a class="code" href="logging_8h.html#a4c0fef90efd9093d28b6dc8e10cb577d">PURIFY_HIGH_LOG</a>(<span class="stringliteral">&quot;Effective sigma is {} Jy&quot;</span>, sigma * params.epsilonScaling());</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="setup__utils_8cc_source.html#l00403">403</a> of file <a class="el" href="setup__utils_8cc_source.html">setup_utils.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;                             {</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;  <a class="code" href="structpurify_1_1pfitsio_1_1header__params.html">pfitsio::header_params</a> psf_header = def_header;</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;  psf_header.<a class="code" href="structpurify_1_1pfitsio_1_1header__params.html#a52ed16fe9c9d5deda4f7a32862fa5f1c">fits_name</a> = params.<a class="code" href="classpurify_1_1YamlParser.html#a4a9c27025ce8cfc99a0a9e4d62263efc">output_path</a>() + <span class="stringliteral">&quot;/psf.fits&quot;</span>;</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;  psf_header.<a class="code" href="structpurify_1_1pfitsio_1_1header__params.html#a9fca5b73fa4d5d69064001d57af4023b">pix_units</a> = <span class="stringliteral">&quot;Jy/Pixel&quot;</span>;</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;  <span class="keyword">const</span> Vector&lt;t_complex&gt; psf = measurements_transform-&gt;adjoint() * (uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a91df0d9033a35225f6ed93bc2e3ab253">weights</a> / flux_scale);</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;  <span class="keyword">const</span> Image&lt;t_real&gt; psf_image =</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;      Image&lt;t_complex&gt;::Map(psf.data(), params.height(), params.width()).real();</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;  <a class="code" href="logging_8h.html#a4c0fef90efd9093d28b6dc8e10cb577d">PURIFY_HIGH_LOG</a>(</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;      <span class="stringliteral">&quot;Peak of PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)&quot;</span>,</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;      psf_image(<span class="keyword">static_cast&lt;</span>t_int<span class="keyword">&gt;</span>(params.width() * 0.5 + params.height() * 0.5 * params.width())));</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;  <span class="keywordflow">if</span> (params.mpiAlgorithm() != factory::algo_distribution::serial) {</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;<span class="preprocessor">#ifdef PURIFY_MPI</span></div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;    <span class="keyword">auto</span> <span class="keyword">const</span> world = sopt::mpi::Communicator::World();</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    <a class="code" href="logging_8h.html#a0c01897a385e812973d29bead7548584">PURIFY_LOW_LOG</a>(</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;        <span class="stringliteral">&quot;Expected image domain residual RMS is {} jy/beam&quot;</span>,</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;        sigma * params.epsilonScaling() * measurements_transform-&gt;norm() /</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;            (std::sqrt(params.width() * params.height()) * world.all_sum_all(uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a71a2094900171da4aa7f0ee62deebd53">size</a>())));</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keywordflow">if</span> (world.is_root())</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Compile with MPI if you want to use MPI algorithm&quot;</span>);</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;      <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(psf_image, psf_header, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    <a class="code" href="logging_8h.html#a0c01897a385e812973d29bead7548584">PURIFY_LOW_LOG</a>(<span class="stringliteral">&quot;Expected image domain residual RMS is {} jy/beam&quot;</span>,</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;                   sigma * params.epsilonScaling() * measurements_transform-&gt;norm() /</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;                       (std::sqrt(params.width() * params.height()) * uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a71a2094900171da4aa7f0ee62deebd53">size</a>()));</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(psf_image, psf_header, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;  }</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;  <a class="code" href="logging_8h.html#a4c0fef90efd9093d28b6dc8e10cb577d">PURIFY_HIGH_LOG</a>(</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;      <span class="stringliteral">&quot;Theoretical calculation for peak PSF: {} (used to convert between Jy/Pixel and Jy/BEAM)&quot;</span>,</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;      beam_units);</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;  <a class="code" href="logging_8h.html#a4c0fef90efd9093d28b6dc8e10cb577d">PURIFY_HIGH_LOG</a>(<span class="stringliteral">&quot;Effective sigma is {} Jy&quot;</span>, sigma * params.epsilonScaling());</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;}</div>
 <div class="ttc" id="alogging_8h_html_a0c01897a385e812973d29bead7548584"><div class="ttname"><a href="logging_8h.html#a0c01897a385e812973d29bead7548584">PURIFY_LOW_LOG</a></div><div class="ttdeci">#define PURIFY_LOW_LOG(...)</div><div class="ttdoc">Low priority message.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8h_source.html#l00207">logging.h:207</a></div></div>
 </div><!-- fragment -->
 <p class="reference">References <a class="el" href="pfitsio_8h_source.html#l00015">purify::pfitsio::header_params::fits_name</a>, <a class="el" href="yaml-parser_8h_source.html#l00152">purify::YamlParser::output_path()</a>, <a class="el" href="pfitsio_8h_source.html#l00023">purify::pfitsio::header_params::pix_units</a>, <a class="el" href="logging_8h_source.html#l00203">PURIFY_HIGH_LOG</a>, <a class="el" href="logging_8h_source.html#l00207">PURIFY_LOW_LOG</a>, <a class="el" href="namespacepurify_1_1factory.html#a862f0cad917b1ba718f965fd508f31f4a74136b24217cb75599440e6e1d807cf7">purify::factory::serial</a>, <a class="el" href="uvw__utilities_8h_source.html#l00054">purify::utilities::vis_params::size()</a>, <a class="el" href="uvw__utilities_8h_source.html#l00023">purify::utilities::vis_params::weights</a>, and <a class="el" href="pfitsio_8cc_source.html#l00030">purify::pfitsio::write2d()</a>.</p>
@@ -1025,42 +1021,42 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="setup__utils_8cc_source.html#l00310">310</a> of file <a class="el" href="setup__utils_8cc_source.html">setup_utils.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;                                                                     {</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  <span class="keywordflow">switch</span> (params.diffFuncType()) {</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="namespacepurify.html#a9288eb8d6da092f4e9d9442046093356af3b33f9ef56070596a299d6824c440a0">purify::diff_func_type::L2Norm</a>:</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    f = std::make_unique&lt;sopt::L2DifferentiableFunc&lt;t_complex&gt;&gt;(sigma, Phi);</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="namespacepurify.html#a9288eb8d6da092f4e9d9442046093356abad1f84f2aa31704a02b89eecbd17f72">purify::diff_func_type::L2Norm_with_CRR</a>:</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;<span class="preprocessor">#ifdef PURIFY_ONNXRT</span></div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    f = std::make_unique&lt;sopt::ONNXDifferentiableFunc&lt;t_complex&gt;&gt;(</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;        params.CRR_function_model_path(), params.CRR_gradient_model_path(), sigma, params.CRR_mu(),</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;        params.CRR_lambda(), Phi);</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;        <span class="stringliteral">&quot;To use the CRR you must compile with ONNX runtime turned on. (-Donnxrt=on)&quot;</span>);</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  }</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160; </div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  <span class="keywordflow">switch</span> (params.nondiffFuncType()) {</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3af3b25b9828de3ee193fbb78a8c847b0a">purify::nondiff_func_type::L1Norm</a>:</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    g = std::make_unique&lt;sopt::algorithm::L1GProximal&lt;t_complex&gt;&gt;();</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3a5ad0cc29f63d0e86542b2935cbde2980">purify::nondiff_func_type::Denoiser</a>:</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;<span class="preprocessor">#ifdef PURIFY_ONNXRT</span></div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    g = std::make_unique&lt;sopt::algorithm::TFGProximal&lt;t_complex&gt;&gt;(params.model_path());</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;        <span class="stringliteral">&quot;To use the Denoiser you must compile with ONNX runtime turned on. (-Donnxrt=on)&quot;</span>);</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160; </div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3a63e2f5122a48c43827d069e526b4cfcf">purify::nondiff_func_type::RealIndicator</a>:</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    g = std::make_unique&lt;sopt::algorithm::RealIndicator&lt;t_complex&gt;&gt;();</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;  }</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="setup__utils_8cc_source.html#l00312">312</a> of file <a class="el" href="setup__utils_8cc_source.html">setup_utils.cc</a>.</p>
+<div class="fragment"><div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;                                                                     {</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;  <span class="keywordflow">switch</span> (params.diffFuncType()) {</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="namespacepurify.html#a9288eb8d6da092f4e9d9442046093356af3b33f9ef56070596a299d6824c440a0">purify::diff_func_type::L2Norm</a>:</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    f = std::make_unique&lt;sopt::L2DifferentiableFunc&lt;t_complex&gt;&gt;(sigma, Phi);</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="namespacepurify.html#a9288eb8d6da092f4e9d9442046093356abad1f84f2aa31704a02b89eecbd17f72">purify::diff_func_type::L2Norm_with_CRR</a>:</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;<span class="preprocessor">#ifdef PURIFY_ONNXRT</span></div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    f = std::make_unique&lt;sopt::ONNXDifferentiableFunc&lt;t_complex&gt;&gt;(</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;        params.CRR_function_model_path(), params.CRR_gradient_model_path(), sigma, params.CRR_mu(),</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;        params.CRR_lambda(), Phi);</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;        <span class="stringliteral">&quot;To use the CRR you must compile with ONNX runtime turned on. (-Donnxrt=on)&quot;</span>);</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  }</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160; </div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;  <span class="keywordflow">switch</span> (params.nondiffFuncType()) {</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3af3b25b9828de3ee193fbb78a8c847b0a">purify::nondiff_func_type::L1Norm</a>:</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    g = std::make_unique&lt;sopt::algorithm::L1GProximal&lt;t_complex&gt;&gt;();</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3a5ad0cc29f63d0e86542b2935cbde2980">purify::nondiff_func_type::Denoiser</a>:</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;<span class="preprocessor">#ifdef PURIFY_ONNXRT</span></div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    g = std::make_unique&lt;sopt::algorithm::TFGProximal&lt;t_complex&gt;&gt;(params.model_path());</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;    <span class="keywordflow">throw</span> std::runtime_error(</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;        <span class="stringliteral">&quot;To use the Denoiser you must compile with ONNX runtime turned on. (-Donnxrt=on)&quot;</span>);</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160; </div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3a63e2f5122a48c43827d069e526b4cfcf">purify::nondiff_func_type::RealIndicator</a>:</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    g = std::make_unique&lt;sopt::algorithm::RealIndicator&lt;t_complex&gt;&gt;();</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  }</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;}</div>
 <div class="ttc" id="anamespacepurify_html_a42082160b5b3bb71406463530ddcdba3a5ad0cc29f63d0e86542b2935cbde2980"><div class="ttname"><a href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3a5ad0cc29f63d0e86542b2935cbde2980">purify::nondiff_func_type::Denoiser</a></div><div class="ttdeci">@ Denoiser</div></div>
 <div class="ttc" id="anamespacepurify_html_a42082160b5b3bb71406463530ddcdba3a63e2f5122a48c43827d069e526b4cfcf"><div class="ttname"><a href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3a63e2f5122a48c43827d069e526b4cfcf">purify::nondiff_func_type::RealIndicator</a></div><div class="ttdeci">@ RealIndicator</div></div>
 <div class="ttc" id="anamespacepurify_html_a42082160b5b3bb71406463530ddcdba3af3b25b9828de3ee193fbb78a8c847b0a"><div class="ttname"><a href="namespacepurify.html#a42082160b5b3bb71406463530ddcdba3af3b25b9828de3ee193fbb78a8c847b0a">purify::nondiff_func_type::L1Norm</a></div><div class="ttdeci">@ L1Norm</div></div>

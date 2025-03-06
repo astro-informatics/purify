@@ -183,37 +183,36 @@ $(function() {
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;                         .l1_proximal_real_constraint(<span class="keyword">true</span>)</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;                         .residual_convergence(epsilon * 1.001)</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;                         .lagrange_update_scale(0.9)</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;                         .sq_op_norm(1e0)</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;                         .Psi(Psi)</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;                         .Phi(measurements_transform);</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <span class="comment">// Timing reconstruction</span></div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> posq = sopt::algorithm::positive_quadrant(<a class="code" href="padmm__random__coverage_8cc.html#a0a5a4b5d505c1171d7dcabe5269fabb1">padmm</a>);</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> min_delta = sigma * std::sqrt(uv_data.vis.size()) / std::sqrt(9 * sky_model.size());</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <span class="comment">// Sets weight after each padmm iteration.</span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <span class="comment">// In practice, this means replacing the proximal of the l1 objective function.</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> reweighted = sopt::algorithm::reweighted(<a class="code" href="padmm__random__coverage_8cc.html#a0a5a4b5d505c1171d7dcabe5269fabb1">padmm</a>).min_delta(min_delta).is_converged(</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      sopt::RelativeVariation&lt;std::complex&lt;t_real&gt;&gt;(1e-3));</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  std::clock_t c_start = std::clock();</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> diagnostic = reweighted();</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  std::clock_t c_end = std::clock();</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  Image&lt;t_complex&gt; image =</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      Image&lt;t_complex&gt;::Map(diagnostic.algo.x.data(), sky_model.rows(), sky_model.cols());</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  Vector&lt;t_complex&gt; original = Vector&lt;t_complex&gt;::Map(sky_model.data(), sky_model.size(), 1);</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  Image&lt;t_complex&gt; res = sky_model - image;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  Vector&lt;t_complex&gt; residual = Vector&lt;t_complex&gt;::Map(res.data(), image.size(), 1);</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  <span class="keyword">auto</span> snr = 20. * std::log10(original.norm() / residual.norm());  <span class="comment">// SNR of reconstruction</span></div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  <span class="keyword">auto</span> total_time = (c_end - c_start) / CLOCKS_PER_SEC;  <span class="comment">// total time for solver to run in seconds</span></div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  <span class="comment">// writing snr and time to a file</span></div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  std::ofstream out(results);</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  out.precision(13);</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  out &lt;&lt; snr &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; total_time;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  out.close();</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;}</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;                         .Psi(Psi)</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;                         .Phi(measurements_transform);</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <span class="comment">// Timing reconstruction</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> posq = sopt::algorithm::positive_quadrant(<a class="code" href="padmm__random__coverage_8cc.html#a0a5a4b5d505c1171d7dcabe5269fabb1">padmm</a>);</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> min_delta = sigma * std::sqrt(uv_data.vis.size()) / std::sqrt(9 * sky_model.size());</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="comment">// Sets weight after each padmm iteration.</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <span class="comment">// In practice, this means replacing the proximal of the l1 objective function.</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> reweighted = sopt::algorithm::reweighted(<a class="code" href="padmm__random__coverage_8cc.html#a0a5a4b5d505c1171d7dcabe5269fabb1">padmm</a>).min_delta(min_delta).is_converged(</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      sopt::RelativeVariation&lt;std::complex&lt;t_real&gt;&gt;(1e-3));</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  std::clock_t c_start = std::clock();</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> diagnostic = reweighted();</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  std::clock_t c_end = std::clock();</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  Image&lt;t_complex&gt; image =</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      Image&lt;t_complex&gt;::Map(diagnostic.algo.x.data(), sky_model.rows(), sky_model.cols());</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  Vector&lt;t_complex&gt; original = Vector&lt;t_complex&gt;::Map(sky_model.data(), sky_model.size(), 1);</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  Image&lt;t_complex&gt; res = sky_model - image;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  Vector&lt;t_complex&gt; residual = Vector&lt;t_complex&gt;::Map(res.data(), image.size(), 1);</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  <span class="keyword">auto</span> snr = 20. * std::log10(original.norm() / residual.norm());  <span class="comment">// SNR of reconstruction</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  <span class="keyword">auto</span> total_time = (c_end - c_start) / CLOCKS_PER_SEC;  <span class="comment">// total time for solver to run in seconds</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  <span class="comment">// writing snr and time to a file</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  std::ofstream out(results);</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  out.precision(13);</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  out &lt;&lt; snr &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; total_time;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  out.close();</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;}</div>
 <div class="ttc" id="alogging_8h_html"><div class="ttname"><a href="logging_8h.html">logging.h</a></div></div>
 <div class="ttc" id="alogging_8h_html_a4c0fef90efd9093d28b6dc8e10cb577d"><div class="ttname"><a href="logging_8h.html#a4c0fef90efd9093d28b6dc8e10cb577d">PURIFY_HIGH_LOG</a></div><div class="ttdeci">#define PURIFY_HIGH_LOG(...)</div><div class="ttdoc">High priority message.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8h_source.html#l00203">logging.h:203</a></div></div>
 <div class="ttc" id="alogging_8h_html_ad2207dcfa3c2c44fa0fccbb9d0a3b21c"><div class="ttname"><a href="logging_8h.html#ad2207dcfa3c2c44fa0fccbb9d0a3b21c">PURIFY_MEDIUM_LOG</a></div><div class="ttdeci">#define PURIFY_MEDIUM_LOG(...)</div><div class="ttdoc">Medium priority message.</div><div class="ttdef"><b>Definition:</b> <a href="logging_8h_source.html#l00205">logging.h:205</a></div></div>

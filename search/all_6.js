@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['fb_5ffactory_148',['fb_factory',['../namespacepurify_1_1factory.html#a13b034d2a3b6b7b7e66543daadcdc5da',1,'purify::factory']]],
+  ['fb_5ffactory_148',['fb_factory',['../namespacepurify_1_1factory.html#a837e9a8ae616548b677af29977bf67c8',1,'purify::factory']]],
   ['fft_2ecc_149',['fft.cc',['../fft_8cc.html',1,'']]],
   ['fftoperatorfixture_150',['FFTOperatorFixture',['../classFFTOperatorFixture.html',1,'']]],
   ['fftw_5fplan_151',['fftw_plan',['../namespacepurify_1_1operators.html#a39f06b7cbec98e0ab8c7d05f643d5db0',1,'purify::operators']]],

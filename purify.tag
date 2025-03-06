@@ -1382,22 +1382,22 @@
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingProximalADMM&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>padmm_factory</name>
       <anchorfile>namespacepurify_1_1factory.html</anchorfile>
-      <anchor>a69db909e3bb6edef074b5eb0e15cdb5b</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real residual_tolerance_scaling=1, const t_real op_norm=1)</arglist>
+      <anchor>a0228357b9fd38b3160cc6afecdea1035</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real residual_tolerance_scaling=1)</arglist>
     </member>
     <member kind="function">
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingForwardBackward&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>fb_factory</name>
       <anchorfile>namespacepurify_1_1factory.html</anchorfile>
-      <anchor>a13b034d2a3b6b7b7e66543daadcdc5da</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real op_norm=1, const std::string model_path=&quot;&quot;, const nondiff_func_type g_proximal=nondiff_func_type::L1Norm, std::shared_ptr&lt; DifferentiableFunc&lt; typename Algorithm::Scalar &gt;&gt; f_function=nullptr)</arglist>
+      <anchor>a837e9a8ae616548b677af29977bf67c8</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const std::string model_path=&quot;&quot;, const nondiff_func_type g_proximal=nondiff_func_type::L1Norm, std::shared_ptr&lt; DifferentiableFunc&lt; typename Algorithm::Scalar &gt;&gt; f_function=nullptr)</arglist>
     </member>
     <member kind="function">
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingPrimalDual&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>primaldual_factory</name>
       <anchorfile>namespacepurify_1_1factory.html</anchorfile>
-      <anchor>a0b08dded6011adff0ab4e7cef53911fc</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const t_real relative_variation=1e-3, const t_real residual_tolerance_scaling=1, const t_real op_norm=1)</arglist>
+      <anchor>a687c12e64ee78c63eda1d3c3606860af</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const t_real relative_variation=1e-3, const t_real residual_tolerance_scaling=1)</arglist>
     </member>
     <member kind="variable">
       <type>const std::map&lt; std::string, algo_distribution &gt;</type>
@@ -3500,10 +3500,10 @@
       <arglist>(const YamlParser &amp;params, const factory::distributed_measurement_operator mop_algo, const factory::distributed_wavelet_operator wop_algo, const bool using_mpi)</arglist>
     </member>
     <member kind="function">
-      <type>measurementOpInfo</type>
+      <type>std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt; &gt; &gt;</type>
       <name>createMeasurementOperator</name>
       <anchorfile>setup__utils_8cc.html</anchorfile>
-      <anchor>a635bd4e2d13f646bb4c2e2369f3130fc</anchor>
+      <anchor>a59bc3b2dc8906a5b1cceb691c5b9aba6</anchor>
       <arglist>(const YamlParser &amp;params, const factory::distributed_measurement_operator mop_algo, const factory::distributed_wavelet_operator wop_algo, const bool using_mpi, const std::vector&lt; t_int &gt; &amp;image_index, const std::vector&lt; t_real &gt; &amp;w_stacks, const utilities::vis_params &amp;uv_data, Vector&lt; t_complex &gt; &amp;measurement_op_eigen_vector)</arglist>
     </member>
     <member kind="function">
@@ -3538,8 +3538,8 @@
       <type>void</type>
       <name>savePSF</name>
       <anchorfile>setup__utils_8cc.html</anchorfile>
-      <anchor>aa75bc3b6f384d070363b7a3c6cddd148</anchor>
-      <arglist>(const YamlParser &amp;params, const pfitsio::header_params &amp;def_header, const std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt;&gt;&gt; &amp;measurements_transform, const utilities::vis_params &amp;uv_data, const t_real flux_scale, const t_real sigma, const t_real operator_norm, const t_real beam_units)</arglist>
+      <anchor>a4e0f466c64b7aa4337590c4028c08479</anchor>
+      <arglist>(const YamlParser &amp;params, const pfitsio::header_params &amp;def_header, const std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt;&gt;&gt; &amp;measurements_transform, const utilities::vis_params &amp;uv_data, const t_real flux_scale, const t_real sigma, const t_real beam_units)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -3563,7 +3563,6 @@
     <class kind="struct">waveletInfo</class>
     <class kind="struct">OperatorsInfo</class>
     <class kind="struct">inputData</class>
-    <class kind="struct">measurementOpInfo</class>
     <class kind="struct">Headers</class>
     <member kind="function">
       <type>waveletInfo</type>
@@ -3587,10 +3586,10 @@
       <arglist>(const YamlParser &amp;params, const factory::distributed_measurement_operator mop_algo, const factory::distributed_wavelet_operator wop_algo, const bool using_mpi)</arglist>
     </member>
     <member kind="function">
-      <type>measurementOpInfo</type>
+      <type>std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt; &gt; &gt;</type>
       <name>createMeasurementOperator</name>
       <anchorfile>setup__utils_8h.html</anchorfile>
-      <anchor>a635bd4e2d13f646bb4c2e2369f3130fc</anchor>
+      <anchor>a59bc3b2dc8906a5b1cceb691c5b9aba6</anchor>
       <arglist>(const YamlParser &amp;params, const factory::distributed_measurement_operator mop_algo, const factory::distributed_wavelet_operator wop_algo, const bool using_mpi, const std::vector&lt; t_int &gt; &amp;image_index, const std::vector&lt; t_real &gt; &amp;w_stacks, const utilities::vis_params &amp;uv_data, Vector&lt; t_complex &gt; &amp;measurement_op_eigen_vector)</arglist>
     </member>
     <member kind="function">
@@ -3625,8 +3624,8 @@
       <type>void</type>
       <name>savePSF</name>
       <anchorfile>setup__utils_8h.html</anchorfile>
-      <anchor>aa75bc3b6f384d070363b7a3c6cddd148</anchor>
-      <arglist>(const YamlParser &amp;params, const pfitsio::header_params &amp;def_header, const std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt;&gt;&gt; &amp;measurements_transform, const utilities::vis_params &amp;uv_data, const t_real flux_scale, const t_real sigma, const t_real operator_norm, const t_real beam_units)</arglist>
+      <anchor>a4e0f466c64b7aa4337590c4028c08479</anchor>
+      <arglist>(const YamlParser &amp;params, const pfitsio::header_params &amp;def_header, const std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt;&gt;&gt; &amp;measurements_transform, const utilities::vis_params &amp;uv_data, const t_real flux_scale, const t_real sigma, const t_real beam_units)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -7464,24 +7463,6 @@
       <arglist>(Log &amp;log, int level)</arglist>
     </member>
   </compound>
-  <compound kind="struct">
-    <name>measurementOpInfo</name>
-    <filename>structmeasurementOpInfo.html</filename>
-    <member kind="variable">
-      <type>std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; t_complex &gt; &gt; &gt;</type>
-      <name>measurement_transform</name>
-      <anchorfile>structmeasurementOpInfo.html</anchorfile>
-      <anchor>a6460d2a2dcdef8d01a16f28a41131ecd</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>t_real</type>
-      <name>operator_norm</name>
-      <anchorfile>structmeasurementOpInfo.html</anchorfile>
-      <anchor>a4b26d4f46e17acf92384affba9e75903</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
   <compound kind="class">
     <name>purify::casa::MeasurementSet</name>
     <filename>classpurify_1_1casa_1_1MeasurementSet.html</filename>
@@ -8885,22 +8866,22 @@
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingProximalADMM&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>padmm_factory</name>
       <anchorfile>namespacepurify_1_1factory.html</anchorfile>
-      <anchor>a69db909e3bb6edef074b5eb0e15cdb5b</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real residual_tolerance_scaling=1, const t_real op_norm=1)</arglist>
+      <anchor>a0228357b9fd38b3160cc6afecdea1035</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real residual_tolerance_scaling=1)</arglist>
     </member>
     <member kind="function">
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingForwardBackward&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>fb_factory</name>
       <anchorfile>namespacepurify_1_1factory.html</anchorfile>
-      <anchor>a13b034d2a3b6b7b7e66543daadcdc5da</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const t_real op_norm=1, const std::string model_path=&quot;&quot;, const nondiff_func_type g_proximal=nondiff_func_type::L1Norm, std::shared_ptr&lt; DifferentiableFunc&lt; typename Algorithm::Scalar &gt;&gt; f_function=nullptr)</arglist>
+      <anchor>a837e9a8ae616548b677af29977bf67c8</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_real step_size, const t_real reg_parameter, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const bool tight_frame=false, const t_real relative_variation=1e-3, const t_real l1_proximal_tolerance=1e-2, const t_uint maximum_proximal_iterations=50, const std::string model_path=&quot;&quot;, const nondiff_func_type g_proximal=nondiff_func_type::L1Norm, std::shared_ptr&lt; DifferentiableFunc&lt; typename Algorithm::Scalar &gt;&gt; f_function=nullptr)</arglist>
     </member>
     <member kind="function">
       <type>std::enable_if&lt; std::is_same&lt; Algorithm, sopt::algorithm::ImagingPrimalDual&lt; t_complex &gt; &gt;::value, std::shared_ptr&lt; Algorithm &gt; &gt;::type</type>
       <name>primaldual_factory</name>
       <anchorfile>namespacepurify_1_1factory.html</anchorfile>
-      <anchor>a0b08dded6011adff0ab4e7cef53911fc</anchor>
-      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const t_real relative_variation=1e-3, const t_real residual_tolerance_scaling=1, const t_real op_norm=1)</arglist>
+      <anchor>a687c12e64ee78c63eda1d3c3606860af</anchor>
+      <arglist>(const algo_distribution dist, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;measurements, std::shared_ptr&lt; sopt::LinearTransform&lt; Vector&lt; typename Algorithm::Scalar &gt;&gt; const &gt; const &amp;wavelets, const utilities::vis_params &amp;uv_data, const t_real sigma, const t_uint imsizey, const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations=500, const bool real_constraint=true, const bool positive_constraint=true, const t_real relative_variation=1e-3, const t_real residual_tolerance_scaling=1)</arglist>
     </member>
     <member kind="function">
       <type>std::shared_ptr&lt; sopt::LinearTransform&lt; T &gt; &gt;</type>

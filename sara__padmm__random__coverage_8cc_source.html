@@ -178,31 +178,30 @@ $(function() {
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;                         .l1_proximal_real_constraint(<span class="keyword">true</span>)</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;                         .residual_convergence(epsilon * 1.001)</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;                         .lagrange_update_scale(0.9)</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;                         .sq_op_norm(1e0)</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                         .Psi(Psi)</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;                         .Phi(measurements_transform);</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> posq = sopt::algorithm::positive_quadrant(<a class="code" href="padmm__random__coverage_8cc.html#a0a5a4b5d505c1171d7dcabe5269fabb1">padmm</a>);</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> min_delta = sigma * std::sqrt(y0.size()) / std::sqrt(9 * M31.size());</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <span class="comment">// Sets weight after each padmm iteration.</span></div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <span class="comment">// In practice, this means replacing the proximal of the l1 objective function.</span></div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> reweighted =</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      sopt::algorithm::reweighted(<a class="code" href="padmm__random__coverage_8cc.html#a0a5a4b5d505c1171d7dcabe5269fabb1">padmm</a>).itermax(10).min_delta(min_delta).is_converged(</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;          sopt::RelativeVariation&lt;std::complex&lt;t_real&gt;&gt;(1e-3));</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> diagnostic = reweighted();</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  assert(diagnostic.algo.x.size() == M31.size());</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  Image&lt;t_complex&gt; image = Image&lt;t_complex&gt;::Map(diagnostic.algo.x.data(), M31.rows(), M31.cols());</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  sopt::utilities::write_tiff(image.real(), outfile);</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(image.real(), outfile_fits);</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  Image&lt;t_complex&gt; residual = Image&lt;t_complex&gt;::Map(</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;      (measurements_transform.adjoint() *</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;       (y0 - measurements_transform * Vector&lt;t_complex&gt;::Map(image.data(), image.size())))</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;          .eval()</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;          .data(),</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      M31.rows(), M31.cols());</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(residual.real(), residual_fits);</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;}</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;                         .Psi(Psi)</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                         .Phi(measurements_transform);</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> posq = sopt::algorithm::positive_quadrant(<a class="code" href="padmm__random__coverage_8cc.html#a0a5a4b5d505c1171d7dcabe5269fabb1">padmm</a>);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> min_delta = sigma * std::sqrt(y0.size()) / std::sqrt(9 * M31.size());</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <span class="comment">// Sets weight after each padmm iteration.</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <span class="comment">// In practice, this means replacing the proximal of the l1 objective function.</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> reweighted =</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      sopt::algorithm::reweighted(<a class="code" href="padmm__random__coverage_8cc.html#a0a5a4b5d505c1171d7dcabe5269fabb1">padmm</a>).itermax(10).min_delta(min_delta).is_converged(</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;          sopt::RelativeVariation&lt;std::complex&lt;t_real&gt;&gt;(1e-3));</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> diagnostic = reweighted();</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  assert(diagnostic.algo.x.size() == M31.size());</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  Image&lt;t_complex&gt; image = Image&lt;t_complex&gt;::Map(diagnostic.algo.x.data(), M31.rows(), M31.cols());</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  sopt::utilities::write_tiff(image.real(), outfile);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(image.real(), outfile_fits);</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  Image&lt;t_complex&gt; residual = Image&lt;t_complex&gt;::Map(</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      (measurements_transform.adjoint() *</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;       (y0 - measurements_transform * Vector&lt;t_complex&gt;::Map(image.data(), image.size())))</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;          .eval()</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;          .data(),</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      M31.rows(), M31.cols());</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  <a class="code" href="namespacepurify_1_1pfitsio.html#a05de3285d7ec5d5a6e43d2e5761e8b12">pfitsio::write2d</a>(residual.real(), residual_fits);</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;}</div>
 <div class="ttc" id="acommon__catch__main_8cc_html_afd7b13def75c5d7feb77ac1ea2df5d0b"><div class="ttname"><a href="common__catch__main_8cc.html#afd7b13def75c5d7feb77ac1ea2df5d0b">mersenne</a></div><div class="ttdeci">std::unique_ptr&lt; std::mt19937_64 &gt; mersenne(new std::mt19937_64(0))</div></div>
 <div class="ttc" id="anamespacepurify_1_1constant_html_aa35bce2e736d0453c6005cbc06f1dbe7"><div class="ttname"><a href="namespacepurify_1_1constant.html#aa35bce2e736d0453c6005cbc06f1dbe7">purify::constant::pi</a></div><div class="ttdeci">const t_real pi</div><div class="ttdoc">mathematical constant</div><div class="ttdef"><b>Definition:</b> <a href="types_8h_source.html#l00070">types.h:70</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1kernels_html_a1e2f3c37e5c0c6e2f2a3282110891f31"><div class="ttname"><a href="namespacepurify_1_1kernels.html#a1e2f3c37e5c0c6e2f2a3282110891f31">purify::kernels::kernel_from_string</a></div><div class="ttdeci">const std::map&lt; std::string, kernel &gt; kernel_from_string</div><div class="ttdef"><b>Definition:</b> <a href="kernels_8h_source.html#l00016">kernels.h:16</a></div></div>

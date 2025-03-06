@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['operatorsinfo_708',['OperatorsInfo',['../structOperatorsInfo.html',1,'']]]
+  ['operatorsinfo_704',['OperatorsInfo',['../structOperatorsInfo.html',1,'']]]
 ];
