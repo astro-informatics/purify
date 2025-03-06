@@ -468,7 +468,7 @@ TEST_CASE("fb_factory_stochastic") {
             1, 2, kernels::kernel_from_string.at("kb"), 4, 4);
 
         auto const power_method_stuff = sopt::algorithm::power_method<Vector<t_complex>>(
-            Phi, 1000, 1e-5, comm.broadcast(Vector<t_complex>::Ones(128 * 128).eval()));
+            *phi, 1000, 1e-5, comm.broadcast(Vector<t_complex>::Ones(128 * 128).eval()));
         const t_real op_norm = std::get<0>(power_method_stuff);
         phi->set_norm(op_norm);
 
