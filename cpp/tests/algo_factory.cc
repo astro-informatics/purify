@@ -193,7 +193,6 @@ TEST_CASE("fb_factory") {
   CHECK(mse <= average_intensity * 1e-3);
 }
 
-#ifdef PURIFY_H5
 TEST_CASE("fb_factory_stochastic") {
   const std::string &test_dir = "expected/fb/";
   const std::string &input_data_path = data_filename(test_dir + "input_data.vis");
@@ -248,7 +247,7 @@ TEST_CASE("fb_factory_stochastic") {
 
         Vector<t_complex> const init = Vector<t_complex>::Ones(imsizex * imsizey);
         auto const power_method_stuff =
-            sopt::algorithm::power_method<Vector<t_complex>>(phi, 1000, 1e-5, init);
+            sopt::algorithm::power_method<Vector<t_complex>>(*phi, 1000, 1e-5, init);
         const t_real op_norm = std::get<0>(power_method_stuff);
         phi->set_norm(op_norm);
 
@@ -300,7 +299,6 @@ TEST_CASE("fb_factory_stochastic") {
   SOPT_HIGH_LOG("MSE = {}", mse);
   CHECK(mse <= average_intensity * 1e-3);
 }
-#endif
 
 #ifdef PURIFY_ONNXRT
 TEST_CASE("tf_fb_factory") {
