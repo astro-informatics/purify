@@ -91,7 +91,6 @@ void padmm(const std::string &name, const t_uint &imsizex, const t_uint &imsizey
       .l1_proximal_real_constraint(true)
       .residual_convergence(epsilon)
       .lagrange_update_scale(0.9)
-      .sq_op_norm(1e0)
       .Psi(Psi)
       .Phi(*measurements_transform);
 

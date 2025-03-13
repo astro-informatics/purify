@@ -116,7 +116,6 @@ std::shared_ptr<sopt::algorithm::ImagingProximalADMM<t_complex>> padmm_factory(
       .l1_proximal_real_constraint(true)
       .residual_tolerance(epsilon)
       .lagrange_update_scale(0.9)
-      .sq_op_norm(1e0)
       .Psi(Psi)
       .Phi(*measurements);
   sopt::ScalarRelativeVariation<t_complex> conv(padmm->relative_variation(),
