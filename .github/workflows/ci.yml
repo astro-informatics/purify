@@ -239,7 +239,7 @@ jobs:
         export DYLD_LIBRARY_PATH=$(brew --prefix)/lib:${DYLD_LIBRARY_PATH}
         ctest -C ${{env.BUILD_TYPE}} --output-on-failure
 
-  examples_benchmarks:
+  examplesBenchmarks:
     needs:
       dependencies
     name: examples_benchmarks (${{matrix.os}}-${{matrix.cxx}}-mpi:${{matrix.mpi}}-openmp:${{matrix.omp}})
