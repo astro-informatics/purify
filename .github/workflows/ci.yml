@@ -261,6 +261,7 @@ jobs:
             - clang++
           mpi:
             - "ON"
+            - "OFF"
           omp:
             - "ON"
           exclude:
@@ -272,6 +273,10 @@ jobs:
               cc: gcc-12
             - os: macos-14
               cxx: g++-12
+            - os: macos-14
+              mpi: "ON"
+            - os: ubuntu-22.04
+              mpi: "OFF"
     steps:
     - uses: actions/checkout@v4
 
