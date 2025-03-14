@@ -290,7 +290,11 @@ jobs:
       if: ${{ contains(matrix.os, 'ubuntu') }}
       run: |
         sudo apt update
-        sudo apt install openmpi-bin libopenmpi-dev ccache graphviz libeigen3-dev libtiff-dev libcfitsio-dev libboost-all-dev libyaml-cpp-dev libbenchmark-dev
+        sudo apt install openmpi-bin libopenmpi-dev ccache graphviz libeigen3-dev libtiff-dev libcfitsio-dev libboost-all-dev libyaml-cpp-dev
+        wget https://github.com/google/benchmark/archive/refs/tags/v1.8.5.tar.gz -O- | tar --no-same-owner -xz;
+        cd benchmark-1.8.5
+        cmake -DBENCHMARK_DOWNLOAD_DEPENDENCIES=on -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -S . -B "build"
+        cmake --build "build" --config Release --target install
 
     - name: Install Dependencies on MacOS
       if: ${{ contains(matrix.os, 'macos') }}
