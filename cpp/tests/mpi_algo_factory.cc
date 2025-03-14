@@ -57,13 +57,15 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
   t_uint const imsizey = 128;
   t_uint const imsizex = 128;
 
-  auto const measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
+  auto measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
       factory::distributed_measurement_operator::mpi_distribute_image, uv_data, imsizey, imsizex, 1,
       1, 2, kernels::kernel_from_string.at("kb"), 4, 4);
   Vector<t_complex> const init = Vector<t_complex>::Ones(imsizex * imsizey).eval();
   auto const power_method_stuff =
       sopt::algorithm::power_method<Vector<t_complex>>(*measurements_transform, 1000, 1e-5, init);
   const t_real op_norm = std::get<0>(power_method_stuff);
+  measurements_transform->set_norm(op_norm);
+
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -75,7 +77,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
   SECTION("global") {
     auto const padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
         factory::algo_distribution::mpi_serial, measurements_transform, wavelets, uv_data, sigma,
-        imsizey, imsizex, sara.size(), 300, true, true, false, 1e-2, 1e-3, 50, 1, op_norm);
+        imsizey, imsizex, sara.size(), 300, true, true, false, 1e-2, 1e-3, 50, 1);
 
     auto const diagnostic = (*padmm)();
     CHECK(diagnostic.niters == 10);
@@ -103,7 +105,7 @@ TEST_CASE("Serial vs. Serial with MPI PADMM") {
   SECTION("local") {
     auto const padmm = factory::padmm_factory<sopt::algorithm::ImagingProximalADMM<t_complex>>(
         factory::algo_distribution::mpi_distributed, measurements_transform, wavelets, uv_data,
-        sigma, imsizey, imsizex, sara.size(), 500, true, true, false, 1e-2, 1e-3, 50, 1, op_norm);
+        sigma, imsizey, imsizex, sara.size(), 500, true, true, false, 1e-2, 1e-3, 50, 1);
 
     auto const diagnostic = (*padmm)();
     t_real const epsilon = utilities::calculate_l2_radius(world.all_sum_all(uv_data.vis.size()),
@@ -166,6 +168,8 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual", "[!shouldfail]") {
       *measurements_transform, 1000, 1e-5,
       world.broadcast(Vector<t_complex>::Ones(imsizex * imsizey).eval()));
   const t_real op_norm = std::get<0>(power_method_stuff);
+  measurements_transform->set_norm(op_norm);
+
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -178,7 +182,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual", "[!shouldfail]") {
     auto const primaldual =
         factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
             factory::algo_distribution::mpi_serial, measurements_transform, wavelets, uv_data,
-            sigma, imsizey, imsizex, sara.size(), 500, true, true, 1e-2, 1, op_norm);
+            sigma, imsizey, imsizex, sara.size(), 500, true, true, 1e-2, 1);
 
     auto const diagnostic = (*primaldual)();
     CHECK(diagnostic.niters == 16);
@@ -207,7 +211,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual", "[!shouldfail]") {
     auto const primaldual =
         factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
             factory::algo_distribution::mpi_distributed, measurements_transform, wavelets, uv_data,
-            sigma, imsizey, imsizex, sara.size(), 500, true, true, 1e-2, 1, op_norm);
+            sigma, imsizey, imsizex, sara.size(), 500, true, true, 1e-2, 1);
 
     auto const diagnostic = (*primaldual)();
     t_real const epsilon = utilities::calculate_l2_radius(world.all_sum_all(uv_data.vis.size()),
@@ -254,6 +258,8 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual", "[!shouldfail]") {
         world, *measurements_transform, 1000, 1e-5,
         world.broadcast(Vector<t_complex>::Ones(imsizex * imsizey).eval()));
     const t_real op_norm = std::get<0>(power_method_stuff);
+    measurements_transform->set_norm(op_norm);
+
     auto sara_dist = sopt::wavelets::distribute_sara(sara, world);
     auto const wavelets_serial = factory::wavelet_operator_factory<Vector<t_complex>>(
         factory::distributed_wavelet_operator::serial, sara_dist, imsizey, imsizex);
@@ -262,7 +268,7 @@ TEST_CASE("Serial vs. Serial with MPI Primal Dual", "[!shouldfail]") {
         factory::primaldual_factory<sopt::algorithm::ImagingPrimalDual<t_complex>>(
             factory::algo_distribution::mpi_random_updates, measurements_transform_serial,
             wavelets_serial, uv_data, sigma, imsizey, imsizex, sara_dist.size(), 500, true, true,
-            1e-2, 1, op_norm);
+            1e-2, 1);
 
     auto const diagnostic = (*primaldual)();
     t_real const epsilon = utilities::calculate_l2_radius(world.all_sum_all(uv_data.vis.size()),
@@ -327,13 +333,15 @@ TEST_CASE("Serial vs. Serial with MPI Forward Backward") {
   t_uint const imsizey = 128;
   t_uint const imsizex = 128;
 
-  auto const measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
+  auto measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
       factory::distributed_measurement_operator::mpi_distribute_image, uv_data, imsizey, imsizex, 1,
       1, 2, kernels::kernel_from_string.at("kb"), 4, 4);
   auto const power_method_stuff = sopt::algorithm::power_method<Vector<t_complex>>(
       *measurements_transform, 1000, 1e-5,
       world.broadcast(Vector<t_complex>::Ones(imsizex * imsizey).eval()));
   const t_real op_norm = std::get<0>(power_method_stuff);
+  measurements_transform->set_norm(op_norm);
+
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -346,7 +354,7 @@ TEST_CASE("Serial vs. Serial with MPI Forward Backward") {
   t_real const gamma = 0.0001;
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::mpi_serial, measurements_transform, wavelets, uv_data, sigma,
-      beta, gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm);
+      beta, gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50);
 
   auto const diagnostic = (*fb)();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
@@ -391,13 +399,15 @@ TEST_CASE("MPI_fb_factory_hdf5") {
   t_uint const imsizey = 128;
   t_uint const imsizex = 128;
 
-  auto const measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
+  auto measurements_transform = factory::measurement_operator_factory<Vector<t_complex>>(
       factory::distributed_measurement_operator::mpi_distribute_image, uv_data, imsizey, imsizex, 1,
       1, 2, kernels::kernel_from_string.at("kb"), 4, 4);
   auto const power_method_stuff = sopt::algorithm::power_method<Vector<t_complex>>(
       *measurements_transform, 1000, 1e-5,
       world.broadcast(Vector<t_complex>::Ones(imsizex * imsizey).eval()));
   const t_real op_norm = std::get<0>(power_method_stuff);
+  measurements_transform->set_norm(op_norm);
+
   std::vector<std::tuple<std::string, t_uint>> const sara{
       std::make_tuple("Dirac", 3u), std::make_tuple("DB1", 3u), std::make_tuple("DB2", 3u),
       std::make_tuple("DB3", 3u),   std::make_tuple("DB4", 3u), std::make_tuple("DB5", 3u),
@@ -410,7 +420,7 @@ TEST_CASE("MPI_fb_factory_hdf5") {
   t_real const gamma = 0.0001;
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::mpi_serial, measurements_transform, wavelets, uv_data, sigma,
-      beta, gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, op_norm);
+      beta, gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50);
 
   auto const diagnostic = (*fb)();
   const Image<t_complex> image = Image<t_complex>::Map(diagnostic.x.data(), imsizey, imsizex);
@@ -449,22 +459,21 @@ TEST_CASE("fb_factory_stochastic") {
 
   // This functor would be defined in Purify
   std::function<std::shared_ptr<sopt::IterationState<Vector<t_complex>>>()> random_updater =
-      [&f = h5file, &N]() {
+      [&h5file, &N, &comm]() {
         utilities::vis_params uv_data =
-            H5::stochread_visibility(f, N, false);  // no w-term in this data-set
+            H5::stochread_visibility(h5file, N, false);  // no w-term in this data-set
         uv_data.units = utilities::vis_units::radians;
         auto phi = factory::measurement_operator_factory<t_complexVec>(
             factory::distributed_measurement_operator::mpi_distribute_image, uv_data, 128, 128, 1,
             1, 2, kernels::kernel_from_string.at("kb"), 4, 4);
 
+        auto const power_method_stuff = sopt::algorithm::power_method<Vector<t_complex>>(
+            *phi, 1000, 1e-5, comm.broadcast(Vector<t_complex>::Ones(128 * 128).eval()));
+        const t_real op_norm = std::get<0>(power_method_stuff);
+        phi->set_norm(op_norm);
+
         return std::make_shared<sopt::IterationState<Vector<t_complex>>>(uv_data.vis, phi);
       };
-
-  auto IS = random_updater();
-  auto Phi = IS->Phi();
-  auto const power_method_stuff = sopt::algorithm::power_method<Vector<t_complex>>(
-      Phi, 1000, 1e-5, comm.broadcast(Vector<t_complex>::Ones(128 * 128).eval()));
-  const t_real op_norm = std::get<0>(power_method_stuff);
 
   const auto solution = pfitsio::read2d(expected_solution_path);
 
@@ -492,7 +501,6 @@ TEST_CASE("fb_factory_stochastic") {
       .relative_variation(1e-3)
       .residual_tolerance(0)
       .tight_frame(true)
-      .sq_op_norm(op_norm * op_norm)
       .obj_comm(comm);
 
   auto gp = std::make_shared<sopt::algorithm::L1GProximal<t_complex>>(false);
