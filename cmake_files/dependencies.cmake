@@ -70,8 +70,7 @@ if(tests OR examples)
 endif()
 
 if(benchmarks)
-  find_package(benchmark REQUIRED)
-  #include(AddBenchmark)
+  find_package(benchmark REQUIRED CONFIG)
 endif()
 
 # Always find open-mp, since it may be used by sopt
