@@ -33,7 +33,7 @@ class StochasticAlgoFixture : public ::benchmark::Fixture {
     m_imsizex = state.range(0);
     m_imsizey = state.range(0);
 
-    m_sigma = 0.016820222945913496 * std::sqrt(2);  // see test_parameters file
+    m_sigma = 0.016820222945913496 * std::sqrt(2);
     m_beta = m_sigma * m_sigma;
     m_gamma = 0.0001;
 
@@ -86,6 +86,7 @@ BENCHMARK_DEFINE_F(StochasticAlgoFixture, ForwardBackward)(benchmark::State &sta
       Phi, 1000, 1e-5, m_world.broadcast(Vector<t_complex>::Ones(m_imsizex * m_imsizey).eval()));
 
   const t_real op_norm = std::get<0>(power_method_stuff);
+  Phi.set_norm(op_norm);
 
   // wavelets
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
@@ -100,7 +101,6 @@ BENCHMARK_DEFINE_F(StochasticAlgoFixture, ForwardBackward)(benchmark::State &sta
       .relative_variation(1e-3)
       .residual_tolerance(0)
       .tight_frame(true)
-      .sq_op_norm(op_norm * op_norm)
       .obj_comm(m_world);
 
   auto gp = std::make_shared<sopt::algorithm::L1GProximal<t_complex>>(false);
