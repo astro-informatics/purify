@@ -93,15 +93,17 @@ std::tuple<utilities::vis_params, t_real> dirty_measurements(
   return std::make_tuple(uv_data, sigma);
 }
 
-utilities::vis_params random_measurements(t_int size, const t_real max_w, const t_int id) {
+utilities::vis_params random_measurements(t_int size, const t_real max_w, const t_int id,
+                                          const bool cache_visibilities) {
+  utilities::vis_params uv_data;
+
   std::stringstream filename;
   filename << "random_" << size << "_";
   filename << std::to_string(id) << ".vis";
   std::string const vis_file = visibility_filename(filename.str());
   std::ifstream vis_file_str(vis_file);
 
-  utilities::vis_params uv_data;
-  if (false) {
+  if (cache_visibilities and vis_file_str.good()) {
     PURIFY_INFO("Reading random visibilities from file {}", vis_file);
     uv_data = utilities::read_visibility(vis_file, true);
     uv_data.units = utilities::vis_units::radians;
@@ -110,7 +112,9 @@ utilities::vis_params random_measurements(t_int size, const t_real max_w, const 
     t_real const sigma_m = constant::pi / 3;
     uv_data = utilities::random_sample_density(size, 0, sigma_m, max_w);
     uv_data.units = utilities::vis_units::radians;
-    // utilities::write_visibility(uv_data, vis_file, true);
+    if (cache_visibilities) {
+      utilities::write_visibility(uv_data, vis_file, true);
+    }
   }
   return uv_data;
 }
