@@ -76,17 +76,15 @@ BENCHMARK_DEFINE_F(StochasticAlgoFixture, ForwardBackward)(benchmark::State &sta
             factory::distributed_measurement_operator::mpi_distribute_image, uv_data, m_imsizex,
             m_imsizey, 1, 1, 2, kernels::kernel_from_string.at("kb"), 4, 4);
 
+        auto const power_method_stuff = sopt::algorithm::power_method<Vector<t_complex>>(
+            *phi, 1000, 1e-5,
+            m_world.broadcast(Vector<t_complex>::Ones(m_imsizex * m_imsizey).eval()));
+
+        const t_real op_norm = std::get<0>(power_method_stuff);
+        phi->set_norm(op_norm);
+
         return std::make_shared<sopt::IterationState<Vector<t_complex>>>(uv_data.vis, phi);
       };
-
-  auto IS = random_updater();
-  auto Phi = IS->Phi();
-
-  auto const power_method_stuff = sopt::algorithm::power_method<Vector<t_complex>>(
-      Phi, 1000, 1e-5, m_world.broadcast(Vector<t_complex>::Ones(m_imsizex * m_imsizey).eval()));
-
-  const t_real op_norm = std::get<0>(power_method_stuff);
-  Phi.set_norm(op_norm);
 
   // wavelets
   auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
