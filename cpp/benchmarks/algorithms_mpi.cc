@@ -134,8 +134,8 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbDistributeImage)(benchmark::State &state) {
 
   m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::mpi_serial, m_measurements_distribute_image, wavelets, m_uv_data,
-      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true,
-      false, 1e-3, 1e-2, 50);
+      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true, false,
+      1e-3, 1e-2, 50);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
@@ -158,8 +158,8 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbDistributeGrid)(benchmark::State &state) {
 
   m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::mpi_serial, m_measurements_distribute_grid, wavelets, m_uv_data,
-      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true,
-      false, 1e-3, 1e-2, 50);
+      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true, false,
+      1e-3, 1e-2, 50);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
@@ -208,7 +208,7 @@ BENCHMARK_REGISTER_F(AlgoFixtureMPI, FbOnnxDistributeImage)
     ->Args({1024, static_cast<t_int>(1e8), 4, 10, 1})
     ->Args({1024, static_cast<t_int>(1e9), 4, 10, 1})
     ->UseManualTime()
-    ->MinTime(120.0)
+    ->MinTime(60.0)
     ->MinWarmUpTime(10.0)
     ->Repetitions(3)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
@@ -223,7 +223,7 @@ BENCHMARK_REGISTER_F(AlgoFixtureMPI, FbDistributeImage)
     ->Args({1024, static_cast<t_int>(1e8), 4, 10, 1})
     ->Args({1024, static_cast<t_int>(1e9), 4, 10, 1})
     ->UseManualTime()
-    ->MinTime(120.0)
+    ->MinTime(60.0)
     ->MinWarmUpTime(10.0)
     ->Repetitions(3)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
@@ -233,10 +233,10 @@ BENCHMARK_REGISTER_F(AlgoFixtureMPI, FbDistributeGrid)
     ->Args({128, 10000, 4, 10, 2})
     ->Args({1024, static_cast<t_int>(1e6), 4, 10, 2})
     ->Args({1024, static_cast<t_int>(1e7), 4, 10, 2})
-    ->Args({1024, static_cast<t_int>(1e8), 4, 10, 1})
-    ->Args({1024, static_cast<t_int>(1e9), 4, 10, 1})
+    ->Args({1024, static_cast<t_int>(1e8), 4, 10, 2})
+    ->Args({1024, static_cast<t_int>(1e9), 4, 10, 2})
     ->UseManualTime()
-    ->MinTime(120.0)
+    ->MinTime(60.0)
     ->MinWarmUpTime(10.0)
     ->Repetitions(3)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
@@ -259,8 +259,8 @@ BENCHMARK_REGISTER_F(AlgoFixtureMPI, PadmmDistributeGrid)
     ->Args({128, 10000, 4, 10, 2})
     ->Args({1024, static_cast<t_int>(1e6), 4, 10, 2})
     ->Args({1024, static_cast<t_int>(1e7), 4, 10, 2})
-    ->Args({1024, static_cast<t_int>(1e8), 4, 10, 1})
-    ->Args({1024, static_cast<t_int>(1e9), 4, 10, 1})
+    ->Args({1024, static_cast<t_int>(1e8), 4, 10, 2})
+    ->Args({1024, static_cast<t_int>(1e9), 4, 10, 2})
     ->UseManualTime()
     ->MinTime(120.0)
     ->MinWarmUpTime(10.0)
