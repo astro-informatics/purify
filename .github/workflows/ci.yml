@@ -357,9 +357,9 @@ jobs:
         name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
 
     - name: Setup cmake
-       uses: jwlawson/actions-setup-cmake@v2
-       with:
-         cmake-version: '3.31.6'
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.31.6'
 
     - name: Unpack dependencies
       run: tar xfv dependencies.tar
