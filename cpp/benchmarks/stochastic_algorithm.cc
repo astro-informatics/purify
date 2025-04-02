@@ -137,7 +137,7 @@ BENCHMARK_DEFINE_F(StochasticAlgoFixture, ForwardBackwardApproxNorm)(benchmark::
             m_world.broadcast(Vector<t_complex>::Ones(m_imsizex * m_imsizey).eval()));
 
         static const t_real op_norm = std::get<0>(power_method_stuff);
-        
+
         // set the normalisation of the new phi
         phi->set_norm(op_norm);
 
