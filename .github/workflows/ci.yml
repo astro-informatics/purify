@@ -64,9 +64,9 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Setup cmake
-       uses: jwlawson/actions-setup-cmake@v2
-       with:
-         cmake-version: '3.31.6'
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.31.6'
 
    # Enable tmate debugging of manually-triggered workflows if the input option was provided
     - name: Setup tmate session
@@ -209,9 +209,9 @@ jobs:
         name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
 
     - name: Setup cmake
-       uses: jwlawson/actions-setup-cmake@v2
-       with:
-         cmake-version: '3.31.6'
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.31.6'
 
     - name: Unpack dependencies
       run: tar xfv dependencies.tar
@@ -295,9 +295,9 @@ jobs:
         name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
 
     - name: Setup cmake
-       uses: jwlawson/actions-setup-cmake@v2
-       with:
-         cmake-version: '3.31.6'
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.31.6'
 
     - name: Unpack dependencies
       run: tar xfv dependencies.tar
