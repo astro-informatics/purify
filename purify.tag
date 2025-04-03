@@ -442,6 +442,13 @@
     </member>
     <member kind="function">
       <type></type>
+      <name>BENCHMARK_DEFINE_F</name>
+      <anchorfile>stochastic__algorithm_8cc.html</anchorfile>
+      <anchor>a64719907d9661a5a1632633dc4f36a9f</anchor>
+      <arglist>(StochasticAlgoFixture, ForwardBackwardApproxNorm)(benchmark</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
       <name>Args</name>
       <anchorfile>stochastic__algorithm_8cc.html</anchorfile>
       <anchor>a3e332e952986275fef89fdfd8b2fa065</anchor>
