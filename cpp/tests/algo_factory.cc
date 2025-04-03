@@ -87,7 +87,7 @@ TEST_CASE("primal_dual_factory") {
   const std::string &expected_solution_path = data_filename(test_dir + "solution.fits");
   const std::string &expected_residual_path = data_filename(test_dir + "residual.fits");
   const std::string &result_path = data_filename(test_dir + "pd_result.fits");
-  
+
   const auto solution = pfitsio::read2d(expected_solution_path);
   const auto residual = pfitsio::read2d(expected_residual_path);
 
