@@ -89,15 +89,15 @@
       <type></type>
       <name>Args</name>
       <anchorfile>algorithms__mpi_8cc.html</anchorfile>
-      <anchor>a812395b93f595ca8fc969903c6acff3d</anchor>
-      <arglist>({128, 10000, 4, 10, 1}) -&gt; Args({1024, static_cast&lt; t_int &gt;(1e6), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e7), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e8), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e9), 4, 10, 1}) -&gt;UseManualTime() -&gt;MinTime(120.0) -&gt;MinWarmUpTime(10.0) -&gt;Repetitions(3) -&gt;Unit(benchmark::kMillisecond)</arglist>
+      <anchor>a5f7b0df8f7c6e161080faba95df94ec9</anchor>
+      <arglist>({128, 10000, 4, 10, 1}) -&gt; Args({1024, static_cast&lt; t_int &gt;(1e6), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e7), 4, 10, 1}) -&gt;Args({2048, static_cast&lt; t_int &gt;(1e6), 4, 10, 1}) -&gt;Args({2048, static_cast&lt; t_int &gt;(1e7), 4, 10, 1}) -&gt;Args({4096, static_cast&lt; t_int &gt;(1e6), 4, 10, 1}) -&gt;Args({4096, static_cast&lt; t_int &gt;(1e7), 4, 10, 1}) -&gt;UseManualTime() -&gt;MinTime(60.0) -&gt;MinWarmUpTime(10.0) -&gt;Repetitions(3) -&gt;Unit(benchmark::kMillisecond)</arglist>
     </member>
     <member kind="function">
       <type></type>
       <name>Args</name>
       <anchorfile>algorithms__mpi_8cc.html</anchorfile>
-      <anchor>ac1dd1acff457ce674e6e8500f0ca6e45</anchor>
-      <arglist>({128, 10000, 4, 10, 2}) -&gt; Args({1024, static_cast&lt; t_int &gt;(1e6), 4, 10, 2}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e7), 4, 10, 2}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e8), 4, 10, 1}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e9), 4, 10, 1}) -&gt;UseManualTime() -&gt;MinTime(120.0) -&gt;MinWarmUpTime(10.0) -&gt;Repetitions(3) -&gt;Unit(benchmark::kMillisecond)</arglist>
+      <anchor>a695aa3b8cb39ec90345116aa05a37d5f</anchor>
+      <arglist>({128, 10000, 4, 10, 2}) -&gt; Args({1024, static_cast&lt; t_int &gt;(1e6), 4, 10, 2}) -&gt;Args({1024, static_cast&lt; t_int &gt;(1e7), 4, 10, 2}) -&gt;Args({2048, static_cast&lt; t_int &gt;(1e6), 4, 10, 2}) -&gt;Args({2048, static_cast&lt; t_int &gt;(1e7), 4, 10, 2}) -&gt;Args({4096, static_cast&lt; t_int &gt;(1e6), 4, 10, 2}) -&gt;Args({4096, static_cast&lt; t_int &gt;(1e7), 4, 10, 2}) -&gt;UseManualTime() -&gt;MinTime(60.0) -&gt;MinWarmUpTime(10.0) -&gt;Repetitions(3) -&gt;Unit(benchmark::kMillisecond)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -420,6 +420,35 @@
     </member>
   </compound>
   <compound kind="file">
+    <name>stochastic_algorithm.cc</name>
+    <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
+    <filename>stochastic__algorithm_8cc.html</filename>
+    <includes id="types_8h" name="types.h" local="yes" imported="no">purify/types.h</includes>
+    <includes id="benchmarks_2utilities_8h" name="utilities.h" local="yes" imported="no">benchmarks/utilities.h</includes>
+    <includes id="algorithm__factory_8h" name="algorithm_factory.h" local="yes" imported="no">purify/algorithm_factory.h</includes>
+    <includes id="measurement__operator__factory_8h" name="measurement_operator_factory.h" local="yes" imported="no">purify/measurement_operator_factory.h</includes>
+    <includes id="mpi__utilities_8h" name="mpi_utilities.h" local="yes" imported="no">purify/mpi_utilities.h</includes>
+    <includes id="operators_8h" name="operators.h" local="yes" imported="no">purify/operators.h</includes>
+    <includes id="purify_2utilities_8h" name="utilities.h" local="yes" imported="no">purify/utilities.h</includes>
+    <includes id="uvw__utilities_8h" name="uvw_utilities.h" local="yes" imported="no">purify/uvw_utilities.h</includes>
+    <includes id="wavelet__operator__factory_8h" name="wavelet_operator_factory.h" local="yes" imported="no">purify/wavelet_operator_factory.h</includes>
+    <class kind="class">StochasticAlgoFixture</class>
+    <member kind="function">
+      <type></type>
+      <name>BENCHMARK_DEFINE_F</name>
+      <anchorfile>stochastic__algorithm_8cc.html</anchorfile>
+      <anchor>a2b026ec34d20b0014e69e2d246a96632</anchor>
+      <arglist>(StochasticAlgoFixture, ForwardBackward)(benchmark</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>Args</name>
+      <anchorfile>stochastic__algorithm_8cc.html</anchorfile>
+      <anchor>a3e332e952986275fef89fdfd8b2fa065</anchor>
+      <arglist>({128, 10000, 10}) -&gt; UseManualTime() -&gt;MinTime(60.0) -&gt;MinWarmUpTime(5.0) -&gt;Repetitions(3) -&gt;Unit(benchmark::kMillisecond)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
     <name>utilities.cc</name>
     <path>/home/runner/work/purify/purify/cpp/benchmarks/</path>
     <filename>benchmarks_2utilities_8cc.html</filename>
@@ -483,8 +512,8 @@
       <type>utilities::vis_params</type>
       <name>random_measurements</name>
       <anchorfile>namespaceb__utilities.html</anchorfile>
-      <anchor>a224195343f875ecd21158fe98df7daf8</anchor>
-      <arglist>(t_int size, const t_real max_w, const t_int id)</arglist>
+      <anchor>afbd497ace5d768e31668bb1ee91119a4</anchor>
+      <arglist>(t_int size, const t_real max_w, const t_int id, const bool cache_visibilities)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -661,8 +690,8 @@
       <type>utilities::vis_params</type>
       <name>random_measurements</name>
       <anchorfile>namespaceb__utilities.html</anchorfile>
-      <anchor>a224195343f875ecd21158fe98df7daf8</anchor>
-      <arglist>(t_int size, const t_real max_w, const t_int id)</arglist>
+      <anchor>afbd497ace5d768e31668bb1ee91119a4</anchor>
+      <arglist>(t_int size, const t_real max_w, const t_int id, const bool cache_visibilities)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -7660,6 +7689,87 @@
     </member>
   </compound>
   <compound kind="class">
+    <name>StochasticAlgoFixture</name>
+    <filename>classStochasticAlgoFixture.html</filename>
+    <member kind="function">
+      <type>void</type>
+      <name>SetUp</name>
+      <anchorfile>classStochasticAlgoFixture.html</anchorfile>
+      <anchor>a289772de123b6e5e5ecaac9d23c02b86</anchor>
+      <arglist>(const ::benchmark::State &amp;state)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>TearDown</name>
+      <anchorfile>classStochasticAlgoFixture.html</anchorfile>
+      <anchor>a3c9c446eac822461a76c4e69a1b9915a</anchor>
+      <arglist>(const ::benchmark::State &amp;state)</arglist>
+    </member>
+    <member kind="variable">
+      <type>sopt::mpi::Communicator</type>
+      <name>m_world</name>
+      <anchorfile>classStochasticAlgoFixture.html</anchorfile>
+      <anchor>ab9b32d6f773fef8304082dcbefd24160</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::string</type>
+      <name>m_input_data_path</name>
+      <anchorfile>classStochasticAlgoFixture.html</anchorfile>
+      <anchor>a11f144c9d58c6c8b4fc305e578896646</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_uint</type>
+      <name>m_imsizey</name>
+      <anchorfile>classStochasticAlgoFixture.html</anchorfile>
+      <anchor>ae38fdb47bc6bf230c17bb92a4459c439</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_uint</type>
+      <name>m_imsizex</name>
+      <anchorfile>classStochasticAlgoFixture.html</anchorfile>
+      <anchor>ad9d645749406e8d8bbf66e15acb057f1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_real</type>
+      <name>m_sigma</name>
+      <anchorfile>classStochasticAlgoFixture.html</anchorfile>
+      <anchor>ae5032f1212fa2c79b24be1321cb7fec5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_real</type>
+      <name>m_beta</name>
+      <anchorfile>classStochasticAlgoFixture.html</anchorfile>
+      <anchor>adb68ce4ede95ac43b41b1ba5e09fa78e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>t_real</type>
+      <name>m_gamma</name>
+      <anchorfile>classStochasticAlgoFixture.html</anchorfile>
+      <anchor>ac7c0a9f6b127aa4cfdc161eed5809805</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>size_t</type>
+      <name>m_N</name>
+      <anchorfile>classStochasticAlgoFixture.html</anchorfile>
+      <anchor>ada9c83f947491799b4d151d845931b69</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>std::vector&lt; std::tuple&lt; std::string, t_uint &gt; &gt; const</type>
+      <name>m_sara</name>
+      <anchorfile>classStochasticAlgoFixture.html</anchorfile>
+      <anchor>a195b0f24be3c375600914d58369f1d3b</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
     <name>TmpMS</name>
     <filename>classTmpMS.html</filename>
     <base>TmpPath</base>
@@ -8119,8 +8229,8 @@
       <type>utilities::vis_params</type>
       <name>random_measurements</name>
       <anchorfile>namespaceb__utilities.html</anchorfile>
-      <anchor>a224195343f875ecd21158fe98df7daf8</anchor>
-      <arglist>(t_int size, const t_real max_w, const t_int id)</arglist>
+      <anchor>afbd497ace5d768e31668bb1ee91119a4</anchor>
+      <arglist>(t_int size, const t_real max_w, const t_int id, const bool cache_visibilities)</arglist>
     </member>
   </compound>
   <compound kind="namespace">

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['vis_5fparams_707',['vis_params',['../structpurify_1_1utilities_1_1vis__params.html',1,'purify::utilities']]]
+  ['tmpms_712',['TmpMS',['../classTmpMS.html',1,'']]],
+  ['tmppath_713',['TmpPath',['../classTmpPath.html',1,'']]]
 ];

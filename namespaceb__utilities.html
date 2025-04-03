@@ -94,8 +94,8 @@ Functions</h2></td></tr>
 <tr class="separator:ab969056ca10702dbc6438b85f9fd583f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92ba576f33170ef3a76ab53c758a2bed"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; <a class="el" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a>, t_real &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceb__utilities.html#a92ba576f33170ef3a76ab53c758a2bed">dirty_measurements</a> (Image&lt; t_complex &gt; const &amp;ground_truth_image, t_uint number_of_vis, t_real snr, const t_real &amp;cellsize)</td></tr>
 <tr class="separator:a92ba576f33170ef3a76ab53c758a2bed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a224195343f875ecd21158fe98df7daf8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceb__utilities.html#a224195343f875ecd21158fe98df7daf8">random_measurements</a> (t_int size, const t_real max_w, const t_int id)</td></tr>
-<tr class="separator:a224195343f875ecd21158fe98df7daf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbd497ace5d768e31668bb1ee91119a4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceb__utilities.html#afbd497ace5d768e31668bb1ee91119a4">random_measurements</a> (t_int size, const t_real max_w, const t_int id, const bool cache_visibilities)</td></tr>
+<tr class="separator:afbd497ace5d768e31668bb1ee91119a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="ab66b84f597f29c434e1666cf4c6f2668"></a>
@@ -167,7 +167,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00077">77</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
 <div class="fragment"><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;                            {</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="keyword">auto</span> uv_data = <a class="code" href="namespaceb__utilities.html#a224195343f875ecd21158fe98df7daf8">random_measurements</a>(number_of_vis);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="keyword">auto</span> uv_data = <a class="code" href="namespaceb__utilities.html#afbd497ace5d768e31668bb1ee91119a4">random_measurements</a>(number_of_vis);</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="comment">// creating operator to generate measurements</span></div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keyword">auto</span> measurement_op = measurementoperator::init_degrid_operator_2d&lt;Vector&lt;t_complex&gt;&gt;(</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      uv_data, ground_truth_image.rows(), ground_truth_image.cols(), cellsize, cellsize, 2,</div>
@@ -182,7 +182,7 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  uv_data.vis = <a class="code" href="namespacepurify_1_1utilities.html#a7788412bbecc48c81b8e5777943b5666">utilities::add_noise</a>(uv_data.vis, 0., sigma);</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <span class="keywordflow">return</span> std::make_tuple(uv_data, sigma);</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;}</div>
-<div class="ttc" id="anamespaceb__utilities_html_a224195343f875ecd21158fe98df7daf8"><div class="ttname"><a href="namespaceb__utilities.html#a224195343f875ecd21158fe98df7daf8">b_utilities::random_measurements</a></div><div class="ttdeci">utilities::vis_params random_measurements(t_int size, const t_real max_w, const t_int id)</div><div class="ttdef"><b>Definition:</b> <a href="benchmarks_2utilities_8cc_source.html#l00096">utilities.cc:96</a></div></div>
+<div class="ttc" id="anamespaceb__utilities_html_afbd497ace5d768e31668bb1ee91119a4"><div class="ttname"><a href="namespaceb__utilities.html#afbd497ace5d768e31668bb1ee91119a4">b_utilities::random_measurements</a></div><div class="ttdeci">utilities::vis_params random_measurements(t_int size, const t_real max_w, const t_int id, const bool cache_visibilities)</div><div class="ttdef"><b>Definition:</b> <a href="benchmarks_2utilities_8cc_source.html#l00096">utilities.cc:96</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1utilities_html_a4b530b0918705248f2d2dd4de0bb29f6"><div class="ttname"><a href="namespacepurify_1_1utilities.html#a4b530b0918705248f2d2dd4de0bb29f6">purify::utilities::SNR_to_standard_deviation</a></div><div class="ttdeci">t_real SNR_to_standard_deviation(const Vector&lt; t_complex &gt; &amp;y0, const t_real &amp;SNR)</div><div class="ttdoc">Converts SNR to RMS noise.</div><div class="ttdef"><b>Definition:</b> <a href="purify_2utilities_8cc_source.html#l00101">utilities.cc:101</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1utilities_html_a7788412bbecc48c81b8e5777943b5666"><div class="ttname"><a href="namespacepurify_1_1utilities.html#a7788412bbecc48c81b8e5777943b5666">purify::utilities::add_noise</a></div><div class="ttdeci">Vector&lt; t_complex &gt; add_noise(const Vector&lt; t_complex &gt; &amp;y0, const t_complex &amp;mean, const t_real &amp;standard_deviation)</div><div class="ttdoc">Add guassian noise to vector.</div><div class="ttdef"><b>Definition:</b> <a href="purify_2utilities_8cc_source.html#l00113">utilities.cc:113</a></div></div>
 </div><!-- fragment -->
@@ -228,8 +228,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a224195343f875ecd21158fe98df7daf8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a224195343f875ecd21158fe98df7daf8">&#9670;&nbsp;</a></span>random_measurements()</h2>
+<a id="afbd497ace5d768e31668bb1ee91119a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afbd497ace5d768e31668bb1ee91119a4">&#9670;&nbsp;</a></span>random_measurements()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -250,7 +250,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const t_int&#160;</td>
-          <td class="paramname"><em>id</em>&#160;</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>cache_visibilities</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -261,27 +267,30 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="benchmarks_2utilities_8cc_source.html#l00096">96</a> of file <a class="el" href="benchmarks_2utilities_8cc_source.html">utilities.cc</a>.</p>
-<div class="fragment"><div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;                                                                                        {</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  std::stringstream filename;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  filename &lt;&lt; <span class="stringliteral">&quot;random_&quot;</span> &lt;&lt; size &lt;&lt; <span class="stringliteral">&quot;_&quot;</span>;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  filename &lt;&lt; std::to_string(<span class="keywordtype">id</span>) &lt;&lt; <span class="stringliteral">&quot;.vis&quot;</span>;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  std::string <span class="keyword">const</span> vis_file = <a class="code" href="namespacepurify.html#a6584f539e48ba1f6740ddd4a6b1789dd">visibility_filename</a>(filename.str());</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  std::ifstream vis_file_str(vis_file);</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <a class="code" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> uv_data;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  <span class="keywordflow">if</span> (vis_file_str.good()) {</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <a class="code" href="logging_8h.html#ade89364ee576bc12d1a4f3553e507f40">PURIFY_INFO</a>(<span class="stringliteral">&quot;Reading random visibilities from file {}&quot;</span>, vis_file);</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    uv_data = <a class="code" href="namespacepurify_1_1H5.html#a0695c59f20a8f28ab2b81a84ce2a1eca">utilities::read_visibility</a>(vis_file, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#aadff757058a3bc040f9ddfc78ad47b1c">units</a> = utilities::vis_units::radians;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <a class="code" href="logging_8h.html#ade89364ee576bc12d1a4f3553e507f40">PURIFY_INFO</a>(<span class="stringliteral">&quot;Generating random visibilities and writing to {}&quot;</span>, vis_file);</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    t_real <span class="keyword">const</span> sigma_m = <a class="code" href="namespacepurify_1_1constant.html#aa35bce2e736d0453c6005cbc06f1dbe7">constant::pi</a> / 3;</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    uv_data = <a class="code" href="namespacepurify_1_1utilities.html#ae8446d8749e342037d66da0ad3ca63ad">utilities::random_sample_density</a>(size, 0, sigma_m, max_w);</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#aadff757058a3bc040f9ddfc78ad47b1c">units</a> = utilities::vis_units::radians;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <a class="code" href="namespacepurify_1_1H5.html#aeb9d8cd7d6e33bb7731456f5ad3f8cdf">utilities::write_visibility</a>(uv_data, vis_file, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  }</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <span class="keywordflow">return</span> uv_data;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;                                                                         {</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <a class="code" href="structpurify_1_1utilities_1_1vis__params.html">utilities::vis_params</a> uv_data;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  std::stringstream filename;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  filename &lt;&lt; <span class="stringliteral">&quot;random_&quot;</span> &lt;&lt; size &lt;&lt; <span class="stringliteral">&quot;_&quot;</span>;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  filename &lt;&lt; std::to_string(<span class="keywordtype">id</span>) &lt;&lt; <span class="stringliteral">&quot;.vis&quot;</span>;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  std::string <span class="keyword">const</span> vis_file = <a class="code" href="namespacepurify.html#a6584f539e48ba1f6740ddd4a6b1789dd">visibility_filename</a>(filename.str());</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  std::ifstream vis_file_str(vis_file);</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <span class="keywordflow">if</span> (cache_visibilities and vis_file_str.good()) {</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <a class="code" href="logging_8h.html#ade89364ee576bc12d1a4f3553e507f40">PURIFY_INFO</a>(<span class="stringliteral">&quot;Reading random visibilities from file {}&quot;</span>, vis_file);</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    uv_data = <a class="code" href="namespacepurify_1_1H5.html#a0695c59f20a8f28ab2b81a84ce2a1eca">utilities::read_visibility</a>(vis_file, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#aadff757058a3bc040f9ddfc78ad47b1c">units</a> = utilities::vis_units::radians;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <a class="code" href="logging_8h.html#ade89364ee576bc12d1a4f3553e507f40">PURIFY_INFO</a>(<span class="stringliteral">&quot;Generating random visibilities&quot;</span>);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    t_real <span class="keyword">const</span> sigma_m = <a class="code" href="namespacepurify_1_1constant.html#aa35bce2e736d0453c6005cbc06f1dbe7">constant::pi</a> / 3;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    uv_data = <a class="code" href="namespacepurify_1_1utilities.html#ae8446d8749e342037d66da0ad3ca63ad">utilities::random_sample_density</a>(size, 0, sigma_m, max_w);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    uv_data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#aadff757058a3bc040f9ddfc78ad47b1c">units</a> = utilities::vis_units::radians;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keywordflow">if</span> (cache_visibilities) {</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      <a class="code" href="namespacepurify_1_1H5.html#aeb9d8cd7d6e33bb7731456f5ad3f8cdf">utilities::write_visibility</a>(uv_data, vis_file, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    }</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  }</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <span class="keywordflow">return</span> uv_data;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;}</div>
 <div class="ttc" id="alogging_8h_html_ade89364ee576bc12d1a4f3553e507f40"><div class="ttname"><a href="logging_8h.html#ade89364ee576bc12d1a4f3553e507f40">PURIFY_INFO</a></div><div class="ttdeci">#define PURIFY_INFO(...)</div><div class="ttdef"><b>Definition:</b> <a href="logging_8h_source.html#l00195">logging.h:195</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1H5_html_a0695c59f20a8f28ab2b81a84ce2a1eca"><div class="ttname"><a href="namespacepurify_1_1H5.html#a0695c59f20a8f28ab2b81a84ce2a1eca">purify::H5::read_visibility</a></div><div class="ttdeci">utilities::vis_params read_visibility(const std::string &amp;vis_name, const bool w_term)</div><div class="ttdoc">Reads an HDF5 file with u,v visibilities, constructs a vis_params object and returns it.</div><div class="ttdef"><b>Definition:</b> <a href="h5reader_8h_source.html#l00166">h5reader.h:166</a></div></div>
 <div class="ttc" id="anamespacepurify_1_1H5_html_aeb9d8cd7d6e33bb7731456f5ad3f8cdf"><div class="ttname"><a href="namespacepurify_1_1H5.html#aeb9d8cd7d6e33bb7731456f5ad3f8cdf">purify::H5::write_visibility</a></div><div class="ttdeci">void write_visibility(const utilities::vis_params &amp;uv_vis, const std::string &amp;h5name, const bool w_term, const size_t chunksize=0)</div><div class="ttdoc">Write an HDF5 file with u,v visibilities from a vis_params object.</div><div class="ttdef"><b>Definition:</b> <a href="h5reader_8h_source.html#l00244">h5reader.h:244</a></div></div>
@@ -436,7 +445,7 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keywordflow">if</span> (data.<a class="code" href="structpurify_1_1utilities_1_1vis__params.html#a00fec6b3490e6c98c4d0befb677bfb09">vis</a>.size() == newSize) {</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  }</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  data = <a class="code" href="namespaceb__utilities.html#a224195343f875ecd21158fe98df7daf8">b_utilities::random_measurements</a>(newSize);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  data = <a class="code" href="namespaceb__utilities.html#afbd497ace5d768e31668bb1ee91119a4">b_utilities::random_measurements</a>(newSize);</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;}</div>
 <div class="ttc" id="astructpurify_1_1utilities_1_1vis__params_html_a00fec6b3490e6c98c4d0befb677bfb09"><div class="ttname"><a href="structpurify_1_1utilities_1_1vis__params.html#a00fec6b3490e6c98c4d0befb677bfb09">purify::utilities::vis_params::vis</a></div><div class="ttdeci">Vector&lt; t_complex &gt; vis</div><div class="ttdef"><b>Definition:</b> <a href="uvw__utilities_8h_source.html#l00022">uvw_utilities.h:22</a></div></div>

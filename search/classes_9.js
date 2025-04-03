@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['nullreporter_703',['NullReporter',['../classNullReporter.html',1,'']]]
+  ['nullreporter_709',['NullReporter',['../classNullReporter.html',1,'']]]
 ];
