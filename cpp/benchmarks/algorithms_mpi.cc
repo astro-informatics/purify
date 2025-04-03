@@ -187,8 +187,36 @@ BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbOnnxDistributeImage)(benchmark::State &stat
 
   m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::mpi_serial, m_measurements_distribute_image, wavelets, m_uv_data,
-      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3) + 1, true, true,
-      false, 1e-3, 1e-2, 50, tf_model_path, nondiff_func_type::Denoiser);
+      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true, false,
+      1e-3, 1e-2, 50, tf_model_path, nondiff_func_type::Denoiser);
+
+  // Benchmark the application of the algorithm
+  while (state.KeepRunning()) {
+    auto start = std::chrono::high_resolution_clock::now();
+    auto result = (*m_fb)();
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "Converged? " << result.good << " , niters = " << result.niters << std::endl;
+    state.SetIterationTime(b_utilities::duration(start, end, m_world));
+  }
+}
+
+BENCHMARK_DEFINE_F(AlgoFixtureMPI, FbOnnxDistributeGrid)(benchmark::State &state) {
+  // Create the algorithm - has to be done there to reset the internal state.
+  // If done in the fixture repeats would start at the solution and converge immediately.
+
+  // TODO: Wavelets are constructed but not used in the factory method
+  auto const wavelets = factory::wavelet_operator_factory<Vector<t_complex>>(
+      factory::distributed_wavelet_operator::serial, m_sara, m_imsizey, m_imsizex);
+
+  t_real const beta = m_sigma * m_sigma;
+  t_real const gamma = 0.0001;
+
+  std::string tf_model_path = purify::models_directory() + "/snr_15_model_dynamic.onnx";
+
+  m_fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
+      factory::algo_distribution::mpi_serial, m_measurements_distribute_grid, wavelets, m_uv_data,
+      m_sigma, beta, gamma, m_imsizey, m_imsizex, m_sara.size(), state.range(3), true, true, false,
+      1e-3, 1e-2, 50, tf_model_path, nondiff_func_type::Denoiser);
 
   // Benchmark the application of the algorithm
   while (state.KeepRunning()) {
@@ -205,11 +233,28 @@ BENCHMARK_REGISTER_F(AlgoFixtureMPI, FbOnnxDistributeImage)
     ->Args({128, 10000, 4, 10, 1})
     ->Args({1024, static_cast<t_int>(1e6), 4, 10, 1})
     ->Args({1024, static_cast<t_int>(1e7), 4, 10, 1})
-    ->Args({1024, static_cast<t_int>(1e8), 4, 10, 1})
-    ->Args({1024, static_cast<t_int>(1e9), 4, 10, 1})
+    ->Args({2048, static_cast<t_int>(1e6), 4, 10, 1})
+    ->Args({2048, static_cast<t_int>(1e7), 4, 10, 1})
+    ->Args({4096, static_cast<t_int>(1e6), 4, 10, 1})
+    ->Args({4096, static_cast<t_int>(1e7), 4, 10, 1})
     ->UseManualTime()
     ->MinTime(60.0)
     ->MinWarmUpTime(10.0)
+    ->Repetitions(3)  //->ReportAggregatesOnly(true)
+    ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_REGISTER_F(AlgoFixtureMPI, FbOnnxDistributeGrid)
+    //->Apply(b_utilities::Arguments)
+    ->Args({128, 10000, 4, 10, 1})
+    ->Args({1024, static_cast<t_int>(1e6), 4, 10, 2})
+    ->Args({1024, static_cast<t_int>(1e7), 4, 10, 2})
+    ->Args({2048, static_cast<t_int>(1e6), 4, 10, 2})
+    ->Args({2048, static_cast<t_int>(1e7), 4, 10, 2})
+    ->Args({4096, static_cast<t_int>(1e6), 4, 10, 2})
+    ->Args({4096, static_cast<t_int>(1e7), 4, 10, 2})
+    ->UseManualTime()
+    ->MinTime(9.0)
+    ->MinWarmUpTime(1.0)
     ->Repetitions(3)  //->ReportAggregatesOnly(true)
     ->Unit(benchmark::kMillisecond);
 
@@ -220,8 +265,10 @@ BENCHMARK_REGISTER_F(AlgoFixtureMPI, FbDistributeImage)
     ->Args({128, 10000, 4, 10, 1})
     ->Args({1024, static_cast<t_int>(1e6), 4, 10, 1})
     ->Args({1024, static_cast<t_int>(1e7), 4, 10, 1})
-    ->Args({1024, static_cast<t_int>(1e8), 4, 10, 1})
-    ->Args({1024, static_cast<t_int>(1e9), 4, 10, 1})
+    ->Args({2048, static_cast<t_int>(1e6), 4, 10, 1})
+    ->Args({2048, static_cast<t_int>(1e7), 4, 10, 1})
+    ->Args({4096, static_cast<t_int>(1e6), 4, 10, 1})
+    ->Args({4096, static_cast<t_int>(1e7), 4, 10, 1})
     ->UseManualTime()
     ->MinTime(60.0)
     ->MinWarmUpTime(10.0)
@@ -233,8 +280,10 @@ BENCHMARK_REGISTER_F(AlgoFixtureMPI, FbDistributeGrid)
     ->Args({128, 10000, 4, 10, 2})
     ->Args({1024, static_cast<t_int>(1e6), 4, 10, 2})
     ->Args({1024, static_cast<t_int>(1e7), 4, 10, 2})
-    ->Args({1024, static_cast<t_int>(1e8), 4, 10, 2})
-    ->Args({1024, static_cast<t_int>(1e9), 4, 10, 2})
+    ->Args({2048, static_cast<t_int>(1e6), 4, 10, 2})
+    ->Args({2048, static_cast<t_int>(1e7), 4, 10, 2})
+    ->Args({4096, static_cast<t_int>(1e6), 4, 10, 2})
+    ->Args({4096, static_cast<t_int>(1e7), 4, 10, 2})
     ->UseManualTime()
     ->MinTime(60.0)
     ->MinWarmUpTime(10.0)
@@ -246,8 +295,10 @@ BENCHMARK_REGISTER_F(AlgoFixtureMPI, PadmmDistributeImage)
     ->Args({128, 10000, 4, 10, 1})
     ->Args({1024, static_cast<t_int>(1e6), 4, 10, 1})
     ->Args({1024, static_cast<t_int>(1e7), 4, 10, 1})
-    ->Args({1024, static_cast<t_int>(1e8), 4, 10, 1})
-    ->Args({1024, static_cast<t_int>(1e9), 4, 10, 1})
+    ->Args({2048, static_cast<t_int>(1e6), 4, 10, 1})
+    ->Args({2048, static_cast<t_int>(1e7), 4, 10, 1})
+    ->Args({4096, static_cast<t_int>(1e6), 4, 10, 1})
+    ->Args({4096, static_cast<t_int>(1e7), 4, 10, 1})
     ->UseManualTime()
     ->MinTime(120.0)
     ->MinWarmUpTime(10.0)
@@ -259,8 +310,10 @@ BENCHMARK_REGISTER_F(AlgoFixtureMPI, PadmmDistributeGrid)
     ->Args({128, 10000, 4, 10, 2})
     ->Args({1024, static_cast<t_int>(1e6), 4, 10, 2})
     ->Args({1024, static_cast<t_int>(1e7), 4, 10, 2})
-    ->Args({1024, static_cast<t_int>(1e8), 4, 10, 2})
-    ->Args({1024, static_cast<t_int>(1e9), 4, 10, 2})
+    ->Args({2048, static_cast<t_int>(1e6), 4, 10, 2})
+    ->Args({2048, static_cast<t_int>(1e7), 4, 10, 2})
+    ->Args({4096, static_cast<t_int>(1e6), 4, 10, 2})
+    ->Args({4096, static_cast<t_int>(1e7), 4, 10, 2})
     ->UseManualTime()
     ->MinTime(120.0)
     ->MinWarmUpTime(10.0)

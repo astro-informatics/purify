@@ -18,13 +18,12 @@ else()
 endif()
 
 find_package(CFitsIO REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.30.0")
   cmake_policy(SET CMP0167 NEW)
 endif()
 find_package(Boost COMPONENTS system filesystem REQUIRED)
-
-find_package(yaml-cpp REQUIRED)
 
 find_package(sopt REQUIRED)
 set(PURIFY_ONNXRT FALSE)

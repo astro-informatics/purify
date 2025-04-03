@@ -63,6 +63,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.31.6'
+
    # Enable tmate debugging of manually-triggered workflows if the input option was provided
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
@@ -203,6 +208,11 @@ jobs:
       with:
         name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
 
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.31.6'
+
     - name: Unpack dependencies
       run: tar xfv dependencies.tar
 
@@ -284,6 +294,11 @@ jobs:
       with:
         name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
 
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.31.6'
+
     - name: Unpack dependencies
       run: tar xfv dependencies.tar
     - name: Install Dependencies on Ubunutu
@@ -312,7 +327,7 @@ jobs:
         cmake .. --fresh -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local -Donnxrt=ON -Dhdf5=ON -Ddocasa=OFF -Ddompi=${{matrix.mpi}} -Dopenmp=${{matrix.omp}} -Dtests=OFF -Dexamples=ON -Dbenchmarks=ON
         make -j$(nproc --ignore 1) install
 
-      
+
   doc:
     needs:
       dependencies
@@ -340,6 +355,11 @@ jobs:
     - uses: actions/download-artifact@v4
       with:
         name: dependencies-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.mpi }}-${{ matrix.omp }}
+
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.31.6'
 
     - name: Unpack dependencies
       run: tar xfv dependencies.tar
