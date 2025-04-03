@@ -91,4 +91,30 @@ void write3d(const std::vector<Image<t_real>> &eigen_images, const std::string &
   write3d(eigen_images, header, overwrite);
 }
 
+//! Read cube from fits file
+std::vector<Image<t_complex>> read3d(const std::string &fits_name) {
+  std::vector<Image<t_complex>> eigen_images;
+  Vector<double> image;
+  int rows, cols, channels, pols = 1;
+  read3d<Vector<double>>(fits_name, image, rows, cols, channels, pols);
+  for (int i = 0; i < channels; i++) {
+    Vector<t_complex> eigen_image = Vector<t_complex>::Zero(rows * cols);
+    eigen_image.real() = image.segment(i * rows * cols, rows * cols);
+    eigen_images.push_back(Image<t_complex>::Map(eigen_image.data(), rows, cols));
+  }
+  return eigen_images;
+}
+
+//! Read image from fits file
+Image<t_complex> read2d(const std::string &fits_name) {
+  /*
+    Reads in an image from a fits file and returns the image.
+
+    fits_name:: name of fits file
+  */
+
+  const std::vector<Image<t_complex>> images = read3d(fits_name);
+  return images.at(0);
+}
+
 }  // namespace purify::pfitsio

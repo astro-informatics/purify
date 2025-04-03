@@ -11,7 +11,6 @@
 #include "purify/wproj_operators_gpu.h"
 #include <sopt/power_method.h>
 using namespace purify;
-using namespace purify::notinstalled;
 TEST_CASE("GPU Operators") {
   af::setDevice(0);
   af::info();

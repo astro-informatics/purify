@@ -7,7 +7,6 @@
 #include "purify/wavelet_operator_factory.h"
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 int main(int nargs, char const **args) {
   purify::logging::set_level("debug");

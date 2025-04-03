@@ -4,8 +4,7 @@
 #include <type_traits>
 #include "purify/distribute.h"
 
-namespace purify {
-namespace utilities {
+namespace purify::utilities {
 
 void regroup(vis_params &uv_params, std::vector<t_int> const &groups_, const t_int max_groups) {
   std::vector<t_int> image_index(uv_params.size(), 0);
@@ -103,9 +102,10 @@ std::tuple<vis_params, std::vector<t_int>> regroup_and_all_to_all(
 
   std::vector<t_int> sizes(comm.size());
   std::fill(sizes.begin(), sizes.end(), 0);
-  for (auto const &group : groups) {
-    if (group > static_cast<t_int>(comm.size()))
-      throw std::out_of_range("groups should go from 0 to comm.size()");
+  for (const t_int &group : groups) {
+    if (group >= static_cast<t_int>(comm.size())) {
+      throw std::out_of_range("groups should go from 0 to comm.size()-1");
+    }
     ++sizes[group];
   }
 
@@ -218,5 +218,4 @@ w_stacking_with_all_to_all(utilities::vis_params const &params, const t_real du,
   return std::tuple<utilities::vis_params, std::vector<t_int>, std::vector<t_real>>(
       outdata, image_index, w_stacks);
 }
-}  // namespace utilities
-}  // namespace purify
+}  // namespace purify::utilities

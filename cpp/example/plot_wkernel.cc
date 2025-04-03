@@ -15,7 +15,6 @@
 #include "purify/wkernel_integration.h"
 
 using namespace purify;
-using namespace purify::notinstalled;
 
 using namespace purify;
 

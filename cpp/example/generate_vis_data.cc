@@ -12,7 +12,6 @@
 
 int main(int nargs, char const **args) {
   using namespace purify;
-  using namespace purify::notinstalled;
   purify::logging::set_level(purify::default_logging_level());
 
   const std::string &pos_filename = mwa_filename("Phase1_config.txt");

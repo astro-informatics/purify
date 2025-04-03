@@ -8,6 +8,8 @@ try:
 except ImportError:
   do_h5 = False
 
+wsort = True
+
 speed_of_light = 299792458. #m/s
 
 def readData(filename, vis_name, pol1, pol2, filter):
@@ -68,12 +70,21 @@ def readData(filename, vis_name, pol1, pol2, filter):
     if do_h5:
         h5_name = vis_name[:vis_name.rfind('.')] + '.h5'
         f = h5py.File(h5_name, 'w')
-        f.create_dataset('u', data=u)
-        f.create_dataset('v', data=v)
-        f.create_dataset('w', data=w)
-        f.create_dataset('re', data=re)
-        f.create_dataset('im', data=im)
-        f.create_dataset('sigma', data=sigma)
+        if wsort:
+            ind = w.argsort()
+            f.create_dataset('u', data=u[ind[::-1]])
+            f.create_dataset('v', data=v[ind[::-1]])
+            f.create_dataset('w', data=w[ind[::-1]])
+            f.create_dataset('re', data=re[ind[::-1]])
+            f.create_dataset('im', data=im[ind[::-1]])
+            f.create_dataset('sigma', data=sigma[ind[::-1]])
+        else:
+            f.create_dataset('u', data=u)
+            f.create_dataset('v', data=v)
+            f.create_dataset('w', data=w)
+            f.create_dataset('re', data=re)
+            f.create_dataset('im', data=im)
+            f.create_dataset('sigma', data=sigma)
         f.close()
         print(f"saved {h5_name}")
     np.savetxt(vis_name, table, delimiter = " ")

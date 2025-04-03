@@ -5,7 +5,6 @@
 #include "purify/directories.h"
 #include "purify/logging.h"
 using namespace purify;
-using namespace purify::notinstalled;
 
 TEST_CASE("sparse [iterator]", "[iterator]") {
   t_int NZnum = 40;

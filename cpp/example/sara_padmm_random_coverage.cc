@@ -19,7 +19,6 @@
 
 int main(int, char **) {
   using namespace purify;
-  using namespace purify::notinstalled;
   sopt::logging::set_level("info");
 
   std::string const fitsfile = image_filename("M31.fits");
@@ -75,19 +74,19 @@ int main(int, char **) {
   pfitsio::write2d(Image<t_real>::Map(dimage.data(), M31.rows(), M31.cols()), dirty_image_fits);
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
-  auto const purify_gamma =
+  auto const purify_regulariser_strength =
       (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis).eval())
           .cwiseAbs()
           .maxCoeff() *
       beta;
 
-  // auto purify_gamma = 3 * utilities::median((Psi.adjoint() * (measurements_transform.adjoint() *
-  // (uv_data.vis - y0))).real().cwiseAbs())/0.6745;
+  // auto purify_regulariser_strength = 3 * utilities::median((Psi.adjoint() *
+  // (measurements_transform.adjoint() * (uv_data.vis - y0))).real().cwiseAbs())/0.6745;
 
   SOPT_INFO("Using epsilon of {} \n", epsilon);
   auto const padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
                          .itermax(1000)
-                         .gamma(purify_gamma)
+                         .regulariser_strength(purify_regulariser_strength)
                          .relative_variation(1e-6)
                          .l2ball_proximal_epsilon(epsilon)
                          .tight_frame(false)
@@ -98,7 +97,6 @@ int main(int, char **) {
                          .l1_proximal_real_constraint(true)
                          .residual_convergence(epsilon * 1.001)
                          .lagrange_update_scale(0.9)
-                         .nu(1e0)
                          .Psi(Psi)
                          .Phi(measurements_transform);
 

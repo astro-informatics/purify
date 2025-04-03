@@ -18,17 +18,12 @@ else()
 endif()
 
 find_package(CFitsIO REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.30.0")
   cmake_policy(SET CMP0167 NEW)
 endif()
 find_package(Boost COMPONENTS system filesystem REQUIRED)
-
-find_package(yaml-cpp REQUIRED)
-
-if (onnxrt)
-  find_package(onnxruntime REQUIRED)
-endif()
 
 find_package(sopt REQUIRED)
 set(PURIFY_ONNXRT FALSE)
@@ -38,6 +33,7 @@ if (onnxrt)
   else()
     message(FATAL_ERROR "SOPT built without ONNXrt support")
   endif()
+  install(DIRECTORY ${CMAKE_SOURCE_DIR}/models DESTINATION .)
 endif()
 
 find_package(Cubature QUIET)
@@ -68,17 +64,12 @@ if(tests)  # Adds ctest
   include(AddCatchTest)
 endif()
 
-if(examples)
-  find_package(TIFF REQUIRED)
-endif()
-
 if(tests OR examples)
   file(COPY data DESTINATION .)
 endif()
 
 if(benchmarks)
-  find_package(benchmark REQUIRED)
-  #include(AddBenchmark)
+  find_package(benchmark REQUIRED CONFIG)
 endif()
 
 # Always find open-mp, since it may be used by sopt
@@ -101,7 +92,11 @@ find_package(fftw3 NAMES FFTW3 REQUIRED)
 set(PURIFY_MPI FALSE)
 if(dompi)
   find_package(MPI REQUIRED)
-  set(PURIFY_MPI TRUE)
+  if (${sopt_HAS_MPI})
+    set(PURIFY_MPI TRUE)
+  else()
+    message(FATAL_ERROR "SOPT built without MPI support")
+  endif()
 endif()
 find_package(TIFF REQUIRED)
 
@@ -127,6 +122,24 @@ if(docasa)
     set(PURIFY_CASACORE_LOOKUP TRUE)
   endif()
   set(PURIFY_CASACORE TRUE)
+endif()
+
+set(PURIFY_H5 FALSE)
+if(hdf5)
+  find_package(HDF5 COMPONENTS CXX REQUIRED)
+  message(STATUS "Found HDF5 include dir: ${HDF5_INCLUDE_DIR}")
+  message(STATUS "Found HDF5 CXX library: ${HDF5_CXX_LIBRARIES}")
+  message(STATUS "HDF5 parallel: ${HDF5_IS_PARALLEL}")
+  if (PURIFY_MPI AND NOT ${HDF5_IS_PARALLEL})
+    message(FATAL_ERROR "HDF5 built without MPI support")
+  endif()
+  find_package(HighFive QUIET)
+  if(NOT HighFive_FOUND)
+    message(STATUS "HighFive not found. Attempt to install...")
+    include(LookUpHighFive)
+    set(PURIFY_HIGHFIVE_LOOKUP TRUE)
+  endif()
+  set(PURIFY_H5 TRUE)
 endif()
 
 # Add script to execute to make sure libraries in the build tree can be found

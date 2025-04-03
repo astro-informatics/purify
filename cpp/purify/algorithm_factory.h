@@ -35,14 +35,11 @@ namespace purify {
 namespace factory {
 enum class algorithm { padmm, primal_dual, sdmm, forward_backward };
 enum class algo_distribution { serial, mpi_serial, mpi_distributed, mpi_random_updates };
-enum class g_proximal_type { L1GProximal, TFGProximal, Indicator };
 const std::map<std::string, algo_distribution> algo_distribution_string = {
     {"none", algo_distribution::serial},
     {"serial-equivalent", algo_distribution::mpi_serial},
     {"random-updates", algo_distribution::mpi_random_updates},
     {"fully-distributed", algo_distribution::mpi_distributed}};
-const std::map<std::string, g_proximal_type> g_proximal_type_string = {
-    {"l1", g_proximal_type::L1GProximal}, {"learned", g_proximal_type::TFGProximal}};
 
 //! return chosen algorithm given parameters
 template <class Algorithm, class... ARGS>
@@ -63,12 +60,13 @@ padmm_factory(const algo_distribution dist,
               const bool tight_frame = false, const t_real relative_variation = 1e-3,
               const t_real l1_proximal_tolerance = 1e-2,
               const t_uint maximum_proximal_iterations = 50,
-              const t_real residual_tolerance_scaling = 1, const t_real op_norm = 1) {
+              const t_real residual_tolerance_scaling = 1) {
   typedef typename Algorithm::Scalar t_scalar;
   if (sara_size > 1 and tight_frame)
     throw std::runtime_error(
         "l1 proximal not consistent: You say you are using a tight frame, but you have more than "
         "one wavelet basis.");
+  PURIFY_INFO("Constructing PADMM algorithm");
   auto epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size())) * sigma;
   auto padmm = std::make_shared<Algorithm>(uv_data.vis);
   padmm->itermax(max_iterations)
@@ -80,7 +78,6 @@ padmm_factory(const algo_distribution dist,
       .l1_proximal_positivity_constraint(positive_constraint)
       .l1_proximal_real_constraint(real_constraint)
       .lagrange_update_scale(0.9)
-      .nu(op_norm * op_norm)
       .Psi(*wavelets)
       .Phi(*measurements);
 #ifdef PURIFY_MPI
@@ -90,10 +87,11 @@ padmm_factory(const algo_distribution dist,
   switch (dist) {
   case (algo_distribution::serial):
     padmm
-        ->gamma((wavelets->adjoint() * (measurements->adjoint() * uv_data.vis).eval())
-                    .cwiseAbs()
-                    .maxCoeff() *
-                1e-3)
+        ->regulariser_strength(
+            (wavelets->adjoint() * (measurements->adjoint() * uv_data.vis).eval())
+                .cwiseAbs()
+                .maxCoeff() *
+            1e-3)
         .l2ball_proximal_epsilon(epsilon)
         .residual_tolerance(epsilon * residual_tolerance_scaling);
     return padmm;
@@ -132,8 +130,8 @@ padmm_factory(const algo_distribution dist,
   std::weak_ptr<Algorithm> const padmm_weak(padmm);
   // set epsilon
   padmm->residual_tolerance(epsilon * residual_tolerance_scaling).l2ball_proximal_epsilon(epsilon);
-  // set gamma
-  padmm->gamma(comm.all_reduce(
+  // set regulariser_strength
+  padmm->regulariser_strength(comm.all_reduce(
       utilities::step_size<Vector<t_complex>>(uv_data.vis, measurements, wavelets, sara_size) *
           1e-3,
       MPI_MAX));
@@ -163,29 +161,29 @@ fb_factory(const algo_distribution dist,
            const bool real_constraint = true, const bool positive_constraint = true,
            const bool tight_frame = false, const t_real relative_variation = 1e-3,
            const t_real l1_proximal_tolerance = 1e-2, const t_uint maximum_proximal_iterations = 50,
-           const t_real op_norm = 1, const std::string model_path = "",
-           const g_proximal_type g_proximal = g_proximal_type::L1GProximal,
+           const std::string model_path = "",
+           const nondiff_func_type g_proximal = nondiff_func_type::L1Norm,
            std::shared_ptr<DifferentiableFunc<typename Algorithm::Scalar>> f_function = nullptr) {
   typedef typename Algorithm::Scalar t_scalar;
   if (sara_size > 1 and tight_frame)
     throw std::runtime_error(
         "l1 proximal not consistent: You say you are using a tight frame, but you have more than "
         "one wavelet basis.");
+  PURIFY_INFO("Constructing Forward Backward algorithm");
   auto fb = std::make_shared<Algorithm>(uv_data.vis);
   fb->itermax(max_iterations)
-      .gamma(reg_parameter)
+      .regulariser_strength(reg_parameter)
       .sigma(sigma * std::sqrt(2))
-      .beta(step_size * std::sqrt(2))
+      .step_size(step_size * std::sqrt(2))
       .relative_variation(relative_variation)
       .tight_frame(tight_frame)
-      .nu(op_norm * op_norm)
       .Phi(*measurements);
 
   if (f_function) fb->f_function(f_function);  // only override f_function default if non-null
   std::shared_ptr<NonDifferentiableFunc<t_scalar>> g;
 
   switch (g_proximal) {
-  case (g_proximal_type::L1GProximal): {
+  case (nondiff_func_type::L1Norm): {
     // Create a shared pointer to an instance of the L1GProximal class
     // and set its properties
     auto l1_gp = std::make_shared<sopt::algorithm::L1GProximal<t_scalar>>(false);
@@ -205,7 +203,7 @@ fb_factory(const algo_distribution dist,
     g = l1_gp;
     break;
   }
-  case (g_proximal_type::TFGProximal): {
+  case (nondiff_func_type::Denoiser): {
 #ifdef PURIFY_ONNXRT
     // Create a shared pointer to an instance of the TFGProximal class
     g = std::make_shared<sopt::algorithm::TFGProximal<t_scalar>>(model_path);
@@ -215,8 +213,9 @@ fb_factory(const algo_distribution dist,
         "Type TFGProximal not recognized because purify was built with onnxrt=off");
 #endif
   }
-  case (g_proximal_type::Indicator): {
-    g = std::make_shared<RealIndicator<t_scalar>>();
+
+  case (nondiff_func_type::RealIndicator): {
+    g = std::make_shared<sopt::algorithm::RealIndicator<t_scalar>>();
     break;
   }
   default: {
@@ -261,9 +260,9 @@ primaldual_factory(
     const utilities::vis_params &uv_data, const t_real sigma, const t_uint imsizey,
     const t_uint imsizex, const t_uint sara_size, const t_uint max_iterations = 500,
     const bool real_constraint = true, const bool positive_constraint = true,
-    const t_real relative_variation = 1e-3, const t_real residual_tolerance_scaling = 1,
-    const t_real op_norm = 1) {
+    const t_real relative_variation = 1e-3, const t_real residual_tolerance_scaling = 1) {
   typedef typename Algorithm::Scalar t_scalar;
+  PURIFY_INFO("Constructing Primal Dual algorithm");
   auto epsilon = std::sqrt(2 * uv_data.size() + 2 * std::sqrt(4 * uv_data.size())) * sigma;
   auto primaldual = std::make_shared<Algorithm>(uv_data.vis);
   primaldual->itermax(max_iterations)
@@ -272,7 +271,7 @@ primaldual_factory(
       .positivity_constraint(positive_constraint)
       .Psi(*wavelets)
       .Phi(*measurements)
-      .tau(0.5 / (op_norm * op_norm + 1))
+      .tau(0.5 / (measurements->sq_norm() + 1))
       .xi(1.)
       .nu(op_norm * op_norm)
       .sigma(1.);
@@ -283,10 +282,11 @@ primaldual_factory(
   switch (dist) {
   case (algo_distribution::serial): {
     primaldual
-        ->gamma((wavelets->adjoint() * (measurements->adjoint() * uv_data.vis).eval())
-                    .cwiseAbs()
-                    .maxCoeff() *
-                1e-3)
+        ->regulariser_strength(
+            (wavelets->adjoint() * (measurements->adjoint() * uv_data.vis).eval())
+                .cwiseAbs()
+                .maxCoeff() *
+            1e-3)
         .l2ball_proximal_epsilon(epsilon)
         .residual_tolerance(epsilon * residual_tolerance_scaling);
     return primaldual;
@@ -346,8 +346,8 @@ primaldual_factory(
   // set epsilon
   primaldual->residual_tolerance(epsilon * residual_tolerance_scaling)
       .l2ball_proximal_epsilon(epsilon);
-  // set gamma
-  primaldual->gamma(comm.all_reduce(
+  // set regulariser_strength
+  primaldual->regulariser_strength(comm.all_reduce(
       utilities::step_size<Vector<t_complex>>(uv_data.vis, measurements, wavelets, sara_size) *
           1e-3,
       MPI_MAX));

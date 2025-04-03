@@ -24,7 +24,6 @@ int main(int nargs, char const **args) {
   }
 
   using namespace purify;
-  using namespace purify::notinstalled;
   sopt::logging::set_level("debug");
   purify::logging::set_level("debug");
 
@@ -95,7 +94,7 @@ int main(int nargs, char const **args) {
   Vector<t_complex> initial_estimate = Vector<t_complex>::Zero(dimage.size());
 
   auto const epsilon = utilities::calculate_l2_radius(uv_data.vis.size(), sigma);
-  auto const purify_gamma =
+  auto const purify_regulariser_strength =
       (Psi.adjoint() * (measurements_transform.adjoint() * uv_data.vis).eval()).real().maxCoeff() *
       1e-3;
   t_int iters = 0;
@@ -105,9 +104,9 @@ int main(int nargs, char const **args) {
   };
   PURIFY_HIGH_LOG("Starting sopt!");
   PURIFY_MEDIUM_LOG("Epsilon {}", epsilon);
-  PURIFY_MEDIUM_LOG("Gamma {}", purify_gamma);
+  PURIFY_MEDIUM_LOG("Regulariser_Strength {}", purify_regulariser_strength);
   auto const padmm = sopt::algorithm::ImagingProximalADMM<t_complex>(uv_data.vis)
-                         .gamma(purify_gamma)
+                         .regulariser_strength(purify_regulariser_strength)
                          .relative_variation(1e-3)
                          .l2ball_proximal_epsilon(epsilon * 1.001)
                          .tight_frame(false)
@@ -118,12 +117,11 @@ int main(int nargs, char const **args) {
                          .l1_proximal_real_constraint(true)
                          .residual_convergence(epsilon * 1.001)
                          .lagrange_update_scale(0.9)
-                         .nu(1e0)
                          .Psi(Psi)
                          .itermax(100)
                          .is_converged(convergence_function)
                          .Phi(measurements_transform);
-  // Timing reconstructionu
+  // Timing reconstruction
 
   std::clock_t c_start = std::clock();
   auto const diagnostic = padmm();

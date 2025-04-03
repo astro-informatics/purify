@@ -119,6 +119,13 @@ void YamlParser::parseAndSetGeneralConfiguration(const YAML::Node& generalConfig
     this->source_ = purify::utilities::vis_source::measurements;
     this->measurements_ = get_vector<std::vector<std::string>>(
         generalConfigNode, {"InputOutput", "input", "measurements", "measurements_files"});
+    try {
+      this->w_term_ =
+          get<bool>(generalConfigNode, {"InputOutput", "input", "measurements", "w_term"});
+    } catch (...) {
+      PURIFY_LOW_LOG("W-term flag not set for input measurements; defaulting to true.");
+      this->w_term_ = true;
+    }
     // TODO: use the enum instead of string.
     const std::string units_measurement_str = get<std::string>(
         generalConfigNode, {"InputOutput", "input", "measurements", "measurements_units"});
@@ -222,9 +229,24 @@ void YamlParser::parseAndSetAlgorithmOptions(const YAML::Node& algorithmOptionsN
         get<t_real>(algorithmOptionsNode, {"fb", "regularisation_parameter"});
     this->dualFBVarianceConvergence_ =
         get<t_real>(algorithmOptionsNode, {"fb", "dualFBVarianceConvergence"});
-    this->gProximalType_ = factory::g_proximal_type_string.at(
-        get<std::string>(algorithmOptionsNode, {"fb", "gProximalType"}));
-    this->model_path_ = get<std::string>(algorithmOptionsNode, {"fb", "modelPath"});
+
+    this->nondiffFuncType_ = nondiff_type_string.at(
+        get<std::string>(algorithmOptionsNode, {"fb", "nonDifferentiableFunctionType"}));
+    if (this->nondiffFuncType_ == nondiff_func_type::Denoiser) {
+      this->model_path_ = get<std::string>(algorithmOptionsNode, {"fb", "modelPath"});
+    }
+
+    this->diffFuncType_ = diff_type_string.at(
+        get<std::string>(algorithmOptionsNode, {"fb", "differentiableFunctionType"}));
+    if (this->diffFuncType_ == diff_func_type::L2Norm_with_CRR) {
+      this->CRR_function_model_path_ =
+          get<std::string>(algorithmOptionsNode, {"fb", "CRR_function_model_path"});
+      this->CRR_gradient_model_path_ =
+          get<std::string>(algorithmOptionsNode, {"fb", "CRR_gradient_model_path"});
+      this->CRR_mu_ = get<t_real>(algorithmOptionsNode, {"fb", "CRR_mu"});
+      this->CRR_lambda_ = get<t_real>(algorithmOptionsNode, {"fb", "CRR_lambda"});
+    }
+
     if (this->algorithm_ == "fb_joint_map") {
       this->jmap_iters_ =
           get<t_uint>(algorithmOptionsNode, {"fb", "joint_map_estimation", "iters"});
@@ -303,7 +325,7 @@ void YamlParser::writeOutput() {
       base_file_name.substr((file_path.size() ? file_path.size() + 1 : 0), base_file_name.size());
   // Construct output directory structure and file name
   boost::filesystem::path const path(this->output_prefix_);
-  std::string const out_path = output_prefix_ + "/output_" + std::string(this->timestamp());
+  out_path = output_prefix_ + "/output_" + std::string(this->timestamp());
   mkdir_recursive(out_path);
   std::string out_filename = out_path + "/" + base_file_name + "_save.yaml";
 

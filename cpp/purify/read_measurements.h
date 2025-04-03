@@ -12,8 +12,8 @@
 
 namespace purify {
 namespace read_measurements {
-enum class format { vis, uvfits, ms };
-//! read in signle measurement file
+enum class format { vis, h5, uvfits, ms };
+//! read in single measurement file
 utilities::vis_params read_measurements(
     const std::string &name, const bool w_term = false, const stokes pol = stokes::I,
     const utilities::vis_units units = utilities::vis_units::lambda);
