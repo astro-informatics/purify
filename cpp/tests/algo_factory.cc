@@ -292,10 +292,9 @@ TEST_CASE("fb_factory_stochastic") {
 
   auto soln_flat = Vector<t_complex>::Map(solution.data(), solution.size());
   double brightness = soln_flat.real().cwiseAbs().maxCoeff();
-  SOPT_HIGH_LOG("Average intensity = {}", average_intensity);
   double mse = (soln_flat - diagnostic.x).real().squaredNorm() / solution.size();
   SOPT_HIGH_LOG("MSE = {}", mse);
-  CHECK(mse <= average_intensity * 5e-2);
+  CHECK(mse <= brightness * 5e-2);
 }
 #endif
 
