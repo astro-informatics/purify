@@ -403,7 +403,7 @@ TEST_CASE("onnx_fb_factory") {
 
   auto const fb = factory::fb_factory<sopt::algorithm::ImagingForwardBackward<t_complex>>(
       factory::algo_distribution::serial, measurements_transform, wavelets, uv_data, sigma, beta,
-      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-2, 1e-3, 50, "",
+      gamma, imsizey, imsizex, sara.size(), 1000, true, true, false, 1e-3, 1e-3, 50, "",
       nondiff_func_type::RealIndicator, diff_function);
 
   auto const diagnostic = (*fb)();
