@@ -5115,8 +5115,8 @@
       <type></type>
       <name>TEST_CASE</name>
       <anchorfile>algo__factory_8cc.html</anchorfile>
-      <anchor>a75f098a45d6096a9d4755d9dd0ccedfb</anchor>
-      <arglist>(&quot;primal_dual_factory&quot;, &quot;[!shouldfail]&quot;)</arglist>
+      <anchor>a0cb87e3296e5d74485276e3dab157ef6</anchor>
+      <arglist>(&quot;primal_dual_factory&quot;)</arglist>
     </member>
     <member kind="function">
       <type></type>
